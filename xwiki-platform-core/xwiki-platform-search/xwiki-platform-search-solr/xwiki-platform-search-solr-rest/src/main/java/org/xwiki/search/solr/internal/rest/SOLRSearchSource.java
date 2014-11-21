@@ -21,7 +21,9 @@ package org.xwiki.search.solr.internal.rest;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,25 +32,28 @@ import javax.inject.Singleton;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.LocaleUtils;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
+import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.AbstractSearchSource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
-import org.xwiki.rest.model.jaxb.SearchResults;
-import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.XWiki;
 
 /**
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M1
  */
 @Component
 @Named("solr")
@@ -58,17 +63,17 @@ public class SOLRSearchSource extends AbstractSearchSource
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
 
-    @Override
-    public List<SearchResult> search(String query, String defaultWikiName, String wikis, boolean hasProgrammingRights,
-        String orderField, String order, boolean distinct, int number, int start, Boolean withPrettyNames,
-        String className, UriInfo uriInfo) throws Exception
-    {
-        XWikiContext xwikiContext = this.xcontextProvider.get();
-        XWiki xwikiApi = new XWiki(xwikiContext.getWiki(), xwikiContext);
+    @Inject
+    protected QueryManager queryManager;
 
+    @Override
+    public List<SearchResult> search(String queryString, String defaultWikiName, String wikis,
+        boolean hasProgrammingRights, String orderField, String order, boolean distinct, int number, int start,
+        Boolean withPrettyNames, String className, UriInfo uriInfo) throws Exception
+    {
         List<SearchResult> result = new ArrayList<SearchResult>();
 
-        if (query == null) {
+        if (queryString == null) {
             return result;
         }
 
@@ -81,15 +86,83 @@ public class SOLRSearchSource extends AbstractSearchSource
             return result;
         }
 
+        Query query = this.queryManager.createQuery(queryString, SolrQueryExecutor.SOLR);
+
+        // We want only documents
+        String fq = "type:DOCUMENT";
+
+        // Additional filter for non PR users
         if (!hasProgrammingRights) {
-            query += " AND NOT space:XWiki AND NOT space:Admin AND NOT space:Panels AND NOT name:WebPreferences";
+            fq += " AND NOT space:XWiki AND NOT space:Admin AND NOT space:Panels AND NOT name:WebPreferences";
         }
 
+        query.bindValue("fq", fq);
+
+        // Order
+        if (!StringUtils.isBlank(orderField)) {
+            if ("desc".equals(order)) {
+                query.bindValue("order", orderField + " desc");
+            } else {
+                query.bindValue("order", orderField + " asc");
+            }
+        }
+
+        // Limit
+        query.setLimit(number).setOffset(start);
+
         try {
-            // TODO: search on SOLR
+            QueryResponse response = (QueryResponse) query.execute().get(0);
+
+            SolrDocumentList documents = response.getResults();
+
+            for (SolrDocument document : documents) {
+                SearchResult searchResult = this.objectFactory.createSearchResult();
+
+                searchResult.setPageFullName((String) document.get("fullname"));
+                searchResult.setTitle((String) document.get("title"));
+                searchResult.setWiki((String) document.get("wiki"));
+                searchResult.setSpace((String) document.get("space"));
+                searchResult.setPageName((String) document.get("name"));
+                searchResult.setVersion((String) document.get("version"));
+
+                searchResult.setType("page");
+                searchResult.setId(Utils.getPageId(searchResult.getWiki(), searchResult.getSpace(),
+                    searchResult.getPageName()));
+
+                searchResult.setScore(((Number) document.get("score")).floatValue());
+                searchResult.setAuthor((String) document.get("author"));
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime((Date) document.get("date"));
+                searchResult.setModified(calendar);
+
+                if (withPrettyNames) {
+                    searchResult.setAuthorName((String) document.get("author_display"));
+                }
+
+                Locale locale = LocaleUtils.toLocale((String) document.get("doclocale"));
+
+                String pageUri = null;
+                if (Locale.ROOT == locale) {
+                    pageUri =
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
+                            searchResult.getSpace(), searchResult.getPageName()).toString();
+                } else {
+                    searchResult.setLanguage(locale.toString());
+                    pageUri =
+                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, searchResult.getSpace(),
+                            searchResult.getPageName(), locale).toString();
+                }
+
+                Link pageLink = new Link();
+                pageLink.setHref(pageUri);
+                pageLink.setRel(Relations.PAGE);
+                searchResult.getLinks().add(pageLink);
+
+                result.add(searchResult);
+            }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Error performing lucene search", e);
+                "Error performing solr search", e);
         }
 
         return result;

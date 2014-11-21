@@ -30,15 +30,20 @@ import org.xwiki.rest.internal.resources.search.SearchSource;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 
-@Component("com.xpn.xwiki.plugin.lucene.internal.rest.WikisSearchQueryResourceImpl")
+/**
+ * 
+ * @version $Id$
+ * @since 6.4M1
+ */
+@Component("org.xwiki.search.solr.internal.rest.WikisSearchQueryResourceImpl")
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
     private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
         "q={lucenequery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     @Inject
-    @Named("lucene")
-    private SearchSource luceneSearch;
+    @Named("solr")
+    private SearchSource solrSearch;
 
     @Override
     public SearchResults search(String query, Integer number, Integer start, Boolean distinct, String searchWikis,
@@ -50,7 +55,7 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
                 MULTIWIKI_QUERY_TEMPLATE_INFO));
 
             searchResults.getSearchResults().addAll(
-                this.luceneSearch.search(
+                this.solrSearch.search(
                     query,
                     getXWikiContext().getWikiId(),
                     searchWikis,

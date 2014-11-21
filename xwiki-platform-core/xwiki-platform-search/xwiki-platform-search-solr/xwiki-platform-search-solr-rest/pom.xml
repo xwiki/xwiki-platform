@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-rest</artifactId>
   <name>XWiki Platform - Search - SOLR - REST</name>
@@ -52,6 +52,11 @@
       <artifactId>xwiki-platform-search-solr-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-query</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -61,8 +66,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            com/xpn/xwiki/plugin/lucene/internal/rest/LuceneSearchSource.java,
-            com/xpn/xwiki/plugin/lucene/internal/rest/WikisSearchQueryResourceImpl.java
+            org/xwiki/search/solr/internal/rest/SOLRSearchSource.java,
+            org/xwiki/search/solr/internal/rest/WikisSearchQueryResourceImpl.java
           </excludes>
         </configuration>
       </plugin>

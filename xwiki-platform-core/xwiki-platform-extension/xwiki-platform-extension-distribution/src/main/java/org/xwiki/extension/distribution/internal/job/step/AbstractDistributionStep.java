@@ -32,14 +32,14 @@ import com.xpn.xwiki.internal.template.TemplateManager;
 public abstract class AbstractDistributionStep implements DistributionStep
 {
     @Inject
-    protected TemplateManager renderer;
+    protected transient TemplateManager renderer;
 
     @Inject
-    protected Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
-
-    protected DistributionJob distributionJob;
+    protected transient Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     private final String stepId;
+
+    protected DistributionJob distributionJob;
 
     private State state;
 

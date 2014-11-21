@@ -431,7 +431,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
                     }
                 }
             };
-            String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
+            String currentWikiId = getConfig().getParameter("wiki");
             getMacroService().getMacroDescriptors(getSyntax(), currentWikiId, macroDescriptorsCallback);
         }
     }

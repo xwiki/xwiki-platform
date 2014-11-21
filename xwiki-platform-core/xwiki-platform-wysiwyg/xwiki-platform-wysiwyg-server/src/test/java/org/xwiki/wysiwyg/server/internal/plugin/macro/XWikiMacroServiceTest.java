@@ -115,8 +115,7 @@ public class XWikiMacroServiceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("xwiki");
 
-        Provider<XWikiContext> contextProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> contextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(contextProvider.get()).thenReturn(xcontext);
 
         Assert.assertSame(translatedDescriptor, mocker.getComponentUnderTest().getMacroDescriptor(macroId, syntaxId));

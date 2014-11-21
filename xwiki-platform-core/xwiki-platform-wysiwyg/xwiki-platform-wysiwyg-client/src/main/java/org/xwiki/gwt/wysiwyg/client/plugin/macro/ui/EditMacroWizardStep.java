@@ -172,7 +172,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
+        String currentWikiId = getConfig().getParameter("wiki");
         getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"), currentWikiId,
             new MacroDescriptorAsyncCallback(cb));
     }

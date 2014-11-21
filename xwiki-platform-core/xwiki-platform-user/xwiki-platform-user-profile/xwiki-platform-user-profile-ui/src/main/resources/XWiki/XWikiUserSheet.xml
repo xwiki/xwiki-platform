@@ -266,7 +266,6 @@ Object.extend(XWiki, {
 
       // History navigation through our pushed states.
       window.addEventListener('popstate', function(event) {
-        console.log('popstate fired! ' + event.state + ' ' + event.state.category);
         if (event.state &amp;&amp; event.state.category) {
           this.switchTab('vertical-menu-' + event.state.category);
         }

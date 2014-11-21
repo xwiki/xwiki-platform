@@ -80,5 +80,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used to check access rights for tree nodes. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

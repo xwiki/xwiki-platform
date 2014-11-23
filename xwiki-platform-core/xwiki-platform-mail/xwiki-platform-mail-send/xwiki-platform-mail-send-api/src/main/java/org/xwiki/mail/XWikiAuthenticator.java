@@ -39,13 +39,15 @@ public class XWikiAuthenticator extends Authenticator
     private String password;
 
     /**
-     * @param username the user name to use to authenticate against the SMTP server
-     * @param password the password to use to authenticate against the SMTP server
+     * @param configuration the configuration from which to extract the SMTP server's user name and password to use
      */
-    public XWikiAuthenticator(String username, String password)
+    public XWikiAuthenticator(MailSenderConfiguration configuration)
     {
-        this.username = username;
-        this.password = password;
+        // Note: We resolve the user name and password early since if we were doing it in #getPasswordAuthentication
+        // then it would mean having an XWikiContext set up in the Mail Sender Thread (as the Configuration requires
+        // an XWikiContext and #getPasswordAuthentication() is called indirectly in the sender thread.
+        this.username = configuration.getUsername();
+        this.password = configuration.getPassword();
     }
 
     @Override

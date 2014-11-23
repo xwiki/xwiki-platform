@@ -424,12 +424,6 @@
               <method>void getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
               <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/XWikiAuthenticator</className>
-              <method>XWikiAuthenticator(org.xwiki.mail.MailSenderConfiguration)</method>
-              <justification>Young API. Change required to fix sending mail with authenticating SMTP servers</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

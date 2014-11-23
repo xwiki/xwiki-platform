@@ -227,7 +227,7 @@ public class MailSenderScriptService implements ScriptService
         Session session;
         if (this.configuration.usesAuthentication()) {
             session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
+                new XWikiAuthenticator(this.configuration.getUsername(), this.configuration.getPassword()));
         } else {
             session = Session.getInstance(this.configuration.getAllProperties());
         }

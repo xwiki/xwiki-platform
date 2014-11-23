@@ -45,7 +45,6 @@ import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
@@ -135,8 +134,7 @@ public class JavaIntegrationTest
     public void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
@@ -175,8 +173,7 @@ public class JavaIntegrationTest
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);

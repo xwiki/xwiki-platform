@@ -2962,7 +2962,8 @@ public class XWiki implements EventListener
         // Let's now send the message
         try {
             Session session =
-                Session.getInstance(configuration.getAllProperties(), new XWikiAuthenticator(configuration));
+                Session.getInstance(configuration.getAllProperties(), new XWikiAuthenticator(
+                    configuration.getUsername(), configuration.getPassword()));
             InputStream is = new ByteArrayInputStream(content.getBytes());
             MimeMessage message = new MimeMessage(session, is);
             message.setFrom(new InternetAddress(sender));

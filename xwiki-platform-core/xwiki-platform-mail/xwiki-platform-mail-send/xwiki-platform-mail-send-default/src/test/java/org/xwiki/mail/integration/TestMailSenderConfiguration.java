@@ -36,11 +36,14 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
 
     private String password;
 
-    public TestMailSenderConfiguration(int port, String username, String password)
+    private Properties additionalProperties;
+
+    public TestMailSenderConfiguration(int port, String username, String password, Properties additionalProperties)
     {
         this.port = port;
         this.username = username;
         this.password = password;
+        this.additionalProperties = additionalProperties;
     }
 
     @Override
@@ -76,6 +79,6 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     @Override
     public Properties getAdditionalProperties()
     {
-        return new Properties();
+        return this.additionalProperties;
     }
 }

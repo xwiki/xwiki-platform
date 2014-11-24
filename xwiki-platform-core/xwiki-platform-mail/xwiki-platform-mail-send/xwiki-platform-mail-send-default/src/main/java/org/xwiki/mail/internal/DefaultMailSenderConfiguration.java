@@ -68,7 +68,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     /**
      * Java Mail SMTP property for the from email address.
      */
-    public static final String JAVAMAIL_FROM = "mail.smtp.from";
+    public static final String JAVAMAIL_SMTP_FROM = "mail.smtp.from";
+
+    /**
+     * Java Mail SMTP property for specifying that we are authenticating.
+     */
+    public static final String JAVAMAIL_SMTP_AUTH = "mail.smtp.auth";
 
     /**
      * Prefix for configuration keys for the Mail Sending module.
@@ -167,9 +172,17 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         addProperty(properties, JAVAMAIL_TRANSPORT_PROTOCOL, "smtp");
         addProperty(properties, JAVAMAIL_SMTP_HOST, getHost());
         addProperty(properties, JAVAMAIL_SMTP_USERNAME, getUsername());
-        addProperty(properties, JAVAMAIL_FROM, getFromAddress());
+        addProperty(properties, JAVAMAIL_SMTP_FROM, getFromAddress());
         addProperty(properties, JAVAMAIL_SMTP_PORT, Integer.toString(getPort()));
+
+        // If a username and a password have been provided consider we're authenticating against the SMTP server
+        if (usesAuthentication()) {
+            properties.put(JAVAMAIL_SMTP_AUTH, "true");
+        }
+
+        // Add user-specified mail properties
         properties.putAll(getAdditionalProperties());
+
         return properties;
     }
 

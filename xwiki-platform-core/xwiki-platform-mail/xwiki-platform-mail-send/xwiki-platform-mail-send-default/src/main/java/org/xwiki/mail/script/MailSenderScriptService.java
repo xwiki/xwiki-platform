@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -77,7 +78,7 @@ public class MailSenderScriptService implements ScriptService
 
     @Inject
     @Named("context")
-    private ComponentManager componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * Provides access to the current context.
@@ -112,7 +113,7 @@ public class MailSenderScriptService implements ScriptService
             }
 
             messageWrapper = new MimeMessageWrapper(extendedMimeMessage, session, this.mailSender, this.execution,
-                this.componentManager);
+                this.componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -128,13 +129,14 @@ public class MailSenderScriptService implements ScriptService
         MimeMessageFactory factory;
 
         // Step 1: Look for a secure version first
+        ComponentManager componentManager = this.componentManagerProvider.get();
         try {
-            factory = this.componentManager.getInstance(
+            factory = componentManager.getInstance(
                 new DefaultParameterizedType(null, MimeMessageFactory.class, type),
                     String.format("%s/secure", hint));
         } catch (ComponentLookupException e) {
             // Step 2: Look for a non secure version if a secure one doesn't exist...
-            factory = this.componentManager.getInstance(
+            factory = componentManager.getInstance(
                 new DefaultParameterizedType(null, MimeMessageFactory.class, type, null), hint);
         }
 
@@ -194,8 +196,8 @@ public class MailSenderScriptService implements ScriptService
     {
         Session session = createSession();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
-        MimeMessageWrapper messageWrapper =
-            new MimeMessageWrapper(message, session, this.mailSender, this.execution, this.componentManager);
+        MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.mailSender, this.execution,
+            this.componentManagerProvider.get());
 
         try {
             if (from != null) {

@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.integration;
 
+import java.util.Properties;
+
 import org.xwiki.mail.internal.DefaultMailSenderConfiguration;
 
 /**
@@ -28,6 +30,19 @@ import org.xwiki.mail.internal.DefaultMailSenderConfiguration;
  */
 public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
 {
+    private int port;
+
+    private String username;
+
+    private String password;
+
+    public TestMailSenderConfiguration(int port, String username, String password)
+    {
+        this.port = port;
+        this.username = username;
+        this.password = password;
+    }
+
     @Override
     public String getHost()
     {
@@ -37,12 +52,30 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     @Override
     public int getPort()
     {
-        return 3025;
+        return this.port;
     }
 
     @Override
     public String getFromAddress()
     {
         return "mary@doe.com";
+    }
+
+    @Override
+    public String getUsername()
+    {
+        return this.username;
+    }
+
+    @Override
+    public String getPassword()
+    {
+        return this.password;
+    }
+
+    @Override
+    public Properties getAdditionalProperties()
+    {
+        return new Properties();
     }
 }

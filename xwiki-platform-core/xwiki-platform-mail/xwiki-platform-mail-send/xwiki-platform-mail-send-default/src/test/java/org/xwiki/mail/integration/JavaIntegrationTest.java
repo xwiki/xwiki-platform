@@ -41,16 +41,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.mail.internal.DefaultMailSenderThread;
+import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
 /**
@@ -59,13 +64,21 @@ import com.icegreen.greenmail.util.ServerSetupTest;
  * @version $Id$
  * @since 6.1M2
  */
-@AllComponents
+@ComponentList({
+    DefaultMimeBodyPartFactory.class,
+    HTMLMimeBodyPartFactory.class,
+    AttachmentMimeBodyPartFactory.class,
+    StandardEnvironment.class,
+    DefaultMailSender.class,
+    DefaultMailSenderThread.class
+})
 public class JavaIntegrationTest
 {
     @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTP);
 
-    private GreenMail mail;
+    @Rule
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
     private MailSenderConfiguration configuration;
 
@@ -91,27 +104,16 @@ public class JavaIntegrationTest
         }
     };
 
-    @Before
-    public void startMail()
+    @BeforeComponent
+    public void registerConfiguration() throws Exception
     {
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
-    }
-
-    @After
-    public void stopMail()
-    {
-        if (this.mail != null) {
-            this.mail.stop();
-        }
+        this.configuration = new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null);
+        this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
     }
 
     @Before
     public void initialize() throws Exception
     {
-        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
-
-        this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.htmlBodyPartFactory = this.componentManager.getInstance(

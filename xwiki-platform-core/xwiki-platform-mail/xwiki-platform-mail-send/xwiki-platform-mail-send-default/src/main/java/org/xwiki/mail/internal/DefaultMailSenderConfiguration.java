@@ -180,7 +180,10 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
             properties.put(JAVAMAIL_SMTP_AUTH, "true");
         }
 
-        // Add user-specified mail properties
+        // Add user-specified mail properties.
+        // Note: We're only supporting SMTP (and not SMTPS) at the moment, which means that for sending emails to a
+        // SMTP server requiring TLS the user will need to pass the "mail.smtp.starttls.enable=true" property and use
+        // the proper port for TLS (587 for Gmail for example, while port 465 is used for SMTPS/SSL).
         properties.putAll(getAdditionalProperties());
 
         return properties;

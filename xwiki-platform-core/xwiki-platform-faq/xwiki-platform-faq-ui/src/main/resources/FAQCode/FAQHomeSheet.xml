@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -61,13 +60,11 @@
     {{/box}}
   #end
 
-  (% class="centered" %) (((
-
-  (% class="faq-link search-faq" %)(((
-    $services.localization.render('platform.faq.search.title')
+  (% class="faq-link search-faq box" %)(((
+    === #if($services.icon)$services.icon.render('find')#end $services.localization.render('platform.faq.search.title') ===
     (((
     {{html}}
-    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')"&gt;
+    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')" class="xformInline"&gt;
       &lt;div&gt;
       ## Lucene search needs the $request.space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
@@ -84,8 +81,8 @@
     )))
   )))
 
-  (% class="faq-link add-faq" %)(((
-    $services.localization.render('platform.faq.create.title')
+  (% class="faq-link add-faq box" %)(((
+    === #if($services.icon)$services.icon.render('add')#end $services.localization.render('platform.faq.create.title') ===
 
     (((
     {{html}}
@@ -94,7 +91,7 @@
       #set($register = ${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))})
       $services.localization.render('platform.faq.need', ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
     #else
-      &lt;form action="" id="newfaq"&gt;
+      &lt;form action="" id="newfaq" class="xformInline"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
           &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
@@ -108,8 +105,6 @@
     #end
     {{/html}}
     )))
-  )))
-
   )))
 
   (% class="clearfloats" %)((()))(%%)

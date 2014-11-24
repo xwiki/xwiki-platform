@@ -53,13 +53,13 @@ public class SchedulerHomePage extends ViewPage
 
     public SchedulerPage clickJobActionView(String jobName)
     {
-        clickAction(jobName, "view");
+        clickAction(jobName, "View");
         return new SchedulerPage();
     }
 
     public SchedulerEditPage clickJobActionEdit(String jobName)
     {
-        clickAction(jobName, "edit");
+        clickAction(jobName, "Edit");
 
         // Make sure we wait for the WYSIWYG fields to be loaded since otherwise they'll steal the focus and if we
         // start typing in other fields before they're loaded what we type will end up in the wrong fields...
@@ -71,33 +71,33 @@ public class SchedulerHomePage extends ViewPage
 
     public ConfirmationPage clickJobActionDelete(String jobName)
     {
-        clickAction(jobName, "delete");
+        clickAction(jobName, "Delete");
         return new ConfirmationPage();
     }
 
     public void clickJobActionScheduler(String jobName)
     {
-        clickAction(jobName, "schedule");
+        clickAction(jobName, "Schedule");
     }
 
     public void clickJobActionTrigger(String jobName)
     {
-        clickAction(jobName, "trigger");
+        clickAction(jobName, "Trigger");
     }
 
     public void clickJobActionPause(String jobName)
     {
-        clickAction(jobName, "pause");
+        clickAction(jobName, "Pause");
     }
 
     public void clickJobActionResume(String jobName)
     {
-        clickAction(jobName, "resume");
+        clickAction(jobName, "Resume");
     }
 
     public void clickJobActionUnschedule(String jobName)
     {
-        clickAction(jobName, "unschedule");
+        clickAction(jobName, "Unschedule");
     }
 
     /**

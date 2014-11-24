@@ -178,7 +178,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     {
         if (this.renderer != null) {
             try {
-                this.suExecutor.call(new Callable<Block>()
+                return this.suExecutor.call(new Callable<Block>()
                 {
                     @Override
                     public Block call() throws Exception

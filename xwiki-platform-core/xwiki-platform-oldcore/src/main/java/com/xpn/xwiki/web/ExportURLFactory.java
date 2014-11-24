@@ -45,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 /**
  * Handle URL generation in rendered wiki pages. This implementation makes sure URL will be local URL for exported
@@ -519,7 +518,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             return "";
         }
 
-        String path = Util.escapeURL(url.toString());
+        String path = url.toString();
 
         if (url.getProtocol().equals("file")) {
             path = path.substring("file://".length());

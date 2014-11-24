@@ -39,7 +39,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
@@ -128,7 +127,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         if (url == null) {
             return "";
         }
-        return Util.escapeURL(url.toString());
+        return url.toString();
     }
 
     /**

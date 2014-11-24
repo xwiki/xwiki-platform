@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Properties;
 
 import javax.mail.BodyPart;
 import javax.mail.internet.MimeMessage;
@@ -79,8 +80,8 @@ public class ScriptingIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
-        MailSenderConfiguration configuration =
-            new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null);
+        MailSenderConfiguration configuration = new TestMailSenderConfiguration(
+            this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
     }
 

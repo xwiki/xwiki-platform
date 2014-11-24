@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
@@ -107,7 +108,8 @@ public class JavaIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
-        this.configuration = new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null);
+        this.configuration = new TestMailSenderConfiguration(
+            this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
     }
 
@@ -142,7 +144,7 @@ public class JavaIntegrationTest
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
-        // Add HTML in the body
+        // Add text in the body
         multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);

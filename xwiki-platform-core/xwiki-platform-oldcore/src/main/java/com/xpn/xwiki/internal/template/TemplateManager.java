@@ -347,20 +347,24 @@ public class TemplateManager
 
         /**
          * Made public to be seen as bean property.
+         * 
+         * @since 6.3.1, 6.4M1
          */
         @SuppressWarnings("unused")
-        public boolean isPriviledged()
+        public boolean isPrivileged()
         {
             return SUPERADMIN_REFERENCE.equals(getAuthorReference());
         }
 
         /**
          * Made public to be seen as bean property.
+         * 
+         * @since 6.3.1, 6.4M1
          */
         @SuppressWarnings("unused")
-        public void setPriviledged(boolean priviledged)
+        public void setPrivileged(boolean privileged)
         {
-            if (priviledged) {
+            if (privileged) {
                 setAuthorReference(SUPERADMIN_REFERENCE);
             }
         }

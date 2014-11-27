@@ -71,6 +71,9 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #if("$!request.title" != '')
   <input type="hidden" name="title" value="$escapetool.xml($!request.title)" />
 #end
+#if("$!request.xhidden" != '')
+  <input type="hidden" name="xhidden" value="$escapetool.xml($!request.xhidden)" />
+#end
 ## ----------------------------
 ## Display the rendered content
 ## ----------------------------

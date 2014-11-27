@@ -35,7 +35,7 @@ public class FAQHomePage extends ViewPage
     @FindBy(name = "question")
     private WebElement faqNameField;
 
-    @FindBy(xpath = "//div[@class = 'faq-link add-faq']//input[@class = 'button']")
+    @FindBy(xpath = "//div[contains(@class, 'faq-link add-faq')]//input[contains(@class, 'button')]")
     private WebElement faqNameButton;
 
     /**

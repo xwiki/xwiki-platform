@@ -113,5 +113,6 @@
   #else
     This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
   #end
+#set($docextras=[])
 {{/velocity}}</content>
 </xwikidoc>

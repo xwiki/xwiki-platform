@@ -117,7 +117,12 @@ public class SOLRSearchSource extends AbstractSearchSource
             }
         }
 
-        // TODO: locale filtering ?
+        // Supported locales
+        XWikiContext xcontext = this.xcontextProvider.get();
+        query.bindValue("xwiki.supportedLocales",
+            StringUtils.join(xcontext.getWiki().getAvailableLocales(xcontext), ','));
+
+        // TODO: current locale filtering ?
 
         query.bindValue("fq", fq);
 

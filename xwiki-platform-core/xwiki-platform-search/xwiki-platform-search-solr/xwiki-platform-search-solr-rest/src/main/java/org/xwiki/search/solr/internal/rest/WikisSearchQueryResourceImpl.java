@@ -39,7 +39,7 @@ import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
     private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
-        "q={lucenequery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
+        "q={solrquery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     @Inject
     @Named("solr")

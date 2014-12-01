@@ -30,8 +30,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1397125381000</date>
-  <contentUpdateDate>1397125381000</contentUpdateDate>
+  <date>1417442821000</date>
+  <contentUpdateDate>1417442821000</contentUpdateDate>
   <version>1.1</version>
   <title>Filter streams</title>
   <comment/>
@@ -56,7 +56,7 @@
 #set($inputProperties = {})
 #foreach($parameterName in $request.parameterNames)
   #if ($parameterName.startsWith('filter_input_properties_descriptor_'))
-    #set($propertyName = $parameterName.substring(39))
+    #set($propertyName = $parameterName.substring(35))
     #if ($request.getParameter($parameterName) &amp;&amp; $request.getParameter($parameterName) != '')
       #set($void = $inputProperties.put($propertyName, $request.getParameter($parameterName)))
     #end
@@ -71,7 +71,7 @@
 #set($outputProperties = {})
 #foreach($parameterName in $request.parameterNames)
   #if ($parameterName.startsWith('filter_output_properties_descriptor_'))
-    #set($propertyName = $parameterName.substring(40))
+    #set($propertyName = $parameterName.substring(36))
     #if ($request.getParameter($parameterName) &amp;&amp; $request.getParameter($parameterName) != '')
       #set($void = $outputProperties.put($propertyName, $request.getParameter($parameterName)))
     #end
@@ -240,7 +240,7 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>

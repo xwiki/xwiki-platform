@@ -88,22 +88,51 @@ public class SOLRSearchSource extends AbstractSearchSource
 
         Query query = this.queryManager.createQuery(queryString, SolrQueryExecutor.SOLR);
 
+        List<String> fq = new ArrayList<String>();
+
         // We want only documents
-        String fq = "type:DOCUMENT";
+        fq.add("{!tag=type}type:(\"DOCUMENT\")");
 
         // Additional filter for non PR users
         if (!hasProgrammingRights) {
-            fq += " AND NOT space:XWiki AND NOT space:Admin AND NOT space:Panels AND NOT name:WebPreferences";
+            fq.add("{!tag=hidden}hidden:(false)");
         }
 
+        // Wikis
+        if (StringUtils.isNotBlank(wikis)) {
+            String[] strings = StringUtils.split(wikis, ',');
+            if (strings.length == 1) {
+                fq.add("{!tag=wiki}wiki:(\"" + strings[0] + "\")");
+            } else if (strings.length > 1) {
+                StringBuilder builder = new StringBuilder();
+                for (String str : strings) {
+                    if (builder.length() > 0) {
+                        builder.append(" OR ");
+                    }
+                    builder.append('\'');
+                    builder.append(str);
+                    builder.append('\'');
+                }
+                fq.add("{!tag=wiki}wiki:(" + builder + ")");
+            }
+        }
+
+        // TODO: locale filtering ?
+
         query.bindValue("fq", fq);
+
+        // Boost
+        // FIXME: take it from configuration
+        query.bindValue("qf",
+            "title^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
+                + "author_display^0.08 creator_display^0.08 " + "comment^0.016 attauthor_display^0.016 space^0.016");
 
         // Order
         if (!StringUtils.isBlank(orderField)) {
             if ("desc".equals(order)) {
-                query.bindValue("order", orderField + " desc");
+                query.bindValue("sort", orderField + " desc");
             } else {
-                query.bindValue("order", orderField + " asc");
+                query.bindValue("sort", orderField + " asc");
             }
         }
 

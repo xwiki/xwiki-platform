@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriInfo;
 
@@ -48,7 +47,6 @@ import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -60,9 +58,6 @@ import com.xpn.xwiki.XWikiException;
 @Singleton
 public class SOLRSearchSource extends AbstractSearchSource
 {
-    @Inject
-    protected Provider<XWikiContext> xcontextProvider;
-
     @Inject
     protected QueryManager queryManager;
 
@@ -116,11 +111,6 @@ public class SOLRSearchSource extends AbstractSearchSource
                 fq.add("{!tag=wiki}wiki:(" + builder + ")");
             }
         }
-
-        // Supported locales
-        XWikiContext xcontext = this.xcontextProvider.get();
-        query.bindValue("xwiki.supportedLocales",
-            StringUtils.join(xcontext.getWiki().getAvailableLocales(xcontext), ','));
 
         // TODO: current locale filtering ?
 

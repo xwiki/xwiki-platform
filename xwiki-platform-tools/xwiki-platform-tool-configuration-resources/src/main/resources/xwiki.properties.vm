@@ -684,7 +684,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.password = somepassword
 
 #-# [Since 6.1M2]
-#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# Extra Java Mail options (see https://javamail.java.net/nonav/docs/api/).
 #-# This configuration property can be overridden in XWikiPreferences objects, by using the "javamail_extra_props"
 #-# property name.
 #-# By default the following properties are set automatically:

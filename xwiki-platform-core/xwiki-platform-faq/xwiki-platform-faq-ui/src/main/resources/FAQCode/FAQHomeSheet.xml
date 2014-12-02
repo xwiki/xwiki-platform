@@ -39,6 +39,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
 #set($faqHome = $doc.getObject("FAQCode.FAQHomeClass"))
 #if($faqHome)
   $doc.use("FAQCode.FAQHomeClass")

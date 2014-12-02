@@ -195,7 +195,6 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Get the document used to test programming right.
      *
-     * @param right the right being checked.
      * @return the current sdoc or doc document reference, null if no doc available.
      */
     private XWikiDocument getProgrammingDocument()

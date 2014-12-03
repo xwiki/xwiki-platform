@@ -701,7 +701,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Defines which authorization checks are done when sending mails using the Mail Sender Script Service.
 #-# Example of valid values:
 #-# - "programmingrights": the current document must have Programming Rights
-#-# - "alwaysallow": no check is performed. This is useful when setting up XWiki in a secure environment where we
+#-# - "alwaysallow": no check is performed. This is useful when running XWiki in a secure environment where we
 #-#   want to allow all users to be able to send emails through the Script Service.
 #-# The default is:
 # mail.sender.scriptServiceCheckerHint = programmingrights

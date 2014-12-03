@@ -329,8 +329,11 @@ zoom_out = search-minus</content>
       <cache>long</cache>
     </property>
     <property>
-      <code>// Reload stylesheet on document ready if IE8
+      <code>// IE8 loads the font *after* the rendering of the page so it does not display the icon correctly.
+// To fix this, we reload the stylesheet when we receive the 'document ready' event.
+// Although, it does not solve everything (see http://jira.xwiki.org/browse/XWIKI-10813).
 require(['jquery'], function($) {
+  // This hack concerns IE8 only
   if (navigator.userAgent.indexOf('MSIE 8.0') &gt; -1) {
     $(function() {
       var link = $("link[href*='IconThemes/FontAwesome']");

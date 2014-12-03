@@ -160,6 +160,7 @@ public class JavaIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
+        assertEquals(3, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
         assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 

@@ -81,4 +81,10 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     {
         return this.additionalProperties;
     }
+
+    @Override
+    public String getScriptServicePermissionCheckerHint()
+    {
+        return "test";
+    }
 }

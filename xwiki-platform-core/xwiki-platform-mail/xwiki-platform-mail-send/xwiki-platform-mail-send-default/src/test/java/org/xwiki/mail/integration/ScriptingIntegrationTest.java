@@ -20,6 +20,7 @@
 package org.xwiki.mail.integration;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -45,6 +46,7 @@ import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
+import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -83,6 +85,10 @@ public class ScriptingIntegrationTest
         MailSenderConfiguration configuration = new TestMailSenderConfiguration(
             this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
+
+        // Register a test Permission Checker that allows sending mails
+        ScriptServicePermissionChecker checker = mock(ScriptServicePermissionChecker.class);
+        this.componentManager.registerComponent(ScriptServicePermissionChecker.class, "test", checker);
     }
 
     @Before
@@ -122,6 +128,7 @@ public class ScriptingIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
+        assertEquals(3, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
         assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 
@@ -180,6 +187,7 @@ public class ScriptingIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
+        assertEquals(1, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
         assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 

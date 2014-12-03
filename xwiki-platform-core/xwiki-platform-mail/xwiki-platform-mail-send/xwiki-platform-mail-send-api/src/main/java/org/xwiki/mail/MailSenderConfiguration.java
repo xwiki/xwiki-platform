@@ -55,7 +55,8 @@ public interface MailSenderConfiguration
     String getPassword();
 
     /**
-     * @return the email address sending the email
+     * @return the default email address to use when sending the email. This is optional if the user of the API sets
+     *         it, and if the user sets it, then it overrides this default value
      */
     String getFromAddress();
 
@@ -79,4 +80,12 @@ public interface MailSenderConfiguration
      * @return if true then the SMTP server requires authentication
      */
     boolean usesAuthentication();
+
+    /**
+     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check if a
+     *         mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
+     *         "alwaysallow", "programmingrights".
+     * @since 6.4M2
+     */
+    String getScriptServicePermissionCheckerHint();
 }

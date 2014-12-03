@@ -430,6 +430,24 @@
               <method>void getMacroDescriptors(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
               <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailSenderConfiguration</className>
+              <method>java.lang.String getScriptServicePermissionCheckerHint()</method>
+              <justification>Young API, adding method to check permissions for sending mail.</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
+              <justification>Young API, this method should not have been made public.</justification>
+            </difference>
+            <difference>
+              <differenceType>7009</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
+              <justification>Young API, this method should not have been made public.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

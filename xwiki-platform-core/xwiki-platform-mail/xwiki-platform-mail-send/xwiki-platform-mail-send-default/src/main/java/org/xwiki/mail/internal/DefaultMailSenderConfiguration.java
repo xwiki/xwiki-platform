@@ -97,7 +97,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getHost()
     {
         return this.documentsSource.getProperty("smtp_server",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
     }
 
     @Override
@@ -122,14 +122,14 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getUsername()
     {
         return this.documentsSource.getProperty("smtp_server_username",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
     }
 
     @Override
     public String getPassword()
     {
         return this.documentsSource.getProperty("smtp_server_password",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
     }
 
     @Override
@@ -200,5 +200,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public boolean usesAuthentication()
     {
         return !StringUtils.isEmpty(getUsername()) && !StringUtils.isEmpty(getPassword());
+    }
+
+    @Override
+    public String getScriptServicePermissionCheckerHint()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + "scriptServiceCheckerHint", "programmingrights");
     }
 }

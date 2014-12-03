@@ -150,6 +150,7 @@ public class AuthenticatingIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
+        assertEquals(1, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
         assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 

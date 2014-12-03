@@ -37,6 +37,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailResultListener;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
@@ -58,6 +59,8 @@ public class MimeMessageWrapper
 
     private Execution execution;
 
+    private MailSenderConfiguration configuration;
+
     private DefaultMailResultListener listener;
 
     private Session session;
@@ -69,15 +72,20 @@ public class MimeMessageWrapper
      * @param session the JavaMail session used to send the mail
      * @param mailSender the component to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
+     * @param configuration the mail sender configuration component
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
-    public MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
-        ComponentManager componentManager)
+    // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
+    // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
+    // of it!
+    MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
+        MailSenderConfiguration configuration, ComponentManager componentManager)
     {
         this.message = message;
         this.session = session;
         this.mailSender = mailSender;
         this.execution = execution;
+        this.configuration = configuration;
         this.componentManager = componentManager;
         this.listener = new DefaultMailResultListener();
     }
@@ -136,6 +144,7 @@ public class MimeMessageWrapper
     public void send()
     {
         try {
+            checkPermissions();
             this.mailSender.send(getMessage(), this.session);
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
@@ -149,8 +158,20 @@ public class MimeMessageWrapper
      */
     public void sendAsynchronously()
     {
+        try {
+            checkPermissions();
+        } catch (MessagingException e) {
+            // Save the exception for reporting through the script services's getError() API
+            setError(e);
+            // Don't send the mail!
+            return;
+        }
+
+        // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
+        // the passed listener.
         this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
     }
+
     /**
      * @param subject the subject to set in the Mime Message
      */
@@ -304,5 +325,27 @@ public class MimeMessageWrapper
             }
         }
         return multipart;
+    }
+
+    private void checkPermissions() throws MessagingException
+    {
+        // Load the configured permission checker
+        ScriptServicePermissionChecker checker;
+        String hint = this.configuration.getScriptServicePermissionCheckerHint();
+        try {
+            checker = this.componentManager.getInstance(ScriptServicePermissionChecker.class, hint);
+        } catch (ComponentLookupException e) {
+            // Failed to load the user-configured hint, in order not to have a security hole, consider that we're not
+            // authorized to send emails!
+            throw new MessagingException(String.format("Failed to locate Permission Checker [%s]. "
+                + "The mail has not been sent.", hint), e);
+        }
+
+        try {
+            checker.check(getMessage());
+        } catch (MessagingException e) {
+            throw new MessagingException(String.format("Not authorized to send mail with subject [%s], using "
+                + "Permission Checker [%s]. The mail has not been sent.", getMessage().getSubject(), hint), e);
+        }
     }
 }

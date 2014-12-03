@@ -113,7 +113,7 @@ public class MailSenderScriptService implements ScriptService
             }
 
             messageWrapper = new MimeMessageWrapper(extendedMimeMessage, session, this.mailSender, this.execution,
-                this.componentManagerProvider.get());
+                this.configuration, componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -197,7 +197,7 @@ public class MailSenderScriptService implements ScriptService
         Session session = createSession();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.mailSender, this.execution,
-            this.componentManagerProvider.get());
+            this.configuration, this.componentManagerProvider.get());
 
         try {
             if (from != null) {

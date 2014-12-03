@@ -23,6 +23,12 @@
   #end
 #end
 ## ----------------------------------------------------------------------------
+## Display UI Extensions before the title element
+## ----------------------------------------------------------------------------
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
+  $services.rendering.render($uix.execute(), 'xhtml/1.0')
+#end
+## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------
 #template("titlevars.vm")

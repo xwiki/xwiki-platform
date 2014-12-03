@@ -242,40 +242,22 @@ function hideMsg(msgdiv)
 
 document.observe("dom:loaded", function() 
 { 
-    if (XWiki.currentDocument.space != "XWiki") {
-     var fullName = XWiki.currentDocument.space + "." + XWiki.currentDocument.page;
-     var url = "$xwiki.getURL('XWiki.Ratings', 'view', 'xpage=plain')" + "&amp;rating=" + encodeURIComponent(fullName);
-     new Ajax.Request(url, {
-     method: 'get',
-     onSuccess: function(transport)
+  $$('.star-rating').each(function(el) 
+  {
+     if(! el.hasClassName('locked')) 
      {
-        // need to cleanup &lt;p&gt;&lt;/p&gt; wrapping the div
-        var result = transport.responseText;
-        result = result.substring("3");
-        result = result.substring(0, result.length-4);
-    
-        if ($('hierarchy')) {
-          Element.insert($('hierarchy'), {after: result});
-        }
-        $$('.star-rating').each(function(el) 
-        {
-           if(! el.hasClassName('locked')) 
-           {
-              var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + el.up('.rating-wrapper').id.substring(7);
-              var msgdiv = el.up('.rating-container').down('.rating-message');
+        var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + el.up('.rating-wrapper').id.substring(7);
+        var msgdiv = el.up('.rating-container').down('.rating-message');
 
-              el.select('a').each(function(astar, i) 
-              {  
-                  Event.observe(astar, 'click', setVote(el, url, i + 1));
-                  msgdiv.prevmsg = "";
-                  Event.observe(astar, 'mouseover', showMsg(msgdiv, i));
-                  Event.observe(astar, 'mouseout', hideMsg(msgdiv));
-              }); // container 
-           }
-        }); 
-      } // onSuccess
-    });
-  } // docSpace
+        el.select('a').each(function(astar, i) 
+        {  
+            Event.observe(astar, 'click', setVote(el, url, i + 1));
+            msgdiv.prevmsg = "";
+            Event.observe(astar, 'mouseover', showMsg(msgdiv, i));
+            Event.observe(astar, 'mouseout', hideMsg(msgdiv));
+        });
+     }
+  }); 
 });</code>
     </property>
     <property>
@@ -503,6 +485,96 @@ position: relative;
       <use>always</use>
     </property>
   </object>
+  <object>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
+    <property>
+      <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
+#if($doc.space != "XWiki")
+  #displayFullRating($doc "")
+#end{{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.template.title.before</extensionPointId>
+    </property>
+    <property>
+      <name>xwiki:XWiki.Ratings</name>
+    </property>
+    <property>
+      <parameters>label=Ratings
+target=XWiki.Rights
+icon=icon:star</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
   <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
 #if("$!{request.xpage}" == "plain")
   #if("$!{request.vote}" != "")
@@ -529,9 +601,6 @@ position: relative;
     #else
       $msg.get("rating.voteoutofbounds")
     #end
-  #elseif("${request.rating}" != "")
-    #set($ratedDoc=$xwiki.getDocument($request.rating))
-    #displayFullRating($ratedDoc "")
   #end
 #end{{/velocity}}</content>
 </xwikidoc>

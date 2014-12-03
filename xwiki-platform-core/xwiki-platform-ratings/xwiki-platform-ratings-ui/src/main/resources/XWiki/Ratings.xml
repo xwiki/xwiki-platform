@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>Ratings</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1356994800000</creationDate>
+  <date>1356994800000</date>
+  <contentUpdateDate>1356994800000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <attachment>
+    <filename>star.gif</filename>
+    <filesize>1120</filesize>
+    <author>XWiki.Admin</author>
+    <date>1223392182000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>R0lGODlhGQBLAOYAAPWGNf784eTi49TR0f3ANvu+bf/MmfPy8uPg4filTv7dSvzGcvioT/3guvu0
+Tuvq6/7xYfq5af7mif3LXP////7w3d/e3vidQfTz9P3ixP/nnP7kUv7ncf/MM/7+9fm1gv7Uaf3G
+Wf76xOvq6tfV1f75sf7WSvmtSv7Zef3v5f7PQ/7vlPaSOv7ngv7emPnAmf748/7tptvY2f7oWf/M
+Zv7fUfzYpv7uw/ilRf7XQ/7vuP70Y/7JPvu3T+fm5vmvU/712PqyTP738v7Xc/73nP72gP7hZff3
+9+/v7/aPOf/elP/fefeUQv7sXfy8U/ioWPq/df3kzv7FO/7UUf70bP756P786v76uv73k/7dh//Q
+O/7yq/7iav3kvf743PvVrP7wzf7uv/7ql/8zAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5
+BAEHAGMALAAAAAAZAEsAAAf/gBSCg4SFhoeHR4qIjIRHSCM+GI2NGAgUlkeUiA8Pgj5Im4ZHFpqC
+FgemohQPFoRIMg8Ys4uJjzKhhBYyvDIII5ODRwcPCCQyPps+I6ZHxbKrFMvCktGsFsGCDwLRlgeF
+zgiqjEcy34cH5pQyI43p54i4lCO5iNONSPWHSOKND/DxxoGrNsiHhQeqBAh0hCDYCHaQLAiY5GOh
+sIlHBEwUhsQHKIuDOn4cVYtcSWsoU6oUdhLlIwEVV2JApREkpU6CSOhbRepIGCBIsKFsVaWDChgI
+Gtp0BAuJBi1alhw55uNBPgzjFB0YYWHAABgmcojVMewAsQcjKTyyYOFjFQli/+Ny4SIhhgdWCAVl
+1ORFDBcFgAMDrkEYCAVU1DS1CEyY8IbHj1dQEAAQkwAkHjjUECtFCoHPUlRwmLxT0AGJHlB0Xq2i
+9RQYNRGRurSktYnbt41QGFCaULoRMRQ0rjGjuBUEvakd2FK8SRMI0CGIwElOEhHoVEpcKbJjR4nT
+NkkdwLIDi4cDoQKUCHA4fCkP7A0KaGuKGTluFE4jUfSoKobkIWHQSWX8LaUWfyslqOCC0SC4kjMC
+5KUSEqnIk9IRl1AQlIH7+JDCC0LEwqEj2HwAwAflyDILVuRg4AMJMCQhYxQ+DNDLQQINUwwJJBxg
+ABNAPpGCaWZ1ogqE0KTwRb0CF1yAw5M4RABFA2rFpFcuBjAAJQ4ndHlCEGDaMBlAR9j3g5dfngCl
+Aw4sAFtpGFxWQQEXyAgAADLKyABsCqEjkRBPsCBok03ikMEIPZLDFgxaPtllED104UM/jCAxAAVs
+OuCEEyF06sKG7pBAQacTlGrqEBTIkM0hllBQKgg3UACGCxOAIM2qhrhIQRYueABLRR5UgQmuhRyQ
+jCBJjcCVBaGY1cgj1yDEHyRpMbLVCKmA05ItIzLo7beCBAIAOw==
+</content>
+  </attachment>
+  <attachment>
+    <filename>smallstar.gif</filename>
+    <filesize>891</filesize>
+    <author>XWiki.Admin</author>
+    <date>1223394833000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>R0lGODlhFAA8AOYAAOfm5vTz9OTi4/Py8tvY2ePg4filRevq6v7dSv7fUf3LXPaPOfmtSv7XQ/7x
+Yf7oWf3GWf7489fV1f7kUv7WSvu0TvqyTP7FO/7+9f7PQ/m1gv7tpvidQf/fef7iav756P70Y/3v
+5f3ANtTR0fWGNf738v7sXfzGcv/nnPilTv/MM/7hZf7uv//Mmf7ngv743P7yq/72gP7wzf7w3f7v
+lP7UafmvU/ioT/7ql/7ncfvVrP3guvq/df/QO/712P7emP76uv7mifu3T/3kzv70bPzYpv784fy8
+U/73nN/e3uvq6+/v7/f39////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5
+BAAAAAAALAAAAAAUADwAAAf/gE2Cg4SFhodMTIeLggEFTQWKjIVKSk0AS5OETEmSSQOSk0pJg0sE
+SgEBiYQDSgUSAJMAkkwFqJqXg0wBuE2jhAK4jgOFAwTEhwQHi8aLBJmLy4cA0ofQhkuRiLGDSUqS
+AqGbj00HzwdJwbOI4QICvE1MS5jihPNL9au9+/yM+vzywvWr1ETCNU2cmLBYkgSeplEfVEQoUMDh
+IibPUPTowETCqSVLHHJKgulDkAYoG3jwsAGDL1qKXuBAQLMmggQJfDQhJWiVC5o4E0wYOoFGEwHI
+BAlYgiEHygsXRIi4kOHowZ5JCnTIkIGCVworRlwdZGzDTZwP0hYY2xMAjLQm2BzIdUBwGxK5RIDE
+AAFiQCdESTAYuSSApKID9XoG84tPHoAAbAUtqZQ03j9DiRL328x5k+ZJTCp9RvSI4ehC80KUOHUa
+awANGjCiSqWZCQAJERYsGAJgBAEC3ggpEYAqhI4UHAwoN8Bjh+VSglosN8CgugULRY4SQtzERnUG
+FpZXOBFhKaEAS2dw0E1Ct+7yAgtxinBDuXUhALRZa1Kh/xEIAJrGTBMAKmCggU0QYNF5TRhYQxMy
+/KDAJQuSNUgBB6BDygCVbeKLN5ndM1qGoHgGWmudpShIIAA7
+</content>
+  </attachment>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>70a8d5ac-906d-4701-b7fd-8837d804740b</guid>
+    <property>
+      <cache>default</cache>
+    </property>
+    <property>
+      <code>function setVote(ulel, url, i) 
+{
+ return function() 
+ {
+   url = url + "&amp;vote=" + i; 
+   new Ajax.Request(url, 
+   {
+    method: 'get',
+    onSuccess: function(transport)
+    {
+      var values = transport.responseText.evalJSON();
+      
+      var avgvote = values.avgvote;
+      var uservote = values.uservote;
+      var totalvotes = values.totalvotes;
+
+      if( (avgvote = parseFloat(avgvote)) ) {
+        var w = avgvote * 20;
+        ulel.down("li.current-rating").style.width = w + "%";
+      }
+      else {
+       alert(transport.responseText); //TODO proper error handling
+      }
+
+      var id = ulel.up('.rating-container').id;
+      var msgdiv = $(id).down(".rating-message");
+      if (msgdiv.prevmsg!="") {
+       msgdiv.innerHTML =  msgdiv.prevmsg;
+       msgdiv.prevmsg = "";
+      }
+      msgdiv.down("span").innerHTML = totalvotes;
+     
+      if( (uservote = parseInt(uservote)) ) {
+        var w = uservote * 20;
+        $(id + "-user").down('.star-rating').down("li.current-rating").style.width = w + "%";
+      }
+      else {
+       alert(transport.responseText); //TODO proper error handling
+      }     
+    }
+   });
+ }
+}
+
+function showMsg(msgdiv, i) 
+{
+ return function() 
+ {
+   if (msgdiv.prevmsg=="")
+    msgdiv.prevmsg = msgdiv.innerHTML;
+   var msgs = ["$msg.get("rating.one-star")", "$msg.get("rating.two-stars")", "$msg.get("rating.three-stars")", "$msg.get("rating.four-stars")", "$msg.get("rating.five-stars")"];
+   msgdiv.update(msgs[i]);
+ }
+}
+
+function hideMsg(msgdiv) 
+{
+ return function() 
+ {
+   if (msgdiv.prevmsg != "")
+    msgdiv.update(msgdiv.prevmsg);
+ }
+}
+
+document.observe("dom:loaded", function() 
+{ 
+    if (XWiki.currentDocument.space != "XWiki") {
+     var fullName = XWiki.currentDocument.space + "." + XWiki.currentDocument.page;
+     var url = "$xwiki.getURL('XWiki.Ratings', 'view', 'xpage=plain')" + "&amp;rating=" + encodeURIComponent(fullName);
+     new Ajax.Request(url, {
+     method: 'get',
+     onSuccess: function(transport)
+     {
+        // need to cleanup &lt;p&gt;&lt;/p&gt; wrapping the div
+        var result = transport.responseText;
+        result = result.substring("3");
+        result = result.substring(0, result.length-4);
+    
+        if ($('hierarchy')) {
+          Element.insert($('hierarchy'), {after: result});
+        }
+        $$('.star-rating').each(function(el) 
+        {
+           if(! el.hasClassName('locked')) 
+           {
+              var url = "$xwiki.getURL("XWiki.Ratings", "view", "xpage=plain&amp;outputSyntax=plain")" + "&amp;doc=" + el.up('.rating-wrapper').id.substring(7);
+              var msgdiv = el.up('.rating-container').down('.rating-message');
+
+              el.select('a').each(function(astar, i) 
+              {  
+                  Event.observe(astar, 'click', setVote(el, url, i + 1));
+                  msgdiv.prevmsg = "";
+                  Event.observe(astar, 'mouseover', showMsg(msgdiv, i));
+                  Event.observe(astar, 'mouseout', hideMsg(msgdiv));
+              }); // container 
+           }
+        }); 
+      } // onSuccess
+    });
+  } // docSpace
+});</code>
+    </property>
+    <property>
+      <name>Ratings Javascript</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.Ratings</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>619a1d7d-5944-4a4a-97b0-e006452b0f44</guid>
+    <property>
+      <cache>default</cache>
+    </property>
+    <property>
+      <code>/* ratings */
+.star-rating,
+.star-rating a:hover,
+.star-rating a:active,
+.star-rating a:focus,
+.star-rating .current-rating{
+background: url($doc.getAttachmentURL("star.gif")) left -1000px repeat-x;
+}
+.star-rating{
+position:relative;
+width:125px;
+height:25px;
+overflow:hidden;
+list-style:none;
+margin:0px !important;
+padding:0px !important;
+background-position: left top;
+}
+.star-rating li{
+display: inline;
+}
+.star-rating a,
+.star-rating .current-rating{
+position:absolute;
+top:0;
+left:0;
+text-indent:-1000em;
+height:25px;
+line-height:25px;
+outline:none;
+overflow:hidden;
+border: none;
+}
+.star-rating a:hover,
+.star-rating a:active,
+.star-rating a:focus{
+background-position: left bottom;
+}
+.star-rating a.one-star{
+width:20%;
+z-index:6;
+}
+.star-rating a.two-stars{
+width:40%;
+z-index:5;
+}
+.star-rating a.three-stars{
+width:60%;
+z-index:4;
+}
+.star-rating a.four-stars{
+width:80%;
+z-index:3;
+}
+.star-rating a.five-stars{
+width:100%;
+z-index:2;
+}
+.star-rating .current-rating{
+z-index:1;
+background-position: left center;
+}
+
+.small-star{
+width:100px;
+height:20px;
+}
+
+.small-star,
+.small-star a:hover,
+.small-star a:active,
+.small-star a:focus,
+.small-star .current-rating{
+background-image: url($doc.getAttachmentURL("smallstar.gif"));
+line-height: 20px;
+height: 20px;
+}
+
+ul.locked a,
+ul.locked a:hover,
+ul.locked a:active,
+ul.locked a:focus {
+background: transparent none;
+}
+
+ul.locked a {
+cursor: default !important;
+}
+
+.rating-container {
+line-height: 25px;
+}
+
+.rating-header {
+font-size: 11px;
+font-weight: bold;
+margin-right: 2px;
+line-height: 25px;
+}
+
+.rating-message {
+font-size: 10px;
+color: #333;
+font-style: italic;
+margin-right: 5px;
+float: right;
+position: relative;
+}
+
+.login-to-rate {
+font-size: 11px;
+font-weight: bold;
+}
+
+.small {
+height: 20px !important;
+line-height: 20px !important;
+}
+
+.rating-wrapper {
+float: right;
+position: relative;
+}
+</code>
+    </property>
+    <property>
+      <name>Ratings CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
+#if("$!{request.xpage}" == "plain")
+  #if("$!{request.vote}" != "")
+    #set($rdoc = $xwiki.getDocument($request.doc))
+    #set($vote = $util.parseInt($request.vote))
+    #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
+      #set($ok = $services.ratings.setRating($rdoc, $xcontext.user, $vote))
+      #if($ok) 
+        #if("$!{request.method}" != "")
+          #set($ar = $services.ratings.getAverageRating($rdoc, $request.method))
+        #else
+          #set($ar = $services.ratings.getAverageRating($rdoc))
+        #end
+        #set($avgvote = $ar.averageVote)
+        #set($uservote = $services.ratings.getRating($rdoc, $xcontext.user))
+        #set($nbVotes = $ar.nbVotes)
+       $response.setContentType('application/json')
+       {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }
+      #else 
+        $msg.get("rating.saveexception")
+      #end
+    #elseif($vote == 0)
+      $msg.get("rating.votenotvalid")
+    #else
+      $msg.get("rating.voteoutofbounds")
+    #end
+  #elseif("${request.rating}" != "")
+    #set($ratedDoc=$xwiki.getDocument($request.rating))
+    #displayFullRating($ratedDoc "")
+  #end
+#end{{/velocity}}</content>
+</xwikidoc>

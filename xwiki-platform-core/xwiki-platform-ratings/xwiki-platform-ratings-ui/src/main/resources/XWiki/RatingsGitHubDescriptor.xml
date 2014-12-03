@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>RatingsGitHubDescriptor</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>GitHub.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1356994800000</creationDate>
+  <date>1356994800000</date>
+  <contentUpdateDate>1356994800000</contentUpdateDate>
+  <version>1.1</version>
+  <title>RatingsGitHubDescriptor</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>GitHubCode.GitHubConfigClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultdate>
+        <customDisplay/>
+        <dateFormat>dd/MM/yyyy</dateFormat>
+        <disabled>0</disabled>
+        <emptyIsToday>0</emptyIsToday>
+        <name>defaultdate</name>
+        <number>11</number>
+        <picker>1</picker>
+        <prettyName>defaultdate</prettyName>
+        <size>20</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+      </defaultdate>
+      <defaultspace>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>defaultspace</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>defaultspace</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultspace>
+      <defaultuser>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>defaultuser</name>
+        <number>12</number>
+        <picker>0</picker>
+        <prettyName>defaultuser</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultuser>
+      <description>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>description</name>
+        <number>3</number>
+        <picker>0</picker>
+        <prettyName>description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <password>
+        <algorithm/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>password</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>password</prettyName>
+        <size>30</size>
+        <storageType>Clear</storageType>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.PasswordClass</classType>
+      </password>
+      <repository_name>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>repository_name</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>repository name</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </repository_name>
+      <repository_path>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>repository_path</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>repository path</prettyName>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </repository_path>
+      <repository_user>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>repository_user</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>repository user</prettyName>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </repository_user>
+      <savedlist>
+        <cache>0</cache>
+        <classname>XWiki.SavedListClass</classname>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <idField>doc.fullName</idField>
+        <multiSelect>0</multiSelect>
+        <name>savedlist</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>savedlist</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>40</size>
+        <sort>value</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField>doc.title</valueField>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </savedlist>
+      <status>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>status</name>
+        <number>13</number>
+        <picker>0</picker>
+        <prettyName>status</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </status>
+      <username>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>username</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>username</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </username>
+      <version>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>version</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>version</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </version>
+    </class>
+    <name>XWiki.RatingsGitHubDescriptor</name>
+    <number>0</number>
+    <className>GitHubCode.GitHubConfigClass</className>
+    <guid>7edeae66-ec2b-43c6-a30a-76e07e95abda</guid>
+    <property>
+      <defaultdate>2013-01-01 00:00:00.0</defaultdate>
+    </property>
+    <property>
+      <defaultspace>XWiki</defaultspace>
+    </property>
+    <property>
+      <defaultuser>xwiki:XWiki.Admin</defaultuser>
+    </property>
+    <property>
+      <description>Allows to rate XWiki pages</description>
+    </property>
+    <property>
+      <name>Ratings Application</name>
+    </property>
+    <property>
+      <password/>
+    </property>
+    <property>
+      <repository_name>application-ratings</repository_name>
+    </property>
+    <property>
+      <repository_path>application</repository_path>
+    </property>
+    <property>
+      <repository_user>xwiki-contrib</repository_user>
+    </property>
+    <property>
+      <savedlist/>
+    </property>
+    <property>
+      <status>XWiki/Treeview;1.1;;
+XWiki/XWikiSyntax.de;2.1;;
+XWiki/ObjectSheet;1.1;;
+XWiki/XWikiUsers;1.1;;
+XWiki/AdminRightsSheet;1.1;;
+XWiki/XWikiRights;1.1;;
+XWiki/ResetPassword;1.1;;
+XWiki/WikiMacroParameterClass;1.1;;
+XWiki/SuggestLuceneService;1.1;;
+XWiki/SharePage;1.1;;
+XWiki/AccountValidation;1.1;;
+XWiki/AdminLocalizationSheet;1.1;;
+XWiki/UserProfileSectionsClass;1.1;;
+XWiki/XWikiUserProfileSheet;1.1;;
+XWiki/GadgetClass;1.1;;
+XWiki/SchedulerJobTemplate;1.1;;
+XWiki/ConfigurableClass;23.1;;
+XWiki/Results;1.1;;
+XWiki/LiveTableResults;1.1;;
+XWiki/DocumentSheetBinding;1.1;;
+XWiki/WikiMacroClass;1.1;;
+XWiki/SearchSuggestConfigSheet;1.1;;
+XWiki/DeletedDocuments;1.1;;
+XWiki/SheetDescriptorClass;1.1;;
+XWiki/LoggingAdmin;1.1;;
+XWiki/XWikiSyntax.fr;2.1;;
+XWiki/UserDirectoryLivetableResultsOverride;1.1;;
+XWiki/WebPreferences;1.1;;
+XWiki/ResetPasswordRequestClass;1.1;;
+XWiki/JavaScriptExtension;1.1;;
+XWiki/OfficeImporter;1.1;;
+XWiki/RatingsClass;6.2;;
+XWiki/XWikiAllGroup;2.1;;
+XWiki/AdminElementsSheet;1.1;;
+XWiki/ExternalLinksJSON;1.1;;
+XWiki/WorkspaceUsers;1.1;;
+XWiki/DocumentsMacro;1.1;;
+XWiki/OrphanedPages;1.1;;
+XWiki/AdminInlineSheet;1.1;;
+XWiki/AdminRatingsSheet;1.1;;
+XWiki/ClassSheetBinding;1.1;;
+XWiki/AdminTemplatesSheet;1.1;;
+XWiki/Mail;1.1;;
+XWiki/ResetPasswordComplete;1.1;;
+XWiki/ClassSheet;1.1;;
+XWiki/WorkspaceStyle;1.1;;
+XWiki/XWikiClasses;1.1;;
+XWiki/AdminImportSheet;1.1;;
+XWiki/OfficeImporterAdmin;23.1;;
+XWiki/TemplateProviderClass;1.1;;
+XWiki/WebDAV;1.1;;
+XWiki/StyleSheetExtension;1.1;;
+XWiki/ClassTemplate;1.1;;
+XWiki/XWikiSkinsTemplate;1.1;;
+XWiki/RatingsGitHubDescriptor;7.1;;
+XWiki/DefaultSkin;1.1;;
+XWiki/Tableview;1.1;;
+XWiki/AdminFieldsDisplaySheet;1.1;;
+XWiki/XWikiGroupTemplate;1.1;;
+XWiki/SchedulerJobSheet;1.1;;
+XWiki/AdminUserProfileSheet;1.1;;
+XWiki/XWikiAdminGroup;2.1;;
+XWiki/TagClass;1.1;;
+XWiki/AllAttachmentsResults;1.1;;
+XWiki/XWikiSkins;1.1;;
+XWiki/SearchSuggestSourceClass;1.1;;
+XWiki/AverageRatingsClass;6.2;;
+XWiki/UserDirectoryLivetableResults;1.1;;
+XWiki/XWikiUserSheet;23.1;;
+XWiki/Ratings;3.61;;
+XWiki/RequestsStatus;23.1;;
+XWiki/UIExtensionSheet;1.1;;
+XWiki/XWikiSkinsSheet;1.1;;
+XWiki/ManageWorkspace;1.1;;
+XWiki/WysiwygEditorConfigTemplate;1.1;;
+XWiki/TagCloud;1.1;;
+XWiki/XWikiSyntax.it;2.1;;
+XWiki/SolrSearchAdmin;1.1;;
+XWiki/WysiwygEditorConfig;23.1;;
+XWiki/XWikiUserWatchListLiveTableResults;1.1;;
+XWiki/SearchSuggestConfig;23.1;;
+XWiki/AdminSheet;23.1;;
+XWiki/TemplateProviderTemplate;1.1;;
+XWiki/DeletedAttachments;1.1;;
+XWiki/XWikiUserPreferencesSheet;1.1;;
+XWiki/EditModeClass;1.1;;
+XWiki/WatchListMessage;23.1;;
+XWiki/RatingsMacros;1.16;1209010137;0
+XWiki/LuceneSearchAdmin;1.1;;
+XWiki/WatchListRss;1.1;;
+XWiki/ResetPasswordMailContent;1.1;;
+XWiki/SearchConfigClass;1.1;;
+XWiki/Registration;1.1;;
+XWiki/WysiwygEditorConfigClass;1.1;;
+XWiki/AttachmentSelector;1.1;;
+XWiki/AddExtensions;23.1;;
+XWiki/XWikiSyntax;23.1;;
+XWiki/InstalledExtensions;23.1;;
+XWiki/TranslationDocumentClass;1.1;;
+XWiki/ExternalLinks;1.1;;
+XWiki/ComponentInterfaceClass;1.1;;
+XWiki/TemplateProviderSheet;1.1;;
+XWiki/LiveTableResultsMacros;1.1;;
+XWiki/AdminEditingSheet;1.1;;
+XWiki/UserProfileSectionClass;1.1;;
+XWiki/ConfigurableClassMacros;1.1;;
+XWiki/XWikiComments;7.1;;
+XWiki/ComponentMethodClass;1.1;;
+XWiki/ForgotUsername;1.1;;
+XWiki/XWikiPreferences;2.1;;
+XWiki/SchedulerJobClass;1.106;;
+XWiki/GoogleAnalyticsCode;23.1;;
+XWiki/AdminEmailSheet;1.1;;
+XWiki/UserDirectoryPreferencesClass;1.1;;
+XWiki/XWikiUserNetworkSheet;1.1;;
+XWiki/SearchAdmin;23.1;;
+XWiki/SheetClass;1.1;;
+XWiki/ComponentDependencyClass;1.1;;
+XWiki/WysiwygEditorConfigSheet;1.1;;
+XWiki/AllAttachments;1.1;;
+XWiki/SearchCode;1.1;;
+XWiki/CoreExtensions;23.1;;
+XWiki/MessageStreamConfig;23.1;;
+XWiki/WorkspaceCandidateMemberClass;1.1;;
+XWiki/DeletedDocumentsJSON;1.1;;
+XWiki/XWikiSyntax.sv;2.1;;
+XWiki/XWikiGroups;1.1;;
+XWiki/XWikiUserWatchListSheet;1.1;;
+XWiki/OfficeImporterResults;1.1;;
+XWiki/RequiredRightClass;1.1;;
+XWiki/XWikiGroupSheet;1.1;;
+XWiki/AdminPresentationSheet;1.1;;
+XWiki/ComponentClass;1.1;;
+XWiki/UIExtensionClass;1.1;;
+XWiki/AdminGroupsSheet;1.1;;
+XWiki/RatingsTranslations;2.3;;
+XWiki/XWikiSyntax.lv;2.1;;
+XWiki/XWikiGlobalRights;1.1;;
+XWiki/AdminExportSheet;1.1;;
+XWiki/WikiMacros;1.1;;
+XWiki/WebHome;1.1;;
+XWiki/WatchListClass;1.1;;
+XWiki/LoggingAdminTableJson;1.1;;
+</status>
+    </property>
+    <property>
+      <username/>
+    </property>
+    <property>
+      <version>1.3</version>
+    </property>
+  </object>
+  <content>{{include document="GitHubCode.GitHubConfigSheet" /}}</content>
+</xwikidoc>

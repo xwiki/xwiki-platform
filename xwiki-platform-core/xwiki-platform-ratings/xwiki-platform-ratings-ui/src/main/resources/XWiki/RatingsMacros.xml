@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>RatingsMacros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.Ratings</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1356994800000</creationDate>
+  <date>1356994800000</date>
+  <contentUpdateDate>1356994800000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+###
+###    Display rating stars UI
+###
+###
+#macro(ratingstars $id $cssclass $ratinglabel $rating $nbVotes $locked)
+#set($width = $rating * 20)
+&lt;div class="rating-container $cssclass" id="$id"&gt;
+    &lt;div class="rating-header $cssclass"&gt;$ratinglabel&lt;/div&gt;
+    &lt;div class="rating-stars"&gt;
+        &lt;ul class="star-rating ${cssclass}-star #if($locked) locked #end"&gt;
+            &lt;li class="current-rating" style="width:${width}%;"&gt;&lt;/li&gt;
+            #set($cls = ["one-star", "two-stars", "three-stars", "four-stars", "five-stars"])
+            #foreach($r in [1..5])
+                #set($i = $r - 1)
+                &lt;li&gt;&lt;a href="#" title="$msg.get("rating.${cls.get($i)}")" class="$cls.get($i)"&gt;$r&lt;/a&gt;&lt;/li&gt;
+            #end
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;div class="rating-message"&gt;#if($nbVotes != "")&lt;span&gt;$nbVotes&lt;/span&gt;&amp;nbsp;$msg.get("rating.votes")#end&lt;/div&gt;
+&lt;/div&gt;
+#end
+
+###
+###    Display full ratings UI ( rating ui, number of votes, user's vote)
+###
+###
+#macro(displayFullRating $rdoc $method)
+{{html clean="false" wiki="false"}}
+#set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+#if($method != "")  #set($ar = $services.ratings.getAverageRating($rdoc, $method))
+#else  #set($ar = $services.ratings.getAverageRating($rdoc)) #end
+#set($avgvote = $ar.averageVote)
+#set($uservote = $services.ratings.getRating($rdoc, $xcontext.user).vote)
+#set($votes = $!ar.nbVotes)
+&lt;div class="rating-wrapper" id="rating-${rdoc.fullName}"&gt;
+#if($xcontext.user!="XWiki.XWikiGuest")
+&lt;div class="avg-rating"&gt;
+#ratingstars($id "" "" $avgvote $votes false)
+&lt;/div&gt;
+#else
+ #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$rdoc.getURL()"))
+&lt;div class="avg-rating"&gt;
+#ratingstars($id "" $msg.get("rating.rate") $avgvote  $votes true)
+&lt;/div&gt;
+#end
+&lt;/div&gt;
+{{/html}}
+#end
+
+###
+###    Display small ratings UI ( rating ui - display only )
+###
+###
+#macro(displaySmallRating $rdoc $method)
+{{html clean="false" wiki="true"}}
+#set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+#if($method != "")  #set($ar = $services.ratings.getAverageRating($rdoc, $method))
+#else  #set($ar = $services.ratings.getAverageRating($rdoc)) #end
+#set($avgvote = $ar.averageVote)
+#ratingstars($id "small" "" $avgvote "" true)
+{{/html}}
+#end
+
+{{/velocity}}</content>
+</xwikidoc>

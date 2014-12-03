@@ -529,6 +529,7 @@
     <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
+    <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>

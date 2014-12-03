@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-ratings</artifactId>
+    <version>6.4-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-ratings-ui</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Ratings - Application</name>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Ratings Application</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.contrib:xwiki-ratings-application</xwiki.extension.features>
+    <!-- Don't run CLIRR here since there's no Java code -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ratings-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <!-- Needed to add support for the XAR packaging -->
+    <extensions>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <!-- The XAR packaging uses the XAR plugin and thus we need to define what version to use -->
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <version>${commons.version}</version>
+      </plugin>
+      <!-- Force the "use" field of JSX and CSS extensions to be the correct ones when building the final XAR.
+           This is to avoid programmers mistakes, as it is very easy to forget to check they have the proper ones
+           When committing changes based on a XAR export.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>xml-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <id>force-sx-use-property</id>
+            <goals>
+              <goal>transform</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <transformationSets>
+            <!-- Make sure the extensions in the ratings admin sheet are always used, in order for the rating admin
+                 category to appear in the wiki administration menu when importing this application XAR.
+            -->
+            <transformationSet>
+              <dir>src/main/resources</dir>
+              <outputDir>${project.build.outputDirectory}</outputDir>
+              <includes>
+                <include>XWiki/AdminRatingsSheet</include>
+              </includes>
+              <stylesheet>src/main/build/transformation/sx-always.xsl</stylesheet>
+            </transformationSet>
+            <!-- Make sure the extensions in XWiki.Ratings are not used always by default, so that the default behavior
+                 when importing the XAR is that ratings are not activated. (They are activable through the Ratings
+                 admin category))
+            -->
+            <transformationSet>
+              <dir>src/main/resources</dir>
+              <outputDir>${project.build.outputDirectory}</outputDir>
+              <includes>
+                <include>XWiki/Ratings</include>
+              </includes>
+              <stylesheet>src/main/build/transformation/sx-ondemand.xsl</stylesheet>
+            </transformationSet>
+          </transformationSets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

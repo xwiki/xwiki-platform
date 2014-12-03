@@ -698,7 +698,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.properties = mail.smtp.socks.host = someserver
 
 #-# [Since 6.4M2]
-#-# Defines which authorization checls are done when sending mails using the Mail Sender Script Service.
+#-# Defines which authorization checks are done when sending mails using the Mail Sender Script Service.
 #-# Example of valid values:
 #-# - "programmingrights": the current document must have Programming Rights
 #-# - "alwaysallow": no check is performed. This is useful when setting up XWiki in a secure environment where we

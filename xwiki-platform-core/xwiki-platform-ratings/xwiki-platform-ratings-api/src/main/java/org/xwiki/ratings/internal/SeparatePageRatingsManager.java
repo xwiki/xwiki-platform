@@ -158,7 +158,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 getXWiki().getStore().searchDocumentsNames(sql, count, start, getXWikiContext());
 
             for (String ratingPageName : ratingPageNameList) {
-                ratings.add(new SeparatePageRatingsManager().getRatingFromDocument(documentName, getXWiki()
+                ratings.add(getRatingFromDocument(documentName, getXWiki()
                     .getDocument(ratingPageName, getXWikiContext())));
             }
         } catch (XWikiException e) {

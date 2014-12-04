@@ -459,18 +459,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
         // support path image references (e.g. image:path:/one/two/three.png).
         String prefix = this.documentAccessBridge.getDocumentURL(ownerDocument, "temp", null, null, true);
 
-        // Make the file path URL encoded
-        String encodedFilePath;
-        try {
-            encodedFilePath = URLEncoder.encode(filePath, "UTF8");
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen
-            encodedFilePath = filePath;
-        }
-        // Put back / from original file path
-        encodedFilePath.replace("%2F", "/");
-
-        return String.format("%s/%s/%s", prefix, MODULE_NAME, encodedFilePath);
+        return String.format("%s/%s/%s", prefix, MODULE_NAME, filePath);
     }
 
     /**

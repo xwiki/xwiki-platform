@@ -40,8 +40,18 @@ public interface RatingsManager
     public static final String RATING_REPUTATION_METHOD_DEFAULT = "average";
     
     public static final String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.";
-    public static final String RATINGS_CONFIG_PAGE = "XWiki.RatingsConfig";
+    public static final String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
+    public static final String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
     public static final String RATINGS_CONFIG_CLASSNAME = "XWiki.RatingsConfigClass";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE = "storageSpace";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES = "storageSeparateSpaces";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING = "storeAverageRating";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION = "reputation";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED = "reputationStored";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD = "reputationMethod";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT = "reputationAlgorithmHint";
+    public static final String RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM = "reputationCustomAlgorithm";
     public static final String RATINGS_CONFIG_FIELDNAME_MANAGER_HINT = "managerHint";
     public static final String RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT = "reputationAlgorithmHint";
  

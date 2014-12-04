@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * @version $Id$
@@ -88,6 +89,31 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return getXWikiContext().getWiki();
     }
 
+    /**
+     * Retrieve configuration parameter from the current space's WebPreferences
+     * and fallback to XWiki.RatingsConfig if it does not exist
+     */
+    protected String getConfigParameter(String parameterName, String defaultValue)
+    {
+        try {
+            String space = getXWikiContext().getDoc().getSpace();
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(space + "." + RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
+            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+
+            if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(parameterName);
+                String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
+
+                return (propValue == "" ? defaultValue : propValue);
+            }
+        } catch(Exception e) {
+            LOGGER.error("Cannot read ratings config", e);
+        }
+
+        return defaultValue;
+    }
+
     public boolean hasRatings()
     {
         int result = (int) getXWiki().ParamAsLong("xwiki.ratings", 0);
@@ -96,20 +122,23 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
     public boolean isAverageRatingStored()
     {
-        int result = (int) getXWiki().ParamAsLong("xwiki.ratings.averagerating.stored", 1);
-        return (getXWiki().getXWikiPreferenceAsInt("ratings_averagerating_stored", result, getXWikiContext()) == 1);
+        String result = getXWiki().Param("xwiki.ratings.averagerating.stored", "1");
+        result = getXWiki().getXWikiPreference("ratings_averagerating_stored", result, getXWikiContext());
+        return (getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING, result) == "1");
     }
 
     public boolean isReputationStored()
     {
-        int result = (int) getXWiki().ParamAsLong("xwiki.ratings.reputation.stored", 0);
-        return (getXWiki().getXWikiPreferenceAsInt("ratings_reputation_stored", result, getXWikiContext()) == 1);
+        String result = getXWiki().Param("xwiki.ratings.reputation.stored", "0");
+        result = getXWiki().getXWikiPreference("ratings_reputation_stored", result, getXWikiContext());
+        return (getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED, result) == "1");
     }
 
     public boolean hasReputation()
     {
-        int result = (int) getXWiki().ParamAsLong("xwiki.ratings.reputation", 0);
-        return (getXWiki().getXWikiPreferenceAsInt("ratings_reputation", result, getXWikiContext()) == 1);
+        String result = getXWiki().Param("xwiki.ratings.reputation", "0");
+        result = getXWiki().getXWikiPreference("ratings_reputation", result, getXWikiContext());
+        return (getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION, result) == "1");
     }
 
     public String[] getDefaultReputationMethods()
@@ -117,6 +146,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         String method =
             getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
         method = getXWiki().getXWikiPreference("ratings_reputation_defaultmethod", method, getXWikiContext());
+        method = getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
         return method.split(",");
     }
 

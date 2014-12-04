@@ -82,9 +82,13 @@ public class ConfiguredRatingsManagerProvider implements Provider<RatingsManager
         String ratingsHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT, "default");
         
         try {
-            XWikiDocument configDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_PAGE, getXWikiContext());
+            String space = getXWikiContext().getDoc().getSpace();
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(space + "." + RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
+            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+
             if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME)!=null) {
-                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT);
+                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
                 String hint = (prop==null) ? null : (String) prop.getValue();
                 ratingsHint = (hint==null) ? ratingsHint : hint;
             }

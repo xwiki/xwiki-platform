@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -555,8 +556,22 @@ position: relative;
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
-      <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
-#if($doc.space != "XWiki")
+      <content>{{include document='XWiki.RatingsMacros'/}}{{velocity}}
+#set($configClass     = 'XWiki.RatingsConfigClass')
+#set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
+#set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))
+##
+#if($xwiki.exists($webPrefDoc) &amp;&amp; $webPrefDoc.getObjectNumbers($configClass) &gt; 0)
+  #set($configObj = $webPrefDoc.getObject($configClass))
+#else
+  #set($configObj = $globalConfigDoc.getObject($configClass))
+#end
+##
+#set($displayRatings = $configObj.getProperty('displayRatings').value == 1)
+#set($excludedPages  = $stringtool.split($configObj.getProperty('excludedPages').value, ','))
+#set($excludedPages  = $stringtool.stripAll($excludedPages))
+##
+#if($displayRatings &amp;&amp; !$listtool.contains($excludedPages, $doc.name))
   #displayFullRating($doc "")
 #end{{/velocity}}</content>
     </property>

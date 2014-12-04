@@ -71,13 +71,14 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         String ratingsSpaceName = getXWiki().Param("xwiki.ratings.separatepagemanager.spacename", "");
         ratingsSpaceName =
             getXWiki().getXWikiPreference("ratings_separatepagemanager_spacename", ratingsSpaceName, getXWikiContext());
-        return ratingsSpaceName;
+        return getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE, ratingsSpaceName);
     }
 
     public boolean hasRatingsSpaceForeachSpace()
     {
-        int result = (int) getXWiki().ParamAsLong("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", 0);
-        return (getXWiki().getXWikiPreferenceAsInt("ratings_separatepagemanager_ratingsspaceforeachspace", result, getXWikiContext()) == 1);
+        String result = getXWiki().Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
+        result = getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result, getXWikiContext());
+        return (getConfigParameter(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result) == "1");
     }
 
     protected void saveRating(Rating rating) throws RatingsException

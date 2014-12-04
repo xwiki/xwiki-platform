@@ -85,10 +85,19 @@ public class ConfiguredReputationAlgorithmProvider implements Provider<Reputatio
         String reputationAlgorithmHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
         
         try {
-            XWikiDocument configDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_PAGE, getXWikiContext());
+            String space = getXWikiContext().getDoc().getSpace();
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(space + "." + RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
+            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+
             if (configDoc!=null && !configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME)!=null) {
-                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT);
+                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
                 String hint = (prop==null) ? null : (String) prop.getValue();
+                if (hint == "custom")
+                {
+                    prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
+                    hint = (prop==null) ? null : (String) prop.getValue();
+                }
                 reputationAlgorithmHint = (hint==null) ? reputationAlgorithmHint : hint;
             }
         } catch(Exception e) {

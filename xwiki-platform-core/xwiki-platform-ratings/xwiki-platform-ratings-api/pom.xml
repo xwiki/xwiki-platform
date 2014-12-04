@@ -36,6 +36,10 @@
     <platform.version>${commons.version}</platform.version>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings API</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>
+      org.xwiki.contrib.ratings:application-ratings-api
+    </xwiki.extension.features>
     <!-- Skipping checkstyle due to the fact that there is no metadata -->
     <!-- for javadoc and some methods that are used are deprecated (TO FIX) -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>

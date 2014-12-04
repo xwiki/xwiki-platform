@@ -36,7 +36,10 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings Application</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.contrib:xwiki-ratings-application</xwiki.extension.features>
+    <xwiki.extension.features>
+      org.xwiki.contrib:xwiki-ratings-application,
+      org.xwiki.contrib.ratings:application-ratings-ui
+    </xwiki.extension.features>
     <!-- Don't run CLIRR here since there's no Java code -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>

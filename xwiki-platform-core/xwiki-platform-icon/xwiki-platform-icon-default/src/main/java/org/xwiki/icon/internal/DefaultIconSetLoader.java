@@ -36,7 +36,7 @@ import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default implementation of {@link org.xwiki.icon.IconSetLoader}.
@@ -66,19 +66,23 @@ public class DefaultIconSetLoader implements IconSetLoader
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public IconSet loadIconSet(DocumentReference iconSetReference) throws IconException
     {
-        String name = entityReferenceSerializer.serialize(iconSetReference);
         try {
             // Get the document
             DocumentModelBridge doc = documentAccessBridge.getDocument(iconSetReference);
             String content = doc.getContent();
+            // The name of the icon set is stored in the IconThemesCode.IconThemeClass XObject of the document
+            DocumentReference iconClassRef = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
+                    "IconThemesCode", "IconThemeClass");
+            String name = (String) documentAccessBridge.getProperty(iconSetReference, iconClassRef, "name");
+            // Load the icon set
             return loadIconSet(new StringReader(content), name);
         } catch (Exception e) {
-            throw new IconException(String.format(ERROR_MSG, name), e);
+            throw new IconException(String.format(ERROR_MSG, iconSetReference), e);
         }
     }
 

@@ -56,4 +56,10 @@ public class DocumentComponentManagerFactory implements ComponentManagerFactory
     {
         return this.factory.createComponentManager(this.spaceComponentManager);
     }
+
+    @Override
+    public ComponentManager createComponentManager(String namespace, ComponentManager parentComponentManager)
+    {
+        return this.factory.createComponentManager(namespace, this.spaceComponentManager);
+    }
 }

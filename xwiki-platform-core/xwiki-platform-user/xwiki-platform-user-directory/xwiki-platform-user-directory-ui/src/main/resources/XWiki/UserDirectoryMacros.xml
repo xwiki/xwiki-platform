@@ -233,8 +233,8 @@
         &lt;dd&gt;
           &lt;select name='value'&gt;
           #foreach ($property in $xwikiUsersClass.properties)
-            #if (!$columns.contains($property.name))
-              ## Display translated class property pretty names only for the columns that are not already selected.
+            #if (!$columns.contains($property.name) &amp;&amp; $property.classType != 'Password')
+              ## Display translated class property pretty names only for the columns that are not already selected or that are not sensitive Password fields.
               &lt;option value="$property.name"&gt;$xwikiUsersClass.get($property.name).translatedPrettyName&lt;/option&gt;
             #end
           #end

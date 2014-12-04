@@ -90,6 +90,7 @@
   <div class="alleditcontent">
   <div id="mainEditArea">
   #if($editor == 'wiki' || $editor == 'wysiwyg' || $editor == 'inline')
+    ## Note: the inline editor never reaches this part since it is handled separately. We add the edit parent button in editinline.vm explicitly.
     <div class='edit-meta-tools'>
       <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a>
     </div>

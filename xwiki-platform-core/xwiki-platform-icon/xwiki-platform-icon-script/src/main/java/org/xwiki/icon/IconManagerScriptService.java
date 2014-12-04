@@ -201,6 +201,25 @@ public class IconManagerScriptService implements ScriptService
     }
 
     /**
+     * Get the name of the current icon set.
+     * @return the name of the current icon set
+     * @since 6.4M2
+     */
+    public String getCurrentIconSetName()
+    {
+        try {
+            IconSet currentIconSet = iconSetManager.getCurrentIconSet();
+            if (currentIconSet != null) {
+                return currentIconSet.getName();
+            }
+        } catch (IconException e) {
+            setLastError(e);
+        }
+
+        return null;
+    }
+
+    /**
      * Get the error generated while performing the previously called action.
      * @return an eventual exception or {@code null} if no exception was thrown
      * @since 6.3RC1

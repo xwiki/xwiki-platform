@@ -32,6 +32,7 @@
   <artifactId>xwiki-platform-icon-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Icon - UI</name>
+  <description>Manage and display icons used all over the wiki</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Icon Theme Application</xwiki.extension.name>

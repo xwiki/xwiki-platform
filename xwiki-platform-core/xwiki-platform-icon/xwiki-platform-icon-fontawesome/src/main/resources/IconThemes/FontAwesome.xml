@@ -46,7 +46,150 @@ xwiki.iconset.jsx = IconThemes.FontAwesome
 xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon"&gt;&lt;/span&gt;{{/html}}
 xwiki.iconset.render.html = &lt;span class="fa fa-$icon"&gt;&lt;/span&gt;
 
-## Icons
+## XWiki Icon Set (see: http://design.xwiki.org/xwiki/bin/view/Proposal/XWiki+Icon+Set).
+home = home
+wiki = globe
+space = folder
+page = file-o
+check = check
+add = plus
+anchor = anchor
+terminal = terminal
+list = list-alt
+branch = code-fork
+down = arrow-down
+up = arrow-up
+left = arrow-left
+right = arrow-right
+arrows = arrows-alt
+repeat = repeat
+undo = undo
+refresh = refresh
+rotate-left = rotate-left
+rotate-right = rotate-right
+switch = random
+random = random
+attach = paperclip
+shopping-cart = shopping-cart
+bell = bell
+trash = trash
+bomb = bomb
+book = book
+cube = cube
+cubes = cubes
+briefcase = briefcase
+bug = bug
+building = building
+caret-down = caret-down
+caret-up = caret-up
+caret-right = caret-right
+calculator = calculator
+calendar = calendar
+camera = camera
+remove = times-circle
+cross = times
+car = car
+truck = truck
+chart-bar = bar-chart-o
+chart-organisation = sitemap
+cloud = cloud
+clock = clock-o
+cog = cog
+comment = comment
+comments = comments
+desktop = desktop
+contrast = adjust
+eject = eject
+step-forward = step-forward
+step-backward = step-backward
+fast-forward = fast-forward
+backward = backward
+play = play
+pause = pause
+stop = stop
+gamepad = gamepad
+credit-card = credit-card
+coffee = coffee
+cut = cut
+database = database
+delete = minus-circle
+floppy-disk = floppy-o
+glass = glass
+drive = hdd-o
+envelope = envelope-o
+warning = exclamation-triangle
+error = exclamation-circle
+info = info-circle
+eye = eye
+rss = rss
+female = female
+male = male
+film = film
+flag = flag
+search = search
+search-plus = search-plus
+search-minus = search-minus
+folder = folder
+user = user
+group = group
+heart = heart
+question = question-circle
+image = image
+key = key
+keyboard = keyboard-o
+lightbulb = lightbulb-o
+link = link
+unlink = unlink
+lock = lock
+unlock = unlock
+money = money
+dollar = dollar
+euro = euro
+gbp = gbp
+yen = yen
+music = music
+file = file
+file-white = file-o
+file-pdf = file-pdf-o
+file-code = file-code-o
+file-archive = file-archive-o
+file-word = file-word-o
+file-excel = file-excel-o
+file-powerpoint = file-powerpoint-o
+file-text = file-text-o
+paste = paste
+pencil = pencil
+print = print
+shield = shield
+certificate = certificate
+volume-up = volume-up
+volume-down = volume-down
+volume-off = volume-off
+soccer = futbol-o
+star = star
+table = table
+phone = phone
+font = font
+bold = bold
+italic = italic
+strikethrough = strikethrough
+subscript = subscript
+superscript = superscript
+underline = underline
+align-center = align-center
+align-justify = align-justify
+align-left = align-left
+align-right = align-right
+columns = columns
+indent-left = indent
+indent-right = outdent
+list-bullets = list-ul
+list-numbers = list-ol
+sun = sun-o
+world = globe
+wrench = wrench
+
+## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
 add = plus-circle
 anchor = anchor
@@ -481,7 +624,7 @@ require(['jquery'], function($) {
   margin-left: 2.14285714em;
   list-style-type: none;
 }
-.fa-ul > li {
+.fa-ul &gt; li {
   position: relative;
 }
 .fa-li {

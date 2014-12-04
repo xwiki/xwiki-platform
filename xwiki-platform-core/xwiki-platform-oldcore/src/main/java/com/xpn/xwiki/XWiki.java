@@ -101,6 +101,7 @@ import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
@@ -868,6 +869,19 @@ public class XWiki implements EventListener
             for (MandatoryDocumentInitializer initializer : initializers) {
                 initializeMandatoryDocument(initializer, context);
             }
+        }
+    }
+
+    private void initializeMandatoryDocument(String wiki, MandatoryDocumentInitializer initializer, XWikiContext context)
+    {
+        String currentWiki = context.getWikiId();
+
+        try {
+            context.setWikiId(wiki);
+
+            initializeMandatoryDocument(initializer, context);
+        } finally {
+            context.setWikiId(currentWiki);
         }
     }
 
@@ -6099,11 +6113,32 @@ public class XWiki implements EventListener
         if (event instanceof ComponentDescriptorAddedEvent) {
             ComponentManager componentManager = (ComponentManager) data;
 
-            MandatoryDocumentInitializer initializer =
-                Utils.getComponent(MandatoryDocumentInitializer.class,
-                    ((ComponentDescriptorAddedEvent) event).getRoleHint());
+            String namespace;
+            if (componentManager instanceof NamespacedComponentManager) {
+                namespace = ((NamespacedComponentManager) componentManager).getNamespace();
+            } else {
+                namespace = null;
+            }
 
-            initializeMandatoryDocument(initializer, getXWikiContext());
+            MandatoryDocumentInitializer initializer;
+            try {
+                initializer =
+                    componentManager.getInstance(MandatoryDocumentInitializer.class,
+                        ((ComponentDescriptorAddedEvent) event).getRoleHint());
+
+                XWikiContext context = getXWikiContext();
+                if (namespace == null) {
+                    // Initialize in already initialized wikis (will be initialized in others when they are initialized)
+                    for (String wiki : this.virtualWikiList) {
+                        initializeMandatoryDocument(wiki, initializer, context);
+                    }
+                } else if (namespace.startsWith("wiki:")) {
+                    // Initialize in the wiki where the extension is installed
+                    initializeMandatoryDocument(namespace.substring("wiki:".length()), initializer, context);
+                }
+            } catch (ComponentLookupException e) {
+                LOGGER.error("Failed to lookup mandatory document initializer", e);
+            }
         }
 
         // Document modifications

@@ -53,6 +53,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -96,7 +97,9 @@ import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -331,6 +334,8 @@ public class XWiki implements EventListener
      */
     private static final String VERSION_FILE_PROPERTY = "version";
 
+    private static XWikiInitializerJob job;
+
     /** List of configured syntax ids. */
     private List<String> configuredSyntaxes;
 
@@ -389,7 +394,9 @@ public class XWiki implements EventListener
 
     private ConfigurationSource spaceConfiguration;
 
-    private static XWikiInitializerJob job;
+    private ObservationManager observationManager;
+
+    private Provider<XWikiContext> xcontextProvider;
 
     private ConfigurationSource getConfiguration()
     {
@@ -443,6 +450,24 @@ public class XWiki implements EventListener
         }
 
         return this.templateManager;
+    }
+
+    private ObservationManager getObservationManager()
+    {
+        if (this.observationManager == null) {
+            observationManager = Utils.getComponent((Type) ObservationManager.class);
+        }
+
+        return this.observationManager;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        if (this.xcontextProvider == null) {
+            this.xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+        }
+
+        return this.xcontextProvider.get();
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -805,7 +830,7 @@ public class XWiki implements EventListener
 
             // Make sure these classes exists
             if (noupdate) {
-                initializeMandatoryClasses(context);
+                initializeMandatoryDocuments(context);
                 getStatsService(context);
             }
 
@@ -823,8 +848,7 @@ public class XWiki implements EventListener
             String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/1.0");
             this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
-            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-            observationManager.addListener(this);
+            getObservationManager().addListener(this);
         } finally {
             progress.popLevelProgress(this);
         }
@@ -834,7 +858,7 @@ public class XWiki implements EventListener
      * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create them if they don't
      * exist.
      */
-    private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
+    private void initializeMandatoryDocuments(XWikiContext context)
     {
         if (context.get("initdone") == null) {
             @SuppressWarnings("deprecation")
@@ -842,17 +866,26 @@ public class XWiki implements EventListener
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
 
             for (MandatoryDocumentInitializer initializer : initializers) {
-                DocumentReference documentReference =
-                    this.currentReferenceDocumentReferenceResolver.resolve(initializer.getDocumentReference());
+                initializeMandatoryDocument(initializer, context);
+            }
+        }
+    }
 
-                if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
-                    XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+    private void initializeMandatoryDocument(MandatoryDocumentInitializer initializer, XWikiContext context)
+    {
+        try {
+            DocumentReference documentReference =
+                this.currentReferenceDocumentReferenceResolver.resolve(initializer.getDocumentReference());
 
-                    if (initializer.updateDocument(document)) {
-                        saveDocument(document, context);
-                    }
+            if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+                if (initializer.updateDocument(document)) {
+                    saveDocument(document, context);
                 }
             }
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to initialize mandatory document", e);
         }
     }
 
@@ -913,7 +946,7 @@ public class XWiki implements EventListener
 
                     // Make sure these classes exists
                     if (initClasses) {
-                        initializeMandatoryClasses(context);
+                        initializeMandatoryDocuments(context);
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
                     }
@@ -1297,8 +1330,7 @@ public class XWiki implements EventListener
                 document.setOriginalDocument(originalDocument);
             }
 
-            @SuppressWarnings("deprecation")
-            ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+            ObservationManager om = getObservationManager();
 
             // Notify listeners about the document about to be created or updated
 
@@ -2971,8 +3003,7 @@ public class XWiki implements EventListener
             mailSender.send(message, session);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL,
-                "Error while sending validation email", e);
+                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending validation email", e);
         }
     }
 
@@ -3443,8 +3474,7 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            @SuppressWarnings("deprecation")
-            ObservationManager om = Utils.getComponent(ObservationManager.class);
+            ObservationManager om = getObservationManager();
 
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
@@ -6059,10 +6089,24 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        // A wiki has been deleted
         if (event instanceof WikiDeletedEvent) {
             getVirtualWikiList().remove(((WikiDeletedEvent) event).getWikiId());
             return;
         }
+
+        // A new mandatory document initializer has been installed
+        if (event instanceof ComponentDescriptorAddedEvent) {
+            ComponentManager componentManager = (ComponentManager) data;
+
+            MandatoryDocumentInitializer initializer =
+                Utils.getComponent(MandatoryDocumentInitializer.class,
+                    ((ComponentDescriptorAddedEvent) event).getRoleHint());
+
+            initializeMandatoryDocument(initializer, getXWikiContext());
+        }
+
+        // Document modifications
 
         XWikiDocument doc = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
@@ -6109,6 +6153,7 @@ public class XWiki implements EventListener
             add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
             add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
             add(new WikiDeletedEvent());
+            add(new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
         }
     };
 

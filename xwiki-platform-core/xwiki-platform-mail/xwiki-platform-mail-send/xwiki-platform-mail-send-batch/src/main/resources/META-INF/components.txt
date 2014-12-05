@@ -1,1 +1,4 @@
 org.xwiki.mail.internal.DefaultBatchMailSender
+org.xwiki.mail.internal.iterator.factory.DefaultUsersMimeMessageIteratorFactory
+org.xwiki.mail.internal.iterator.factory.DefaultGroupMimeMessageIteratorFactory
+org.xwiki.mail.internal.iterator.factory.DefaultSerializedFilesMimeMessageIteratorFactory

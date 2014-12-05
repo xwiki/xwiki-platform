@@ -219,7 +219,7 @@
       </storeAverageRating>
     </class>
     <property>
-      <displayRatings>1</displayRatings>
+      <displayRatings>0</displayRatings>
     </property>
     <property>
       <excludedPages/>

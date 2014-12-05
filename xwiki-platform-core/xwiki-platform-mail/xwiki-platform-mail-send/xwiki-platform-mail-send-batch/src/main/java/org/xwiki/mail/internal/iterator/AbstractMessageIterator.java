@@ -68,6 +68,7 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>
             } catch (MessagingException e) {
                 this.logger.error("Failed to create mime message. "
                     + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
+                //TODO We need to save all the errors and display them in the status of all emails in the admin UI.
             }
             position++;
             return mimeMessage;

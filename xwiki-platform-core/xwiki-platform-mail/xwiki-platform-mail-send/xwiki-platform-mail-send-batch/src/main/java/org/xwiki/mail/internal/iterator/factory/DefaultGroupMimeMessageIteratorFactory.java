@@ -17,33 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.iterator.factory;
 
 import java.util.Iterator;
+import java.util.Map;
 
-import javax.mail.Session;
+import javax.inject.Singleton;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.internal.iterator.GroupMimeMessageIterator;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Asynchronous API to send mails to lots of recipients in a single call.
  *
  * @version $Id$
  * @since 6.4M2
  */
-@Role
-@Unstable
-public interface BatchMailSender
+@Component
+@Singleton
+public class DefaultGroupMimeMessageIteratorFactory implements GroupMimeMessageIteratorFactory
 {
-    /**
-     * Send mails to lots of recipients in a single call, asynchronously.
-     *
-     * @param messageIterator the iterator of emails to send, Using an Iterator allows to construct the MimeMessage
-     * objects one by one and thus allow scaling to an unlimited number of mails to send since we don't need to have all
-     * MimeMessage instance in memory at once.
-     * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
-     */
-    void send(Iterator<MimeMessage> messageIterator, Session session);
+    @Override public Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException
+    {
+        GroupMimeMessageIterator iterator = new GroupMimeMessageIterator(groupReference, factory, parameters);
+        return iterator;
+    }
 }

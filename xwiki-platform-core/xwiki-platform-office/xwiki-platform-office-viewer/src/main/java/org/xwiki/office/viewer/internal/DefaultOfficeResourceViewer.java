@@ -472,7 +472,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     {
         String encoded;
         try {
-            encoded = URLEncoder.encode(name, DEFAULT_ENCODING).replace(".", "%2E").replace("*", "%2A");
+            encoded = URLEncoder.encode(name, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             // Should never happen
 

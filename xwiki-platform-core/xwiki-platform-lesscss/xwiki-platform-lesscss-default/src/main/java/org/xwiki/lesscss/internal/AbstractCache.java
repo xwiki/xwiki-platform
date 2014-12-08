@@ -31,7 +31,6 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.LESSCache;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -67,11 +66,6 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      * corresponding cache when a color theme is saved.
      */
     private Map<String, List<String>> cachedFilesKeysMapPerColorTheme = new HashMap<>();
-    /**
-     * This map stores the list of the cached files keys corresponding to an entity, in order to clear the
-     * corresponding cache when a XObject is saved.
-     */
-    private Map<String, List<String>> cachedFilesKeysMapPerEntity = new HashMap<>();
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
@@ -89,12 +83,6 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public T get(EntityReference entityReference, String fileSystemSkin, String colorTheme)
-    {
-        return cache.get(getCacheKey(entityReference, fileSystemSkin, getColorThemeFullName(colorTheme)));
-    }
-
-    @Override
     public void set(String fileName, String fileSystemSkin, String colorTheme, T content)
     {
         // Get the fullname of the color theme
@@ -106,23 +94,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 
         // Add the new key to maps
         registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, fileSystemSkin);
-        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorThemeFullName);
-    }
-
-    @Override
-    public void set(EntityReference entity, String fileSystemSkin, String colorTheme, T content)
-    {
-        // Get the fullname of the color theme
-        String colorThemeFullName = getColorThemeFullName(colorTheme);
-
-        // Store the content in the cache
-        String cacheKey = getCacheKey(entity, fileSystemSkin, colorThemeFullName);
-        cache.set(cacheKey, content);
-
-        // Add the new key to maps
-        registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, fileSystemSkin);
-        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorThemeFullName);
-        registerCacheKey(cachedFilesKeysMapPerEntity, cacheKey, entityReferenceSerializer.serialize(entity));
+        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorTheme);
     }
 
     /**
@@ -152,7 +124,6 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         cache.removeAll();
         cachedFilesKeysMapPerSkin.clear();
         cachedFilesKeysMapPerColorTheme.clear();
-        cachedFilesKeysMapPerEntity.clear();
     }
 
     private void clearFromCriteria(Map<String, List<String>> cachedFilesKeysMap, String criteria)
@@ -179,13 +150,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Override
     public void clearFromColorTheme(String colorTheme)
     {
-        clearFromCriteria(cachedFilesKeysMapPerColorTheme, getColorThemeFullName(colorTheme));
-    }
-
-    @Override
-    public void clearFromEntity(EntityReference entity)
-    {
-        clearFromCriteria(cachedFilesKeysMapPerEntity, entityReferenceSerializer.serialize(entity));
+        clearFromCriteria(cachedFilesKeysMapPerColorTheme, colorTheme);
     }
 
     private String getColorThemeFullName(String colorTheme)
@@ -200,18 +165,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 
     private String getCacheKey(String fileName, String skin, String colorThemeFullName)
     {
-        return "FILE" + CACHE_KEY_SEPARATOR + skin.length() + skin
-                + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
+        return skin.length() + skin + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
                 + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
-    }
-
-    private String getCacheKey(EntityReference entityReference, String skin, String colorThemeFullName)
-    {
-        String serializedEntity = entityReferenceSerializer.serialize(entityReference);
-
-        return "ENTITY" + CACHE_KEY_SEPARATOR + skin.length() + skin
-                + CACHE_KEY_SEPARATOR
-                + colorThemeFullName.length() + colorThemeFullName
-                + CACHE_KEY_SEPARATOR + serializedEntity.length() + serializedEntity;
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.lesscss;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component to parse a LESS skin file and to return a Color Theme from it.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface LESSColorThemeConverter
 {
     /**

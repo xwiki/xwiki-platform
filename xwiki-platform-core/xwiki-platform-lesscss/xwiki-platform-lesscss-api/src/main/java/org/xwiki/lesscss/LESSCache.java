@@ -19,22 +19,18 @@
  */
 package org.xwiki.lesscss;
 
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
-
 /**
- * Component to cache objects computed from a LESS files contained in the skin and in the wiki.
+ * Component to cache objects computed from a LESS files contained in the skin.
  *
  * @param <T> class of the objects to cache
  *
  * @since 6.1M2
  * @version $Id$
  */
-@Unstable
 public interface LESSCache<T>
 {
     /**
-     * Get an object from the name of the LESS source, the skin and the name of the color theme.
+     * Get an object from the name of the LESS source, the wiki ID, the skin and the name of the color theme.
      * @param fileName name of the LESS source
      * @param skin name of the skin
      * @param colorTheme name of the color theme
@@ -43,17 +39,6 @@ public interface LESSCache<T>
      * @since 6.3M2
      */
     T get(String fileName, String skin, String colorTheme);
-
-    /**
-     * Get an object from the reference of an entity, the skin and the name of the color theme.
-     * @param entityReference reference of an entity that contains some LESS code
-     * @param skin name of the skin
-     * @param colorTheme name of the color theme
-     * @return the corresponding CSS
-     *
-     * @since 6.4M2
-     */
-    T get(EntityReference entityReference, String skin, String colorTheme);
 
     /**
      * Add an object in the cache.
@@ -66,18 +51,6 @@ public interface LESSCache<T>
      * @since 6.3M2
      */
     void set(String fileName, String fileSystemSkin, String colorThemeName, T object);
-
-    /**
-     * Add an object in the cache.
-     *
-     * @param entityReference reference of an entity that contains some LESS code
-     * @param fileSystemSkin name of the skin
-     * @param colorThemeName name of the color theme
-     * @param object the object to cache
-     *
-     * @since 6.4M2
-     */
-    void set(EntityReference entityReference, String fileSystemSkin, String colorThemeName, T object);
 
     /**
      * Clear the cache.
@@ -101,13 +74,4 @@ public interface LESSCache<T>
      * @since 6.3M2
      */
     void clearFromColorTheme(String colorTheme);
-
-    /**
-     * Clear all the cached files related to an entity.
-     *
-     * @param entity reference to an entity
-     *
-     * @since 6.4M2
-     */
-    void clearFromEntity(EntityReference entity);
 }

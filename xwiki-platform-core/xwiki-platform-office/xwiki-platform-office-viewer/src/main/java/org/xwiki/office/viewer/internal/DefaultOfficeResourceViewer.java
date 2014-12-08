@@ -159,16 +159,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     String getFilePath(String resourceName, String fileName, Map<String, ?> parameters)
     {
-        try {
-            return URLEncoder.encode(getSafeFileName(resourceName), DEFAULT_ENCODING) + '/' + parameters.hashCode()
-                + '/' + URLEncoder.encode(getSafeFileName(fileName), DEFAULT_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            // Should never happen
-
-            this.logger.error("Cannot use UTF8 encoding", e);
-        }
-
-        return resourceName + '/' + fileName;
+        return getSafeFileName(resourceName) + '/' + parameters.hashCode() + '/' + getSafeFileName(fileName);
     }
 
     /**
@@ -423,7 +414,6 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     File getTemporaryFile(DocumentReference documentReference, String filepath) throws Exception
     {
-        // Extract wiki, space, page and attachment name.
         String wiki = documentReference.getWikiReference().getName();
         String space = documentReference.getParent().getName();
         String page = documentReference.getName();
@@ -470,16 +460,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      */
     private String getSafeFileName(String name)
     {
-        String encoded;
         try {
-            encoded = URLEncoder.encode(name, DEFAULT_ENCODING);
+            return URLEncoder.encode(name, DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
-            // Should never happen
-
-            encoded = name;
+            // Should never happen.
+            return name;
         }
-
-        return encoded;
     }
 
     private DocumentReference getOwnerDocument(Map<String, ?> parameters)

@@ -23,12 +23,12 @@ package org.xwiki.mail.event;
 import org.xwiki.observation.event.AbstractFilterableEvent;
 
 /**
- * An event triggered when a mail is ready to be sent.
+ * An event triggered when failing to send mail.
  *
  * @version $Id$
  * @since 6.4M2
  */
-public class EmailReadyEvent extends AbstractFilterableEvent
+public class EmailErrorEvent extends AbstractFilterableEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

@@ -36,8 +36,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailResultListener;
-import org.xwiki.mail.event.EmailFailEvent;
-import org.xwiki.mail.event.EmailReadyEvent;
+import org.xwiki.mail.event.EmailErrorEvent;
+import org.xwiki.mail.event.EmailSendingEvent;
 import org.xwiki.mail.event.EmailSentEvent;
 import org.xwiki.observation.ObservationManager;
 
@@ -136,10 +136,9 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
         MimeMessage message = item.getMessage();
         //Data to be passed to the events
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("mesage", message);
         eventData.put("date", new Date());
         //send event when the mail is ready te be send
-        this.observationManager.notify(new EmailReadyEvent(), null, eventData);
+        this.observationManager.notify(new EmailSendingEvent(), message, eventData);
 
         MailResultListener listener = item.getListener();
         try {
@@ -162,7 +161,7 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
 
             eventData.put("date", new Date());
             //send event when the mail is sent
-            this.observationManager.notify(new EmailSentEvent(), null, eventData);
+            this.observationManager.notify(new EmailSentEvent(), message, eventData);
             // Step 3: Notify the user of the success if a listener has been provided
             if (listener != null) {
                 listener.onSuccess(message);
@@ -174,7 +173,7 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             }
             eventData.put("date", new Date());
             //send event when failing to send mail
-            this.observationManager.notify(new EmailFailEvent(), null, eventData);
+            this.observationManager.notify(new EmailErrorEvent(), message, eventData);
         }
     }
 

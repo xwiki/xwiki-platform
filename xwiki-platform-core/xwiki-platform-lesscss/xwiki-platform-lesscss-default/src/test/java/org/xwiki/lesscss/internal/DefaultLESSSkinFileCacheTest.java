@@ -30,6 +30,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -65,6 +66,8 @@ public class DefaultLESSSkinFileCacheTest
 
     private WikiDescriptorManager wikiDescriptorManager;
 
+    private ObjectReference objectReference;
+
     @Before
     public void setUp() throws Exception
     {
@@ -80,32 +83,39 @@ public class DefaultLESSSkinFileCacheTest
                 new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         DocumentReference colorThemeRef = new DocumentReference("currentWiki", "ColorTheme", "CT");
+        DocumentReference colorThemeRef2 = new DocumentReference("currentWiki", "ColorTheme", "CT2");
         when(documentReferenceResolver.resolve(eq("colorTheme"), any(WikiReference.class))).thenReturn(colorThemeRef);
+        when(documentReferenceResolver.resolve(eq("colorTheme2"), any(WikiReference.class))).thenReturn(colorThemeRef2);
         when(entityReferenceSerializer.serialize(colorThemeRef)).thenReturn("currentWiki:ColorTheme.CT");
+        when(entityReferenceSerializer.serialize(colorThemeRef2)).thenReturn("currentWiki:ColorTheme.CT2");
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWiki");
+        objectReference = new ObjectReference("SSX", new DocumentReference("wiki", "space", "page"));
+        when(entityReferenceSerializer.serialize(eq(objectReference))).thenReturn("XObjectRef");
     }
 
     @Test
     public void get() throws Exception
     {
-        // Mock
-        when(cache.get("4skin_25currentWiki:ColorTheme.CT_4file")).thenReturn("Expected output");
+        // Mocks
+        when(cache.get("FILE_4skin_25currentWiki:ColorTheme.CT_4file")).thenReturn("Expected output for file");
+        when(cache.get("ENTITY_4skin_25currentWiki:ColorTheme.CT_10XObjectRef")).thenReturn("Expected output for XO");
 
-        // Test
-        String result = mocker.getComponentUnderTest().get("file", "skin", "colorTheme");
-
-        // Verify
-        assertEquals("Expected output", result);
+        // Tests
+        assertEquals("Expected output for file", mocker.getComponentUnderTest().get("file", "skin", "colorTheme"));
+        assertEquals("Expected output for XO", mocker.getComponentUnderTest().get(
+                objectReference, "skin", "colorTheme"));
     }
 
     @Test
     public void set() throws Exception
     {
-        // Test
-        mocker.getComponentUnderTest().set("file", "skin", "colorTheme", "css");
+        // Tests
+        mocker.getComponentUnderTest().set("file", "skin", "colorTheme", "css for file");
+        mocker.getComponentUnderTest().set(objectReference, "skin", "colorTheme", "css for xo");
 
         // Verify
-        verify(cache).set(eq("4skin_25currentWiki:ColorTheme.CT_4file"), eq("css"));
+        verify(cache).set(eq("FILE_4skin_25currentWiki:ColorTheme.CT_4file"), eq("css for file"));
+        verify(cache).set(eq("ENTITY_4skin_25currentWiki:ColorTheme.CT_10XObjectRef"), eq("css for xo"));
     }
 
     @Test
@@ -130,14 +140,16 @@ public class DefaultLESSSkinFileCacheTest
         // Others
         mocker.getComponentUnderTest().set("file1", "skin2", "colorTheme", "css2");
         mocker.getComponentUnderTest().set("file2", "skin1", "colorTheme", "css3");
+        mocker.getComponentUnderTest().set(objectReference, "skin1", "colorTheme", "css4");
 
         // Testskin1
         mocker.getComponentUnderTest().clearFromFileSystemSkin("skin1");
 
         // Verify
-        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache).remove("5skin1_25currentWiki:ColorTheme.CT_5file2");
-        verify(cache, never()).remove("5skin2_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, times(1)).remove("FILE_5skin1_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, times(1)).remove("ENTITY_5skin1_25currentWiki:ColorTheme.CT_10XObjectRef");
+        verify(cache).remove("FILE_5skin1_25currentWiki:ColorTheme.CT_5file2");
+        verify(cache, never()).remove("FILE_5skin2_25currentWiki:ColorTheme.CT_5file1");
     }
 
     @Test
@@ -155,14 +167,38 @@ public class DefaultLESSSkinFileCacheTest
         // Others
         mocker.getComponentUnderTest().set("file1", "skin1", "colorTheme2", "css2");
         mocker.getComponentUnderTest().set("file1", "skin2", "colorTheme", "css3");
+        mocker.getComponentUnderTest().set(objectReference, "skin1", "colorTheme", "css4");
 
         // Test
         mocker.getComponentUnderTest().clearFromColorTheme("colorTheme");
 
         // Verify
-        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache).remove("5skin2_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache, never()).remove("5skin2_26currentWiki:ColorTheme.CT2_5file1");
+        verify(cache, times(1)).remove("FILE_5skin1_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, times(1)).remove("ENTITY_5skin1_25currentWiki:ColorTheme.CT_10XObjectRef");
+        verify(cache).remove("FILE_5skin2_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, never()).remove("FILE_5skin2_26currentWiki:ColorTheme.CT2_5file1");
+    }
+
+    @Test
+    public void clearFromEntity() throws Exception
+    {
+        // Add the first one twice
+        mocker.getComponentUnderTest().set("file1", "skin1", "colorTheme", "css1");
+        mocker.getComponentUnderTest().set("file1", "skin1", "colorTheme", "css1");
+
+        // Others
+        mocker.getComponentUnderTest().set("file1", "skin1", "colorTheme2", "css2");
+        mocker.getComponentUnderTest().set("file1", "skin2", "colorTheme", "css3");
+        mocker.getComponentUnderTest().set(objectReference, "skin1", "colorTheme", "css4");
+
+        // Test
+        mocker.getComponentUnderTest().clearFromEntity(objectReference);
+
+        // Verify
+        verify(cache, never()).remove("FILE_5skin1_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, times(1)).remove("ENTITY_5skin1_25currentWiki:ColorTheme.CT_10XObjectRef");
+        verify(cache, never()).remove("FILE_5skin2_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, never()).remove("FILE_5skin2_26currentWiki:ColorTheme.CT2_5file1");
     }
 
 }

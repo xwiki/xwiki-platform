@@ -448,6 +448,24 @@
               <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
               <justification>Young API, this method should not have been made public.</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/lesscss/LESSCache</className>
+              <method>void clearFromEntity(org.xwiki.model.reference.EntityReference)</method>
+              <justification>Unstable API, add support for Entity containing LESS code (eg. SSX objects).</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/lesscss/LESSCache</className>
+              <method>java.lang.Object get(org.xwiki.model.reference.EntityReference, java.lang.String, java.lang.String)</method>
+              <justification>Unstable API, add support for Entity containing LESS code (eg. SSX objects).</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/lesscss/LESSCache</className>
+              <method>void set(org.xwiki.model.reference.EntityReference, java.lang.String, java.lang.String, java.lang.Object)</method>
+              <justification>Unstable API, add support for Entity containing LESS code (eg. SSX objects).</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

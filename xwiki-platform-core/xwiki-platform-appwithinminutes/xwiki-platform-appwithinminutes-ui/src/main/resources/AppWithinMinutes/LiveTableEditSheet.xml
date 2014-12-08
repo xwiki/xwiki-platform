@@ -120,7 +120,7 @@
     : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
     {{/html}}
     
-    {{iconPicker id="applicationIcon" prefix="icon:"}}
+    {{iconPicker id="applicationIcon" prefix="icon:" /}}
   #end
 #end
 

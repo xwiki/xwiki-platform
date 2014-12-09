@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.cache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,8 @@ import javax.inject.Provider;
 
 import org.xwiki.lesscss.LESSCache;
 import org.xwiki.lesscss.LESSCompilerException;
+import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -35,12 +37,14 @@ import com.xpn.xwiki.XWikiContext;
  *
  * @param <T> class of the expected results
  *
- * @since 6.1M2
+ * @since 6.4M2
  * @version $Id$
  */
 public abstract class AbstractCachedCompiler<T>
 {
     protected LESSCache<T> cache;
+
+    protected CachedCompilerInterface<T> compiler;
 
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
@@ -48,31 +52,40 @@ public abstract class AbstractCachedCompiler<T>
     @Inject
     private CurrentColorThemeGetter currentColorThemeGetter;
 
-    private Map<String, Object> mutexList = new HashMap<>();
+    @Inject
+    private CacheKeyFactory cacheKeyFactory;
+
+    private Map<CacheKey, Object> mutexList = new HashMap<>();
 
     /**
-     * Compile an output corresponding to a LESS filename, located on the current skin.
-     * @param fileName name of the file
+     * Get the result of the compilation.
+     * @param lessResourceReference reference to the LESS content
+     * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
+     * defined there
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the desired object
      * @throws LESSCompilerException if problems occur
      */
-    public T compileFromSkinFile(String fileName, boolean force) throws LESSCompilerException
+    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean force)
+        throws LESSCompilerException
     {
         XWikiContext context = xcontextProvider.get();
         String skin = context.getWiki().getSkin(context);
-        return compileFromSkinFile(fileName, skin, force);
+        return getResult(lessResourceReference, includeSkinStyle, skin, force);
     }
 
     /**
-     * Compile an output corresponding to a LESS filename.
-     * @param fileName name of the file
+     * Get the result of the compilation.
+     * @param lessResourceReference reference to the LESS content
+     * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
+     * defined there
      * @param force force the computation, even if the output is already in the cache (not recommended)
-     * @param skin name of the skin where the LESS file is located
+     * @param skin name of the skin used for the context
      * @return the desired object
      * @throws LESSCompilerException if problems occur
      */
-    public T compileFromSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
+    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin,
+        boolean force) throws LESSCompilerException
     {
         T result;
 
@@ -80,33 +93,31 @@ public abstract class AbstractCachedCompiler<T>
 
         // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
         // use the last result stored in the cache
-        synchronized (getMutex(colorTheme)) {
+        synchronized (getMutex(skin, colorTheme, lessResourceReference)) {
 
             // Check if the result is in the cache
             if (!force) {
-                result = cache.get(fileName, skin, colorTheme);
+                result = cache.get(lessResourceReference, skin, colorTheme);
                 if (result != null) {
                     return result;
                 }
             }
 
-            // Either the result was in the cache or the force flag is set to true, we need to compile
-            result = compile(fileName, skin, force);
-            cache.set(fileName, skin, colorTheme, result);
-
+            // Either the result was in the cache or the force flag is set to true, we need to getResult
+            result = compiler.compute(lessResourceReference, includeSkinStyle, skin);
+            cache.set(lessResourceReference, skin, colorTheme, result);
         }
 
         return result;
     }
 
-    protected abstract T compile(String fileName, String skin, boolean force) throws LESSCompilerException;
-
-    private synchronized Object getMutex(String colorThemeFullName)
+    private synchronized Object getMutex(String skin, String colorTheme, LESSResourceReference lessResourceReference)
     {
-        Object mutex = mutexList.get(colorThemeFullName);
+        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
+        Object mutex = mutexList.get(cacheKey);
         if (mutex == null) {
             mutex = new Object();
-            mutexList.put(colorThemeFullName, mutex);
+            mutexList.put(cacheKey, mutex);
         }
         return mutex;
     }

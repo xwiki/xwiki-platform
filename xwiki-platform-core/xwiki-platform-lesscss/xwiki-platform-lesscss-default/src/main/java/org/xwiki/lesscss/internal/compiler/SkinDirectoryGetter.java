@@ -17,29 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.compiler;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSSkinFileCache;
-import org.xwiki.lesscss.LESSSkinFileCompiler;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -52,104 +44,33 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
+ * Component to get the directory of the base skin of any skin.
  *
- * @since 6.1M1
+ * @since 6.4M2
  * @version $Id$
  */
-@Component
+@Component(roles = SkinDirectoryGetter.class)
 @Singleton
-public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> implements LESSSkinFileCompiler,
-        Initializable
+public class SkinDirectoryGetter
 {
-    private static final String SKIN_CONTEXT_KEY = "skin";
-
     @Inject
-    private LESSCompiler lessCompiler;
-
-    @Inject
-    private LESSSkinFileCache cache;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        super.cache = cache;
-    }
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
-    @Override
-    protected String compile(String fileName, String skin, boolean force) throws LESSCompilerException
-    {
-        // Get the XWiki object
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-        String currentSkin = xwiki.getSkin(xcontext);
-
-        try {
-            // First, get the skin directory
-            String path = "/skins/" + getSkinDirectory(skin) +  "/less";
-            String realPath = xwiki.getEngineContext().getRealPath(path);
-            File lessDirectory = new File(realPath);
-            if (!lessDirectory.exists() || !lessDirectory.isDirectory()) {
-                throw new LESSCompilerException(String.format("The path [%s] is not a directory or does not exists.",
-                        path));
-            }
-            Path lessFilesPath = Paths.get(xwiki.getEngineContext().getRealPath(path));
-            Path[] includePaths = {lessFilesPath};
-
-            // Get the file content
-            String fullFileName = path + "/" + fileName;
-            File lessFile = new File(xwiki.getEngineContext().getRealPath(fullFileName));
-            if (!lessFile.exists() || !lessFile.isFile()) {
-                throw new LESSCompilerException(String.format("The path [%s] is not a file or does not exists.",
-                        fullFileName));
-            }
-            InputStream is = xwiki.getEngineContext().getResourceAsStream(fullFileName);
-            StringWriter source = new StringWriter();
-            IOUtils.copy(is, source);
-
-            // Trick: change the current skin in order to compile the LESS file as if the specified skin
-            // was the current skin
-            if (!currentSkin.equals(skin)) {
-                xcontext.put(SKIN_CONTEXT_KEY, skin);
-            }
-
-            // Parse the LESS content with Velocity
-            String velocityParsedSource = xwiki.parseContent(source.toString(), xcontext);
-
-            // Compile the LESS code
-            return lessCompiler.compile(velocityParsedSource, includePaths);
-        } catch (LESSCompilerException | IOException e) {
-            throw new LESSCompilerException(String.format("Failed to compile the file [%s] with LESS.", fileName), e);
-        } finally {
-            // Reset the current skin to the old value
-            if (!currentSkin.equals(skin)) {
-                xcontext.put(SKIN_CONTEXT_KEY, currentSkin);
-            }
-        }
-    }
-
-    @Override
-    public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
-    {
-        return this.compileFromSkinFile(fileName, force);
-    }
-
-    @Override
-    public String compileSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
-    {
-        return this.compileFromSkinFile(fileName, skin, force);
-    }
-
-    private String getSkinDirectory(String skin) throws LESSCompilerException
+    /**
+     * @param skin name of the skin
+     * @return the directory of the base skin of the specified skin. The directory is relative to the webapp one.
+     * @throws LESSCompilerException if problem occurs
+     */
+    public String getSkinDirectory(String skin) throws LESSCompilerException
     {
         // Is the skin a Wiki Document?
-        return getSkinDirectory(skin, new ArrayList<String>());
+        return "/skins/" + getSkinDirectory(skin, new ArrayList<String>());
     }
 
     private String getSkinDirectory(String skin, List<String> alreadyVisitedSkins) throws LESSCompilerException
@@ -195,4 +116,28 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         return skin;
     }
 
+    /**
+     * Get the full path of the directory where LESS skin file resources are stored inside a skin.
+     * @param skin the name of the skin
+     * @return the directory where LESS skin file resources are stored inside a skin.
+     * @throws LESSCompilerException if problem occurs
+     */
+    public Path getLESSSkinFilesDirectory(String skin) throws LESSCompilerException
+    {
+        // Get the XWiki object
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+
+        // Get the skin directory, where LESS resources are located
+        String path = this.getSkinDirectory(skin) + "/less";
+        String realPath = xwiki.getEngineContext().getRealPath(path);
+        File lessDirectory = new File(realPath);
+        if (!lessDirectory.exists() || !lessDirectory.isDirectory()) {
+            throw new LESSCompilerException(
+                    String.format("The path [%s] is not a directory or does not exists.",
+                            path));
+        }
+
+        return Paths.get(realPath);
+    }
 }

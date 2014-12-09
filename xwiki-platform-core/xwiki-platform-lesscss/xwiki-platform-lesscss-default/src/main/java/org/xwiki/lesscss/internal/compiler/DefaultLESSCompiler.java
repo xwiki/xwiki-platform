@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.compiler;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -36,7 +36,7 @@ import org.xwiki.lesscss.LESSCompilerException;
 /**
  * Default implementation of {@link LESSCompiler}.
  *
- * @since 6.1M1
+ * @since 6.4M2
  * @version $Id$
  */
 @Component

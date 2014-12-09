@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;

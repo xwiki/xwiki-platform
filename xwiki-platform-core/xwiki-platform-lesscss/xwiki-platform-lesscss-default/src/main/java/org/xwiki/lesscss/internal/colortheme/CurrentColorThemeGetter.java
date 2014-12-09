@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.colortheme;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,14 +36,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.internal.CurrentColorThemeGetter}.
+ * Component to get the current color theme set by the request.
  *
- * @since 6.3M2
+ * @since 6.4M2
  * @version $Id$
  */
-@Component
+@Component(roles = CurrentColorThemeGetter.class)
 @Singleton
-public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
+public class CurrentColorThemeGetter
 {
     private static final String COLOR_THEME_FIELD = "colorTheme";
 
@@ -59,7 +59,10 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    @Override
+    /**
+     * @param fallbackValue value to return if the current color theme is invalid
+     * @return the full name of the current color theme or fallbackValue if the current color theme is invalid
+     */
     public String getCurrentColorTheme(String fallbackValue)
     {
         // Get information about the context
@@ -80,7 +83,7 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
                 documentReferenceResolver.resolve(colorTheme, new WikiReference(wikiId));
         colorTheme = entityReferenceSerializer.serialize(colorThemeReference);
 
-        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
+        // Check that the color theme exists, to avoid a DOS if some user tries to getResult a skin file
         // with random colorTheme names
         if (!xwiki.exists(colorThemeReference, context)) {
             colorTheme = fallbackValue;

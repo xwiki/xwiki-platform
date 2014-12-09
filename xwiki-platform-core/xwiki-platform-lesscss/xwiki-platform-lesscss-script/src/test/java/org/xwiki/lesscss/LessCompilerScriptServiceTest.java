@@ -299,8 +299,8 @@ public class LessCompilerScriptServiceTest
         assertTrue(mocker.getComponentUnderTest().clearCacheFromFileSystemSkin("skin"));
 
         // Verify
-        verify(lessCache).clearFromFileSystemSkin(eq("skin"));
-        verify(colorThemeCache).clearFromFileSystemSkin(eq("skin"));
+        verify(lessCache).clearFromSkin(eq("skin"));
+        verify(colorThemeCache).clearFromSkin(eq("skin"));
     }
 
     @Test

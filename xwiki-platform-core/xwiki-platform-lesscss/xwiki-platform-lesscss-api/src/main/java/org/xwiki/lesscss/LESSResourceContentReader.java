@@ -17,22 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Component to get the current color theme set by the request.
+ * This component gets the content of a LESS resource.
  *
- * @since 6.3M2
+ * @since 6.4M2
  * @version $Id$
  */
 @Role
-public interface CurrentColorThemeGetter
+@Unstable
+public interface LESSResourceContentReader
 {
     /**
-     * @param fallbackValue value to return if the current color theme is invalid
-     * @return the full name of the current color theme or fallbackValue if the current color theme is invalid
+     * Get the content of the LESS resource.
+     * @param lessResourceReference a reference to a LESS resource
+     * @param skin skin used for the compilation
+     * @return the content
+     * @throws LESSCompilerException if problem occurs
      */
-    String getCurrentColorTheme(String fallbackValue);
+    String getContent(LESSResourceReference lessResourceReference, String skin) throws LESSCompilerException;
 }

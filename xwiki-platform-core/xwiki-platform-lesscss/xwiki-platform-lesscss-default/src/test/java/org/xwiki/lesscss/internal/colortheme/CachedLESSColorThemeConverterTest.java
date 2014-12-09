@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.colortheme;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -26,38 +26,46 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.LESSSkinFileCompiler;
+import org.xwiki.lesscss.IntegratedLESSCompiler;
+import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
- * Test class for {@link org.xwiki.lesscss.internal.DefaultLESSColorThemeConverter}.
+ * Test class for {@link org.xwiki.lesscss.internal.colortheme.CachedLESSColorThemeConverter}.
  *
- * @since 6.1M2
+ * @since 6.4M2
  * @version $Id$
  */
-public class DefaultLESSColorThemeConverterTest
+public class CachedLESSColorThemeConverterTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultLESSColorThemeConverter> mocker =
-            new MockitoComponentMockingRule<>(DefaultLESSColorThemeConverter.class);
+    public MockitoComponentMockingRule<CachedLESSColorThemeConverter> mocker =
+            new MockitoComponentMockingRule<>(CachedLESSColorThemeConverter.class);
 
-    private LESSSkinFileCompiler lessSkinFileCompiler;
+    private IntegratedLESSCompiler lessCompiler;
 
     @Before
     public void setUp() throws Exception
     {
-        lessSkinFileCompiler = mocker.getInstance(LESSSkinFileCompiler.class);
+        lessCompiler = mocker.getInstance(IntegratedLESSCompiler.class);
     }
 
     @Test
-    public void getColorThemeFromCSS() throws Exception
+    public void compute() throws Exception
     {
         StringWriter string = new StringWriter();
         IOUtils.copy(getClass().getResourceAsStream("/bigStyle.css"), string);
+        when(lessCompiler.compile(any(LESSResourceReference.class), eq(false), eq("skin"), eq(false))).
+            thenReturn(string.toString());
 
-        Map<String, String> results = mocker.getComponentUnderTest().getColorThemeFromCSS(string.toString());
+        Map<String, String> results = mocker.getComponentUnderTest().compute(
+            new LESSSkinFileResourceReference("file"), false, "skin");
         assertEquals("#e8e8e8", results.get("borderColor"));
     }
 }

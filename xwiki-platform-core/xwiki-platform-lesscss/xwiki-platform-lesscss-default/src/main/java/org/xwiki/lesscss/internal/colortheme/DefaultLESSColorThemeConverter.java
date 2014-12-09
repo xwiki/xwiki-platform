@@ -17,45 +17,56 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.colortheme;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.ColorTheme;
 import org.xwiki.lesscss.ColorThemeCache;
+import org.xwiki.lesscss.LESSColorThemeConverter;
+import org.xwiki.lesscss.LESSCompilerException;
+import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.ColorThemeCache}.
+ * Default implementation of {@link org.xwiki.lesscss.LESSColorThemeConverter}.
  *
- * @since 6.1M1
+ * @since 6.4M2
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultColorThemeCache extends AbstractCache<ColorTheme> implements ColorThemeCache, Initializable
+public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
+        implements LESSColorThemeConverter, Initializable
 {
-    /**
-     * Id of the cache for generated CSS.
-     */
-    public static final String LESS_COLOR_THEMES_CACHE_ID = "lesscss.colortheme.cache";
+    @Inject
+    private ColorThemeCache cache;
+
+    @Inject
+    private CachedLESSColorThemeConverter cachedLESSColorThemeConverter;
 
     @Override
     public void initialize() throws InitializationException
     {
-        try {
-            CacheConfiguration configuration = new CacheConfiguration(LESS_COLOR_THEMES_CACHE_ID);
-            CacheFactory cacheFactory = cacheManager.getCacheFactory();
-            this.cache = cacheFactory.newCache(configuration);
-        } catch (ComponentLookupException | CacheException e) {
-            throw new InitializationException(
-                    String.format("Failed to initialize LESS color themes cache [%s].", LESS_COLOR_THEMES_CACHE_ID), e);
-        }
+        super.cache = cache;
+        super.compiler = cachedLESSColorThemeConverter;
     }
+
+    @Override
+    public ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException
+    {
+        return super.getResult(new LESSSkinFileResourceReference(fileName), false, force);
+    }
+
+    @Override
+    public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
+        throws LESSCompilerException
+    {
+        return super.getResult(new LESSSkinFileResourceReference(fileName), false, skin, force);
+    }
+
 }

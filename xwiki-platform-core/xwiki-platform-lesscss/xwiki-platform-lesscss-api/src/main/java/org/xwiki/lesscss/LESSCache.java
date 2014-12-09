@@ -30,27 +30,27 @@ package org.xwiki.lesscss;
 public interface LESSCache<T>
 {
     /**
-     * Get an object from the name of the LESS source, the wiki ID, the skin and the name of the color theme.
-     * @param fileName name of the LESS source
+     * Get an object from the name of the LESS source, the skin and the name of the color theme.
+     * @param lessResourceReference reference of the code to compile
      * @param skin name of the skin
      * @param colorTheme name of the color theme
      * @return the corresponding CSS
      *
-     * @since 6.3M2
+     * @since 6.4M2
      */
-    T get(String fileName, String skin, String colorTheme);
+    T get(LESSResourceReference lessResourceReference, String skin, String colorTheme);
 
     /**
      * Add an object in the cache.
      *
-     * @param fileName name of the LESS source
-     * @param fileSystemSkin name of the skin
+     * @param lessResourceReference reference of the code to compile
+     * @param skin name of the skin
      * @param colorThemeName name of the color theme
      * @param object the object to cache
      *
-     * @since 6.3M2
+     * @since 6.4M2
      */
-    void set(String fileName, String fileSystemSkin, String colorThemeName, T object);
+    void set(LESSResourceReference lessResourceReference, String skin, String colorThemeName, T object);
 
     /**
      * Clear the cache.
@@ -58,20 +58,29 @@ public interface LESSCache<T>
     void clear();
 
     /**
-     * Clear all the cached files related to a skin.
+     * Clear all the cached content related to a skin.
      *
-     * @param fileSystemSkin name of the filesystem skin
+     * @param skin name of the filesystem skin
      *
-     * @since 6.3M2
+     * @since 6.4M2
      */
-    void clearFromFileSystemSkin(String fileSystemSkin);
+    void clearFromSkin(String skin);
 
     /**
-     * Clear all the cached files related to a color theme.
+     * Clear all the cached content related to a color theme.
      *
      * @param colorTheme name of the color theme
      *
      * @since 6.3M2
      */
     void clearFromColorTheme(String colorTheme);
+
+    /**
+     * Clear all the cached content related to a LESS resource.
+     *
+     * @param lessResourceReference reference of a LESS resource
+     *
+     * @since 6.4M2
+     */
+    void clearFromLESSResource(LESSResourceReference lessResourceReference);
 }

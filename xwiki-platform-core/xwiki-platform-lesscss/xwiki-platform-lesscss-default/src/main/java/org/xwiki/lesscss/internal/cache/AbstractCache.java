@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.cache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,24 +29,19 @@ import javax.inject.Inject;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.LESSCache;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.LESSResourceReferenceSerializer;
 
 /**
  * Default and abstract implementation of {@link org.xwiki.lesscss.LESSCache}.
  *
  * @param <T> class of the object to cache
  *
- * @since 6.1M2
+ * @since 6.4M2
  * @version $Id$
  */
 public abstract class AbstractCache<T> implements LESSCache<T>
 {
-    private static final String CACHE_KEY_SEPARATOR = "_";
-
     @Inject
     protected CacheManager cacheManager;
 
@@ -67,34 +62,42 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      */
     private Map<String, List<String>> cachedFilesKeysMapPerColorTheme = new HashMap<>();
 
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    /**
+     * This map stores the list of the cached files keys corresponding to a LESS resource, in order to clear the
+     * corresponding cache when a LESS resource is saved.
+     */
+    private Map<String, List<String>> cachedFilesKeysMapPerLESSResource = new HashMap<>();
 
     @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private CacheKeyFactory cacheKeyFactory;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private CacheKeySerializer cacheKeySerializer;
+
+    @Inject
+    private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
 
     @Override
-    public T get(String fileName, String fileSystemSkin, String colorTheme)
+    public T get(LESSResourceReference lessResourceReference, String skin, String colorTheme)
     {
-        return cache.get(getCacheKey(fileName, fileSystemSkin, getColorThemeFullName(colorTheme)));
+        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
+        String serializedCacheKey = cacheKeySerializer.serialize(cacheKey);
+        return cache.get(serializedCacheKey);
     }
 
     @Override
-    public void set(String fileName, String fileSystemSkin, String colorTheme, T content)
+    public void set(LESSResourceReference lessResourceReference, String skin, String colorTheme, T content)
     {
-        // Get the fullname of the color theme
-        String colorThemeFullName = getColorThemeFullName(colorTheme);
-
         // Store the content in the cache
-        String cacheKey = getCacheKey(fileName, fileSystemSkin, colorThemeFullName);
-        cache.set(cacheKey, content);
+        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
+        String serializedCacheKey = cacheKeySerializer.serialize(cacheKey);
+        cache.set(serializedCacheKey, content);
 
         // Add the new key to maps
-        registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, fileSystemSkin);
-        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorTheme);
+        registerCacheKey(cachedFilesKeysMapPerSkin, serializedCacheKey, cacheKey.getSkin());
+        registerCacheKey(cachedFilesKeysMapPerColorTheme, serializedCacheKey, cacheKey.getColorTheme());
+        registerCacheKey(cachedFilesKeysMapPerLESSResource, serializedCacheKey,
+            lessResourceReferenceSerializer.serialize(lessResourceReference));
     }
 
     /**
@@ -124,6 +127,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         cache.removeAll();
         cachedFilesKeysMapPerSkin.clear();
         cachedFilesKeysMapPerColorTheme.clear();
+        cachedFilesKeysMapPerLESSResource.clear();
     }
 
     private void clearFromCriteria(Map<String, List<String>> cachedFilesKeysMap, String criteria)
@@ -142,9 +146,9 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public void clearFromFileSystemSkin(String fileSystemSkin)
+    public void clearFromSkin(String skin)
     {
-        clearFromCriteria(cachedFilesKeysMapPerSkin, fileSystemSkin);
+        clearFromCriteria(cachedFilesKeysMapPerSkin, skin);
     }
 
     @Override
@@ -153,19 +157,10 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         clearFromCriteria(cachedFilesKeysMapPerColorTheme, colorTheme);
     }
 
-    private String getColorThemeFullName(String colorTheme)
+    @Override
+    public void clearFromLESSResource(LESSResourceReference lessResourceReference)
     {
-        // Current Wiki Reference
-        WikiReference currentWikiRef = new WikiReference(wikiDescriptorManager.getCurrentWikiId());
-        // Get the full reference of the color theme
-        DocumentReference colorThemeRef = documentReferenceResolver.resolve(colorTheme, currentWikiRef);
-        // Return the serialized reference
-        return entityReferenceSerializer.serialize(colorThemeRef);
-    }
-
-    private String getCacheKey(String fileName, String skin, String colorThemeFullName)
-    {
-        return skin.length() + skin + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
-                + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
+        clearFromCriteria(cachedFilesKeysMapPerLESSResource,
+            lessResourceReferenceSerializer.serialize(lessResourceReference));
     }
 }

@@ -213,8 +213,8 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        lessCache.clearFromFileSystemSkin(skin);
-        colorThemeCache.clearFromFileSystemSkin(skin);
+        lessCache.clearFromSkin(skin);
+        colorThemeCache.clearFromSkin(skin);
         return true;
     }
 }

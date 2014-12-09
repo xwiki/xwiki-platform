@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.colortheme;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,50 +26,32 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.ColorTheme;
-import org.xwiki.lesscss.ColorThemeCache;
-import org.xwiki.lesscss.LESSColorThemeConverter;
+import org.xwiki.lesscss.IntegratedLESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSSkinFileCompiler;
+import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 
 /**
- * Default implementation of {@link org.xwiki.lesscss.LESSColorThemeConverter}.
+ * Computes a color theme corresponding to a LESS file. To be used with AbstractCachedCompiler.
  *
- * @since 6.1M2
+ * @since 6.4M2
  * @version $Id$
  */
-@Component
+@Component(roles = CachedLESSColorThemeConverter.class)
 @Singleton
-public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
-        implements LESSColorThemeConverter, Initializable
+public class CachedLESSColorThemeConverter implements CachedCompilerInterface<ColorTheme>
 {
     @Inject
-    private LESSSkinFileCompiler lessSkinFileCompiler;
-
-    @Inject
-    private ColorThemeCache cache;
+    private IntegratedLESSCompiler lessCompiler;
 
     private final Pattern pattern = Pattern.compile("\\.colortheme-(\\w+)[\\s$]*\\{(\\w+):(#*\\w+)\\}");
 
     @Override
-    public void initialize() throws InitializationException
-    {
-        super.cache = cache;
-    }
-
-    @Override
-    public ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException
-    {
-        return this.compileFromSkinFile(fileName, force);
-    }
-
-    @Override
-    public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
+    public ColorTheme compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin)
         throws LESSCompilerException
     {
-        return this.compileFromSkinFile(fileName, skin, force);
+        return getColorThemeFromCSS(lessCompiler.compile(lessResourceReference, false, skin, false));
     }
 
     /**
@@ -77,7 +59,7 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
      * @param css code to parse
      * @return the corresponding color theme
      */
-    public ColorTheme getColorThemeFromCSS(String css)
+    private ColorTheme getColorThemeFromCSS(String css)
     {
         ColorTheme results = new ColorTheme();
         String cssWithoutComments = css.replaceAll("/\\*[\\u0000-\\uffff]*?\\*/", "");
@@ -89,11 +71,4 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
         }
         return results;
     }
-
-    @Override
-    protected ColorTheme compile(String fileName, String skin, boolean force) throws LESSCompilerException
-    {
-        return getColorThemeFromCSS(lessSkinFileCompiler.compileSkinFile(fileName, skin, false));
-    }
-
 }

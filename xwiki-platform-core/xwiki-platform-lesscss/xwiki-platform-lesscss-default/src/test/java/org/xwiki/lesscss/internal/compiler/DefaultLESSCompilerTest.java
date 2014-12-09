@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.compiler;
 
 import java.io.FileInputStream;
 import java.io.StringWriter;
@@ -32,7 +32,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test class for {@link org.xwiki.lesscss.internal.DefaultLESSCompiler}.
+ * Test class for {@link org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler}.
  *
  * @since 6.1M1
  * @version $Id$

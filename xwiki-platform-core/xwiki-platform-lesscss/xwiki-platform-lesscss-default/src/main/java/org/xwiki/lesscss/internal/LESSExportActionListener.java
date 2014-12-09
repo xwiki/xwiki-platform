@@ -30,6 +30,7 @@ import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 

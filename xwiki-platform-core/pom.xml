@@ -456,6 +456,8 @@
             <!-- Add new methods to the Icon Set Module -->
             <exclude>**/IconSetManager**</exclude>
             <exclude>**/IconManager**</exclude>
+            <!-- Refactor on the LESS module -->
+            <exclude>**/xwiki-platform-lesscss/**</exclude>
           </excludes>
         </configuration>
       </plugin>

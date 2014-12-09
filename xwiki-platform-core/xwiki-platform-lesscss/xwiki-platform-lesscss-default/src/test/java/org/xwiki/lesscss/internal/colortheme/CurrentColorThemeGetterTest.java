@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.colortheme;
 
 import javax.inject.Provider;
 
@@ -43,16 +43,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Test class for {@link org.xwiki.lesscss.internal.CurrentColorThemeGetter}.
+ * Test class for {@link org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter}.
  *
  * @since 6.3M2
  * @version $Id$
  */
-public class DefaultCurrentColorThemeGetterTest
+public class CurrentColorThemeGetterTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultCurrentColorThemeGetter> mocker =
-            new MockitoComponentMockingRule<>(DefaultCurrentColorThemeGetter.class);
+    public MockitoComponentMockingRule<CurrentColorThemeGetter> mocker =
+            new MockitoComponentMockingRule<>(CurrentColorThemeGetter.class);
 
     private DocumentReferenceResolver<String> documentReferenceResolver;
 

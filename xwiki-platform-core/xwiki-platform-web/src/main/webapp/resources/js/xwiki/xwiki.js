@@ -1438,8 +1438,7 @@ document.observe('xwiki:dom:loaded', function() {
           elements.each(function(element) {$(element).select(selector).each(function(item) {
             if (!item.hasClassName('initialized')) {
               var options = {
-                timeout : 30000,
-                parentContainer : item.up()
+                timeout : 30000
               };
               Object.extend(options, suggestionsMapping[keys[i]]);
               // Create the Suggest.

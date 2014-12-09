@@ -328,6 +328,8 @@
             <execution>
               <!-- Minify the WebJar resources before packing the jar. -->
               <id>minify-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
               <goals>
                 <goal>compress</goal>
               </goals>
@@ -356,7 +358,8 @@
             <execution>
               <!-- Copy the WebJar resources to the right path before packing the jar. -->
               <id>copy-webjar-resources</id>
-              <phase>validate</phase>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
               <goals>
                 <goal>copy-resources</goal>
               </goals>

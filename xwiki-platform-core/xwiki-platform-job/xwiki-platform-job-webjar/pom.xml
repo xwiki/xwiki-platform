@@ -50,6 +50,7 @@
         <executions>
           <execution>
             <id>copy-webjar-resources</id>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -59,6 +60,7 @@
         <executions>
           <execution>
             <id>minify-webjar-resources</id>
+            <phase>process-resources</phase>
           </execution>
         </executions>
       </plugin>

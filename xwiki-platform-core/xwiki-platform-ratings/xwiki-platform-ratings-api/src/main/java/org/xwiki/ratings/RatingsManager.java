@@ -72,17 +72,17 @@ public interface RatingsManager
 
     // average rating and reputation
 
-    boolean isAverageRatingStored();
+    boolean isAverageRatingStored(String documentName);
 
-    boolean isReputationStored();
+    boolean isReputationStored(String documentName);
 
-    boolean hasReputation();
+    boolean hasReputation(String documentName);
     
     AverageRating getUserReputation(String username) throws ReputationException;
         
     void updateUserReputation(String author, AverageRating voterRating) throws RatingsException;
 
-    String[] getDefaultReputationMethods();
+    String[] getDefaultReputationMethods(String documentName);
 
     AverageRating getAverageRating(String documentName) throws RatingsException;
 

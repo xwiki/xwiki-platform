@@ -224,8 +224,8 @@ public class SeparatePageRating implements Rating
     private String getPageName(String documentName) throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(documentName, context);
-        String ratingsSpace = ratingsManager.getRatingsSpaceName();
-        boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace();
+        String ratingsSpace = ratingsManager.getRatingsSpaceName(documentName);
+        boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentName);
         if (hasRatingsSpaceForeachSpace) {
             return doc.getSpace() + ratingsSpace + "."
                 + getUniquePageName(ratingsSpace, doc.getName(), "R", true);

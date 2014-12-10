@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="XWiki.SchedulerJobSheet"/}}</content>
+  <content/>
   <object>
     <name>XWiki.SchedulerJobTemplate</name>
     <number>0</number>

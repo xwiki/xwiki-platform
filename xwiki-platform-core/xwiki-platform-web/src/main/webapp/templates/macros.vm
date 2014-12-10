@@ -2546,6 +2546,9 @@ $string##
 #if (!$condition && "$!condition" == '')##
 ## Undefined condition. Use the default condition.
 #set ($condition = $doc.getObject('XWiki.SheetDescriptorClass'))
+#elseif ($condition.getClass().getName() == 'java.lang.String')##
+## The condition is the name of an xclass. Display the sheet title if the current document doesn't have such an object.
+#set ($condition = !$doc.getObject($condition))
 #end##
 ##
 #if ($condition)##

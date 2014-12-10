@@ -9,7 +9,8 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
 ## avoid using the minified versions of JS/CSS.
 ##
-#if ("$!request.minify" == 'false')
+#if ($request.minify == 'false')
+  #set ($jsExtension = '.js')
   $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
   $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
@@ -25,9 +26,11 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
   $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})##
   $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##
 #else
+  #set ($jsExtension = '.min.js')
   $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})##
   $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})##
 #end
+$xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : $xcontext.language})##
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -94,12 +97,6 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 require.config({
 ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: {
-## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
-#if($request.minify == 'false')
-  #set($jsExtension = '.js')
-#else
-  #set($jsExtension = '.min.js')
-#end
     'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
     'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap/3.2.0/js/bootstrap${jsExtension}"))',
     'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'

@@ -73,7 +73,23 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 1: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
+      <!-- Step 2: Verify and minify the JavaScript code. -->
+      <plugin>
+        <groupId>com.cj.jshintmojo</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Step 2: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

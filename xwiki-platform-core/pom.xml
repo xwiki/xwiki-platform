@@ -339,17 +339,31 @@
                   <exclude>**/*.min.*</exclude>
                 </excludes>
                 <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-                <!-- Don't overwrite the original version. -->
-                <nosuffix>false</nosuffix>
-                <suffix>.min</suffix>
               </configuration>
             </execution>
           </executions>
           <configuration>
             <skip>${xwiki.minification.skip}</skip>
+            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
             <jswarn>false</jswarn>
-            <!-- Overwrite the resource files with the minimized version. -->
-            <nosuffix>true</nosuffix>
+            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
+              currently more widely used in the JavaScript world. -->
+            <suffix>.min</suffix>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.cj.jshintmojo</groupId>
+          <artifactId>jshint-maven-plugin</artifactId>
+          <version>1.3.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>lint</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <globals>require,define</globals>
           </configuration>
         </plugin>
         <plugin>

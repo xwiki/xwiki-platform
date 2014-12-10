@@ -141,6 +141,8 @@
             <configuration>
               <sourceDirectory>${xwe.directory}/stylesheets</sourceDirectory>
               <outputDirectory>${xwe.directory}/stylesheets</outputDirectory>
+              <!-- Overwrite the CSS files with the minified version. -->
+              <nosuffix>true</nosuffix>
               <aggregations>
                 <aggregation>
                   <removeIncluded>true</removeIncluded>

@@ -52,6 +52,8 @@
           <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
                with the original, uncompressed ones. -->
           <webappDirectory>${project.build.directory}/minimized</webappDirectory>
+          <!-- We don't need the suffix (.min) because the minified files are put in a separate folder. -->
+          <nosuffix>true</nosuffix>
           <excludes>
             <!-- Exclude already minified files -->
             <exclude>**/*-min.js</exclude>

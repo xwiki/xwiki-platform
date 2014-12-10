@@ -1,4 +1,5 @@
 define(['jquery'], function($) {
+  'use strict';
   var createCallback = function(config, promise) {
     var answerJobQuestion = function(data) {
       // 'this' is the job status.
@@ -62,5 +63,5 @@ define(['jquery'], function($) {
     };
 
     return this;
-  }
+  };
 });

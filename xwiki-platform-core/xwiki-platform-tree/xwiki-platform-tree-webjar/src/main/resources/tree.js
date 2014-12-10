@@ -1,4 +1,5 @@
 define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
+  'use strict';
   // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
   // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
   // order to add the following special characters: ?`.
@@ -33,7 +34,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
           node.data = {validChildren: validChildren};
         }
         nestedCallback(children);
-      }
+      };
     }
     var childrenURL = node.data && node.data.childrenURL;
     parameters = parameters || {};
@@ -73,9 +74,9 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     return true;
   };
 
-  var canCopyNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Copy')};
-  var canCutNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Move')};
-  var canRemoveNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Delete')};
+  var canCopyNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Copy');};
+  var canCutNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Move');};
+  var canRemoveNodes = function(nodes) {return canPerformBatchOperation(nodes, 'Delete');};
 
   var validateOperation = function (operation, node, parent, position, more) {
     // The operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'.
@@ -108,7 +109,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var position = paginationElement.parent().children().index(paginationElement[0]);
       tree.delete_node(paginationNode);
       $.each(children, function(index) {
-        var selectFirstChild = index == 0 && tree.element.hasClass('jstree-no-links');
+        var selectFirstChild = index === 0 && tree.element.hasClass('jstree-no-links');
         tree.create_node(parent, this, position + index, selectFirstChild && function(firstChild) {
           tree.select_node(firstChild);
         });
@@ -237,8 +238,8 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       // Make sure the parameters are not modified by the event listeners.
       data.parameters = $.extend(true, {}, parameters || {});
       tree.element.trigger('xtree.contextMenu.' + action, data);
-    }
-  }
+    };
+  };
 
   var prepareNodeTemplate = function(parent, template) {
     var defaultTemplate = {
@@ -346,7 +347,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     },
     execute: function(action, node, params) {
       var url = node.data && node.data[action + 'URL'];
-      var params = params || {};
+      params = params || {};
       if (!url) {
         url = this.element.attr('data-url');
         params.action = action;
@@ -547,7 +548,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     //
 
     }).each(function() {
-      $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}))
+      $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}));
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });
   };

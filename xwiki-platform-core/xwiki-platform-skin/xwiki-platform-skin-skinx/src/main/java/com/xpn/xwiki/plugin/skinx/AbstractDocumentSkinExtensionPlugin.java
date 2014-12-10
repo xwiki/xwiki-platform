@@ -67,7 +67,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Log helper for logging messages in this class.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
 
     /**
      * The name of the field that indicates whether an extension should always be used, or only when explicitly pulled.

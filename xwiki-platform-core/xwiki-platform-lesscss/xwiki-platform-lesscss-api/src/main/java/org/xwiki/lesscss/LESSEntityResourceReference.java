@@ -19,6 +19,7 @@
  */
 package org.xwiki.lesscss;
 
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -30,6 +31,25 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class LESSEntityResourceReference implements LESSResourceReference
 {
+    private ObjectPropertyReference objectPropertyReference;
+
+    /**
+     * Constructor.
+     * @param objectPropertyReference reference to the property of an XObject storing some LESS code
+     */
+    public LESSEntityResourceReference(ObjectPropertyReference objectPropertyReference)
+    {
+        this.objectPropertyReference = objectPropertyReference;
+    }
+
+    /**
+     * @return the reference to a property of an XObject storing some LESS code
+     */
+    public ObjectPropertyReference getObjectPropertyReference()
+    {
+        return objectPropertyReference;
+    }
+
     @Override
     public boolean equals(Object o)
     {

@@ -124,9 +124,9 @@ public class CachedIntegratedLESSCompilerTest
 
         // Resource
         when(lessResourceContentReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("import (reference) \"style.less.vm\";\nSome LESS content"), eq(xcontext))).
-                thenReturn("import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
-        when(lessCompiler.compile(eq("import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content"),
+        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\nSome LESS content"), eq(xcontext))).
+                thenReturn("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
+        when(lessCompiler.compile(eq("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content"),
                 any(Path[].class))).thenReturn("output");
 
         // Tests

@@ -55,9 +55,9 @@ public class ColorThemeFullnameGetterTest
     {
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null,
-            DocumentReferenceResolver.class, String.class));
+                DocumentReferenceResolver.class, String.class));
         entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
-            EntityReferenceSerializer.class, String.class));
+                EntityReferenceSerializer.class, String.class));
     }
 
     @Test

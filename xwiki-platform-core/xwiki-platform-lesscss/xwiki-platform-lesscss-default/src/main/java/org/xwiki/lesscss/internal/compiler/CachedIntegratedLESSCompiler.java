@@ -148,9 +148,11 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
         String velocityOutput = executeVelocity(mainSkinStyle, skin);
         // Write the file on the temp directory
         File mainSkinStyleFile = new File(tempDir, MAIN_SKIN_STYLE_FILENAME);
-        IOUtils.copy(new StringReader(velocityOutput), new FileWriter(mainSkinStyleFile));
+        FileWriter fileWriter = new FileWriter(mainSkinStyleFile);
+        IOUtils.copy(new StringReader(velocityOutput), fileWriter);
+        fileWriter.close();
         // Add the import line to the LESS resource
-        source.write("import (reference) \"" + MAIN_SKIN_STYLE_FILENAME + "\";\n");
+        source.write("@import (reference) \"" + MAIN_SKIN_STYLE_FILENAME + "\";\n");
     }
 
     private String executeVelocity(String source, String skin)

@@ -14,6 +14,8 @@ org.xwiki.lesscss.internal.compiler.DefaultLESSSkinFileCompiler
 org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceContentReader
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReferenceSerializer
+org.xwiki.lesscss.internal.resources.LESSEntityResourceContentReader
+org.xwiki.lesscss.internal.resources.LESSEntityResourceReferenceSerializer
 org.xwiki.lesscss.internal.resources.LESSSkinFileContentReader
 org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReferenceSerializer
 org.xwiki.lesscss.internal.LESSExportActionListener

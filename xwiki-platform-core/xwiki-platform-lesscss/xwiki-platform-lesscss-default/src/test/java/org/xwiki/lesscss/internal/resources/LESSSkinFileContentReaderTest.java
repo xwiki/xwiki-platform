@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSEntityResourceReference;
+import org.xwiki.lesscss.LESSResourceReference;
 import org.xwiki.lesscss.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -99,7 +99,7 @@ public class LESSSkinFileContentReaderTest
         // Test
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().getContent(new LESSEntityResourceReference(), "skin");
+            mocker.getComponentUnderTest().getContent(new LESSResourceReference(){}, "skin");
         } catch (LESSCompilerException e) {
             caughtException = e;
         }
@@ -115,7 +115,7 @@ public class LESSSkinFileContentReaderTest
         // Mocks
         when(skinDirectoryGetter.getSkinDirectory("skin")).thenReturn("skins/skin");
         when(engineContext.getRealPath("skins/skin/less/not-existing-file.less")).
-                thenReturn(getClass().getResource("/").getPath()+"not-existing-file.less");
+                thenReturn(getClass().getResource("/").getPath() + "not-existing-file.less");
 
         // Test
         LESSCompilerException caughtException = null;

@@ -19,34 +19,56 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.LESSEntityResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * @since 6.4M2
  * @version $Id$
  */
-public class LessSkinFileResourceReferenceSerializerTest
+public class LESSEntityResourceReferenceSerializerTest
 {
     @Rule
-    public MockitoComponentMockingRule<LESSSkinFileResourceReferenceSerializer> mocker =
-            new MockitoComponentMockingRule<>(LESSSkinFileResourceReferenceSerializer.class);
+    public MockitoComponentMockingRule<LESSEntityResourceReferenceSerializer> mocker =
+            new MockitoComponentMockingRule<>(LESSEntityResourceReferenceSerializer.class);
+
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
+                EntityReferenceSerializer.class, String.class));
+    }
 
     @Test
     public void serialize() throws Exception
     {
+        // Mocks
+        when(entityReferenceSerializer.serialize(any(ObjectPropertyReference.class))).thenReturn("object_code");
+
         // Test
-        assertEquals("LessSkinFile[myFile.less]", mocker.getComponentUnderTest().serialize(
-                new LESSSkinFileResourceReference("myFile.less")));
+        assertEquals("LessEntity[object_code]", mocker.getComponentUnderTest().serialize(
+                new LESSEntityResourceReference(new ObjectPropertyReference("code", new ObjectReference("Object",
+                new DocumentReference("wiki", "space", "page"))))));
 
         // Verify
         verifyZeroInteractions(mocker.getMockedLogger());
@@ -56,10 +78,9 @@ public class LessSkinFileResourceReferenceSerializerTest
     public void serializeWithUnsupportedResource() throws Exception
     {
         // Test
-        assertNull(mocker.getComponentUnderTest().serialize(new LESSEntityResourceReference()));
+        assertNull(mocker.getComponentUnderTest().serialize(new LESSResourceReference(){}));
 
         // Verify
-        verify(mocker.getMockedLogger()).warn(eq("Invalid LESS resource type [{}]."),
-            eq((new LESSEntityResourceReference()).toString()));
+        verify(mocker.getMockedLogger()).warn(eq("Invalid LESS resource type [{}]."), anyString());
     }
 }

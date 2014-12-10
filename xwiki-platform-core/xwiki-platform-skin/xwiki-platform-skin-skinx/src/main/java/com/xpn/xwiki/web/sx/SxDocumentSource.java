@@ -27,6 +27,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.lesscss.IntegratedLESSCompiler;
+import org.xwiki.lesscss.LESSCompilerException;
+import org.xwiki.lesscss.LESSEntityResourceReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -34,6 +38,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -119,7 +124,18 @@ public class SxDocumentSource implements SxSource
                 }
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
-                if (parse == 1) {
+                if ("less".equals(sxObj.getStringValue("preprocessor"))) {
+                    IntegratedLESSCompiler lessCompiler = Utils.getComponent(IntegratedLESSCompiler.class);
+                    try {
+                        sxContent = lessCompiler.compile(new LESSEntityResourceReference(
+                            new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
+                                    sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()))),
+                            true, false);
+                    } catch (LESSCompilerException e) {
+                        LOGGER.warn("LESS errors while parsing skin extension [{}] with content [{}]: ",
+                            this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(e));
+                    }
+                } else if (parse == 1) {
                     try {
                         StringWriter writer = new StringWriter();
                         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);

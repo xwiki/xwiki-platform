@@ -293,7 +293,7 @@ public class BasePage extends BaseElement
      */
     public void togglePageMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmPage");
     }
 
     /**
@@ -301,7 +301,7 @@ public class BasePage extends BaseElement
      */
     public void toggleUserMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmUser']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmUser");
     }
 
     /**
@@ -309,7 +309,7 @@ public class BasePage extends BaseElement
      */
     public void toggleSpaceMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmSpace']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmSpace");
     }
 
     /**
@@ -322,8 +322,26 @@ public class BasePage extends BaseElement
         if (!getUtil().hasElement(By.id(wikiMenuId))) {
             wikiMenuId = "tmMainWiki";
         }
-        getDriver().findElement(By.xpath("//li[@id='" + wikiMenuId + "']//a[contains(@class, 'dropdown-toggle')]"))
-            .click();
+        toggleTopMenu(wikiMenuId);
+    }
+
+    /**
+     * @return {@code true} if the screen is extra small (as defined by Bootstrap), {@code false} otherwise
+     */
+    private boolean isExtraSmallScreen()
+    {
+        return getDriver().manage().window().getSize().getWidth() < 768;
+    }
+
+    private By getTopMenuToggleSelector(String menuId)
+    {
+        String side = isExtraSmallScreen() ? "left" : "right";
+        return By.xpath("//li[@id='" + menuId + "']//a[contains(@class, 'dropdown-split-" + side + "')]");
+    }
+
+    private void toggleTopMenu(String menuId)
+    {
+        getDriver().findElement(getTopMenuToggleSelector(menuId)).click();
     }
 
     /**

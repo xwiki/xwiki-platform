@@ -162,6 +162,11 @@
 
 .toc ul {
   margin-top: 0;
+}
+
+.extensionInfo .rating-wrapper,
+.extensionInfo .rating-wrapper .rating-message {
+  float: none;
 }</code>
     </property>
     <property>
@@ -296,6 +301,7 @@
     </property>
   </object>
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
+{{include reference="XWiki.RatingsMacros"/}}
 
 {{velocity output="false"}}
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
@@ -367,6 +373,8 @@
         #else
           $doc.authors
         #end
+      ##------- Rating --------
+      |(% class="label" %)Rating(%%)|#displayFullRating($doc "")
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')

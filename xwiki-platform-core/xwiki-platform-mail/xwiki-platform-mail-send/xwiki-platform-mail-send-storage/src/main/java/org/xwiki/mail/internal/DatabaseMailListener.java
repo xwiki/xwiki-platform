@@ -65,4 +65,10 @@ public class DatabaseMailListener implements MailListener
     {
         return null;
     }
+
+    @Override
+    public int getErrorsNumber()
+    {
+        return 0;
+    }
 }

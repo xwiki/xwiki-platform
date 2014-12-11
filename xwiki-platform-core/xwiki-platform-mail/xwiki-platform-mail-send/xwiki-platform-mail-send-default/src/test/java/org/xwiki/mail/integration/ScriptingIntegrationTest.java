@@ -41,6 +41,7 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
@@ -68,7 +69,8 @@ import static org.mockito.Mockito.mock;
     DefaultMailSenderThread.class,
     DefaultExecution.class,
     ContextComponentManagerProvider.class,
-    DefaultMimeBodyPartFactory.class
+    DefaultMimeBodyPartFactory.class,
+    MemoryMailListener.class
 })
 public class ScriptingIntegrationTest
 {

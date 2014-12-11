@@ -70,5 +70,12 @@ public class MemoryMailListener implements MailListener
     {
         return this.errorQueue.iterator();
 
+
+    }
+
+    @Override
+    public int getErrorsNumber()
+    {
+        return this.errorQueue.size();
     }
 }

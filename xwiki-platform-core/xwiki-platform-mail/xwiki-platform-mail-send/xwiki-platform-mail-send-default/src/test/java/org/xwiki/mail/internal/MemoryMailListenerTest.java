@@ -49,6 +49,6 @@ public class MemoryMailListenerTest
         MimeMessage message = mock(MimeMessage.class);
         listener.onError(message, new Exception("error"));
         assertTrue(listener.getErrors().hasNext());
-        assertEquals("error", listener.getErrors().next().getMessage());
+        assertEquals("error", listener.getErrors().next().getException().getMessage());
     }
 }

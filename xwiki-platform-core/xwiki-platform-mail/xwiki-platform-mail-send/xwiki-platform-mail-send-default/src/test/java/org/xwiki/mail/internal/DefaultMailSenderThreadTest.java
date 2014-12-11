@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Collection;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -31,10 +30,10 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.MailStatus;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.DefaultMailSenderThread}.
@@ -42,6 +41,9 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentList({
+    MemoryMailListener.class
+})
 public class DefaultMailSenderThreadTest
 {
     @Rule
@@ -76,7 +78,7 @@ public class DefaultMailSenderThreadTest
         boolean success = true;
         try {
             long time = System.currentTimeMillis();
-            while (((Collection<MailStatus>)listener.getErrors()).size() != 2) {
+            while (listener.getErrorsNumber() != 2) {
                 if (System.currentTimeMillis() - time > 5000L) {
                     success = false;
                     break;

@@ -45,6 +45,7 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -67,7 +68,8 @@ import static org.junit.Assert.assertEquals;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    DefaultMailSenderThread.class,
+    MemoryMailListener.class
 })
 public class AuthenticatingIntegrationTest
 {

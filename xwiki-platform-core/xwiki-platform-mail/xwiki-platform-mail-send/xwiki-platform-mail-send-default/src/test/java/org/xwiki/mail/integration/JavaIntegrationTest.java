@@ -52,6 +52,7 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -74,7 +75,8 @@ import static org.junit.Assert.fail;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    DefaultMailSenderThread.class,
+    MemoryMailListener.class
 })
 public class JavaIntegrationTest
 {
@@ -115,6 +117,11 @@ public class JavaIntegrationTest
         @Override public Iterator<MailStatus> getErrors()
         {
             return null;
+        }
+
+        @Override public int getErrorsNumber()
+        {
+            return 0;
         }
     };
 

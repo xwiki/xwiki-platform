@@ -58,5 +58,13 @@ public interface MailListener
      */
     void onError(MimeMessage message, Exception e);
 
+    /**
+     * @return the list of MailStatus
+     */
     Iterator<MailStatus> getErrors();
+
+    /**
+     * @return the number of errors
+     */
+    int getErrorsNumber();
 }

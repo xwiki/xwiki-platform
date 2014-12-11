@@ -1,0 +1,14 @@
+.runTransformations
+.#--------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that the macro generates an error if the user doesn't exist.
+.#--------------------------------------------------------------------
+{{useravatar username="XWiki.UserWithNonExistingAvatarFile" /}}
+.#--------------------------------------------------------------------
+.expect|event/1.0
+.#--------------------------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [useravatar] [username=XWiki.UserWithNonExistingAvatarFile]
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/noavatar.png]] [false] [[alt]=[Picture of UserWithNonExistingAvatarFile][title]=[UserWithNonExistingAvatarFile]]
+endMacroMarkerStandalone [useravatar] [username=XWiki.UserWithNonExistingAvatarFile]
+endDocument

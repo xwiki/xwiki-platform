@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -66,7 +65,9 @@
         ## Delete only the application's entries (just data) from the data space.
         ##
         ## Note: XWQL does not support parametrised object class, so we just have to push it directly in the query string.    
-        #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') as obj $deleteQueryString")
+        #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') AS obj $deleteQueryString AND doc.fullName &lt;&gt; :template")
+        #set ($templateDocRef = $services.model.createDocumentReference($xcontext.wiki, $classRef.lastSpaceReference.name, "${appName}Template"))
+        #set ($templateDocFullName = $services.model.serialize($templateDocRef, 'local'))
       #else
         ## Delete the entire application (code + data spaces).
         ##
@@ -77,6 +78,9 @@
       ## Run the query and delete the documents.
       #set ($deleteQuery = $services.query.xwql($deleteQueryString))
       #set ($discard = $deleteQuery.bindValue('spaces', $deleteQuerySpaces))
+      #if ($templateDocFullName)
+        #set ($discard = $deleteQuery.bindValue('template', $templateDocFullName))
+      #end
       #set ($docNamesToDelete = $deleteQuery.execute())
       #foreach ($docNameToDelete in $docNamesToDelete)
         #set ($docToDelete = $xwiki.getDocument($docNameToDelete))

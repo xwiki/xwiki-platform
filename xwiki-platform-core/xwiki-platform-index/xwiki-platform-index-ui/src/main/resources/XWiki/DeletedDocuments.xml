@@ -495,10 +495,10 @@ document.observe('xwiki:dom:loaded', function() {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
 }
 .itemActions .restore {
-   background-image: url("$xwiki.getSkinFile('/icons/silk/arrow_refresh.png')") !important;
+   background-image: url("$xwiki.getSkinFile('icons/silk/arrow_refresh.png')") !important;
 }
 .itemActions .cannot-restore {
-   background-image: url("$xwiki.getSkinFile('/icons/silk/page_error.png')") !important;
+   background-image: url("$xwiki.getSkinFile('icons/silk/page_error.png')") !important;
 }</code>
     </property>
     <property>

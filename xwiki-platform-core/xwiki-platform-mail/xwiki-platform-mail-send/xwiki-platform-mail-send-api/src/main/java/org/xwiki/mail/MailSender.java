@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail;
 
+import java.util.UUID;
+
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
@@ -43,7 +45,7 @@ public interface MailSender
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @throws MessagingException when an error occurs when sending the mail
      */
-    void send(MimeMessage message, Session session) throws MessagingException;
+    UUID send(MimeMessage message, Session session) throws MessagingException;
 
     /**
      * Send a mail asynchronously (the call returns immediately and you need to call {@link #waitTillSent(long)} if you
@@ -54,7 +56,7 @@ public interface MailSender
      * @param listener a listener called when the mail is sent successfully or when there is an error
      * @since 6.2M1
      */
-    void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener);
+    UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener) throws MessagingException;
 
     /**
      * Wait for all messages on the sending queue to be sent before returning.

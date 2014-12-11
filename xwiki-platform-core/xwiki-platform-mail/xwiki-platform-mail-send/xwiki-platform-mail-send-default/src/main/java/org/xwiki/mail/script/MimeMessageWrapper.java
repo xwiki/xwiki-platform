@@ -22,9 +22,12 @@ package org.xwiki.mail.script;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
+import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -36,10 +39,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.DefaultMailResultListener;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
 
@@ -61,7 +65,9 @@ public class MimeMessageWrapper
 
     private MailSenderConfiguration configuration;
 
-    private DefaultMailResultListener listener;
+    @Inject
+    @Named("memory")
+    private MailListener listener;
 
     private Session session;
 
@@ -87,7 +93,6 @@ public class MimeMessageWrapper
         this.execution = execution;
         this.configuration = configuration;
         this.componentManager = componentManager;
-        this.listener = new DefaultMailResultListener();
     }
 
     /**
@@ -141,14 +146,15 @@ public class MimeMessageWrapper
      * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling
      * {@link #getErrors()}.
      */
-    public void send()
+    public UUID send()
     {
         try {
             checkPermissions();
-            this.mailSender.send(getMessage(), this.session);
+            return this.mailSender.send(getMessage(), this.session);
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
             setError(e);
+            return null;
         }
     }
 
@@ -156,7 +162,7 @@ public class MimeMessageWrapper
      * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking or simply use
      * {@link #send()}. Any error can be retrieved by calling {@link #getErrors()}.
      */
-    public void sendAsynchronously()
+    public UUID sendAsynchronously() throws MessagingException
     {
         try {
             checkPermissions();
@@ -164,12 +170,13 @@ public class MimeMessageWrapper
             // Save the exception for reporting through the script services's getError() API
             setError(e);
             // Don't send the mail!
-            return;
+            return null;
         }
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
+        UUID Sender = this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
+        return Sender;
     }
 
     /**
@@ -257,9 +264,9 @@ public class MimeMessageWrapper
      *         when the sending was done asynchronously. If the send was done synchronously and an error happened
      *         then it's available through the script service's {@code #getLastError()} method.
      */
-    public BlockingQueue<Exception> getErrors()
+    public Iterator<MailStatus> getErrors()
     {
-        return this.listener.getExceptionQueue();
+        return this.listener.getErrors();
     }
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException

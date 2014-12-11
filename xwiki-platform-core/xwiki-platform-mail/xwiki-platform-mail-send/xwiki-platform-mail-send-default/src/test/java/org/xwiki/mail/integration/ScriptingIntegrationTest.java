@@ -19,9 +19,6 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Properties;
@@ -54,6 +51,10 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -122,7 +123,7 @@ public class ScriptingIntegrationTest
         message.waitTillSent(10000L);
 
         // Verify that there are no errors
-        assertEquals(0, message.getErrors().size());
+        assertFalse(message.getErrors().hasNext());
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
@@ -181,7 +182,7 @@ public class ScriptingIntegrationTest
         message.send();
 
         // Verify that there are no errors
-        assertEquals(0, message.getErrors().size());
+        assertFalse(message.getErrors().hasNext());
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

@@ -19,13 +19,11 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,9 +42,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.environment.internal.StandardEnvironment;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -59,6 +58,9 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -90,8 +92,13 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailResultListener listener = new MailResultListener()
+    private MailListener listener = new MailListener()
     {
+        @Override public void onPrepare(MimeMessage message)
+        {
+            // Do nothing
+        }
+
         @Override
         public void onSuccess(MimeMessage message)
         {
@@ -103,6 +110,11 @@ public class JavaIntegrationTest
         {
             // Shouldn't happen, fail the test!
             fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
+        }
+
+        @Override public Iterator<MailStatus> getErrors()
+        {
+            return null;
         }
     };
 

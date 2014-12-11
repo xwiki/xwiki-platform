@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,28 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-mail</artifactId>
-    <version>6.4-SNAPSHOT</version>
-  </parent>
-  <packaging>pom</packaging>
-  <artifactId>xwiki-platform-mail-send</artifactId>
-  <name>XWiki Platform - Mail - Send - Parent POM</name>
-  <description>XWiki Platform - Mail - Send - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-mail-send-api</module>
-    <module>xwiki-platform-mail-send-default</module>
-    <module>xwiki-platform-mail-send-storage</module>
-  </modules>
-</project>
+package org.xwiki.mail.internal.iterator.factory;
+
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
+
+/**
+ *
+ * @version $Id$
+ * @since 6.4M2
+ */
+@Role
+public interface GroupMimeMessageIteratorFactory
+{
+    public Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException;
+}

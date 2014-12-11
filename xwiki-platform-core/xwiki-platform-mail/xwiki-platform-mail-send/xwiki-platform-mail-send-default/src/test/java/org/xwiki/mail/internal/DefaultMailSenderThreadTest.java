@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collection;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,6 +30,8 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.*;
@@ -55,7 +58,7 @@ public class DefaultMailSenderThreadTest
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        DefaultMailResultListener listener = new DefaultMailResultListener();
+        MailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         MailSenderQueueItem item = new MailSenderQueueItem(message, session, listener);
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
@@ -73,7 +76,7 @@ public class DefaultMailSenderThreadTest
         boolean success = true;
         try {
             long time = System.currentTimeMillis();
-            while (listener.getExceptionQueue().size() != 2) {
+            while (((Collection<MailStatus>)listener.getErrors()).size() != 2) {
                 if (System.currentTimeMillis() - time > 5000L) {
                     success = false;
                     break;

@@ -17,33 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+
+package org.xwiki.mail.internal.iterator.factory;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Allows listening to Mail sending results.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M2
  */
-@Unstable
-public interface MailResultListener
+@Role
+public interface UsersMimeMessageIteratorFactory
 {
-    /**
-     * Called when the mail is sent successfully.
-     *
-     * @param message the message sent
-     */
-    void onSuccess(MimeMessage message);
-
-    /**
-     * Called when the mail has failed to be sent.
-     *
-     * @param message the message that was tried to be sent
-     * @param e the exception explaining why the message couldn't be sent
-     */
-    void onError(MimeMessage message, Exception e);
+    public Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
+        Map<String, Object> parameters);
 }

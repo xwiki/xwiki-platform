@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 
 /**
  * Thread that regularly check for mails on a Queue, and for each mail tries to send it.
@@ -125,8 +125,11 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     protected void sendMail(MailSenderQueueItem item)
     {
         MimeMessage message = item.getMessage();
-        MailResultListener listener = item.getListener();
-
+        MailListener listener = item.getListener();
+        // Mail ready to be sent, notify the user if a listener has been provided
+        if (listener != null) {
+            listener.onPrepare(message);
+        }
         try {
             // Step 1: If the current Session in use is different from the one passed then close the current Transport,
             // get a new one and reconnect. Also do that every 100 mails sent.

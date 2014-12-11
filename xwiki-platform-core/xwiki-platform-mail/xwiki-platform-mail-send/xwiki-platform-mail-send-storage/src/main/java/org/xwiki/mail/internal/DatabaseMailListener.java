@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,23 +16,53 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.mail.internal;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-mail</artifactId>
-    <version>6.4-SNAPSHOT</version>
-  </parent>
-  <packaging>pom</packaging>
-  <artifactId>xwiki-platform-mail-send</artifactId>
-  <name>XWiki Platform - Mail - Send - Parent POM</name>
-  <description>XWiki Platform - Mail - Send - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-mail-send-api</module>
-    <module>xwiki-platform-mail-send-default</module>
-    <module>xwiki-platform-mail-send-storage</module>
-  </modules>
-</project>
+import java.util.Iterator;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.mail.internet.MimeMessage;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailEventManager;
+
+/**
+ * @version $Id$
+ * @since 6.4M2
+ */
+@Component
+@Singleton
+@Named("database")
+public class DatabaseMailListener implements MailListener
+{
+    @Inject
+    private MailEventManager mailEventManager;
+
+    @Override
+    public void onPrepare(MimeMessage message)
+    {
+
+    }
+
+    @Override
+    public void onSuccess(MimeMessage message)
+    {
+    }
+
+    @Override
+    public void onError(MimeMessage message, Exception e)
+    {
+
+    }
+
+    @Override
+    public Iterator<MailStatus> getErrors()
+    {
+        return null;
+    }
+}

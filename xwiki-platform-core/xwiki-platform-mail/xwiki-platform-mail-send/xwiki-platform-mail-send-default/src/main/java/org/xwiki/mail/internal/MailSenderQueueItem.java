@@ -24,7 +24,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -39,7 +39,7 @@ public class MailSenderQueueItem
 
     private Session session;
 
-    private MailResultListener listener;
+    private MailListener listener;
 
     private long threadId;
 
@@ -48,7 +48,7 @@ public class MailSenderQueueItem
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      */
-    public MailSenderQueueItem(MimeMessage message, Session session, MailResultListener listener)
+    public MailSenderQueueItem(MimeMessage message, Session session, MailListener listener)
     {
         this.message = message;
         this.session = session;
@@ -75,7 +75,7 @@ public class MailSenderQueueItem
     /**
      * @return an optional listener to call when the mail is sent successfully or when there's an error
      */
-    public MailResultListener getListener()
+    public MailListener getListener()
     {
         return this.listener;
     }

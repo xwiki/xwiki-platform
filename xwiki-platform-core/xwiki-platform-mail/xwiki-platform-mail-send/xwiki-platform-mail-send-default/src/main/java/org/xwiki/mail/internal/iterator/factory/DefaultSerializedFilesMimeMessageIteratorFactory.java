@@ -17,43 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.iterator.factory;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
+import javax.inject.Singleton;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.internal.iterator.SerializedFilesMimeMessageIterator;
 
 /**
- * Saves errors when sending messages, in a local variable.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M2
  */
-public class DefaultMailResultListener implements MailResultListener
+@Component
+@Singleton
+public class DefaultSerializedFilesMimeMessageIteratorFactory implements SerializedFilesMimeMessageIteratorFactory
 {
-    private BlockingQueue<Exception> errorQueue = new LinkedBlockingQueue<>(100);
-
-    @Override
-    public void onSuccess(MimeMessage message)
+    @Override public Iterator<MimeMessage> create(List<File> files, Map<String, Object> parameters)
     {
-        // We're only interested in errors in the scripting API.
-    }
-
-    @Override
-    public void onError(MimeMessage message, Exception e)
-    {
-        // Add the error to the queue
-        this.errorQueue.add(e);
-    }
-
-    /**
-     * @return the list of exceptions raised when sending mails in the current thread
-     */
-    public BlockingQueue<Exception> getExceptionQueue()
-    {
-        return this.errorQueue;
+        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(files, parameters);
+        return iterator;
     }
 }

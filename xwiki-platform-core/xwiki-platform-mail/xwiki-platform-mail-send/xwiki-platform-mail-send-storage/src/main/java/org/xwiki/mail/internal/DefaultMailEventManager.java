@@ -17,30 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.xwiki.mail.internal;
 
-import javax.mail.internet.MimeMessage;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MailEvent;
+import org.xwiki.mail.MailEventManager;
+import org.xwiki.query.QueryManager;
 
 /**
- * Unit tests for {@link DefaultMailResultListener}.
- *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M2
  */
-public class DefaultMailResultListenerTest
+@Component
+@Singleton
+public class DefaultMailEventManager implements MailEventManager
 {
-    @Test
-    public void errorAndRetrieveError() throws Exception
+    @Inject
+    private QueryManager queryManager;
+
+
+    @Override
+    public MailEvent getEvent(String messageID)
     {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        MimeMessage message = mock(MimeMessage.class);
-        listener.onError(message, new Exception("error"));
-        assertEquals(1, listener.getExceptionQueue().size());
-        assertEquals("error", listener.getExceptionQueue().take().getMessage());
+        return null;
     }
 }

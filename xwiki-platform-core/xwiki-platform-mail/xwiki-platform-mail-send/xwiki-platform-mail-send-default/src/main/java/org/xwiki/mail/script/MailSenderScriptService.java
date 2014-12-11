@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -163,7 +164,7 @@ public class MailSenderScriptService implements ScriptService
      *
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage()
+    public MimeMessageWrapper createMessage() throws MessagingException
     {
         return createMessage(null, null, (String) null);
     }
@@ -177,7 +178,7 @@ public class MailSenderScriptService implements ScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage(String to, String subject)
+    public MimeMessageWrapper createMessage(String to, String subject) throws MessagingException
     {
         return createMessage(this.configuration.getFromAddress(), to, subject);
     }
@@ -192,7 +193,7 @@ public class MailSenderScriptService implements ScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage(String from, String to, String subject)
+    public MimeMessageWrapper createMessage(String from, String to, String subject) throws MessagingException
     {
         Session session = createSession();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);

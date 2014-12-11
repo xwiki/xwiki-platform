@@ -26,8 +26,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -65,8 +63,6 @@ public class MimeMessageWrapper
 
     private MailSenderConfiguration configuration;
 
-    @Inject
-    @Named("memory")
     private MailListener listener;
 
     private Session session;
@@ -85,7 +81,7 @@ public class MimeMessageWrapper
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
     MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
-        MailSenderConfiguration configuration, ComponentManager componentManager)
+        MailSenderConfiguration configuration, ComponentManager componentManager) throws MessagingException
     {
         this.message = message;
         this.session = session;
@@ -93,6 +89,11 @@ public class MimeMessageWrapper
         this.execution = execution;
         this.configuration = configuration;
         this.componentManager = componentManager;
+        try {
+            this.listener = this.componentManager.getInstance(MailListener.class, "memory");
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate [%s] event lister. ", "memory"), e);
+        }
     }
 
     /**

@@ -25,9 +25,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceContentReader;
-import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
  * Default implementation of {@link LESSResourceContentReader}. It looks-up the component corresponding to the

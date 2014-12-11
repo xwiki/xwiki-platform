@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.ColorTheme;
-import org.xwiki.lesscss.IntegratedLESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.colortheme.ColorTheme;
+import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 
 /**
@@ -48,10 +48,11 @@ public class CachedLESSColorThemeConverter implements CachedCompilerInterface<Co
     private final Pattern pattern = Pattern.compile("\\.colortheme-(\\w+)[\\s$]*\\{(\\w+):(#*\\w+)\\}");
 
     @Override
-    public ColorTheme compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin)
+    public ColorTheme compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle,
+        boolean useVelocity, String skin)
         throws LESSCompilerException
     {
-        return getColorThemeFromCSS(lessCompiler.compile(lessResourceReference, false, skin, false));
+        return getColorThemeFromCSS(lessCompiler.compile(lessResourceReference, false, useVelocity, skin, false));
     }
 
     /**

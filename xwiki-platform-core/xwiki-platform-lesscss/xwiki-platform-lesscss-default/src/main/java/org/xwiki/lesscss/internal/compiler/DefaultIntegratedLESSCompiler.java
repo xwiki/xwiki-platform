@@ -25,14 +25,14 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.IntegratedLESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.IntegratedLESSCompiler}. It uses the CachedIntegratedLESSCompiler
+ * Default implementation for {@link org.xwiki.lesscss.compiler.IntegratedLESSCompiler}. It uses the CachedIntegratedLESSCompiler
  * through the AbstractCachedCompiler to cache the result of the compilation.
  *
  * @since 6.4M2
@@ -41,10 +41,10 @@ import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
 @Component
 @Singleton
 public class DefaultIntegratedLESSCompiler extends AbstractCachedCompiler<String> implements IntegratedLESSCompiler,
-        Initializable
+    Initializable
 {
     @Inject
-    private LESSSkinFileCache cache;
+    private LESSResourcesCache cache;
 
     @Inject
     private CachedIntegratedLESSCompiler cachedIntegratedLESSCompiler;
@@ -57,16 +57,16 @@ public class DefaultIntegratedLESSCompiler extends AbstractCachedCompiler<String
     }
 
     @Override
-    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean force)
-        throws LESSCompilerException
+    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        boolean force) throws LESSCompilerException
     {
-        return super.getResult(lessResourceReference, includeSkinStyle, force);
+        return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, force);
     }
 
     @Override
-    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin,
-            boolean force) throws LESSCompilerException
+    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        String skin, boolean force) throws LESSCompilerException
     {
-        return super.getResult(lessResourceReference, includeSkinStyle, skin, force);
+        return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, skin, force);
     }
 }

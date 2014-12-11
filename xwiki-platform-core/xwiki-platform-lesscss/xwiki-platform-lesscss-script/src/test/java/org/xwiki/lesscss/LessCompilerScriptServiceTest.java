@@ -25,6 +25,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.colortheme.ColorTheme;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
+import org.xwiki.lesscss.skin.FSSkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -56,7 +66,7 @@ public class LessCompilerScriptServiceTest
 
     private LESSSkinFileCompiler lessCompiler;
 
-    private LESSSkinFileCache lessCache;
+    private LESSResourcesCache lessCache;
 
     private ColorThemeCache colorThemeCache;
 
@@ -68,14 +78,20 @@ public class LessCompilerScriptServiceTest
 
     private XWikiContext xcontext;
 
+    private SkinReferenceFactory skinReferenceFactory;
+
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
+
     @Before
     public void setUp() throws Exception
     {
         lessCompiler = mocker.getInstance(LESSSkinFileCompiler.class);
         lessColorThemeConverter = mocker.getInstance(LESSColorThemeConverter.class);
-        lessCache = mocker.getInstance(LESSSkinFileCache.class);
+        lessCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
+        skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
+        colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -253,12 +269,15 @@ public class LessCompilerScriptServiceTest
 
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
 
+        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
+                new NamedColorThemeReference("colorTheme"));
+
         // Tests
         assertTrue(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
-        verify(lessCache).clearFromColorTheme(eq("colorTheme"));
-        verify(colorThemeCache).clearFromColorTheme(eq("colorTheme"));
+        verify(lessCache).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
+        verify(colorThemeCache).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
     }
 
     @Test
@@ -294,13 +313,14 @@ public class LessCompilerScriptServiceTest
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+        when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
 
         // Tests
-        assertTrue(mocker.getComponentUnderTest().clearCacheFromFileSystemSkin("skin"));
+        assertTrue(mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
 
         // Verify
-        verify(lessCache).clearFromSkin(eq("skin"));
-        verify(colorThemeCache).clearFromSkin(eq("skin"));
+        verify(lessCache).clearFromSkin(eq(new FSSkinReference("skin")));
+        verify(colorThemeCache).clearFromSkin(eq(new FSSkinReference("skin")));
     }
 
     @Test
@@ -317,7 +337,7 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
 
         // Tests
-        assertFalse(mocker.getComponentUnderTest().clearCacheFromFileSystemSkin("skin"));
+        assertFalse(mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
 
         // Verify
         verifyZeroInteractions(lessCache);

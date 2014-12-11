@@ -35,18 +35,18 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.LESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceContentReader;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.IntegratedLESSCompiler}.
+ * Compile a LESS resource in a particular context (@see org.xwiki.lesscss.compiler.IntegratedLESSCompiler}.
  * To be used with AbstractCachedCompiler.
  *
  * @since 6.4M2
@@ -73,8 +73,8 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
     private LESSResourceContentReader lessResourceContentReader;
 
     @Override
-    public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin)
-        throws LESSCompilerException
+    public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        String skin) throws LESSCompilerException
     {
         StringWriter source = new StringWriter();
         List<Path> includePaths = new ArrayList<>();
@@ -115,17 +115,21 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
             }
 
             // Parse the LESS content with Velocity
-            String velocityParsedSource = executeVelocity(source.toString(), skin);
+            String lessCode = source.toString();
+            if (useVelocity) {
+                lessCode = executeVelocity(source.toString(), skin);
+            }
 
             // Compile the LESS code
             Path[] includePathsArray = includePaths.toArray(new Path[1]);
-            return lessCompiler.compile(velocityParsedSource, includePathsArray);
+            return lessCompiler.compile(lessCode, includePathsArray);
         } catch (LESSCompilerException | IOException e) {
             throw new LESSCompilerException(String.format("Failed to compile the resource [%s] with LESS.",
                     lessResourceReference), e);
         } finally {
             // Delete the temp directory
             if (tempDir != null) {
+                // ToDo: it may fail because the directory contains files
                 tempDir.delete();
             }
         }

@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
 
 /**
  * Default implementation of {@link LESSResourceReferenceSerializer}. It looks-up the component corresponding to the

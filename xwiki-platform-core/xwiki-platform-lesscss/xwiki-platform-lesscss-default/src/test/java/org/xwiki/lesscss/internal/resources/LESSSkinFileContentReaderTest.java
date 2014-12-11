@@ -29,9 +29,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 

@@ -27,10 +27,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.lesscss.LESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceContentReader;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -40,8 +40,10 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -100,11 +102,29 @@ public class CachedIntegratedLESSCompilerTest
         when(lessCompiler.compile(eq("Some Velocity-rendered LESS content"), any(Path[].class))).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, "skin2"));
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, true, "skin2"));
 
         // Verify
         verify(xcontext, times(1)).put("skin", "skin2");
         verify(xcontext, times(1)).put("skin", "skin");
+    }
+
+    @Test
+    public void computeSkinFileWithoutVelocity() throws Exception
+    {
+        // Mocks
+        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
+
+        Path path = mock(Path.class);
+        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
+        when(lessResourceContentReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        when(lessCompiler.compile(eq("Some LESS content"), any(Path[].class))).thenReturn("output");
+
+        // Tests
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, "skin2"));
+
+        // Verify
+        verify(xcontext, never()).put(eq("skin"), anyString());
     }
 
     @Test
@@ -130,7 +150,7 @@ public class CachedIntegratedLESSCompilerTest
                 any(Path[].class))).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, "skin"));
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, "skin"));
 
     }
 
@@ -152,7 +172,7 @@ public class CachedIntegratedLESSCompilerTest
         // Tests
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().compute(resource, false, "skin2");
+            mocker.getComponentUnderTest().compute(resource, false, true, "skin2");
         } catch(LESSCompilerException e) {
             caughtException = e;
         }

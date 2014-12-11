@@ -28,12 +28,14 @@ import javax.inject.Inject;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.lesscss.LESSCache;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.cache.LESSCache;
+import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.skin.SkinReference;
 
 /**
- * Default and abstract implementation of {@link org.xwiki.lesscss.LESSCache}.
+ * Default and abstract implementation of {@link org.xwiki.lesscss.cache.LESSCache}.
  *
  * @param <T> class of the object to cache
  *
@@ -54,50 +56,44 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      * This map stores the list of the cached files keys corresponding to a skin, in order to clear the corresponding
      * cache when a skin is saved.
      */
-    private Map<String, List<String>> cachedFilesKeysMapPerSkin = new HashMap<>();
+    private Map<Object, List<String>> cachedFilesKeysMapPerSkin = new HashMap<>();
 
     /**
      * This map stores the list of the cached files keys corresponding to a color theme, in order to clear the
      * corresponding cache when a color theme is saved.
      */
-    private Map<String, List<String>> cachedFilesKeysMapPerColorTheme = new HashMap<>();
+    private Map<Object, List<String>> cachedFilesKeysMapPerColorTheme = new HashMap<>();
 
     /**
      * This map stores the list of the cached files keys corresponding to a LESS resource, in order to clear the
      * corresponding cache when a LESS resource is saved.
      */
-    private Map<String, List<String>> cachedFilesKeysMapPerLESSResource = new HashMap<>();
+    private Map<Object, List<String>> cachedFilesKeysMapPerLESSResource = new HashMap<>();
 
     @Inject
     private CacheKeyFactory cacheKeyFactory;
 
     @Inject
-    private CacheKeySerializer cacheKeySerializer;
-
-    @Inject
     private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
 
     @Override
-    public T get(LESSResourceReference lessResourceReference, String skin, String colorTheme)
+    public T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme)
     {
-        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
-        String serializedCacheKey = cacheKeySerializer.serialize(cacheKey);
-        return cache.get(serializedCacheKey);
+        return cache.get(cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme));
     }
 
     @Override
-    public void set(LESSResourceReference lessResourceReference, String skin, String colorTheme, T content)
+    public void set(LESSResourceReference lessResourceReference, SkinReference skin,
+        ColorThemeReference colorTheme, T content)
     {
         // Store the content in the cache
-        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
-        String serializedCacheKey = cacheKeySerializer.serialize(cacheKey);
-        cache.set(serializedCacheKey, content);
+        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme);
+        cache.set(cacheKey, content);
 
         // Add the new key to maps
-        registerCacheKey(cachedFilesKeysMapPerSkin, serializedCacheKey, cacheKey.getSkin());
-        registerCacheKey(cachedFilesKeysMapPerColorTheme, serializedCacheKey, cacheKey.getColorTheme());
-        registerCacheKey(cachedFilesKeysMapPerLESSResource, serializedCacheKey,
-            lessResourceReferenceSerializer.serialize(lessResourceReference));
+        registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, skin);
+        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorTheme);
+        registerCacheKey(cachedFilesKeysMapPerLESSResource, cacheKey, lessResourceReference);
     }
 
     /**
@@ -106,15 +102,15 @@ public abstract class AbstractCache<T> implements LESSCache<T>
      *
      * @param cachedFilesKeysMap could be cachedFilesKeysMapPerSkin or cachedFilesKeysMapPerColorTheme
      * @param cacheKey the cache key to register
-     * @param name name of the skin or of the color theme
+     * @param reference name of the skin or of the color theme
      */
-    private void registerCacheKey(Map<String, List<String>> cachedFilesKeysMap, String cacheKey, String name)
+    private void registerCacheKey(Map<Object, List<String>> cachedFilesKeysMap, String cacheKey, Object reference)
     {
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(name);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(reference);
         if (cachedFilesKeys == null) {
             // if the list of cached files keys corresponding to the skin/colortheme name does not exist, we create it
             cachedFilesKeys = new ArrayList<>();
-            cachedFilesKeysMap.put(name, cachedFilesKeys);
+            cachedFilesKeysMap.put(reference, cachedFilesKeys);
         }
         if (!cachedFilesKeys.contains(cacheKey)) {
             cachedFilesKeys.add(cacheKey);
@@ -130,7 +126,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         cachedFilesKeysMapPerLESSResource.clear();
     }
 
-    private void clearFromCriteria(Map<String, List<String>> cachedFilesKeysMap, String criteria)
+    private void clearFromCriteria(Map<Object, List<String>> cachedFilesKeysMap, Object criteria)
     {
         // Get the list of cached files keys corresponding to the criteria
         List<String> cachedFilesKeys = cachedFilesKeysMap.get(criteria);
@@ -146,13 +142,13 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public void clearFromSkin(String skin)
+    public void clearFromSkin(SkinReference skin)
     {
         clearFromCriteria(cachedFilesKeysMapPerSkin, skin);
     }
 
     @Override
-    public void clearFromColorTheme(String colorTheme)
+    public void clearFromColorTheme(ColorThemeReference colorTheme)
     {
         clearFromCriteria(cachedFilesKeysMapPerColorTheme, colorTheme);
     }
@@ -160,7 +156,6 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Override
     public void clearFromLESSResource(LESSResourceReference lessResourceReference)
     {
-        clearFromCriteria(cachedFilesKeysMapPerLESSResource,
-            lessResourceReferenceSerializer.serialize(lessResourceReference));
+        clearFromCriteria(cachedFilesKeysMapPerLESSResource, lessResourceReference);
     }
 }

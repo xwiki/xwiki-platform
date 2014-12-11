@@ -25,6 +25,16 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.colortheme.ColorTheme;
+import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
+import org.xwiki.lesscss.skin.SkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -48,7 +58,7 @@ public class LessCompilerScriptService implements ScriptService
     private LESSSkinFileCompiler lessCompiler;
 
     @Inject
-    private LESSSkinFileCache lessCache;
+    private LESSResourcesCache lessCache;
 
     @Inject
     private ColorThemeCache colorThemeCache;
@@ -58,6 +68,12 @@ public class LessCompilerScriptService implements ScriptService
 
     @Inject
     private LESSColorThemeConverter lessColorThemeConverter;
+
+    @Inject
+    private SkinReferenceFactory skinReferenceFactory;
+
+    @Inject
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -192,9 +208,14 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        lessCache.clearFromColorTheme(colorTheme);
-        colorThemeCache.clearFromColorTheme(colorTheme);
-        return true;
+        try {
+            ColorThemeReference colorThemeReference = colorThemeReferenceFactory.createReference(colorTheme);
+            lessCache.clearFromColorTheme(colorThemeReference);
+            colorThemeCache.clearFromColorTheme(colorThemeReference);
+            return true;
+        } catch (LESSCompilerException e) {
+            return false;
+        }
     }
 
     /**
@@ -202,8 +223,10 @@ public class LessCompilerScriptService implements ScriptService
      * The script calling this method needs the programming rights.
      * @param skin name of the filesystem skin
      * @return true if the operation succeed
+     *
+     * @since 6.4M2
      */
-    public boolean clearCacheFromFileSystemSkin(String skin)
+    public boolean clearCacheFromSkin(String skin)
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -213,8 +236,13 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        lessCache.clearFromSkin(skin);
-        colorThemeCache.clearFromSkin(skin);
-        return true;
+        try {
+            SkinReference skinReference = skinReferenceFactory.createReference(skin);
+            lessCache.clearFromSkin(skinReference);
+            colorThemeCache.clearFromSkin(skinReference);
+            return true;
+        } catch (LESSCompilerException e) {
+            return false;
+        }
     }
 }

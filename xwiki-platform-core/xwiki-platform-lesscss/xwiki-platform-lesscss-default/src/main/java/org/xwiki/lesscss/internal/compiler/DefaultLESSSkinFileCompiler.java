@@ -23,13 +23,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.IntegratedLESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSSkinFileCompiler;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
+ * Default implementation for {@link org.xwiki.lesscss.compiler.LESSSkinFileCompiler}.
  *
  * @since 6.4M2
  * @version $Id$
@@ -46,12 +46,12 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
     @Override
     public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
-        return integratedLESSCompiler.compile(new LESSSkinFileResourceReference(fileName), false, force);
+        return integratedLESSCompiler.compile(new LESSSkinFileResourceReference(fileName), false, true, force);
     }
 
     @Override
     public String compileSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
     {
-        return integratedLESSCompiler.compile(new LESSSkinFileResourceReference(fileName), false, skin, force);
+        return integratedLESSCompiler.compile(new LESSSkinFileResourceReference(fileName), false, true, skin, force);
     }
 }

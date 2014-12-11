@@ -25,10 +25,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.xwiki.lesscss.LESSCache;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.cache.LESSCache;
+import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
+import org.xwiki.lesscss.skin.SkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceFactory;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -53,25 +57,32 @@ public abstract class AbstractCachedCompiler<T>
     private CurrentColorThemeGetter currentColorThemeGetter;
 
     @Inject
+    private SkinReferenceFactory skinReferenceFactory;
+
+    @Inject
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
+
+    @Inject
     private CacheKeyFactory cacheKeyFactory;
 
-    private Map<CacheKey, Object> mutexList = new HashMap<>();
+    private Map<String, Object> mutexList = new HashMap<>();
 
     /**
      * Get the result of the compilation.
      * @param lessResourceReference reference to the LESS content
      * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
      * defined there
+     * @param useVelocity either or not the resource be parsed by Velocity before compiling it
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the desired object
      * @throws LESSCompilerException if problems occur
      */
-    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean force)
-        throws LESSCompilerException
+    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        boolean force) throws LESSCompilerException
     {
         XWikiContext context = xcontextProvider.get();
         String skin = context.getWiki().getSkin(context);
-        return getResult(lessResourceReference, includeSkinStyle, skin, force);
+        return getResult(lessResourceReference, includeSkinStyle, useVelocity, skin, force);
     }
 
     /**
@@ -79,41 +90,50 @@ public abstract class AbstractCachedCompiler<T>
      * @param lessResourceReference reference to the LESS content
      * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
      * defined there
+     * @param useVelocity either or not the resource be parsed by Velocity before compiling it
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @param skin name of the skin used for the context
      * @return the desired object
      * @throws LESSCompilerException if problems occur
      */
-    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin,
-        boolean force) throws LESSCompilerException
+    public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        String skin, boolean force) throws LESSCompilerException
     {
-        T result;
+        T result = null;
 
-        String colorTheme = currentColorThemeGetter.getCurrentColorTheme("default");
+        SkinReference skinReference = skinReferenceFactory.createReference(skin);
+        ColorThemeReference colorThemeReference = colorThemeReferenceFactory.createReference(
+                currentColorThemeGetter.getCurrentColorTheme("default"));
 
         // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
         // use the last result stored in the cache
-        synchronized (getMutex(skin, colorTheme, lessResourceReference)) {
+        synchronized (getMutex(lessResourceReference, skinReference, colorThemeReference)) {
 
             // Check if the result is in the cache
             if (!force) {
-                result = cache.get(lessResourceReference, skin, colorTheme);
+                result = cache.get(lessResourceReference, skinReference, colorThemeReference);
                 if (result != null) {
                     return result;
                 }
             }
 
-            // Either the result was in the cache or the force flag is set to true, we need to getResult
-            result = compiler.compute(lessResourceReference, includeSkinStyle, skin);
-            cache.set(lessResourceReference, skin, colorTheme, result);
+            // Either the result was in the cache or the force flag is set to true, we need to compile
+            try {
+                result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, skin);
+            } finally {
+                // We must cache the result, even if the compilation have failed, to prevent re-compiling again and
+                // again (the compilation will still fail until the LESS resource is updated so it useless to retry).
+                cache.set(lessResourceReference, skinReference, colorThemeReference, result);
+            }
         }
 
         return result;
     }
 
-    private synchronized Object getMutex(String skin, String colorTheme, LESSResourceReference lessResourceReference)
+    private synchronized Object getMutex(LESSResourceReference lessResourceReference, SkinReference skinReference,
+        ColorThemeReference colorThemeReference)
     {
-        CacheKey cacheKey = cacheKeyFactory.getCacheKey(skin, colorTheme, lessResourceReference);
+        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skinReference, colorThemeReference);
         Object mutex = mutexList.get(cacheKey);
         if (mutex == null) {
             mutex = new Object();

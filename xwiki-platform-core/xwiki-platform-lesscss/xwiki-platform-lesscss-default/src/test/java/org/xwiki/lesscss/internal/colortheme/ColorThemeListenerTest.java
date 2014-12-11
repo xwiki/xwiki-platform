@@ -30,8 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.lesscss.ColorThemeCache;
-import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
+import org.xwiki.lesscss.internal.listeners.ColorThemeListener;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -44,13 +46,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Test class for {@link ColorThemeListener}.
+ * Test class for {@link org.xwiki.lesscss.internal.listeners.ColorThemeListener}.
  *
  * @since 6.3M2
  * @version $Id$
@@ -61,19 +64,15 @@ public class ColorThemeListenerTest
     public MockitoComponentMockingRule<ColorThemeListener> mocker =
             new MockitoComponentMockingRule<>(ColorThemeListener.class);
 
-    private LESSSkinFileCache lessSkinFileCache;
+    private LESSResourcesCache lessResourcesCache;
 
     private ColorThemeCache colorThemeCache;
-
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Before
     public void setUp() throws Exception
     {
-        lessSkinFileCache = mocker.getInstance(LESSSkinFileCache.class);
+        lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
-        entityReferenceSerializer = mocker.getInstance(
-                new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
     }
 
     @Test
@@ -109,14 +108,13 @@ public class ColorThemeListenerTest
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
-        when(entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.page");
 
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessSkinFileCache).clearFromColorTheme("wiki:space.page");
-        verify(colorThemeCache).clearFromColorTheme("wiki:space.page");
+        verify(lessResourcesCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
+        verify(colorThemeCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
     }
 
     @Test
@@ -135,14 +133,13 @@ public class ColorThemeListenerTest
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
-        when(entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.page");
 
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessSkinFileCache).clearFromColorTheme("wiki:space.page");
-        verify(colorThemeCache).clearFromColorTheme("wiki:space.page");
+        verify(lessResourcesCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
+        verify(colorThemeCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
     }
 
     @Test
@@ -162,7 +159,7 @@ public class ColorThemeListenerTest
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verifyZeroInteractions(lessSkinFileCache);
+        verifyZeroInteractions(lessResourcesCache);
         verifyZeroInteractions(colorThemeCache);
     }
 }

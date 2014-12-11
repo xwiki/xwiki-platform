@@ -26,9 +26,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.IntegratedLESSCompiler;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -61,11 +61,11 @@ public class CachedLESSColorThemeConverterTest
     {
         StringWriter string = new StringWriter();
         IOUtils.copy(getClass().getResourceAsStream("/bigStyle.css"), string);
-        when(lessCompiler.compile(any(LESSResourceReference.class), eq(false), eq("skin"), eq(false))).
+        when(lessCompiler.compile(any(LESSResourceReference.class), eq(false), eq(false), eq("skin"), eq(false))).
             thenReturn(string.toString());
 
         Map<String, String> results = mocker.getComponentUnderTest().compute(
-            new LESSSkinFileResourceReference("file"), false, "skin");
+            new LESSSkinFileResourceReference("file"), false, false, "skin");
         assertEquals("#e8e8e8", results.get("borderColor"));
     }
 }

@@ -25,16 +25,19 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSResourceReferenceSerializer;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 
 /**
- * @since 6.4M2
+ * Specialized implementation of {@link LESSResourceReferenceSerializer} to serialize
+ * {@link LESSSkinFileResourceReference} references.
+ *
  * @version $Id$
+ * @since 6.4M2
  */
 @Component
-@Named("org.xwiki.lesscss.LESSSkinFileResourceReference")
+@Named("org.xwiki.lesscss.resources.LESSSkinFileResourceReference")
 @Singleton
 public class LESSSkinFileResourceReferenceSerializer implements LESSResourceReferenceSerializer
 {

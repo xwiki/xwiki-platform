@@ -22,9 +22,9 @@ package org.xwiki.lesscss.internal.resources;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSResourceReferenceSerializer;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -53,7 +53,7 @@ public class DefaultLESSResourceReferenceSerializerTest
         LESSResourceReferenceSerializer serializer = mock(LESSResourceReferenceSerializer.class);
         when(serializer.serialize(any(LESSResourceReference.class))).thenReturn("serialized resource");
         mocker.registerComponent(LESSResourceReferenceSerializer.class,
-            "org.xwiki.lesscss.LESSSkinFileResourceReference", serializer);
+            "org.xwiki.lesscss.resources.LESSSkinFileResourceReference", serializer);
 
         // Test
         assertEquals("serialized resource",

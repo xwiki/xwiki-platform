@@ -19,8 +19,8 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -37,11 +37,12 @@ public interface CachedCompilerInterface<T>
      * Compute the compilation.
      * @param lessResourceReference reference to the LESS resource to compile
      * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
+     * @param useVelocity either or not the resource be parsed by Velocity before compiling it
      * defined there
      * @param skin skin in used for the compilation
      * @return the result of the compilation of the LESS Resource
      * @throws LESSCompilerException if problem occurs
      */
-    T compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, String skin)
+    T compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity, String skin)
         throws LESSCompilerException;
 }

@@ -22,11 +22,17 @@ package org.xwiki.lesscss.internal.cache;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
-import org.xwiki.lesscss.internal.colortheme.ColorThemeFullNameGetter;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceSerializer;
+import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.skin.FSSkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 public class CacheKeyFactoryTest
@@ -35,28 +41,33 @@ public class CacheKeyFactoryTest
     public MockitoComponentMockingRule<CacheKeyFactory> mocker =
             new MockitoComponentMockingRule<>(CacheKeyFactory.class);
 
-    private ColorThemeFullNameGetter colorThemeFullNameGetter;
+    private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
+
+    private SkinReferenceSerializer skinReferenceSerializer;
+
+    private ColorThemeReferenceSerializer colorThemeReferenceSerializer;
 
     @Before
     public void setUp() throws Exception
     {
-        colorThemeFullNameGetter = mocker.getInstance(ColorThemeFullNameGetter.class);
+        lessResourceReferenceSerializer = mocker.getInstance(LESSResourceReferenceSerializer.class);
+        skinReferenceSerializer = mocker.getInstance(SkinReferenceSerializer.class);
+        colorThemeReferenceSerializer = mocker.getInstance(ColorThemeReferenceSerializer.class);
     }
 
     @Test
     public void getCacheKey() throws Exception
     {
-        // Mock
-        when(colorThemeFullNameGetter.getColorThemeFullName("ColorTheme")).thenReturn("wiki:Space.ColorTheme");
+        // Mocks
+        when(lessResourceReferenceSerializer.serialize(eq(new LESSSkinFileResourceReference("file")))).
+                thenReturn("file");
+        when(skinReferenceSerializer.serialize(eq(new FSSkinReference("skin")))).thenReturn("skin");
+        when(colorThemeReferenceSerializer.serialize(new NamedColorThemeReference("colorTheme"))).thenReturn("colorTheme");
 
         // Test
-        CacheKey cacheKey = mocker.getComponentUnderTest().getCacheKey("skin", "ColorTheme",
-            new LESSSkinFileResourceReference("file"));
-
-        // Verify
-        assertEquals("skin", cacheKey.getSkin());
-        assertEquals("wiki:Space.ColorTheme", cacheKey.getColorTheme());
-        assertEquals(new LESSSkinFileResourceReference("file"), cacheKey.getLessResourceReference());
+        assertEquals("4_file_4_skin_10_colorTheme", mocker.getComponentUnderTest().getCacheKey(
+                new LESSSkinFileResourceReference("file"), new FSSkinReference("skin"),
+                new NamedColorThemeReference("colorTheme")));
     }
 
 

@@ -31,23 +31,24 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceContentReader;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Component to get the content of a LESS skin file resource.
+ * Specialized implementation of {@link LESSResourceContentReader} to read resources referenced by an
+ * {@link LESSSkinFileResourceReference} object.
  *
  * @since 6.4M2
  * @version $Id$
  */
 @Component
-@Named("org.xwiki.lesscss.LESSSkinFileResourceReference")
+@Named("org.xwiki.lesscss.resources.LESSSkinFileResourceReference")
 @Singleton
 public class LESSSkinFileContentReader implements LESSResourceContentReader
 {

@@ -23,8 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.internal.colortheme.ColorThemeFullNameGetter;
+import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceSerializer;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
+import org.xwiki.lesscss.skin.SkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceSerializer;
 
 /**
  * Factory to create a cache key.
@@ -36,20 +40,35 @@ import org.xwiki.lesscss.internal.colortheme.ColorThemeFullNameGetter;
 @Singleton
 public class CacheKeyFactory
 {
+    private static final String CACHE_KEY_SEPARATOR = "_";
+
     @Inject
-    private ColorThemeFullNameGetter colorThemeFullNameGetter;
+    private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
+
+    @Inject
+    private SkinReferenceSerializer skinReferenceSerializer;
+
+    @Inject
+    private ColorThemeReferenceSerializer colorThemeReferenceSerializer;
 
     /**
      * Get the cache key corresponding to the given LESS resource and context.
      *
-     * @param skin skin for which the resource have been compiled
-     * @param colorTheme color theme for which the resource have been compiled.
      * @param lessResourceReference the reference to the LESS resource that have been compiled
+     * @param skinReference skin for which the resource have been compiled
+     * @param colorThemeReference color theme for which the resource have been compiled.
      *
      * @return the corresponding cache key.
      */
-    public CacheKey getCacheKey(String skin, String colorTheme, LESSResourceReference lessResourceReference)
+    public String getCacheKey(LESSResourceReference lessResourceReference, SkinReference skinReference,
+            ColorThemeReference colorThemeReference)
     {
-        return new CacheKey(skin, colorThemeFullNameGetter.getColorThemeFullName(colorTheme), lessResourceReference);
+        String lessResource = lessResourceReferenceSerializer.serialize(lessResourceReference);
+        String skin = skinReferenceSerializer.serialize(skinReference);
+        String colorTheme = colorThemeReferenceSerializer.serialize(colorThemeReference);
+
+        return lessResource.length() + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
+            + skin.length() + CACHE_KEY_SEPARATOR + skin + CACHE_KEY_SEPARATOR
+            + colorTheme.length() + CACHE_KEY_SEPARATOR + colorTheme;
     }
 }

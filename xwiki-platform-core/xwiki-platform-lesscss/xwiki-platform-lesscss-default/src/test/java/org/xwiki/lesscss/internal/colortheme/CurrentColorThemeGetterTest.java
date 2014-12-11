@@ -45,7 +45,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter}.
  *
- * @since 6.3M2
+ * @since 6.4M2
  * @version $Id$
  */
 public class CurrentColorThemeGetterTest

@@ -24,8 +24,9 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.lesscss.LESSCompiler;
-import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -52,7 +53,7 @@ public class DefaultLESSSkinFileCompilerTest
 
     private LESSCompiler lessCompiler;
 
-    private LESSSkinFileCache cache;
+    private LESSResourcesCache cache;
 
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -73,7 +74,7 @@ public class DefaultLESSSkinFileCompilerTest
     {
         lessCompiler = mocker.getInstance(LESSCompiler.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        cache = mocker.getInstance(LESSSkinFileCache.class);
+        cache = mocker.getInstance(LESSResourcesCache.class);
         currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
         referenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
                 String.class));

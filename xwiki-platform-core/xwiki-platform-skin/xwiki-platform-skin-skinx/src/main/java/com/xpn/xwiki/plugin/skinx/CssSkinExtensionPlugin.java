@@ -109,7 +109,7 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     {
         // First, let the parent do its job
         super.getExtensionClass(context);
-        // Now adding the CSS preprocessor field
+        // Now adding the content type field
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
             boolean needsUpdate = false;
@@ -118,7 +118,7 @@ public class CssSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
             if (context.get("initdone") != null) {
                 return bclass;
             }
-            needsUpdate |= bclass.addStaticListField("preprocessor", "CSS Preprocessor", "none|less");
+            needsUpdate |= bclass.addStaticListField("contentType", "Content Type", "CSS|LESS");
 
             if (needsUpdate) {
                 context.getWiki().saveDocument(doc, context);

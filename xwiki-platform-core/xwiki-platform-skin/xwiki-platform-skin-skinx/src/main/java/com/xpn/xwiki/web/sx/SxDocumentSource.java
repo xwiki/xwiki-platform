@@ -27,9 +27,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.lesscss.IntegratedLESSCompiler;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSEntityResourceReference;
+import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -53,11 +53,17 @@ public class SxDocumentSource implements SxSource
     /** The name of the property in the script extension object which contains the script content. */
     private static final String CONTENT_PROPERTY_NAME = "code";
 
+    /** The name of the property in the script extension object which contains the content type. */
+    private static final String CONTENT_TYPE_PROPERTY_NAME = "contentType";
+
     /** The name of the property in the script extension object which tells us if the content should be parsed. */
     private static final String PARSE_CONTENT_PROPERTY_NAME = "parse";
 
     /** The name of the property in the script extension object which contains the cache policy. */
     private static final String CACHE_POLICY_PROPERTY_NAME = "cache";
+
+    /** The name of the property in the script extension object which contains the name of the object. */
+    private static final String NAME_PROPERTY_NAME = "name";
 
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SxDocumentSource.class);
@@ -103,7 +109,7 @@ public class SxDocumentSource implements SxSource
                     }
                 } catch (Exception ex) {
                     LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
-                        new Object[]{this.document.getFullName(), sxObj.getStringValue("name"),
+                        new Object[]{this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
                             sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
                 }
             }
@@ -124,16 +130,20 @@ public class SxDocumentSource implements SxSource
                 }
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
-                if ("less".equals(sxObj.getStringValue("preprocessor"))) {
+                if ("LESS".equals(sxObj.getStringValue(CONTENT_TYPE_PROPERTY_NAME))) {
                     IntegratedLESSCompiler lessCompiler = Utils.getComponent(IntegratedLESSCompiler.class);
-                    try {
-                        sxContent = lessCompiler.compile(new LESSEntityResourceReference(
+                    ObjectPropertyReference objectPropertyReference =
                             new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
-                                    sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()))),
-                            true, false);
+                                    sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
+                    try {
+                        sxContent = lessCompiler.compile(
+                                new LESSObjectPropertyResourceReference(objectPropertyReference), true, (parse == 1),
+                                false);
                     } catch (LESSCompilerException e) {
-                        LOGGER.warn("LESS errors while parsing skin extension [{}] with content [{}]: ",
-                            this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(e));
+                        // Set the error message in a CSS comment to help the developer understand why its SSX is not
+                        // working (it will work only if the CSS minifier is not used).
+                        sxContent = String.format("/* LESS errors while parsing skin extension [%s]. */\n/* %s */",
+                            sxObj.getStringValue(NAME_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(e));
                     }
                 } else if (parse == 1) {
                     try {

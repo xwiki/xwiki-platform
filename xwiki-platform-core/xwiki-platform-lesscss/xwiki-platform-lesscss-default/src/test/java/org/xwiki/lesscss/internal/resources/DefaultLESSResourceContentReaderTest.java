@@ -21,10 +21,10 @@ package org.xwiki.lesscss.internal.resources;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSResourceContentReader;
-import org.xwiki.lesscss.LESSResourceReference;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +49,7 @@ public class DefaultLESSResourceContentReaderTest
     {
         // Mock
         LESSResourceContentReader reader = mock(LESSSkinFileContentReader.class);
-        mocker.registerComponent(LESSResourceContentReader.class, "org.xwiki.lesscss.LESSSkinFileResourceReference",
+        mocker.registerComponent(LESSResourceContentReader.class, "org.xwiki.lesscss.resources.LESSSkinFileResourceReference",
             reader);
         when(reader.getContent(any(LESSResourceReference.class), anyString())).thenReturn("content");
 

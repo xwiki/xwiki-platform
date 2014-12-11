@@ -25,15 +25,15 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.ColorTheme;
-import org.xwiki.lesscss.ColorThemeCache;
-import org.xwiki.lesscss.LESSColorThemeConverter;
-import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.lesscss.LESSSkinFileResourceReference;
+import org.xwiki.lesscss.colortheme.ColorTheme;
+import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
 
 /**
- * Default implementation of {@link org.xwiki.lesscss.LESSColorThemeConverter}.
+ * Default implementation of {@link org.xwiki.lesscss.colortheme.LESSColorThemeConverter}.
  *
  * @since 6.4M2
  * @version $Id$
@@ -59,14 +59,14 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
     @Override
     public ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
-        return super.getResult(new LESSSkinFileResourceReference(fileName), false, force);
+        return super.getResult(new LESSSkinFileResourceReference(fileName), false, true, force);
     }
 
     @Override
     public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
         throws LESSCompilerException
     {
-        return super.getResult(new LESSSkinFileResourceReference(fileName), false, skin, force);
+        return super.getResult(new LESSSkinFileResourceReference(fileName), false, true, skin, force);
     }
 
 }

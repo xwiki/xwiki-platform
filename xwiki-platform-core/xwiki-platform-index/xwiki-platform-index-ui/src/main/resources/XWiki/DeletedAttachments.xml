@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,448 +19,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>DeletedAttachments</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.AllDocs</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.AllDocs</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1262178920000</creationDate>
   <date>1297363233000</date>
   <contentUpdateDate>1297363233000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.index.attachmentsTrash')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.DeletedAttachments</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>2b1a4426-e37b-40ba-9ad3-4055a466da0a</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>// Make sure the XWiki.index.trash.attachments 'namespace' exists.
-if (typeof XWiki == "undefined") {
-  XWiki = new Object();
-}
-if (typeof XWiki.index == "undefined") {
-  XWiki.index = new Object();
-}
-if (typeof XWiki.index.trash == "undefined") {
-  XWiki.index.trash = new Object();
-}
-if (typeof XWiki.index.trash.attachments == "undefined") {
-  XWiki.index.trash.attachments = new Object();
-}
-
-/**
- * Callback function used by the DeletedAttachments livetable for generating the HTML code needed to display an entry.
- * 
- * @param row the JSON data corresponding to the entry to be displayed
- * @param i the index of the row in the list of entries
- * @param table the LiveTable javascript object
- */
-XWiki.index.trash.attachments.displayEntry = function (row, i, table) {
-  var tr = new Element('tr'); // The resulting table row
-  var file = new Element('a', {'href' : row.url}).update(row.filename);
-  tr.appendChild(new Element('td').update(file));
-  var doc = new Element('a', {'href' : row.documentUrl}).update(row.title);
-  doc.appendChild(document.createTextNode(' (' + row.docName + ')'));
-  tr.appendChild(new Element('td').update(doc));
-  tr.appendChild(new Element('td').update(row.date));
-  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
-  tr.appendChild(new Element('td').update(deleter));
-  var actions = new Element('td', {'class' : 'itemActions'});
-  if(row.canDelete) {
-    var delete_ = new Element('a', {
-        'href' : row.deleteUrl,
-        'class' : "tool delete",
-        'title' : "$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"
-      }).update("$services.localization.render('platform.index.trashAttachmentsActionsDeleteText')");
-    actions.appendChild(delete_);
-    delete_.observe('click', XWiki.index.trash.attachments.confirmDelete.bindAsEventListener(delete_, table, i));
-  }
-  tr.appendChild(actions);
-  return tr;
-}
-
-/**
- * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
- * deletion process.
- * 
- * @param event the link activation event
- * @param table the LiveTable javascript object
- * @param rowIdx the index of the row corresponding to the entry to be deleted
- */
-XWiki.index.trash.attachments.confirmDelete = function(event, table, rowIdx) {
-  event.stop();
-  if (this.disabled) {
-    // Do nothing if the button was already clicked and it's waiting for a response from the server.
-    return;
-  } else {
-    new XWiki.widgets.ConfirmedAjaxRequest(
-      /* Ajax request URL */
-      this.href + '&amp;confirm=1' + (Prototype.Browser.Opera ? "" : "&amp;ajax=1"),
-      /* Ajax request parameters */
-      {
-        onCreate : function() {
-          // Disable the button, to avoid a cascade of clicks from impatient users
-          this.disabled = true;
-        }.bind(this),
-        onSuccess : function(table, rowIdx) {
-          // Remove the corresponding HTML element from the UI and update the livetable
-          table.deleteRow(rowIdx);
-        }.bind(this, table, rowIdx),
-        // This is an expected 404, returned when the document has been successfully deleted and is no longer found
-        on404 : function(response, table, rowIdx) {
-          response.request.options.onSuccess(table, rowIdx);
-        }.bindAsEventListener(this, table, rowIdx),
-        onComplete : function() {
-          // In the end: re-enable the button
-          this.disabled = false;
-        }.bind(this)
-      },
-      /* Interaction parameters */
-      {
-         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
-         progressMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteInProgress')",
-         successMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteDone')",
-         failureMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteFailed')"
-      }
-      );
-  }
-}
-/*
- * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
- * Re-display it when the document loads and Javascript is available.
- */
-document.observe('xwiki:dom:loaded', function() {
-  if ($('attachmentTrash')) {
-    $('attachmentTrash').up('.hidden').removeClassName('hidden');
-  }
-});</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.RequiredRightClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <level>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>level</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>level</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <sort>none</sort>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <values>edit|programming</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </level>
-    </class>
-    <name>XWiki.DeletedAttachments</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>b70cdd38-4b2d-4dea-b1e0-c054359d3793</guid>
-    <property>
-      <level>programming</level>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.DeletedAttachments</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>33778e4e-5d86-472e-b065-c9c87b5b282e</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.itemActions .tool {
-  width: 16px;
-  height: 16px;
-  margin: 0 2px;
-  float: left;
-  text-indent: -1000em;
-  overflow: hidden;
-  background: transparent no-repeat center center;
-}
-.itemActions .delete {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
-}
-.itemActions .restore {
-   background-image: url("$xwiki.getSkinFile('/icons/silk/arrow_refresh.png')") !important;
-}
-.itemActions .cannot-restore {
-   background-image: url("$xwiki.getSkinFile('/icons/silk/page_error.png')") !important;
-}</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.XWikiRights</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <allow>
-        <defaultValue>1</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>allow</displayType>
-        <name>allow</name>
-        <number>4</number>
-        <prettyName>Allow/Deny</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </allow>
-      <groups>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>groups</name>
-        <number>1</number>
-        <picker>1</picker>
-        <prettyName>Groups</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <size>5</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
-      </groups>
-      <levels>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>1</multiSelect>
-        <name>levels</name>
-        <number>2</number>
-        <prettyName>Levels</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <size>3</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
-      </levels>
-      <users>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>users</name>
-        <number>3</number>
-        <picker>1</picker>
-        <prettyName>Users</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <size>5</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
-      </users>
-    </class>
-    <name>XWiki.DeletedAttachments</name>
-    <number>0</number>
-    <className>XWiki.XWikiRights</className>
-    <guid>8d68ba7a-72d3-4f9f-a984-c7c47139b0a8</guid>
-    <property>
-      <allow>1</allow>
-    </property>
-    <property>
-      <groups>XWiki.XWikiAdminGroup</groups>
-    </property>
-    <property>
-      <levels>view,edit</levels>
-    </property>
-  </object>
   <content>{{velocity}}
 #if(!$xwiki.hasProgrammingRights())
   {{warning}}This document requires programming rights and needs to be saved by an administrator of this Wiki{{/warning}}
@@ -637,4 +213,426 @@ $response.setContentType('application/json')
 #end## request.list
 #end## hasProgramR
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2b1a4426-e37b-40ba-9ad3-4055a466da0a</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Make sure the XWiki.index.trash.attachments 'namespace' exists.
+if (typeof XWiki == "undefined") {
+  XWiki = new Object();
+}
+if (typeof XWiki.index == "undefined") {
+  XWiki.index = new Object();
+}
+if (typeof XWiki.index.trash == "undefined") {
+  XWiki.index.trash = new Object();
+}
+if (typeof XWiki.index.trash.attachments == "undefined") {
+  XWiki.index.trash.attachments = new Object();
+}
+
+/**
+ * Callback function used by the DeletedAttachments livetable for generating the HTML code needed to display an entry.
+ * 
+ * @param row the JSON data corresponding to the entry to be displayed
+ * @param i the index of the row in the list of entries
+ * @param table the LiveTable javascript object
+ */
+XWiki.index.trash.attachments.displayEntry = function (row, i, table) {
+  var tr = new Element('tr'); // The resulting table row
+  var file = new Element('a', {'href' : row.url}).update(row.filename);
+  tr.appendChild(new Element('td').update(file));
+  var doc = new Element('a', {'href' : row.documentUrl}).update(row.title);
+  doc.appendChild(document.createTextNode(' (' + row.docName + ')'));
+  tr.appendChild(new Element('td').update(doc));
+  tr.appendChild(new Element('td').update(row.date));
+  var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
+  tr.appendChild(new Element('td').update(deleter));
+  var actions = new Element('td', {'class' : 'itemActions'});
+  if(row.canDelete) {
+    var delete_ = new Element('a', {
+        'href' : row.deleteUrl,
+        'class' : "tool delete",
+        'title' : "$services.localization.render('platform.index.trashAttachmentsActionsDeleteTooltip')"
+      }).update("$services.localization.render('platform.index.trashAttachmentsActionsDeleteText')");
+    actions.appendChild(delete_);
+    delete_.observe('click', XWiki.index.trash.attachments.confirmDelete.bindAsEventListener(delete_, table, i));
+  }
+  tr.appendChild(actions);
+  return tr;
+}
+
+/**
+ * Event listener, called when clicking a delete version link. It displays a confirmation box, speeding up the two-step
+ * deletion process.
+ * 
+ * @param event the link activation event
+ * @param table the LiveTable javascript object
+ * @param rowIdx the index of the row corresponding to the entry to be deleted
+ */
+XWiki.index.trash.attachments.confirmDelete = function(event, table, rowIdx) {
+  event.stop();
+  if (this.disabled) {
+    // Do nothing if the button was already clicked and it's waiting for a response from the server.
+    return;
+  } else {
+    new XWiki.widgets.ConfirmedAjaxRequest(
+      /* Ajax request URL */
+      this.href + '&amp;confirm=1' + (Prototype.Browser.Opera ? "" : "&amp;ajax=1"),
+      /* Ajax request parameters */
+      {
+        onCreate : function() {
+          // Disable the button, to avoid a cascade of clicks from impatient users
+          this.disabled = true;
+        }.bind(this),
+        onSuccess : function(table, rowIdx) {
+          // Remove the corresponding HTML element from the UI and update the livetable
+          table.deleteRow(rowIdx);
+        }.bind(this, table, rowIdx),
+        // This is an expected 404, returned when the document has been successfully deleted and is no longer found
+        on404 : function(response, table, rowIdx) {
+          response.request.options.onSuccess(table, rowIdx);
+        }.bindAsEventListener(this, table, rowIdx),
+        onComplete : function() {
+          // In the end: re-enable the button
+          this.disabled = false;
+        }.bind(this)
+      },
+      /* Interaction parameters */
+      {
+         confirmationText: "$services.localization.render('core.recyclebin.completelyDeleteConfirm')",
+         progressMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteInProgress')",
+         successMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteDone')",
+         failureMessageText : "$services.localization.render('platform.index.trashAttachmentsDeleteFailed')"
+      }
+      );
+  }
+}
+/*
+ * The livetable is hidden when javascript is disabled, so that an alternative &lt;noscript&gt; table is displayed.
+ * Re-display it when the document loads and Javascript is available.
+ */
+document.observe('xwiki:dom:loaded', function() {
+  if ($('attachmentTrash')) {
+    $('attachmentTrash').up('.hidden').removeClassName('hidden');
+  }
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>b70cdd38-4b2d-4dea-b1e0-c054359d3793</guid>
+    <class>
+      <name>XWiki.RequiredRightClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <level>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>level</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>level</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>edit|programming</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </level>
+    </class>
+    <property>
+      <level>programming</level>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>33778e4e-5d86-472e-b065-c9c87b5b282e</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.itemActions .tool {
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  float: left;
+  text-indent: -1000em;
+  overflow: hidden;
+  background: transparent no-repeat center center;
+}
+.itemActions .delete {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')") !important;
+}
+.itemActions .restore {
+   background-image: url("$xwiki.getSkinFile('/icons/silk/arrow_refresh.png')") !important;
+}
+.itemActions .cannot-restore {
+   background-image: url("$xwiki.getSkinFile('/icons/silk/page_error.png')") !important;
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DeletedAttachments</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>8d68ba7a-72d3-4f9f-a984-c7c47139b0a8</guid>
+    <class>
+      <name>XWiki.XWikiRights</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <allow>
+        <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>allow</displayType>
+        <name>allow</name>
+        <number>4</number>
+        <prettyName>Allow/Deny</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </allow>
+      <groups>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>groups</name>
+        <number>1</number>
+        <picker>1</picker>
+        <prettyName>Groups</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+      </groups>
+      <levels>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>levels</name>
+        <number>2</number>
+        <prettyName>Levels</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>3</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+      </levels>
+      <users>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>users</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>Users</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </users>
+    </class>
+    <property>
+      <allow>1</allow>
+    </property>
+    <property>
+      <groups>XWiki.XWikiAdminGroup</groups>
+    </property>
+    <property>
+      <levels>view,edit</levels>
+    </property>
+    <property>
+      <users/>
+    </property>
+  </object>
 </xwikidoc>

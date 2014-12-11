@@ -40,15 +40,23 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-webjars</artifactId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-script</artifactId>
+      <artifactId>xwiki-platform-webjars</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>

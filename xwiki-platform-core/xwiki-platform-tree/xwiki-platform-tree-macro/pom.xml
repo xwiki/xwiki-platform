@@ -49,6 +49,11 @@
       <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- RequireJS is used to load the tree widget -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
     <!-- Required by wiki macros -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

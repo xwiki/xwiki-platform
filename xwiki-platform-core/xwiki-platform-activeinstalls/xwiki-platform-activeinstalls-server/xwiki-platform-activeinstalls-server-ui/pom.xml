@@ -87,6 +87,15 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
     <!-- The Panels application is an optional dependency since the FAQ application can work even if it's not present but if it's
          there then it'll register in it. -->
     <dependency>

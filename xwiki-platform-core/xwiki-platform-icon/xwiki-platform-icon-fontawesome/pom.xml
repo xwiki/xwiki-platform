@@ -62,5 +62,14 @@
       <version>4.2.0</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- We use JavaScript to fix the way fonts are loaded on IE8. -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
   </dependencies>
 </project>

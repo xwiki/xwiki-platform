@@ -42,6 +42,15 @@
     <xwiki.extension.name>Menu Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
     <!-- Required by the menu wiki macro -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

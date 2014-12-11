@@ -50,5 +50,14 @@
       <artifactId>xwiki-platform-icon-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- JavaScript dependencies (for the icon picker) -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
   </dependencies>
 </project>

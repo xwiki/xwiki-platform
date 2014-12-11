@@ -97,7 +97,6 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 ## Start the requirejs config.
 ##
 require.config({
-## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: {
     'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
     'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap", "js/bootstrap${jsExtension}"))',
@@ -106,6 +105,7 @@ require.config({
   shim: {
     'bootstrap' : ['jquery']
   },
+  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   map: {
     '*': {
       'jquery': 'jQueryNoConflict'

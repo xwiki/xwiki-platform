@@ -128,8 +128,8 @@
  ************************************/
 require.config({
   paths: {
-    'jquery-ui' : '$services.webjars.url('jquery-ui/1.11.1/jquery-ui.min.js')',
-    'jquery-ui-touch-punch' : '$services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js')'
+    'jquery-ui' : "$services.webjars.url('jquery-ui', 'jquery-ui.min.js')",
+    'jquery-ui-touch-punch' : "$services.webjars.url('jquery-ui-touch-punch', 'jquery.ui.touch-punch.min.js')"
   },
   shim: {
     'jquery-ui' : ['jquery'],

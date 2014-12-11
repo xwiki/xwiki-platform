@@ -45,7 +45,7 @@
 ############################
 #set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet'))
 #set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
-#set($discard = $xwiki.linkx.use($services.webjars.url('colpick/2.0.2/css/colpick.css'), {'rel': 'stylesheet'}))
+#set($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'), {'rel': 'stylesheet'}))
 ############################
 ## GLOBALS
 ############################
@@ -474,7 +474,7 @@ require(['jquery'], function($) {
       link.type = "text/css";
       link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
       var script = document.createElement("script");
-      script.src = "$services.webjars.url('less/1.7.0/less.min.js')";
+      script.src = "$services.webjars.url('less', 'less.min.js')";
       iframeHead.appendChild(link);
       iframeHead.appendChild(script);
       waitUntilLessIsLoadedInIFrame(function(){
@@ -599,7 +599,7 @@ require(['jquery'], function($) {
       <code>// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
 require.config({
   paths: {
-    'colpick': '$services.webjars.url('colpick/2.0.2/js/colpick.js')'
+    'colpick': "$services.webjars.url('colpick', 'js/colpick.js')"
   },
   shim: {
     'colpick' : ['jquery']

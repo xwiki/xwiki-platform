@@ -210,7 +210,7 @@
 ##############################################
 
 ## Fix font path
-@icon-font-path:                      "$services.webjars.url('bootstrap/3.2.0/fonts')/";
+@icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
 
 ##
 ## XWiki variables: LESS variables specific to XWiki

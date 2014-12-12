@@ -319,9 +319,9 @@ public class DefaultOfficeResourceViewerTest
     }
 
     /**
-     * A test case for testing the {@link OfficeResourceViewer#getFilePath(DocumentReference, String)} method.
+     * A test case for testing the {@link DefaultOfficeResourceViewer#getFilePath(String, String, Map)} method.
      * 
-     * @throws Exception if an error occurs.
+     * @throws Exception if an error occurs
      */
     @Test
     public void testGetFilePath() throws Exception
@@ -333,6 +333,6 @@ public class DefaultOfficeResourceViewerTest
         String filePath =
             implementation.getFilePath(ATTACHMENT_REFERENCE.getName(), "some temporary artifact.gif",
                 Collections.<String, Object>emptyMap());
-        Assert.assertEquals("Test+file.doc/0/some+temporary+artifact.gif", filePath);
+        Assert.assertEquals("VGVzdCBmaWxlLmRvYw/0/some+temporary+artifact.gif", filePath);
     }
 }

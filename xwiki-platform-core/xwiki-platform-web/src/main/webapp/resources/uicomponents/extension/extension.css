@@ -50,6 +50,12 @@
   right: 0;
 }
 
+.extension-rating {
+  clear: right;
+  float: right;
+  margin-top: 10px;
+}
+
 .extension-status {
   font-size: 0.8em;
 }

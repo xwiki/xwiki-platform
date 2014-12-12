@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.artofsolving.jodconverter.document.DocumentFamily;
@@ -159,7 +160,16 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
 
     String getFilePath(String resourceName, String fileName, Map<String, ?> parameters)
     {
-        return getSafeFileName(resourceName) + '/' + parameters.hashCode() + '/' + getSafeFileName(fileName);
+        // We use Base64 encoding for the resource name because it may contain special characters like / (slash) or \
+        // (back-slash) that are prohibited in URLs by some servlet containers (e.g. Tomcat) even if they are
+        // URL-encoded. This can happen for instance if the resource is specified by an URL (e.g. external resource).
+        // Even for internal resources the back-slash character may be used to escape some characters in the resource
+        // reference. The down-side of the Base64 encoding is that the length of the output is greater than the length
+        // of the input by 30%. This means the file path can become quite large which may cause problems on environments
+        // that limit the path length (e.g. Windows). To be safe, the resource name should not exceed one third of the
+        // maximum accepted path length on the environment where XWiki is running.
+        String safeResourceName = Base64.encodeBase64URLSafeString(resourceName.getBytes());
+        return safeResourceName + '/' + parameters.hashCode() + '/' + getSafeFileName(fileName);
     }
 
     /**
@@ -169,13 +179,14 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      * @param xdom the XDOM whose image blocks are to be processed
      * @param artifacts specify which of the image blocks should be processed; only the image blocks that were generated
      *            during the office import process should be processed
-     * @param attachmentReference a reference to the office file that is being viewed; this reference is used to compute
+     * @param ownerDocumentReference specifies the document that owns the office file
+     * @param resourceReference a reference to the office file that is being viewed; this reference is used to compute
      *            the path to the temporary directory holding the image artifacts
      * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
      *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
-    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, DocumentReference documentReference,
+    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, DocumentReference ownerDocumentReference,
         String resourceReference, Map<String, ?> parameters)
     {
         // Process all image blocks.
@@ -190,12 +201,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
                     String filePath = getFilePath(resourceReference, imageReference, parameters);
 
                     // Write the image into a temporary file.
-                    File tempFile = getTemporaryFile(documentReference, filePath);
+                    File tempFile = getTemporaryFile(ownerDocumentReference, filePath);
                     createTemporaryFile(tempFile, artifacts.get(imageReference));
 
                     // Create a URL image reference which links to above temporary image file.
                     ResourceReference urlImageReference =
-                        new ResourceReference(buildURL(documentReference, filePath), ResourceType.URL);
+                        new ResourceReference(buildURL(ownerDocumentReference, filePath), ResourceType.URL);
                     // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
                     urlImageReference.setTyped(false);
 
@@ -330,9 +341,13 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
             String attachmentVersion = this.documentAccessBridge.getAttachmentVersion(attachmentReference);
             XDOM xdom = xdomOfficeDocument.getContentDocument();
+            // We use only the file name from the resource reference because the rest of the information is specified by
+            // the owner document reference. This way we ensure the path to the temporary files doesn't contain
+            // redundant information and so it remains as small as possible (considering that the path length is limited
+            // on some environments).
             Set<File> temporaryFiles =
                 processImages(xdom, xdomOfficeDocument.getArtifacts(), attachmentReference.getDocumentReference(),
-                    this.resourceReferenceSerializer.serialize(reference), parameters);
+                    attachmentReference.getName(), parameters);
             view =
                 new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
                     temporaryFiles);

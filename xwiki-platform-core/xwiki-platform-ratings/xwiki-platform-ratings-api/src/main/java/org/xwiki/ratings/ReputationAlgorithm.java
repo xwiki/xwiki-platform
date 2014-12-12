@@ -32,8 +32,9 @@ public interface ReputationAlgorithm
     
     /** 
      * Gets current ratings manager
+     * @param documentName the document which the ratings are for
      */
-    RatingsManager getRatingsManager();
+    RatingsManager getRatingsManager(String documentName);
  
     /**
      * Updates reputation after a vote

@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.ReputationAlgorithm;
 import org.xwiki.ratings.UpdateRatingEvent;
 import org.xwiki.observation.EventListener;
@@ -41,7 +42,7 @@ import org.xwiki.observation.event.Event;
 public class UpdateReputationListener implements EventListener
 {
     @Inject
-    Provider<ReputationAlgorithm> reputationAlgorithm;
+    ConfiguredProvider<ReputationAlgorithm> reputationAlgorithm;
 
     @Override
     public List<Event> getEvents()
@@ -59,7 +60,8 @@ public class UpdateReputationListener implements EventListener
     public void onEvent(Event event, Object arg1, Object arg2)
     {
        UpdateRatingEvent ratingEvent = (UpdateRatingEvent) event;
-       reputationAlgorithm.get().updateReputation(ratingEvent.getDocumentName(), ratingEvent.getNewRating(), ratingEvent.getOldRating());
+       String documentName = ratingEvent.getDocumentName();
+       reputationAlgorithm.get(documentName).updateReputation(documentName, ratingEvent.getNewRating(), ratingEvent.getOldRating());
     }
   
 }

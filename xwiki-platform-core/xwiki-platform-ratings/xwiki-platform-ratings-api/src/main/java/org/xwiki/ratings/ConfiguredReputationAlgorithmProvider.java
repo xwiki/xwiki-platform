@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 @Component
 @Singleton
-public class ConfiguredReputationAlgorithmProvider implements Provider<ReputationAlgorithm> 
+public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider<ReputationAlgorithm>
 {
     
     @Inject 
@@ -49,7 +49,7 @@ public class ConfiguredReputationAlgorithmProvider implements Provider<Reputatio
     ComponentManager componentManager;
     
     @Inject
-    Provider<RatingsManager> ratingsManagerProvider;
+    ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
     /**
      * <p>
@@ -79,14 +79,14 @@ public class ConfiguredReputationAlgorithmProvider implements Provider<Reputatio
 
 
     @Override
-    public ReputationAlgorithm get() 
+    public ReputationAlgorithm get(String documentName)
     {
         // TODO implement
         String reputationAlgorithmHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
         
         try {
-            String space = getXWikiContext().getDoc().getSpace();
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(space + "." + RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
+            XWikiDocument ratingDocument = getXWiki().getDocument(documentName, getXWikiContext());
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
             XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
             XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
 
@@ -113,7 +113,7 @@ public class ConfiguredReputationAlgorithmProvider implements Provider<Reputatio
                  reputationInstance.setComponentManager(componentManager);
                  reputationInstance.setExecution(execution);
                  reputationInstance.setXWikiContext(getXWikiContext());
-                 reputationInstance.setRatingsManager(ratingsManagerProvider.get());
+                 reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentName));
                  return reputationInstance;
              }
             } catch (Throwable e) {

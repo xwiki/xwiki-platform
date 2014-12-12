@@ -56,15 +56,16 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Gets or calculates the user reputation.
      *
+     * @param documentName the document which the ratings are for
      * @param username Person to calculate the reputation for
      * @param context context of the request
      * @return AverageRating of the voter
      */
-    public AverageRating getUserReputation(String username) throws ReputationException
+    public AverageRating getUserReputation(String documentName, String username) throws ReputationException
     {
         try {
             AverageRating aveRating =
-                getRatingsManager().getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
+                getRatingsManager(documentName).getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
             float oldRep = aveRating.getAverageVote();
             aveRating.setAverageVote(aveRating.getAverageVote() * 100 / getTotalReputation());
             totalReputation += aveRating.getAverageVote() - oldRep;
@@ -89,10 +90,10 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     public AverageRating calcNewContributorReputation(String contributor, String documentName, Rating rating, int oldVote) throws ReputationException
     {
         String voter = rating.getAuthor();
-        float voterRep = getUserReputation(voter).getAverageVote();
+        float voterRep = getUserReputation(documentName, voter).getAverageVote();
         float constantX = getConstantX();
         float constantY = getConstantY();
-        AverageRating currentRep = getUserReputation(contributor);
+        AverageRating currentRep = getUserReputation(documentName, contributor);
         currentRep.setAverageVote(currentRep.getAverageVote() + (rating.getVote() + constantX) * voterRep / constantY);
         notimplemented();
         return null;

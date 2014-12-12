@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.ratings.AverageRating;
+import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -58,7 +59,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
     Execution execution;
     
     @Inject
-    Provider<RatingsManager> ratingsManagerProvider;
+    ConfiguredProvider<RatingsManager> ratingsManagerProvider;
   
     /**
      * <p>
@@ -85,8 +86,8 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return getXWikiContext().getWiki();
     }
    
-    public RatingsManager getRatingsManager() {
-        return ratingsManagerProvider.get();
+    public RatingsManager getRatingsManager(String documentName) {
+        return ratingsManagerProvider.get(documentName);
     }
         
     public void updateReputation(String documentName, Rating rating, int oldVote)
@@ -99,7 +100,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
                     calcNewVoterReputation(rating.getAuthor(), documentName, rating, oldVote);
                 // we need to save this reputation if it has changed
                 try {
-                 getRatingsManager().updateUserReputation(rating.getAuthor(), voterRating);
+                 getRatingsManager(documentName).updateUserReputation(rating.getAuthor(), voterRating);
                 } catch (RatingsException re) {
                     if (LOGGER.isErrorEnabled()) {
                         LOGGER.error("Error while storing reputation for user " + rating.getAuthor(), re);
@@ -121,7 +122,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
                 AverageRating authorRating = calcNewContributorReputation(doc.getCreator(), documentName, rating, oldVote);
                 // we need to save the author reputation
                 try {
-                    getRatingsManager().updateUserReputation(doc.getCreator(), authorRating);
+                    getRatingsManager(documentName).updateUserReputation(doc.getCreator(), authorRating);
                 } catch (RatingsException re) {
                     if (LOGGER.isErrorEnabled()) {
                         LOGGER.error("Error while storing reputation for user " + doc.getCreator(), re);

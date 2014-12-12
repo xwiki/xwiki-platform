@@ -32,6 +32,7 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -46,7 +47,7 @@ public class RatingsScriptService implements ScriptService
     private Execution execution;
     
     @Inject
-    private Provider<RatingsManager> ratingsManagerProvider;
+    private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
     @Inject
     private Provider<ReputationAlgorithm> reputationAlgorithmProvider;
@@ -83,7 +84,8 @@ public class RatingsScriptService implements ScriptService
         // TODO protect this with programming rights
         // and add a setRating(docName), not protected but for which the author is retrieved from getXWikiContext().
         try {
-            return new RatingApi(ratingsManagerProvider.get().setRating(doc.getFullName(), author, vote));
+            String documentName = doc.getFullName();
+            return new RatingApi(ratingsManagerProvider.get(documentName).setRating(documentName, author, vote));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -93,7 +95,8 @@ public class RatingsScriptService implements ScriptService
     public RatingApi getRating(Document doc, String author)
     {
         try {
-            Rating rating = ratingsManagerProvider.get().getRating(doc.getFullName(), author);
+            String documentName = doc.getFullName();
+            Rating rating = ratingsManagerProvider.get(documentName).getRating(documentName, author);
             if (rating == null) {
                 return null;
             }
@@ -112,7 +115,8 @@ public class RatingsScriptService implements ScriptService
     public List<RatingApi> getRatings(Document doc, int start, int count, boolean asc)
     {
         try {
-            return wrapRatings(ratingsManagerProvider.get().getRatings(doc.getFullName(), start, count, asc));
+            String documentName = doc.getFullName();
+            return wrapRatings(ratingsManagerProvider.get(documentName).getRatings(documentName, start, count, asc));
         } catch (Exception e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -122,7 +126,8 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(Document doc, String method)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get().getAverageRating(doc.getFullName(), method));
+            String documentName = doc.getFullName();
+            return new AverageRatingApi(ratingsManagerProvider.get(documentName).getAverageRating(documentName, method));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -132,7 +137,8 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(Document doc)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get().getAverageRating(doc.getFullName()));
+            String documentName = doc.getFullName();
+            return new AverageRatingApi(ratingsManagerProvider.get(documentName).getAverageRating(documentName));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -142,7 +148,7 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(String fromsql, String wheresql, String method)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get().getAverageRatingFromQuery(fromsql, wheresql, method));
+            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getAverageRatingFromQuery(fromsql, wheresql, method));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -152,7 +158,7 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(String fromsql, String wheresql)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get().getAverageRatingFromQuery(fromsql, wheresql));
+            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getAverageRatingFromQuery(fromsql, wheresql));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -162,7 +168,7 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getUserReputation(String username)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get().getUserReputation(username));
+            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getUserReputation(username));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;

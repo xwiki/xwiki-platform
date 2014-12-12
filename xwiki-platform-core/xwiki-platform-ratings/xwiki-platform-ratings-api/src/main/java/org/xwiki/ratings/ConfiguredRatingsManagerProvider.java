@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 
 @Component
 @Singleton
-public class ConfiguredRatingsManagerProvider implements Provider<RatingsManager> 
+public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<RatingsManager>
 {
         
     @Inject 
@@ -73,17 +73,15 @@ public class ConfiguredRatingsManagerProvider implements Provider<RatingsManager
         return getXWikiContext().getWiki();
     }
 
-
-
     @Override
-    public RatingsManager get() 
+    public RatingsManager get(String documentName)
     {
         // TODO implement
         String ratingsHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT, "default");
         
         try {
-            String space = getXWikiContext().getDoc().getSpace();
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(space + "." + RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
+            XWikiDocument ratingDocument = getXWiki().getDocument(documentName, getXWikiContext());
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
             XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
             XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
 

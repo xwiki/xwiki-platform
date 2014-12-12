@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.DefaultExtensionRating;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionRating;
 import org.xwiki.extension.ResolveException;

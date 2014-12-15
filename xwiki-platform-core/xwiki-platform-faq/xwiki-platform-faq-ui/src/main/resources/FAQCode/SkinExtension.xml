@@ -229,7 +229,7 @@
   padding: 0 1em 1em 1em;
   box-sizing: border-box;
   min-height: 115px;
-  min-width: 315px;
+  min-width: 265px;
 }
 
 .faq-link.box h3 {

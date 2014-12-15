@@ -31,7 +31,7 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-public interface LESSResourceContentReader
+public interface LESSResourceReader
 {
     /**
      * Get the content of the LESS resource.

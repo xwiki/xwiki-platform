@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -64,7 +64,7 @@ public class CachedIntegratedLESSCompilerTest
 
     private SkinDirectoryGetter skinDirectoryGetter;
 
-    private LESSResourceContentReader lessResourceContentReader;
+    private LESSResourceReader lessResourceReader;
 
     private XWikiContext xcontext;
 
@@ -77,7 +77,7 @@ public class CachedIntegratedLESSCompilerTest
     {
         lessCompiler = mocker.getInstance(LESSCompiler.class);
         skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
-        lessResourceContentReader = mocker.getInstance(LESSResourceContentReader.class);
+        lessResourceReader = mocker.getInstance(LESSResourceReader.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -96,7 +96,7 @@ public class CachedIntegratedLESSCompilerTest
 
         Path path = mock(Path.class);
         when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
-        when(lessResourceContentReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
             thenReturn("Some Velocity-rendered LESS content");
         when(lessCompiler.compile(eq("Some Velocity-rendered LESS content"), any(Path[].class))).thenReturn("output");
@@ -117,7 +117,7 @@ public class CachedIntegratedLESSCompilerTest
 
         Path path = mock(Path.class);
         when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
-        when(lessResourceContentReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(lessCompiler.compile(eq("Some LESS content"), any(Path[].class))).thenReturn("output");
 
         // Tests
@@ -137,13 +137,13 @@ public class CachedIntegratedLESSCompilerTest
         when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin")).thenReturn(path);
 
         // Main style
-        when(lessResourceContentReader.getContent(eq(new LESSSkinFileResourceReference("style.less.vm")), eq("skin"))).
+        when(lessResourceReader.getContent(eq(new LESSSkinFileResourceReference("style.less.vm")), eq("skin"))).
                 thenReturn("LESS code from main file");
         when(xwiki.parseContent(eq("LESS code from main file"), eq(xcontext))).
                 thenReturn("Velocity-rendered main style");
 
         // Resource
-        when(lessResourceContentReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
+        when(lessResourceReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\nSome LESS content"), eq(xcontext))).
                 thenReturn("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content");
         when(lessCompiler.compile(eq("@import (reference) \"style.less.vm\";\nSome Velocity-rendered LESS content"),
@@ -162,7 +162,7 @@ public class CachedIntegratedLESSCompilerTest
 
         Path path = mock(Path.class);
         when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
-        when(lessResourceContentReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
                 thenReturn("Some Velocity-rendered LESS content");
         LESSCompilerException lessCompilerException = new LESSCompilerException("error");

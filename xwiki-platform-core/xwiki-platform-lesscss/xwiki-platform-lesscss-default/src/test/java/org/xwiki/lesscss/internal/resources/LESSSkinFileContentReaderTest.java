@@ -52,8 +52,8 @@ import static org.mockito.Mockito.when;
 public class LESSSkinFileContentReaderTest
 {
     @Rule
-    public MockitoComponentMockingRule<LESSSkinFileContentReader> mocker =
-            new MockitoComponentMockingRule<>(LESSSkinFileContentReader.class);
+    public MockitoComponentMockingRule<LESSSkinFileReader> mocker =
+            new MockitoComponentMockingRule<>(LESSSkinFileReader.class);
 
     private Provider<XWikiContext> xcontextProvider;
 

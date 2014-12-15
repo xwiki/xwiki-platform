@@ -27,12 +27,12 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
- * Specialized implementation of {@link LESSResourceContentReader} to read resources referenced by an
- * {@link LESSObjectPropertyResourceReference} object.
+ * Specialized implementation of {@link org.xwiki.lesscss.resources.LESSResourceReader} to read resources referenced by
+ * an {@link LESSObjectPropertyResourceReference} object.
  *
  * @since 6.4M2
  * @version $Id$
@@ -40,7 +40,7 @@ import org.xwiki.lesscss.resources.LESSResourceReference;
 @Component
 @Named("org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference")
 @Singleton
-public class LESSObjectPropertyResourceContentReader implements LESSResourceContentReader
+public class LESSObjectPropertyReader implements LESSResourceReader
 {
     @Inject
     private DocumentAccessBridge bridge;

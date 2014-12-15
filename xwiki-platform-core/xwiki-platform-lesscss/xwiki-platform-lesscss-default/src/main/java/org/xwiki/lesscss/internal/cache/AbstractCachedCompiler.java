@@ -125,6 +125,8 @@ public abstract class AbstractCachedCompiler<T>
             } finally {
                 // We must cache the result, even if the compilation have failed, to prevent re-compiling again and
                 // again (the compilation will still fail until the LESS resource is updated so it useless to retry).
+                // FixMe: it actually does not work, since setting null in the cache will not prevent an other
+                // computation.
                 cache.set(lessResourceReference, skinReference, colorThemeReference, result);
             }
         }

@@ -43,8 +43,8 @@ import static org.mockito.Mockito.when;
 public class LESSObjectPropertyResourceContentReaderTest
 {
     @Rule
-    public MockitoComponentMockingRule<LESSObjectPropertyResourceContentReader> mocker =
-            new MockitoComponentMockingRule<>(LESSObjectPropertyResourceContentReader.class);
+    public MockitoComponentMockingRule<LESSObjectPropertyReader> mocker =
+            new MockitoComponentMockingRule<>(LESSObjectPropertyReader.class);
 
     private DocumentAccessBridge bridge;
 

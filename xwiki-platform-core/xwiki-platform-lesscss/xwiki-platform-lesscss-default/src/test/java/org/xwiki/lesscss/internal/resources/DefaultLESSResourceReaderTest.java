@@ -22,7 +22,7 @@ package org.xwiki.lesscss.internal.resources;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -38,18 +38,18 @@ import static org.mockito.Mockito.when;
  * @since 6.4M2
  * @version $Id$
  */
-public class DefaultLESSResourceContentReaderTest
+public class DefaultLESSResourceReaderTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultLESSResourceContentReader> mocker =
-            new MockitoComponentMockingRule<>(DefaultLESSResourceContentReader.class);
+    public MockitoComponentMockingRule<DefaultLESSResourceReader> mocker =
+            new MockitoComponentMockingRule<>(DefaultLESSResourceReader.class);
 
     @Test
     public void getContent() throws Exception
     {
         // Mock
-        LESSResourceContentReader reader = mock(LESSSkinFileContentReader.class);
-        mocker.registerComponent(LESSResourceContentReader.class, "org.xwiki.lesscss.resources.LESSSkinFileResourceReference",
+        LESSResourceReader reader = mock(LESSSkinFileReader.class);
+        mocker.registerComponent(LESSResourceReader.class, "org.xwiki.lesscss.resources.LESSSkinFileResourceReference",
             reader);
         when(reader.getContent(any(LESSResourceReference.class), anyString())).thenReturn("content");
 

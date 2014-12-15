@@ -32,7 +32,7 @@ import javax.inject.Singleton;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Specialized implementation of {@link LESSResourceContentReader} to read resources referenced by an
+ * Specialized implementation of {@link org.xwiki.lesscss.resources.LESSResourceReader} to read resources referenced by an
  * {@link LESSSkinFileResourceReference} object.
  *
  * @since 6.4M2
@@ -50,7 +50,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("org.xwiki.lesscss.resources.LESSSkinFileResourceReference")
 @Singleton
-public class LESSSkinFileContentReader implements LESSResourceContentReader
+public class LESSSkinFileReader implements LESSResourceReader
 {
     @Inject
     private Provider<XWikiContext> xcontextProvider;

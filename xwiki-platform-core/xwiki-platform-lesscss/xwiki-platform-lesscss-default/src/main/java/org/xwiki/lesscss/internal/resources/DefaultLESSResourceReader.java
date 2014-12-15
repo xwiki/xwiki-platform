@@ -26,11 +26,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 
 /**
- * Default implementation of {@link LESSResourceContentReader}. It looks-up the component corresponding to the
+ * Default implementation of {@link org.xwiki.lesscss.resources.LESSResourceReader}. It looks-up the component corresponding to the
  * type of the LESS resource to get the content every type of resources.
  *
  * @version $Id$
@@ -38,7 +38,7 @@ import org.xwiki.lesscss.resources.LESSResourceReference;
  */
 @Component
 @Singleton
-public class DefaultLESSResourceContentReader implements LESSResourceContentReader
+public class DefaultLESSResourceReader implements LESSResourceReader
 {
     @Inject
     private ComponentManager componentManager;
@@ -48,7 +48,7 @@ public class DefaultLESSResourceContentReader implements LESSResourceContentRead
         throws LESSCompilerException
     {
         try {
-            LESSResourceContentReader reader = componentManager.getInstance(LESSResourceContentReader.class,
+            LESSResourceReader reader = componentManager.getInstance(LESSResourceReader.class,
                     lessResourceReference.getClass().getName());
             return reader.getContent(lessResourceReference, skin);
         } catch (ComponentLookupException e) {

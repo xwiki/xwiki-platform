@@ -37,7 +37,7 @@ import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSResourceContentReader;
+import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.internal.cache.CachedCompilerInterface;
@@ -70,7 +70,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
     private SkinDirectoryGetter skinDirectoryGetter;
 
     @Inject
-    private LESSResourceContentReader lessResourceContentReader;
+    private LESSResourceReader lessResourceReader;
 
     @Override
     public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
@@ -111,7 +111,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
                 }
 
                 // Get the content of the LESS resource
-                source.write(lessResourceContentReader.getContent(lessResourceReference, skin));
+                source.write(lessResourceReader.getContent(lessResourceReference, skin));
             }
 
             // Parse the LESS content with Velocity
@@ -146,7 +146,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
         throws LESSCompilerException, IOException
     {
         // Get the file content
-        String mainSkinStyle = lessResourceContentReader.getContent(
+        String mainSkinStyle = lessResourceReader.getContent(
             new LESSSkinFileResourceReference(MAIN_SKIN_STYLE_FILENAME), skin);
         // Execute velocity on it
         String velocityOutput = executeVelocity(mainSkinStyle, skin);

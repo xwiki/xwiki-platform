@@ -22,38 +22,57 @@ package org.xwiki.mail.internal.iterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.environment.Environment;
+
 /**
- *  Generate messages from a list of files.
+ * Generate messages from a list of files.
  *
  * @version $Id$
  * @since 6.4M2
  */
 public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
 {
-    private final List<File> files;
+    private final File[] files;
+
+    private ComponentManager componentManager;
+
+    private Environment environment;
+
+    private File batchDirectory;
 
     /**
-     *
-     * @param files the list of file that contains serialized MimeMessages
+     * @param batchID the name of the directory that contains serialized MimeMessages
      * @param parameters the parameters from which to extract the session
+     * @param componentManager used to dynamically load components
+     * @throws MessagingException when an error occurs when retrieving messages
      */
-    public SerializedFilesMimeMessageIterator(List<File> files, Map<String, Object> parameters)
+    public SerializedFilesMimeMessageIterator(UUID batchID, Map<String, Object> parameters,
+        ComponentManager componentManager) throws MessagingException
     {
-        this.iteratorSize = files.size();
-        this.files = files;
+        this.componentManager = componentManager;
+        try {
+            this.environment = this.componentManager.getInstance(Environment.class);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException("Failed to find default Environment", e);
+        }
+        this.batchDirectory = new File(this.environment.getPermanentDirectory(), batchID.toString());
+        this.files = this.batchDirectory.listFiles();
+        this.iteratorSize = this.files.length;
         this.parameters = parameters;
     }
 
     @Override protected MimeMessage createMessage() throws MessagingException
     {
-        File file = this.files.get(this.position);
+        File file = this.files[this.position];
         Session session = (Session) this.parameters.get("session");
         try {
             FileInputStream emailStream = new FileInputStream(file);

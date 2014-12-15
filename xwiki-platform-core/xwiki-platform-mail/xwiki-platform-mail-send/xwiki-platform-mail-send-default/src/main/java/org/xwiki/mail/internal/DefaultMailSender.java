@@ -21,7 +21,7 @@ package org.xwiki.mail.internal;
 
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
@@ -36,11 +36,14 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStatus;
 
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
@@ -62,6 +65,9 @@ public class DefaultMailSender implements MailSender, Initializable
     @Inject
     private Logger logger;
 
+    @Inject
+    private ComponentManager componentManager;
+
     /**
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
@@ -76,23 +82,28 @@ public class DefaultMailSender implements MailSender, Initializable
     }
 
     @Override
-    public void send(MimeMessage message, Session session) throws MessagingException
+    public UUID send(MimeMessage message, Session session) throws MessagingException
     {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        sendAsynchronously(message, session, listener);
+        MailListener listener = getListener("memory");
+        UUID batchID = sendAsynchronously(message, session, listener);
         waitTillSent(Long.MAX_VALUE);
-        BlockingQueue<Exception> errorQueue = listener.getExceptionQueue();
-        if (!errorQueue.isEmpty()) {
-            throw new MessagingException(String.format("Failed to send mail message [%s]", message), errorQueue.peek());
+        Iterator<MailStatus> errors = listener.getErrors();
+        if (errors.hasNext()) {
+            throw new MessagingException(String.format("Failed to send mail message [%s]", message),
+                errors.next().getException());
         }
+        return batchID;
     }
 
     @Override
-    public void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener)
+    public UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener)
     {
+        UUID batchID = UUID.randomUUID();
         try {
             // If the user has not set the From header then use the default value from configuration and if it's not
             // set then raise an error since a message must have a from set!
+            message.setHeader("X-SenderID", batchID.toString());
+            // Perform some basic verification to avoid NPEs in JavaMail
             if (message.getFrom() == null) {
                 // Try using the From address in the Session
                 String from = this.configuration.getFromAddress();
@@ -118,6 +129,7 @@ public class DefaultMailSender implements MailSender, Initializable
             // Save any exception in the listener
             listener.onError(message, e);
         }
+        return batchID;
     }
 
     /**
@@ -158,6 +170,7 @@ public class DefaultMailSender implements MailSender, Initializable
 
     /**
      * Stops the sending thread. Should be called when the application is stopped for a clean shutdown.
+     *
      * @throws InterruptedException if the thread failed to be stopped
      */
     public void stopMailSenderThread() throws InterruptedException
@@ -165,5 +178,16 @@ public class DefaultMailSender implements MailSender, Initializable
         this.mailSenderThread.stopProcessing();
         // Wait till the thread goes away
         this.mailSenderThread.join();
+    }
+
+    private MailListener getListener(String hint) throws MessagingException
+    {
+        MailListener listener;
+        try {
+            listener = this.componentManager.getInstance(MailListener.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate [%s] Event lister. ", hint), e);
+        }
+        return listener;
     }
 }

@@ -29,19 +29,19 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.MailListener;
+import org.xwiki.mail.AbstractMailListener;
 import org.xwiki.mail.MailStatus;
 
 /**
  * Saves errors when sending messages, in a local variable.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M2
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("memory")
-public class MemoryMailListener implements MailListener
+public class MemoryMailListener extends AbstractMailListener
 {
     private BlockingQueue<MailStatus> errorQueue = new LinkedBlockingQueue<>(100);
 

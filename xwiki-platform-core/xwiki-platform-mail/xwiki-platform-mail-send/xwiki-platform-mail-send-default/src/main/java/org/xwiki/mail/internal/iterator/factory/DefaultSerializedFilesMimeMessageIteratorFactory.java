@@ -19,15 +19,19 @@
  */
 package org.xwiki.mail.internal.iterator.factory;
 
-import java.io.File;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mail.internal.iterator.SerializedFilesMimeMessageIterator;
 
 /**
@@ -39,9 +43,15 @@ import org.xwiki.mail.internal.iterator.SerializedFilesMimeMessageIterator;
 @Singleton
 public class DefaultSerializedFilesMimeMessageIteratorFactory implements SerializedFilesMimeMessageIteratorFactory
 {
-    @Override public Iterator<MimeMessage> create(List<File> files, Map<String, Object> parameters)
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Override public Iterator<MimeMessage> create(UUID batchID, Map<String, Object> parameters)
+        throws MessagingException
     {
-        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(files, parameters);
+        ComponentManager cm = componentManagerProvider.get();
+        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchID, parameters, cm);
         return iterator;
     }
 }

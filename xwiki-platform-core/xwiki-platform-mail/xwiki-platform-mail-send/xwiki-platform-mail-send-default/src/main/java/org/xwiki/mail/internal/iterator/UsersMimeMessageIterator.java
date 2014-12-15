@@ -22,7 +22,6 @@ package org.xwiki.mail.internal.iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -30,6 +29,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -43,23 +44,39 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
 {
     private static final String USER_SPACE = "XWiki";
 
-    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     private final List<DocumentReference> users;
+
+    private ComponentManager componentManager;
 
     /**
      * @param userReferences the list of recipients
      * @param factory to create MimeMessage
      * @param parameters the parameters from which to extract the session, source and the headers
+     * @param componentManager used to dynamically load components
+     * @throws MessagingException when an error occurs
      */
     public UsersMimeMessageIterator(List<DocumentReference> userReferences, MimeMessageFactory factory,
-        Map<String, Object> parameters)
+        Map<String, Object> parameters, ComponentManager componentManager) throws MessagingException
     {
         this.factory = factory;
         this.parameters = parameters;
         this.iteratorSize = userReferences.size();
         this.users = userReferences;
+        this.componentManager = componentManager;
+        this.documentAccessBridge = getAccessBridge();
+    }
+
+    private DocumentAccessBridge getAccessBridge() throws MessagingException
+    {
+        DocumentAccessBridge accessBridge;
+        try {
+            accessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException("Failed to find default Document bridge ", e);
+        }
+        return accessBridge;
     }
 
     @Override protected MimeMessage createMessage() throws MessagingException

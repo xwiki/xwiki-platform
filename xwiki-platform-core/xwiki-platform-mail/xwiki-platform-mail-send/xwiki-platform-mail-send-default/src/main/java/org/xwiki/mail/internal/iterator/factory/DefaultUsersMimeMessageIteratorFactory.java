@@ -23,10 +23,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.iterator.UsersMimeMessageIterator;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,10 +45,16 @@ import org.xwiki.model.reference.DocumentReference;
 @Singleton
 public class DefaultUsersMimeMessageIteratorFactory implements UsersMimeMessageIteratorFactory
 {
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Override
     public Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
-        Map<String, Object> parameters)
+        Map<String, Object> parameters) throws MessagingException
     {
-        UsersMimeMessageIterator iterator = new UsersMimeMessageIterator(userReferences, factory, parameters);
+        ComponentManager cm = componentManagerProvider.get();
+        UsersMimeMessageIterator iterator = new UsersMimeMessageIterator(userReferences, factory, parameters, cm);
         return iterator;
     }
 }

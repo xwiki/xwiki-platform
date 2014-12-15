@@ -22,17 +22,20 @@ package org.xwiki.mail.internal.iterator.factory;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.iterator.GroupMimeMessageIterator;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- *
  * @version $Id$
  * @since 6.4M2
  */
@@ -40,10 +43,16 @@ import org.xwiki.model.reference.DocumentReference;
 @Singleton
 public class DefaultGroupMimeMessageIteratorFactory implements GroupMimeMessageIteratorFactory
 {
-    @Override public Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    @Override
+    public Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
         Map<String, Object> parameters) throws MessagingException
     {
-        GroupMimeMessageIterator iterator = new GroupMimeMessageIterator(groupReference, factory, parameters);
+        ComponentManager cm = componentManagerProvider.get();
+        GroupMimeMessageIterator iterator = new GroupMimeMessageIterator(groupReference, factory, parameters, cm);
         return iterator;
     }
 }

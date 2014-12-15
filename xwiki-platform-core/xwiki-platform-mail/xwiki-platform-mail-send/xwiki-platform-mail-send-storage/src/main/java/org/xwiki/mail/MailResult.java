@@ -25,7 +25,7 @@ import java.util.Date;
  * @version $Id$
  * @since 6.4M2
  */
-public class MailEvent
+public class MailResult
 {
     /**
      * ID.

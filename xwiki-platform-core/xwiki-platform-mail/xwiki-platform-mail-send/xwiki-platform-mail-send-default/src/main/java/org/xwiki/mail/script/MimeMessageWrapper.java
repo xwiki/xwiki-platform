@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -33,6 +34,8 @@ import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -69,6 +72,9 @@ public class MimeMessageWrapper
 
     private ExtendedMimeMessage message;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
@@ -81,7 +87,7 @@ public class MimeMessageWrapper
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
     MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
-        MailSenderConfiguration configuration, ComponentManager componentManager) throws MessagingException
+        MailSenderConfiguration configuration, ComponentManager componentManager)
     {
         this.message = message;
         this.session = session;
@@ -89,10 +95,12 @@ public class MimeMessageWrapper
         this.execution = execution;
         this.configuration = configuration;
         this.componentManager = componentManager;
+        String hint = "memory";
         try {
-            this.listener = this.componentManager.getInstance(MailListener.class, "memory");
-        } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to locate [%s] event lister. ", "memory"), e);
+            this.listener = getListener(hint);
+        } catch (MessagingException e) {
+            this.logger.error(String.format("Failed to locate [%s] event lister. ", hint)
+                + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -146,6 +154,8 @@ public class MimeMessageWrapper
     /**
      * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling
      * {@link #getErrors()}.
+     *
+     * @return UUID of the Batch mail
      */
     public UUID send()
     {
@@ -162,8 +172,10 @@ public class MimeMessageWrapper
     /**
      * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking or simply use
      * {@link #send()}. Any error can be retrieved by calling {@link #getErrors()}.
+     *
+     * @return UUID of the Batch mail
      */
-    public UUID sendAsynchronously() throws MessagingException
+    public UUID sendAsynchronously()
     {
         try {
             checkPermissions();
@@ -176,8 +188,8 @@ public class MimeMessageWrapper
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        UUID Sender = this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
-        return Sender;
+        UUID sender = this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
+        return sender;
     }
 
     /**
@@ -354,6 +366,15 @@ public class MimeMessageWrapper
         } catch (MessagingException e) {
             throw new MessagingException(String.format("Not authorized to send mail with subject [%s], using "
                 + "Permission Checker [%s]. The mail has not been sent.", getMessage().getSubject(), hint), e);
+        }
+    }
+
+    private MailListener getListener(String hint) throws MessagingException
+    {
+        try {
+            return this.componentManager.getInstance(MailListener.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate [%s] mail event lister. ", hint), e);
         }
     }
 }

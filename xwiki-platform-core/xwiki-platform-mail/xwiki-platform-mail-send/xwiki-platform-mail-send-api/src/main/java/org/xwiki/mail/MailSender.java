@@ -43,6 +43,7 @@ public interface MailSender
      *
      * @param message the message to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
+     * @return UUID of the Batch mail
      * @throws MessagingException when an error occurs when sending the mail
      */
     UUID send(MimeMessage message, Session session) throws MessagingException;
@@ -54,9 +55,10 @@ public interface MailSender
      * @param message the message to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @param listener a listener called when the mail is sent successfully or when there is an error
+     * @return UUID of the Batch mail
      * @since 6.2M1
      */
-    UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener) throws MessagingException;
+    UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener);
 
     /**
      * Wait for all messages on the sending queue to be sent before returning.

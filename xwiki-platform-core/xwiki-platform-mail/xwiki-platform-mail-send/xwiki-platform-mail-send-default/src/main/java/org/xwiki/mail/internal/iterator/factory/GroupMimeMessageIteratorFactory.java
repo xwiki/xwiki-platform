@@ -38,6 +38,15 @@ import org.xwiki.model.reference.DocumentReference;
 @Role
 public interface GroupMimeMessageIteratorFactory
 {
-    public Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
+    /**
+     * Create Iterator of MimeMessages.
+     *
+     * @param groupReference the group that contains the list of user.
+     * @param factory factory to create MimeMessage
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a users in group (groupReference)
+     * @throws MessagingException when an error occurs
+     */
+    Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
         Map<String, Object> parameters) throws MessagingException;
 }

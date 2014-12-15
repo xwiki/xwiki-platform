@@ -21,8 +21,6 @@ package org.xwiki.mail.internal.iterator;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -30,6 +28,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.EntityType;
@@ -53,33 +53,28 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
     private static final EntityReference GROUPS_CLASS =
         new EntityReference("XWikiGroups", EntityType.DOCUMENT, new EntityReference(USER_SPACE, EntityType.SPACE));
 
-    @Inject
-    private Execution execution;
-
-    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> resolver;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<String> stringResolver;
 
     private DocumentReference groupReference;
+
+    private ComponentManager componentManager;
 
     /**
      * @param groupReference the group that contains list of recipients
      * @param factory to create MimeMessage
      * @param parameters the parameters from which to extract the session, source and the headers
+     * @param componentManager used to dynamically load components
      * @throws MessagingException when an error occurs when retrieving the number of users
      */
     public GroupMimeMessageIterator(DocumentReference groupReference, MimeMessageFactory factory,
-        Map<String, Object> parameters) throws MessagingException
+        Map<String, Object> parameters, ComponentManager componentManager) throws MessagingException
     {
         this.factory = factory;
         this.parameters = parameters;
         this.groupReference = groupReference;
+        this.componentManager = componentManager;
 
         XWikiContext context = getXWikiContext();
         try {
@@ -88,16 +83,19 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
             throw new MessagingException(String.format(
                 "Failed to find number of [%s] objects in group Document [%s]", GROUPS_CLASS, groupReference), e);
         }
+        this.documentAccessBridge = getAccessBridge();
+
+        this.stringResolver = getResolver();
     }
 
     @Override protected MimeMessage createMessage() throws MessagingException
     {
-        DocumentReference groupsClassReference = this.resolver.resolve(GROUPS_CLASS);
+        DocumentReference groupsClassReference = this.stringResolver.resolve(USER_SPACE + ".XWikiGroups");
         String userFullName =
             this.documentAccessBridge.getProperty(this.groupReference, groupsClassReference, this.position, "member")
                 .toString();
 
-        DocumentReference userReference = documentReferenceResolver.resolve(userFullName);
+        DocumentReference userReference = this.stringResolver.resolve(userFullName);
 
         String email = this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
             .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "email").toString();
@@ -111,8 +109,38 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
         return mimeMessage;
     }
 
-    private XWikiContext getXWikiContext()
+    private DocumentAccessBridge getAccessBridge() throws MessagingException
     {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        DocumentAccessBridge accessBridge;
+        try {
+            accessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException("Failed to find default Document bridge ", e);
+        }
+        return accessBridge;
+    }
+
+    private XWikiContext getXWikiContext() throws MessagingException
+    {
+
+        XWikiContext xWikiContext;
+        try {
+            Execution execution = this.componentManager.getInstance(Execution.class);
+            xWikiContext = (XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException("Failed to find default Execution context", e);
+        }
+        return xWikiContext;
+    }
+
+    private DocumentReferenceResolver<String> getResolver() throws MessagingException
+    {
+        DocumentReferenceResolver<String> resolver;
+        try {
+            resolver = this.componentManager.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+        } catch (ComponentLookupException e) {
+            throw new MessagingException("Failed to find default Document resolver", e);
+        }
+        return resolver;
     }
 }

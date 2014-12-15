@@ -18,31 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.MailEvent;
-import org.xwiki.mail.MailEventManager;
-import org.xwiki.query.QueryManager;
+import java.util.Iterator;
 
 /**
+ *
  * @version $Id$
  * @since 6.4M2
  */
-@Component
-@Singleton
-public class DefaultMailEventManager implements MailEventManager
+public abstract class AbstractMailListener implements MailListener
 {
-    @Inject
-    private QueryManager queryManager;
+    /**
+     * @return the list of MailStatus
+     */
+    public abstract Iterator<MailStatus> getErrors();
 
-
-    @Override
-    public MailEvent getEvent(String messageID)
-    {
-        return null;
-    }
+    /**
+     * @return the number of errors
+     */
+    public abstract int getErrorsNumber();
 }

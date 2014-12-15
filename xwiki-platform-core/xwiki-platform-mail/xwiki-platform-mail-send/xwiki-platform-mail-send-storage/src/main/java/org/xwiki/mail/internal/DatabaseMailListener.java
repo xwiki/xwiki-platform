@@ -27,9 +27,12 @@ import javax.inject.Singleton;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.MailListener;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.AbstractMailListener;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MailEventManager;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -38,10 +41,13 @@ import org.xwiki.mail.MailEventManager;
 @Component
 @Singleton
 @Named("database")
-public class DatabaseMailListener implements MailListener
+public class DatabaseMailListener extends AbstractMailListener
 {
+    /**
+     * Used to get the XWiki Context.
+     */
     @Inject
-    private MailEventManager mailEventManager;
+    private Execution execution;
 
     @Override
     public void onPrepare(MimeMessage message)
@@ -70,5 +76,14 @@ public class DatabaseMailListener implements MailListener
     public int getErrorsNumber()
     {
         return 0;
+    }
+
+    /**
+     * @return XWikiContext
+     */
+    private XWikiContext getXWikiContext()
+    {
+        ExecutionContext context = this.execution.getContext();
+        return (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

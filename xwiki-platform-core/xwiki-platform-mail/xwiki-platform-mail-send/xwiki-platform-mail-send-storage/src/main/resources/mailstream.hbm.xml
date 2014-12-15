@@ -25,7 +25,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
-  <class name="org.xwiki.mail.MailEvent" table="mailstream_events">
+  <class name="org.xwiki.mail.MailResult" table="mailstream_events">
     <id name="messageID" type="string" unsaved-value="any">
       <column name="mail_id" not-null="true" />
       <generator class="assigned" />

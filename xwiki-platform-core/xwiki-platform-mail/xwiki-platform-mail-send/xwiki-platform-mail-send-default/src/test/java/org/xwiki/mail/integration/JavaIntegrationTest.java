@@ -42,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.mail.AbstractMailListener;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -94,7 +95,7 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailListener listener = new MailListener()
+    private MailListener listener = new AbstractMailListener()
     {
         @Override public void onPrepare(MimeMessage message)
         {

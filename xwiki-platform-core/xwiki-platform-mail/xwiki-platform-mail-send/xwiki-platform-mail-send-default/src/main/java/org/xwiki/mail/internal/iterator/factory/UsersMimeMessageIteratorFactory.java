@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
@@ -38,6 +39,15 @@ import org.xwiki.model.reference.DocumentReference;
 @Role
 public interface UsersMimeMessageIteratorFactory
 {
-    public Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
-        Map<String, Object> parameters);
+    /**
+     * Create Iterator of MimeMessages.
+     *
+     * @param userReferences the list of recipients
+     * @param factory factory to create MimeMessage
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a user references (userReferences)
+     * @throws MessagingException when an error occurs
+     */
+    Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException;
 }

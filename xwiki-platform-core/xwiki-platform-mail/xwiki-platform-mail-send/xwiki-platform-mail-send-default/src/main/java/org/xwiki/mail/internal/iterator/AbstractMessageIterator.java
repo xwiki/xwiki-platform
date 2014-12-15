@@ -21,7 +21,6 @@ package org.xwiki.mail.internal.iterator;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -61,20 +60,16 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>
 
     @Override public MimeMessage next()
     {
-        if (hasNext()) {
-            MimeMessage mimeMessage = null;
-            try {
-                mimeMessage = createMessage();
-            } catch (MessagingException e) {
-                this.logger.error("Failed to create mime message. "
-                    + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
-                //TODO We need to save all the errors and display them in the status of all emails in the admin UI.
-            }
-            position++;
-            return mimeMessage;
-        } else {
-            throw new NoSuchElementException("There are no more elements");
+        MimeMessage mimeMessage = null;
+        try {
+            mimeMessage = createMessage();
+        } catch (MessagingException e) {
+            this.logger.error("Failed to create mime message. "
+                + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
+            //TODO We need to save all the errors and display them in the status of all emails in the admin UI.
         }
+        position++;
+        return mimeMessage;
     }
 
     @Override public boolean hasNext()

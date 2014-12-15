@@ -40,7 +40,7 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-filter-ui</xwiki.extension.features>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Sream Converter Application</xwiki.extension.name>
+    <xwiki.extension.name>Filter Streams Converter Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

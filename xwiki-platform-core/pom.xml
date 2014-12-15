@@ -471,6 +471,26 @@
               <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
               <justification>Young API, this method should not have been made public.</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
+              <method>boolean clearCacheFromFileSystemSkin(java.lang.String)</method>
+              <justification>LESS refactoring.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
+              <method>org.xwiki.lesscss.ColorTheme getColorThemeFromSkinFile(java.lang.String)</method>
+              <to>org.xwiki.lesscss.colortheme.ColorTheme</to>
+              <justification>LESS refactoring.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
+              <method>org.xwiki.lesscss.ColorTheme getColorThemeFromSkinFile(java.lang.String, java.lang.String)</method>
+              <to>org.xwiki.lesscss.colortheme.ColorTheme</to>
+              <justification>LESS refactoring.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

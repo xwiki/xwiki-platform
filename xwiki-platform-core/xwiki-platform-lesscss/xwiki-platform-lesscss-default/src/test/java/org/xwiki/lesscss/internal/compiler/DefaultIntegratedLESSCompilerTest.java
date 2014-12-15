@@ -29,6 +29,7 @@ import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.internal.cache.CacheKeyFactory;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
@@ -71,6 +72,8 @@ public class DefaultIntegratedLESSCompilerTest
 
     private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
+    private CacheKeyFactory cacheKeyFactory;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
@@ -83,6 +86,7 @@ public class DefaultIntegratedLESSCompilerTest
         currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
         colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
+        cacheKeyFactory = mocker.getInstance(CacheKeyFactory.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -93,13 +97,13 @@ public class DefaultIntegratedLESSCompilerTest
         when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
         when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
                 new NamedColorThemeReference("colorTheme"));
+        when(cacheKeyFactory.getCacheKey(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
+                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cacheKey");
     }
 
     @Test
     public void compileWhenInCache() throws Exception
     {
-        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
-
         // Mocks
         when(cache.get(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
                 eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cached output");

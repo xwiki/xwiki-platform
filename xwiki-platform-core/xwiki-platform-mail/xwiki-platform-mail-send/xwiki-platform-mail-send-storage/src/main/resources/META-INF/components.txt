@@ -1,2 +1,2 @@
 org.xwiki.mail.internal.DatabaseMailListener
-org.xwiki.mail.internal.DefaultMailEventManager
+org.xwiki.mail.internal.DefaultMailStore

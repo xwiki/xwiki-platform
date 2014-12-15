@@ -85,6 +85,11 @@
       <artifactId>servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>6.3-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <!-- Used by unit tests to set the temporary directory to be the Maven target directory -->
   <build>

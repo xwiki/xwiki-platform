@@ -17,12 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.mail;
 
 import java.util.Date;
 
-import javax.mail.internet.MimeMessage;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Contains information about mail to sent.
@@ -32,44 +31,218 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailStatus
 {
-    private MimeMessage message;
+    /**
+     * ID.
+     */
+    private String messageID;
 
-    private Exception exception;
+    /*
+     * Mail Status.
+     */
+    private String status;
 
+    /*
+     * Mail Batch ID.
+     */
+    private String batchID;
+
+    /*
+     * Mail Date.
+     */
     private Date date;
 
+    /*
+     * Mail To email address.
+     */
+    private String recipient;
+
+    /*
+     * Mail Type.
+     */
+    private String type;
+
+    /*
+     * Mail Reference to emails stored in the permanent directory.
+     */
+    private String reference;
+
+    /*
+     * Mail Exception
+     */
+    private String exception;
+
+
+
     /**
+     * Constructor initializing the MailStatus with the MimeMessage ID.
      *
-     * @param message to send
-     * @param exception when an error occurs when sending the mail
+     * @param messageID the id of Message
      */
-    public MailStatus(MimeMessage message, Exception exception)
+    public MailStatus(String messageID)
     {
-        this.message = message;
-        this.exception = exception;
-        this.date = new Date();
+        setMessageID(messageID);
+        setDate(new Date());
     }
 
     /**
-     * @return the exception when an error occurs when sending the mail
+     * Constructor initializing the MailStatus with the MimeMessage ID and root cause message of exception.
+     *
+     * @param messageID the id of Message
+     * @param exception the root cause message of exception that was encountered during sending mail
      */
-    public Exception getException()
+    public MailStatus(String messageID, String exception)
     {
-        return exception;
+        this.messageID = messageID;
+        setException(exception);
+        setDate(new Date());
     }
 
     /**
-     * @return the message to send
+     * Constructor initializing the MailStatus with the MimeMessage ID the exception.
+     *
+     * @param messageID the id of Message
+     * @param exception the exception that was encountered during sending mail
      */
-    public MimeMessage getMessage()
+    public MailStatus(String messageID, Exception exception)
     {
-        return message;
+        this.messageID = messageID;
+        setException(exception);
+        setDate(new Date());
     }
 
     /**
-     * @return the date of status
+     * @return the MimeMessage ID
      */
-    public Date getDate() {
+    public String getMessageID()
+    {
+        return this.messageID;
+    }
+
+    /**
+     * @param messageID the MimeMessage ID
+     */
+    public void setMessageID(String messageID)
+    {
+        this.messageID = messageID;
+    }
+
+    /**
+     * @return the status of the mail
+     */
+    public String getStatus()
+    {
+        return this.status;
+    }
+
+    /**
+     * @param status of the mail
+     */
+    public void setStatus(MailState status)
+    {
+        this.status = status.toString();
+    }
+
+    /**
+     * @return the ID of the batch mail sender
+     */
+    public String getBatchID()
+    {
+        return this.batchID;
+    }
+
+    /**
+     * @param batchID the ID of the batch mail sender
+     */
+    public void setBatchID(String batchID)
+    {
+        this.batchID = batchID;
+    }
+
+    /**
+     * @return the date of status of mail
+     */
+    public Date getDate()
+    {
         return this.date;
+    }
+
+    /**
+     * @param date of status of mail
+     */
+    public void setDate(Date date)
+    {
+        this.date = date;
+    }
+
+    /**
+     * @return the mail To email address
+     */
+    public String getRecipient()
+    {
+        return this.recipient;
+    }
+
+    /**
+     * @param recipient the mail To email address
+     */
+    public void setRecipient(String recipient)
+    {
+        this.recipient = recipient;
+    }
+
+    /**
+     * @return the type of batch mail (Watchlist, news ...)
+     */
+    public String getType()
+    {
+        return this.type;
+    }
+
+    /**
+     * @param type of batch mail (Watchlist, news ...)
+     */
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * @return the reference of serialized MimeMessage in permanent directory
+     */
+    public String getReference()
+    {
+        return this.reference;
+    }
+
+    /**
+     * @param reference of serialized MimeMessage in permanent directory
+     */
+    public void setReference(String reference)
+    {
+        this.reference = reference;
+    }
+
+    /**
+     * @return the root cause message of exception
+     */
+    public String getException()
+    {
+        return this.exception;
+    }
+
+    /**
+     * @param exception the root cause message of exception that was encountered during sending mail
+     */
+    public void setException(String exception)
+    {
+        this.exception = exception;
+    }
+
+    /**
+     * @param exception the exception that was encountered during sending mail
+     */
+    public void setException(Exception exception)
+    {
+        this.exception = ExceptionUtils.getRootCauseMessage(exception);
     }
 }

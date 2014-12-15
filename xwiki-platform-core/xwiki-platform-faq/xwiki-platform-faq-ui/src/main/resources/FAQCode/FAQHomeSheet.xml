@@ -72,7 +72,7 @@
       ## Lucene search needs the $request.wikinames param
       &lt;input type="hidden" name="wikinames" value="${xcontext.database}" /&gt;
       ## Both Lucene and SOLR searches obey the $request.text param
-      &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
+      &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="16" class="withTip" /&gt;
       &lt;span class="buttonwrapper"&gt;
         &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.search.submit')" /&gt;
       &lt;/span&gt;
@@ -97,7 +97,7 @@
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
           &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
           &lt;input type="hidden" name="createFAQ" value="true" /&gt;
-          &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="25"/&gt;
+          &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="16"/&gt;
           &lt;span class="buttonwrapper"&gt;
             &lt;input class="btn btn-success button" type="submit" value="$services.localization.render('platform.faq.create.submit')" /&gt;
           &lt;/span&gt;

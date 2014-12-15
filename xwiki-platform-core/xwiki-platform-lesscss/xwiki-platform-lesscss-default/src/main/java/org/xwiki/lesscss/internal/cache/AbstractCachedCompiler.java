@@ -65,7 +65,7 @@ public abstract class AbstractCachedCompiler<T>
     @Inject
     private CacheKeyFactory cacheKeyFactory;
 
-    private Map<String, Object> mutexList = new HashMap<>();
+    private Map<String, String> mutexList = new HashMap<>();
 
     /**
      * Get the result of the compilation.
@@ -106,8 +106,10 @@ public abstract class AbstractCachedCompiler<T>
                 currentColorThemeGetter.getCurrentColorTheme("default"));
 
         // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
-        // use the last result stored in the cache
-        synchronized (getMutex(lessResourceReference, skinReference, colorThemeReference)) {
+        // use the last result stored in the cache.
+        // The mutex is a string (actually the cache key) to help debugging.
+        String mutex = getMutex(lessResourceReference, skinReference, colorThemeReference);
+        synchronized (mutex) {
 
             // Check if the result is in the cache
             if (!force) {
@@ -130,13 +132,14 @@ public abstract class AbstractCachedCompiler<T>
         return result;
     }
 
-    private synchronized Object getMutex(LESSResourceReference lessResourceReference, SkinReference skinReference,
+    private synchronized String getMutex(LESSResourceReference lessResourceReference, SkinReference skinReference,
         ColorThemeReference colorThemeReference)
     {
         String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skinReference, colorThemeReference);
-        Object mutex = mutexList.get(cacheKey);
+        String mutex = mutexList.get(cacheKey);
         if (mutex == null) {
-            mutex = new Object();
+            // the mutex is the key, so no extra memory is needed
+            mutex = cacheKey;
             mutexList.put(cacheKey, mutex);
         }
         return mutex;

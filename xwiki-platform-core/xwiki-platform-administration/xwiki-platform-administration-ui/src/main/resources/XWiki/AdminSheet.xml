@@ -63,6 +63,7 @@
     'children': [
        {'id' : 'Editing'},
        {'id' : 'Localization'},
+       {'id' : 'Email'},
        {'id' : 'XWiki.OfficeImporterAdmin'}
     ]
   },

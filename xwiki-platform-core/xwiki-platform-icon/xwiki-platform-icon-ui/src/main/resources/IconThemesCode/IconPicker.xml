@@ -422,6 +422,13 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
         loadIconList(currentIconTheme);
       }
     }
+    // Close the picker when the user press 'escape'.
+    currentInput.keyup(function (event) {
+      // See: http://stackoverflow.com/questions/1160008/which-keycode-for-escape-key-with-jquery
+      if (event.which == 27) {
+        closePicker();
+      }
+    });
   }
   
   /**
@@ -450,7 +457,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     
     // Because the picker uses the 'fixed' position, we must recompute its position everytime the user scrolls the page
     // Otherwise, the picker would stay in the same position *on the screen* without staying close to the input.
-    $(window).scroll(function(){
+    $(window).scroll(function() {
       setPickerPosition();
     });
     

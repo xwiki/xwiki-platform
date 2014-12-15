@@ -63,7 +63,7 @@ public class FilterTest extends AbstractTest
     }
 
     @Test
-    public void testConvertXMLURL() throws IOException
+    public void testConvertXMLURL() throws IOException, InterruptedException
     {
         URL url = getClass().getResource("/xml/document1.xml");
 
@@ -83,6 +83,10 @@ public class FilterTest extends AbstractTest
         // Start conversion
         WebElement submit = getDriver().findElement(By.name("convert"));
         submit.click();
+
+        // Give some time to finish the conversion
+        // TODO: use a cleaner way to find if the conversion is done
+        Thread.sleep(30000);
 
         Assert.assertEquals(IOUtils.toString(getClass().getResource("/xml/document1.xml")),
             FileUtils.readFileToString(tmp));

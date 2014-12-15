@@ -131,6 +131,7 @@ public abstract class AbstractCachedCompiler<T>
             }
         }
 
+        // FixMe: we actually return the cached instance
         return result;
     }
 

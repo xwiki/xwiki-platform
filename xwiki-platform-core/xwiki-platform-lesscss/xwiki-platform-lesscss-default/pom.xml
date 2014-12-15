@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Default implementation for XWiki Platform - LESS CSS - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
      <xwiki.extension.features>
      <!-- only used in 6.2M1 -->
@@ -85,4 +85,4 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
   </dependencies>
-</project>
+  </project>

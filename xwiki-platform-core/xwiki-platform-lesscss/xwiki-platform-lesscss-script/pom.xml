@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <description>Script Services for using LESS CSS preprocessor in XWiki</description>
   <properties>
+     <xwiki.jacoco.instructionRatio>0.96</xwiki.jacoco.instructionRatio>
      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
      <xwiki.extension.features>
      <!-- only used in 6.2M1 -->

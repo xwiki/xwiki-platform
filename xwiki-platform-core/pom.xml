@@ -479,6 +479,11 @@
             <!-- Add new methods to the Icon Set Module -->
             <exclude>**/IconSetManager**</exclude>
             <exclude>**/IconManager**</exclude>
+            <!-- Refactor on the LESS module.
+             The clirr configuration of that module is actually done in xwiki-platfrom-lesscss-api/pom.xml because of
+             a bug in the clirr plugin.
+             Do not forget to also change that file for the final release!-->
+            <exclude>**/xwiki-platform-lesscss/**</exclude>
           </excludes>
         </configuration>
       </plugin>

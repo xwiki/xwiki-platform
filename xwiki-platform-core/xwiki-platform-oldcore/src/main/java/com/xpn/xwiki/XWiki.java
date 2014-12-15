@@ -6103,62 +6103,65 @@ public class XWiki implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // A wiki has been deleted
         if (event instanceof WikiDeletedEvent) {
-            getVirtualWikiList().remove(((WikiDeletedEvent) event).getWikiId());
-            return;
-        }
+            // A wiki has been deleted
+            onWikiDeletedEvent((WikiDeletedEvent) event);
+        } else if (event instanceof ComponentDescriptorAddedEvent) {
+            // A new mandatory document initializer has been installed
+            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) data);
+        } else {
+            // Document modifications
 
-        // A new mandatory document initializer has been installed
-        if (event instanceof ComponentDescriptorAddedEvent) {
-            ComponentManager componentManager = (ComponentManager) data;
+            XWikiDocument doc = (XWikiDocument) source;
+            XWikiContext context = (XWikiContext) data;
 
-            String namespace;
-            if (componentManager instanceof NamespacedComponentManager) {
-                namespace = ((NamespacedComponentManager) componentManager).getNamespace();
-            } else {
-                namespace = null;
-            }
-
-            MandatoryDocumentInitializer initializer;
-            try {
-                initializer =
-                    componentManager.getInstance(MandatoryDocumentInitializer.class,
-                        ((ComponentDescriptorAddedEvent) event).getRoleHint());
-
-                XWikiContext context = getXWikiContext();
-                if (namespace == null) {
-                    // Initialize in already initialized wikis (will be initialized in others when they are initialized)
-                    for (String wiki : this.virtualWikiList) {
-                        initializeMandatoryDocument(wiki, initializer, context);
-                    }
-                } else if (namespace.startsWith("wiki:")) {
-                    // Initialize in the wiki where the extension is installed
-                    initializeMandatoryDocument(namespace.substring("wiki:".length()), initializer, context);
+            if (event instanceof XObjectPropertyEvent) {
+                EntityReference reference = ((XObjectPropertyEvent) event).getReference();
+                String modifiedProperty = reference.getName();
+                if ("backlinks".equals(modifiedProperty)) {
+                    this.hasBacklinks =
+                        doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                            getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
                 }
-            } catch (ComponentLookupException e) {
-                LOGGER.error("Failed to lookup mandatory document initializer", e);
+            } else if (event instanceof XObjectEvent) {
+                onServerObjectEvent(event, doc, context);
             }
-        }
-
-        // Document modifications
-
-        XWikiDocument doc = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
-
-        if (event instanceof XObjectPropertyEvent) {
-            EntityReference reference = ((XObjectPropertyEvent) event).getReference();
-            String modifiedProperty = reference.getName();
-            if ("backlinks".equals(modifiedProperty)) {
-                this.hasBacklinks =
-                    doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
-                        getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
-            }
-        } else if (event instanceof XObjectEvent) {
-            onServerObjectEvent(event, doc, context);
         }
     }
 
+    private void onWikiDeletedEvent(WikiDeletedEvent event)
+    {
+        getVirtualWikiList().remove(event.getWikiId());
+    }
+
+    private void onMandatoryDocumentInitializerAdded(ComponentDescriptorAddedEvent event, ComponentManager componentManager)
+    {
+        String namespace;
+        if (componentManager instanceof NamespacedComponentManager) {
+            namespace = ((NamespacedComponentManager) componentManager).getNamespace();
+        } else {
+            namespace = null;
+        }
+
+        MandatoryDocumentInitializer initializer;
+        try {
+            initializer = componentManager.getInstance(MandatoryDocumentInitializer.class, event.getRoleHint());
+
+            XWikiContext context = getXWikiContext();
+            if (namespace == null) {
+                // Initialize in already initialized wikis (will be initialized in others when they are initialized)
+                for (String wiki : this.virtualWikiList) {
+                    initializeMandatoryDocument(wiki, initializer, context);
+                }
+            } else if (namespace.startsWith("wiki:")) {
+                // Initialize in the wiki where the extension is installed
+                initializeMandatoryDocument(namespace.substring("wiki:".length()), initializer, context);
+            }
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to lookup mandatory document initializer", e);
+        }
+    }
+    
     private void onServerObjectEvent(Event event, XWikiDocument doc, XWikiContext context)
     {
         flushVirtualWikis(doc.getOriginalDocument());

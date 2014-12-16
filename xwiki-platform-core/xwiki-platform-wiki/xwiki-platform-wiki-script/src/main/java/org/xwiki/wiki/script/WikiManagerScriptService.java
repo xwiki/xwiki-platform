@@ -405,6 +405,21 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * @return the descriptor of the current wiki
+     */
+    public WikiDescriptor getCurrentWikiDescriptor()
+    {
+        WikiDescriptor descriptor = null;
+        try {
+            descriptor = wikiDescriptorManager.getCurrentWikiDescriptor();
+        } catch (WikiManagerException e) {
+            error(e);
+        }
+
+        return descriptor;
+    }
+
+    /**
      * Save the specified descriptor (if you have the right).
      * 
      * @param descriptor descriptor to save

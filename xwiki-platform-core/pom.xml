@@ -491,6 +491,12 @@
               <to>org.xwiki.lesscss.colortheme.ColorTheme</to>
               <justification>LESS refactoring.</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/wiki/descriptor/WikiDescriptorManager</className>
+              <method>org.xwiki.wiki.descriptor.WikiDescriptor getCurrentWikiDescriptor()</method>
+              <justification>Young API, this method needs to be available for consistency with the getMainWikiDescriptor/Id pair of methods</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

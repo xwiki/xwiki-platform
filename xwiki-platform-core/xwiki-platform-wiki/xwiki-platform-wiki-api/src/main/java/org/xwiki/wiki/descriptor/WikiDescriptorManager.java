@@ -87,6 +87,12 @@ public interface WikiDescriptorManager
     String getCurrentWikiId();
 
     /**
+     * @return the descriptor of the current wiki
+     * @throws WikiManagerException if problems occur
+     */
+    WikiDescriptor getCurrentWikiDescriptor() throws WikiManagerException;
+
+    /**
      * Check if a wiki corresponding to an Id exists.
      *
      * @param wikiId The id of the wiki to test.

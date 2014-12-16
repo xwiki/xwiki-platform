@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -35,8 +35,13 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.mail.MailSenderConfiguration;
 
 /**
- * Gets the Mail Sending configuration by first looking it up in document sources (space and wiki preferences) and if
- * not found in the xwiki properties file.
+ * Gets the Mail Sending configuration. The configuration is checked in the following order:
+ * <ul>
+ *   <li>Look in Mail.SendMailConfigClass in the current wiki</li>
+ *   <li>Look in (current space).XWikiPreferences in the current wiki</li>
+ *   <li>Look in XWiki.XWikiPreferences in the current wiki</li>
+ *   <li>Look in the xwiki properties file</li>
+ * </ul>
  *
  * @version $Id$
  * @since 6.1M2
@@ -82,8 +87,19 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final int DEFAULT_PORT = 25;
 
+    private static final String FROM_PROPERTY = "from";
+    private static final String HOST_PROPERTY = "host";
+    private static final String PORT_PROPERTY = "port";
+    private static final String USERNAME_PROPERTY = "username";
+    private static final String PASSWORD_PROPERTY = "password";
+    private static final String PROPERTIES_PROPERTY = "properties";
+
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named("mailsend")
+    private ConfigurationSource mailConfigSource;
 
     @Inject
     @Named("documents")
@@ -96,47 +112,94 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getHost()
     {
-        return this.documentsSource.getProperty("smtp_server",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
+        String host;
+
+        // First, look in the document sources
+        host = this.mailConfigSource.getProperty(HOST_PROPERTY,
+            this.documentsSource.getProperty("smtp_server", String.class));
+
+        // If not found, look in the xwiki properties source
+        if (host == null) {
+            host = this.xwikiPropertiesSource.getProperty(PREFIX + HOST_PROPERTY, "localhost");
+        }
+
+        return host;
     }
 
     @Override
     public int getPort()
     {
-        // TODO: Improve this code by fixing the Document Configuration Source.
-        int port;
+        Integer port;
+
+        // First, look in the document sources
         String portAsString = this.documentsSource.getProperty("smtp_port");
         if (!StringUtils.isEmpty(portAsString)) {
             try {
-                port = Integer.parseInt(portAsString);
+                port = this.mailConfigSource.getProperty(PORT_PROPERTY, Integer.parseInt(portAsString));
             } catch (NumberFormatException e) {
                 port = DEFAULT_PORT;
             }
         } else {
-            port = this.xwikiPropertiesSource.getProperty(PREFIX + "port", DEFAULT_PORT);
+            port = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class).intValue();
         }
+
+        // If not found, look in the xwiki properties source
+        if (port == null) {
+            port = this.xwikiPropertiesSource.getProperty(PREFIX + PORT_PROPERTY, DEFAULT_PORT);
+        }
+
         return port;
     }
 
     @Override
     public String getUsername()
     {
-        return this.documentsSource.getProperty("smtp_server_username",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
+        String username;
+
+        // First, look in the document sources
+        username = this.mailConfigSource.getProperty(USERNAME_PROPERTY,
+            this.documentsSource.getProperty("smtp_server_username", String.class));
+
+        // If not found, look in the xwiki properties source
+        if (username == null) {
+            username = this.xwikiPropertiesSource.getProperty(PREFIX + USERNAME_PROPERTY, String.class);
+        }
+
+        return username;
     }
 
     @Override
     public String getPassword()
     {
-        return this.documentsSource.getProperty("smtp_server_password",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
+        String password;
+
+        // First, look in the document sources
+        password = this.mailConfigSource.getProperty(PASSWORD_PROPERTY,
+            this.documentsSource.getProperty("smtp_server_password", String.class));
+
+        // If not found, look in the xwiki properties source
+        if (password == null) {
+            password = this.xwikiPropertiesSource.getProperty(PREFIX + PASSWORD_PROPERTY, String.class);
+        }
+
+        return password;
     }
 
     @Override
     public String getFromAddress()
     {
-        return this.documentsSource.getProperty("admin_email",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
+        String from;
+
+        // First, look in the document sources
+        from = this.mailConfigSource.getProperty(FROM_PROPERTY,
+            this.documentsSource.getProperty("admin_email", String.class));
+
+        // If not found, look in the xwiki properties source
+        if (from == null) {
+            from = this.xwikiPropertiesSource.getProperty(PREFIX + FROM_PROPERTY, String.class);
+        }
+
+        return from;
     }
 
     @Override
@@ -144,12 +207,15 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     {
         Properties properties;
 
-        // The "javamail_extra_props" property is stored in a text area and thus we need to convert it to a Map.
-        String extraPropertiesAsString = this.documentsSource.getProperty("javamail_extra_props");
-        if (StringUtils.isEmpty(extraPropertiesAsString)) {
-            properties = this.xwikiPropertiesSource.getProperty(PREFIX + "properties", Properties.class);
+        // First, look in the document sources
+        String extraPropertiesAsString = this.mailConfigSource.getProperty(PROPERTIES_PROPERTY,
+            this.documentsSource.getProperty("javamail_extra_props", String.class));
+
+        // If not found, look in the xwiki properties source
+        if (extraPropertiesAsString == null) {
+            properties = this.xwikiPropertiesSource.getProperty(PREFIX + PROPERTIES_PROPERTY, Properties.class);
         } else {
-            // Convert the String to Map
+            // The "javamail_extra_props" property is stored in a text area and thus we need to convert it to a Map.
             InputStream is = new ByteArrayInputStream(extraPropertiesAsString.getBytes());
             properties = new Properties();
             try {
@@ -158,7 +224,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
                 // Will happen if the user has not used the right format, in which case we log a warning but discard
                 // the user values.
                 this.logger.warn("Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-                        extraPropertiesAsString, ExceptionUtils.getRootCauseMessage(e));
+                    extraPropertiesAsString, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

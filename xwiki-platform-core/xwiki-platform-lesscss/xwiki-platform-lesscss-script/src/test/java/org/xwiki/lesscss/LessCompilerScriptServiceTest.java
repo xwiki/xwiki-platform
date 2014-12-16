@@ -151,7 +151,7 @@ public class LessCompilerScriptServiceTest
         String result = mocker.getComponentUnderTest().compileSkinFile("style.less", false);
 
         // Verify
-        assertEquals(exception.getMessage(), result);
+        assertEquals("LESSCompilerException: Exception with LESS", result);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class LessCompilerScriptServiceTest
         String result = mocker.getComponentUnderTest().compileSkinFile("style.less", "flamingo", false);
 
         // Verify
-        assertEquals(exception.getMessage(), result);
+        assertEquals("LESSCompilerException: Exception with LESS", result);
     }
 
     @Test

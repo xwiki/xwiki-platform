@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
@@ -105,7 +106,7 @@ public class LessCompilerScriptService implements ScriptService
         try {
             return lessCompiler.compileSkinFile(fileName, force);
         } catch (LESSCompilerException e) {
-            return e.getMessage();
+            return ExceptionUtils.getRootCauseMessage(e);
         }
     }
 
@@ -138,7 +139,7 @@ public class LessCompilerScriptService implements ScriptService
         try {
             return lessCompiler.compileSkinFile(fileName, skin, force);
         } catch (LESSCompilerException e) {
-            return e.getMessage();
+            return ExceptionUtils.getRootCauseMessage(e);
         }
     }
 

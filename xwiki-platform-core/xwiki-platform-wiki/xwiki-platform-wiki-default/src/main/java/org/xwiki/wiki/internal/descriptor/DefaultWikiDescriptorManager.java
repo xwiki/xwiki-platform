@@ -216,6 +216,12 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         return xcontextProvider.get().getWikiId();
     }
 
+    @Override
+    public WikiDescriptor getCurrentWikiDescriptor() throws WikiManagerException
+    {
+        return getById(getCurrentWikiId());
+    }
+
     private DefaultWikiDescriptor buildDescriptorFromDocument(XWikiDocument document)
     {
         DefaultWikiDescriptor descriptor = null;

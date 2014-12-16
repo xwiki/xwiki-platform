@@ -21,13 +21,19 @@ package com.xpn.xwiki.plugin.mailsender;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 
+import org.jmock.Expectations;
 import org.jmock.Mock;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jvnet.mock_javamail.Mailbox;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.mail.MailSenderConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -59,16 +65,27 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
             returnValue(new XWikiDocument()));
         this.mockXWiki.stubs().method("saveDocument");
 
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server"), ANYTHING).will(
-            returnValue("myserver"));
-        this.mockXWiki.stubs().method("getXWikiPreferenceAsInt").withAnyArguments().will(returnValue(25));
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_from"), ANYTHING).will(returnValue(""));
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server_username"), ANYTHING).will(
-            returnValue(""));
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server_password"), ANYTHING).will(
-            returnValue(""));
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("javamail_extra_props"), ANYTHING).will(
-            returnValue(""));
+        // Register a mock Mail Sender Configuration component since it's used by MailConfiguration
+        Mockery mockery = new JUnit4Mockery();
+        final MailSenderConfiguration mockConfiguration =
+            getComponentManager().registerMockComponent(mockery, MailSenderConfiguration.class);
+        mockery.checking(new Expectations()
+        {
+            {
+                allowing(mockConfiguration).getHost();
+                will(returnValue("myserver"));
+                allowing(mockConfiguration).getPort();
+                will(returnValue(25));
+                allowing(mockConfiguration).getFromAddress();
+                will(returnValue(null));
+                allowing(mockConfiguration).getUsername();
+                will(returnValue(null));
+                allowing(mockConfiguration).getPassword();
+                will(returnValue(null));
+                allowing(mockConfiguration).getAdditionalProperties();
+                will(returnValue(new Properties()));
+            }
+        });
 
         MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", getContext());
         this.api = new MailSenderPluginApi(plugin, getContext());

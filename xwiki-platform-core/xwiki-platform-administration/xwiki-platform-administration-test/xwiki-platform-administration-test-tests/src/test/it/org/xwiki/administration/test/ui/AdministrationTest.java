@@ -61,7 +61,6 @@ public class AdministrationTest extends AbstractTest
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Admin UI extension
         Assert.assertTrue(administrationPage.hasSection("Editing"));
         Assert.assertTrue(administrationPage.hasSection("Localization"));
-        Assert.assertTrue(administrationPage.hasSection("Email"));
         Assert.assertTrue(administrationPage.hasSection("Presentation"));
         Assert.assertTrue(administrationPage.hasSection("Elements"));
         Assert.assertTrue(administrationPage.hasSection("Registration"));
@@ -89,7 +88,6 @@ public class AdministrationTest extends AbstractTest
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Editing"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Localization"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Registration"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Users"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Groups"));

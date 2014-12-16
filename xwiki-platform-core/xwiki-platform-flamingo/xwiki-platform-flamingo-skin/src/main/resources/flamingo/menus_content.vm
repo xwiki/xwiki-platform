@@ -16,7 +16,7 @@
       #end
       #submenuitem($doc.getURL($editaction, "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
       #submenuseparator()
-      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'hdd')
+      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
       #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
       #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
     #xwikibuttonentryend()

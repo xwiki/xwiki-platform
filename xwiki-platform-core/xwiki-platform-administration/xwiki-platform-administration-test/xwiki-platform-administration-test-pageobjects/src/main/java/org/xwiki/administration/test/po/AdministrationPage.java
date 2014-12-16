@@ -134,10 +134,32 @@ public class AdministrationPage extends ViewPage
         return new PageElementsAdministrationSectionPage();
     }
 
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasSection(String categoryName, String sectionName)
+    {
+        return getUtil().hasElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']"));
+    }
+
     public boolean hasSection(String sectionName)
     {
         return getUtil().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
             + sectionName + "')]"));
+    }
+
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasNotSection(String categoryName, String sectionName)
+    {
+        return getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).size() == 0;
     }
 
     public boolean hasNotSection(String sectionName)

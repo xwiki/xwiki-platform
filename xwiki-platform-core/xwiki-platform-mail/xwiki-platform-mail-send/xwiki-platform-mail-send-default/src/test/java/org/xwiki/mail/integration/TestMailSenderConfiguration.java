@@ -21,7 +21,7 @@ package org.xwiki.mail.integration;
 
 import java.util.Properties;
 
-import org.xwiki.mail.internal.DefaultMailSenderConfiguration;
+import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 
 /**
  * Makes {@link DefaultMailSenderConfiguration} more easily testable.

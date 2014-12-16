@@ -109,8 +109,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var position = paginationElement.parent().children().index(paginationElement[0]);
       tree.delete_node(paginationNode);
       $.each(children, function(index) {
-        var selectFirstChild = index === 0 && tree.element.hasClass('jstree-no-links');
-        tree.create_node(parent, this, position + index, selectFirstChild && function(firstChild) {
+        tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
           tree.select_node(firstChild);
         });
       });
@@ -332,6 +331,8 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
 
   var customTreeAPI = {
     openTo: function(nodeId, callback) {
+      // Select the node if no callback is provided.
+      callback = callback || $.proxy(this, 'select_node', nodeId);
       // We need to open all the ancestors of the specified node.
       getPath.call(this, nodeId, function(path) {
         openPath.call(this, path, callback);
@@ -366,7 +367,8 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var selectedNode = data.node;
       if (selectedNode.data && selectedNode.data.type == 'pagination') {
         addMoreChildren(tree, selectedNode);
-      } else if (!$(this).hasClass('jstree-no-links')) {
+      } else if (data.event && !$(this).hasClass('jstree-no-links')) {
+        // The node selection was triggered by an user event and links are enabled.
         window.location.href = selectedNode.a_attr.href;
       }
 

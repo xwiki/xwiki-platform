@@ -217,11 +217,8 @@ require(['tree'], function($) {
   $('.xtree').xtree().one('ready.jstree', function(event, data) {
     var tree = data.instance;
     var openToNodeId = tree.element.attr('data-openTo');
-    // Open the tree to the specified node.
-    openToNodeId &amp;&amp; data.instance.openTo(openToNodeId, function() {
-      // Select the node only if the node label doesn't behave as link (otherwise we're going to open the link).
-      tree.element.hasClass('jstree-no-links') &amp;&amp; tree.select_node(openToNodeId);
-    });
+    // Open the tree to the specified node and select it.
+    openToNodeId &amp;&amp; data.instance.openTo(openToNodeId);
   });
 });</code>
     </property>

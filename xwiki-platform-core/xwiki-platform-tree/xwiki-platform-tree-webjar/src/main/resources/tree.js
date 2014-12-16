@@ -291,6 +291,8 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var getDefaultParams = function(element) {
     var baseParams = {
       core: {
+        // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
+        force_text: true,
         themes: {
           name: 'xwiki',
           responsive: element.attr('data-responsive') == 'true',

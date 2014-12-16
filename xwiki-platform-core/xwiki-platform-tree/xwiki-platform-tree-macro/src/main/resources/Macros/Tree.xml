@@ -201,18 +201,6 @@ require.config({
   }
 });
 
-(function loadCss(urls) {
-  for (var i = 0; i &lt; urls.length; i++) {
-    var link = document.createElement("link");
-    link.type = "text/css";
-    link.rel = "stylesheet";
-    link.href = urls[i];
-    document.getElementsByTagName("head")[0].appendChild(link);
-  }
-})([
-  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})"
-]);
-
 require(['tree'], function($) {
   $('.xtree').xtree().one('ready.jstree', function(event, data) {
     var tree = data.instance;
@@ -348,6 +336,8 @@ require(['tree'], function($) {
     </class>
     <property>
       <code>{{velocity output="false"}}
+#set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
 #set ($discard = $xwiki.jsx.use($xcontext.macro.doc))
 #set ($classes = ['xtree', "$!xcontext.macro.params.get('class')"])
 #set ($noLinks = $xcontext.macro.params.links != 'true')

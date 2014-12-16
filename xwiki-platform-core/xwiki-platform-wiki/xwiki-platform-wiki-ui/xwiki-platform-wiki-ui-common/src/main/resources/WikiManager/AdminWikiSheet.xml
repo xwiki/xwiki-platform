@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -72,9 +71,9 @@
     #else
       $response.setStatus(400)
       #if (!$services.csrf.isTokenValid("$!{request.form_token}"))
-        Invalid CSRF token. Please refresh the page and try again.
+        $services.localization.render('platform.wiki.admin.wiki.csrfInvalidError')
       #else
-        Owner and Homepage are required fields.
+        $services.localization.render('platform.wiki.admin.wiki.requiredFieldsError')
       #end
     #end
   #else
@@ -142,7 +141,7 @@
 
           &lt;dt class='warning'&gt;
             &lt;label for='owner'&gt;
-              &lt;span class='xErrorMsg'&gt;Warning: Once you change this, the previous owner will lose his owner rights. If that is you, make sure you do not lock yourself out of the wiki. If that happens by mistake, you will need to contact the main wiki's administrators or use the superadmin account.&lt;/span&gt;
+              &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
             &lt;/label&gt;
           &lt;/dt&gt;
         &lt;/dl&gt;
@@ -467,7 +466,7 @@ var init = function() {
       // We do it like this because we want to wait for the reply while blocking (window.confirm) the save event
       // handler so that we can eventually stop the event itself instead of having to re-submit the form in an asynch
       // callback (Confirm Widget).
-      var confirmed = window.confirm("The new owner's user does not exist or it may come from a different wiki.\nAre you sure you want to use it and continue with the save operation?");
+      var confirmed = window.confirm("$services.localization.render('platform.wiki.admin.wiki.ownerProblemConfirmation')");
       if (!confirmed) {
         event.stop();
         if (event.memo) {
@@ -489,7 +488,7 @@ var init = function() {
       <name>Script</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>currentPage</use>

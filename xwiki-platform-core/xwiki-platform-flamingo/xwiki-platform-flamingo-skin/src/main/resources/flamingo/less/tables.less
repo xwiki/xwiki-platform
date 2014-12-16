@@ -1,0 +1,77 @@
+//
+// Tables
+// --------------------------------------------------
+
+// -----------------------------
+// Make a table responsive to the screen size.
+// --
+// To use it, just add the ".responsive-table" class to you table, be sure you have proper <thead> and <tbody> tags in
+// it, and put the title of the each column in the "data-title" attribute of every cell.
+// Example:
+// <table class="responsive-table">
+//   <thead>
+//     <tr>
+//       <th>Name</th>
+//       <th>Age</th>
+//     </tr>
+//   </thead>
+//   <tbody>
+//     <tr>
+//       <td data-title="Name">John Smith</td>
+//       <td data-title="Age">42</td>
+//     </tr>
+//   </thead>
+// </table>
+.responsive-table {
+  @media only screen and (max-width: @screen-xs-max) {
+    thead, tbody, th, td, tr {
+      display: block;
+    }
+    
+    > thead {
+      display: none;
+    }
+    
+    > tbody {
+      clear: left;
+      border-top: 1px solid #ccc;
+        
+      > tr {
+        border: 1px solid #ccc;
+        border-top: 0;
+      }
+      
+      > tr > td, > tr > th {
+        // Behave like a "row"
+        border: none;
+        border-bottom: 1px solid #eee;
+        .clearfix();
+        min-height: @input-height-base;
+        position: relative;
+        padding-left: 50%;
+        white-space: normal;
+        text-align:left;
+        
+        &:before {
+          // Now like a table header
+          position: absolute;
+          // Top/left values mimic padding
+          top: 6px;
+          left: 6px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+          content: attr(data-title);
+        }
+        
+        &:last-child {
+          border: 0;
+        }
+        
+      }
+    }
+  }
+}
+

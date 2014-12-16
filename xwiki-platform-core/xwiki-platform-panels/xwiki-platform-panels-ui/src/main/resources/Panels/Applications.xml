@@ -473,6 +473,8 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationsPanel li a {
   padding: 0.7em 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .panel-width-Small .applicationsPanel li img {

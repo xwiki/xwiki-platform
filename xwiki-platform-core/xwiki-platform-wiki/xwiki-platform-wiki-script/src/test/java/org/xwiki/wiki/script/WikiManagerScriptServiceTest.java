@@ -26,6 +26,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +37,7 @@ import java.util.Collection;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +56,7 @@ import org.xwiki.url.internal.standard.StandardURLConfiguration;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -91,6 +95,8 @@ public class WikiManagerScriptServiceTest
 
     private XWikiDocument currentDoc;
 
+    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
     @Before
     public void setUp() throws Exception
     {
@@ -118,6 +124,8 @@ public class WikiManagerScriptServiceTest
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
 
         when(entityReferenceSerializer.serialize(currentUserRef)).thenReturn("mainWiki:XWiki.User");
+
+        wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
     }
 
     /**
@@ -158,6 +166,19 @@ public class WikiManagerScriptServiceTest
         doThrow(exception).when(authorizationManager).checkAccess(eq(Right.CREATE_WIKI), eq(currentUserRef), eq(wiki));
 
         return exception;
+    }
+
+    /**
+     * @param wikiId the id of the wiki for which to get the descriptor
+     * @return the wiki descriptor document for the wiki identified by the given wikiId
+     */
+    private DocumentReference getAndSetupDescriptorDocument(String wikiId)
+    {
+        DocumentReference descriptorDocument =
+            new DocumentReference("mainWiki", "XWiki", "XWikiServer" + StringUtils.capitalize(wikiId));
+        when(wikiDescriptorDocumentHelper.getDocumentReferenceFromId(wikiId)).thenReturn(descriptorDocument);
+
+        return descriptorDocument;
     }
 
     @Test
@@ -389,13 +410,18 @@ public class WikiManagerScriptServiceTest
     }
 
     @Test
-    public void saveDescriptorWhenIAmOwner() throws Exception
+    public void saveDescriptorWhenICanEditDescriptorDocument() throws Exception
     {
         WikiDescriptor oldDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
-        oldDescriptor.setOwnerId("mainWiki:XWiki.User");
+        oldDescriptor.setOwnerId("SomeUser");
         when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
-        WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        DocumentReference wikiDescriptorDocRef = getAndSetupDescriptorDocument(oldDescriptor.getId());
+        when(this.authorizationManager.hasAccess(Right.EDIT, currentUserRef, wikiDescriptorDocRef)).thenReturn(true);
+
+        // Changing some value, not the owner.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        descriptor.setOwnerId(oldDescriptor.getOwnerId());
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
         assertTrue(result);
 
@@ -404,48 +430,115 @@ public class WikiManagerScriptServiceTest
     }
 
     @Test
-    public void saveDescriptorWhenIAmAdmin() throws Exception
+    public void saveDescriptorWhenIAmOwner() throws Exception
+    {
+        WikiDescriptor oldDescriptor = mock(WikiDescriptor.class);
+        when(oldDescriptor.getId()).thenReturn("wikiId");
+        when(oldDescriptor.getOwnerId()).thenReturn("mainWiki:XWiki.User");
+        when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
+
+        // Changing some value, not the owner.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        descriptor.setOwnerId(oldDescriptor.getOwnerId());
+        boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
+        assertTrue(result);
+
+        // The owner of the old descriptor was verified (once by us, once by the call).
+        verify(oldDescriptor, times(2)).getOwnerId();
+
+        // The descriptor has been saved
+        verify(wikiDescriptorManager).saveDescriptor(descriptor);
+    }
+
+    @Test
+    public void saveDescriptorWhenIAmLocalAdmin() throws Exception
     {
         WikiDescriptor oldDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
         oldDescriptor.setOwnerId("SomeUser");
         when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
-        WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        // Local admin.
+        when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId"))))
+            .thenReturn(true);
+
+        // Changing some value, not the owner.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        descriptor.setOwnerId(oldDescriptor.getOwnerId());
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
         assertTrue(result);
 
         // The right has been checked
-        verify(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId")));
+        verify(authorizationManager).hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId")));
         // The descriptor has been saved
         verify(wikiDescriptorManager).saveDescriptor(descriptor);
     }
 
     @Test
-    public void saveDescriptorWhenIAmNotOwnerNorAdmin() throws Exception
+    public void saveDescriptorWhenIAmNotOwnerNorLocalAdminNorGlobalAdmin() throws Exception
     {
         WikiDescriptor oldDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
         oldDescriptor.setOwnerId("SomeUser");
         when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
-        Exception exception = new AccessDeniedException(Right.ADMIN, currentUserRef, new WikiReference("wikiId"));
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef),
-            eq(new WikiReference("wikiId")));
+        when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId"))))
+            .thenReturn(false);
 
-        WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        // Changing some value, not the owner.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        oldDescriptor.setOwnerId(oldDescriptor.getOwnerId());
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+
+        // The descriptor has not been saved
+        verify(wikiDescriptorManager, never()).saveDescriptor(descriptor);
+
+        Exception exception = new AccessDeniedException(currentUserRef, new WikiReference("wikiId"));
+        assertEquals(exception.getMessage(), mocker.getComponentUnderTest().getLastError().getMessage());
+        assertEquals(exception.getClass(), mocker.getComponentUnderTest().getLastError().getClass());
     }
 
     @Test
-    public void saveDescriptorWithoutPR() throws Exception
+    public void saveDescriptorWhenIAmLocalAdminAndChangeOwner() throws Exception
     {
-        Exception exception = currentScriptHasNotProgrammingRight();
+        WikiDescriptor oldDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        oldDescriptor.setOwnerId("SomeUser");
+        when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
 
-        WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        // Changing the owner.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        descriptor.setOwnerId("SomeOtherUserOrMyself");
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
         assertFalse(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+
+        // The right has been checked
+        verify(authorizationManager).hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId")));
+
+        // The descriptor has not been saved
+        verify(wikiDescriptorManager, never()).saveDescriptor(descriptor);
+
+        Exception expectedException = new AccessDeniedException(currentUserRef, new WikiReference("wikiId"));
+        assertEquals(expectedException.getMessage(), mocker.getComponentUnderTest().getLastError().getMessage());
+        assertEquals(expectedException.getClass(), mocker.getComponentUnderTest().getLastError().getClass());
+    }
+
+    @Test
+    public void saveDescriptorWhenICanEditDescriptorDocumentAndChangeOwner() throws Exception
+    {
+        WikiDescriptor oldDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        oldDescriptor.setOwnerId("SomeUser");
+        when(wikiDescriptorManager.getById(oldDescriptor.getId())).thenReturn(oldDescriptor);
+
+        DocumentReference wikiDescriptorDocRef = getAndSetupDescriptorDocument(oldDescriptor.getId());
+        when(this.authorizationManager.hasAccess(Right.EDIT, currentUserRef, wikiDescriptorDocRef)).thenReturn(true);
+
+        // Changing the owner is possible, since I can directly edit the wiki descriptor anyway.
+        WikiDescriptor descriptor = new WikiDescriptor(oldDescriptor.getId(), "wikiAlias");
+        descriptor.setOwnerId("SomeOtherUserOrMyself");
+        boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
+        assertTrue(result);
+
+        // The descriptor has been saved
+        verify(wikiDescriptorManager).saveDescriptor(descriptor);
     }
 
     @Test
@@ -453,11 +546,27 @@ public class WikiManagerScriptServiceTest
     {
         WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
+        assertFalse(result);
+
+        // Verify the rights have been checked
+        verify(authorizationManager).hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("mainWiki")));
+
+        // The descriptor has not been saved
+        verify(wikiDescriptorManager, never()).saveDescriptor(descriptor);
+    }
+
+    @Test
+    public void saveDescriptorWhenDescriptorDidNotExistAndIAmGlobalAdmin() throws Exception
+    {
+        when(this.authorizationManager.hasAccess(Right.ADMIN, currentUserRef, new WikiReference("mainWiki")))
+            .thenReturn(true);
+
+        WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
+        boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
         assertTrue(result);
 
         // Verify the rights have been checked
-        verify(authorizationManager)
-            .checkAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("mainWiki")));
+        verify(authorizationManager).hasAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("mainWiki")));
 
         // The descriptor has been saved
         verify(wikiDescriptorManager).saveDescriptor(descriptor);

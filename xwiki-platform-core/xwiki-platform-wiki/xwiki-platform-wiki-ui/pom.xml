@@ -34,5 +34,6 @@
   <modules>
     <module>xwiki-platform-wiki-ui-mainwiki</module>
     <module>xwiki-platform-wiki-ui-wiki</module>
+    <module>xwiki-platform-wiki-ui-common</module>
   </modules>
 </project>

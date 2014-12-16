@@ -24,24 +24,32 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-mail</artifactId>
     <version>6.4-SNAPSHOT</version>
   </parent>
-  <packaging>pom</packaging>
-  <artifactId>xwiki-platform-mail</artifactId>
-  <name>XWiki Platform - Mail - Parent POM</name>
-  <description>XWiki Platform - Mail - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-mail-send</module>
-    <module>xwiki-platform-mail-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-mail-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <packaging>xar</packaging>
+  <artifactId>xwiki-platform-mail-ui</artifactId>
+  <name>XWiki Platform - Mail - UI</name>
+  <description>Administration UI for mail configuration and statuses</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Mail Application</xwiki.extension.name>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

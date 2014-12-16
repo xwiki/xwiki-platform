@@ -1,5 +1,4 @@
 org.xwiki.mail.script.MailSenderScriptService
-org.xwiki.mail.internal.DefaultMailSenderConfiguration
 org.xwiki.mail.internal.AttachmentMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMimeBodyPartFactory
 org.xwiki.mail.internal.HTMLMimeBodyPartFactory
@@ -18,3 +17,5 @@ org.xwiki.mail.internal.template.SecureMailTemplateManager
 org.xwiki.mail.internal.template.DefaultAttachmentConverter
 org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
+org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration
+org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource

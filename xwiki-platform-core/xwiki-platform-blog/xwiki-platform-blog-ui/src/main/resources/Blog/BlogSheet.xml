@@ -35,7 +35,7 @@
   <date>1227680870000</date>
   <contentUpdateDate>1227680870000</contentUpdateDate>
   <version>1.1</version>
-  <title>#evaluate($!doc.getValue('title'))</title>
+  <title>#evaluate($!{doc.getValue('title')})</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

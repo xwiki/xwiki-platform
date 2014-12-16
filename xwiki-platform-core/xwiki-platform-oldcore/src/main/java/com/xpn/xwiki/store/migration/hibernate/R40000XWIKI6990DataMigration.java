@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
@@ -98,6 +99,7 @@ import com.xpn.xwiki.util.Util;
  */
 @Component
 @Named("R40000XWIKI6990")
+@Singleton
 public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 {
     /** Document classes to migrate, using the document id in the first column of their key. */

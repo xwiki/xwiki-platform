@@ -20,29 +20,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>UserDirectoryTranslations</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.UserDirectory</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.UserDirectory</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1390398450000</creationDate>
   <date>1390398458000</date>
   <contentUpdateDate>1390398454000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>userdirectory.userScopeFilter=User scope:
+userdirectory.userScopeFilter.hint=Select the category of users you wish to display.
+userdirectory.userScopeFilter.local=Local users
+userdirectory.userScopeFilter.global=Global users who are members of this wiki
+platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
+platform.userdirectory.configTitle=User Directory Configuration
+platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
+platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.</content>
   <object>
     <name>XWiki.UserDirectoryTranslations</name>
     <number>0</number>
@@ -78,8 +82,4 @@
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>userdirectory.userScopeFilter=User scope:
-userdirectory.userScopeFilter.hint=Select the category of users you wish to display.
-userdirectory.userScopeFilter.local=Local users
-userdirectory.userScopeFilter.global=Global users who are members of this wiki</content>
 </xwikidoc>

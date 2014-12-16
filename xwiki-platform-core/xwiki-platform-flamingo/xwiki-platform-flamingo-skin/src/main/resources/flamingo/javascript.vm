@@ -1,32 +1,38 @@
+## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+#set ($jsExtension = '.min.js')
+#if ($request.minify == 'false')
+  #set ($jsExtension = '.js')
+#end
 ##
 ## JS Libraries.
 ##
-$xwiki.jsfx.use('js/amd/require.js', {'defer': false, 'minimize':false})
-$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false, 'minimize':false})
-$xwiki.jsfx.use('js/scriptaculous/effects.js', true)
+<script type="text/javascript" src="$services.webjars.url('requirejs', "require$jsExtension")"></script>
 ##
-## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
-## avoid using the minified versions of JS/CSS.
-##
-#if ("$!request.minify" == 'false')
-  $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})
-  $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
-  $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
-  $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
-  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})
-  $xwiki.jsfx.use('uicomponents/model/entityReference.js')
-  $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
-  $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
-  $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
-  $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
-  $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
-  $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
-  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
-  $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)
+$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
+$xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
+## xwiki-min.js and xwiki-min.css aggregate a couple of JavaScript and CSS files that are used on each page. In order to
+## help debugging we provide/bundle the individual files also and you can load them instead of the aggregated files by
+## passing 'minify=false' in the request query string.
+#if ($request.minify == 'false')
+  $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
+  $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
+  $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
+  $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)##
+  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.jsfx.use('uicomponents/model/entityReference.js')##
+  $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')##
+  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##
 #else
-  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
-  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
+  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})##
+  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})##
 #end
+$xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : $xcontext.language})##
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
   ## We can't just have it as a always-use SSX yet since we compute a hash to be sure to refresh
@@ -45,15 +51,15 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
     $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
       'forceSkinAction' : true,
       'h' : $searchSuggestConfigHash.hashCode()
-    })
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
+    })##
+    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])
 #if($editActions.contains($xcontext.action))
-  $xwiki.jsfx.use('uicomponents/lock/lock.js')
-  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')
-  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)
+  $xwiki.jsfx.use('uicomponents/lock/lock.js')##
+  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')##
+  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions
@@ -68,9 +74,9 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 <!--[if lt IE 9]>
   ## HTML5Shiv enable the compatibility with IE8
-  <script src="$services.webjars.url('html5shiv/3.7.2/html5shiv.min.js')"></script>
+  <script src="$services.webjars.url('html5shiv', 'html5shiv.min.js')"></script>
   ## Respond.js implements the CSS 3 media queries for IE8
-  <script type="text/javascript" src="$services.webjars.url('respond/1.4.2/dest/respond.min.js')" defer="defer"></script>
+  <script type="text/javascript" src="$services.webjars.url('respond', 'dest/respond.min.js')" defer="defer"></script>
 <![endif]-->
 <script type="text/javascript">
 // <![CDATA[
@@ -91,20 +97,15 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 ## Start the requirejs config.
 ##
 require.config({
-## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: {
-## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
-#if($request.minify == 'false')
-  #set($jsExtension = '.js')
-#else
-  #set($jsExtension = '.min.js')
-#end
-    'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
-    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap/3.2.0/js/bootstrap${jsExtension}"))'
+    'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
+    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap", "js/bootstrap${jsExtension}"))',
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
   },
   shim: {
     'bootstrap' : ['jquery']
   },
+  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   map: {
     '*': {
       'jquery': 'jQueryNoConflict'

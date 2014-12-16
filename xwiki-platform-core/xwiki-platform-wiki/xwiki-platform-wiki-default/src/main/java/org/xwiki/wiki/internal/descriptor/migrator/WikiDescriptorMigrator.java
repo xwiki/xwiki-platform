@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -54,6 +55,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Named("R54300WikiDescriptorMigration")
+@Singleton
 public class WikiDescriptorMigrator extends AbstractHibernateDataMigration
 {
     @Inject

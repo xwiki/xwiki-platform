@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
@@ -96,6 +96,7 @@
     <module>xwiki-platform-search-solr-api</module>
     <module>xwiki-platform-search-solr-plugin</module>
     <module>xwiki-platform-search-solr-query</module>
+    <module>xwiki-platform-search-solr-rest</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>
 </project>

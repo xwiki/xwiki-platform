@@ -27,10 +27,12 @@ import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
@@ -440,5 +442,32 @@ public class DefaultStringEntityReferenceResolverTest
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
+    }
+
+    /**
+     * Tests resolving wiki references.
+     */
+    @Test
+    public void testResolveWikiReference()
+    {
+        WikiReference reference = new WikiReference(resolver.resolve("dev", EntityType.WIKI));
+        Assert.assertEquals("dev", reference.getName());
+
+        // default value
+        reference = new WikiReference(resolver.resolve("", EntityType.WIKI));
+        Assert.assertEquals(DEFAULT_WIKI, reference.getName());
+
+        // with parameter
+        DocumentReference baseReference = new DocumentReference("math", "Theorems", "Pitagora");
+        reference = new WikiReference(resolver.resolve("", EntityType.WIKI, baseReference));
+        Assert.assertEquals(baseReference.getWikiReference(), reference);
+
+        // special symbols
+        reference = new WikiReference(resolver.resolve("dev:lab.uix", EntityType.WIKI));
+        Assert.assertEquals("dev:lab.uix", reference.getName());
+
+        // escaping
+        reference = new WikiReference(resolver.resolve("dev\\:lab\\.uix", EntityType.WIKI));
+        Assert.assertEquals("dev:lab.uix", reference.getName());
     }
 }

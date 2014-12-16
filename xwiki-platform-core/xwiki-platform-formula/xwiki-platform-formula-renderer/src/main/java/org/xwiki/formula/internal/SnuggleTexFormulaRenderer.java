@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.io.output.NullOutputStream;
 import org.slf4j.Logger;
@@ -49,7 +52,9 @@ import uk.ac.ed.ph.snuggletex.jeuclid.SimpleMathMLImageSavingCallback;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("snuggletex")
+@Component
+@Named("snuggletex")
+@Singleton
 public final class SnuggleTexFormulaRenderer extends AbstractFormulaRenderer
 {
     /** Logging helper object. */

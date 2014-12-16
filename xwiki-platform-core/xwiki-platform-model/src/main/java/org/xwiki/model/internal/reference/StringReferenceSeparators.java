@@ -150,6 +150,7 @@ interface StringReferenceSeparators
             put(EntityType.OBJECT, new char[] {COBJECTSEP, CSPACESEP, CWIKISEP});
             put(EntityType.OBJECT_PROPERTY, new char[] {CPROPERTYSEP, COBJECTSEP, CSPACESEP, CWIKISEP});
             put(EntityType.CLASS_PROPERTY, new char[] {CCLASSPROPSEP, CSPACESEP, CWIKISEP});
+            put(EntityType.WIKI, new char[] {});
         }
     };
 }

@@ -11,6 +11,8 @@
 ##############################################
 #set($doNotLoadColorThemeFromCSS = true)
 #template('colorThemeInit.vm')
+## Reset $doNotLoadColorThemeFromCSS for future calls (in SSX for examples)
+#set($doNotLoadColorThemeFromCSS = false)
 #if ("$!themeObj" != '')
   #initFromOldColorTheme()
 #else
@@ -87,8 +89,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################
@@ -99,6 +101,16 @@
 ##############################################
 #macro(initFromFlamingoTheme)
   // Colors from the new flamingo theme class
+  ## Set the XWiki variables
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
+  @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
+  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  ## Now set the variables with the values of the object
   #if ("$!themeObj" != '')
     ## variables of the class
     #set($variables = {
@@ -119,7 +131,7 @@
       "font-family-serif": "text",
       "font-family-monospace": "font",
       "font-size-base" : "size",
-      "btn-font-weight" : "text",
+      "btn-font-weight" : "size",
       "btn-default-color" : "color",
       "btn-default-bg" : "color",
       "btn-primary-color" : "color",
@@ -173,13 +185,6 @@
       #end
     #end
   #end
-  @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
-  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
 #end
 
 ##############################################
@@ -196,8 +201,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################
@@ -207,7 +212,7 @@
 ##############################################
 
 ## Fix font path
-@icon-font-path:                      "$services.webjars.url('bootstrap/3.2.0/fonts')/";
+@icon-font-path:                      "$services.webjars.url('bootstrap', 'fonts')/";
 
 ##
 ## XWiki variables: LESS variables specific to XWiki

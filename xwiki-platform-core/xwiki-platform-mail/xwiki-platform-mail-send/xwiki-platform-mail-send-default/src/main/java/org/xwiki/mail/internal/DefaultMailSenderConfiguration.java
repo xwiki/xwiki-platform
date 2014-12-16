@@ -68,7 +68,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     /**
      * Java Mail SMTP property for the from email address.
      */
-    public static final String JAVAMAIL_FROM = "mail.smtp.from";
+    public static final String JAVAMAIL_SMTP_FROM = "mail.smtp.from";
+
+    /**
+     * Java Mail SMTP property for specifying that we are authenticating.
+     */
+    public static final String JAVAMAIL_SMTP_AUTH = "mail.smtp.auth";
 
     /**
      * Prefix for configuration keys for the Mail Sending module.
@@ -92,7 +97,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getHost()
     {
         return this.documentsSource.getProperty("smtp_server",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
     }
 
     @Override
@@ -117,14 +122,14 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getUsername()
     {
         return this.documentsSource.getProperty("smtp_server_username",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
     }
 
     @Override
     public String getPassword()
     {
         return this.documentsSource.getProperty("smtp_server_password",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
+            this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
     }
 
     @Override
@@ -167,9 +172,20 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         addProperty(properties, JAVAMAIL_TRANSPORT_PROTOCOL, "smtp");
         addProperty(properties, JAVAMAIL_SMTP_HOST, getHost());
         addProperty(properties, JAVAMAIL_SMTP_USERNAME, getUsername());
-        addProperty(properties, JAVAMAIL_FROM, getFromAddress());
+        addProperty(properties, JAVAMAIL_SMTP_FROM, getFromAddress());
         addProperty(properties, JAVAMAIL_SMTP_PORT, Integer.toString(getPort()));
+
+        // If a username and a password have been provided consider we're authenticating against the SMTP server
+        if (usesAuthentication()) {
+            properties.put(JAVAMAIL_SMTP_AUTH, "true");
+        }
+
+        // Add user-specified mail properties.
+        // Note: We're only supporting SMTP (and not SMTPS) at the moment, which means that for sending emails to a
+        // SMTP server requiring TLS the user will need to pass the "mail.smtp.starttls.enable=true" property and use
+        // the proper port for TLS (587 for Gmail for example, while port 465 is used for SMTPS/SSL).
         properties.putAll(getAdditionalProperties());
+
         return properties;
     }
 
@@ -184,5 +200,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public boolean usesAuthentication()
     {
         return !StringUtils.isEmpty(getUsername()) && !StringUtils.isEmpty(getPassword());
+    }
+
+    @Override
+    public String getScriptServicePermissionCheckerHint()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + "scriptServiceCheckerHint", "programmingrights");
     }
 }

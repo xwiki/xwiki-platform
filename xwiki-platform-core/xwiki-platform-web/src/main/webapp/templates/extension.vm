@@ -264,6 +264,21 @@
         <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
       #end
 
+      #if ($extension.scm)
+        #if ($extension.scm.url)
+          <dt>$services.localization.render('extensions.info.scm')</dt>
+          <dd><a href="$extension.scm.url">$escapetool.xml($extension.scm.url.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+        #elseif ($extension.scm.connection)
+          <dt>$services.localization.render('extensions.info.scm')</dt>
+          <dd><a href="$extension.scm.connection.path">$escapetool.xml($extension.scm.connection.system)</a></dd>
+        #end
+      #end
+
+      #if ($extension.issueManagement.getURL())
+        <dt>$services.localization.render('extensions.info.issueManagement')</dt>
+        <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
+      #end
+
       #if ($extension.isInstalled())
         #displayExtensionDetails_description_wikis($extension)
       #end

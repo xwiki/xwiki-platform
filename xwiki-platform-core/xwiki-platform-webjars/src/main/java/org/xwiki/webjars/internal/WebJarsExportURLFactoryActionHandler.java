@@ -32,6 +32,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.web.ExportURLFactoryContext;
  */
 @Component
 @Named("webjars")
+@Singleton
 public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryActionHandler
 {
     /**

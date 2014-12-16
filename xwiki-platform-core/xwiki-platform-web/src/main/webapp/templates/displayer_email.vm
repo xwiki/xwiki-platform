@@ -1,6 +1,8 @@
 #if ($type == 'edit' || $type == 'search')
+  #set ($disabled = $field.getProperty('disabled').value == 1)
   #set ($id = $escapetool.xml("${prefix}${name}"))
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email" />
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email"
+    #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
 #if ($xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0) == 1)
 $!value.replaceAll('^(.).*@', '$1...@')##

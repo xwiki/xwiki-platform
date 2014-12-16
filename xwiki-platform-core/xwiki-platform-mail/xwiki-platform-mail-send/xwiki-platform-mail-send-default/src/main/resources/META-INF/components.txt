@@ -16,3 +16,5 @@ org.xwiki.mail.internal.template.SecureTemplateMimeMessageFactory
 org.xwiki.mail.internal.template.DefaultMailTemplateManager
 org.xwiki.mail.internal.template.SecureMailTemplateManager
 org.xwiki.mail.internal.template.DefaultAttachmentConverter
+org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
+org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker

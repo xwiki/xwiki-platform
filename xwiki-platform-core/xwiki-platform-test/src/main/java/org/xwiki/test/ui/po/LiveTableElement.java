@@ -136,7 +136,7 @@ public class LiveTableElement extends BaseElement
      */
     public boolean hasRow(String columnTitle, String columnValue)
     {
-        String escapedColumnValue = columnValue.replace("\\", "\\\\").replace("'", "\\'");
+        String escapedColumnValue = columnValue.replace("'", "\\'");
         String cellXPath = "//tr/td[position() = %s and . = '%s']";
 
         WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));

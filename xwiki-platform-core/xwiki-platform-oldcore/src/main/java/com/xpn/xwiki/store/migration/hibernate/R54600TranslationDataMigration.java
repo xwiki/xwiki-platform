@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R54600Translation")
+@Singleton
 public class R54600TranslationDataMigration extends AbstractHibernateDataMigration
 {
     @Override

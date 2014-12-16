@@ -532,7 +532,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                         sbuf.append(anchor);
                     }
 
-                    relativeURL = Util.escapeURL(sbuf.toString());
+                    relativeURL = sbuf.toString();
                 }
             }
         } catch (Exception e) {

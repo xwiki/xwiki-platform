@@ -22,6 +22,9 @@ package org.xwiki.store.serialization.xml.internal;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
@@ -34,7 +37,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * @version $Id$
  * @since 3.0M2
  */
-@Component("attachment-meta/1.0")
+@Component
+@Named("attachment-meta/1.0")
+@Singleton
 public class AttachmentMetadataSerializer extends AbstractXMLSerializer<XWikiAttachment, XWikiAttachment>
 {
     /**

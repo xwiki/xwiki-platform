@@ -1,14 +1,15 @@
 ##################################
 ##          SPACE MENU
 ##################################s
-#set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 #set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin || $xwiki.exists('Main.SpaceIndex'))
 #xwikitopmenuseparator()
+#set($spaceURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))))
 #if (!$displaySpaceSubmenu)
-  #xwikitopmenuentry($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
+  #xwikitopmenuentry($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
-    #set ($hasPreviousMenuSection = false)
+  #xwikitopmenuentrystart($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
+    ## GO TO
+    #submenuitem($spaceURL $services.localization.render('core.menu.goto.space') '', '', 'arrow-right')
     ## WATCH / UNWATCH
     #if ($hasWatch)
       #set ($watchClasses = '')
@@ -19,7 +20,6 @@
       #end
       #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space') 'tmWatchSpace', $watchClasses, 'eye-open')
       #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses, 'eye-close')
-      #set ($hasPreviousMenuSection = true)
     #end
     ## ADMIN
     #if ($hasSpaceAdmin && $isAdminAppInstalled)
@@ -30,9 +30,7 @@
     #end
     ## DOCUMENT INDEX
     #if ($xwiki.exists('Main.SpaceIndex'))
-      #if ($hasPreviousMenuSection)
-        #submenuseparator()
-      #end
+      #submenuseparator()
       #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
       #submenuitem($spaceIndexUrl $services.localization.render('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '' 'book')
       #set ($hasPreviousMenuSection = true)

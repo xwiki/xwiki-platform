@@ -1,6 +1,6 @@
 #template('colorThemeInit.vm')
 body {
-  behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
+  behavior: url("$xwiki.getSkinFile('htc/csshover3.htc')");
 }
 
 * html div {

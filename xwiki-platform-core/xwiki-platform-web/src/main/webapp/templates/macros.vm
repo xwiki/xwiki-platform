@@ -230,9 +230,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach($user in $usersList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($userReference = $user.extractReference('DOCUMENT'))
       #if (!$userReference)
-        #set ($userReference = $services.model.resolveDocument($user, 'explicit', $xcontext.userReference))
+        #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
       #end
       #set ($userName = ${userReference.name})
       #getUserAvatarURL($userReference $avatarURL 30)
@@ -272,9 +274,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach ($group in $groupsList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($groupReference = $group.extractReference('DOCUMENT'))
       #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($group, 'explicit', $xcontext.userReference))
+        #set ($groupReference = $services.model.resolveDocument($user, 'group/current'))
       #end
       #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
       #if ("$!groupTitle" == '')
@@ -1337,12 +1341,15 @@ ${Msz}Mb##
  * @param options the livetable options.
  *#
 #macro(livetable $divid $collist $colprops $options)
+## Open wiki syntax wrappers.
+#if("$!options.outputOnlyHtml" != 'true')
 ## Do not indent:
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
 {{html}}
 #else {pre} #end
+#end
   ##
   ## SX deps.
   ##
@@ -1380,6 +1387,7 @@ ${Msz}Mb##
   #set ($dataColumns = [])
   #set ($classParams = {})
   #foreach($colname in $collist)
+    ## If the live table options don't specify which column to select then select the first non-special column.
     #if("$!selectedColumn" == '' && !$colname.startsWith('_'))
       #set($selectedColumn = $colname)
     #end
@@ -1388,6 +1396,10 @@ ${Msz}Mb##
       #set($propClassName = "$!{colprops.get($colname).get('class')}")
       #if($propClassName != '')
         #set ($discard = $classParams.put("${colname}_class", $propClassName))
+      #end
+      #set ($propMatchType = "$!colprops.get($colname).match")
+      #if ($propMatchType != '')
+        #set ($discard = $classParams.put("${colname}_match", $propMatchType))
       #end
     #end
   #end
@@ -1612,11 +1624,13 @@ ${Msz}Mb##
 })();
    //]]>
   </script>
-</div> ## xwiki-livetable-container
-  #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+</div>## xwiki-livetable-container
+## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
+#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
-#else {/pre} #end
-#end
+#else{/pre}#end##
+#end## end-wrappers
+#end## end-livetable-macro
 
 #**
  * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function
@@ -2167,7 +2181,11 @@ var $jsVarName = {
 #end
 #set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
 #set($ok = $parameters.put('convertInput', true))
-#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', $escapetool.url({
+  'xpage': 'wysiwyginput',
+  'token': $services.csrf.token,
+  'skin': $xwiki.getSkin()
+}))))
 #if($full)
   #set($ok = $parameters.put('displayTabs', $services.wysiwyg.config.isSourceEditorEnabled()))
   #if($parameters.displayTabs)
@@ -2528,6 +2546,9 @@ $string##
 #if (!$condition && "$!condition" == '')##
 ## Undefined condition. Use the default condition.
 #set ($condition = $doc.getObject('XWiki.SheetDescriptorClass'))
+#elseif ($condition.getClass().getName() == 'java.lang.String')##
+## The condition is the name of an xclass. Display the sheet title if the current document doesn't have such an object.
+#set ($condition = !$doc.getObject($condition))
 #end##
 ##
 #if ($condition)##
@@ -2622,10 +2643,12 @@ Recursive title display detected!##
 #end
 
 ###
-### Displays an unexpected exception with a default message.
+### Generically display exceptions that have not been handled at the right level and have now bubbled up to the UI.
+###
+### This is a convenience macro, see #displayException.
 ###
 ### @param exception The exception to format for displaying
-#macro(displayUnexpectedException $exception)
+#macro(displayUnhandledException $exception)
   #set ($sentence1 = 'Unexpected error.')
   #set ($sentence2 = 'Contact your administrator or <a href="http://jira.xwiki.org">report the issue</a>.')
   #set ($sentence3 = 'Click this box to get technical details.')

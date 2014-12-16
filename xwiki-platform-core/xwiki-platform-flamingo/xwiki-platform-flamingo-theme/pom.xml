@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-platform-flamingo</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-theme</artifactId>
   <packaging>xar</packaging>
@@ -40,19 +40,35 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-webjars</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
       <artifactId>less</artifactId>
       <version>1.7.0</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>colpick</artifactId>
       <version>2.0.2</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

@@ -5,6 +5,7 @@
 textarea, select, input[type="text"], input[type="password"] {
   &:extend(.form-control all);
   display: inline-block;
+  max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
   width: auto;
 }
 
@@ -24,7 +25,6 @@ input[type="checkbox"] {
 
 textarea {
   height: auto;
-  max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
   font-family: @font-family-monospace;
 }
 
@@ -44,11 +44,6 @@ select[size="0"], select[size="1"] {
   input[type="text"], input[type="password"], select, textarea {
     width: 100%;
   }
-  input[type="radio"], 
-  input[type="checkbox"] {
-    min-height: 10px;
-    margin: 0 .3em 0 0;
-  }
   dl {
     dt {
       margin-top: floor(@font-size-base * 1.4);
@@ -57,7 +52,7 @@ select[size="0"], select[size="1"] {
         margin-top: 0;
       }
       label {
-        color: #636B75;
+        color: @text-color;
         font-size: 0.85em;
         font-weight: 700;
         margin-bottom: 0.3em;
@@ -81,7 +76,7 @@ select[size="0"], select[size="1"] {
   .xRequired {
     margin-left: 1ex;
   }
-  .xHint, .xRequired {
+  .xHint, .xRequired, .xErrorMsg {
     .text-muted-smaller;
     font-weight: 400;
     text-transform: none;
@@ -93,13 +88,18 @@ select[size="0"], select[size="1"] {
     color: @state-danger-text;
   }
   .xErrorField {
-    border-color: @state-danger-bg;
+    border-color: @state-danger-border;
   }
 }
 
-.xformInline label {
-  text-transform: uppercase;
-  margin-right: 0.5em;
+.xformInline {
+  label {
+    text-transform: uppercase;
+    margin-right: 0.5em;
+  }
+  input[type="text"] {
+    vertical-align: middle;
+  }
 }
 
 .xwiki-form-listclass {
@@ -109,4 +109,11 @@ select[size="0"], select[size="1"] {
 /* Validation messages do not have the place to be displayed at the right of the input field, because the width of the fields is 100%. */
 .LV_validation_message {
   display: block;
+}
+
+// Forms on the navbar ==================================================
+@media screen and (max-width: @screen-xs-max) {
+  .navbar-form {
+    margin: 0 0;
+  }
 }

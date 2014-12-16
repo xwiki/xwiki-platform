@@ -7,12 +7,12 @@
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 #set ($isWikiAPIAvailable = ("$!services.wiki" != '' && "$!services.wiki.user" != ''))
 #set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
-
+#set ($isAdminAppInstalled = $xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'AdminSheet')))
 ###
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)
-  <div class="navbar navbar-default actionmenu">
+  <nav class="navbar navbar-default actionmenu" role="navigation">
     <div class="container-fluid">
       ## Brand and toggle get grouped for better mobile display
       <div class="navbar-header">
@@ -36,7 +36,7 @@
 #macro(xwikitopmenuend)
       </div>## /.navbar-collapse
     </div> ## / container-fluid
-  </div>
+  </nav>
 #end
 
 ###
@@ -81,14 +81,23 @@
   #set($linkName = $linktext)
   #set($linkTitle = $linktext) 
   #if ($linktext.contains($sep))
-    #set($linkWords = $linktext.split($sep))
+    #set($linkWords = $linktext.split($sep, 2))
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="dropdown text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
-      <a href="$actionurl" class="$!class" title="$linkTitle">#glyphicon($icon) $!iconImg $linkName</a>
-      <a href="$actionurl" class="hasCaret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
-      <ul class="dropdown-menu">
+  <li class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+    ## The menu label. On large screens (tablet and desktop) the label is a link that triggers the default menu action
+    ## (e.g. navigation) and the menu is opened using a separated caret. On extra small screens (phones) the label opens
+    ## the menu and the default menu action is the first item in the menu.
+    <a href="$actionurl" class="dropdown-split-left dropdown-toggle $!class" data-toggle="dropdown" title="$linkTitle">
+      ## This caret is displayed only on extra small screens to indicate that the label toggles the menu.
+      #glyphicon($icon)$!{iconImg} $linkName <b class="caret"></b>
+    ## Don't leave any space between the anchors because they have display:inline-block on large screens.
+    </a><a href="#" class="dropdown-split-right dropdown-toggle hidden-xs $!class" data-toggle="dropdown">
+      ## This caret is used to toggle the menu on large screens (tablet and desktop).
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
 #end
 
 ###

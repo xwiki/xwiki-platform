@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Named("solr")
+@Singleton
 public class SolrIndexScriptService implements ScriptService
 {
     /**

@@ -24,6 +24,8 @@
 # -----------------
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
+#   JETTY_OPTS - optional parameters passed to Jetty's start.jar. See
+#       http://www.eclipse.org/jetty/documentation/9.2.3.v20140905/start-jar.html for options.
 #   JETTY_PORT - the port on which Jetty was started.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
 # ----------------------------------------------------------------------------------------------------------------
@@ -66,6 +68,7 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
+JETTY_BASE=.
 
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
@@ -112,11 +115,11 @@ done
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
 
-# Specify port and key to stop a running Jetty instance
-XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
+# Specify Jetty's home and base directories
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
-# Specify Jetty's home directory
-XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
+# Specify port and key to stop a running Jetty instance
+JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
 [ ! -e $XWIKI_LOCK_FILE ] && echo "Lock file [${XWIKI_LOCK_FILE}] is missing. Aborting stop." && exit 0
 
@@ -124,7 +127,7 @@ if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
   # An XWiki instance is still running
 
   echo Attempting to stop XWiki cleanly on port ${JETTY_PORT}...
-  java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop
+  java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop $JETTY_OPTS
   waitForLockDeletion $XWIKI_LOCK_FILE && exit 0
 
   echo 'Failed to stop XWiki cleanly, attempting kill...'

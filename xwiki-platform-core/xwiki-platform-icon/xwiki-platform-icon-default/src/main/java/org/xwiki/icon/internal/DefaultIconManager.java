@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -52,10 +54,53 @@ public class DefaultIconManager implements IconManager
     }
 
     @Override
+    public String render(String iconName, String iconSetName) throws IconException
+    {
+        return this.render(iconName, iconSetName, true);
+    }
+
+    @Override
+    public String render(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        IconSet iconSet = getIconSet(iconName, iconSetName, fallback);
+        if (iconSet == null) {
+            return "";
+        }
+        return iconRenderer.render(iconName, iconSet);
+    }
+
+    @Override
     public String renderHTML(String iconName) throws IconException
     {
-
         return iconRenderer.renderHTML(iconName, getIconSet(iconName));
+    }
+
+    @Override
+    public String renderHTML(String iconName, String iconSetName) throws IconException
+    {
+        return this.renderHTML(iconName, iconSetName, true);
+    }
+
+    @Override
+    public String renderHTML(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        IconSet iconSet = getIconSet(iconName, iconSetName, fallback);
+        if (iconSet == null) {
+            return "";
+        }
+        return iconRenderer.renderHTML(iconName, iconSet);
+    }
+
+    @Override
+    public List<String> getIconNames() throws IconException
+    {
+        return iconSetManager.getCurrentIconSet().getIconNames();
+    }
+
+    @Override
+    public List<String> getIconNames(String iconSetName) throws IconException
+    {
+        return iconSetManager.getIconSet(iconSetName).getIconNames();
     }
 
     private IconSet getIconSet(String iconName) throws IconException
@@ -64,8 +109,23 @@ public class DefaultIconManager implements IconManager
         IconSet currentIconSet = iconSetManager.getCurrentIconSet();
         if (currentIconSet != null && currentIconSet.getIcon(iconName) != null) {
             return currentIconSet;
-        } else {
+        }
+
+        // Fallback to the default icon set
+        return iconSetManager.getDefaultIconSet();
+    }
+
+    private IconSet getIconSet(String iconName, String iconSetName, boolean fallback) throws IconException
+    {
+        // Get the specified icon set
+        IconSet iconSet = iconSetManager.getIconSet(iconSetName);
+
+        // Fallback if necessary
+        if ((iconSet == null || iconSet.getIcon(iconName) == null) && fallback) {
             return iconSetManager.getDefaultIconSet();
         }
+
+        // Return the icon set
+        return iconSet;
     }
 }

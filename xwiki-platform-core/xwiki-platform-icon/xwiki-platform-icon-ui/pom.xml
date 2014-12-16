@@ -27,11 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-icon</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-ui</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Icon - UI</name>
+  <description>Manage and display icons used all over the wiki</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Icon Theme Application</xwiki.extension.name>
@@ -41,6 +42,22 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-script</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- We need a default implementation at runtime, include it here so that any other module that depends on this
+         XAR will be sure to have all that's required to make it work at runtime. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- JavaScript dependencies (for the icon picker) -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
     </dependency>
   </dependencies>
 </project>

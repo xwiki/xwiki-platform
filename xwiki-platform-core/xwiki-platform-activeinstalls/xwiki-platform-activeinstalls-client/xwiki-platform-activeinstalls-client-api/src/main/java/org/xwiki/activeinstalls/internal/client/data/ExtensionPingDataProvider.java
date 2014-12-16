@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.activeinstalls.internal.client.PingDataProvider;
 import org.xwiki.component.annotation.Component;
@@ -43,6 +44,7 @@ import net.sf.json.JSONObject;
  */
 @Component
 @Named("extensions")
+@Singleton
 public class ExtensionPingDataProvider implements PingDataProvider
 {
     private static final String PROPERTY_ID = "id";

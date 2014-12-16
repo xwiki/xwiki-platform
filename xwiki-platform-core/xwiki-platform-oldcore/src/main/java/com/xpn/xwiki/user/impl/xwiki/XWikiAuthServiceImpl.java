@@ -584,10 +584,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             contextPath = "";
         }
 
-        // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.
-        // Apply the same escape method to compensate this.
-        contextPath = Util.escapeURL(contextPath);
-
         String urlPrefix = url.getProtocol() + "://" + url.getAuthority() + contextPath;
 
         // Since the passed URL has been potentially modified by HttpServletResponse.encodeURL() we also need to call

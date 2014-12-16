@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.WikiDocument;
@@ -55,6 +57,7 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  * @since 1.9M1
  */
 @Component
+@Singleton
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**

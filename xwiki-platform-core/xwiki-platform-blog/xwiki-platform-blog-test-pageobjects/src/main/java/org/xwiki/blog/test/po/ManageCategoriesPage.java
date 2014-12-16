@@ -151,12 +151,13 @@ public class ManageCategoriesPage extends BasePage
     }
 
     /**
-     * Return a xpath locator for the given category. Not guaranteed to find exactly one occurrence
+     * Return a xpath locator for the given category. Not guaranteed to find exactly one occurrence.
+     * Excludes the RSS link for a better chance to find problems with the link to the category page 
      * 
      * @param name category name
      */
     private By categoryLocator(String name)
     {
-        return By.xpath("//span[@class='blog-category']//a[contains(@href, '" + getUtil().escapeURL(name) + "')]");
+        return By.xpath("//span[@class='blog-category']//a[contains(@href, '" + getUtil().escapeURL(name) + "') and not(@title='RSS')]");
     }
 }

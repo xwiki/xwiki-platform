@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -69,6 +70,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Named("R40001XWIKI7540")
+@Singleton
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
     /** The comment class reference. */

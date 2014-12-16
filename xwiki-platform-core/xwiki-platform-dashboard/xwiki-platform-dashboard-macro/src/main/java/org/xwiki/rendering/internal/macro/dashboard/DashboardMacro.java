@@ -242,7 +242,6 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
             // without. See XWIKI-6620 for details
             this.jsfx.use("js/smartclient/initsc.js", fxParamsNonDeferredForceSkinAction);
             this.jsfx.use("js/smartclient/modules/ISC_Core.js", fxParamsNonDeferred);
-            this.jsfx.use("js/smartclient/overwritesc.js", fxParamsNonDeferred);
             this.jsfx.use("js/smartclient/modules/ISC_Foundation.js", fxParamsNonDeferred);
             this.jsfx.use("js/smartclient/modules/ISC_Containers.js", fxParamsNonDeferred);
             // this is the only file that seems to be not really needed. I am including it though since I'm including

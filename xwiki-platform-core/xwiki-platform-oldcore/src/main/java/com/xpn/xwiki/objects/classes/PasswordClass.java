@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 import org.apache.ecs.xhtml.input;
 import org.slf4j.Logger;
@@ -170,6 +171,20 @@ public class PasswordClass extends StringClass
     }
 
     /**
+     * @param password
+     * @return The salt used for the given password. If this is an unsalted password, let it be known by returning "".
+     */
+    public String getSaltFromPassword(String password)
+    {
+        String[] components = password.split(SEPARATOR);
+        if (components.length == 4) {
+            return components[2];
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * Transforms a plain text password so that it has the same encryption as a password stored in the database. The
      * current configuration for this password XProperty cannot be used, as the user might have a different encryption
      * mechanism (for example, if the user was imported, or the password was not yet upgraded).
@@ -182,7 +197,8 @@ public class PasswordClass extends StringClass
     {
         String result = plainPassword;
         if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword));
+            result =
+                getPasswordHash(result, getAlgorithmFromPassword(storedPassword), getSaltFromPassword(storedPassword));
         } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
             result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
         }
@@ -212,19 +228,67 @@ public class PasswordClass extends StringClass
         return password;
     }
 
+    /**
+     * @param password the password to hash.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;algorithmName> is
+     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), &lt;salt> is a random 64 character
+     *         salt and &lt;hexStrignHash> is the salted hash of the given password, using the given hashing algorithm.
+     */
     public String getPasswordHash(String password)
     {
-        return getPasswordHash(password, getHashAlgorithm());
+        return getPasswordHash(password, getHashAlgorithm(), null);
     }
 
+    /**
+     * @param password the password to hash.
+     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;salt> is a random
+     *         64 character salt and &lt;hexStrignHash> is the salted hash of the given password, using the given
+     *         hashing algorithm.
+     */
     public String getPasswordHash(String password, String algorithmName)
     {
+        return getPasswordHash(password, algorithmName, null);
+    }
+
+    /**
+     * @param password the password to hash.
+     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
+     * @param salt the string to pad the password with before hashing. If {@code null}, a random 64 character salt will
+     *            be used. To disable salting, use an empty ({@code ""}) salt string.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;hexStrignHash> is
+     *         the salted hash of the given password, using the given hashing algorithm.
+     * @since 6.3M2
+     */
+    public String getPasswordHash(String password, String algorithmName, String salt)
+    {
+        // If no salt given, let's generate one.
+        if (salt == null) {
+            salt = randomSalt();
+        }
+
         try {
             LOGGER.debug("Hashing password");
+
+            String saltedPassword = salt + password;
+
             MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
-            hashAlgorithm.update(password.getBytes());
+            hashAlgorithm.update(saltedPassword.getBytes());
             byte[] digest = hashAlgorithm.digest();
-            StringBuffer sb = new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
+
+            // Build the result.
+            StringBuilder sb = new StringBuilder();
+            // Metadata
+            sb.append(HASH_IDENTIFIER);
+            sb.append(SEPARATOR);
+            sb.append(algorithmName);
+            sb.append(SEPARATOR);
+            // Backward compatibility concern : let's keep unsalted password the way they are.
+            if (!salt.equals("")) {
+                sb.append(salt);
+                sb.append(SEPARATOR);
+            }
+            // The actual password hash.
             for (int j = 0; j < digest.length; ++j) {
                 int b = digest[j] & 0xFF;
                 if (b < 0x10) {
@@ -232,12 +296,32 @@ public class PasswordClass extends StringClass
                 }
                 sb.append(Integer.toHexString(b));
             }
+
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error("Wrong hash algorithm [" + algorithmName + "] in [" + getXClassReference() + "]", ex);
+            LOGGER.error("Wrong hash algorithm [{}] specified in property [{}] of class [{}]", algorithmName,
+                getName(), getXClassReference(), ex);
         } catch (NullPointerException ex) {
             LOGGER.error("Error hashing password", ex);
         }
         return password;
+    }
+
+    public static String randomSalt()
+    {
+        StringBuilder salt = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[32];
+        random.nextBytes(bytes);
+        for (int i = 0; i < bytes.length; i++) {
+            byte temp = bytes[i];
+            String s = Integer.toHexString(new Byte(temp));
+            while (s.length() < 2) {
+                s = "0" + s;
+            }
+            s = s.substring(s.length() - 2);
+            salt.append(s);
+        }
+        return salt.toString();
     }
 }

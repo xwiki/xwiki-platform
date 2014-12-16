@@ -652,7 +652,9 @@ public class Util
      * 
      * @param text
      * @return escaped text
+     * @deprecated dedicated to Radeox which is deprecated since a long time
      */
+    @Deprecated
     public static String escapeText(String text)
     {
         text = text.replaceAll("http://", "&#104;ttp://");
@@ -674,7 +676,9 @@ public class Util
      * 
      * @param url
      * @return encoded URL
+     * @deprecated dedicated to Radeox which is deprecated since a long time
      */
+    @Deprecated
     public static String escapeURL(String url)
     {
         url = url.replaceAll("\\~", "%7E");

@@ -83,13 +83,14 @@
       }
     </style>
 
-    <script type='text/javascript' src='/xwiki/resources/js/amd/require.js'></script>
+    ## The URL factory is not available until XWiki is fully initialized. The WebJar script service uses the URL factory.
+    <script type="text/javascript" src="/xwiki/bin/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
     <script type='text/javascript' src='/xwiki/resources/uicomponents/logging/logging.js'></script>
     <script type="text/javascript">
     // <![CDATA[
       require.config({
         baseUrl: '/',
-          paths: { 'jquery': "/xwiki/resources/js/amd/jquery" },
+          paths: { 'jquery': '/xwiki/bin/webjars/resources/path?value=jquery%2F1.11.1%2Fjquery.min.js' },
         map: {
           '*': { 'jquery': 'jQueryNoConflict' },
           'jQueryNoConflict': { 'jquery': 'jquery' }

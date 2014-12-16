@@ -15,7 +15,7 @@
 #mapping("titleColor", "@headings-color")
 #mapping("pageBackgroundColor", "@body-bg")
 #mapping("menuBackgroundColor", "@navbar-default-bg")
-#mapping("menuLinkColor", "@navbar-inverse-link-color")
+#mapping("menuLinkColor", "@navbar-default-link-color")
 #mapping("menuSelectedEntryBackgroundColor", "@navbar-default-link-active-bg")
 #mapping("menuSelectedEntryLinkColor" "@navbar-default-link-active-color")
 #mapping("panelBackgroundColor", "@panel-bg")

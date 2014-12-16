@@ -16,6 +16,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   urlTemplate : "$xwiki.getURL('__space__.__document__', '__action__')",
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function($super) {
+    // Build the modal popup's content
     var content = new Element("div");
     this.input = new Element("input", {
       "type" : "text",
@@ -29,12 +30,24 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     buttonContainer.appendChild(this.viewButton);
     buttonContainer.appendChild(this.editButton);
     content.appendChild(buttonContainer);
+
+    // Initialize the popup
     $super(
       content,
       {
-        "show" : { method : this.showDialog, keys : [$services.localization.render('core.viewers.jump.shortcuts')] },
-        "view" : { method : this.openDocument, keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')] },
-        "edit" : { method : this.openDocument, keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')] }
+        "show" : {
+	  method : this.showDialog,
+	  keys : [$services.localization.render('core.viewers.jump.shortcuts')]
+	},
+        "view" : {
+	  method : this.openDocument,
+	  keys : [$services.localization.render('core.viewers.jump.dialog.actions.view.shortcuts')],
+	  options : { 'propagate' : true }
+	},
+        "edit" : {
+	  method : this.openDocument,
+	  keys : [$services.localization.render('core.viewers.jump.dialog.actions.edit.shortcuts')]
+	}
       },
       {
         title : "$services.localization.render('core.viewers.jump.dialog.content')",
@@ -42,6 +55,10 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         verticalPosition : "top"
       }
     );
+
+    // Allow the default close event ('Escape' key) to propagate so that the ajaxsuggest can catch it and clear the suggestions list.
+    this.shortcuts['close'].options = { 'propagate' : true };
+
     this.addQuickLinksEntry();
   },
   /**
@@ -72,7 +89,9 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         resultValue : "pageFullName",
         resultInfo : "pageFullName",
         timeout : 30000,
-        parentContainer : this.dialogBox
+        parentContainer : this.dialogBox,
+        // Make sure the suggest widget does not hogg the Enter key press event.
+        propagateEventKeyCodes : [ Event.KEY_RETURN ]
       });
     }
   },
@@ -85,6 +104,15 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     // Focus the input field
     this.input.focus();
   },
+  /** Called when the dialog is closed. Overriding default behavior to check if the user actually wanted to close the suggestions list instead. */
+  closeDialog : function($super, event) {
+    if (!event.type.startsWith('key') || !this.dialogBox.down('.ajaxsuggest')) {
+      // Close the dialog either from the close/x button (mouse event) or when the keyboard shortcut (Escape key) is used and there is no ajax suggestion list displayed.
+      $super();
+      // Clear the suggestion list so that it does not flicker next time we open the dialog.
+      this.input.__x_suggest.clearSuggestions();
+    }
+  },
   /**
    * Open the selected document in the specified mode.
    *
@@ -93,10 +121,18 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
    *     server side, "edit" could be replaced with "inline" if the document is sheet-based.
    */
   openDocument : function(event, mode) {
-    if (!$('as_jmp_target') && this.input.value != "") {
+    // Don`t do anything if the user is still selecting from the suggestions list or if nothing was entered yet.
+    var highlightedSuggestion = this.dialogBox.down('.ajaxsuggest .xhighlight');
+    if ((!highlightedSuggestion || highlightedSuggestion.hasClassName('noSuggestion')) && this.input.value != "") {
       Event.stop(event);
       var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT);
-      window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
+      if (reference.parent) {
+        window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
+      } else {
+        if (typeof(XWiki.widgets.Suggest) != "undefined") {
+          new XWiki.widgets.Notification("$services.localization.render('core.viewers.jump.dialog.invalidNameError')", 'error');
+        }
+      }
     }
   },
   addQuickLinksEntry : function() {

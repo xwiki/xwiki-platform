@@ -298,7 +298,7 @@ public class XWikiCachingRightService implements XWikiRightService
         LOGGER.debug("hasAccessLevel() resolved document named [{}] into reference [{}]", docname, document);
         DocumentReference user = resolveUserName(username, wikiReference);
 
-        if (XWikiConstants.GUEST_USER.equals(user.getName())) {
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
             // Public users (not logged in) should be passed as null in the new API
             user = null;
         }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -47,7 +46,7 @@
   #else
     $escapetool.xml($facetPrettyValue)
     #set ($hint = $escapetool.xml($services.localization.render('solr.field.locale.emptyValue.hint')))
-    &lt;img src="$xwiki.getSkinFile('/icons/silk/information.png')" alt="$hint" title="$hint" class="icon" /&gt;
+    &lt;img src="$xwiki.getSkinFile('icons/silk/information.png')" alt="$hint" title="$hint" class="icon" /&gt;
   #end
 #end
 #set ($currentLocale = $services.localization.currentLocale)

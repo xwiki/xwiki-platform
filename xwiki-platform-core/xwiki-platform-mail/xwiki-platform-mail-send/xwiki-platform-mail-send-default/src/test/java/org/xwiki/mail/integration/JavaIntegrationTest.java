@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
@@ -41,17 +42,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.XWikiAuthenticator;
+import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.mail.internal.DefaultMailSenderThread;
+import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
 /**
@@ -60,13 +65,21 @@ import com.icegreen.greenmail.util.ServerSetupTest;
  * @version $Id$
  * @since 6.1M2
  */
-@AllComponents
+@ComponentList({
+    DefaultMimeBodyPartFactory.class,
+    HTMLMimeBodyPartFactory.class,
+    AttachmentMimeBodyPartFactory.class,
+    StandardEnvironment.class,
+    DefaultMailSender.class,
+    DefaultMailSenderThread.class
+})
 public class JavaIntegrationTest
 {
     @Rule
-    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTP);
 
-    private GreenMail mail;
+    @Rule
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
     private MailSenderConfiguration configuration;
 
@@ -92,27 +105,17 @@ public class JavaIntegrationTest
         }
     };
 
-    @Before
-    public void startMail()
+    @BeforeComponent
+    public void registerConfiguration() throws Exception
     {
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
-    }
-
-    @After
-    public void stopMail()
-    {
-        if (this.mail != null) {
-            this.mail.stop();
-        }
+        this.configuration = new TestMailSenderConfiguration(
+            this.mail.getSmtp().getPort(), null, null, new Properties());
+        this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
     }
 
     @Before
     public void initialize() throws Exception
     {
-        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
-
-        this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.htmlBodyPartFactory = this.componentManager.getInstance(
@@ -132,8 +135,7 @@ public class JavaIntegrationTest
     public void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
@@ -142,7 +144,7 @@ public class JavaIntegrationTest
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
-        // Add HTML in the body
+        // Add text in the body
         multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
@@ -158,6 +160,7 @@ public class JavaIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
+        assertEquals(3, messages.length);
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
         assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 
@@ -172,8 +175,7 @@ public class JavaIntegrationTest
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);

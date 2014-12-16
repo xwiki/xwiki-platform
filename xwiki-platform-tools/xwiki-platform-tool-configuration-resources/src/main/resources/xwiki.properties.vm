@@ -684,7 +684,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.password = somepassword
 
 #-# [Since 6.1M2]
-#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# Extra Java Mail options (see https://javamail.java.net/nonav/docs/api/).
 #-# This configuration property can be overridden in XWikiPreferences objects, by using the "javamail_extra_props"
 #-# property name.
 #-# By default the following properties are set automatically:
@@ -697,11 +697,21 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.properties = mail.smtp.starttls.enable = true
 # mail.sender.properties = mail.smtp.socks.host = someserver
 
+
+#-# [Since 6.4M2]
+#-# Defines which authorization checks are done when sending mails using the Mail Sender Script Service.
+#-# Example of valid values:
+#-# - "programmingrights": the current document must have Programming Rights
+#-# - "alwaysallow": no check is performed. This is useful when running XWiki in a secure environment where we
+#-#   want to allow all users to be able to send emails through the Script Service.
+#-# The default is:
+# mail.sender.scriptServiceCheckerHint = programmingrights
+
 #-------------------------------------------------------------------------------------
 # LESS
 #-------------------------------------------------------------------------------------
 
-#-# [Since 6.3M1]
+#-# [Since 6.4M2]
 #-# LESS CSS compiler to use. Valid values are:
 #-# - "javascript" : to use the official LESS compiler.
 #-# - "less4j" : (default) to use a Java version of LESS which has better performances.

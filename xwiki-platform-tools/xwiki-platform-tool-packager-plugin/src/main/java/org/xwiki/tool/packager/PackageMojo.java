@@ -64,7 +64,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -72,7 +71,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.xwiki.tool.utils.LogUtils;
-import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.tool.backup.Importer;
@@ -672,8 +670,14 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-lesscss-script", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-webjars", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-configuration-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
             "bootstrap", "3.2.0", null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
+            "requirejs", "2.1.15", null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",

@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  */
 @Component
 @Named("applicationmanager")
+@Singleton
 public class ApplicationManagerScriptService implements ScriptService
 {
     private static final String PLUGINAPI_KEY = "applicationmanagerapi";

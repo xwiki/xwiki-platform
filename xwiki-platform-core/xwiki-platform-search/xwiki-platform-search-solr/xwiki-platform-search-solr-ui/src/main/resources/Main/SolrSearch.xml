@@ -578,7 +578,6 @@
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
-  #setSupportedLocales($query)
   #setQueryFields($query)
   #setFacetFields($query)
   #setFilterQuery($query)
@@ -588,27 +587,6 @@
   ##
   ## Execute the query.
   #set ($searchResponse = $query.execute()[0])
-#end
-
-#**
- * We have to set the list of supported locales so the names of the fields that are indexed in multiple languages are
- * expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
- * title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
- *#
-#macro (setSupportedLocales $query)
-  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
-  #set ($supportedLanguages = [])
-  #foreach ($supportedLanguage in $supportedLanguagesRaw)
-    #if ($supportedLanguage.trim() != '')
-      #set ($discard = $supportedLanguages.add($supportedLanguage))
-    #end
-  #end
-  ## Make sure the default language is included.
-  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
-  #if (!$supportedLanguages.contains($defaultLanguage))
-    #set ($discard = $supportedLanguages.add($defaultLanguage))
-  #end
-  #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
 #end
 
 #macro (setQueryFields $query)

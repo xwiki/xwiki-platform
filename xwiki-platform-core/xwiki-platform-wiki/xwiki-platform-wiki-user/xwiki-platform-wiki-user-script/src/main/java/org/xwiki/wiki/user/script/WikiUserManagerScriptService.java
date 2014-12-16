@@ -411,6 +411,11 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public Boolean hasPendingInvitation(DocumentReference user, String wikiId)
     {
+        // Guest users never have pending invitations!
+        if (user == null) {
+            return false;
+        }
+
         try {
             // Check if the current user is userId and if the current script has the programing rights
             XWikiContext xcontext = xcontextProvider.get();
@@ -440,13 +445,19 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public Boolean hasPendingRequest(DocumentReference user, String wikiId)
     {
+        // Guest users never have pending requests!
+        if (user == null) {
+            return false;
+        }
+
         try {
-            // Check if the current user is userId and if the current script has the programing rights
+            // Check if the passed user is the current user and if the current document has the programming rights
             XWikiContext xcontext = xcontextProvider.get();
             authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
                     xcontext.getDoc().getDocumentReference());
 
-            // If the current user is not concerned by the invitation, he must be admin of the subwiki
+            // If the current user is not concerned by the invitation, he must be admin of the subwiki to have pending
+            // requests.
             if (!xcontext.getUserReference().equals(user)) {
                 authorizationManager.checkAccess(Right.ADMIN,
                         xcontext.getUserReference(), new WikiReference(wikiId));

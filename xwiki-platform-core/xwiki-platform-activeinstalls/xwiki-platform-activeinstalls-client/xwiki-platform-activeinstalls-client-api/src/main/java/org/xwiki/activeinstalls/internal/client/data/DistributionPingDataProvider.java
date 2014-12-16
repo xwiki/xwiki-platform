@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.activeinstalls.internal.client.PingDataProvider;
@@ -41,6 +42,7 @@ import org.xwiki.instance.InstanceIdManager;
  */
 @Component
 @Named("distribution")
+@Singleton
 public class DistributionPingDataProvider implements PingDataProvider
 {
     private static final String PROPERTY_INSTANCE_ID = "instanceId";

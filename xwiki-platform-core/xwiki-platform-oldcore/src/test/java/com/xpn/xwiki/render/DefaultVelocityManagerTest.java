@@ -35,6 +35,7 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
@@ -45,6 +46,7 @@ import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.template.TemplateManager;
 
 /**
  * Unit tests for {@link DefaultVelocityManager}.
@@ -107,6 +109,11 @@ public class DefaultVelocityManagerTest
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityFactory.createVelocityEngine(eq("default"), any(Properties.class))).thenReturn(velocityEngine);
+
+        TemplateManager templates = mock(TemplateManager.class);
+        Provider<TemplateManager> templatesProvider = this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
+            TemplateManager.class));
+        when(templatesProvider.get()).thenReturn(templates);
 
         Assert.assertSame(velocityEngine, this.mocker.getComponentUnderTest().getVelocityEngine());
     }

@@ -22,6 +22,7 @@ package org.xwiki.appwithinminutes.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -140,6 +141,8 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         applicationIconInput.clear();
         applicationIconInput.sendKeys(icon);
+        // Send 'escape' to close the icon picker after having filled the input.
+        applicationIconInput.sendKeys(Keys.ESCAPE);
     }
 
     /**

@@ -277,7 +277,9 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, false);
 
         // Enable the source editor in order to be able to submit its content.
-        editor.getPlainTextEditor().getTextArea().setEnabled(true);
+        if (editor.getConfig().isEnabled()) {
+            editor.getPlainTextEditor().getTextArea().setEnabled(true);
+        }
         // Store the initial value of the plain text area in case it is submitted without gaining focus.
         editor.getPlainTextEditor().submit();
         // Remember the fact that the submitted value is not HTML for the case when the editor is loaded from cache.
@@ -455,7 +457,9 @@ public class WysiwygEditorTabSwitchHandler implements SelectionHandler<Integer>,
         // Enable the rich text area in order to be able to edit and submit its content.
         // We have to enable the rich text area before initializing the rich text editor because some of the editing
         // features are loaded only when the rich text area is enabled.
-        editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, true);
+        if (editor.getConfig().isEnabled()) {
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(Command.ENABLE, true);
+        }
         // Initialize the rich text editor if this is the first time we switch to WYSIWYG tab.
         editor.maybeInitializeRichTextEditor();
         // Restore the DOM selection before executing the commands.

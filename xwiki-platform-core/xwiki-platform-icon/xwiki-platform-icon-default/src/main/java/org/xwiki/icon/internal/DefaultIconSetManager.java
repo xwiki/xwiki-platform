@@ -21,9 +21,12 @@ package org.xwiki.icon.internal;
 
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -35,6 +38,10 @@ import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,6 +53,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultIconSetManager implements IconSetManager
 {
     private static final String DEFAULT_ICONSET_NAME = "default";
@@ -54,6 +62,7 @@ public class DefaultIconSetManager implements IconSetManager
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
@@ -64,6 +73,12 @@ public class DefaultIconSetManager implements IconSetManager
 
     @Inject
     private IconSetLoader iconSetLoader;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public IconSet getCurrentIconSet() throws IconException
@@ -84,6 +99,7 @@ public class DefaultIconSetManager implements IconSetManager
                 // lazy loading
                 iconSet = iconSetLoader.loadIconSet(iconThemeDocRef);
                 iconSetCache.put(iconThemeDocRef, iconSet);
+                iconSetCache.put(iconSet.getName(), wikiDescriptorManager.getCurrentWikiId(), iconSet);
             }
         }
 
@@ -109,5 +125,60 @@ public class DefaultIconSetManager implements IconSetManager
         }
 
         return iconSet;
+    }
+
+    @Override
+    public IconSet getIconSet(String name) throws IconException
+    {
+        // Special case: the default icon theme
+        if (DEFAULT_ICONSET_NAME.equals(name)) {
+            return getDefaultIconSet();
+        }
+
+        // Get the icon set from the cache
+        IconSet iconSet = iconSetCache.get(name, wikiDescriptorManager.getCurrentWikiId());
+
+        // Load it if it is not loaded yet
+        if (iconSet == null) {
+            try {
+                // Search by name
+                String xwql = "FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name";
+                Query query = queryManager.createQuery(xwql, Query.XWQL);
+                query.bindValue("name", name);
+                List<String> results = query.execute();
+                if (results.isEmpty()) {
+                    return null;
+                }
+
+                // Get the first result
+                String docName = results.get(0);
+                DocumentReference docRef = documentReferenceResolver.resolve(docName);
+
+                // Load the icon theme
+                iconSet = iconSetLoader.loadIconSet(docRef);
+
+                // Put it in the cache
+                iconSetCache.put(docRef, iconSet);
+                iconSetCache.put(name, wikiDescriptorManager.getCurrentWikiId(), iconSet);
+            } catch (QueryException e) {
+                throw new IconException(String.format("Failed to load the icon set [%s].", name), e);
+            }
+        }
+
+        // Return the icon set
+        return iconSet;
+    }
+
+    @Override
+    public List<String> getIconSetNames() throws IconException
+    {
+        try {
+            String xwql = "SELECT obj.name FROM Document doc, doc.object(IconThemesCode.IconThemeClass) obj "
+                    + "ORDER BY obj.name";
+            Query query = queryManager.createQuery(xwql, Query.XWQL);
+            return query.execute();
+        } catch (QueryException e) {
+            throw new IconException("Failed to get the name of all icon sets.", e);
+        }
     }
 }

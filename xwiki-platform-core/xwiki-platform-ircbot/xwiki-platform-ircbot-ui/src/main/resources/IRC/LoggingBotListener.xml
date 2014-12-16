@@ -161,7 +161,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </event>
       <script>
@@ -225,7 +225,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </event>
       <script>
@@ -289,7 +289,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </event>
       <script>
@@ -353,7 +353,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </event>
       <script>
@@ -417,7 +417,7 @@
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
-        <values>onConnect|onDisconnect|onJoin|onMessage|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </event>
       <script>
@@ -453,5 +453,67 @@
       </script>
     </property>
   </object>
-  <content/>
+  <object>
+    <name>IRC.LoggingBotListener</name>
+    <number>5</number>
+    <className>IRC.IRCBotListenerEventClass</className>
+    <guid>3ea1f451-93b4-4abb-b726-b71422831b2b</guid>
+    <class>
+      <name>IRC.IRCBotListenerEventClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <event>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>event</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Event</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values>onRegistration|onConnect|onDisconnect|onJoin|onMessage|onAction|onPart|onNickChange|onPrivateMessage|onQuit</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </event>
+      <script>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>---</editor>
+        <name>script</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>Script</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </script>
+    </class>
+    <property>
+      <event>onAction</event>
+    </property>
+    <property>
+      <script>{{velocity}}
+#set ($irccontext = $services.ircbot.context)
+{{irclog}}
+* $irccontext.user.nick $irccontext.message
+{{/irclog}}
+{{/velocity}}</script>
+    </property>
+  </object>
 </xwikidoc>

@@ -22,7 +22,6 @@ package org.xwiki.index.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.EntityTreeElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -49,6 +48,9 @@ public class AllDocsPage extends ViewPage
     @FindBy(xpath = "//li[@id='xwikideletedAttachments']/a")
     private WebElement deletedAttachmentsTab;
 
+    @FindBy(className = "xtree")
+    private WebElement treeElement;
+
     public static AllDocsPage gotoPage()
     {
         getUtil().gotoPage("Main", "AllDocs");
@@ -70,10 +72,10 @@ public class AllDocsPage extends ViewPage
         return lt;
     }
 
-    public EntityTreeElement clickTreeTab()
+    public DocumentTreeElement clickTreeTab()
     {
         this.treeTab.click();
-        return new EntityTreeElement();
+        return new DocumentTreeElement(this.treeElement).waitForIt();
     }
 
     public LiveTableElement clickAttachmentsTab()

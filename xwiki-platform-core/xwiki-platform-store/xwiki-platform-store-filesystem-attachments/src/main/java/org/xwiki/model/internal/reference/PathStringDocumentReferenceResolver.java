@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.CharEncoding;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -37,7 +40,9 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
  * @version $Id$
  * @since 5.3M1
  */
-@Component("path")
+@Component
+@Named("path")
+@Singleton
 public class PathStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
     @Override

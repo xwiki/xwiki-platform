@@ -75,8 +75,9 @@ public class IconThemeListenerTest
         List<BaseObject> list = new ArrayList<BaseObject>();
         BaseObject obj = mock(BaseObject.class);
         list.add(obj);
+        when(obj.getStringValue("name")).thenReturn("icontheme1");
 
-        DocumentReference docRef = new DocumentReference("a", "b", "c");
+        DocumentReference docRef = new DocumentReference("wikiA", "b", "c");
         when(doc.getDocumentReference()).thenReturn(docRef);
 
         LocalDocumentReference iconThemeClassRef = new LocalDocumentReference("IconThemesCode", "IconThemeClass");
@@ -87,6 +88,7 @@ public class IconThemeListenerTest
 
         // Verify
         verify(iconSetCache, atLeastOnce()).clear(docRef);
+        verify(iconSetCache, atLeastOnce()).clear("icontheme1", "wikiA");
     }
 
     @Test

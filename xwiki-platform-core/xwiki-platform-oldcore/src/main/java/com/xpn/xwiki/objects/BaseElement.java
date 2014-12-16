@@ -74,8 +74,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     /**
      * Used to build uid string for the getId() hash.
@@ -122,7 +121,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     {
         // If the name is null then serialize the reference as a string.
         if (this.name == null && this.documentReference != null) {
-            this.name = this.localEntityReferenceSerializer.serialize(this.documentReference);
+            this.name = getLocalEntityReferenceSerializer().serialize(this.documentReference);
         }
 
         return this.name;
@@ -165,7 +164,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @return return the LocalUidStringEntityReferenceSerializer to compute ids.
+     * @return the component used to build uid string for the getId() hash
      * @since 4.0M1
      */
     protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer()
@@ -176,6 +175,19 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         }
 
         return this.localUidStringEntityReferenceSerializer;
+    }
+
+    /**
+     * @return the component used to convert a proper Document Reference to a string but without the wiki name.
+     * @since 6.3M1
+     */
+    protected EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    {
+        if (this.localEntityReferenceSerializer == null) {
+            this.localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+
+        return this.localEntityReferenceSerializer;
     }
 
     /**

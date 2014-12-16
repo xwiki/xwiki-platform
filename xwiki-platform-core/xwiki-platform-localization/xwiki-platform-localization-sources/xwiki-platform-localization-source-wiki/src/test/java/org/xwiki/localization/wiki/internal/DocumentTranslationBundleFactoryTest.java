@@ -31,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
@@ -96,6 +97,8 @@ public class DocumentTranslationBundleFactoryTest
         this.oldcore.getMocker().getInstance(TranslationBundleFactory.class, DocumentTranslationBundleFactory.ID);
 
         this.localization = this.oldcore.getMocker().getInstance(LocalizationManager.class);
+
+        this.oldcore.getMocker().registerMockComponent(ConfigurationSource.class);
     }
 
     @AfterComponent

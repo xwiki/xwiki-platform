@@ -22,8 +22,19 @@ package org.xwiki.lesscss;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.cache.LESSResourcesCache;
+import org.xwiki.lesscss.colortheme.ColorTheme;
+import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
+import org.xwiki.lesscss.skin.SkinReference;
+import org.xwiki.lesscss.skin.SkinReferenceFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -39,6 +50,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Named("lesscss")
+@Singleton
 @Unstable
 public class LessCompilerScriptService implements ScriptService
 {
@@ -46,13 +58,22 @@ public class LessCompilerScriptService implements ScriptService
     private LESSSkinFileCompiler lessCompiler;
 
     @Inject
-    private LESSSkinFileCache cache;
+    private LESSResourcesCache lessCache;
+
+    @Inject
+    private ColorThemeCache colorThemeCache;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private LESSColorThemeConverter lessColorThemeConverter;
+
+    @Inject
+    private SkinReferenceFactory skinReferenceFactory;
+
+    @Inject
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -166,17 +187,18 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.clear();
+        lessCache.clear();
+        colorThemeCache.clear();
         return true;
     }
 
     /**
-     * Remove every generated files corresponding to a wiki.
+     * Remove every generated files corresponding to a color theme.
      * The script calling this method needs the programming rights.
-     * @param wikiId id of the wiki
+     * @param colorTheme fullname of the color theme
      * @return true if the operation succeed
      */
-    public boolean clearCache(String wikiId)
+    public boolean clearCacheFromColorTheme(String colorTheme)
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -186,7 +208,41 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.clear(wikiId);
-        return true;
+        try {
+            ColorThemeReference colorThemeReference = colorThemeReferenceFactory.createReference(colorTheme);
+            lessCache.clearFromColorTheme(colorThemeReference);
+            colorThemeCache.clearFromColorTheme(colorThemeReference);
+            return true;
+        } catch (LESSCompilerException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Remove every generated files corresponding to a filesystem skin.
+     * The script calling this method needs the programming rights.
+     * @param skin name of the filesystem skin
+     * @return true if the operation succeed
+     *
+     * @since 6.4M2
+     */
+    public boolean clearCacheFromSkin(String skin)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // Check if the current script has the programing rights
+        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                xcontext.getDoc().getDocumentReference())) {
+            return false;
+        }
+
+        try {
+            SkinReference skinReference = skinReferenceFactory.createReference(skin);
+            lessCache.clearFromSkin(skinReference);
+            colorThemeCache.clearFromSkin(skinReference);
+            return true;
+        } catch (LESSCompilerException e) {
+            return false;
+        }
     }
 }

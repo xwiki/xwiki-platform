@@ -71,7 +71,7 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.mockPluginManager = getMockery().mock(XWikiPluginManager.class);;
+        this.mockPluginManager = getMockery().mock(XWikiPluginManager.class);
         this.testRenderingCacheAware  = new TestRenderingCacheAware("Test","Test",getContext());
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));

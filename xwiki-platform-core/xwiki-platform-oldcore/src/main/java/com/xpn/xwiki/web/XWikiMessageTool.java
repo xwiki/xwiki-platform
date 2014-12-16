@@ -58,7 +58,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * modified, its content is cached again next time a key is asked.
  * 
  * @version $Id$
- * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
+ * @deprecated since 4.3M2 use the {@link org.xwiki.localization.LocalizationManager} component instead
  */
 @Deprecated
 public class XWikiMessageTool
@@ -117,8 +117,6 @@ public class XWikiMessageTool
 
     /**
      * @param localization the localization manager
-     * @param componentManager used to get the proper renderer
-     * @param context the XWiki context
      */
     public XWikiMessageTool(ContextualLocalizationManager localization)
     {

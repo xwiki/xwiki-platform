@@ -20,6 +20,7 @@
 package org.xwiki.skinx.internal;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 
@@ -35,6 +36,7 @@ import com.xpn.xwiki.web.sx.Extension;
  */
 @Component
 @Named("jsx")
+@Singleton
 public class JsxExportURLFactoryActionHandler extends AbstractSxExportURLFactoryActionHandler
 {
     @Override

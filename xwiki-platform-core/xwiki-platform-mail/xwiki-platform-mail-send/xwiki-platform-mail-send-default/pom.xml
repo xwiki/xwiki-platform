@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-send</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>xwiki-platform-mail-send-default</artifactId>
   <name>XWiki Platform - Mail - Send - Default Implementation</name>
   <description>Default implementation of the API to send emails</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
   </properties>
@@ -70,7 +70,7 @@
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
-      <version>1.3</version>
+      <version>1.4.0</version>
       <scope>test</scope>
     </dependency>
     <!-- Needed at runtime by the Extension Manager to properly load some components

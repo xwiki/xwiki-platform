@@ -56,4 +56,10 @@ public class SpaceComponentManagerFactory implements ComponentManagerFactory
     {
         return this.factory.createComponentManager(this.wikiComponentManager);
     }
+
+    @Override
+    public ComponentManager createComponentManager(String namespace, ComponentManager parentComponentManager)
+    {
+        return this.factory.createComponentManager(namespace, this.wikiComponentManager);
+    }
 }

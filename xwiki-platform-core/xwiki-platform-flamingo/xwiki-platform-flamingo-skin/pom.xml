@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin</artifactId>
   <name>XWiki Platform - Flamingo - Skin</name>
@@ -37,7 +37,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
     <!-- Bootstrap version is used in several places -->
-    <bootstrap.version>3.2.0</bootstrap.version>
+    <bootstrap.version>3.3.1</bootstrap.version>
   </properties>
   <dependencies>
     <!-- LESS Module -->
@@ -53,6 +53,14 @@
       <artifactId>xwiki-platform-webjars</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
@@ -73,7 +81,23 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 1: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
+      <!-- Step 2: Verify and minify the JavaScript code. -->
+      <plugin>
+        <groupId>com.cj.jshintmojo</groupId>
+        <artifactId>jshint-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Step 2: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

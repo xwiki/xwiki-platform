@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -103,6 +104,12 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     private EntityReferenceValueProvider currentEntityReferenceValueProvider;
 
     /**
+     * Logging framework.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public UserAvatarMacro()
@@ -134,14 +141,27 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                 + "] is not registered in this wiki");
         }
 
-        ResourceReference imageReference;
-        if (StringUtils.isBlank(fileName)) {
-            imageReference = new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
-        } else {
+        // Initialize with the default avatar.
+        ResourceReference imageReference =
+            new ResourceReference(this.skinAccessBridge.getSkinFile("noavatar.png"), ResourceType.URL);
+
+        // Try to use the configured avatar.
+        if (!StringUtils.isBlank(fileName)) {
             AttachmentReference attachmentReference = new AttachmentReference(fileName, userReference);
-            imageReference =
-                new ResourceReference(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference),
-                    ResourceType.ATTACHMENT);
+
+            // Check if the configured avatar file actually exists.
+            try {
+                if (documentAccessBridge.getAttachmentVersion(attachmentReference) != null) {
+                    // Use it.
+                    imageReference =
+                        new ResourceReference(this.compactWikiEntityReferenceSerializer.serialize(attachmentReference),
+                            ResourceType.ATTACHMENT);
+                }
+            } catch (Exception e) {
+                // Log and fallback on default.
+                logger.warn("Failed to get the avatar for user [{}]. Using default.",
+                    this.compactWikiEntityReferenceSerializer.serialize(userReference));
+            }
         }
         ImageBlock imageBlock = new ImageBlock(imageReference, false);
 

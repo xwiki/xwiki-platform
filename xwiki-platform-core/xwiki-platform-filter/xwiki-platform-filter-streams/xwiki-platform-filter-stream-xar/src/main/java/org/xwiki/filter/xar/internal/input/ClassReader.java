@@ -75,6 +75,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
         }
     }
 
+    @Override
     public WikiClass read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
     {
         WikiClass wikiClass = new WikiClass();
@@ -96,7 +97,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
                     }
                 }
             } else {
-                wikiClass.addProperty((WikiClassProperty) this.propertyReader.read(xmlReader));
+                wikiClass.addProperty(this.propertyReader.read(xmlReader));
             }
         }
 

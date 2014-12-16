@@ -200,7 +200,8 @@ public class XWikiExecutor
         if (!this.wasStarted) {
             LOGGER.info("Stopping any potentially running XWiki server at [{}]", getURL());
             stopInternal();
-            LOGGER.info("Starting XWiki server at [{}]", getURL());
+            LOGGER.info("Starting XWiki server at [{}], using stop port [{}] and RMI port [{}]", getURL(),
+                getStopPort(), getRMIPort());
             startXWiki();
             waitForXWikiToLoad();
             this.hasXWikiBeenStartedProperly = true;

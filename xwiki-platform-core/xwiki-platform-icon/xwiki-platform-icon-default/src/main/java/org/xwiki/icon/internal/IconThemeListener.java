@@ -77,6 +77,11 @@ public class IconThemeListener implements EventListener
         if (iconThemeObjects != null && !iconThemeObjects.isEmpty()) {
             // Clear the icon set from the cache (since it has been updated)
             iconSetCache.clear(document.getDocumentReference());
+            // Clear the icon set from its name
+            BaseObject iconThemeObj = iconThemeObjects.get(0);
+            String iconThemeName = iconThemeObj.getStringValue("name");
+            String currentWiki = document.getDocumentReference().getWikiReference().getName();
+            iconSetCache.clear(iconThemeName, currentWiki);
         }
     }
 }

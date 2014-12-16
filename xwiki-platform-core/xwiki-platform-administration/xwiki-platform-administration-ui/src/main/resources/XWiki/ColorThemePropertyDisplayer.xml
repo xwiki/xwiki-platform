@@ -69,11 +69,11 @@
       &lt;option value=""#if ("$!value" == '') selected="selected"#end&gt;---&lt;/option&gt;
     #end
     ## Display the Flamingo themes
-    #set($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate'")
+    #set($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate' ORDER BY doc.name")
     #set($themes = $services.query.xwql($xwql).execute())
     #displaySkinLines($themes, $services.localization.render('admin.colorthemes.flamingothemes'))
     ## Display the Colibri themes
-    #set($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate'")
+    #set($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate' ORDER BY doc.name")
     #set($themes = $services.query.xwql($xwql).execute())
     #displaySkinLines($themes, $services.localization.render('admin.colorthemes.colibrithemes'))
   &lt;/select&gt;

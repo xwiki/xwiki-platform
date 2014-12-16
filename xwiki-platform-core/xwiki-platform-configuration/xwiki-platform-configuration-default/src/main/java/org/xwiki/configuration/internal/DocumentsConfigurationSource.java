@@ -21,6 +21,7 @@ package org.xwiki.configuration.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -41,6 +42,7 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 @Component
 @Named("documents")
+@Singleton
 public class DocumentsConfigurationSource extends CompositeConfigurationSource implements Initializable
 {
     @Inject

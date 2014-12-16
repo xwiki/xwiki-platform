@@ -54,7 +54,7 @@ public class BaseSearchResult extends XWikiResource
         "q={keywords}(&scope={content|name|title|spaces|objects})*(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&prettyNames={false|true})";
 
     protected static final String QUERY_TEMPLATE_INFO =
-        "q={query}(&type={xwql,hql,lucene})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
+        "q={query}(&type={type})(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
 
     protected static enum SearchScope
     {

@@ -32,6 +32,11 @@
     <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')"
       title="$services.localization.render('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
     <div class="btn-group xwikibuttonlinks">
+    #if("$!{services.officemanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
+      <a class="viewlink btn btn-xs btn-default" title="$services.localization.render('core.viewers.attachments.officeView.title')"
+        href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}"
+        target="_blank">#glyphicon('eye-open')</a>
+    #end
     #if($hasEdit || $hasAdmin)
       ## Delete attachment link
       <a class="btn btn-default btn-xs deletelink" href="$doc.getAttachmentURL($attach.filename, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url($redirect)")"
@@ -48,11 +53,6 @@
         $services.localization.render('core.viewers.attachments.webdavEdit')
       </a>*#
     #end ## hasEdit
-    #if("$!{services.officemanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
-      <a class="viewlink btn" title="$services.localization.render('core.viewers.attachments.officeView.title')"
-        href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}"
-        target="_blank">$services.localization.render('core.viewers.attachments.officeView')</a>
-    #end
     </div> ## xwikibuttonlinks
     <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')"
       title="$services.localization.render('core.viewers.attachments.showHistory')">$attach.version</a></span>

@@ -27,12 +27,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-ui</artifactId>
   <name>XWiki Platform - Filter - UI</name>
   <packaging>xar</packaging>
-  <description>XWiki Filter, an application for manipulating Filter modules.</description>
+  <description>Provide a generic UI to convert from a XWiki Filter input stream to an output stream with settings for each stream.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
@@ -40,7 +40,7 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-filter-ui</xwiki.extension.features>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Filter Application</xwiki.extension.name>
+    <xwiki.extension.name>Filter Streams Converter Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
@@ -48,6 +48,35 @@
       <artifactId>xwiki-platform-filter-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- The Panels application is an optional dependency since the Filter application can work even if it's not present but if it's
+         there then it'll register in it. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

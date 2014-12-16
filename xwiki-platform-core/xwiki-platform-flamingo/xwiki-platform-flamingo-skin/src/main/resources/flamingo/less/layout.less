@@ -215,9 +215,7 @@
 // Layout Styling =============================================================
 
 #headerglobal {
-  background-color: @xwiki-page-header-bg-color;
-  background-image: @xwiki-page-header-bg-image;
-  background-position: @xwiki-page-header-bg-position;
+  background: @xwiki-page-header-bg-color @xwiki-page-header-bg-image @xwiki-page-header-bg-position;
 }
 
 .main {
@@ -247,6 +245,7 @@
   margin-bottom: @line-height-computed;
   #document-title h1 {
     margin-top: 0;
+    word-wrap: break-word;
   }
   .document-menu, .document-info {
     margin-top: @line-height-computed;

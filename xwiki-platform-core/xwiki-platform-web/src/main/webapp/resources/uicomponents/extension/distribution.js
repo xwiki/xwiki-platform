@@ -286,7 +286,8 @@ var PreviousUIForm = Class.create({
     installButton.insert({after: new Element('input', {
       type: 'hidden',
       name: 'form_token',
-      value: document.head.down('meta[name="form_token"]').readAttribute('content')
+      // FIXME: Use the xwiki-meta module to get the form token when we switch to jQuery/RequireJS.
+      value: document.documentElement.getAttribute('data-xwiki-form-token')
     })});
   },
 

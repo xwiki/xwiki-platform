@@ -28,7 +28,9 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -36,13 +38,14 @@ import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Executes Solr queries.
@@ -55,12 +58,19 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  */
 @Component
 @Named(SolrQueryExecutor.SOLR)
+@Singleton
 public class SolrQueryExecutor implements QueryExecutor
 {
     /**
      * Query language ID.
      */
     public static final String SOLR = "solr";
+
+    /**
+     * The parameter that specifies the list of supported locales. This is used to add generic (unlocalized) aliases for
+     * localized query fields (e.g. 'title' alias for 'title_en' query field).
+     */
+    private static final String PARAM_SUPPORTED_LOCALES = "xwiki.supportedLocales";
 
     /**
      * Logging framework.
@@ -75,49 +85,23 @@ public class SolrQueryExecutor implements QueryExecutor
     protected DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to retrieve user preference regarding hidden documents.
-     */
-    @Inject
-    @Named("user")
-    protected ConfigurationSource userPreferencesSource;
-
-    /**
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
      */
     @Inject
     protected Provider<SolrInstance> solrInstanceProvider;
+
+    /**
+     * Used to retrieve the configured supported locales.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
         try {
             SolrInstance solrInstance = solrInstanceProvider.get();
-
-            SolrQuery solrQuery = new SolrQuery(query.getStatement());
-
-            // Overwrite offset and limit only if the query object explicitly says so, otherwise use whatever the query
-            // statement says or the defaults
-            if (query.getOffset() > 0) {
-                solrQuery.setStart(query.getOffset());
-            }
-            if (query.getLimit() > 0) {
-                solrQuery.setRows(query.getLimit());
-            }
-
-            // TODO: good idea? Any confusion? Do we really needs something like this?
-            // Reuse the Query.getNamedParameters() map to get extra parameters.
-            for (Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
-                Object value = entry.getValue();
-
-                if (value instanceof Iterable) {
-                    solrQuery.set(entry.getKey(), toStringArray((Iterable) value));
-                } else if (value != null && value.getClass().isArray()) {
-                    solrQuery.set(entry.getKey(), toStringArray(value));
-                } else {
-                    solrQuery.set(entry.getKey(), String.valueOf(value));
-                }
-            }
-
+            SolrQuery solrQuery = createSolrQuery(query);
             QueryResponse response = solrInstance.query(solrQuery);
 
             // Check access rights need to be checked before returning the response.
@@ -133,6 +117,45 @@ public class SolrQueryExecutor implements QueryExecutor
         } catch (Exception e) {
             throw new QueryException("Exception while executing query", query, e);
         }
+    }
+
+    private SolrQuery createSolrQuery(Query query)
+    {
+        SolrQuery solrQuery = new SolrQuery(query.getStatement());
+
+        // Overwrite offset and limit only if the query object explicitly says so, otherwise use whatever the query
+        // statement says or the defaults.
+        if (query.getOffset() > 0) {
+            solrQuery.setStart(query.getOffset());
+        }
+        if (query.getLimit() > 0) {
+            solrQuery.setRows(query.getLimit());
+        }
+
+        // TODO: good idea? Any confusion? Do we really needs something like this?
+        // Reuse the Query.getNamedParameters() map to get extra parameters.
+        for (Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof Iterable) {
+                solrQuery.set(entry.getKey(), toStringArray((Iterable) value));
+            } else if (value != null && value.getClass().isArray()) {
+                solrQuery.set(entry.getKey(), toStringArray(value));
+            } else {
+                solrQuery.set(entry.getKey(), String.valueOf(value));
+            }
+        }
+
+        // Make sure the list of supported locales is set so the names of the fields that are indexed in multiple
+        // languages are expanded in the search query. For instance, the query "title:text" will be expanded to
+        // "title__:text OR title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
+        if (!solrQuery.getParameterNames().contains(PARAM_SUPPORTED_LOCALES)) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            solrQuery.set(PARAM_SUPPORTED_LOCALES,
+                StringUtils.join(xcontext.getWiki().getAvailableLocales(xcontext), ","));
+        }
+
+        return solrQuery;
     }
 
     /**

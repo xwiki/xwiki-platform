@@ -31,8 +31,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414593125000</creationDate>
-  <date>1414593177000</date>
-  <contentUpdateDate>1414593177000</contentUpdateDate>
+  <date>1418728002000</date>
+  <contentUpdateDate>1418668181000</contentUpdateDate>
   <version>1.1</version>
   <title>Simplex</title>
   <defaultTemplate/>
@@ -909,7 +909,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Simplex 3.2.0
+      <lessCode>// Simplex 3.3.1
 // Variables
 // --------------------------------------------------
 
@@ -918,7 +918,8 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-@gray-darker:            lighten(#000, 13.5%); // #222
+@gray-base:              #000;
+@gray-darker:            lighten(@gray-base, 13.5%); // #222
 @gray-dark:              #444;
 @gray:                   #777;
 @gray-light:             #808080;
@@ -944,6 +945,8 @@
 @link-color:            @brand-primary;
 //** Link hover color set via `darken()` function.
 @link-hover-color:      darken(@link-color, 15%);
+//** Link hover decoration.
+@link-hover-decoration: underline;
 
 
 //== Typography
@@ -1092,8 +1095,15 @@
 @input-color:                    @text-color;
 //** `&lt;input&gt;` border color
 @input-border:                   #ddd;
-//** `&lt;input&gt;` border radius
+
+// TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
+//** Default `.form-control` border radius
 @input-border-radius:            @border-radius-base;
+//** Large `.form-control` border radius
+@input-border-radius-large:      @border-radius-large;
+//** Small `.form-control` border radius
+@input-border-radius-small:      @border-radius-small;
+
 //** Border color for inputs on focus
 @input-border-focus:             #66afe9;
 
@@ -1115,6 +1125,9 @@
 //** Border color for textual input addons
 @input-group-addon-border-color: @input-border;
 
+//** Disabled cursor for form controls and buttons.
+@cursor-disabled:                not-allowed;
+
 
 //== Dropdowns
 //
@@ -1134,7 +1147,7 @@
 //** Hover color for dropdown links.
 @dropdown-link-hover-color:      #fff;
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         @dropdown-link-active-bg;
+@dropdown-link-hover-bg:         @component-active-bg;
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     #fff;
@@ -1142,10 +1155,10 @@
 @dropdown-link-active-bg:        @component-active-bg;
 
 //** Disabled dropdown menu item background color.
-@dropdown-link-disabled-color:   @text-muted;
+@dropdown-link-disabled-color:   @gray-light;
 
 //** Text color for headers within dropdown menus.
-@dropdown-header-color:          @text-muted;
+@dropdown-header-color:          @gray-light;
 
 //** Deprecated `@dropdown-caret-color` as of v3.1.0
 @dropdown-caret-color:           #000;
@@ -1163,8 +1176,7 @@
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal-background:  1040;
-@zindex-modal:             1050;
+@zindex-modal:             1040;
 
 
 //== Media queries breakpoints
@@ -1226,17 +1238,17 @@
 //## Define the maximum width of `.container` for different screen sizes.
 
 // Small screen / tablet
-@container-tablet:             ((720px + @grid-gutter-width));
+@container-tablet:             (720px + @grid-gutter-width);
 //** For `@screen-sm-min` and up.
 @container-sm:                 @container-tablet;
 
 // Medium screen / desktop
-@container-desktop:            ((940px + @grid-gutter-width));
+@container-desktop:            (940px + @grid-gutter-width);
 //** For `@screen-md-min` and up.
 @container-md:                 @container-desktop;
 
 // Large screen / wide desktop
-@container-large-desktop:      ((1140px + @grid-gutter-width));
+@container-large-desktop:      (1140px + @grid-gutter-width);
 //** For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
 
@@ -1313,8 +1325,6 @@
 
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
-
-@nav-open-link-hover-color:                 #fff;
 
 //== Tabs
 @nav-tabs-border-color:                     #ddd;
@@ -1440,7 +1450,7 @@
 //** Popover arrow width
 @popover-arrow-width:                 10px;
 //** Popover arrow color
-@popover-arrow-color:                 #fff;
+@popover-arrow-color:                 @popover-bg;
 
 //** Popover outer arrow width
 @popover-arrow-outer-width:           (@popover-arrow-width + 1);
@@ -1539,6 +1549,8 @@
 @progress-bg:                 #f5f5f5;
 //** Progress bar text color
 @progress-bar-color:          #fff;
+//** Variable for setting rounded corners on progress bar.
+@progress-border-radius:      @border-radius-base;
 
 //** Default progress bar color
 @progress-bar-bg:             @brand-primary;
@@ -1598,11 +1610,11 @@
 
 //** Border color for elements within panels
 @panel-inner-border:          #ddd;
-@panel-footer-bg:             @panel-default-heading-bg;
+@panel-footer-bg:             @body-bg;
 
 @panel-default-text:          @gray-dark;
 @panel-default-border:        #ddd;
-@panel-default-heading-bg:    @body-bg;
+@panel-default-heading-bg:    @panel-footer-bg;
 
 @panel-primary-text:          #fff;
 @panel-primary-border:        @brand-primary;
@@ -1754,7 +1766,7 @@
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Simplex 3.2.0
+// Simplex 3.3.1
 // Bootswatch
 // -----------------------------------------------------
 
@@ -1895,8 +1907,7 @@ label {
 
 // Progress bars ==============================================================
 
-// Containers =================================================================
-</lessCode>
+// Containers =================================================================</lessCode>
     </property>
     <property>
       <link-color>#d9230f</link-color>

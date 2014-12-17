@@ -21,6 +21,8 @@ package org.xwiki.mail.internal.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -88,6 +90,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     private static final int DEFAULT_PORT = 25;
 
     private static final String FROM_PROPERTY = "from";
+    private static final String BCC_PROPERTY = "bcc";
     private static final String HOST_PROPERTY = "host";
     private static final String PORT_PROPERTY = "port";
     private static final String USERNAME_PROPERTY = "username";
@@ -183,6 +186,29 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         }
 
         return password;
+    }
+
+    @Override
+    public List<String> getBCCAddresses()
+    {
+        List<String> bccAddresses = new ArrayList<>();
+
+        // First, look in the document source
+        String bccAsString = this.mailConfigSource.getProperty(BCC_PROPERTY, String.class);
+
+        // If not found, look in the xwiki properties source
+        if (bccAsString == null) {
+            bccAsString = this.xwikiPropertiesSource.getProperty(PREFIX + BCC_PROPERTY, String.class);
+        }
+
+        // Convert into a list (if property is found and not null)
+        if (bccAsString != null) {
+            for (String address : StringUtils.split(bccAsString, ',')) {
+                bccAddresses.add(StringUtils.trim(address));
+            }
+        }
+
+        return bccAddresses;
     }
 
     @Override

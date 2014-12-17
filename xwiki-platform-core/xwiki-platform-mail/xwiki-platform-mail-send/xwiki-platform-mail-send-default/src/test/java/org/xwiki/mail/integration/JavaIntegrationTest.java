@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class JavaIntegrationTest
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
-    private MailSenderConfiguration configuration;
+    private TestMailSenderConfiguration configuration;
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
@@ -149,6 +150,9 @@ public class JavaIntegrationTest
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
+        // We also test using some default BCC addresses from configuration in this test
+        this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
+
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         this.sender.sendAsynchronously(message, session, this.listener);
@@ -160,15 +164,19 @@ public class JavaIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals(3, messages.length);
+        // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
+        assertEquals(9, messages.length);
+
+        // Assert the email parts that are the same for all mails
         assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
-
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
-
         BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
+        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+
+        // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
+        // messages ;) But we chekced that we received 9 emails above so that's good enough.
     }
 
     @Test

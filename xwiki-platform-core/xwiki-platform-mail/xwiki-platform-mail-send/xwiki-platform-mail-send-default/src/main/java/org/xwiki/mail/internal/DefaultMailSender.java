@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -89,7 +91,8 @@ public class DefaultMailSender implements MailSender, Initializable
     public void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener)
     {
         try {
-            // Perform some basic verification to avoid NPEs in JavaMail
+            // If the user has not set the From header then use the default value from configuration and if it's not
+            // set then raise an error since a message must have a from set!
             if (message.getFrom() == null) {
                 // Try using the From address in the Session
                 String from = this.configuration.getFromAddress();
@@ -98,6 +101,14 @@ public class DefaultMailSender implements MailSender, Initializable
                 } else {
                     throw new MessagingException("Missing the From Address for sending the mail. "
                         + "You need to either define it in the Mail Configuration or pass it in your message.");
+                }
+            }
+
+            // If the user has not set the BCC header then use the default value from configuration
+            Address[] bccAddresses = message.getRecipients(Message.RecipientType.BCC);
+            if (bccAddresses == null || bccAddresses.length == 0) {
+                for (String address : this.configuration.getBCCAddresses()) {
+                    message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
                 }
             }
 

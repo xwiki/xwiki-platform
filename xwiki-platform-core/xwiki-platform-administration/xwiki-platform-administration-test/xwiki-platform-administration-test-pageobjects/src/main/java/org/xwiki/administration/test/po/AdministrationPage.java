@@ -137,6 +137,18 @@ public class AdministrationPage extends ViewPage
     /**
      * @since 6.4M2
      */
+    public ViewPage clickSection(String categoryName, String sectionName)
+    {
+        getDriver().findElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).click();
+        return new ViewPage();
+    }
+
+    /**
+     * @since 6.4M2
+     */
     public boolean hasSection(String categoryName, String sectionName)
     {
         return getUtil().hasElement(By.xpath(

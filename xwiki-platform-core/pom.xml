@@ -460,6 +460,12 @@
               <justification>Young API, adding method to check permissions for sending mail.</justification>
             </difference>
             <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailSenderConfiguration</className>
+              <method>java.util.List getBCCAddresses()</method>
+              <justification>Young API, adding method to configure default BCC addresses to use when sending mail.</justification>
+            </difference>
+            <difference>
               <differenceType>7004</differenceType>
               <className>org/xwiki/mail/script/MimeMessageWrapper</className>
               <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>

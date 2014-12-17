@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.configuration;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.junit.Rule;
@@ -26,12 +27,10 @@ import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration}.
@@ -202,5 +201,16 @@ public class DefaultMailSenderConfigurationTest
         when(mailConfigDocumentSource.getProperty("port", 25)).thenReturn(25);
 
         assertEquals(25, this.mocker.getComponentUnderTest().getPort());
+    }
+
+    @Test
+    public void getBCCAddressesFromMailConfig() throws Exception
+    {
+        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
+        when(mailConfigDocumentSource.getProperty("bcc", String.class)).thenReturn("john@doe.com, mary@doe.com");
+
+        assertThat(Arrays.asList("john@doe.com", "mary@doe.com"),
+            containsInAnyOrder(this.mocker.getComponentUnderTest().getBCCAddresses().toArray()));
+
     }
 }

@@ -26,13 +26,13 @@
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Mail.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1418633909000</creationDate>
+  <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418635807000</date>
-  <contentUpdateDate>1418635807000</contentUpdateDate>
+  <date>1418743428000</date>
+  <contentUpdateDate>1418743428000</contentUpdateDate>
   <version>1.1</version>
   <title>Mail Translations</title>
   <comment/>
@@ -47,6 +47,8 @@ Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 Mail.SendMailConfigClass_from=Email address to send from
 Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
+Mail.SendMailConfigClass_bcc=BCC email addresses
+Mail.SendMailConfigClass_bcc.hint=A default comma-separated list of BCC email addresses to use when sending mail
 Mail.SendMailConfigClass_host=Email Server
 Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "localhost"
 Mail.SendMailConfigClass_port=Email Server Port

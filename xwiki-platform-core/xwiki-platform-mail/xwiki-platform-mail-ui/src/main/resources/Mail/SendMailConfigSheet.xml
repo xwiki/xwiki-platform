@@ -31,8 +31,8 @@
   <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418723661000</date>
-  <contentUpdateDate>1418723661000</contentUpdateDate>
+  <date>1418743275000</date>
+  <contentUpdateDate>1418743275000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -56,31 +56,49 @@
   #set ($oldValue = $xwiki.getSpacePreference('admin_email'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('from', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('from', ''))
   #end
   ## Get the "host" value from the old location
   #set ($oldValue = $xwiki.getSpacePreference('smtp_server'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('host', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('host', 'localhost'))
   #end
   ## Get the "port" value from the old location
   #set ($oldValue = $xwiki.getSpacePreference('smtp_port'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('port', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('port', '25'))
   #end
   ## Get the "username" value from the old location
   #set ($oldValue = $xwiki.getSpacePreference('smtp_server_username'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('username', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('username', ''))
   #end
   ## Get the "password" value from the old location
   #set ($oldValue = $xwiki.getSpacePreference('smtp_server_password'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('password', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('password', ''))
   #end
   ## Get the "properties" value from the old location
   #set ($oldValue = $xwiki.getSpacePreference('javamail_extra_props'))
   #if ("$!oldValue" != '')
     #set ($discard = $configObj.set('properties', $oldValue))
+  #else
+    ## Make sure the value is set and thus overrides the old config
+    #set ($discard = $configObj.set('properties', ''))
   #end
   ## Save the new xobject!
   #set ($discard = $configDoc.save('Migrated Mail configuration found in XWikiPreferences', true))
@@ -89,7 +107,7 @@
 ## Step 1: Display form
 ## =======================================================
 #set ($params = {
-  'send': ['from', 'host', 'port', 'username', 'password', 'properties']
+  'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties']
 })
 #set ($paramDoc = $configDoc)
 #set ($paramClass = $configClassName)

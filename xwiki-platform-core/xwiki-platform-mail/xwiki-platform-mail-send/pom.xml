@@ -36,12 +36,4 @@
     <module>xwiki-platform-mail-send-api</module>
     <module>xwiki-platform-mail-send-default</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-mail-send-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

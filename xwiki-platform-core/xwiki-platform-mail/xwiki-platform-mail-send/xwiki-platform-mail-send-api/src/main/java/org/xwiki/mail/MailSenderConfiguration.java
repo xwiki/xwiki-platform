@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
@@ -55,10 +56,17 @@ public interface MailSenderConfiguration
     String getPassword();
 
     /**
-     * @return the default email address to use when sending the email. This is optional if the user of the API sets
-     *         it, and if the user sets it, then it overrides this default value
+     * @return the default email address to use when sending the email. This is optional and if the user of the API sets
+     *         it, then it overrides this default value
      */
     String getFromAddress();
+
+    /**
+     * @return the list of default email addresses to add to the BCC mail header when sending email.This is optional and
+     *         if the user of the API sets it, then it overrides this default value
+     * @since 6.4M2
+     */
+    List<String> getBCCAddresses();
 
     /**
      * @return the list of additional Java Mail properties (in addition to the host, port, username and from

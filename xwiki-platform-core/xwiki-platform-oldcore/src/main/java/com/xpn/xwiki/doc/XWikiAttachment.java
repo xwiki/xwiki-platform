@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
+import org.apache.tika.mime.MediaType;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -841,10 +843,40 @@ public class XWikiAttachment implements Cloneable
         loadArchive(context).updateArchive(null, context);
     }
 
+    /**
+     * Detects the media type of this attachment's content using {@link Tika}. We first try to determine the media type
+     * based on the file name extension and if the extension is unknown we try to determine the media type by reading
+     * the first bytes of the attachment content.
+     * 
+     * @param context the XWiki context
+     * @return the media type of this attachment's content
+     */
     public String getMimeType(XWikiContext context)
     {
-        // TODO: Try the stream too in case the extension in unknown (might be expensive to load it just for this) ?
-        return new Tika().detect(getFilename());
+        // We try name-based detection and then fall back on content-based detection. We don't do this in a single step,
+        // by passing both the content and the file name to Tika, because the default detector looks at the content
+        // first which can be an issue for large attachments. Our approach is less accurate but has better performance.
+        Tika tika = new Tika();
+        // Name-based detection is quick but less accurate.
+        String mediaType = tika.detect(getFilename());
+        if (MediaType.OCTET_STREAM.toString().equals(mediaType)) {
+            try {
+                // Content-based detection is more accurate but it may require loading the attachment content in memory
+                // (from the database) if it hasn't been cached as a temporary file yet. This can be an issue for large
+                // attachments when database storage is used. Only the first bytes are normally read but still this
+                // process is slower than name-based detection.
+                //
+                // We wrap the content input stream in a BufferedInputStream to make sure that all the detectors can
+                // read the content even if the input stream is configured to auto close when it reaches the end. This
+                // can happen for small files if AutoCloseInputStream is used, which supports the mark and reset methods
+                // so Tika uses it directly. In this case, the input stream is automatically closed after the first
+                // detector reads it so the next detector fails to read it.
+                mediaType = tika.detect(new BufferedInputStream(getContentInputStream(context)));
+            } catch (Exception e) {
+                LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type.", getReference());
+            }
+        }
+        return mediaType;
     }
 
     public boolean isImage(XWikiContext context)

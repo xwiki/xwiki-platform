@@ -90,6 +90,12 @@
       <groupId>com.github.sommeri</groupId>
       <artifactId>less4j</artifactId>
       <version>1.8.4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   </project>

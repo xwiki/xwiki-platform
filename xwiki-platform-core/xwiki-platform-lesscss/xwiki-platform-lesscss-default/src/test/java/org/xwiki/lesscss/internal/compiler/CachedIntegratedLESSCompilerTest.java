@@ -144,13 +144,13 @@ public class CachedIntegratedLESSCompilerTest
 
         // Resource
         when(lessResourceReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
+        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\n"
             + "Some LESS content"), eq(xcontext)))
-                .thenReturn("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
+                .thenReturn("@import (reference) \"style.less.vm\";\n"
                         +"Some Velocity-rendered LESS content");
-        when(lessCompiler.compile(eq("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
+        when(lessCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
             +"Some Velocity-rendered LESS content"),any(Path[].class)))
-                .thenReturn(".realStartOfXWikiSSX{color:#000}output");
+                .thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, "skin"));

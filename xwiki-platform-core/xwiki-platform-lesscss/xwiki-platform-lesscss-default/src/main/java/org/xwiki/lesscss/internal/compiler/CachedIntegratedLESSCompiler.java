@@ -60,8 +60,6 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
 
     private static final String MAIN_SKIN_STYLE_FILENAME = "style.less.vm";
 
-    private static final String LESS_INCLUDE_SEPARATOR = ".realStartOfXWikiSSX{color:#000}";
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -127,11 +125,6 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
             Path[] includePathsArray = includePaths.toArray(new Path[1]);
             String result = lessCompiler.compile(lessCode, includePathsArray);
 
-            // Remove some useless code
-            if (includeSkinStyle) {
-                result = removeMainSkinStyleUndesiredOutput(result);
-            }
-
             // End
             return result;
         } catch (LESSCompilerException | IOException e) {
@@ -174,17 +167,6 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
         // We import this file to be able to use variables and mix-ins defined in it/
         // But we don't want it in the output.
         source.write("@import (reference) \"" + MAIN_SKIN_STYLE_FILENAME + "\";\n");
-        // See removeMainSkinStyleUndesiredOutput()
-        source.write(LESS_INCLUDE_SEPARATOR);
-    }
-
-    private String removeMainSkinStyleUndesiredOutput(String cssCode) {
-        // Because of a bug in the "@import" function of the LESS compiler, we manually remove all the content that
-        // have been imported, thanks to LESS_INCLUDE_SEPARATOR which is a marker to know where the interesting
-        // content really start.
-        // See: https://github.com/less/less.js/issues/1968 and https://github.com/less/less.js/issues/1878
-        int contentToRemoveIndex = cssCode.indexOf(LESS_INCLUDE_SEPARATOR) + LESS_INCLUDE_SEPARATOR.length();
-        return cssCode.substring(contentToRemoveIndex);
     }
 
     private String executeVelocity(String source, String skin)

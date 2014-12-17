@@ -69,6 +69,8 @@ public class IntegrationTests
         final DocumentReference userNotExistingReference = new DocumentReference("wiki", "XWiki", "UserNotExisting");
         final DocumentReference userWithNonExistingAvatarFileReference =
             new DocumentReference("wiki", "XWiki", "UserWithNonExistingAvatarFile");
+        final DocumentReference userWithExceptionRetrievingAvatarFileReference =
+            new DocumentReference("wiki", "XWiki", "UserWithExceptionRetrievingAvatarFile");
         final DocumentReference userClassReference = new DocumentReference("wiki", "XWiki", "XWikiUsers");
         final DocumentAccessBridge mockDocumentAccessBridge =
             registerMockComponent(componentManager, mockery, DocumentAccessBridge.class);
@@ -78,6 +80,7 @@ public class IntegrationTests
             allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(false));
             allowing(mockDocumentAccessBridge).exists(userNotExistingReference); will(returnValue(false));
             allowing(mockDocumentAccessBridge).exists(userWithNonExistingAvatarFileReference); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).exists(userWithExceptionRetrievingAvatarFileReference); will(returnValue(true));
 
             allowing(mockDocumentAccessBridge).getProperty(adminUserReference, userClassReference, "avatar");
                 will(returnValue("mockAvatar.png"));
@@ -85,11 +88,15 @@ public class IntegrationTests
                 "avatar"); will(returnValue(null));
             allowing(mockDocumentAccessBridge).getProperty(userWithNonExistingAvatarFileReference,
                 userClassReference, "avatar"); will(returnValue("mockAvatar.png"));
+            allowing(mockDocumentAccessBridge).getProperty(userWithExceptionRetrievingAvatarFileReference,
+                userClassReference, "avatar"); will(returnValue("mockAvatar.png"));
 
             allowing(mockDocumentAccessBridge).getAttachmentVersion(new AttachmentReference("mockAvatar.png",
                 adminUserReference)); will(returnValue("1.1"));
             allowing(mockDocumentAccessBridge).getAttachmentVersion(new AttachmentReference("mockAvatar.png",
                 userWithNonExistingAvatarFileReference)); will(returnValue(null));
+            allowing(mockDocumentAccessBridge).getAttachmentVersion(new AttachmentReference("mockAvatar.png",
+                userWithExceptionRetrievingAvatarFileReference)); will(throwException(new Exception("Sum Ting Wong")));
         }});
 
         // Document Resolver Mock
@@ -108,6 +115,9 @@ public class IntegrationTests
             allowing(mockDocumentReferenceResolver).resolve("XWiki.UserWithNonExistingAvatarFile",
                 new EntityReference("XWiki", EntityType.SPACE));
                 will(returnValue(userWithNonExistingAvatarFileReference));
+            allowing(mockDocumentReferenceResolver).resolve("XWiki.UserWithExceptionRetrievingAvatarFile",
+                new EntityReference("XWiki", EntityType.SPACE));
+                will(returnValue(userWithExceptionRetrievingAvatarFileReference));
         }});
 
         // Entity Reference Serializer Mock
@@ -122,6 +132,11 @@ public class IntegrationTests
             allowing(mockEntityReferenceSerializer).serialize(
                 new AttachmentReference("mockAvatar.png", userWithNonExistingAvatarFileReference));
                 will(returnValue("XWiki.UserWithNonExistingAvatarFile@mockAvatar.png"));
+            allowing(mockEntityReferenceSerializer).serialize(
+                new AttachmentReference("mockAvatar.png", userWithExceptionRetrievingAvatarFileReference));
+                will(returnValue("XWiki.UserWithExceptionRetrievingAvatarFile@mockAvatar.png"));
+            allowing(mockEntityReferenceSerializer).serialize(userWithExceptionRetrievingAvatarFileReference);
+                will(returnValue("XWiki.UserWithExceptionRetrievingAvatarFile"));
         }});
 
         // Entity Reference Serializer Mock

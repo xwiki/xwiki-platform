@@ -60,6 +60,8 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
 
     private static final String MAIN_SKIN_STYLE_FILENAME = "style.less.vm";
 
+    private static final String LESS_INCLUDE_SEPARATOR = ".realStartOfXWikiSSX{color:#000}";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -78,6 +80,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
     {
         StringWriter source = new StringWriter();
         List<Path> includePaths = new ArrayList<>();
+        List<File> tempFilesToDelete = new ArrayList<>();
         File tempDir = null;
 
         try {
@@ -97,7 +100,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
                 // TODO: it is actually not implemented yet
                 //
                 // Finally, this directory is used as the main include path by LESS Compiler.
-                tempDir = createTempDir(includePaths);
+                tempDir = createTempDir(includePaths, tempFilesToDelete);
 
                 // TODO: implement http://jira.xwiki.org/browse/XWIKI-11394 here
 
@@ -107,7 +110,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
 
                 // Render and include the main skin file
                 if (includeSkinStyle) {
-                    includeMainSkinStyle(source, skin, tempDir);
+                    importMainSkinStyle(source, skin, tempDir, tempFilesToDelete);
                 }
 
                 // Get the content of the LESS resource
@@ -122,27 +125,35 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
 
             // Compile the LESS code
             Path[] includePathsArray = includePaths.toArray(new Path[1]);
-            return lessCompiler.compile(lessCode, includePathsArray);
+            String result = lessCompiler.compile(lessCode, includePathsArray);
+
+            // Remove some useless code
+            if (includeSkinStyle) {
+                result = removeMainSkinStyleUndesiredOutput(result);
+            }
+
+            // End
+            return result;
         } catch (LESSCompilerException | IOException e) {
             throw new LESSCompilerException(String.format("Failed to compile the resource [%s] with LESS.",
                     lessResourceReference), e);
         } finally {
-            // Delete the temp directory
-            if (tempDir != null) {
-                // ToDo: it may fail because the directory contains files
-                tempDir.delete();
-            }
+            deleteTempFiles(tempFilesToDelete);
         }
     }
 
-    private File createTempDir(List<Path> includePaths) throws IOException
+    private File createTempDir(List<Path> includePaths, List<File> tempFilesToDelete) throws IOException
     {
         File tempDir = Files.createTempDirectory("XWikiLESSCompilation").toFile();
         includePaths.add(tempDir.toPath());
+        // Don't forget to delete this file later
+        tempFilesToDelete.add(tempDir);
+        // Be sure it's done even if the JVM is stopped
+        tempDir.deleteOnExit();
         return tempDir;
     }
 
-    private void includeMainSkinStyle(StringWriter source, String skin, File tempDir)
+    private void importMainSkinStyle(StringWriter source, String skin, File tempDir, List<File> tempFilesToDelete)
         throws LESSCompilerException, IOException
     {
         // Get the file content
@@ -155,8 +166,25 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
         FileWriter fileWriter = new FileWriter(mainSkinStyleFile);
         IOUtils.copy(new StringReader(velocityOutput), fileWriter);
         fileWriter.close();
-        // Add the import line to the LESS resource
+        // Don't forget to delete this file later
+        tempFilesToDelete.add(mainSkinStyleFile);
+        // Be sure it's done even if the JVM is stopped
+        mainSkinStyleFile.deleteOnExit();
+        // Add the import line to the LESS resource.
+        // We import this file to be able to use variables and mix-ins defined in it/
+        // But we don't want it in the output.
         source.write("@import (reference) \"" + MAIN_SKIN_STYLE_FILENAME + "\";\n");
+        // See removeMainSkinStyleUndesiredOutput()
+        source.write(LESS_INCLUDE_SEPARATOR);
+    }
+
+    private String removeMainSkinStyleUndesiredOutput(String cssCode) {
+        // Because of a bug in the "@import" function of the LESS compiler, we manually remove all the content that
+        // have been imported, thanks to LESS_INCLUDE_SEPARATOR which is a marker to know where the interesting
+        // content really start.
+        // See: https://github.com/less/less.js/issues/1968 and https://github.com/less/less.js/issues/1878
+        int contentToRemoveIndex = cssCode.indexOf(LESS_INCLUDE_SEPARATOR) + LESS_INCLUDE_SEPARATOR.length();
+        return cssCode.substring(contentToRemoveIndex);
     }
 
     private String executeVelocity(String source, String skin)
@@ -180,5 +208,15 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
                 xcontext.put(SKIN_CONTEXT_KEY, currentSkin);
             }
         }
+    }
+
+    private void deleteTempFiles(List<File> tempFilesToDelete)
+    {
+        // Delete files from the last to the first, because the first could be a directory that contains all the others
+        for (int i = tempFilesToDelete.size() - 1; i >= 0; --i) {
+            File tempFile = tempFilesToDelete.get(i);
+            tempFile.delete();
+        }
+        tempFilesToDelete.clear();
     }
 }

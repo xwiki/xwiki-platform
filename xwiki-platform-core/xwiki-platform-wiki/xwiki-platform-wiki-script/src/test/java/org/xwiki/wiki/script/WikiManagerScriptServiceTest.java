@@ -480,4 +480,11 @@ public class WikiManagerScriptServiceTest
         assertEquals(mocker.getComponentUnderTest().getAliasSuffix(), "mysuffix.org");
     }
 
+    @Test
+    public void getCurrentDescriptor() throws Exception
+    {
+        mocker.getComponentUnderTest().getCurrentWikiDescriptor();
+
+        verify(wikiDescriptorManager).getCurrentWikiDescriptor();
+    }
 }

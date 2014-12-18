@@ -21,13 +21,17 @@ package org.xwiki.mail.script;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -37,18 +41,19 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailSession;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
- * Expose Mail Sending API to scripts.
- * <p/>
- * Example for sending an HTML message with attachments and a text alternative:
+ * Expose Mail Sending API to scripts. <p/> Example for sending an HTML message with attachments and a text
+ * alternative:
  * <pre><code>
  *   #set ($message = $services.mailSender.createMessage(to, subject))
  *   #set ($discard = $message.addPart("html", "html message", {"alternate" : "text message",
@@ -86,9 +91,12 @@ public class MailSenderScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    @Inject
+    private MailSession mailSession;
+
     /**
-     * Creates a pre-filled Mime Message by running the Component implementation of
-     * {@link org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     * Creates a pre-filled Mime Message by running the Component implementation of {@link
+     * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
      *
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
      * @param source the source from which to prefill the Mime Message (depends on the implementation)
@@ -100,7 +108,7 @@ public class MailSenderScriptService implements ScriptService
         MimeMessageWrapper messageWrapper;
         try {
             MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
-            Session session = createSession();
+            Session session = mailSession.getInstance();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -133,7 +141,7 @@ public class MailSenderScriptService implements ScriptService
         try {
             factory = componentManager.getInstance(
                 new DefaultParameterizedType(null, MimeMessageFactory.class, type),
-                    String.format("%s/secure", hint));
+                String.format("%s/secure", hint));
         } catch (ComponentLookupException e) {
             // Step 2: Look for a non secure version if a secure one doesn't exist...
             factory = componentManager.getInstance(
@@ -144,8 +152,8 @@ public class MailSenderScriptService implements ScriptService
     }
 
     /**
-     * Creates a pre-filled Mime Message by running the Component implementation of
-     * {@link org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     * Creates a pre-filled Mime Message by running the Component implementation of {@link
+     * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
      *
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
      * @param source the source from which to prefill the Mime Message (depends on the implementation)
@@ -194,7 +202,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = createSession();
+        Session session = mailSession.getInstance();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.mailSender, this.execution,
             this.configuration, this.componentManagerProvider.get());
@@ -217,23 +225,104 @@ public class MailSenderScriptService implements ScriptService
     }
 
     /**
+     * Send the mail synchronously with Memory MailListener .
+     *
+     * @param messages the list of messages that was tried to be sent
+     * @return UUID of the Batch mail
+     */
+    public UUID send(List<? extends MimeMessage> messages)
+    {
+        return send(messages, "memory");
+    }
+
+
+    /**
+     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling {@link
+     * #getErrors(UUID)}.
+     *
+     * @param messages the list of messages that was tried to be sent
+     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
+     * @return UUID of the Batch mail
+     */
+    public UUID send(List<? extends MimeMessage> messages, String hint)
+    {
+        MailListener listener;
+        try {
+            checkPermissions();
+            listener = getListener(hint);
+            return this.mailSender.send(messages, mailSession.getInstance());
+        } catch (MessagingException e) {
+            // Save the exception for reporting through the script services's getError() API
+            setError(e);
+        }
+        return null;
+    }
+
+    /**
+     * Send the mail asynchronously.
+     *
+     * @param messages the list of messages that was tried to be sent
+     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
+     * @return UUID of the Batch mail
+     */
+    public UUID sendAsynchronously(List<? extends MimeMessage> messages, String hint)
+    {
+        final MailListener listener;
+        try {
+            listener = getListener(hint);
+            checkPermissions();
+        } catch (MessagingException e) {
+            // Save the exception for reporting through the script services's getError() API
+            setError(e);
+            // Don't send the mail!
+            return null;
+        }
+
+        // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
+        // the passed listener.
+        UUID sender = this.mailSender.sendAsynchronously(messages, mailSession.getInstance(), listener);
+        return sender;
+    }
+
+    /**
+     * Check authorization to send mail.
+     *
+     * @throws MessagingException when not authorized to send mail
+     */
+    private void checkPermissions() throws MessagingException
+    {
+        /*
+         * TODO: we need check permissions once, so we can't use ScriptServicePermissionChecker#check(MimeMessage)
+         */
+    }
+
+    /**
+     * @param batchID the UUID of the Batch mail
+     * @return errors raised during the send of all emails
+     */
+    public Iterator<MailStatus> getErrors(UUID batchID)
+    {
+        // TODO:
+        return null;
+    }
+
+    private MailListener getListener(String hint) throws MessagingException
+    {
+        MailListener listener;
+        try {
+            listener = this.componentManagerProvider.get().getInstance(MailListener.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate [%s] Event lister. ", hint), e);
+        }
+        return listener;
+    }
+
+    /**
      * @return the configuration for sending mails (SMTP host, port, etc)
      */
     public MailSenderConfiguration getConfiguration()
     {
         return this.configuration;
-    }
-
-    private Session createSession()
-    {
-        Session session;
-        if (this.configuration.usesAuthentication()) {
-            session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
-        } else {
-            session = Session.getInstance(this.configuration.getAllProperties());
-        }
-        return session;
     }
 
     // Error management

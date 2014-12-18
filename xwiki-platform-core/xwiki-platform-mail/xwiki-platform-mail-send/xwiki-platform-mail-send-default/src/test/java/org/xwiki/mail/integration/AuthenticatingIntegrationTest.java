@@ -20,6 +20,7 @@
 package org.xwiki.mail.integration;
 
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -146,7 +147,7 @@ public class AuthenticatingIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail synchronously
-        this.sender.send(message, session);
+        this.sender.send(Arrays.asList(message), session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

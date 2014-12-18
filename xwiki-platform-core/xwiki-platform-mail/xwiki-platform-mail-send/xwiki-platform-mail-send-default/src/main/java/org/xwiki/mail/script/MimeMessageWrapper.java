@@ -22,28 +22,22 @@ package org.xwiki.mail.script;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
-import javax.inject.Inject;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
@@ -56,7 +50,7 @@ import org.xwiki.stability.Unstable;
  * @since 6.1RC1
  */
 @Unstable
-public class MimeMessageWrapper
+public class MimeMessageWrapper extends MimeMessage
 {
     private ComponentManager componentManager;
 
@@ -66,15 +60,9 @@ public class MimeMessageWrapper
 
     private MailSenderConfiguration configuration;
 
-    private MailListener listener;
-
     private Session session;
 
     private ExtendedMimeMessage message;
-
-    @Inject
-    private Logger logger;
-
     /**
      * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
@@ -89,19 +77,13 @@ public class MimeMessageWrapper
     MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
         MailSenderConfiguration configuration, ComponentManager componentManager)
     {
+        super(session);
         this.message = message;
         this.session = session;
         this.mailSender = mailSender;
         this.execution = execution;
         this.configuration = configuration;
         this.componentManager = componentManager;
-        String hint = "memory";
-        try {
-            this.listener = getListener(hint);
-        } catch (MessagingException e) {
-            this.logger.error(String.format("Failed to locate [%s] event lister. ", hint)
-                + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
-        }
     }
 
     /**
@@ -112,6 +94,13 @@ public class MimeMessageWrapper
         return this.message;
     }
 
+    /**
+     * @return the JavaMail session used to send the mail
+     */
+    public Session getSession()
+    {
+        return this.session;
+    }
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
@@ -149,47 +138,6 @@ public class MimeMessageWrapper
             // Save the exception for reporting through the script services's getError() API
             setError(e);
         }
-    }
-
-    /**
-     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling
-     * {@link #getErrors()}.
-     *
-     * @return UUID of the Batch mail
-     */
-    public UUID send()
-    {
-        try {
-            checkPermissions();
-            return this.mailSender.send(getMessage(), this.session);
-        } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
-            setError(e);
-            return null;
-        }
-    }
-
-    /**
-     * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking or simply use
-     * {@link #send()}. Any error can be retrieved by calling {@link #getErrors()}.
-     *
-     * @return UUID of the Batch mail
-     */
-    public UUID sendAsynchronously()
-    {
-        try {
-            checkPermissions();
-        } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
-            setError(e);
-            // Don't send the mail!
-            return null;
-        }
-
-        // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
-        // the passed listener.
-        UUID sender = this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
-        return sender;
     }
 
     /**
@@ -272,15 +220,6 @@ public class MimeMessageWrapper
         this.mailSender.waitTillSent(timeout);
     }
 
-    /**
-     * @return a queue containing top errors raised during the send of all emails in the queue for the current thread
-     *         when the sending was done asynchronously. If the send was done synchronously and an error happened
-     *         then it's available through the script service's {@code #getLastError()} method.
-     */
-    public Iterator<MailStatus> getErrors()
-    {
-        return this.listener.getErrors();
-    }
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException
     {
@@ -347,7 +286,7 @@ public class MimeMessageWrapper
         return multipart;
     }
 
-    private void checkPermissions() throws MessagingException
+    protected void checkPermissions() throws MessagingException
     {
         // Load the configured permission checker
         ScriptServicePermissionChecker checker;
@@ -366,15 +305,6 @@ public class MimeMessageWrapper
         } catch (MessagingException e) {
             throw new MessagingException(String.format("Not authorized to send mail with subject [%s], using "
                 + "Permission Checker [%s]. The mail has not been sent.", getMessage().getSubject(), hint), e);
-        }
-    }
-
-    private MailListener getListener(String hint) throws MessagingException
-    {
-        try {
-            return this.componentManager.getInstance(MailListener.class, hint);
-        } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to locate [%s] mail event lister. ", hint), e);
         }
     }
 }

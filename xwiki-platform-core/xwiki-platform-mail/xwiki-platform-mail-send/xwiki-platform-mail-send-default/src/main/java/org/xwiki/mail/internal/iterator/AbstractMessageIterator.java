@@ -36,7 +36,7 @@ import org.xwiki.mail.MimeMessageFactory;
  * @version $Id$
  * @since 6.4M2
  */
-public abstract class AbstractMessageIterator implements Iterator<MimeMessage>
+public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
     protected MimeMessageFactory factory;
 
@@ -80,5 +80,10 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>
     @Override public void remove()
     {
         throw new UnsupportedOperationException();
+    }
+
+    @Override public Iterator<MimeMessage> iterator()
+    {
+        return this;
     }
 }

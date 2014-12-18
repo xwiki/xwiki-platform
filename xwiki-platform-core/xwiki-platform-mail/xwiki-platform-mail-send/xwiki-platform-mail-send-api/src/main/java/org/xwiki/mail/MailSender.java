@@ -41,24 +41,24 @@ public interface MailSender
     /**
      * Send a mail and wait for it to be sent.
      *
-     * @param message the message to sent
+     * @param messages the message to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @return UUID of the Batch mail
      * @throws MessagingException when an error occurs when sending the mail
      */
-    UUID send(MimeMessage message, Session session) throws MessagingException;
+    UUID send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException;
 
     /**
      * Send a mail asynchronously (the call returns immediately and you need to call {@link #waitTillSent(long)} if you
      * wish to wait till it's been effectively sent).
      *
-     * @param message the message to sent
+     * @param messages the message to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @param listener a listener called when the mail is sent successfully or when there is an error
      * @return UUID of the Batch mail
      * @since 6.2M1
      */
-    UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener);
+    UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener);
 
     /**
      * Wait for all messages on the sending queue to be sent before returning.

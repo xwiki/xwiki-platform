@@ -132,7 +132,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        Integer port;
+        Integer port = null;
 
         // First, look in the document sources
         String portAsString = this.documentsSource.getProperty("smtp_port");
@@ -143,7 +143,10 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
                 port = DEFAULT_PORT;
             }
         } else {
-            port = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class).intValue();
+            Long portAsLong = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class);
+            if (portAsLong != null) {
+                port = portAsLong.intValue();
+            }
         }
 
         // If not found, look in the xwiki properties source

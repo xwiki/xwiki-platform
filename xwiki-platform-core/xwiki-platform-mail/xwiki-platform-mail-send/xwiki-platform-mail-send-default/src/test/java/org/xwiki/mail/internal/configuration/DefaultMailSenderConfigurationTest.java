@@ -42,7 +42,7 @@ public class DefaultMailSenderConfigurationTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultMailSenderConfiguration> mocker =
-            new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
+        new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
 
     @Test
     public void getFromAddressWhenNotConfigured() throws Exception
@@ -122,7 +122,7 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn(null);
 
         ConfigurationSource xwikiPropertiesSource =
-                this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
         properties.setProperty("key2", "value2");
@@ -145,8 +145,8 @@ public class DefaultMailSenderConfigurationTest
 
         // Verify the logs
         verify(this.mocker.getMockedLogger()).warn(
-                "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-                "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
+            "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
+            "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
     }
 
     @Test
@@ -211,6 +211,15 @@ public class DefaultMailSenderConfigurationTest
 
         assertThat(Arrays.asList("john@doe.com", "mary@doe.com"),
             containsInAnyOrder(this.mocker.getComponentUnderTest().getBCCAddresses().toArray()));
+    }
 
+    @Test
+    public void getPortWhenMailConfigDoesntExist() throws Exception
+    {
+        ConfigurationSource xwikiPropertiesSource =
+            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        when(xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
+
+        assertEquals(25, this.mocker.getComponentUnderTest().getPort());
     }
 }

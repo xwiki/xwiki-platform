@@ -706,4 +706,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # mail.sender.scriptServiceCheckerHint = programmingrights
 
+#-# [Since 6.4M2]
+#-# optional default email addresses to add to the BCC mail header when sending email.
+# mail.sender.bcc = john@doe.com,mary@doe.com
+
 $!xwikiPropertiesAdditionalProperties

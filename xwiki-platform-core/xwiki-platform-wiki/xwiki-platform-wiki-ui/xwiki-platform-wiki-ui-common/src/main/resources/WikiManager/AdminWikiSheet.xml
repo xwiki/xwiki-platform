@@ -121,6 +121,12 @@
             &lt;input name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
           &lt;/dd&gt;
 
+          ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).
+          #set ($currentUserString = $services.model.serialize($xcontext.userReference))
+          #set ($descriptorReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', "XWikiServer${stringtool.capitalize($descriptor.id)}"))
+          #set ($descriptorFullName = $services.model.serialize($descriptorReference))
+          #set ($hasEditOnDescriptor = $xwiki.hasAccessLevel('edit', $currentUserString, $descriptorFullName))
+          #if ($currentUserString == "$!{services.wiki.currentWikiDescriptor.ownerId}" || $hasEditOnDescriptor)
           &lt;dt&gt;
             &lt;label for='owner'&gt;
               $services.localization.render('platform.wiki.sheet.prop.owner') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
@@ -144,6 +150,8 @@
               &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
             &lt;/label&gt;
           &lt;/dt&gt;
+          #end
+
         &lt;/dl&gt;
 
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
@@ -345,7 +353,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory></displayBeforeCategory>
+      <displayBeforeCategory/>
     </property>
     <property>
       <displayInCategory>configuration</displayInCategory>

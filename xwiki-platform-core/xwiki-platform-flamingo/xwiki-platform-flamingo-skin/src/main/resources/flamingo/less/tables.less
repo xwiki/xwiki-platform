@@ -2,28 +2,29 @@
 // Tables
 // --------------------------------------------------
 
-// -----------------------------
-// Make a table responsive to the screen size.
-// --
-// To use it, just add the ".responsive-table" class to you table, be sure you have proper <thead> and <tbody> tags in
-// it, and put the title of the each column in the "data-title" attribute of every cell.
-// Example:
-// <table class="responsive-table">
-//   <thead>
-//     <tr>
-//       <th>Name</th>
-//       <th>Age</th>
-//     </tr>
-//   </thead>
-//   <tbody>
-//     <tr>
-//       <td data-title="Name">John Smith</td>
-//       <td data-title="Age">42</td>
-//     </tr>
-//   </tbody>
-// </table>
-//
-// @since 6.4M2
+/* -----------------------------
+ Make a table responsive to the screen size.
+ --
+ To use it, just add the ".responsive-table" class to you table, be sure you have proper <thead> and <tbody> tags in
+ it, and put the title of the each column in the "data-title" attribute of every cell.
+ Example:
+ <table class="responsive-table">
+   <thead>
+     <tr>
+       <th>Name</th>
+       <th>Age</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <td data-title="Name">John Smith</td>
+       <td data-title="Age">42</td>
+     </tr>
+   </tbody>
+ </table>
+
+ @since 6.4M2
+*/
 .responsive-table {
   @media only screen and (max-width: @screen-xs-max) {
     thead, tbody, th, td, tr {
@@ -45,27 +46,30 @@
       
       > tr > td, > tr > th {
         // Behave like a "row"
+        .clearfix();
         border: none;
         border-bottom: 1px solid #eee;
-        .clearfix();
         min-height: @input-height-base;
         position: relative;
         padding-left: 50%;
-        white-space: normal;
+        padding-top: @table-cell-padding;
+        top: 0;
         text-align:left;
+        white-space: normal;
         
         &:before {
-          // Now like a table header
-          position: absolute;
-          // Top/left values mimic padding
-          top: 6px;
-          left: 6px;
-          width: 45%;
-          padding-right: 10px;
-          white-space: nowrap;
-          text-align: left;
-          font-weight: bold;
+          // Behave like a table header
+          &:extend(.table > thead > tr > th);
+          color: @text-color;
           content: attr(data-title);
+          font-weight: bold;
+          left: @table-cell-padding;
+          padding-right: @table-cell-padding;
+          position: absolute;
+          text-align: left;
+          top: @table-cell-padding;
+          white-space: nowrap;
+          width: 45%;
         }
         
         &:last-child {

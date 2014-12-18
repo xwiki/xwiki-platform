@@ -43,45 +43,54 @@
       }
     }
 
+    // The rest is not specific to the livetable, so we just re-use the .responsible-table class.
     .xwiki-livetable-display-body {
+      // code duplication there because LESS is buggy
+      // goal: &:extend(.responsive-table > tbody);
       clear: left;
+      border-top: 1px solid #ccc;
       
-      tr {
+      > tr {
+        // code duplication there because LESS is buggy
+        // goal: &:extend(.responsive-table > tbody > tr);
         border: 1px solid #ccc;
         border-top: 0;
-      }
-      
-      td {
-        // Behave like a "row"
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        white-space: normal;
-        text-align:left;
         
-        &:before {
-          // Now like a table header
-          position: absolute;
-          // Top/left values mimic padding
-          top: 6px;
-          left: 6px;
-          width: 45%;
-          padding-right: 10px;
-          white-space: nowrap;
-          text-align: left;
-          font-weight: bold;
-          content: attr(data-title);
+        > td, > th {
+          // code duplication there because LESS is buggy
+          // goal: &:extend(.responsive-table > tbody > tr > td);
+          .clearfix();
+          border: none;
+          border-bottom: 1px solid #eee;
+          min-height: @input-height-base;
+          position: relative;
+          padding-left: 50%;
+          padding-top: @table-cell-padding;
+          top: 0;
+          text-align:left;
+          white-space: normal;
+            
+          &:before {
+            // code duplication there because LESS is buggy
+            // goal: &:extend(.responsive-table > tbody > tr > td:before);
+            &:extend(.table > thead > tr > th);
+            color: @text-color;
+            content: attr(data-title);
+            font-weight: bold;
+            left: @table-cell-padding;
+            padding-right: @table-cell-padding;
+            position: absolute;
+            text-align: left;
+            top: @table-cell-padding;
+            white-space: nowrap;
+            width: 45%;
+          }
+          // code duplication there because LESS is buggy
+          &:last-child {
+            border: 0;
+          }
         }
-        
-        &:last-child {
-          border: 0;
-        }
-        
       }
-      
     }
   }
 }
-
-

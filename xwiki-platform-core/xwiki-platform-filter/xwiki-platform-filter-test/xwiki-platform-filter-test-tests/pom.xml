@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-administration-test</artifactId>
+    <artifactId>xwiki-platform-filter-test</artifactId>
     <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-test-tests</artifactId>

@@ -24,6 +24,8 @@ import com.xpn.xwiki.XWikiContext;
 
 import java.util.Date;
 
+import org.xwiki.model.reference.DocumentReference;
+
 /**
  * Wrapper around a {@link Rating}, typically returned by the {@link RatingsPluginApi} and manipulated using a scripting
  * language in the wiki.
@@ -71,7 +73,7 @@ public class RatingApi
         }
     }
 
-    public String getAuthor()
+    public DocumentReference getAuthor()
     {
         return rating.getAuthor();
     }

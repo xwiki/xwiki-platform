@@ -21,6 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -38,7 +39,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 public class SeparatePageRating implements Rating
 {
-    private String documentName;
+    private DocumentReference documentRef;
 
     private XWikiDocument document;
 
@@ -46,24 +47,24 @@ public class SeparatePageRating implements Rating
 
     private SeparatePageRatingsManager ratingsManager;
     
-    public SeparatePageRating(String documentName, String author, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
-        this(documentName, author, new Date(), vote, context, ratingsManager);
+        this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
 
-    public SeparatePageRating(String documentName, String author, Date date, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this.context = context;
         this.ratingsManager = ratingsManager;
-        this.documentName = documentName;
-        this.document = addDocument(documentName, author, date, vote);
+        this.documentRef = documentRef;
+        this.document = addDocument(documentRef, author, date, vote);
     }
 
-    public SeparatePageRating(String documentName, XWikiDocument doc, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, XWikiDocument doc, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this.context = context;
         this.ratingsManager = ratingsManager;
-        this.documentName = documentName;
+        this.documentRef = documentRef;
         this.document = doc;
     }
 
@@ -89,7 +90,7 @@ public class SeparatePageRating implements Rating
     {
         if (document == null) {
             try {
-                document = context.getWiki().getDocument(getPageName(this.documentName), context);
+                document = context.getWiki().getDocument(getPageName(this.documentRef), context);
             } catch (XWikiException e) {
                 return null;
             }
@@ -102,9 +103,18 @@ public class SeparatePageRating implements Rating
      *
      * @see org.xwiki.ratings.Rating#getAuthor()
      */
-    public String getAuthor()
+    public DocumentReference getAuthor()
     {
-        return getAsObject().getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+        XWikiDocument authorDoc;
+
+        try {
+            String objectVal = getAsObject().getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+            authorDoc = context.getWiki().getDocument(objectVal, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+
+        return authorDoc.getDocumentReference();
     }
 
     public Date getDate()
@@ -118,9 +128,9 @@ public class SeparatePageRating implements Rating
      *
      * @see org.xwiki.ratings.Rating#setAuthor(String)
      */
-    public void setAuthor(String author)
+    public void setAuthor(DocumentReference author)
     {
-        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author);
+        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
     }
 
     public void setDate(Date date)
@@ -221,19 +231,19 @@ public class SeparatePageRating implements Rating
     /**
      * Generate page name from the container page We add Rating and getUniquePageName will add us a counter to our page
      */
-    private String getPageName(String documentName) throws XWikiException
+    private DocumentReference getPageName(DocumentReference documentRef) throws XWikiException
     {
-        XWikiDocument doc = context.getWiki().getDocument(documentName, context);
-        String ratingsSpace = ratingsManager.getRatingsSpaceName(documentName);
-        boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentName);
+        XWikiDocument doc = context.getWiki().getDocument(documentRef, context);
+        String ratingsSpace = ratingsManager.getRatingsSpaceName(documentRef);
+        boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentRef);
         if (hasRatingsSpaceForeachSpace) {
-            return doc.getSpace() + ratingsSpace + "."
-                + getUniquePageName(ratingsSpace, doc.getName(), "R", true);
+            return new DocumentReference(context.getWikiId(), doc.getSpace() + ratingsSpace,
+                getUniquePageName(ratingsSpace, doc.getName(), "R", true));
         } else if (ratingsSpace == null) {
-            return doc.getSpace() + "." + getUniquePageName(doc.getSpace(), doc.getName() + "R", "", true);
+            return new DocumentReference(context.getWikiId(), doc.getSpace(), getUniquePageName(doc.getSpace(), doc.getName() + "R", "", true));
         } else {
-            return ratingsSpace + "."
-                + getUniquePageName(ratingsSpace, doc.getSpace() + "_" + doc.getName(), "R", true);
+            return new DocumentReference(context.getWikiId(), ratingsSpace,
+                getUniquePageName(ratingsSpace, doc.getSpace() + "_" + doc.getName(), "R", true));
         }
     }
 
@@ -250,19 +260,19 @@ public class SeparatePageRating implements Rating
         return pageName;
     }
 
-    private XWikiDocument addDocument(String documentName, String author, Date date, int vote) throws RatingsException
+    private XWikiDocument addDocument(DocumentReference documentRef, DocumentReference author, Date date, int vote) throws RatingsException
     {
         try {
             String ratingsClassName = RatingsManager.RATINGS_CLASSNAME;
-            String pageName = getPageName(documentName);
-            String parentDocName = documentName;
+            DocumentReference pageName = getPageName(documentRef);
+            String parentDocName = documentRef.getName();
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(pageName, context);
             doc.setParent(parentDocName);
             BaseObject obj = new BaseObject();
             obj.setClassName(ratingsClassName);
-            obj.setName(pageName);
-            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author);
+            obj.setName(pageName.getName());
+            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
             obj.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
             obj.setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, parentDocName);
@@ -295,8 +305,8 @@ public class SeparatePageRating implements Rating
         return sb.toString();
     }
 
-    public String getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return this.documentName;
+        return this.documentRef;
     }
 }

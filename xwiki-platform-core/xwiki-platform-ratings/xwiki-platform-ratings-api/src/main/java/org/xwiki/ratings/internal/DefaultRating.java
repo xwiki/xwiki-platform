@@ -21,6 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -36,7 +37,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  */
 public class DefaultRating implements Rating
 {
-    private String documentName;
+    private DocumentReference documentRef;
 
     private XWikiDocument document;
 
@@ -44,30 +45,30 @@ public class DefaultRating implements Rating
     
     private XWikiContext context;
 
-    public DefaultRating(String documentName, String author, int vote, XWikiContext context)
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context)
     {
-        this(documentName, author, new Date(), vote, context);
+        this(documentRef, author, new Date(), vote, context);
     }
 
-    public DefaultRating(String documentName, String author, Date date, int vote, XWikiContext context)
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context)
     {
         this.context = context;
-        this.documentName = documentName;
+        this.documentRef = documentRef;
         
-        createObject(documentName, author, date, vote);
+        createObject(documentRef.getName(), author.getName(), date, vote);
     }
 
-    public DefaultRating(String documentName, BaseObject obj, XWikiContext context)
+    public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context)
     {
         this.context = context;
-        this.documentName = documentName;        
+        this.documentRef = documentRef;
         this.document = getDocument();
         this.object = obj;
     }
     
 
     /**
-     * RatingId represente the rating ID. It is the object number in the default ratings case
+     * RatingId represents the rating ID. It is the object number in the default ratings case
      */
     public String getRatingId()
     {
@@ -75,7 +76,7 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * RatingId represente the rating ID. It is the object number in the default ratings case
+     * RatingId represents the rating ID. It is the object number in the default ratings case
      */
     public String getGlobalRatingId()
     {
@@ -91,7 +92,7 @@ public class DefaultRating implements Rating
     {
         if (document == null) {
             try {
-                document = context.getWiki().getDocument(this.documentName, context);
+                document = context.getWiki().getDocument(this.documentRef, context);
             } catch (XWikiException e) {
                 // do nothing
             }
@@ -104,14 +105,23 @@ public class DefaultRating implements Rating
      *
      * @see org.xwiki.ratings.Rating#getAuthor()
      */
-    public String getAuthor()
+    public DocumentReference getAuthor()
     {
-        return object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+        XWikiDocument authorDoc;
+
+        try {
+            String objectVal = object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+            authorDoc = context.getWiki().getDocument(objectVal, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+
+        return authorDoc.getDocumentReference();
     }
 
-    public void setAuthor(String author)
+    public void setAuthor(DocumentReference author)
     {
-        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author);
+        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
     }
 
     /**
@@ -171,11 +181,11 @@ public class DefaultRating implements Rating
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.Rating#getDocumentName()
+     * @see org.xwiki.ratings.Rating#getDocumentReference()
      */
-    public String getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return this.documentName;
+        return this.documentRef;
     }
 
     public void save() throws RatingsException

@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -66,19 +67,19 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         super();
     }
 
-    public String getRatingsSpaceName(String documentName)
+    public String getRatingsSpaceName(DocumentReference documentRef)
     {
         String ratingsSpaceName = getXWiki().Param("xwiki.ratings.separatepagemanager.spacename", "");
         ratingsSpaceName =
             getXWiki().getXWikiPreference("ratings_separatepagemanager_spacename", ratingsSpaceName, getXWikiContext());
-        return getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE, ratingsSpaceName);
+        return getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE, ratingsSpaceName);
     }
 
-    public boolean hasRatingsSpaceForeachSpace(String documentName)
+    public boolean hasRatingsSpaceForeachSpace(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
         result = getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result, getXWikiContext());
-        return (getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result) == "1");
+        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result) == "1");
     }
 
     protected void saveRating(Rating rating) throws RatingsException
@@ -104,13 +105,13 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
      * @see org.xwiki.ratings.RatingsManager#setRating(com.xpn.xwiki.plugin.comments.Container, String, int,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public Rating setRating(String documentName, String author, int vote) throws RatingsException
+    public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
     {
-        Rating rating = getRating(documentName, author);
+        Rating rating = getRating(documentRef, author);
         int oldVote;
         if (rating == null) {
             oldVote = 0;
-            rating = new SeparatePageRating(documentName, author, vote, getXWikiContext(), this);
+            rating = new SeparatePageRating(documentRef, author, vote, getXWikiContext(), this);
         } else {
             oldVote = rating.getVote();
             rating.setVote(vote);
@@ -121,10 +122,10 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         rating.save();
        
         // update the average rating
-        updateAverageRatings(documentName, rating, oldVote);
+        updateAverageRatings(documentRef, rating, oldVote);
 
         // update reputation
-        observationManager.notify(new UpdateRatingEvent(documentName, rating, oldVote), null);
+        observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
         return rating;
     }
 
@@ -134,7 +135,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
      * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int,
      *      boolean, com.xpn.xwiki.XWikiContext)
      */
-    public List<Rating> getRatings(String documentName, int start, int count, boolean asc) throws RatingsException
+    public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc) throws RatingsException
     {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Calling separate page manager code for ratings");
@@ -146,7 +147,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 + "' and obj.id=parentprop.id.id and parentprop.id.name='"
                 + RATING_CLASS_FIELDNAME_PARENT
                 + "' and parentprop.value='"
-                + documentName
+                + documentRef.getName()
                 +
                 "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
                 + getRatingsClassName()
@@ -159,7 +160,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 getXWiki().getStore().searchDocumentsNames(sql, count, start, getXWikiContext());
 
             for (String ratingPageName : ratingPageNameList) {
-                ratings.add(getRatingFromDocument(documentName, getXWiki()
+                ratings.add(getRatingFromDocument(documentRef, getXWiki()
                     .getDocument(ratingPageName, getXWikiContext())));
             }
         } catch (XWikiException e) {
@@ -175,7 +176,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
      * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int,
      *      boolean, com.xpn.xwiki.XWikiContext)
      */
-    public Rating getRating(String documentName, int id) throws RatingsException
+    public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
         String sql =
             ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className='"
@@ -183,7 +184,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 + "' and obj.id=parentprop.id.id and parentprop.id.name='"
                 + RATING_CLASS_FIELDNAME_PARENT
                 + "' and parentprop.value='"
-                + documentName
+                + documentRef
                 +
                 "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
                 + getRatingsClassName()
@@ -194,7 +195,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             if ((ratingPageNameList == null) || (ratingPageNameList.size() == 0)) {
                 return null;
             } else {
-                return new SeparatePageRatingsManager().getRatingFromDocument(documentName, getXWiki()
+                return new SeparatePageRatingsManager().getRatingFromDocument(documentRef, getXWiki()
                     .getDocument(ratingPageNameList.get(0), getXWikiContext()));
             }
         } catch (XWikiException e) {
@@ -208,10 +209,10 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
      * @see org.xwiki.ratings.RatingsManager#getRating(com.xpn.xwiki.plugin.comments.Container, String,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public Rating getRating(String documentName, String author) throws RatingsException
+    public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
     {
         try {
-            for (Rating rating : getRatings(documentName, 0, 0, false)) {
+            for (Rating rating : getRatings(documentRef, 0, 0, false)) {
                 if (author.equals(rating.getAuthor())) {
                     return rating;
                 }
@@ -244,16 +245,17 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             }
 
             String parentDocName = object.getStringValue(RATING_CLASS_FIELDNAME_PARENT);
+            XWikiDocument parentDoc = getXWikiContext().getWiki().getDocument(parentDocName, getXWikiContext());
 
-            return new SeparatePageRating(parentDocName, doc, getXWikiContext(), this);
+            return new SeparatePageRating(parentDoc.getDocumentReference(), doc, getXWikiContext(), this);
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }
     }
 
-    public Rating getRatingFromDocument(String documentName, XWikiDocument doc)
+    public Rating getRatingFromDocument(DocumentReference documentRef, XWikiDocument doc)
         throws RatingsException
     {
-        return new SeparatePageRating(documentName, doc, getXWikiContext(), this);
+        return new SeparatePageRating(documentRef, doc, getXWikiContext(), this);
     }
 }

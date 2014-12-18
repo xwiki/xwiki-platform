@@ -21,6 +21,8 @@ package org.xwiki.ratings;
 
 import com.xpn.xwiki.objects.BaseObject;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import java.util.Date;
 
 /**
@@ -33,9 +35,9 @@ import java.util.Date;
 public interface Rating
 {
     /**
-     * @return the document name for which this rating applies.
+     * @return the document reference for which this rating applies.
      */
-    String getDocumentName();
+    DocumentReference getDocumentReference();
 
     /**
      * Retrives the current rating as a BaseObject This method is used for compatiblity
@@ -63,7 +65,7 @@ public interface Rating
      *
      * @return String author of the rating
      */
-    String getAuthor();
+    DocumentReference getAuthor();
 
     /**
      * Retrieves the date of the rating
@@ -93,15 +95,46 @@ public interface Rating
      */
     String display(String propertyName, String mode);
 
-    void setAuthor(String author);
+    /**
+     * Set the author to which the ratings belongs to
+     *
+     * @param author
+     */
+    void setAuthor(DocumentReference author);
 
+    /**
+     * Set the date when the rating occured
+     *
+     * @param date
+     */
     void setDate(Date date);
 
+    /**
+     * Set the vote that the user gave
+     *
+     * @param vote the number of selected stars ranging from 1 to 5
+     */
     void setVote(int vote);
 
+    /**
+     * Store the rating information
+     *
+     * @throws RatingsException
+     */
     void save() throws RatingsException;
 
+    /**
+     * Remove the rating
+     * 
+     * @return
+     * @throws RatingsException
+     */
     boolean remove() throws RatingsException;
 
+    /**
+     * The string representation of the vote
+     *
+     * @return the string representation of the vote
+     */
     String toString();
 }

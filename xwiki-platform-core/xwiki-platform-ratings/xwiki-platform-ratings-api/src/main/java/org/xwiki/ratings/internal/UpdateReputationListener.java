@@ -29,6 +29,7 @@ import javax.inject.Named;
 
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.ReputationAlgorithm;
 import org.xwiki.ratings.UpdateRatingEvent;
@@ -60,8 +61,8 @@ public class UpdateReputationListener implements EventListener
     public void onEvent(Event event, Object arg1, Object arg2)
     {
        UpdateRatingEvent ratingEvent = (UpdateRatingEvent) event;
-       String documentName = ratingEvent.getDocumentName();
-       reputationAlgorithm.get(documentName).updateReputation(documentName, ratingEvent.getNewRating(), ratingEvent.getOldRating());
+       DocumentReference documentRef = ratingEvent.getDocumentReference();
+       reputationAlgorithm.get(documentRef).updateReputation(documentRef, ratingEvent.getNewRating(), ratingEvent.getOldRating());
     }
   
 }

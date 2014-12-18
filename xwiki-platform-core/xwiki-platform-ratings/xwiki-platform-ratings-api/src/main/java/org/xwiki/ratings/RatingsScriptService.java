@@ -20,7 +20,9 @@
 package org.xwiki.ratings;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.script.service.ScriptService;
 
@@ -78,25 +81,38 @@ public class RatingsScriptService implements ScriptService
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
     
+    /**
+     *
+     */
+    private DocumentReference getGlobalConfig() {
+        XWikiContext context = getXWikiContext();
+        XWikiDocument globalConfigDoc;
+
+        try {
+            globalConfigDoc = context.getWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+
+        return globalConfigDoc.getDocumentReference();
+    }
     
-    public RatingApi setRating(Document doc, String author, int vote)
+    public RatingApi setRating(DocumentReference documentRef, DocumentReference author, int vote)
     {
         // TODO protect this with programming rights
         // and add a setRating(docName), not protected but for which the author is retrieved from getXWikiContext().
         try {
-            String documentName = doc.getFullName();
-            return new RatingApi(ratingsManagerProvider.get(documentName).setRating(documentName, author, vote));
+            return new RatingApi(ratingsManagerProvider.get(documentRef).setRating(documentRef, author, vote));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
         }
     }
 
-    public RatingApi getRating(Document doc, String author)
+    public RatingApi getRating(DocumentReference documentRef, DocumentReference author)
     {
         try {
-            String documentName = doc.getFullName();
-            Rating rating = ratingsManagerProvider.get(documentName).getRating(documentName, author);
+            Rating rating = ratingsManagerProvider.get(documentRef).getRating(documentRef, author);
             if (rating == null) {
                 return null;
             }
@@ -107,38 +123,35 @@ public class RatingsScriptService implements ScriptService
         }
     }
 
-    public List<RatingApi> getRatings(Document doc, int start, int count)
+    public List<RatingApi> getRatings(DocumentReference documentRef, int start, int count)
     {
-        return getRatings(doc, start, count, true);
+        return getRatings(documentRef, start, count, true);
     }
 
-    public List<RatingApi> getRatings(Document doc, int start, int count, boolean asc)
+    public List<RatingApi> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
     {
         try {
-            String documentName = doc.getFullName();
-            return wrapRatings(ratingsManagerProvider.get(documentName).getRatings(documentName, start, count, asc));
+            return wrapRatings(ratingsManagerProvider.get(documentRef).getRatings(documentRef, start, count, asc));
         } catch (Exception e) {
             getXWikiContext().put("exception", e);
             return null;
         }
     }
 
-    public AverageRatingApi getAverageRating(Document doc, String method)
+    public AverageRatingApi getAverageRating(DocumentReference documentRef, String method)
     {
         try {
-            String documentName = doc.getFullName();
-            return new AverageRatingApi(ratingsManagerProvider.get(documentName).getAverageRating(documentName, method));
+            return new AverageRatingApi(ratingsManagerProvider.get(documentRef).getAverageRating(documentRef, method));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
         }
     }
 
-    public AverageRatingApi getAverageRating(Document doc)
+    public AverageRatingApi getAverageRating(DocumentReference documentRef)
     {
         try {
-            String documentName = doc.getFullName();
-            return new AverageRatingApi(ratingsManagerProvider.get(documentName).getAverageRating(documentName));
+            return new AverageRatingApi(ratingsManagerProvider.get(documentRef).getAverageRating(documentRef));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -148,7 +161,7 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(String fromsql, String wheresql, String method)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getAverageRatingFromQuery(fromsql, wheresql, method));
+            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(fromsql, wheresql, method));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
@@ -158,17 +171,17 @@ public class RatingsScriptService implements ScriptService
     public AverageRatingApi getAverageRating(String fromsql, String wheresql)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getAverageRatingFromQuery(fromsql, wheresql));
+            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(fromsql, wheresql));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;
         }
     }
 
-    public AverageRatingApi getUserReputation(String username)
+    public AverageRatingApi getUserReputation(DocumentReference username)
     {
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE).getUserReputation(username));
+            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
         } catch (Throwable e) {
             getXWikiContext().put("exception", e);
             return null;

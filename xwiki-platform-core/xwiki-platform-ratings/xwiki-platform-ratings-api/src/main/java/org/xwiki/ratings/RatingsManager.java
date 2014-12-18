@@ -22,6 +22,9 @@ package org.xwiki.ratings;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Role
 public interface RatingsManager
@@ -38,7 +41,7 @@ public interface RatingsManager
     public static final String RATING_REPUTATION_METHOD_BALANCED = "balanced";
     public static final String RATING_REPUTATION_METHOD_AVERAGE = "average";
     public static final String RATING_REPUTATION_METHOD_DEFAULT = "average";
-    
+
     public static final String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.";
     public static final String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
     public static final String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
@@ -57,38 +60,38 @@ public interface RatingsManager
  
     String getRatingsClassName();
 
-    List<Rating> getRatings(String documentName, int start, int count, boolean asc)
+    List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException;
 
     Rating getRating(String ratingId) throws RatingsException;
 
-    Rating getRating(String documentName, int id) throws RatingsException;
+    Rating getRating(DocumentReference documentRef, int id) throws RatingsException;
 
-    Rating getRating(String documentName, String user) throws RatingsException;
+    Rating getRating(DocumentReference documentRef, DocumentReference user) throws RatingsException;
 
-    Rating setRating(String documentName, String author, int vote) throws RatingsException;
+    Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException;
 
     boolean removeRating(Rating rating) throws RatingsException;
 
     // average rating and reputation
 
-    boolean isAverageRatingStored(String documentName);
+    boolean isAverageRatingStored(DocumentReference documentRef);
 
-    boolean isReputationStored(String documentName);
+    boolean isReputationStored(DocumentReference documentRef);
 
-    boolean hasReputation(String documentName);
+    boolean hasReputation(DocumentReference documentRef);
     
-    AverageRating getUserReputation(String username) throws ReputationException;
+    AverageRating getUserReputation(DocumentReference username) throws ReputationException;
         
-    void updateUserReputation(String author, AverageRating voterRating) throws RatingsException;
+    void updateUserReputation(DocumentReference author, AverageRating voterRating) throws RatingsException;
 
-    String[] getDefaultReputationMethods(String documentName);
+    String[] getDefaultReputationMethods(DocumentReference documentRef);
 
-    AverageRating getAverageRating(String documentName) throws RatingsException;
+    AverageRating getAverageRating(DocumentReference documentRef) throws RatingsException;
 
-    AverageRating getAverageRating(String documentName, String method) throws RatingsException;
+    AverageRating getAverageRating(DocumentReference documentRef, String method) throws RatingsException;
 
-    AverageRating getAverageRating(String documentName, String method, boolean create)
+    AverageRating getAverageRating(DocumentReference documentRef, String method, boolean create)
         throws RatingsException;
 
     AverageRating getAverageRatingFromQuery(String fromsql, String wheresql)
@@ -97,12 +100,12 @@ public interface RatingsManager
     AverageRating getAverageRatingFromQuery(String fromsql, String wheresql, String method)
         throws RatingsException;
 
-    AverageRating calcAverageRating(String documentName, String method) throws RatingsException;
+    AverageRating calcAverageRating(DocumentReference documentRef, String method) throws RatingsException;
 
-    void updateAverageRating(String documentName, Rating rating, int oldVote, String method)
+    void updateAverageRating(DocumentReference documentRef, Rating rating, int oldVote, String method)
         throws RatingsException;
 
-    void updateAverageRatings(String documentName, Rating rating, int oldVote)
+    void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote)
         throws RatingsException;
 
 }

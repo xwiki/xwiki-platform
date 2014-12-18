@@ -19,24 +19,25 @@
  */
 package org.xwiki.ratings;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 
 public class UpdateRatingEvent implements Event
 {
-    private String documentName;
+    private DocumentReference documentRef;
     
     private Rating newRating;
     
     private int oldRating;
 
-    public String getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return documentName;
+        return documentRef;
     }
 
-    public void setDocumentName(String documentName)
+    public void setDocumentReference(DocumentReference documentRef)
     {
-        this.documentName = documentName;
+        this.documentRef = documentRef;
     }
 
     public Rating getNewRating()
@@ -62,8 +63,8 @@ public class UpdateRatingEvent implements Event
     public UpdateRatingEvent() { 
     }
     
-    public UpdateRatingEvent(String documentName, Rating newRating, int oldRating) {
-        this.documentName = documentName;
+    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating) {
+        this.documentRef = documentRef;
         this.newRating = newRating;
         this.oldRating = oldRating;
     }

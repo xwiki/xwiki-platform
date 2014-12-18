@@ -593,18 +593,20 @@ icon=icon:star</parameters>
   <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
 #if("$!{request.xpage}" == "plain")
   #if("$!{request.vote}" != "")
-    #set($rdoc = $xwiki.getDocument($request.doc))
+    #set($requestDoc = $xwiki.getDocument($request.doc))
+    #set($requestDocRef = $requestDoc.getDocumentReference())
+    #set($userDocRef = $xcontext.getUserReference())
     #set($vote = $util.parseInt($request.vote))
     #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
-      #set($ok = $services.ratings.setRating($rdoc, $xcontext.user, $vote))
+      #set($ok = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
       #if($ok) 
         #if("$!{request.method}" != "")
-          #set($ar = $services.ratings.getAverageRating($rdoc, $request.method))
+          #set($ar = $services.ratings.getAverageRating($requestDocRef, $request.method))
         #else
-          #set($ar = $services.ratings.getAverageRating($rdoc))
+          #set($ar = $services.ratings.getAverageRating($requestDocRef))
         #end
         #set($avgvote = $ar.averageVote)
-        #set($uservote = $services.ratings.getRating($rdoc, $xcontext.user))
+        #set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef))
         #set($nbVotes = $ar.nbVotes)
        $response.setContentType('application/json')
        {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }

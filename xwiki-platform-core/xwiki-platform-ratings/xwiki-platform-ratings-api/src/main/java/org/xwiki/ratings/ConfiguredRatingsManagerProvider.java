@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -73,14 +74,21 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
         return getXWikiContext().getWiki();
     }
 
+    /**
+     * Retrieve an instance of the desired RatingsManager (default/separate)
+     * - default: save the rating information in the same page
+     * - separate: save the rating information in a specified space
+     *
+     * @return the ratings manager selected by looking at the current configuration settings
+     */
     @Override
-    public RatingsManager get(String documentName)
+    public RatingsManager get(DocumentReference documentRef)
     {
         // TODO implement
         String ratingsHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT, "default");
         
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentName, getXWikiContext());
+            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
             XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
             XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
             XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;

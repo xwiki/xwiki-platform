@@ -73,10 +73,12 @@
 #macro(displayFullRating $rdoc $method)
 {{html clean="false" wiki="false"}}
 #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#if($method != "")  #set($ar = $services.ratings.getAverageRating($rdoc, $method))
-#else  #set($ar = $services.ratings.getAverageRating($rdoc)) #end
+#set($requestDocRef = $rdoc.getDocumentReference())
+#set($userDocRef = $xcontext.getUserReference())
+#if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
+#else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
 #set($avgvote = $ar.averageVote)
-#set($uservote = $services.ratings.getRating($rdoc, $xcontext.user).vote)
+#set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef).vote)
 #set($votes = $!ar.nbVotes)
 &lt;div class="rating-wrapper" id="rating-${rdoc.fullName}"&gt;
 #if($xcontext.user!="XWiki.XWikiGuest")
@@ -100,8 +102,9 @@
 #macro(displaySmallRating $rdoc $method)
 {{html clean="false" wiki="true"}}
 #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#if($method != "")  #set($ar = $services.ratings.getAverageRating($rdoc, $method))
-#else  #set($ar = $services.ratings.getAverageRating($rdoc)) #end
+#set($requestDocRef = $rdoc.getDocumentReference())
+#if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
+#else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
 #set($avgvote = $ar.averageVote)
 #ratingstars($id "small" "" $avgvote "" true)
 {{/html}}

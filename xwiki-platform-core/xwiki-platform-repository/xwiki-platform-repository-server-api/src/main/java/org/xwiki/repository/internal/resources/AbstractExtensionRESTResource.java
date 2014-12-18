@@ -282,6 +282,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
+        DocumentReference extensionDocumentReference = extensionDocument.getDocumentReference();
 
         if (extensionObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -312,7 +313,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         license.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
         extension.getLicenses().add(license);
 
-        extension.setRating(getExtensionRating(extensionDocument));
+        extension.setRating(getExtensionRating(extensionDocumentReference));
         extension.setSummary((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
@@ -405,8 +406,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Rating
         DocumentReference extensionDocumentReference = new DocumentReference(xcontext.getWikiId(), (String) entry[1], (String) entry[0]);
-        XWikiDocument extensionDocument = new XWikiDocument(extensionDocumentReference);
-        extension.setRating(getExtensionRating(extensionDocument));
+        extension.setRating(getExtensionRating(extensionDocumentReference));
 
         // Website
         extension.setWebsite(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
@@ -440,12 +440,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return extension;
     }
 
-    private ExtensionRating getExtensionRating(XWikiDocument extensionDocument)
+    private ExtensionRating getExtensionRating(DocumentReference extensionDocumentReference)
     {
         ExtensionRating extensionRating = this.extensionObjectFactory.createExtensionRating();
 
         try {
-            AverageRatingApi averageRating = new AverageRatingApi(ratingsManager.getAverageRating(extensionDocument.getFullName()));
+            AverageRatingApi averageRating = new AverageRatingApi(ratingsManager.getAverageRating(extensionDocumentReference));
             extensionRating.setTotalVotes(averageRating.getNbVotes());
             extensionRating.setAverageVote(averageRating.getAverageVote());
         } catch (XWikiException e) {

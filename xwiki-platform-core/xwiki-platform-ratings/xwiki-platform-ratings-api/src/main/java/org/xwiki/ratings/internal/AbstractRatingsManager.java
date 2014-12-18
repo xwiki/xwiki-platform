@@ -32,6 +32,7 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.ReputationException;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -93,10 +94,10 @@ public abstract class AbstractRatingsManager implements RatingsManager
      * Retrieve configuration parameter from the current space's WebPreferences
      * and fallback to XWiki.RatingsConfig if it does not exist
      */
-    protected String getConfigParameter(String documentName, String parameterName, String defaultValue)
+    protected String getConfigParameter(DocumentReference documentRef, String parameterName, String defaultValue)
     {
         try {
-            XWikiDocument sourceDoc = getXWiki().getDocument(documentName, getXWikiContext());
+            XWikiDocument sourceDoc = getXWiki().getDocument(documentRef, getXWikiContext());
             XWikiDocument spaceConfigDoc = getXWiki().getDocument(sourceDoc.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
             XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
             XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
@@ -120,42 +121,42 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return (getXWiki().getXWikiPreferenceAsInt("ratings", result, getXWikiContext()) == 1);
     }
 
-    public boolean isAverageRatingStored(String documentName)
+    public boolean isAverageRatingStored(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.averagerating.stored", "1");
         result = getXWiki().getXWikiPreference("ratings_averagerating_stored", result, getXWikiContext());
-        return (getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING, result) == "1");
+        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING, result) == "1");
     }
 
-    public boolean isReputationStored(String documentName)
+    public boolean isReputationStored(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.reputation.stored", "0");
         result = getXWiki().getXWikiPreference("ratings_reputation_stored", result, getXWikiContext());
-        return (getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED, result) == "1");
+        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_STORED, result) == "1");
     }
 
-    public boolean hasReputation(String documentName)
+    public boolean hasReputation(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.reputation", "0");
         result = getXWiki().getXWikiPreference("ratings_reputation", result, getXWikiContext());
-        return (getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION, result) == "1");
+        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION, result) == "1");
     }
 
-    public String[] getDefaultReputationMethods(String documentName)
+    public String[] getDefaultReputationMethods(DocumentReference documentRef)
     {
         String method =
             getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
         method = getXWiki().getXWikiPreference("ratings_reputation_defaultmethod", method, getXWikiContext());
-        method = getConfigParameter(documentName, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
+        method = getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
         return method.split(",");
     }
 
-    public void updateAverageRatings(String documentName, Rating rating, int oldVote)
+    public void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote)
         throws RatingsException
     {
-        String[] methods = getDefaultReputationMethods(documentName);
+        String[] methods = getDefaultReputationMethods(documentRef);
         for (int i = 0; i < methods.length; i++) {
-            updateAverageRating(documentName, rating, oldVote, methods[i]);
+            updateAverageRating(documentRef, rating, oldVote, methods[i]);
         }
     }
 
@@ -165,9 +166,9 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return getAverageRatingFromQuery(fromsql, wheresql, RATING_REPUTATION_METHOD_AVERAGE);
     }
 
-    public AverageRating getAverageRating(String documentName) throws RatingsException
+    public AverageRating getAverageRating(DocumentReference documentRef) throws RatingsException
     {
-        return getAverageRating(documentName, RATING_REPUTATION_METHOD_AVERAGE);
+        return getAverageRating(documentRef, RATING_REPUTATION_METHOD_AVERAGE);
     }
 
     public AverageRating getAverageRatingFromQuery(String fromsql, String wheresql, String method)
@@ -214,7 +215,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
      * @param context context of the request
      * @return AverageRating of the voter
      */
-    public AverageRating getUserReputation(String username) throws ReputationException
+    public AverageRating getUserReputation(DocumentReference username) throws ReputationException
     {
         try {
             return getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
@@ -223,23 +224,23 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    public AverageRating calcAverageRating(String documentName, String method)
+    public AverageRating calcAverageRating(DocumentReference documentRef, String method)
         throws RatingsException
     {
         int nbVotes = 0;
         int balancedNbVotes = 0;
         float totalVote = 0;
         float averageVote = 0;
-        List<Rating> ratings = getRatings(documentName, 0, 0, true);
+        List<Rating> ratings = getRatings(documentRef, 0, 0, true);
         if (ratings == null) {
             return null;
         }
         for (Rating rating : ratings) {
             if (method.equals(RATING_REPUTATION_METHOD_BALANCED)) {
-                String author = rating.getAuthor();
+                DocumentReference author = rating.getAuthor();
                 // in case we are evaluating the average rating of a user
                 // we should not include votes of himself to a user
-                if (!author.equals(documentName)) {
+                if (!author.equals(documentRef)) {
                     AverageRating reputation = getUserReputation(author);
                     if ((reputation == null) || (reputation.getAverageVote() == 0)) {
                         totalVote += rating.getVote();
@@ -259,16 +260,16 @@ public abstract class AbstractRatingsManager implements RatingsManager
         if (balancedNbVotes != 0) {
             averageVote = totalVote / balancedNbVotes;
         }
-        return new MemoryAverageRating(documentName, nbVotes, averageVote, method);
+        return new MemoryAverageRating(documentRef, nbVotes, averageVote, method);
     }
 
-    public void updateAverageRating(String documentName, Rating rating, int oldVote, String method)
+    public void updateAverageRating(DocumentReference documentRef, Rating rating, int oldVote, String method)
         throws RatingsException
     {
         // we only update if we are in stored mode and if the vote changed
-        if (isAverageRatingStored(documentName) && oldVote != rating.getVote()) {
-            AverageRating aRating = calcAverageRating(documentName, method);
-            AverageRating averageRating = getAverageRating(documentName, method, true);
+        if (isAverageRatingStored(documentRef) && oldVote != rating.getVote()) {
+            AverageRating aRating = calcAverageRating(documentRef, method);
+            AverageRating averageRating = getAverageRating(documentRef, method, true);
             averageRating.setAverageVote(aRating.getAverageVote());
             averageRating.setNbVotes(aRating.getNbVotes());
             averageRating.save();
@@ -282,7 +283,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    public void updateUserReputation(String author, AverageRating voterRating)
+    public void updateUserReputation(DocumentReference author, AverageRating voterRating)
         throws RatingsException
     {
         try {
@@ -297,25 +298,25 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
     
-    public AverageRating getAverageRating(String documentName, String method)
+    public AverageRating getAverageRating(DocumentReference documentRef, String method)
         throws RatingsException
     {
-        return getAverageRating(documentName, method, false);
+        return getAverageRating(documentRef, method, false);
     }
 
-    public AverageRating getAverageRating(String documentName, String method, boolean create)
+    public AverageRating getAverageRating(DocumentReference documentRef, String method, boolean create)
         throws RatingsException
     {
         try {
-            if (isAverageRatingStored(documentName)) {
+            if (isAverageRatingStored(documentRef)) {
                 String className = getAverageRatingsClassName();
-                XWikiDocument doc = getXWikiContext().getWiki().getDocument(documentName, getXWikiContext());
+                XWikiDocument doc = getXWikiContext().getWiki().getDocument(documentRef, getXWikiContext());
                 BaseObject averageRatingObject =
                     doc.getObject(className, RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD, method,
                         false);
                 if (averageRatingObject == null) {
                     if (!create) {
-                        return calcAverageRating(documentName, method);
+                        return calcAverageRating(documentRef, method);
                     }
 
                     // initiate a new average rating object
@@ -326,7 +327,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
                 return new StoredAverageRating(doc, averageRatingObject, getXWikiContext());
             } else {
-                return calcAverageRating(documentName, method);
+                return calcAverageRating(documentRef, method);
             }
         } catch (XWikiException e) {
             throw new RatingsException(e);

@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
@@ -56,16 +57,16 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Gets or calculates the user reputation.
      *
-     * @param documentName the document which the ratings are for
+     * @param documentRef the document which the ratings are for
      * @param username Person to calculate the reputation for
      * @param context context of the request
      * @return AverageRating of the voter
      */
-    public AverageRating getUserReputation(String documentName, String username) throws ReputationException
+    public AverageRating getUserReputation(DocumentReference documentRef, DocumentReference username) throws ReputationException
     {
         try {
             AverageRating aveRating =
-                getRatingsManager(documentName).getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
+                getRatingsManager(documentRef).getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
             float oldRep = aveRating.getAverageVote();
             aveRating.setAverageVote(aveRating.getAverageVote() * 100 / getTotalReputation());
             totalReputation += aveRating.getAverageVote() - oldRep;
@@ -78,7 +79,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Not implemented. Voters don't receive reputation
      */
-    public AverageRating calcNewVoterReputation(String voter, String documentName, Rating rating, int oldVote) throws ReputationException
+    public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
     {
         notimplemented();
         return null;
@@ -87,13 +88,13 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Implemented. Authors will receive a simple reputation.
      */
-    public AverageRating calcNewContributorReputation(String contributor, String documentName, Rating rating, int oldVote) throws ReputationException
+    public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
     {
-        String voter = rating.getAuthor();
-        float voterRep = getUserReputation(documentName, voter).getAverageVote();
+        DocumentReference voter = rating.getAuthor();
+        float voterRep = getUserReputation(documentRef, voter).getAverageVote();
         float constantX = getConstantX();
         float constantY = getConstantY();
-        AverageRating currentRep = getUserReputation(documentName, contributor);
+        AverageRating currentRep = getUserReputation(documentRef, contributor);
         currentRep.setAverageVote(currentRep.getAverageVote() + (rating.getVote() + constantX) * voterRep / constantY);
         notimplemented();
         return null;
@@ -134,7 +135,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Not implemented
      */
-    public Map<String, AverageRating> calcNewAuthorsReputation(String documentName, Rating rating, int oldVote) throws ReputationException
+    public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
     {
         notimplemented();
         return null;

@@ -19,6 +19,7 @@
  */
 package org.xwiki.ratings.internal;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
 
@@ -30,7 +31,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class MemoryAverageRating implements AverageRating
 {
-    private String documentName;
+    private DocumentReference documentRef;
 
     private int nbVotes;
 
@@ -38,22 +39,22 @@ public class MemoryAverageRating implements AverageRating
 
     private String method;
 
-    public MemoryAverageRating(String documentName, int nbVotes, float averageVote, String method)
+    public MemoryAverageRating(DocumentReference documentRef, int nbVotes, float averageVote, String method)
     {
-        this.documentName = documentName;
+        this.documentRef = documentRef;
         this.nbVotes = nbVotes;
         this.averageVote = averageVote;
         this.method = method;
     }
 
-    public String getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return documentName;
+        return documentRef;
     }
 
-    public void setDocumentName(String documentName)
+    public void setDocumentReference(DocumentReference documentRef)
     {
-        this.documentName = documentName;
+        this.documentRef = documentRef;
     }
 
     public int getNbVotes()

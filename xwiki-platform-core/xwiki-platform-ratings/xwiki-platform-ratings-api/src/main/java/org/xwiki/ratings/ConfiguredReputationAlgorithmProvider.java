@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -76,16 +77,19 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
         return getXWikiContext().getWiki();
     }
 
-
-
+    /**
+     * Retrieve an instance of the desired ReputationAlorithm (default/simple/custom)
+     *
+     * @return the reputation algorithm selected by looking at the current configuration settings
+     */
     @Override
-    public ReputationAlgorithm get(String documentName)
+    public ReputationAlgorithm get(DocumentReference documentRef)
     {
         // TODO implement
         String reputationAlgorithmHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
         
         try {
-            XWikiDocument ratingDocument = getXWiki().getDocument(documentName, getXWikiContext());
+            XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
             XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
             XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
             XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
@@ -113,7 +117,7 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                  reputationInstance.setComponentManager(componentManager);
                  reputationInstance.setExecution(execution);
                  reputationInstance.setXWikiContext(getXWikiContext());
-                 reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentName));
+                 reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentRef));
                  return reputationInstance;
              }
             } catch (Throwable e) {

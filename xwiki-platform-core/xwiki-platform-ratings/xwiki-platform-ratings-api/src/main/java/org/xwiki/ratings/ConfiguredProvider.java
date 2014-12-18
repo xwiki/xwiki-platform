@@ -20,6 +20,7 @@
 package org.xwiki.ratings;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Provide instances of objects configured relative to the passed document.
@@ -31,8 +32,8 @@ import org.xwiki.component.annotation.Role;
 public interface ConfiguredProvider <T>
 {
     /**
-     * @param documentName
+     * @param documentRef
      * @return object of type T
      */
-    T get(String documentName);
+    T get(DocumentReference documentRef);
 }

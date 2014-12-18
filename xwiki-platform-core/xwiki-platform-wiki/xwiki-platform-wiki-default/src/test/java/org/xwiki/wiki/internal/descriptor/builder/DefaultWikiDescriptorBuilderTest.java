@@ -19,6 +19,14 @@
  */
 package org.xwiki.wiki.internal.descriptor.builder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +39,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -44,14 +53,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.descriptor.builder.DefaultWikiDescriptorBuilder}.
  *
@@ -62,13 +63,15 @@ public class DefaultWikiDescriptorBuilderTest
 {
     @Rule
     public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorBuilder> mocker =
-            new MockitoComponentMockingRule(DefaultWikiDescriptorBuilder.class);
+        new MockitoComponentMockingRule(DefaultWikiDescriptorBuilder.class);
 
     private Provider<XWikiContext> xcontextProvider;
 
     private EntityReferenceSerializer<String> referenceSerializer;
 
     private DocumentReferenceResolver<String> referenceResolver;
+
+    private DocumentReferenceResolver<String> userReferenceResolver;
 
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -91,15 +94,16 @@ public class DefaultWikiDescriptorBuilderTest
 
         referenceSerializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         referenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
+        userReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "user");
 
         wikiDescriptorManager = mock(WikiDescriptorManager.class);
         wikiPropertyGroupManager = mock(WikiPropertyGroupManager.class);
         wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
-        Provider<WikiDescriptorManager> wikiDescriptorManagerProvider = mocker.getInstance(
-                new DefaultParameterizedType(null, Provider.class, WikiDescriptorManager.class));
-        Provider<WikiPropertyGroupManager> wikiPropertyGroupManagerProvider = mocker.getInstance(
-                new DefaultParameterizedType(null, Provider.class, WikiPropertyGroupManager.class));
+        Provider<WikiDescriptorManager> wikiDescriptorManagerProvider =
+            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, WikiDescriptorManager.class));
+        Provider<WikiPropertyGroupManager> wikiPropertyGroupManagerProvider =
+            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, WikiPropertyGroupManager.class));
 
         when(wikiDescriptorManagerProvider.get()).thenReturn(wikiDescriptorManager);
         when(wikiPropertyGroupManagerProvider.get()).thenReturn(wikiPropertyGroupManager);
@@ -132,18 +136,15 @@ public class DefaultWikiDescriptorBuilderTest
         DocumentReference mainPageReference = new DocumentReference("subwiki1", "Space", "MainPage");
 
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)).thenReturn("Space.MainPage");
-        when(referenceResolver.resolve("Space.MainPage")).
-                thenReturn(mainPageReference);
-        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME)).
-                thenReturn("myPrettyName");
-        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)).
-                thenReturn("myOwner");
-        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).
-                thenReturn("myDescription");
+        when(referenceResolver.resolve("Space.MainPage")).thenReturn(mainPageReference);
+        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME)).thenReturn(
+            "myPrettyName");
+        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)).thenReturn("myOwner");
+        when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).thenReturn("myDescription");
 
-        DocumentReference ownerRef = new DocumentReference("xwiki", "XWiki", "myOwner");
-        when(referenceResolver.resolve("myOwner")).thenReturn(ownerRef);
-        when(referenceSerializer.serialize(ownerRef)).thenReturn("xwiki:XWiki.myOwner");
+        DocumentReference ownerRef = new DocumentReference("subwiki1", "XWiki", "myOwner");
+        when(userReferenceResolver.resolve("myOwner", new WikiReference("subwiki1"))).thenReturn(ownerRef);
+        when(referenceSerializer.serialize(ownerRef)).thenReturn("subwiki1:XWiki.myOwner");
 
         // Test
         WikiDescriptor result = mocker.getComponentUnderTest().buildDescriptorObject(objects, document);
@@ -155,7 +156,7 @@ public class DefaultWikiDescriptorBuilderTest
         assertEquals("alias2", result.getAliases().get(2));
         assertEquals(mainPageReference, result.getMainPageReference());
         assertEquals("myPrettyName", result.getPrettyName());
-        assertEquals("xwiki:XWiki.myOwner", result.getOwnerId());
+        assertEquals("subwiki1:XWiki.myOwner", result.getOwnerId());
         assertEquals("myDescription", result.getDescription());
 
         // Verify
@@ -193,8 +194,7 @@ public class DefaultWikiDescriptorBuilderTest
 
         DocumentReference mainPageReference = new DocumentReference("subwiki1", "Space", "MainPage");
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)).thenReturn("Space.MainPage");
-        when(referenceResolver.resolve("Space.MainPage")).
-                thenReturn(mainPageReference);
+        when(referenceResolver.resolve("Space.MainPage")).thenReturn(mainPageReference);
 
         Exception exception = new WikiPropertyGroupException("error in wikiPropertyGroupManager.loadForDescriptor");
         doThrow(exception).when(wikiPropertyGroupManager).loadForDescriptor(any(WikiDescriptor.class));
@@ -203,7 +203,7 @@ public class DefaultWikiDescriptorBuilderTest
         mocker.getComponentUnderTest().buildDescriptorObject(objects, document);
 
         // Verify
-        verify(mocker.getMockedLogger()).error("Failed to load wiki property groups for wiki [{}].",
-                "subwiki1", exception);
+        verify(mocker.getMockedLogger()).error("Failed to load wiki property groups for wiki [{}].", "subwiki1",
+            exception);
     }
 }

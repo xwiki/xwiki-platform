@@ -78,6 +78,7 @@ public interface ReputationAlgorithm
      * @param context context of the request
      * @return AverageRating of the contributor
      */
+    AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException;
 
     /**
      * Recalculated all reputation of the wiki The result is given as a set of AverageRating objects That can be saved

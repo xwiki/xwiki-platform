@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -36,6 +37,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -43,6 +45,7 @@ import org.xwiki.url.internal.standard.StandardURLConfiguration;
 import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -108,6 +111,9 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private WikiConfiguration wikiConfiguration;
 
+    @Inject
+    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
     /**
      * Logging tool.
      */
@@ -153,8 +159,8 @@ public class WikiManagerScriptService implements ScriptService
     private void checkProgrammingRights() throws AuthorizationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                xcontext.getDoc().getDocumentReference());
+        authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(), xcontext.getDoc()
+            .getDocumentReference());
     }
 
     /**
@@ -429,27 +435,51 @@ public class WikiManagerScriptService implements ScriptService
     {
         XWikiContext context = xcontextProvider.get();
 
-        try {
-            // Check if the current script has the programming rights
-            checkProgrammingRights();
+        boolean result = false;
 
+        try {
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
+            WikiReference wikiReference = descriptor.getReference();
             if (oldDescriptor != null) {
-                String owner = oldDescriptor.getOwnerId();
-                // Check right access
-                WikiReference wikiReference = new WikiReference(oldDescriptor.getId());
-                if (!entityReferenceSerializer.serialize(context.getUserReference()).equals(owner)) {
-                    authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+                if (!result) {
+                    // Users that can edit the wiki's descriptor document are allowed to use this API as well. This
+                    // includes global admins.
+                    DocumentReference descriptorDocument =
+                        wikiDescriptorDocumentHelper.getDocumentReferenceFromId(oldDescriptor.getId());
+                    result = authorizationManager.hasAccess(Right.EDIT, context.getUserReference(), descriptorDocument);
+                }
+
+                String currentOwner = oldDescriptor.getOwnerId();
+                if (!result) {
+                    // The current owner can edit anything.
+                    result = entityReferenceSerializer.serialize(context.getUserReference()).equals(currentOwner);
+                }
+
+                if (!result) {
+                    // Local admins can edit the descriptor, except for the "ownerId" field, which should be
+                    // editable only by the current owner or main wiki admins.
+                    String newOwner = descriptor.getOwnerId();
+                    result =
+                        authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), wikiReference)
+                            && StringUtils.equals(newOwner, currentOwner);
                 }
             } else {
                 // Saving a descriptor that did not already exist should be reserved to global admins
-                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(),
-                        new WikiReference(wikiDescriptorManager.getMainWikiId()));
+                result =
+                    authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), new WikiReference(
+                        wikiDescriptorManager.getMainWikiId()));
             }
-            wikiDescriptorManager.saveDescriptor(descriptor);
 
-            return true;
+            if (!result) {
+                // Exhausted all options. Deny access for the current user to edit the descriptor.
+                throw new AccessDeniedException(context.getUserReference(), wikiReference);
+            } else {
+                // Execute the operation.
+                wikiDescriptorManager.saveDescriptor(descriptor);
+            }
+
+            return result;
         } catch (Exception e) {
             error(e);
             return false;
@@ -458,8 +488,9 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Tell if the path mode is used for subwikis.
-     *
+     * <p/>
      * Example:
+     * 
      * <pre>
      * {@code
      * wiki alias: subwiki

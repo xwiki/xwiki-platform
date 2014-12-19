@@ -22,44 +22,35 @@
   *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>xwiki-platform-wiki-ui</artifactId>
     <groupId>org.xwiki.platform</groupId>
     <version>6.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
+  <artifactId>xwiki-platform-wiki-ui-common</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Wiki - UI - Wiki</name>
-  <description>XWiki application that manages wiki.</description>
-  <properties>
-    <xwiki.extension.features>
-      <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      org.xwiki.platform:xwiki-platform-workspace-template-features
-    </xwiki.extension.features>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Wiki Application for subwikis</xwiki.extension.name>
-  </properties>
+  <name>XWiki Platform - Wiki - UI - Common</name>
+  <description>Common Wiki related UI that is used in both the main wiki and subwikis.</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-user-api</artifactId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <!-- needed until the UI has removed every relation to the default implementation -->
-      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-ui-common</artifactId>
-      <version>${project.version}</version>
-      <type>xar</type>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-html</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

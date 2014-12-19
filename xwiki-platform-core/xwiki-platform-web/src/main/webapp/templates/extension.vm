@@ -322,17 +322,14 @@ $namespace##
 #end
 
 #macro (displayExtensionDetails_description_versions $extension)
-  #if (!$request.listVersions)
-    <dt></dt>
-    <dd>
+  <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
+  <dd>
+    #if (!$request.listVersions)
       <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
         class="extension-versions-link">
         $services.localization.render('extensions.info.stableVersions.linkLabel')
       </a>
-    </dd>
-  #else
-    <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
-    <dd>
+    #else
       #set ($stableVersions = [])
       #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
         #if ($version.type == 'STABLE')
@@ -350,8 +347,8 @@ $namespace##
       #else
         $services.localization.render('extensions.info.stableVersions.noResults')
       #end
-    </dd>
-  #end
+    #end
+  </dd>
 #end
 
 #**

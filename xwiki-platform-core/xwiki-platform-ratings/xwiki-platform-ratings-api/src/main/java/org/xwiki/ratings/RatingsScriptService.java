@@ -23,17 +23,17 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Document;
 
 /**
  * @version $Id$
@@ -44,18 +44,56 @@ import com.xpn.xwiki.XWikiContext;
 public class RatingsScriptService implements ScriptService
 {
     @Inject
-    private Execution execution;
-    
+    private Provider<XWikiContext> xcontext;
+
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
-    /**
-     * Reference resolver for string representations of references.
-     */
     @Inject
     @Named("current")
-    protected DocumentReferenceResolver<String> referenceResolver;
- 
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    @Named("user/current")
+    private DocumentReferenceResolver<String> userReferenceResolver;
+
+    /**
+     * Retrieve the XWiki context from the current execution context.
+     * 
+     * @return the XWiki context
+     * @throws RuntimeException If there was an error retrieving the context
+     */
+    protected XWikiContext getXWikiContext()
+    {
+        return xcontext.get();
+    }
+
+    /**
+     * Store a caught exception in the context.
+     * 
+     * @param e the exception to store, can be null to clear the previously stored exception
+     */
+    private void setError(Throwable e)
+    {
+        getXWikiContext().put("exception", e);
+    }
+
+    /**
+     * Retrieve the global configuration document.
+     *
+     * @return a reference to the global configuration document
+     */
+    private DocumentReference getGlobalConfig()
+    {
+        return documentReferenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE);
+    }
+
+    /**
+     * Wrap rating objects.
+     * 
+     * @param ratings a list of rating object
+     * @return list of object wrapped with the RatingAPI
+     */
     protected static List<RatingApi> wrapRatings(List<Rating> ratings)
     {
         if (ratings == null) {
@@ -66,118 +104,279 @@ public class RatingsScriptService implements ScriptService
         for (Rating rating : ratings) {
             ratingsResult.add(new RatingApi(rating));
         }
+
         return ratingsResult;
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Set a new rating.
      * 
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
+     * @param doc the document which is being rated
+     * @param author the author giving the rating
+     * @param vote the number of stars given (from 1 to 5)
+     * @return the new rating object
      */
-    protected XWikiContext getXWikiContext()
+    @Deprecated
+    public RatingApi setRating(Document doc, String author, int vote)
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        DocumentReference documentRef = doc.getDocumentReference();
+        DocumentReference authorRef = userReferenceResolver.resolve(author);
+        return setRating(documentRef, authorRef, vote);
     }
-    
+
     /**
-     * Retrieve the global configuration document
-     *
-     * @return a reference to the global configuration document
+     * Set a new rating.
+     * 
+     * @param document the document which is being rated
+     * @param author the author giving the rating
+     * @param vote the number of stars given (from 1 to 5)
+     * @return the new rating object
      */
-    private DocumentReference getGlobalConfig() {
-        return referenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE);
-    }
-    
-    public RatingApi setRating(DocumentReference documentRef, DocumentReference author, int vote)
+    public RatingApi setRating(DocumentReference document, DocumentReference author, int vote)
     {
         // TODO protect this with programming rights
         // and add a setRating(docName), not protected but for which the author is retrieved from getXWikiContext().
+        setError(null);
+
         try {
-            return new RatingApi(ratingsManagerProvider.get(documentRef).setRating(documentRef, author, vote));
+            return new RatingApi(ratingsManagerProvider.get(document).setRating(document, author, vote));
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
-    public RatingApi getRating(DocumentReference documentRef, DocumentReference author)
+    /**
+     * Retrieve a specific rating.
+     * 
+     * @param doc the document to which the rating belongs to
+     * @param author the user that gave the rating
+     * @return a rating object
+     */
+    @Deprecated
+    public RatingApi getRating(Document doc, String author)
     {
+        DocumentReference documentRef = doc.getDocumentReference();
+        DocumentReference authorRef = userReferenceResolver.resolve(author);
+        return getRating(documentRef, authorRef);
+    }
+
+    /**
+     * Retrieve a specific rating.
+     * 
+     * @param document the document to which the rating belongs to
+     * @param author the user that gave the rating
+     * @return a rating object
+     */
+    public RatingApi getRating(DocumentReference document, DocumentReference author)
+    {
+        setError(null);
+
         try {
-            Rating rating = ratingsManagerProvider.get(documentRef).getRating(documentRef, author);
+            Rating rating = ratingsManagerProvider.get(document).getRating(document, author);
             if (rating == null) {
                 return null;
             }
             return new RatingApi(rating);
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
-    public List<RatingApi> getRatings(DocumentReference documentRef, int start, int count)
+    /**
+     * Get a list of ratings.
+     * 
+     * @param doc the document to which the ratings belong to
+     * @param start the offset from which to start
+     * @param count number of ratings to return
+     * @return a list of rating objects
+     */
+    @Deprecated
+    public List<RatingApi> getRatings(Document doc, int start, int count)
     {
-        return getRatings(documentRef, start, count, true);
+        return getRatings(doc.getDocumentReference(), start, count);
     }
 
-    public List<RatingApi> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
+    /**
+     * Get a list of ratings.
+     * 
+     * @param document the document to which the ratings belong to
+     * @param start the offset from which to start
+     * @param count number of ratings to return
+     * @return a list of rating objects
+     */
+    public List<RatingApi> getRatings(DocumentReference document, int start, int count)
     {
+        return getRatings(document, start, count, true);
+    }
+
+    /**
+     * Get a sorted list of ratings.
+     * 
+     * @param doc the document to which the ratings belong to
+     * @param start the offset from which to start
+     * @param count number of ratings to return
+     * @param asc in ascending order or not
+     * @return a list of rating objects
+     */
+    @Deprecated
+    public List<RatingApi> getRatings(Document doc, int start, int count, boolean asc)
+    {
+        return getRatings(doc.getDocumentReference(), start, count, asc);
+    }
+
+    /**
+     * Get a sorted list of ratings.
+     * 
+     * @param document the document to which the ratings belong to
+     * @param start the offset from which to start
+     * @param count number of ratings to return
+     * @param asc in ascending order or not
+     * @return a list of rating objects
+     */
+    public List<RatingApi> getRatings(DocumentReference document, int start, int count, boolean asc)
+    {
+        setError(null);
+
         try {
-            return wrapRatings(ratingsManagerProvider.get(documentRef).getRatings(documentRef, start, count, asc));
+            return wrapRatings(ratingsManagerProvider.get(document).getRatings(document, start, count, asc));
         } catch (Exception e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
-    public AverageRatingApi getAverageRating(DocumentReference documentRef, String method)
+    /**
+     * Get average rating.
+     * 
+     * @param doc the document to which the average rating belongs to
+     * @param method the method of calculating the average
+     * @return a average rating API object
+     */
+    @Deprecated
+    public AverageRatingApi getAverageRating(Document doc, String method)
     {
-        try {
-            return new AverageRatingApi(ratingsManagerProvider.get(documentRef).getAverageRating(documentRef, method));
-        } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
-            return null;
-        }
+        return getAverageRating(doc.getDocumentReference(), method);
     }
 
-    public AverageRatingApi getAverageRating(DocumentReference documentRef)
+    /**
+     * Get average rating.
+     * 
+     * @param document the document to which the average rating belongs to
+     * @param method the method of calculating the average
+     * @return a average rating API object
+     */
+    public AverageRatingApi getAverageRating(DocumentReference document, String method)
     {
+        setError(null);
+
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(documentRef).getAverageRating(documentRef));
+            return new AverageRatingApi(ratingsManagerProvider.get(document).getAverageRating(document, method));
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
+    /**
+     * Get average rating.
+     * 
+     * @param doc the document to which the average rating belongs to
+     * @return a average rating API object
+     */
+    @Deprecated
+    public AverageRatingApi getAverageRating(Document doc)
+    {
+        return getAverageRating(doc.getDocumentReference());
+    }
+
+    /**
+     * Get average rating.
+     * 
+     * @param document the document to which the average rating belongs to
+     * @return a average rating API object
+     */
+    public AverageRatingApi getAverageRating(DocumentReference document)
+    {
+        setError(null);
+
+        try {
+            return new AverageRatingApi(ratingsManagerProvider.get(document).getAverageRating(document));
+        } catch (Throwable e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Get average rating from query.
+     * 
+     * @param fromsql the from clause of the query
+     * @param wheresql the where clause of the query
+     * @param method the method of calculating the average
+     * @return a average rating API object
+     */
     public AverageRatingApi getAverageRating(String fromsql, String wheresql, String method)
     {
+        setError(null);
+
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(fromsql, wheresql, method));
+            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
+                fromsql, wheresql, method));
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
+    /**
+     * Get average rating from query.
+     * 
+     * @param fromsql the from clause of the query
+     * @param wheresql the where clause of the query
+     * @return a average rating API object
+     */
     public AverageRatingApi getAverageRating(String fromsql, String wheresql)
     {
+        setError(null);
+
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(fromsql, wheresql));
+            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
+                fromsql, wheresql));
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }
 
+    /**
+     * Get a user's reputation.
+     * 
+     * @param username the user document
+     * @return a average rating API object
+     */
+    @Deprecated
+    public AverageRatingApi getUserReputation(String username)
+    {
+        DocumentReference userRef = userReferenceResolver.resolve(username);
+        return getUserReputation(userRef);
+    }
+
+    /**
+     * Get a user's reputation.
+     * 
+     * @param username the user document
+     * @return a average rating API object
+     */
     public AverageRatingApi getUserReputation(DocumentReference username)
     {
+        setError(null);
+
         try {
             return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
         } catch (Throwable e) {
-            getXWikiContext().put("exception", e);
+            setError(e);
             return null;
         }
     }

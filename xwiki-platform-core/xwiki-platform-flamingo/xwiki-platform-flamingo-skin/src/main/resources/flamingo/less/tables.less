@@ -36,48 +36,59 @@
     }
     
     > tbody {
-      clear: left;
-      border-top: 1px solid #ccc;
+      .responsive-table-tbody();
         
       > tr {
-        border: 1px solid #ccc;
-        border-top: 0;
+        .responsive-table-tbody-tr();
       }
       
       > tr > td, > tr > th {
-        // Behave like a "row"
-        .clearfix();
-        border: none;
-        border-bottom: 1px solid #eee;
-        min-height: @input-height-base;
-        position: relative;
-        padding-left: 50%;
-        padding-top: @table-cell-padding;
-        top: 0;
-        text-align:left;
-        white-space: normal;
-        
-        &:before {
-          // Behave like a table header
-          &:extend(.table > thead > tr > th);
-          color: @text-color;
-          content: attr(data-title);
-          font-weight: bold;
-          left: @table-cell-padding;
-          padding-right: @table-cell-padding;
-          position: absolute;
-          text-align: left;
-          top: @table-cell-padding;
-          white-space: nowrap;
-          width: 45%;
-        }
-        
-        &:last-child {
-          border: 0;
-        }
-        
+        .responsive-table-tbody-tr-tdth();
       }
     }
   }
 }
-
+/* -----------------------------
+  Mixins to create a responsive table
+*/
+.responsive-table-tbody() {
+  clear: left;
+}
+.responsive-table-tbody-tr() {
+  border-top: 2px solid @table-border-color;
+}
+// The cell (td or th) must be displayed as a row. The content is displayed on the right side to let display fake
+// headers on the left
+.responsive-table-tbody-tr-tdth() {
+  .clearfix();
+  border: none;
+  border-bottom: 1px solid @table-border-color;
+  min-height: @input-height-base;
+  position: relative;
+  padding-left: 50%;
+  padding-top: @table-cell-padding;
+  top: 0;
+  text-align:left;
+  white-space: normal;
+  
+  // Fake header: display a fake cell to display the title of the current cell
+  &:before {
+    // Behave like a table header
+    &:extend(.table > thead > tr > th);
+    color: @text-color;
+    // The title is stored in the data-title attribute of the cell
+    content: attr(data-title);
+    font-weight: bold;
+    left: @table-cell-padding;
+    padding-right: @table-cell-padding;
+    position: absolute;
+    text-align: left;
+    top: @table-cell-padding;
+    white-space: nowrap;
+    width: 45%;
+  }
+  
+  &:last-child {
+    border: 0;
+  }
+}

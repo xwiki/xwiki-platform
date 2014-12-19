@@ -27,7 +27,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  * Contains information about mail to sent.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public class MailStatus
 {

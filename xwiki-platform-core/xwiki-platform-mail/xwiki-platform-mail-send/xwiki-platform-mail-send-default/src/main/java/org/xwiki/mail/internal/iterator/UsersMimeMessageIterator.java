@@ -38,7 +38,7 @@ import org.xwiki.model.reference.DocumentReference;
  *  Generate messages from a user references.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public class UsersMimeMessageIterator extends AbstractMessageIterator
 {

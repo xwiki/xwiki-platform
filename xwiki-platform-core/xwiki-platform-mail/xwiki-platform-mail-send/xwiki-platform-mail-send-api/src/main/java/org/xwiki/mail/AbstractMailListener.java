@@ -25,7 +25,7 @@ import java.util.Iterator;
 /**
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public abstract class AbstractMailListener implements MailListener
 {

@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 /**
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Role
 public interface UsersMimeMessageIteratorFactory

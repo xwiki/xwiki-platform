@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Save and load mail to/from disk.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Role
 @Unstable

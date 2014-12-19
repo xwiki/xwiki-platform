@@ -37,7 +37,7 @@ import org.xwiki.mail.internal.iterator.SerializedFilesMimeMessageIterator;
 /**
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Component
 @Singleton

@@ -40,7 +40,7 @@ import org.xwiki.mail.MailStatus;
  * Saves errors when sending messages, in a local variable.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

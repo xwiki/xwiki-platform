@@ -44,7 +44,7 @@ import com.xpn.xwiki.XWikiException;
  * Generate messages from a group reference.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public class GroupMimeMessageIterator extends AbstractMessageIterator
 {

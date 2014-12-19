@@ -24,7 +24,7 @@ package org.xwiki.mail;
  * Used to specify the state of Mail.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public enum MailState
 {

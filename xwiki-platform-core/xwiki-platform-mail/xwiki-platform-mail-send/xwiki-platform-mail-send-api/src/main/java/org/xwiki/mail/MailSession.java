@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * Create JavaMail session used to send the mail.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Role
 @Unstable

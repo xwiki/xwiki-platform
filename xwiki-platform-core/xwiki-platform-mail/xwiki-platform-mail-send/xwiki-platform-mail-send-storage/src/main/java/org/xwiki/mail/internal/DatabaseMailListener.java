@@ -48,7 +48,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Component
 @Singleton

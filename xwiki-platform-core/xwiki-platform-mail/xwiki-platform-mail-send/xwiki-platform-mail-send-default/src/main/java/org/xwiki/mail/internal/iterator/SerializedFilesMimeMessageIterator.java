@@ -37,7 +37,7 @@ import org.xwiki.environment.Environment;
  * Generate messages from a list of files.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
 {

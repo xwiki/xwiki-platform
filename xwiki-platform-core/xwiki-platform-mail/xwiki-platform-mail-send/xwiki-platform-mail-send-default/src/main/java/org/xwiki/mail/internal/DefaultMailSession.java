@@ -33,7 +33,7 @@ import org.xwiki.mail.XWikiAuthenticator;
  * Default implementation.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Component
 @Singleton

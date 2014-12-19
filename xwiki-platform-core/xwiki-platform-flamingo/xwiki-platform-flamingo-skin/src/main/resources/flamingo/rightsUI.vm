@@ -90,6 +90,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             <tr class="userorgroups-header">
               ## Groups/Users switch
               <th scope="col" class="usersorgroupsnames">
+                ## ToDo: workspace is deprecated
                 #set ($isWorkspace = $services.workspace.isWorkspace($xcontext.database))
                 <label for="uorgg" class="hidden">$services.localization.render('rightsmanager.groups')</label>
                 <input type="radio" id="uorgg" name="uorg" value="groups"
@@ -122,9 +123,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
             </tr>
             <tr id="unregistered">
               ## Rights for guests, statically displayed outside the livetable
-              <td id="unreguser">$services.localization.render('rightsmanager.unregisteredusers')</td>
+              <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
               #foreach ($i in [0..$maxlevel])
-                <td class="rights" id="td${levelsRights.get($i)}"></td>
+                <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
               #end
             </tr>
             <tr id="usersandgroupstable-filters">

@@ -3,6 +3,11 @@
 // 
 // Some adaptations to make the livetable responsive to the screen size
 // --------------------------------------------------
+// Looks nicer with the .table-striped() mix-in of bootstrap
+.xwiki-livetable-display {
+  .table;
+  .table-striped;
+}
 
 @media only screen and (max-width: @screen-xs-max) {
 
@@ -17,7 +22,10 @@
     .xwiki-livetable-display-header tr {
       width: 50%;
       float: left;
-      border: 1px solid #ccc;
+      
+      th.xwiki-livetable-display-header-text {
+        background-color: @table-border-color;
+      }
       
       &:first-child{
         border-right: 0;
@@ -29,6 +37,7 @@
     }
     
     .xwiki-livetable-display-header{ // I'm forced to be that specific to override the rules of livetable.css
+      border-top: 2px solid @table-border-color;
     
       .xwiki-livetable-display-header-text, .xwiki-livetable-display-header-filter {
         height: @input-height-base + @padding-base-vertical;
@@ -42,53 +51,59 @@
         }
       }
     }
-
-    // The rest is not specific to the livetable, so we just re-use the .responsible-table class.
+    
+    // Re-use mix-ins from "tables.less"
     .xwiki-livetable-display-body {
-      // code duplication there because LESS is buggy
-      // goal: &:extend(.responsive-table > tbody);
-      clear: left;
-      border-top: 1px solid #ccc;
+      .responsive-table-tbody();
       
       > tr {
-        // code duplication there because LESS is buggy
-        // goal: &:extend(.responsive-table > tbody > tr);
-        border: 1px solid #ccc;
-        border-top: 0;
+        .responsive-table-tbody-tr();
         
         > td, > th {
-          // code duplication there because LESS is buggy
-          // goal: &:extend(.responsive-table > tbody > tr > td);
-          .clearfix();
-          border: none;
-          border-bottom: 1px solid #eee;
-          min-height: @input-height-base;
-          position: relative;
-          padding-left: 50%;
-          padding-top: @table-cell-padding;
-          top: 0;
-          text-align:left;
-          white-space: normal;
-            
-          &:before {
-            // code duplication there because LESS is buggy
-            // goal: &:extend(.responsive-table > tbody > tr > td:before);
-            &:extend(.table > thead > tr > th);
-            color: @text-color;
-            content: attr(data-title);
-            font-weight: bold;
-            left: @table-cell-padding;
-            padding-right: @table-cell-padding;
-            position: absolute;
-            text-align: left;
-            top: @table-cell-padding;
-            white-space: nowrap;
-            width: 45%;
-          }
-          // code duplication there because LESS is buggy
-          &:last-child {
-            border: 0;
-          }
+          .responsive-table-tbody-tr-tdth();
+        }
+      }
+    }
+  }
+}
+
+// Some adaptations for livetable related to user rights
+// see: http://jira.xwiki.org/browse/XWIKI-11583
+@media only screen and (max-width: @screen-xs-max) {
+  .skin-flamingo { // Needed to override the rules from livetable.css and usersandgroups.css
+  
+    #usersandgroupstable td.rights{
+      padding-left: 50% !important; // overwrite usersandgroups.css
+    }
+    
+    #usersandgroupstable.rights .rights {
+      width: 100% !important; // overwrite usersandgroups.css
+    }
+  
+    .xwiki-livetable-display-header {
+          
+      > .userorgroups-header {
+        width: 100%;
+        
+        > .rights {
+          // Hide the headers that do not propose filtering
+          display: none;
+        }
+      }
+      
+      > #usersandgroupstable-filters {
+        width: 100%;
+      }
+      
+      #unregistered {
+        .responsive-table-tbody-tr();
+        width: 100%;
+        border: 0;
+        border-bottom: 2px solid @table-border-color;
+        
+        > td {
+          .responsive-table-tbody-tr-tdth();
+          width: 100%;
         }
       }
     }

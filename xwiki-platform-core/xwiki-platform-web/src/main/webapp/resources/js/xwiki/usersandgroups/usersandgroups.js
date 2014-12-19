@@ -376,6 +376,12 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  if (uorg == 'groups') {
+    username.setAttribute('data-title', '$escapetool.javascript($services.localization.render('rightsmanager.groupname'))');
+  } else {
+    username.setAttribute('data-title', '$escapetool.javascript($services.localization.render('rightsmanager.username'))');
+  }
   if (row.wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -384,6 +390,12 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   } else {
     username.appendChild(document.createTextNode(row.username));
   }
+  
+  var translatedRights = {};
+  #set ($rightsLevels = ['view', 'comment', 'edit', 'delete', 'admin', 'register', 'programming', 'createwiki'])
+  #foreach ($rightLevel in $rightsLevels)
+    translatedRights['$rightLevel'] = '$escapetool.javascript($services.localization.render("rightsmanager.${rightLevel}"))';
+  #end
 
   username.className = "username";
   tr.appendChild(username);
@@ -392,6 +404,8 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
     {
       var td = document.createElement('td');
       td.className = "rights";
+      // Set a data-title attribute for the responsive livetable (since Flamingo).
+      td.setAttribute("data-title", translatedRights[right]);
       var r = 0;
       if (allows.match("\\b" + right + "\\b")) {
         r = 1;

@@ -19,9 +19,6 @@
  */
 package org.xwiki.ratings;
 
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.XWikiContext;
-
 import java.util.Date;
 
 import org.xwiki.model.reference.DocumentReference;

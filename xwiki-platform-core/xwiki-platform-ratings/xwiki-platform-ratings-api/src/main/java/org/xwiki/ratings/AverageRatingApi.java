@@ -19,9 +19,6 @@
  */
 package org.xwiki.ratings;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-
 /**
  * Api wrapper for an average rating.
  *

@@ -56,11 +56,9 @@ public class RatingsException extends XWikiException
 
     public RatingsException(XWikiException e)
     {
-        super();
-        setModule(e.getModule());
-        setCode(e.getCode());
-        setException(e.getException());
+        super(e.getModule(), e.getCode(), e.getMessage());
+
+        initCause(e.getCause());
         setArgs(e.getArgs());
-        setMessage(e.getMessage());
     }
 }

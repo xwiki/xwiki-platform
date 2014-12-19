@@ -23,8 +23,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.RatingsException;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
  * @version $Id$
  * @see AverageRating

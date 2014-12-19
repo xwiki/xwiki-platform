@@ -22,8 +22,6 @@ package org.xwiki.ratings.internal;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;

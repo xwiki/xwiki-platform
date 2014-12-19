@@ -20,7 +20,6 @@
 package org.xwiki.ratings;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -39,7 +38,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<RatingsManager>
 {
-        
     @Inject 
     Logger logger;   
 

@@ -20,7 +20,6 @@
 package org.xwiki.ratings;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;

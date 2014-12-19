@@ -34,7 +34,6 @@ import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.ReputationAlgorithm;
 import org.xwiki.ratings.ReputationException;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
@@ -103,9 +102,9 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     private float getTotalReputation()
     {
         if (totalReputation == 0) {
-            // recalc it
+            // recalculate it
             try {
-                List result =
+                List<Float> result =
                         getXWiki()
                         .search(
                             "select sum(prop.value) from XWikiDocument as doc, BaseObject as obj, FloatProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj.id=prop.id.id and prop.id.name='averagevote'",
@@ -113,7 +112,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
                 if ((result == null) || (result.size() == 0)) {
                     totalReputation = 0;
                 } else {
-                    totalReputation = ((Float) result.get(0)).floatValue();
+                    totalReputation = result.get(0).floatValue();
                 }
             } catch (XWikiException e) {
                 totalReputation = 0;

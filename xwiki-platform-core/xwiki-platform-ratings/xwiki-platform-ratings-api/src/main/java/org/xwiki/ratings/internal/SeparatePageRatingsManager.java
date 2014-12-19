@@ -27,13 +27,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import org.slf4j.Logger;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -118,7 +116,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             rating.setDate(new Date());
         }
         
-        // savin rating
+        // saving rating
         rating.save();
        
         // update the average rating
@@ -156,12 +154,12 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 + (asc ? "asc" : "desc");
         List<Rating> ratings = new ArrayList<Rating>();
         try {
-            List<String> ratingPageNameList =
-                getXWiki().getStore().searchDocumentsNames(sql, count, start, getXWikiContext());
+            List<DocumentReference> ratingPageReferenceList =
+                getXWiki().getStore().searchDocumentReferences(sql, count, start, getXWikiContext());
 
-            for (String ratingPageName : ratingPageNameList) {
+            for (DocumentReference ratingPageReference : ratingPageReferenceList) {
                 ratings.add(getRatingFromDocument(documentRef, getXWiki()
-                    .getDocument(ratingPageName, getXWikiContext())));
+                    .getDocument(ratingPageReference, getXWikiContext())));
             }
         } catch (XWikiException e) {
             throw new RatingsException(e);
@@ -191,12 +189,12 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 +
                 "' and obj2.id=statusprop.id.id and statusprop.id.name='status' and (statusprop.value='moderated' or statusprop.value='refused') and obj.id=obj2.id) order by doc.date desc";
         try {
-            List<String> ratingPageNameList = getXWiki().getStore().searchDocumentsNames(sql, 1, id, getXWikiContext());
-            if ((ratingPageNameList == null) || (ratingPageNameList.size() == 0)) {
+            List<DocumentReference> ratingPageReferenceList = getXWiki().getStore().searchDocumentReferences(sql, 1, id, getXWikiContext());
+            if ((ratingPageReferenceList == null) || (ratingPageReferenceList.size() == 0)) {
                 return null;
             } else {
                 return new SeparatePageRatingsManager().getRatingFromDocument(documentRef, getXWiki()
-                    .getDocument(ratingPageNameList.get(0), getXWikiContext()));
+                    .getDocument(ratingPageReferenceList.get(0), getXWikiContext()));
             }
         } catch (XWikiException e) {
             throw new RatingsException(e);

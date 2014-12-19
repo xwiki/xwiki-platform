@@ -19,24 +19,21 @@
  */
 package org.xwiki.ratings;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.util.List;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.script.service.ScriptService;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -52,8 +49,12 @@ public class RatingsScriptService implements ScriptService
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
+    /**
+     * Reference resolver for string representations of references.
+     */
     @Inject
-    private Provider<ReputationAlgorithm> reputationAlgorithmProvider;
+    @Named("current")
+    protected DocumentReferenceResolver<String> referenceResolver;
  
     protected static List<RatingApi> wrapRatings(List<Rating> ratings)
     {
@@ -82,19 +83,12 @@ public class RatingsScriptService implements ScriptService
     }
     
     /**
+     * Retrieve the global configuration document
      *
+     * @return a reference to the global configuration document
      */
     private DocumentReference getGlobalConfig() {
-        XWikiContext context = getXWikiContext();
-        XWikiDocument globalConfigDoc;
-
-        try {
-            globalConfigDoc = context.getWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, context);
-        } catch (XWikiException e) {
-            return null;
-        }
-
-        return globalConfigDoc.getDocumentReference();
+        return referenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE);
     }
     
     public RatingApi setRating(DocumentReference documentRef, DocumentReference author, int vote)

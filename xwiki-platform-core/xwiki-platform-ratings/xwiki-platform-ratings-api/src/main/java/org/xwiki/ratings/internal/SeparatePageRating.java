@@ -46,7 +46,7 @@ public class SeparatePageRating implements Rating
     private XWikiContext context;
 
     private SeparatePageRatingsManager ratingsManager;
-    
+
     public SeparatePageRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this(documentRef, author, new Date(), vote, context, ratingsManager);
@@ -90,7 +90,7 @@ public class SeparatePageRating implements Rating
     {
         if (document == null) {
             try {
-                document = context.getWiki().getDocument(getPageName(this.documentRef), context);
+                document = context.getWiki().getDocument(getPageReference(this.documentRef), context);
             } catch (XWikiException e) {
                 return null;
             }
@@ -105,16 +105,8 @@ public class SeparatePageRating implements Rating
      */
     public DocumentReference getAuthor()
     {
-        XWikiDocument authorDoc;
-
-        try {
-            String objectVal = getAsObject().getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
-            authorDoc = context.getWiki().getDocument(objectVal, context);
-        } catch (XWikiException e) {
-            return null;
-        }
-
-        return authorDoc.getDocumentReference();
+        String objectVal = getAsObject().getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+        return ratingsManager.userReferenceResolver.resolve(objectVal, documentRef);
     }
 
     public Date getDate()
@@ -130,7 +122,7 @@ public class SeparatePageRating implements Rating
      */
     public void setAuthor(DocumentReference author)
     {
-        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
+        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
     public void setDate(Date date)
@@ -231,7 +223,7 @@ public class SeparatePageRating implements Rating
     /**
      * Generate page name from the container page We add Rating and getUniquePageName will add us a counter to our page
      */
-    private DocumentReference getPageName(DocumentReference documentRef) throws XWikiException
+    private DocumentReference getPageReference(DocumentReference documentRef) throws XWikiException
     {
         XWikiDocument doc = context.getWiki().getDocument(documentRef, context);
         String ratingsSpace = ratingsManager.getRatingsSpaceName(documentRef);
@@ -260,19 +252,20 @@ public class SeparatePageRating implements Rating
         return pageName;
     }
 
-    private XWikiDocument addDocument(DocumentReference documentRef, DocumentReference author, Date date, int vote) throws RatingsException
+    private XWikiDocument addDocument(DocumentReference documentRef, DocumentReference author, Date date, int vote)
+        throws RatingsException
     {
         try {
             String ratingsClassName = RatingsManager.RATINGS_CLASSNAME;
-            DocumentReference pageName = getPageName(documentRef);
-            String parentDocName = documentRef.getName();
+            DocumentReference pageRef = getPageReference(documentRef);
+            String parentDocName = ratingsManager.entityReferenceSerializer.serialize(documentRef);
             XWiki xwiki = context.getWiki();
-            XWikiDocument doc = xwiki.getDocument(pageName, context);
+            XWikiDocument doc = xwiki.getDocument(pageRef, context);
             doc.setParent(parentDocName);
             BaseObject obj = new BaseObject();
             obj.setClassName(ratingsClassName);
-            obj.setName(pageName.getName());
-            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
+            obj.setName(ratingsManager.entityReferenceSerializer.serialize(pageRef));
+            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, ratingsManager.entityReferenceSerializer.serialize(author));
             obj.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
             obj.setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, parentDocName);

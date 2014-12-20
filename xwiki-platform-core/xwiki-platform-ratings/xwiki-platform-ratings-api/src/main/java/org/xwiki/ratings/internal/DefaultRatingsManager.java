@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.UpdateRatingEvent;
@@ -51,6 +54,14 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     @Inject
     private Logger LOGGER;
     
+    @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    @Named("local")
+    protected EntityReferenceSerializer<String> entityReferenceSerializer;
+
     /**
      * {@inheritDoc}
      *
@@ -63,7 +74,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         int oldVote;
         if (rating == null) {
             oldVote = 0;
-            rating = new DefaultRating(documentRef, author, vote, getXWikiContext());
+            rating = new DefaultRating(documentRef, author, vote, getXWikiContext(), this);
         } else {
             oldVote = rating.getVote();
             rating.setVote(vote);
@@ -147,7 +158,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
                     RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, could not find rating");
             }
 
-            return new DefaultRating(docRef, object, getXWikiContext());
+            return new DefaultRating(docRef, object, getXWikiContext(), this);
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }
@@ -211,6 +222,6 @@ public class DefaultRatingsManager extends AbstractRatingsManager
 
     private DefaultRating getDefaultRating(DocumentReference documentRef, BaseObject bobj)
     {
-        return new DefaultRating(documentRef, bobj, getXWikiContext());
+        return new DefaultRating(documentRef, bobj, getXWikiContext(), this);
     }
 }

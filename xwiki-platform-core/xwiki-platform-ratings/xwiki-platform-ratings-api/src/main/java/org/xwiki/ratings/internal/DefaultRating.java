@@ -21,7 +21,12 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -42,24 +47,28 @@ public class DefaultRating implements Rating
     private XWikiDocument document;
 
     private BaseObject object;
-    
+
     private XWikiContext context;
 
-    public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context)
+    private DefaultRatingsManager ratingsManager;
+
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context, DefaultRatingsManager ratingsManager)
     {
-        this(documentRef, author, new Date(), vote, context);
+        this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
 
-    public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context)
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context, DefaultRatingsManager ratingsManager)
     {
         this.context = context;
         this.documentRef = documentRef;
+        this.ratingsManager = ratingsManager;
         
-        createObject(documentRef.getName(), author.getName(), date, vote);
+        createObject(this.ratingsManager.entityReferenceSerializer.serialize(documentRef), this.ratingsManager.entityReferenceSerializer.serialize(author), date, vote);
     }
 
-    public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context)
+    public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context, DefaultRatingsManager ratingsManager)
     {
+        this.ratingsManager = ratingsManager;
         this.context = context;
         this.documentRef = documentRef;
         this.document = getDocument();
@@ -107,21 +116,13 @@ public class DefaultRating implements Rating
      */
     public DocumentReference getAuthor()
     {
-        XWikiDocument authorDoc;
-
-        try {
-            String objectVal = object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
-            authorDoc = context.getWiki().getDocument(objectVal, context);
-        } catch (XWikiException e) {
-            return null;
-        }
-
-        return authorDoc.getDocumentReference();
+        String objectVal = object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
+        return this.ratingsManager.userReferenceResolver.resolve(objectVal, documentRef);
     }
 
     public void setAuthor(DocumentReference author)
     {
-        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author.getName());
+        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, this.ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
     /**

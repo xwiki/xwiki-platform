@@ -572,7 +572,7 @@ position: relative;
 #set($excludedPages  = $stringtool.stripAll($excludedPages))
 ##
 #if($displayRatings &amp;&amp; !$listtool.contains($excludedPages, $doc.name))
-  #displayFullRating($doc "")
+  #displayFullRating($doc.getDocumentReference() "")
 #end{{/velocity}}</content>
     </property>
     <property>
@@ -593,8 +593,7 @@ icon=icon:star</parameters>
   <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
 #if("$!{request.xpage}" == "plain")
   #if("$!{request.vote}" != "")
-    #set($requestDoc = $xwiki.getDocument($request.doc))
-    #set($requestDocRef = $requestDoc.getDocumentReference())
+    #set($requestDocRef = $services.model.resolveDocument($request.doc))
     #set($userDocRef = $xcontext.getUserReference())
     #set($vote = $util.parseInt($request.vote))
     #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)

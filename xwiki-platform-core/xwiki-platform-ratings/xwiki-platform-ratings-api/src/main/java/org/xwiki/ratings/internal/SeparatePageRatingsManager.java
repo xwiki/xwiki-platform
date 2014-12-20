@@ -32,9 +32,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import org.slf4j.Logger;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -59,6 +60,14 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
      */
     @Inject
     private Logger LOGGER;
+
+    @Inject
+    @Named("user/current")
+    protected DocumentReferenceResolver<String> userReferenceResolver;
+
+    @Inject
+    @Named("local")
+    protected EntityReferenceSerializer<String> entityReferenceSerializer;
   
     public SeparatePageRatingsManager()
     {
@@ -145,7 +154,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 + "' and obj.id=parentprop.id.id and parentprop.id.name='"
                 + RATING_CLASS_FIELDNAME_PARENT
                 + "' and parentprop.value='"
-                + documentRef.getName()
+                + entityReferenceSerializer.serialize(documentRef)
                 +
                 "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
                 + getRatingsClassName()
@@ -182,7 +191,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
                 + "' and obj.id=parentprop.id.id and parentprop.id.name='"
                 + RATING_CLASS_FIELDNAME_PARENT
                 + "' and parentprop.value='"
-                + documentRef
+                + entityReferenceSerializer.serialize(documentRef)
                 +
                 "' and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className='"
                 + getRatingsClassName()

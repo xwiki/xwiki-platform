@@ -70,22 +70,22 @@
 ###    Display full ratings UI ( rating ui, number of votes, user's vote)
 ###
 ###
-#macro(displayFullRating $rdoc $method)
+#macro(displayFullRating $requestDocRef $method)
 {{html clean="false" wiki="false"}}
 #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#set($requestDocRef = $rdoc.getDocumentReference())
 #set($userDocRef = $xcontext.getUserReference())
 #if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
 #else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
 #set($avgvote = $ar.averageVote)
 #set($uservote = $services.ratings.getRating($requestDocRef, $userDocRef).vote)
 #set($votes = $!ar.nbVotes)
-&lt;div class="rating-wrapper" id="rating-${rdoc.fullName}"&gt;
+&lt;div class="rating-wrapper" id="rating-${requestDocRef}"&gt;
 #if($xcontext.user!="XWiki.XWikiGuest")
 &lt;div class="avg-rating"&gt;
 #ratingstars($id "" "" $avgvote $votes false)
 &lt;/div&gt;
 #else
+ #set($rdoc = $xwiki.getDocument($requestDocRef))
  #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$rdoc.getURL()"))
 &lt;div class="avg-rating"&gt;
 #ratingstars($id "" $msg.get("rating.rate") $avgvote  $votes true)
@@ -99,10 +99,9 @@
 ###    Display small ratings UI ( rating ui - display only )
 ###
 ###
-#macro(displaySmallRating $rdoc $method)
+#macro(displaySmallRating $requestDocRef $method)
 {{html clean="false" wiki="true"}}
 #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
-#set($requestDocRef = $rdoc.getDocumentReference())
 #if($method != "")  #set($ar = $services.ratings.getAverageRating($requestDocRef, $method))
 #else  #set($ar = $services.ratings.getAverageRating($requestDocRef)) #end
 #set($avgvote = $ar.averageVote)

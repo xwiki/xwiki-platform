@@ -25,9 +25,9 @@ import org.xwiki.observation.event.Event;
 public class UpdateRatingEvent implements Event
 {
     private DocumentReference documentRef;
-    
+
     private Rating newRating;
-    
+
     private int oldRating;
 
     public DocumentReference getDocumentReference()
@@ -59,16 +59,17 @@ public class UpdateRatingEvent implements Event
     {
         this.oldRating = oldRating;
     }
-   
-    public UpdateRatingEvent() { 
+
+    public UpdateRatingEvent()
+    {
     }
-    
-    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating) {
+
+    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating)
+    {
         this.documentRef = documentRef;
         this.newRating = newRating;
         this.oldRating = oldRating;
     }
-
 
     @Override
     public boolean matches(Object arg0)

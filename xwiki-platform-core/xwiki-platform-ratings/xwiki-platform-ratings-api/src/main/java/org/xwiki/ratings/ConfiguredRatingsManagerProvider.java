@@ -38,8 +38,8 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<RatingsManager>
 {
-    @Inject 
-    Logger logger;   
+    @Inject
+    Logger logger;
 
     @Inject
     Execution execution;
@@ -73,9 +73,8 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     }
 
     /**
-     * Retrieve an instance of the desired RatingsManager (default/separate)
-     * - default: save the rating information in the same page
-     * - separate: save the rating information in a specified space
+     * Retrieve an instance of the desired RatingsManager (default/separate) - default: save the rating information in
+     * the same page - separate: save the rating information in a specified space
      *
      * @return the ratings manager selected by looking at the current configuration settings
      */
@@ -83,20 +82,30 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     public RatingsManager get(DocumentReference documentRef)
     {
         // TODO implement
-        String ratingsHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT, "default");
-        
+        String ratingsHint =
+            getXWiki().Param(
+                RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT,
+                "default");
+
         try {
             XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
-            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
-            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+            XWikiDocument spaceConfigDoc =
+                getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
+                    getXWikiContext());
+            XWikiDocument globalConfigDoc =
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc =
+                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                    : spaceConfigDoc;
 
-            if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME)!=null) {
-                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
-                String hint = (prop==null) ? null : (String) prop.getValue();
-                ratingsHint = (hint==null) ? ratingsHint : hint;
+            if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+                BaseProperty prop =
+                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                        RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
+                String hint = (prop == null) ? null : (String) prop.getValue();
+                ratingsHint = (hint == null) ? ratingsHint : hint;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Cannot read ratings config", e);
         }
 

@@ -34,7 +34,6 @@ import org.xwiki.ratings.UpdateRatingEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
-
 @Component
 @Named("updatereputation")
 @Singleton
@@ -58,9 +57,10 @@ public class UpdateReputationListener implements EventListener
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
-       UpdateRatingEvent ratingEvent = (UpdateRatingEvent) event;
-       DocumentReference documentRef = ratingEvent.getDocumentReference();
-       reputationAlgorithm.get(documentRef).updateReputation(documentRef, ratingEvent.getNewRating(), ratingEvent.getOldRating());
+        UpdateRatingEvent ratingEvent = (UpdateRatingEvent) event;
+        DocumentReference documentRef = ratingEvent.getDocumentReference();
+        reputationAlgorithm.get(documentRef).updateReputation(documentRef, ratingEvent.getNewRating(),
+            ratingEvent.getOldRating());
     }
-  
+
 }

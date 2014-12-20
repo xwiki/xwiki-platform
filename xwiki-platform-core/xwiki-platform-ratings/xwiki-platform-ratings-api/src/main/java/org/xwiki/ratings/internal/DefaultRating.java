@@ -52,21 +52,25 @@ public class DefaultRating implements Rating
 
     private DefaultRatingsManager ratingsManager;
 
-    public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context, DefaultRatingsManager ratingsManager)
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context,
+        DefaultRatingsManager ratingsManager)
     {
         this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
 
-    public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context, DefaultRatingsManager ratingsManager)
+    public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote,
+        XWikiContext context, DefaultRatingsManager ratingsManager)
     {
         this.context = context;
         this.documentRef = documentRef;
         this.ratingsManager = ratingsManager;
-        
-        createObject(this.ratingsManager.entityReferenceSerializer.serialize(documentRef), this.ratingsManager.entityReferenceSerializer.serialize(author), date, vote);
+
+        createObject(this.ratingsManager.entityReferenceSerializer.serialize(documentRef),
+            this.ratingsManager.entityReferenceSerializer.serialize(author), date, vote);
     }
 
-    public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context, DefaultRatingsManager ratingsManager)
+    public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context,
+        DefaultRatingsManager ratingsManager)
     {
         this.ratingsManager = ratingsManager;
         this.context = context;
@@ -74,7 +78,6 @@ public class DefaultRating implements Rating
         this.document = getDocument();
         this.object = obj;
     }
-    
 
     /**
      * RatingId represents the rating ID. It is the object number in the default ratings case
@@ -122,7 +125,8 @@ public class DefaultRating implements Rating
 
     public void setAuthor(DocumentReference author)
     {
-        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, this.ratingsManager.entityReferenceSerializer.serialize(author));
+        object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
+            this.ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
     /**

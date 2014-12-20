@@ -39,14 +39,14 @@ public class StoredAverageRating implements AverageRating
     private BaseObject object;
 
     private XWikiContext context;
-    
+
     public StoredAverageRating(XWikiDocument document, BaseObject ratingObject, XWikiContext context)
     {
         this.document = document;
         this.context = context;
         this.object = ratingObject;
     }
-    
+
     public int getNbVotes()
     {
         return object.getIntValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES);

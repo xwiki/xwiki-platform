@@ -53,7 +53,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
      */
     @Inject
     private Logger LOGGER;
-    
+
     @Inject
     @Named("user/current")
     protected DocumentReferenceResolver<String> userReferenceResolver;
@@ -82,10 +82,10 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         }
         // update rating
         rating.save();
-        
+
         // update average rating count
         updateAverageRatings(documentRef, rating, oldVote);
-        
+
         // update reputation
         observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
         return rating;
@@ -94,8 +94,8 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int,
-     *      boolean, com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int, boolean,
+     *      com.xpn.xwiki.XWikiContext)
      */
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException

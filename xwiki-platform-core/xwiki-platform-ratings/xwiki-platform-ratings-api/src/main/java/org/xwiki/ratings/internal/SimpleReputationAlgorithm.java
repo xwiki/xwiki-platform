@@ -61,11 +61,13 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
      * @param context context of the request
      * @return AverageRating of the voter
      */
-    public AverageRating getUserReputation(DocumentReference documentRef, DocumentReference username) throws ReputationException
+    public AverageRating getUserReputation(DocumentReference documentRef, DocumentReference username)
+        throws ReputationException
     {
         try {
             AverageRating aveRating =
-                getRatingsManager(documentRef).getAverageRating(username, RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
+                getRatingsManager(documentRef).getAverageRating(username,
+                    RatingsManager.RATING_REPUTATION_METHOD_AVERAGE);
             float oldRep = aveRating.getAverageVote();
             aveRating.setAverageVote(aveRating.getAverageVote() * 100 / getTotalReputation());
             totalReputation += aveRating.getAverageVote() - oldRep;
@@ -78,7 +80,8 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Not implemented. Voters don't receive reputation
      */
-    public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
+    public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
+        int oldVote) throws ReputationException
     {
         notimplemented();
         return null;
@@ -87,7 +90,8 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Implemented. Authors will receive a simple reputation.
      */
-    public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
+    public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
+        Rating rating, int oldVote) throws ReputationException
     {
         DocumentReference voter = rating.getAuthor();
         float voterRep = getUserReputation(documentRef, voter).getAverageVote();
@@ -105,7 +109,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
             // recalculate it
             try {
                 List<Float> result =
-                        getXWiki()
+                    getXWiki()
                         .search(
                             "select sum(prop.value) from XWikiDocument as doc, BaseObject as obj, FloatProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj.id=prop.id.id and prop.id.name='averagevote'",
                             getXWikiContext());
@@ -134,7 +138,8 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     /**
      * Not implemented
      */
-    public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException
+    public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
+        throws ReputationException
     {
         notimplemented();
         return null;

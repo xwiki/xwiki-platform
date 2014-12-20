@@ -38,16 +38,15 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider<ReputationAlgorithm>
 {
-    
-    @Inject 
-    Logger logger;   
+    @Inject
+    Logger logger;
 
     @Inject
     Execution execution;
 
     @Inject
     ComponentManager componentManager;
-    
+
     @Inject
     ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
@@ -85,45 +84,59 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     public ReputationAlgorithm get(DocumentReference documentRef)
     {
         // TODO implement
-        String reputationAlgorithmHint = getXWiki().Param(RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
-        
+        String reputationAlgorithmHint =
+            getXWiki().Param(
+                RatingsManager.RATINGS_CONFIG_PARAM_PREFIX
+                    + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
+
         try {
             XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
-            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
-            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+            XWikiDocument spaceConfigDoc =
+                getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
+                    getXWikiContext());
+            XWikiDocument globalConfigDoc =
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc =
+                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                    : spaceConfigDoc;
 
-            if (configDoc!=null && !configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME)!=null) {
-                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
-                String hint = (prop==null) ? null : (String) prop.getValue();
-                if (hint == "custom")
-                {
-                    prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
-                    hint = (prop==null) ? null : (String) prop.getValue();
+            if (configDoc != null && !configDoc.isNew()
+                && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+                BaseProperty prop =
+                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                        RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
+                String hint = (prop == null) ? null : (String) prop.getValue();
+                if (hint == "custom") {
+                    prop =
+                        (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
+                    hint = (prop == null) ? null : (String) prop.getValue();
                 }
-                reputationAlgorithmHint = (hint==null) ? reputationAlgorithmHint : hint;
+                reputationAlgorithmHint = (hint == null) ? reputationAlgorithmHint : hint;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Cannot read reputation algorithm config", e);
         }
-        
+
         // if the reputation algorithm hint is a page let's try to get the instance from groovy
-        if (reputationAlgorithmHint.contains(".")) { 
+        if (reputationAlgorithmHint.contains(".")) {
             try {
-             ReputationAlgorithmGroovy reputationInstance = (ReputationAlgorithmGroovy) getXWiki().parseGroovyFromPage(reputationAlgorithmHint, getXWikiContext());
-             
-             if (reputationInstance!=null) {            
-                 reputationInstance.setComponentManager(componentManager);
-                 reputationInstance.setExecution(execution);
-                 reputationInstance.setXWikiContext(getXWikiContext());
-                 reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentRef));
-                 return reputationInstance;
-             }
+                ReputationAlgorithmGroovy reputationInstance =
+                    (ReputationAlgorithmGroovy) getXWiki().parseGroovyFromPage(reputationAlgorithmHint,
+                        getXWikiContext());
+
+                if (reputationInstance != null) {
+                    reputationInstance.setComponentManager(componentManager);
+                    reputationInstance.setExecution(execution);
+                    reputationInstance.setXWikiContext(getXWikiContext());
+                    reputationInstance.setRatingsManager(ratingsManagerProvider.get(documentRef));
+                    return reputationInstance;
+                }
             } catch (Throwable e) {
-                logger.error("Cannot instanciate Reputation algorithm from page " + reputationAlgorithmHint, e);                
+                logger.error("Cannot instanciate Reputation algorithm from page " + reputationAlgorithmHint, e);
             }
-        } 
-         
+        }
+
         try {
             return componentManager.getInstance(ReputationAlgorithm.class, reputationAlgorithmHint);
         } catch (ComponentLookupException e) {

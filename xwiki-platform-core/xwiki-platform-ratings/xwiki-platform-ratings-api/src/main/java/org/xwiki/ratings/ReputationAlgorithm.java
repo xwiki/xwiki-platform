@@ -30,21 +30,23 @@ import org.xwiki.model.reference.DocumentReference;
 @Role
 public interface ReputationAlgorithm
 {
-    
-    /** 
+
+    /**
      * Gets current ratings manager
+     * 
      * @param documentRef the document which the ratings are for
      */
     RatingsManager getRatingsManager(DocumentReference documentRef);
- 
+
     /**
      * Updates reputation after a vote
+     * 
      * @param documentRef document on which the rating occured
-     * @param rating rating set 
+     * @param rating rating set
      * @param oldVote previous rating set
      */
     public void updateReputation(DocumentReference documentRef, Rating rating, int oldVote);
-    
+
     /**
      * Recalculates the contributor reputation. Only the creator of the document will have it's reputation updated
      *
@@ -55,7 +57,8 @@ public interface ReputationAlgorithm
      * @param context context of the request
      * @return AverageRating of the voter
      */
-    AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException;
+    AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
+        int oldVote) throws ReputationException;
 
     /**
      * Recalculates the contributors reputation
@@ -66,7 +69,8 @@ public interface ReputationAlgorithm
      * @param context context of the request
      * @return Map of AverageRating of each contributor of the page that has an updated reputation
      */
-    Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException;
+    Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
+        throws ReputationException;
 
     /**
      * Recalculates the contributor reputation. Only the creator of the document will have it's reputation updated
@@ -78,7 +82,8 @@ public interface ReputationAlgorithm
      * @param context context of the request
      * @return AverageRating of the contributor
      */
-    AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef, Rating rating, int oldVote) throws ReputationException;
+    AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
+        Rating rating, int oldVote) throws ReputationException;
 
     /**
      * Recalculated all reputation of the wiki The result is given as a set of AverageRating objects That can be saved

@@ -29,7 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @since 6.4M2
  */
 @Role
-public interface ConfiguredProvider <T>
+public interface ConfiguredProvider<T>
 {
     /**
      * @param documentRef

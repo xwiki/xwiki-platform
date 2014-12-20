@@ -29,16 +29,16 @@ import com.xpn.xwiki.XWikiContext;
  */
 public interface ReputationAlgorithmGroovy extends ReputationAlgorithm
 {
-    
-    /** 
+
+    /**
      * Sets current ratings manager
      */
     void setRatingsManager(RatingsManager rManager);
-    
+
     void setExecution(Execution execution);
-    
+
     void setComponentManager(ComponentManager componentManager);
-    
+
     void setXWikiContext(XWikiContext context);
-    
+
 }

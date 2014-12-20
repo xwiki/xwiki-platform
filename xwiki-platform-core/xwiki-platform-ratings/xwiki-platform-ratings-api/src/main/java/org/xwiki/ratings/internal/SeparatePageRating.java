@@ -47,12 +47,14 @@ public class SeparatePageRating implements Rating
 
     private SeparatePageRatingsManager ratingsManager;
 
-    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context,
+        SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
 
-    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, Date date, int vote, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, DocumentReference author, Date date, int vote,
+        XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this.context = context;
         this.ratingsManager = ratingsManager;
@@ -60,7 +62,8 @@ public class SeparatePageRating implements Rating
         this.document = addDocument(documentRef, author, date, vote);
     }
 
-    public SeparatePageRating(DocumentReference documentRef, XWikiDocument doc, XWikiContext context, SeparatePageRatingsManager ratingsManager) throws RatingsException
+    public SeparatePageRating(DocumentReference documentRef, XWikiDocument doc, XWikiContext context,
+        SeparatePageRatingsManager ratingsManager) throws RatingsException
     {
         this.context = context;
         this.ratingsManager = ratingsManager;
@@ -122,7 +125,8 @@ public class SeparatePageRating implements Rating
      */
     public void setAuthor(DocumentReference author)
     {
-        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, ratingsManager.entityReferenceSerializer.serialize(author));
+        getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
+            ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
     public void setDate(Date date)
@@ -229,13 +233,14 @@ public class SeparatePageRating implements Rating
         String ratingsSpace = ratingsManager.getRatingsSpaceName(documentRef);
         boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentRef);
         if (hasRatingsSpaceForeachSpace) {
-            return new DocumentReference(context.getWikiId(), doc.getSpace() + ratingsSpace,
-                getUniquePageName(ratingsSpace, doc.getName(), "R", true));
+            return new DocumentReference(context.getWikiId(), doc.getSpace() + ratingsSpace, getUniquePageName(
+                ratingsSpace, doc.getName(), "R", true));
         } else if (ratingsSpace == null) {
-            return new DocumentReference(context.getWikiId(), doc.getSpace(), getUniquePageName(doc.getSpace(), doc.getName() + "R", "", true));
+            return new DocumentReference(context.getWikiId(), doc.getSpace(), getUniquePageName(doc.getSpace(),
+                doc.getName() + "R", "", true));
         } else {
-            return new DocumentReference(context.getWikiId(), ratingsSpace,
-                getUniquePageName(ratingsSpace, doc.getSpace() + "_" + doc.getName(), "R", true));
+            return new DocumentReference(context.getWikiId(), ratingsSpace, getUniquePageName(ratingsSpace,
+                doc.getSpace() + "_" + doc.getName(), "R", true));
         }
     }
 
@@ -265,7 +270,8 @@ public class SeparatePageRating implements Rating
             BaseObject obj = new BaseObject();
             obj.setClassName(ratingsClassName);
             obj.setName(ratingsManager.entityReferenceSerializer.serialize(pageRef));
-            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, ratingsManager.entityReferenceSerializer.serialize(author));
+            obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
+                ratingsManager.entityReferenceSerializer.serialize(author));
             obj.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
             obj.setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, parentDocName);

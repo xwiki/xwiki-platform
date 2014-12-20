@@ -26,9 +26,15 @@ import org.xwiki.model.reference.DocumentReference;
 import java.util.Date;
 
 /**
- * Represent a rating : a note given by a user to a container. A container can be : <ul> <li>A Wiki Document</li> <li>A
- * section of a wiki document</li> <li>A sentence in a wiki document</li> <li>A comment</li> <li>A sentence in a
- * comment</li> <li>etc...</li> </ul>
+ * Represent a rating : a note given by a user to a container. A container can be :
+ * <ul>
+ * <li>A Wiki Document</li>
+ * <li>A section of a wiki document</li>
+ * <li>A sentence in a wiki document</li>
+ * <li>A comment</li>
+ * <li>A sentence in a comment</li>
+ * <li>etc...</li>
+ * </ul>
  *
  * @version $Id$
  */

@@ -52,9 +52,9 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
     @Inject
     ObservationManager observationManager;
-    
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractRatingsManager.class);
-    
+
     public String getRatingsClassName()
     {
         return RATINGS_CLASSNAME;
@@ -64,7 +64,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         return AVERAGE_RATINGS_CLASSNAME;
     }
-   
+
     /**
      * <p>
      * Retrieve the XWiki context from the current execution context
@@ -91,24 +91,30 @@ public abstract class AbstractRatingsManager implements RatingsManager
     }
 
     /**
-     * Retrieve configuration parameter from the current space's WebPreferences
-     * and fallback to XWiki.RatingsConfig if it does not exist
+     * Retrieve configuration parameter from the current space's WebPreferences and fallback to XWiki.RatingsConfig if
+     * it does not exist
      */
     protected String getConfigParameter(DocumentReference documentRef, String parameterName, String defaultValue)
     {
         try {
             XWikiDocument sourceDoc = getXWiki().getDocument(documentRef, getXWikiContext());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(sourceDoc.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE, getXWikiContext());
-            XWikiDocument globalConfigDoc = getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
-            XWikiDocument configDoc = (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc : spaceConfigDoc;
+            XWikiDocument spaceConfigDoc =
+                getXWiki().getDocument(sourceDoc.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
+                    getXWikiContext());
+            XWikiDocument globalConfigDoc =
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+            XWikiDocument configDoc =
+                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                    : spaceConfigDoc;
 
             if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
-                BaseProperty prop = (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(parameterName);
+                BaseProperty prop =
+                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(parameterName);
                 String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
 
                 return (propValue == "" ? defaultValue : propValue);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Cannot read ratings config", e);
         }
 
@@ -125,7 +131,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         String result = getXWiki().Param("xwiki.ratings.averagerating.stored", "1");
         result = getXWiki().getXWikiPreference("ratings_averagerating_stored", result, getXWikiContext());
-        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING, result) == "1");
+        return (getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORE_AVERAGE_RATING,
+            result) == "1");
     }
 
     public boolean isReputationStored(DocumentReference documentRef)
@@ -144,15 +151,14 @@ public abstract class AbstractRatingsManager implements RatingsManager
 
     public String[] getDefaultReputationMethods(DocumentReference documentRef)
     {
-        String method =
-            getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
+        String method = getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
         method = getXWiki().getXWikiPreference("ratings_reputation_defaultmethod", method, getXWikiContext());
-        method = getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
+        method =
+            getConfigParameter(documentRef, RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_METHOD, method);
         return method.split(",");
     }
 
-    public void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote)
-        throws RatingsException
+    public void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote) throws RatingsException
     {
         String[] methods = getDefaultReputationMethods(documentRef);
         for (int i = 0; i < methods.length; i++) {
@@ -160,8 +166,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    public AverageRating getAverageRatingFromQuery(String fromsql, String wheresql)
-        throws RatingsException
+    public AverageRating getAverageRatingFromQuery(String fromsql, String wheresql) throws RatingsException
     {
         return getAverageRatingFromQuery(fromsql, wheresql, RATING_REPUTATION_METHOD_AVERAGE);
     }
@@ -207,7 +212,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         return rating.remove();
     }
-    
+
     /**
      * Gets or calculates the user reputation.
      *
@@ -224,8 +229,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    public AverageRating calcAverageRating(DocumentReference documentRef, String method)
-        throws RatingsException
+    public AverageRating calcAverageRating(DocumentReference documentRef, String method) throws RatingsException
     {
         int nbVotes = 0;
         int balancedNbVotes = 0;
@@ -283,8 +287,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    public void updateUserReputation(DocumentReference author, AverageRating voterRating)
-        throws RatingsException
+    public void updateUserReputation(DocumentReference author, AverageRating voterRating) throws RatingsException
     {
         try {
             // We should update the user rating
@@ -297,9 +300,8 @@ public abstract class AbstractRatingsManager implements RatingsManager
             throw new RatingsException(e);
         }
     }
-    
-    public AverageRating getAverageRating(DocumentReference documentRef, String method)
-        throws RatingsException
+
+    public AverageRating getAverageRating(DocumentReference documentRef, String method) throws RatingsException
     {
         return getAverageRating(documentRef, method, false);
     }

@@ -1,0 +1,9 @@
+org.xwiki.ratings.ConfiguredRatingsManagerProvider
+org.xwiki.ratings.ConfiguredReputationAlgorithmProvider
+org.xwiki.ratings.RatingsScriptService
+org.xwiki.ratings.internal.DefaultRatingsManager
+org.xwiki.ratings.internal.DefaultRatingsManagerInitialization
+org.xwiki.ratings.internal.DefaultReputationAlgorithm
+org.xwiki.ratings.internal.SeparatePageRatingsManager
+org.xwiki.ratings.internal.SimpleReputationAlgorithm
+org.xwiki.ratings.internal.UpdateReputationListener

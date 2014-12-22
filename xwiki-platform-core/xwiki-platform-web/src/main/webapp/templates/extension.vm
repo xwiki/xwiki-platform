@@ -163,6 +163,16 @@
   #end
 #end
 
+#macro (displayExtensionRating $extension)
+  #set ($rating = $services.extension.rating.getRating($extension.id))
+  #if ($rating != $NULL)
+    #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+    <div class="extension-rating">
+      #ratingstars($id "" "" $rating.averageVote $rating.totalVotes true)
+    </div>
+  #end
+#end
+
 #macro (displayExtensionAuthors $extension)
   #set ($authors = [])
   #foreach ($author in $extension.authors)
@@ -748,6 +758,7 @@ $namespace##
         <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
       #end
       #displayExtensionActionButtons($extension)
+      #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
       #end

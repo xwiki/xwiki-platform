@@ -34,29 +34,32 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
 
+/**
+ * Retrieve the appropriate ReputationAlgorithm by looking at the current configuration settings.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider<ReputationAlgorithm>
 {
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    Execution execution;
+    private Execution execution;
 
     @Inject
-    ComponentManager componentManager;
+    private ComponentManager componentManager;
 
     @Inject
-    ConfiguredProvider<RatingsManager> ratingsManagerProvider;
+    private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Retrieve the XWiki context from the current execution context.
      * 
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
+     * @return the XWiki context
+     * @throws RuntimeException if there was an error retrieving the context
      */
     protected XWikiContext getXWikiContext()
     {
@@ -64,11 +67,9 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieve the XWiki private API object.
      * 
-     * @return The XWiki private API object.
+     * @return the XWiki private API object
      */
     protected XWiki getXWiki()
     {
@@ -76,18 +77,19 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
     }
 
     /**
-     * Retrieve an instance of the desired ReputationAlorithm (default/simple/custom)
+     * Retrieve an instance of the desired ReputationAlorithm (default/simple/custom).
      *
+     * @param documentRef documentRef the document to which the ratings are associated to
      * @return the reputation algorithm selected by looking at the current configuration settings
      */
     @Override
     public ReputationAlgorithm get(DocumentReference documentRef)
     {
-        // TODO implement
+        String defaultAlgorithmHint = "default";
         String reputationAlgorithmHint =
             getXWiki().Param(
                 RatingsManager.RATINGS_CONFIG_PARAM_PREFIX
-                    + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, "default");
+                    + RatingsManager.RATINGS_CONFIG_FIELDNAME_REPUTATIONALGORITHM_HINT, defaultAlgorithmHint);
 
         try {
             XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
@@ -143,7 +145,7 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
             // TODO Auto-generated catch block
             logger.error("Error loading ratings manager component for hint " + reputationAlgorithmHint, e);
             try {
-                return componentManager.getInstance(ReputationAlgorithm.class, "default");
+                return componentManager.getInstance(ReputationAlgorithm.class, defaultAlgorithmHint);
             } catch (ComponentLookupException e1) {
                 return null;
             }

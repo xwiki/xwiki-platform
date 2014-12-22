@@ -58,7 +58,6 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
      *
      * @param documentRef the document which the ratings are for
      * @param username Person to calculate the reputation for
-     * @param context context of the request
      * @return AverageRating of the voter
      */
     public AverageRating getUserReputation(DocumentReference documentRef, DocumentReference username)
@@ -78,7 +77,9 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     }
 
     /**
-     * Not implemented. Voters don't receive reputation
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewVoterReputation()
      */
     public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
         int oldVote) throws ReputationException
@@ -88,7 +89,9 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     }
 
     /**
-     * Implemented. Authors will receive a simple reputation.
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewContributorReputation()
      */
     public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
         Rating rating, int oldVote) throws ReputationException
@@ -103,6 +106,11 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return null;
     }
 
+    /**
+     * Gets the total reputation.
+     * 
+     * @return total reputation represented as a float
+     */
     private float getTotalReputation()
     {
         if (totalReputation == 0) {
@@ -125,18 +133,30 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return (totalReputation <= 1) ? 1 : totalReputation;
     }
 
+    /**
+     * Gets x constant.
+     * 
+     * @return x constant
+     */
     private float getConstantX()
     {
         return constantX;
     }
 
+    /**
+     * Gets y constant.
+     * 
+     * @return y constant
+     */
     private float getConstantY()
     {
         return constantY;
     }
 
     /**
-     * Not implemented
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
      */
     public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
         throws ReputationException
@@ -146,7 +166,9 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
     }
 
     /**
-     * Not implemented
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
      */
     public Map<String, AverageRating> recalcAllReputation() throws ReputationException
     {
@@ -154,6 +176,11 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return null;
     }
 
+    /**
+     * Marks methods that have not been implemented.
+     * 
+     * @throws ReputationException when the method is called
+     */
     protected void notimplemented() throws ReputationException
     {
         throw new ReputationException(ReputationException.MODULE_PLUGIN_RATINGS_REPUTATION,

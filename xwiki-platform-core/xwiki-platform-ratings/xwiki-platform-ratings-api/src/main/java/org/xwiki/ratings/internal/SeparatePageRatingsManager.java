@@ -57,9 +57,6 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
 
     public static final String RATINGS_CONFIG_FIELDNAME_SEPARATEPAGE_RATINGS_SPACE_PER_SPACE = "ratingsSpacePerSpace";
 
-    /**
-     * The logger to LOGGER.
-     */
     @Inject
     private Logger LOGGER;
 
@@ -71,11 +68,20 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     @Named("local")
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    /**
+     * SeparatePageRatingsManager constructor.
+     */
     public SeparatePageRatingsManager()
     {
         super();
     }
 
+    /**
+     * Gets the ratings space name.
+     * 
+     * @param documentRef reference to the document with which the ratings are associated
+     * @return the ratings space name
+     */
     public String getRatingsSpaceName(DocumentReference documentRef)
     {
         String ratingsSpaceName = getXWiki().Param("xwiki.ratings.separatepagemanager.spacename", "");
@@ -85,6 +91,12 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             ratingsSpaceName);
     }
 
+    /**
+     * Gets whether to associate a different space for every space which is ratable.
+     * 
+     * @param documentRef reference to the document with which the ratings are associated
+     * @return whether to associate a different space for every space which is ratable
+     */
     public boolean hasRatingsSpaceForeachSpace(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
@@ -95,6 +107,12 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             result) == "1");
     }
 
+    /**
+     * Saves the rating.
+     * 
+     * @param rating a Rating object
+     * @throws RatingsException when an error occurs while saving the rating
+     */
     protected void saveRating(Rating rating) throws RatingsException
     {
         try {
@@ -116,8 +134,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#setRating(com.xpn.xwiki.plugin.comments.Container, String, int,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#setRating()
      */
     public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
     {
@@ -146,8 +163,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int, boolean,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRatings()
      */
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
@@ -186,8 +202,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int, boolean,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRatings()
      */
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
@@ -218,8 +233,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRating(com.xpn.xwiki.plugin.comments.Container, String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRating()
      */
     public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
     {
@@ -235,6 +249,11 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.RatingsManager#getRatings()
+     */
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
@@ -265,6 +284,14 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         }
     }
 
+    /**
+     * Gets a SeparatePageRating instance from a document 
+     * 
+     * @param documentRef the reference of the document which the ratings are for
+     * @param doc the document which the ratings are for
+     * @return a SeparatePageRating
+     * @throws RatingsException when an error occurs while fetching the rating
+     */
     public Rating getRatingFromDocument(DocumentReference documentRef, XWikiDocument doc) throws RatingsException
     {
         return new SeparatePageRating(documentRef, doc, getXWikiContext(), this);

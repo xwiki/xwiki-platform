@@ -42,18 +42,14 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.UpdateRatingEvent;
 
 /**
+ * The default ratings manager.
+ * 
  * @version $Id$
  */
 @Component
 @Singleton
 public class DefaultRatingsManager extends AbstractRatingsManager
 {
-    /**
-     * The logger to LOGGER.
-     */
-    @Inject
-    private Logger LOGGER;
-
     @Inject
     @Named("user/current")
     protected DocumentReferenceResolver<String> userReferenceResolver;
@@ -62,11 +58,13 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     @Named("local")
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private Logger logger;
+
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#setRating(com.xpn.xwiki.plugin.comments.Container, String, int,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#setRating()
      */
     public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
     {
@@ -94,14 +92,13 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRatings(com.xpn.xwiki.plugin.comments.Container, int, int, boolean,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRatings()
      */
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Calling default manager code for ratings");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling default manager code for ratings");
         }
         try {
             int skipped = 0;
@@ -131,6 +128,11 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.RatingsManager#getRating()
+     */
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
@@ -167,8 +169,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRating(com.xpn.xwiki.plugin.comments.Container, int,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRating()
      */
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
@@ -196,8 +197,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.RatingsManager#getRating(com.xpn.xwiki.plugin.comments.Container, String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.RatingsManager#getRating()
      */
     public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
     {
@@ -220,6 +220,13 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         return null;
     }
 
+    /**
+     * Gets a DefaultRating.
+     *
+     * @param documentRef the document to which the rating is linked
+     * @param bobj the rating object containing the rating information
+     * @return an instance of DefaultRating containing the passed rating information
+     */
     private DefaultRating getDefaultRating(DocumentReference documentRef, BaseObject bobj)
     {
         return new DefaultRating(documentRef, bobj, getXWikiContext(), this);

@@ -27,42 +27,51 @@ package org.xwiki.ratings;
 public interface AverageRating
 {
     /**
-     * @return the number of votes for the container this average rating represents.
+     * Gets the number of votes.
+     * 
+     * @return the number of votes for the container this average rating represents
      */
-    public int getNbVotes();
+    int getNbVotes();
 
     /**
      * Sets the number of votes for the container this average rating represents.
      *
-     * @param nbVotes the total number of votes for the container represented by this average rating.
+     * @param nbVotes the total number of votes for the container represented by this average rating
      */
-    public void setNbVotes(int nbVotes);
+    void setNbVotes(int nbVotes);
 
     /**
+     * Gets the average vote.
+     * 
      * @return the average vote for this container.
      */
-    public float getAverageVote();
+    float getAverageVote();
 
     /**
+     * Sets the average vote.
+     * 
      * @param averageVote the average vote
      */
-    public void setAverageVote(float averageVote);
+    void setAverageVote(float averageVote);
 
     /**
+     * Gets the method used to compute the average rating.
+     * 
      * @return the method used to compute the average rating
      */
-    public String getMethod();
+    String getMethod();
 
     /**
+     * Sets the method used to compute the average rating.
+     * 
      * @param method the method used to compute the average rating
      */
-    public void setMethod(String method);
+    void setMethod(String method);
 
     /**
      * Saves this average rating.
      *
-     * @param context the XWiki context
-     * @throws RatingsException when an error occurs while saving this average rating.
+     * @throws RatingsException when an error occurs while saving this average rating
      */
-    public void save() throws RatingsException;
+    void save() throws RatingsException;
 }

@@ -21,12 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -38,7 +33,10 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
 /**
+ * Default implementation of the Rating interface.
+ * 
  * @see Rating
+ * @version $Id$
  */
 public class DefaultRating implements Rating
 {
@@ -52,12 +50,31 @@ public class DefaultRating implements Rating
 
     private DefaultRatingsManager ratingsManager;
 
+    /**
+     * DefaultRating constructor.
+     * 
+     * @param documentRef the document to which the rating is linked
+     * @param author the user that created the rating
+     * @param vote the author's vote
+     * @param context the context in which the rating was created
+     * @param ratingsManager the ratings manager used when the rating was created
+     */
     public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context,
         DefaultRatingsManager ratingsManager)
     {
         this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
 
+    /**
+     * DefaultRating constructor.
+     * 
+     * @param documentRef the document to which the rating is linked
+     * @param author the user that created the rating
+     * @param date the date when the rating took place
+     * @param vote the author's vote
+     * @param context the context in which the rating was created
+     * @param ratingsManager the ratings manager used when the rating was created
+     */
     public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote,
         XWikiContext context, DefaultRatingsManager ratingsManager)
     {
@@ -69,6 +86,14 @@ public class DefaultRating implements Rating
             this.ratingsManager.entityReferenceSerializer.serialize(author), date, vote);
     }
 
+    /**
+     * DefaultRating constructor.
+     * 
+     * @param documentRef the document to which the rating is linked
+     * @param obj the rating object containing the rating information
+     * @param context the context in which the rating was created
+     * @param ratingsManager the ratings manager used when the rating was created
+     */
     public DefaultRating(DocumentReference documentRef, BaseObject obj, XWikiContext context,
         DefaultRatingsManager ratingsManager)
     {
@@ -80,7 +105,9 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * RatingId represents the rating ID. It is the object number in the default ratings case
+     * RatingId represents the rating ID. It is the object number in the default ratings case.
+     * 
+     * @return the rating id
      */
     public String getRatingId()
     {
@@ -88,18 +115,30 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * RatingId represents the rating ID. It is the object number in the default ratings case
+     * RatingId represents the rating ID. It is the object number in the default ratings case.
+     * 
+     * @return the global rating id
      */
     public String getGlobalRatingId()
     {
         return document.getFullName() + ":" + object.getNumber();
     }
 
+    /**
+     * Gets the object representation of the rating.
+     * 
+     * @return an object containing the rating information
+     */
     public BaseObject getAsObject()
     {
         return object;
     }
 
+    /**
+     * Gets the document to which the rating is linked from the document reference.
+     * 
+     * @return the document to which the rating belongs to
+     */
     public XWikiDocument getDocument()
     {
         if (document == null) {
@@ -122,7 +161,11 @@ public class DefaultRating implements Rating
         String objectVal = object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
         return this.ratingsManager.userReferenceResolver.resolve(objectVal, documentRef);
     }
-
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.Rating#setAuthor()
+     */
     public void setAuthor(DocumentReference author)
     {
         object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
@@ -139,6 +182,11 @@ public class DefaultRating implements Rating
         return object.getDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.Rating#setDate()
+     */
     public void setDate(Date date)
     {
         object.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
@@ -153,7 +201,11 @@ public class DefaultRating implements Rating
     {
         return object.getIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE);
     }
-
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.Rating#setVote()
+     */
     public void setVote(int vote)
     {
         object.setIntValue("vote", vote);
@@ -162,7 +214,7 @@ public class DefaultRating implements Rating
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.Rating#get(String)
+     * @see org.xwiki.ratings.Rating#get()
      */
     public Object get(String propertyName)
     {
@@ -176,7 +228,7 @@ public class DefaultRating implements Rating
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.ratings.Rating#display(String,String, com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.ratings.Rating#display()
      */
     public String display(String propertyName, String mode)
     {
@@ -193,6 +245,11 @@ public class DefaultRating implements Rating
         return this.documentRef;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.Rating#save()
+     */
     public void save() throws RatingsException
     {
         try {
@@ -223,9 +280,10 @@ public class DefaultRating implements Rating
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#remove()
+     * Remove the rating.
+     * 
+     * @param withSave save the document after removing the rating or not
+     * @return the status of the action
      */
     protected boolean remove(boolean withSave)
     {
@@ -246,6 +304,14 @@ public class DefaultRating implements Rating
         return true;
     }
 
+    /**
+     * Creates a new ratings object.
+     * 
+     * @param documentName the document being rated
+     * @param author the author of the rating
+     * @param date the date when the rating took place
+     * @param vote the vote that the author gave
+     */
     private void createObject(String documentName, String author, Date date, int vote)
     {
         XWikiDocument doc = getDocument();
@@ -264,6 +330,11 @@ public class DefaultRating implements Rating
         object = obj;
     }
 
+    /**
+     * Creates a string representation of the rating.
+     * 
+     * @return the string representation of the rating
+     */
     public String toString()
     {
         boolean shouldAddSpace = false;

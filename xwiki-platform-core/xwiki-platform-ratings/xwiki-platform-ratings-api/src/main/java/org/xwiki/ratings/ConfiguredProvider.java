@@ -25,6 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 /**
  * Provide instances of objects configured relative to the passed document.
  *
+ * @param <T> the type of the returned object
  * @version $Id$
  * @since 6.4M2
  */
@@ -32,8 +33,10 @@ import org.xwiki.model.reference.DocumentReference;
 public interface ConfiguredProvider<T>
 {
     /**
-     * @param documentRef
-     * @return object of type T
+     * Returns an instance of the required RatingsManager based on the current configuration.
+     * 
+     * @param documentRef the document to which the ratings are associated to
+     * @return an instance of RatingsManager (default or separate)
      */
     T get(DocumentReference documentRef);
 }

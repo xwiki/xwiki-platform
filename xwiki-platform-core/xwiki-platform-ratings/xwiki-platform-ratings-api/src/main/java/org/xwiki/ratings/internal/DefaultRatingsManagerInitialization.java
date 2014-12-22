@@ -43,16 +43,29 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+/**
+ * The default ratings manager initialization.
+ * 
+ * @version $Id$
+ */
 @Component
 @Named("ratingswikiinit")
 @Singleton
 public class DefaultRatingsManagerInitialization implements EventListener, Initializable
 {
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    Execution execution;
+    private Execution execution;
+
+    private final String baseTypeInteger = "integer";
+
+    private final String baseTypeFloat = "float";
+
+    private final String xwikiAdmin = "xwiki:XWiki.Admin";
+
+    private final String xwikiClasses = "XWiki.XWikiClasses";
 
     @Override
     public List<Event> getEvents()
@@ -60,6 +73,11 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
         return Arrays.<Event>asList(new WikiReadyEvent());
     }
 
+    /**
+     * Gets the component name.
+     * 
+     * @return the component name
+     */
     @Override
     public String getName()
     {
@@ -67,12 +85,10 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Retrieve the XWiki context from the current execution context.
      * 
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
+     * @return the XWiki context.
+     * @throws RuntimeException if there was an error retrieving the context.
      */
     protected XWikiContext getXWikiContext()
     {
@@ -80,11 +96,9 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieve the XWiki private API object.
      * 
-     * @return The XWiki private API object.
+     * @return the XWiki private API object.
      */
     protected XWiki getXWiki()
     {
@@ -102,9 +116,11 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
         // making sure the classes exist
         initRatingsClass();
         initAverageRatingsClass();
-
     }
 
+    /**
+     * Initialize the AverageRatingsClass.
+     */
     private void initAverageRatingsClass()
     {
         try {
@@ -118,25 +134,25 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
 
             needsUpdate |=
                 bclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, "Number of Votes", 5,
-                    "integer");
+                    baseTypeInteger);
             needsUpdate |=
                 bclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, "Average Vote", 5,
-                    "float");
+                    baseTypeFloat);
             needsUpdate |=
                 bclass.addTextField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD,
                     "Average Vote method", 10);
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;
-                doc.setAuthor("xwiki:XWiki.Admin");
+                doc.setAuthor(xwikiAdmin);
             }
             if (StringUtils.isBlank(doc.getCreator())) {
                 needsUpdate = true;
-                doc.setCreator("xwiki:XWiki.Admin");
+                doc.setCreator(xwikiAdmin);
             }
             if (StringUtils.isBlank(doc.getParent())) {
                 needsUpdate = true;
-                doc.setParent("XWiki.XWikiClasses");
+                doc.setParent(xwikiClasses);
             }
 
             String title = doc.getTitle();
@@ -150,10 +166,13 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
                 xwiki.saveDocument(doc, getXWikiContext());
             }
         } catch (Exception e) {
-            logger.error("Error while initializzing average ratings class", e);
+            logger.error("Error while initializing average ratings class", e);
         }
     }
 
+    /**
+     * Initialize the RatingsClass.
+     */
     private void initRatingsClass()
     {
         try {
@@ -166,21 +185,22 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
             BaseClass bclass = doc.getXClass();
 
             needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, "Author", 30);
-            needsUpdate |= bclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, "integer");
+            needsUpdate |=
+                bclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, baseTypeInteger);
             needsUpdate |= bclass.addDateField(RatingsManager.RATING_CLASS_FIELDNAME_DATE, "Date");
             needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, "Parent", 30);
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;
-                doc.setAuthor("xwiki:XWiki.Admin");
+                doc.setAuthor(xwikiAdmin);
             }
             if (StringUtils.isBlank(doc.getCreator())) {
                 needsUpdate = true;
-                doc.setCreator("xwiki:XWiki.Admin");
+                doc.setCreator(xwikiAdmin);
             }
             if (StringUtils.isBlank(doc.getParent())) {
                 needsUpdate = true;
-                doc.setParent("XWiki.XWikiClasses");
+                doc.setParent(xwikiClasses);
             }
 
             String title = doc.getTitle();
@@ -194,7 +214,7 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
                 xwiki.saveDocument(doc, getXWikiContext());
             }
         } catch (Exception e) {
-            logger.error("Error while initializzing ratings class", e);
+            logger.error("Error while initializing ratings class", e);
         }
     }
 }

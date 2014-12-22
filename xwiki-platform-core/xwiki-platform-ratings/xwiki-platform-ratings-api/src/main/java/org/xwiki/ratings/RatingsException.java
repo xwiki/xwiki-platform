@@ -22,14 +22,18 @@ package org.xwiki.ratings;
 import com.xpn.xwiki.XWikiException;
 
 /**
+ * RatingsException definition.
+ * 
  * @version $Id$
  */
 public class RatingsException extends XWikiException
 {
     private static final long serialVersionUID = 1L;
 
+    // Module
     public static final int MODULE_PLUGIN_RATINGS = 1120;
-
+    
+    // Error list
     public static final int ERROR_RATINGS_CREATECONTAINER_NULLSPACE = 1120001;
 
     public static final int ERROR_RATINGS_ADDRATING_NULLCONTAINER = 1120002;
@@ -40,20 +44,43 @@ public class RatingsException extends XWikiException
 
     public static final int ERROR_RATINGS_SAVERATING_NULLDOCUMENT = 1120005;
 
+    /**
+     * RatingsException default constructor
+     */
     public RatingsException()
     {
     }
 
+    /**
+     * RatingsException constructor.
+     * 
+     * @param module the module in which the exception occurred
+     * @param code the code for the generated exception
+     * @param message the message for the generated exception
+     */
     public RatingsException(int module, int code, String message)
     {
         super(module, code, message);
     }
 
+    /**
+     * RatingsException constructor.
+     * 
+     * @param module the module in which the exception occurred
+     * @param code the code for the generated exception
+     * @param message the message for the generated exception
+     * @param e the XWikiException that occurred
+     */
     public RatingsException(int module, int code, String message, Exception e)
     {
         super(module, code, message, e);
     }
 
+    /**
+     * RatingsException constructor.
+     * 
+     * @param e the XWikiException that occurred
+     */
     public RatingsException(XWikiException e)
     {
         super(e.getModule(), e.getCode(), e.getMessage());

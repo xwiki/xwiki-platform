@@ -34,13 +34,16 @@ import org.xwiki.ratings.UpdateRatingEvent;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
+/**
+ * @version $Id$
+ */
 @Component
 @Named("updatereputation")
 @Singleton
 public class UpdateReputationListener implements EventListener
 {
     @Inject
-    ConfiguredProvider<ReputationAlgorithm> reputationAlgorithm;
+    private ConfiguredProvider<ReputationAlgorithm> reputationAlgorithm;
 
     @Override
     public List<Event> getEvents()

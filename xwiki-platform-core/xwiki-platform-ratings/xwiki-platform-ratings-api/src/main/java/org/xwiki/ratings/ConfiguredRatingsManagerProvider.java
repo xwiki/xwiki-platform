@@ -34,26 +34,29 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
 
+/**
+ * Retrieve the appropriate RatingsManager by looking at the current configuration settings.
+ * 
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<RatingsManager>
 {
     @Inject
-    Logger logger;
+    private Logger logger;
 
     @Inject
-    Execution execution;
+    private Execution execution;
 
     @Inject
-    ComponentManager componentManager;
+    private ComponentManager componentManager;
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Retrieve the XWiki context from the current execution context.
      * 
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
+     * @return the XWiki context
+     * @throws RuntimeException if there was an error retrieving the context
      */
     protected XWikiContext getXWikiContext()
     {
@@ -61,11 +64,9 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieve the XWiki private API object.
      * 
-     * @return The XWiki private API object.
+     * @return the XWiki private API object
      */
     protected XWiki getXWiki()
     {
@@ -73,19 +74,21 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     }
 
     /**
-     * Retrieve an instance of the desired RatingsManager (default/separate) - default: save the rating information in
-     * the same page - separate: save the rating information in a specified space
+     * Retrieve an instance of the desired RatingsManager (default/separate).
+     * - default: save the rating information in the same page
+     * - separate: save the rating information in a specified space
      *
+     * @param documentRef the document to which the ratings are associated to
      * @return the ratings manager selected by looking at the current configuration settings
      */
     @Override
     public RatingsManager get(DocumentReference documentRef)
     {
-        // TODO implement
+        String defaultHint = "default";
         String ratingsHint =
             getXWiki().Param(
                 RatingsManager.RATINGS_CONFIG_PARAM_PREFIX + RatingsManager.RATINGS_CONFIG_FIELDNAME_MANAGER_HINT,
-                "default");
+                defaultHint);
 
         try {
             XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
@@ -115,7 +118,7 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
             // TODO Auto-generated catch block
             logger.error("Error loading ratings manager component for hint " + ratingsHint, e);
             try {
-                return componentManager.getInstance(RatingsManager.class, "default");
+                return componentManager.getInstance(RatingsManager.class, defaultHint);
             } catch (ComponentLookupException e1) {
                 return null;
             }

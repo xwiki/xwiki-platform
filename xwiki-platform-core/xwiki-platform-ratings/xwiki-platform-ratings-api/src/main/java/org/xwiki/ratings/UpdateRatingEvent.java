@@ -22,6 +22,11 @@ package org.xwiki.ratings;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
 
+/**
+ * Event fired when updating a Rating.
+ *
+ * @version $Id$
+ */
 public class UpdateRatingEvent implements Event
 {
     private DocumentReference documentRef;
@@ -30,44 +35,84 @@ public class UpdateRatingEvent implements Event
 
     private int oldRating;
 
+    /**
+     * Default UpdateRatingEvent constructor.
+     */
+    public UpdateRatingEvent()
+    {
+    }
+
+    /**
+     * UpdateRatingEvent constructor.
+     * 
+     * @param documentRef the document which is being rated
+     * @param newRating the new rating in the shape of a Rating object
+     * @param oldRating the old rating value
+     */
+    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating)
+    {
+        this.documentRef = documentRef;
+        this.newRating = newRating;
+        this.oldRating = oldRating;
+    }
+
+    /**
+     * Gets the document reference of the document being rated.
+     * 
+     * @return document reference of the document being rated
+     */
     public DocumentReference getDocumentReference()
     {
         return documentRef;
     }
 
+    /**
+     * Sets the document reference of the document being rated. 
+     * 
+     * @param documentRef the document being rated
+     */
     public void setDocumentReference(DocumentReference documentRef)
     {
         this.documentRef = documentRef;
     }
 
+    /**
+     * Gets the new rating set.
+     * 
+     * @return Rating object representing the new rating
+     */
     public Rating getNewRating()
     {
         return newRating;
     }
 
+    /**
+     * Sets the new rating.
+     * 
+     * @param newRating the new rating
+     */
     public void setNewRating(Rating newRating)
     {
         this.newRating = newRating;
     }
 
+    /**
+     * Gets the old rating value.
+     * 
+     * @return the old rating value
+     */
     public int getOldRating()
     {
         return oldRating;
     }
 
+    /**
+     * Sets the old rating value.
+     * 
+     * @param oldRating the old rating value
+     */
     public void setOldRating(int oldRating)
     {
-        this.oldRating = oldRating;
-    }
-
-    public UpdateRatingEvent()
-    {
-    }
-
-    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating)
-    {
-        this.documentRef = documentRef;
-        this.newRating = newRating;
         this.oldRating = oldRating;
     }
 

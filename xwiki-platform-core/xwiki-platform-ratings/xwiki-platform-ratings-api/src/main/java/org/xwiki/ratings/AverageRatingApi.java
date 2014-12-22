@@ -28,7 +28,7 @@ package org.xwiki.ratings;
 public class AverageRatingApi
 {
     /**
-     * The wrapped average rating
+     * The wrapped average rating.
      */
     protected AverageRating averageRating;
 
@@ -36,7 +36,6 @@ public class AverageRatingApi
      * Constructor of this average rating wrapper.
      *
      * @param arating the wrapped rating
-     * @param context the XWiki context
      */
     public AverageRatingApi(AverageRating arating)
     {
@@ -44,6 +43,8 @@ public class AverageRatingApi
     }
 
     /**
+     * Gets the number of votes for this average rating.
+     * 
      * @return the number of votes for this average rating
      * @see AverageRating#getNbVotes()
      */
@@ -57,6 +58,8 @@ public class AverageRatingApi
     }
 
     /**
+     * Gets the average vote.
+     * 
      * @return the average vote
      * @see AverageRating#getAverageVote()
      */
@@ -70,6 +73,8 @@ public class AverageRatingApi
     }
 
     /**
+     * Gets the method used to compute the average rating.
+     * 
      * @return the method used to compute the average rating
      * @see AverageRating#getMethod()
      */

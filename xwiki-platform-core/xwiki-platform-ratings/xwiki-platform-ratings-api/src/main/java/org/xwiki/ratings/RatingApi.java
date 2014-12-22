@@ -38,10 +38,9 @@ public class RatingApi
     protected Rating rating;
 
     /**
-     * Constructor of this wrapper
+     * Constructor of this wrapper.
      *
      * @param rating the wrapped rating
-     * @param context the XWiki context
      */
     public RatingApi(Rating rating)
     {
@@ -49,6 +48,8 @@ public class RatingApi
     }
 
     /**
+     * Gets the rating.
+     * 
      * @return the wrapped rating
      */
     protected Rating getRating()
@@ -56,11 +57,21 @@ public class RatingApi
         return rating;
     }
 
+    /**
+     * Gets the global rating id.
+     * 
+     * @return the global rating id
+     */
     public String getGlobalRatingId()
     {
         return rating.getGlobalRatingId();
     }
 
+    /**
+     * Gets the vote for the rating.
+     * 
+     * @return the vote for the rating consisting of the number of stars the author gave
+     */
     public int getVote()
     {
         if (rating == null) {
@@ -70,11 +81,21 @@ public class RatingApi
         }
     }
 
+    /**
+     * Gets the rating author.
+     * 
+     * @return a document reference to the rating author
+     */
     public DocumentReference getAuthor()
     {
         return rating.getAuthor();
     }
 
+    /**
+     * Gets the rating date.
+     * 
+     * @return the date when the rating was done
+     */
     public Date getDate()
     {
         return rating.getDate();

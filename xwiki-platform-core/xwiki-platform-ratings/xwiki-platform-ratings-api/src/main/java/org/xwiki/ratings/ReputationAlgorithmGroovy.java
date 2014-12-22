@@ -25,20 +25,38 @@ import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Algorithm to calculate a user's reputation which is loaded from a page containing a groovy script.
+ * 
  * @version $Id$
  */
 public interface ReputationAlgorithmGroovy extends ReputationAlgorithm
 {
-
     /**
-     * Sets current ratings manager
+     * Sets current ratings manager.
+     * 
+     * @param rManager the current RatingsManager
      */
     void setRatingsManager(RatingsManager rManager);
 
+    /**
+     * Sets the current execution context.
+     * 
+     * @param execution the current execution manager
+     */
     void setExecution(Execution execution);
 
+    /**
+     * Sets the current ComponentManager.
+     * 
+     * @param componentManager the current ComponentManager
+     */
     void setComponentManager(ComponentManager componentManager);
 
+    /**
+     * Sets the current XWiki Context.
+     * 
+     * @param context the current XWikiContext
+     */
     void setXWikiContext(XWikiContext context);
 
 }

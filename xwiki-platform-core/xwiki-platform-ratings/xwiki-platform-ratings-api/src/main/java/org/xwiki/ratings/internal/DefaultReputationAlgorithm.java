@@ -52,21 +52,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DefaultReputationAlgorithm implements ReputationAlgorithm
 {
     @Inject
-    Logger LOGGER;
+    private Logger logger;
 
     @Inject
-    Execution execution;
+    private Execution execution;
 
     @Inject
-    ConfiguredProvider<RatingsManager> ratingsManagerProvider;
+    private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
 
     /**
-     * <p>
-     * Retrieve the XWiki context from the current execution context
-     * </p>
+     * Retrieves the XWiki context from the current execution context.
      * 
-     * @return The XWiki context.
-     * @throws RuntimeException If there was an error retrieving the context.
+     * @return the XWiki context.
+     * @throws RuntimeException if there was an error retrieving the context.
      */
     protected XWikiContext getXWikiContext()
     {
@@ -74,22 +72,30 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
     }
 
     /**
-     * <p>
-     * Retrieve the XWiki private API object
-     * </p>
+     * Retrieves the XWiki private API object.
      * 
-     * @return The XWiki private API object.
+     * @return the XWiki private API object.
      */
     protected XWiki getXWiki()
     {
         return getXWikiContext().getWiki();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#getRatingsManager()
+     */
     public RatingsManager getRatingsManager(DocumentReference documentRef)
     {
         return ratingsManagerProvider.get(documentRef);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#updateReputation()
+     */
     public void updateReputation(DocumentReference documentRef, Rating rating, int oldVote)
     {
         // we only update if we are in stored mode and if the vote changed
@@ -101,15 +107,15 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
                 try {
                     getRatingsManager(documentRef).updateUserReputation(rating.getAuthor(), voterRating);
                 } catch (RatingsException re) {
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Error while storing reputation for user " + rating.getAuthor(), re);
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Error while storing reputation for user " + rating.getAuthor(), re);
                     }
                 }
             } catch (ReputationException e) {
                 if (e.getCode() != ReputationException.ERROR_REPUTATION_NOT_IMPLEMENTED) {
                     // we should log this error
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Error while calculating voter reputation " + rating.getAuthor()
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Error while calculating voter reputation " + rating.getAuthor()
                             + " for document " + documentRef, e);
                     }
                 }
@@ -124,8 +130,8 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
                 try {
                     getRatingsManager(documentRef).updateUserReputation(doc.getCreatorReference(), authorRating);
                 } catch (RatingsException re) {
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Error while storing reputation for user " + doc.getCreatorReference().getName(),
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Error while storing reputation for user " + doc.getCreatorReference().getName(),
                             re);
                     }
                 }
@@ -133,13 +139,13 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
             } catch (ReputationException e) {
                 if (e.getCode() != ReputationException.ERROR_REPUTATION_NOT_IMPLEMENTED) {
                     // we should log this error
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Error while calculating author reputation for document " + documentRef, e);
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Error while calculating author reputation for document " + documentRef, e);
                     }
                 }
             } catch (XWikiException e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Error while calculating author reputation for document " + documentRef, e);
+                if (logger.isErrorEnabled()) {
+                    logger.error("Error while calculating author reputation for document " + documentRef, e);
                 }
             }
 
@@ -150,20 +156,22 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
             } catch (ReputationException e) {
                 if (e.getCode() != ReputationException.ERROR_REPUTATION_NOT_IMPLEMENTED) {
                     // we should log this error
-                    if (LOGGER.isErrorEnabled()) {
-                        LOGGER.error("Error while calculating authors reputation for document " + documentRef, e);
+                    if (logger.isErrorEnabled()) {
+                        logger.error("Error while calculating authors reputation for document " + documentRef, e);
                     }
                 }
             } catch (XWikiException e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Error while calculating authors for document " + documentRef, e);
+                if (logger.isErrorEnabled()) {
+                    logger.error("Error while calculating authors for document " + documentRef, e);
                 }
             }
         }
     }
 
     /**
-     * Not implemented. Voters don't receive reputation
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewVoterReputation()
      */
     public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
         int oldVote) throws ReputationException
@@ -173,7 +181,9 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
     }
 
     /**
-     * Implemented. Authors will receive a simple reputation.
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewContributorReputation()
      */
     public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
         Rating rating, int oldVote) throws ReputationException
@@ -183,7 +193,9 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
     }
 
     /**
-     * Not implemented
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
      */
     public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
         throws ReputationException
@@ -193,7 +205,9 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
     }
 
     /**
-     * Not implemented
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.ReputationAlgorithm#recalcAllReputation()
      */
     public Map<String, AverageRating> recalcAllReputation() throws ReputationException
     {
@@ -201,6 +215,11 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return null;
     }
 
+    /**
+     * Marks methods that have not been implemented.
+     * 
+     * @throws ReputationException when the method is called
+     */
     protected void notimplemented() throws ReputationException
     {
         throw new ReputationException(ReputationException.MODULE_PLUGIN_RATINGS_REPUTATION,

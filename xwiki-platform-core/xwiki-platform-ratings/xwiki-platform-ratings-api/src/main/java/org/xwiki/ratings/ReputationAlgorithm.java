@@ -25,6 +25,8 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * Algorithm to calculate a user's reputation.
+ * 
  * @version $Id$
  */
 @Role
@@ -32,65 +34,66 @@ public interface ReputationAlgorithm
 {
 
     /**
-     * Gets current ratings manager
+     * Gets current ratings manager.
      * 
      * @param documentRef the document which the ratings are for
+     * @return the current RatingsManager
      */
     RatingsManager getRatingsManager(DocumentReference documentRef);
 
     /**
-     * Updates reputation after a vote
+     * Updates reputation after a vote.
      * 
-     * @param documentRef document on which the rating occured
+     * @param documentRef document on which the rating occurred
      * @param rating rating set
-     * @param oldVote previous rating set
+     * @param oldVote previous vote value
      */
-    public void updateReputation(DocumentReference documentRef, Rating rating, int oldVote);
+    void updateReputation(DocumentReference documentRef, Rating rating, int oldVote);
 
     /**
-     * Recalculates the contributor reputation. Only the creator of the document will have it's reputation updated
+     * Recalculates the contributor reputation. Only the creator of the document will have it's reputation updated.
      *
      * @param voter Voter that will have it's reputation updated
-     * @param documentRef Elements that was rated
-     * @param rating New rating of the element, including who did the rating
+     * @param documentRef the document that was rated
+     * @param rating the new rating of the element, including who did the rating
      * @param oldVote previous vote of the user
-     * @param context context of the request
      * @return AverageRating of the voter
+     * @throws ReputationException when an error occurs while calculating the new reputation
      */
     AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
         int oldVote) throws ReputationException;
 
     /**
-     * Recalculates the contributors reputation
+     * Recalculates the contributors reputation.
      *
-     * @param documentRef Elements that was rated
-     * @param rating New rating of the element, including who did the rating
+     * @param documentRef the document that was rated
+     * @param rating the new rating of the element, including who did the rating
      * @param oldVote previous vote of the user
-     * @param context context of the request
-     * @return Map of AverageRating of each contributor of the page that has an updated reputation
+     * @return map of AverageRating of each contributor of the page that has an updated reputation
+     * @throws ReputationException when an error occurs while calculating the new reputation
      */
     Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
         throws ReputationException;
 
     /**
-     * Recalculates the contributor reputation. Only the creator of the document will have it's reputation updated
+     * Recalculates the contributor reputation. Only the creator of the document will have his reputation updated.
      *
-     * @param contributor Contributor that will have it's reputation updated
-     * @param documentRef Elements that was rated
-     * @param rating New rating of the element, including who did the rating
+     * @param contributor the contributor that will have his reputation updated
+     * @param documentRef the document that was rated
+     * @param rating new rating of the element, including who did the rating
      * @param oldVote previous vote of the user
-     * @param context context of the request
      * @return AverageRating of the contributor
+     * @throws ReputationException when an error occurs while calculating the new reputation
      */
     AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
         Rating rating, int oldVote) throws ReputationException;
 
     /**
-     * Recalculated all reputation of the wiki The result is given as a set of AverageRating objects That can be saved
-     * to the user page
+     * Recalculates all the reputations of the wiki. The result is given as a set of AverageRating objects that can be
+     * saved on the user page.
      *
-     * @param context context of the request
-     * @return Map of AverageRating of each user of the wiki
+     * @return map of AverageRating of each user of the wiki
+     * @throws ReputationException when an error occurs while recalculating all the user reputations
      */
     Map<String, AverageRating> recalcAllReputation() throws ReputationException;
 }

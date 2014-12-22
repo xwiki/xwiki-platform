@@ -36,6 +36,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 
 /**
+ * Script service offering access to the ratings API.
+ * 
  * @version $Id$
  */
 @Component

@@ -40,6 +40,13 @@ public class StoredAverageRating implements AverageRating
 
     private XWikiContext context;
 
+    /**
+     * StoredAverageRating constructor.
+     * 
+     * @param document the document with which the rating is associated
+     * @param ratingObject the Rating object
+     * @param context the context
+     */
     public StoredAverageRating(XWikiDocument document, BaseObject ratingObject, XWikiContext context)
     {
         this.document = document;
@@ -47,36 +54,71 @@ public class StoredAverageRating implements AverageRating
         this.object = ratingObject;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getNbVotes()
+     */
     public int getNbVotes()
     {
         return object.getIntValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setNbVotes()
+     */
     public void setNbVotes(int nbVotes)
     {
         object.setIntValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, nbVotes);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getAverageVote()
+     */
     public float getAverageVote()
     {
         return object.getFloatValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setAverageVote()
+     */
     public void setAverageVote(float averageVote)
     {
         object.setFloatValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, averageVote);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getMethod()
+     */
     public String getMethod()
     {
         return object.getStringValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setMethod()
+     */
     public void setMethod(String method)
     {
         object.setStringValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD, method);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#save()
+     */
     public void save() throws RatingsException
     {
         try {

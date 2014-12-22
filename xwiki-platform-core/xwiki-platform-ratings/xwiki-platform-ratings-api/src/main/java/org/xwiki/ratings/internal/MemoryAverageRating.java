@@ -37,6 +37,14 @@ public class MemoryAverageRating implements AverageRating
 
     private String method;
 
+    /**
+     * MemoryAverageRating constructor.
+     * 
+     * @param documentRef the document with which the average rating is associated
+     * @param nbVotes the total number of votes
+     * @param averageVote the average rating
+     * @param method the method to use when calculating the average
+     */
     public MemoryAverageRating(DocumentReference documentRef, int nbVotes, float averageVote, String method)
     {
         this.documentRef = documentRef;
@@ -45,46 +53,91 @@ public class MemoryAverageRating implements AverageRating
         this.method = method;
     }
 
+    /**
+     * Gets the document with which the average rating is associated.
+     * 
+     * @return the document with which the average rating is associated
+     */
     public DocumentReference getDocumentReference()
     {
         return documentRef;
     }
 
+    /**
+     * Sets the document with which the average rating is associated.
+     * 
+     * @param documentRef the document with which the average rating is associated
+     */
     public void setDocumentReference(DocumentReference documentRef)
     {
         this.documentRef = documentRef;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getNbVotes()
+     */
     public int getNbVotes()
     {
         return nbVotes;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setNbVotes()
+     */
     public void setNbVotes(int nbVotes)
     {
         this.nbVotes = nbVotes;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getAverageVote()
+     */
     public float getAverageVote()
     {
         return averageVote;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setAverageVote()
+     */
     public void setAverageVote(float averageVote)
     {
         this.averageVote = averageVote;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#getMethod()
+     */
     public String getMethod()
     {
         return method;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#setMethod()
+     */
     public void setMethod(String method)
     {
         this.method = method;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.ratings.AverageRating#save()
+     */
     public void save() throws RatingsException
     {
     }

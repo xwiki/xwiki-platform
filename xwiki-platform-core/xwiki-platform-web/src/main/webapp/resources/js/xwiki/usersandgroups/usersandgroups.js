@@ -207,6 +207,8 @@ function displayUsers(row, i, table, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.username'))");
   if (wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -219,14 +221,20 @@ function displayUsers(row, i, table, form_token)
   tr.appendChild(username);
 
   var firstname = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  firstname.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.firstname'))");
   firstname.appendChild(document.createTextNode(row.firstname) );
   tr.appendChild(firstname);
 
   var lastname = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  lastname.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.lastname'))");
   lastname.appendChild(document.createTextNode(row.lastname) );
   tr.appendChild(lastname);
 
   var manage = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  manage.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.manage'))");
   manage.className = "manage";
 
   if (wikiname == "local") {
@@ -269,6 +277,8 @@ function displayGroups(row, i, table, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.groupname'))");
   if (wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -281,6 +291,8 @@ function displayGroups(row, i, table, form_token)
   tr.appendChild(username);
 
   var members = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  members.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.members'))");
   if (wikiname == "local") {
     members.appendChild(document.createTextNode(row.members));
   } else {
@@ -289,6 +301,8 @@ function displayGroups(row, i, table, form_token)
   tr.appendChild(members);
 
   var manage = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  manage.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.manage'))");
   manage.className = "manage";
 
   if (wikiname == "local") {

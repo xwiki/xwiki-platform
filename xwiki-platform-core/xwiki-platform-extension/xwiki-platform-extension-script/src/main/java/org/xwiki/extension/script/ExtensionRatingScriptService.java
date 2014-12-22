@@ -36,7 +36,7 @@ import org.xwiki.extension.version.Version;
  * Various script APIs related to ratable extensions.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Component
 @Named(ExtensionManagerScriptService.ROLEHINT + '.' + ExtensionRatingScriptService.ID)

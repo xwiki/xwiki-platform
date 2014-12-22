@@ -27,7 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @param <T> the type of the returned object
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 @Role
 public interface ConfiguredProvider<T>

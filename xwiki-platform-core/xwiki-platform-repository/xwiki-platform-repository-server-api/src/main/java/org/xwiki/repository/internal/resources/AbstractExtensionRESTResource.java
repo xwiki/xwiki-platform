@@ -48,7 +48,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.ratings.AverageRatingApi;
 import org.xwiki.ratings.RatingsManager;
-import org.xwiki.ratings.internal.SeparatePageRatingsManager;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.XWikiResource;

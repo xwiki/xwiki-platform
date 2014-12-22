@@ -225,8 +225,8 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             MetaDataBlock metaDataBlock =
                 new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
 
-            // otherwise the inner macros will not be able to access the parent DOM
-            metaDataBlock.setParent(wikiMacroBlock.getParent());
+            // Make sure the context XDOM contains the html macro content
+            wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
             if (observation != null) {
                 observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
@@ -236,6 +236,9 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
             txContext.setId(context.getId());
             macroTransformation.transform(wikiMacroMarker, txContext);
+
+            // Restore context XDOM to its previous state
+            metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {

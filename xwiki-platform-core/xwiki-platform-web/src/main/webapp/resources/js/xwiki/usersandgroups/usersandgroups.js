@@ -394,14 +394,14 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   // We set this map manually because we cannot use #foreach loops with yuicompressor, that forbids the '#' character,
   // since it has nothing to do in javascript.
   var translatedRights = {
-      'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
-      'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
-      'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
-      'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
-      'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin''))",
-      'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",
-      'programming' : "$escapetool.javascript($services.localization.render('rightsmanager.programming'))",
-      'createwiki'  : "$escapetool.javascript($services.localization.render('rightsmanager.createwiki'))"
+    'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
+    'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
+    'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
+    'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
+    'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin''))",
+    'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",
+    'programming' : "$escapetool.javascript($services.localization.render('rightsmanager.programming'))",
+    'createwiki'  : "$escapetool.javascript($services.localization.render('rightsmanager.createwiki'))"
   };
 
   username.className = "username";

@@ -378,9 +378,9 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var username = document.createElement('td');
   // Set a data-title attribute for the responsive livetable (since Flamingo).
   if (uorg == 'groups') {
-    username.setAttribute('data-title', '$escapetool.javascript($services.localization.render('rightsmanager.groupname'))');
+    username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.groupname'))");
   } else {
-    username.setAttribute('data-title', '$escapetool.javascript($services.localization.render('rightsmanager.username'))');
+    username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.username'))");
   }
   if (row.wikiname == "local") {
     var a = document.createElement('a');
@@ -390,12 +390,19 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   } else {
     username.appendChild(document.createTextNode(row.username));
   }
-  
-  var translatedRights = {};
-  #set ($rightsLevels = ['view', 'comment', 'edit', 'delete', 'admin', 'register', 'programming', 'createwiki'])
-  #foreach ($rightLevel in $rightsLevels)
-    translatedRights['$rightLevel'] = '$escapetool.javascript($services.localization.render("rightsmanager.${rightLevel}"))';
-  #end
+
+  // We set this map manually because we cannot use #foreach loops with yuicompressor, that forbids the '#' character,
+  // since it has nothing to do in javascript.
+  var translatedRights = {
+      'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
+      'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
+      'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
+      'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
+      'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin''))",
+      'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",
+      'programming' : "$escapetool.javascript($services.localization.render('rightsmanager.programming'))",
+      'createwiki'  : "$escapetool.javascript($services.localization.render('rightsmanager.createwiki'))"
+  };
 
   username.className = "username";
   tr.appendChild(username);

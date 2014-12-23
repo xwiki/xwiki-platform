@@ -19,11 +19,15 @@
  */
 package org.xwiki.ratings;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Represents a computed average rating for a container or a set of containers.
  *
  * @version $Id$
+ * @since 6.4M3
  */
+@Unstable
 public interface AverageRating
 {
     /**

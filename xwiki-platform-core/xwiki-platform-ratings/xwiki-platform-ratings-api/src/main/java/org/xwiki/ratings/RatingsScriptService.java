@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -39,10 +40,12 @@ import com.xpn.xwiki.api.Document;
  * Script service offering access to the ratings API.
  * 
  * @version $Id$
+ * @since 6.4M3
  */
 @Component
 @Singleton
 @Named("ratings")
+@Unstable
 public class RatingsScriptService implements ScriptService
 {
     @Inject

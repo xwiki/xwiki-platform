@@ -21,6 +21,7 @@ package org.xwiki.ratings;
 
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -28,7 +29,9 @@ import com.xpn.xwiki.XWikiContext;
  * Algorithm to calculate a user's reputation which is loaded from a page containing a groovy script.
  * 
  * @version $Id$
+ * @since 6.4M3
  */
+@Unstable
 public interface ReputationAlgorithmGroovy extends ReputationAlgorithm
 {
     /**

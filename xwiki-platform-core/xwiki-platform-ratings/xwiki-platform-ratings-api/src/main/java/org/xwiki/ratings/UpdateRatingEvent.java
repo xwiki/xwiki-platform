@@ -21,12 +21,15 @@ package org.xwiki.ratings;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.Event;
+import org.xwiki.stability.Unstable;
 
 /**
  * Event fired when updating a Rating.
  *
  * @version $Id$
+ * @since 6.4M3
  */
+@Unstable
 public class UpdateRatingEvent implements Event
 {
     private DocumentReference documentRef;

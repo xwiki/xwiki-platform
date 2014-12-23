@@ -19,12 +19,16 @@
  */
 package org.xwiki.ratings;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Api wrapper for an average rating.
  *
  * @version $Id$
  * @see AverageRating
+ * @since 6.4M3
  */
+@Unstable
 public class AverageRatingApi
 {
     /**

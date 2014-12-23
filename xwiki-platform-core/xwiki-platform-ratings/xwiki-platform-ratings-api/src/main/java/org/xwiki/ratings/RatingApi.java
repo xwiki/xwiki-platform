@@ -22,6 +22,7 @@ package org.xwiki.ratings;
 import java.util.Date;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Wrapper around a {@link Rating}, typically returned by the {@link RatingsPluginApi} and manipulated using a scripting
@@ -29,7 +30,9 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @see Rating
+ * @since 6.4M3
  */
+@Unstable
 public class RatingApi
 {
     /**

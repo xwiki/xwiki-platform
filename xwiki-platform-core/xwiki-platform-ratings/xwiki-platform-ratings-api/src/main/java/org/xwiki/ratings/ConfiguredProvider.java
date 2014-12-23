@@ -21,6 +21,7 @@ package org.xwiki.ratings;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provide instances of objects configured relative to the passed document.
@@ -30,6 +31,7 @@ import org.xwiki.model.reference.DocumentReference;
  * @since 6.4M3
  */
 @Role
+@Unstable
 public interface ConfiguredProvider<T>
 {
     /**

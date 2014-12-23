@@ -115,7 +115,7 @@ public abstract class AbstractCachedCompiler<T>
             if (!force) {
                 result = cache.get(lessResourceReference, skinReference, colorThemeReference);
                 if (result != null) {
-                    return result;
+                    return cloneResult(result);
                 }
             }
 
@@ -131,9 +131,18 @@ public abstract class AbstractCachedCompiler<T>
             }
         }
 
-        // FixMe: we actually return the cached instance
-        return result;
+        return cloneResult(result);
     }
+
+    /**
+     * Returns a clone of the result to avoid returning the instance stored in the cache. Need to be implemented by
+     * subclasses.
+     * @param toClone result to clone
+     * @return a clone of the result
+     *
+     * @since 6.4M3
+     */
+    protected abstract T cloneResult(T toClone);
 
     private synchronized String getMutex(LESSResourceReference lessResourceReference, SkinReference skinReference,
         ColorThemeReference colorThemeReference)

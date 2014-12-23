@@ -69,4 +69,10 @@ public class DefaultIntegratedLESSCompiler extends AbstractCachedCompiler<String
     {
         return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, skin, force);
     }
+
+    @Override
+    protected String cloneResult(String toClone)
+    {
+        return new String(toClone);
+    }
 }

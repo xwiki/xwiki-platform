@@ -32,5 +32,20 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class ColorTheme extends HashMap<String, String>
 {
+    /**
+     * Construct a new color theme.
+     */
+    public ColorTheme()
+    {
+        super();
+    }
 
+    /**
+     * Construct a copy of a color theme.
+     * @param colorTheme the color theme to copy
+     */
+    public ColorTheme(ColorTheme colorTheme)
+    {
+        super(colorTheme);
+    }
 }

@@ -95,7 +95,7 @@
             &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.wikiprettyname')&lt;/span&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
-            &lt;input name='prettyName' type='text' size='30' value="$!{escapetool.xml($descriptor.prettyName)}" /&gt;
+            &lt;input id='prettyName' name='prettyName' type='text' size='30' value="$!{escapetool.xml($descriptor.prettyName)}" /&gt;
           &lt;/dd&gt;
 
           &lt;dt&gt;
@@ -103,7 +103,7 @@
             &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.description')&lt;/span&gt;
           &lt;/dt&gt;
           &lt;dd&gt;
-            &lt;textarea name='description'&gt;$!{escapetool.xml($descriptor.description)}&lt;/textarea&gt;
+            &lt;textarea id='description' name='description'&gt;$!{escapetool.xml($descriptor.description)}&lt;/textarea&gt;
           &lt;/dd&gt;
 
           &lt;dt&gt;
@@ -118,7 +118,7 @@
             #else
               #set ($homepage = '')
             #end
-            &lt;input name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
+            &lt;input id='homepage' name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
           &lt;/dd&gt;
 
           ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).
@@ -142,7 +142,7 @@
             #elseif ($userScope == 'GLOBAL_ONLY')
               #set ($class = "$class global")
             #end
-            &lt;input name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
+            &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
           &lt;/dd&gt;
 
           &lt;dt class='warning'&gt;

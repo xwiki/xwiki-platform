@@ -230,20 +230,22 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             // Make sure the context XDOM contains the html macro content
             wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
-            if (observation != null) {
-                observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+            try {
+                if (observation != null) {
+                    observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+                }
+
+                // Perform internal macro transformations.
+                TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+                txContext.setId(context.getId());
+
+                RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
+                    wikiMacroMarker);
+            } finally {
+                // Restore context XDOM to its previous state
+                metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
             }
-
-            // Perform internal macro transformations.
-            TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
-            txContext.setId(context.getId());
-
-            RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
-                wikiMacroMarker);
-
-            // Restore context XDOM to its previous state
-            metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {

@@ -31,7 +31,7 @@
   <name>XWiki Platform - Tools - Web Standards Validator</name>
   <description>XWiki Platform - Tools - Web Standard Validator</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

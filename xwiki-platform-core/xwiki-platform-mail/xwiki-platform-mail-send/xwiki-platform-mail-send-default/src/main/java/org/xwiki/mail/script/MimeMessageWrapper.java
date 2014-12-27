@@ -210,16 +210,6 @@ public class MimeMessageWrapper extends MimeMessage
         this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
     }
 
-    /**
-     * Wait for all messages on the sending queue to be sent before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     */
-    public void waitTillSent(long timeout)
-    {
-        this.mailSender.waitTillSent(timeout);
-    }
-
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException
     {

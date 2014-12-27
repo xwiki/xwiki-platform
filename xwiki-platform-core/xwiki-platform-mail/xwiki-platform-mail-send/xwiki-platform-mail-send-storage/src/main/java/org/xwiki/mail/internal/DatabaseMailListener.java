@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.mail.AbstractMailListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStore;
@@ -53,7 +53,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 @Component
 @Singleton
 @Named("database")
-public class DatabaseMailListener extends AbstractMailListener
+public class DatabaseMailListener implements MailListener
 {
     /**
      * Used to get the XWiki Context.
@@ -117,13 +117,17 @@ public class DatabaseMailListener extends AbstractMailListener
         }
     }
 
-    @Override
+    /**
+     * @return errors raised during the send of all emails
+     */
     public Iterator<MailStatus> getErrors()
     {
         return getMailResults(this.batchID, MailState.FAILED).iterator();
     }
 
-    @Override
+    /**
+     * @return the number of errors
+     */
     public int getErrorsNumber()
     {
         return getMailResults(this.batchID, MailState.FAILED).size();
@@ -131,26 +135,24 @@ public class DatabaseMailListener extends AbstractMailListener
 
     private String getMessageID(MimeMessage message)
     {
-        String messageID = null;
         try {
-            messageID = message.getMessageID();
+            return message.getHeader("X-MailID", null);
         } catch (MessagingException e) {
             this.logger.warn("Failed to retrieve Message ID from message. Reason: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
-        return messageID;
     }
 
     private String getMessageBatchID(MimeMessage message)
     {
-        String xbatchID = null;
         try {
-            xbatchID = message.getHeader("X-BatchID")[0];
+            return message.getHeader("X-BatchID")[0];
         } catch (MessagingException e) {
             this.logger.warn("Failed to retrieve Batch ID from message. Reason: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
+            return null;
         }
-        return xbatchID;
     }
 
     private MailStatus getMailResult(final String messageID)

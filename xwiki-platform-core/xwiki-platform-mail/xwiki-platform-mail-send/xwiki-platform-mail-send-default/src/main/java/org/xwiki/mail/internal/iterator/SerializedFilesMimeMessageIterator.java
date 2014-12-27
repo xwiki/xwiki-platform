@@ -41,6 +41,11 @@ import org.xwiki.environment.Environment;
  */
 public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
 {
+    /**
+     * The mails store directory name.
+     */
+    public static final String ROOT_DIRECTORY = "mailstore";
+
     private final File[] files;
 
     private ComponentManager componentManager;
@@ -64,7 +69,8 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
         } catch (ComponentLookupException e) {
             throw new MessagingException("Failed to find default Environment", e);
         }
-        this.batchDirectory = new File(this.environment.getPermanentDirectory(), batchID.toString());
+        this.batchDirectory =
+            new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchID.toString());
         this.files = this.batchDirectory.listFiles();
         this.iteratorSize = this.files.length;
         this.parameters = parameters;

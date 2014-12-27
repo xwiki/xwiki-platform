@@ -19,7 +19,11 @@
  */
 package org.xwiki.mail.internal;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -33,7 +37,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.AbstractMailListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailStatus;
 
 /**
@@ -45,14 +49,27 @@ import org.xwiki.mail.MailStatus;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("memory")
-public class MemoryMailListener extends AbstractMailListener
+public class MemoryMailListener implements MailListener
 {
+    private static List<WeakReference<MemoryMailListener>> instances = new ArrayList<>();
+
+    private String batchID;
+
     @Inject
     private Logger logger;
 
     private BlockingQueue<MailStatus> errorQueue = new LinkedBlockingQueue<>(100);
 
-    @Override public void onPrepare(MimeMessage message)
+    /**
+     * Constructor adding the WeakReference to {@link #instances}.
+     */
+    public MemoryMailListener()
+    {
+        instances.add(new WeakReference<>(this));
+    }
+
+    @Override
+    public void onPrepare(MimeMessage message)
     {
         // We're only interested in errors in the scripting API.
     }
@@ -67,7 +84,8 @@ public class MemoryMailListener extends AbstractMailListener
     public void onError(MimeMessage message, Exception e)
     {
         try {
-            this.errorQueue.add(new MailStatus(message.getMessageID(), ExceptionUtils.getMessage(e)));
+            this.batchID = message.getHeader("X-BatchID", null);
+            this.errorQueue.add(new MailStatus(message.getHeader("X-MailID", null), ExceptionUtils.getMessage(e)));
         } catch (MessagingException ex) {
             this.logger.warn("Failed to retrieve Message ID from message. Reason: [{}]",
                 ExceptionUtils.getRootCauseMessage(e));
@@ -75,15 +93,50 @@ public class MemoryMailListener extends AbstractMailListener
     }
 
     /**
+     * @return the list of WeakReference of the instances
+     */
+    private static List<WeakReference<MemoryMailListener>> getInstances()
+    {
+        return instances;
+    }
+
+    /**
+     * @param batchID the UUID of the Batch mail
+     * @return errors raised during the send of all emails
+     */
+    public static Iterator<MailStatus> getErrors(UUID batchID)
+    {
+        for (WeakReference<MemoryMailListener> instance : instances) {
+            if (instance != null) {
+                MemoryMailListener listener = instance.get();
+                if (listener != null) {
+                    if (batchID.toString().equals(listener.getBatchID())) {
+                        return listener.getErrors();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the batch ID of the batch mail
+     */
+    public String getBatchID()
+    {
+        return batchID;
+    }
+    /**
      * @return the list of exceptions raised when sending mails in the current thread
      */
-    @Override
     public Iterator<MailStatus> getErrors()
     {
         return this.errorQueue.iterator();
     }
 
-    @Override
+    /**
+     * @return the number of errors
+     */
     public int getErrorsNumber()
     {
         return this.errorQueue.size();

@@ -91,14 +91,15 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
     @Override protected MimeMessage createMessage() throws MessagingException
     {
         DocumentReference groupsClassReference = this.stringResolver.resolve(USER_SPACE + ".XWikiGroups");
-        String userFullName =
-            this.documentAccessBridge.getProperty(this.groupReference, groupsClassReference, this.position, "member")
-                .toString();
+
+        String userFullName = this.documentAccessBridge
+            .getProperty(this.groupReference, groupsClassReference, this.position, "member").toString();
 
         DocumentReference userReference = this.stringResolver.resolve(userFullName);
 
         String email = this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
             .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "email").toString();
+
 
         Map<String, Object> parameters = (Map<String, Object>) this.parameters.get("parameters");
         Session session = (Session) this.parameters.get("session");

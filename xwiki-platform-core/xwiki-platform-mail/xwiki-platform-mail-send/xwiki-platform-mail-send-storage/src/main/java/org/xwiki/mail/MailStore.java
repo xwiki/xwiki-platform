@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail;
 
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
@@ -44,9 +45,10 @@ public interface MailStore
     /**
      * Load message saved on disk.
      *
+     * @param session the JavaMail session used to send the mail
      * @param batchID correspond to directory name on permanent directory
      * @param messageID correspond to file name of serialized MimeMessage
      * @return MimeMessage serialised on disk
      */
-    MimeMessage load(String batchID, String messageID);
+    MimeMessage load(Session session, String batchID, String messageID);
 }

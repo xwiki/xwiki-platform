@@ -80,7 +80,7 @@ public class MailStatus
      */
     public MailStatus(String messageID)
     {
-        setMessageID(messageID);
+        this.messageID = messageID;
         setDate(new Date());
     }
 
@@ -116,14 +116,6 @@ public class MailStatus
     public String getMessageID()
     {
         return this.messageID;
-    }
-
-    /**
-     * @param messageID the MimeMessage ID
-     */
-    public void setMessageID(String messageID)
-    {
-        this.messageID = messageID;
     }
 
     /**

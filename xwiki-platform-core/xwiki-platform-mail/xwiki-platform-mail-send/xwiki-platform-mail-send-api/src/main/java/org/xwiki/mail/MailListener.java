@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail;
 
-import java.util.Iterator;
-
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
@@ -61,10 +59,10 @@ public interface MailListener
     /**
      * @return the list of MailStatus
      */
-    Iterator<MailStatus> getErrors();
+    //Iterator<MailStatus> getErrors();
 
     /**
      * @return the number of errors
      */
-    int getErrorsNumber();
+    //int getErrorsNumber();
 }

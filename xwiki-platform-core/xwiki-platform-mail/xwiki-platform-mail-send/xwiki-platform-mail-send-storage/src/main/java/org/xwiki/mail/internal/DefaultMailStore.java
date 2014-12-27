@@ -17,17 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.mail.internal;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -46,6 +49,10 @@ import org.xwiki.mail.MailStore;
 @Singleton
 public class DefaultMailStore implements MailStore
 {
+    /**
+     * The mails store directory name.
+     */
+    public static final String ROOT_DIRECTORY = "mailstore";
 
     @Inject
     private Logger logger;
@@ -57,12 +64,13 @@ public class DefaultMailStore implements MailStore
     public void save(MimeMessage message)
     {
         try {
-            String messageID = message.getMessageID();
-            String batchID = message.getHeader("X-BatchID")[0];
-            File batchDirectory = new File(this.environment.getPermanentDirectory(), batchID);
+            String messageID = message.getHeader("X-MailID", null);
+            String batchID = message.getHeader("X-BatchID", null);
+            File batchDirectory =
+                new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchID);
+            batchDirectory.mkdirs();
             File file = new File(batchDirectory, messageID);
-            OutputStream os = null;
-            os = new FileOutputStream(file);
+            OutputStream os = new FileOutputStream(file);
             message.writeTo(os);
         } catch (IOException | MessagingException e) {
             this.logger.warn("Failed to save message on disk. Reason: [{}]",
@@ -71,9 +79,19 @@ public class DefaultMailStore implements MailStore
     }
 
     @Override
-    public MimeMessage load(String batchID, String messageID)
+    public MimeMessage load(Session session, String batchID, String messageID)
     {
-
-        return null;
+        try {
+            File batchDirectory =
+                new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchID);
+            File file = new File(batchDirectory, messageID);
+            InputStream is = new FileInputStream(file);
+            MimeMessage message = new MimeMessage(session, is);
+            return message;
+        } catch (MessagingException | FileNotFoundException e) {
+            this.logger.warn("Failed to load message from disk. Reason: [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 }

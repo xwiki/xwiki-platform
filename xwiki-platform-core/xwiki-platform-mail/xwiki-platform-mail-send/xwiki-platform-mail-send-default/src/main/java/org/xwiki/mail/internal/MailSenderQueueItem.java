@@ -19,23 +19,24 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.UUID;
+
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.mail.MailListener;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Represents a Mail message placed on the queue for sending.
+ * Represents a Mail messages placed on the queue for sending.
  *
  * @version $Id$
  * @since 6.1M2
  */
 public class MailSenderQueueItem
 {
-    private MimeMessage message;
+    private Iterable<? extends MimeMessage> messages;
 
     private Session session;
 
@@ -43,25 +44,30 @@ public class MailSenderQueueItem
 
     private long threadId;
 
+    private UUID batchID;
+
     /**
-     * @param message see {@link #getMessage()}
+     * @param messages see {@link #getMessages()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
+     * @param batchID see {@link #getBatchID()}
      */
-    public MailSenderQueueItem(MimeMessage message, Session session, MailListener listener)
+    public MailSenderQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
+        UUID batchID)
     {
-        this.message = message;
+        this.messages = messages;
         this.session = session;
         this.listener = listener;
+        this.batchID = batchID;
         this.threadId = Thread.currentThread().getId();
     }
 
     /**
-     * @return the mail message to be sent
+     * @return the list of mail messages to be sent
      */
-    public MimeMessage getMessage()
+    public Iterable<? extends MimeMessage> getMessages()
     {
-        return this.message;
+        return this.messages;
     }
 
     /**
@@ -92,29 +98,16 @@ public class MailSenderQueueItem
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-
-        ToStringBuilder messageBuilder = new XWikiToStringBuilder(this);
-
-        String subjectValue;
-        try {
-            subjectValue = getMessage().getSubject();
-        } catch (Exception e) {
-            subjectValue = String.format("<couldn't get message, reason: [%s]>",
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-        messageBuilder.append("subject", subjectValue);
-
-        String fromValue;
-        try {
-            fromValue = getMessage().getFrom()[0].toString();
-        } catch (Exception e) {
-            fromValue = String.format("<couldn't get from, reason: [%s]>",
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-        messageBuilder.append("from", fromValue);
-
-        builder.append("message", getMessage() == null ? null : messageBuilder.toString());
+        builder.append("batchID", this.batchID);
         builder.append("threadId", getThreadId());
         return builder.toString();
+    }
+
+    /**
+     * @return the UUID of the batch
+     */
+    public UUID getBatchID()
+    {
+        return this.batchID;
     }
 }

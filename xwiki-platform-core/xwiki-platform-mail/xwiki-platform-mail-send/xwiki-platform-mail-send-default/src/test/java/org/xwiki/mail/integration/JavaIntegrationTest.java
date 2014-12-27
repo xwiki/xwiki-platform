@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,11 +41,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.environment.internal.StandardEnvironment;
-import org.xwiki.mail.AbstractMailListener;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -95,7 +92,7 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailListener listener = new AbstractMailListener()
+    private MailListener listener = new MailListener()
     {
         @Override public void onPrepare(MimeMessage message)
         {
@@ -113,16 +110,6 @@ public class JavaIntegrationTest
         {
             // Shouldn't happen, fail the test!
             fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
-        }
-
-        @Override public Iterator<MailStatus> getErrors()
-        {
-            return null;
-        }
-
-        @Override public int getErrorsNumber()
-        {
-            return 0;
         }
     };
 
@@ -175,10 +162,7 @@ public class JavaIntegrationTest
 
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.sendAsynchronously(Arrays.asList(message), session, this.listener);
-        this.sender.sendAsynchronously(Arrays.asList(message), session, this.listener);
-        this.sender.sendAsynchronously(Arrays.asList(message), session, this.listener);
-        this.sender.waitTillSent(10000L);
+        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, this.listener);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);

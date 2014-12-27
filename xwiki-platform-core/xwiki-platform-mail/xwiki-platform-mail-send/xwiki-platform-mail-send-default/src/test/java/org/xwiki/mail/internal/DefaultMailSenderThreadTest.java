@@ -19,8 +19,10 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.mail.Session;
@@ -60,8 +62,9 @@ public class DefaultMailSenderThreadTest
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        MailListener listener = this.mocker.getInstance(MailListener.class, "memory");
-        MailSenderQueueItem item = new MailSenderQueueItem(message, session, listener);
+        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        UUID batchID = UUID.randomUUID();
+        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchID);
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 

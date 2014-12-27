@@ -20,6 +20,7 @@
 package org.xwiki.mail.script;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -44,10 +45,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailSession;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -91,9 +93,6 @@ public class MailSenderScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    @Inject
-    private MailSession mailSession;
-
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
      * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
@@ -108,7 +107,7 @@ public class MailSenderScriptService implements ScriptService
         MimeMessageWrapper messageWrapper;
         try {
             MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
-            Session session = mailSession.getInstance();
+            Session session = createSession();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -130,6 +129,33 @@ public class MailSenderScriptService implements ScriptService
         }
 
         return messageWrapper;
+    }
+
+    /**
+     * @param hint the hint of Iterator factories
+     * @param source the source from which to prefill the Mime Message iterator (depends on the implementation)
+     * @param factoryHint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
+     * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
+     * @return the ist of the pre-filled Mime Message wrapped
+     */
+    public Iterator<? extends MimeMessage> createMessages(String hint, Object source, String factoryHint,
+        Map<String, Object> parameters)
+    {
+        MimeMessageFactory factory;
+        try {
+            factory = getMimeMessageFactory(factoryHint, parameters.get("source").getClass());
+        } catch (ComponentLookupException e) {
+            setError(e);
+            return null;
+        }
+        try {
+            MimeMessageIteratorFactory iteratorFactory = new MimeMessageIteratorFactory();
+            return
+                iteratorFactory.createIterator(hint, source, factory, parameters, this.componentManagerProvider.get());
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
     }
 
     private MimeMessageFactory getMimeMessageFactory(String hint, Type type) throws ComponentLookupException
@@ -202,7 +228,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = mailSession.getInstance();
+        Session session = createSession();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.mailSender, this.execution,
             this.configuration, this.componentManagerProvider.get());
@@ -225,16 +251,26 @@ public class MailSenderScriptService implements ScriptService
     }
 
     /**
-     * Send the mail synchronously with Memory MailListener .
+     * Send one mail synchronously with Memory MailListener .
+     *
+     * @param message the message that was tried to be sent
+     * @return UUID of the Batch mail
+     */
+    public UUID send(MimeMessage message)
+    {
+        return send(Arrays.asList(message));
+    }
+
+    /**
+     * Send the list of mails synchronously with Memory MailListener.
      *
      * @param messages the list of messages that was tried to be sent
      * @return UUID of the Batch mail
      */
-    public UUID send(List<? extends MimeMessage> messages)
+    public UUID send(Iterable<? extends MimeMessage> messages)
     {
         return send(messages, "memory");
     }
-
 
     /**
      * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling {@link
@@ -244,15 +280,15 @@ public class MailSenderScriptService implements ScriptService
      * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
      * @return UUID of the Batch mail
      */
-    public UUID send(List<? extends MimeMessage> messages, String hint)
+    public UUID send(Iterable<? extends MimeMessage> messages, String hint)
     {
         MailListener listener;
         try {
             checkPermissions();
             listener = getListener(hint);
-            return this.mailSender.send(messages, mailSession.getInstance());
+            return this.mailSender.send(messages, createSession());
         } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
+            // Save the exception for reporting through the script services's getLastError() API
             setError(e);
         }
         return null;
@@ -272,7 +308,7 @@ public class MailSenderScriptService implements ScriptService
             listener = getListener(hint);
             checkPermissions();
         } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
+            // Save the exception for reporting through the script services's getLastError() API
             setError(e);
             // Don't send the mail!
             return null;
@@ -280,7 +316,7 @@ public class MailSenderScriptService implements ScriptService
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        UUID sender = this.mailSender.sendAsynchronously(messages, mailSession.getInstance(), listener);
+        UUID sender = this.mailSender.sendAsynchronously(messages, createSession(), listener);
         return sender;
     }
 
@@ -302,8 +338,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public Iterator<MailStatus> getErrors(UUID batchID)
     {
-        // TODO:
-        return null;
+        return MemoryMailListener.getErrors(batchID);
     }
 
     private MailListener getListener(String hint) throws MessagingException
@@ -312,7 +347,7 @@ public class MailSenderScriptService implements ScriptService
         try {
             listener = this.componentManagerProvider.get().getInstance(MailListener.class, hint);
         } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to locate [%s] Event lister. ", hint), e);
+            throw new MessagingException(String.format("Failed to locate [%s] Event listener. ", hint), e);
         }
         return listener;
     }
@@ -323,6 +358,18 @@ public class MailSenderScriptService implements ScriptService
     public MailSenderConfiguration getConfiguration()
     {
         return this.configuration;
+    }
+
+    private Session createSession()
+    {
+        Session session;
+        if (this.configuration.usesAuthentication()) {
+            session = Session.getInstance(this.configuration.getAllProperties(),
+                new XWikiAuthenticator(this.configuration));
+        } else {
+            session = Session.getInstance(this.configuration.getAllProperties());
+        }
+        return session;
     }
 
     // Error management

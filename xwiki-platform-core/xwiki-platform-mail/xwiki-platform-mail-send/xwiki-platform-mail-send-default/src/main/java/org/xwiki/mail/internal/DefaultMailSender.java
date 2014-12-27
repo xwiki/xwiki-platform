@@ -26,11 +26,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.mail.Address;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,7 +40,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailStatus;
 
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
@@ -82,53 +78,19 @@ public class DefaultMailSender implements MailSender, Initializable
     }
 
     @Override
-    public UUID send(MimeMessage message, Session session) throws MessagingException
+    public UUID send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException
     {
         MailListener listener = getListener("memory");
-        UUID batchID = sendAsynchronously(message, session, listener);
+        UUID batchID = sendAsynchronously(messages, session, listener);
         waitTillSent(Long.MAX_VALUE);
-        Iterator<MailStatus> errors = listener.getErrors();
-        if (errors.hasNext()) {
-            throw new MessagingException(String.format("Failed to send mail message [%s]", message),
-                errors.next().getException());
-        }
         return batchID;
     }
 
     @Override
-    public UUID sendAsynchronously(MimeMessage message, Session session, MailListener listener)
+    public UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener)
     {
         UUID batchID = UUID.randomUUID();
-        try {
-            // If the user has not set the From header then use the default value from configuration and if it's not
-            // set then raise an error since a message must have a from set!
-            message.setHeader("X-SenderID", batchID.toString());
-            // Perform some basic verification to avoid NPEs in JavaMail
-            if (message.getFrom() == null) {
-                // Try using the From address in the Session
-                String from = this.configuration.getFromAddress();
-                if (from != null) {
-                    message.setFrom(new InternetAddress(from));
-                } else {
-                    throw new MessagingException("Missing the From Address for sending the mail. "
-                        + "You need to either define it in the Mail Configuration or pass it in your message.");
-                }
-            }
-
-            // If the user has not set the BCC header then use the default value from configuration
-            Address[] bccAddresses = message.getRecipients(Message.RecipientType.BCC);
-            if (bccAddresses == null || bccAddresses.length == 0) {
-                for (String address : this.configuration.getBCCAddresses()) {
-                    message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
-                }
-            }
-
-            // Push new mail message on the queue
-            getMailQueue().add(new MailSenderQueueItem(message, session, listener));
-        } catch (Exception e) {
-            // Save any exception in the listener
-            listener.onError(message, e);
-        }
+        getMailQueue().add(new MailSenderQueueItem(messages, session, listener, batchID));
         return batchID;
     }
 
@@ -186,7 +148,7 @@ public class DefaultMailSender implements MailSender, Initializable
         try {
             listener = this.componentManager.getInstance(MailListener.class, hint);
         } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to locate [%s] Event lister. ", hint), e);
+            throw new MessagingException(String.format("Failed to locate [%s] Event listener. ", hint), e);
         }
         return listener;
     }

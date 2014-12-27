@@ -42,8 +42,6 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public class UsersMimeMessageIterator extends AbstractMessageIterator
 {
-    private static final String USER_SPACE = "XWiki";
-
     private DocumentAccessBridge documentAccessBridge;
 
     private final List<DocumentReference> users;
@@ -84,7 +82,7 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
         DocumentReference userReference = users.get(this.position);
 
         String email = this.documentAccessBridge.getProperty(userReference, new DocumentReference(userReference
-            .getWikiReference().getName(), USER_SPACE, "XWikiUsers"), "email").toString();
+            .getWikiReference().getName(), "XWiki", "XWikiUsers"), "email").toString();
 
         Map<String, Object> parameters = (Map<String, Object>) this.parameters.get("parameters");
         Session session = (Session) this.parameters.get("session");

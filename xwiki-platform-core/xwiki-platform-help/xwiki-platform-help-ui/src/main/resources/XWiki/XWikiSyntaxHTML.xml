@@ -43,6 +43,7 @@
 
 == HTML ==
 
+{{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 HTML ===
 
 {{info}}It is possible to enter HTML markup directly in the text in XWiki Syntax 1.0.{{/info}}
@@ -55,9 +56,9 @@
 {{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} HTML or XHTML must be entered by using the HTML macro.{{/info}}
 
 |=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}}}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
+|{{{{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}} }}}|{{html}}&lt;b&gt;bold&lt;/b&gt;{{/html}}
 
-{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, by default the HTML macro does not understands XWiki Syntax (other macros included since it's XWiki Syntax too). To enable it, use {{{{{html wiki="true"}}}}}.{{/info}}</content>
+{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, by default the HTML macro does not understands XWiki Syntax (other macros included since it's XWiki Syntax too). To enable it, use {{{{{html wiki="true"}} }}}.{{/info}}</content>
   <object>
     <name>XWiki.XWikiSyntaxHTML</name>
     <number>0</number>

@@ -35,6 +35,7 @@ import org.xwiki.test.internal.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -156,8 +157,8 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         public void restoreCacheResources(XWikiContext context, UsedExtension extension) {
             Assert.assertNotNull(extension);
             Assert.assertNotNull(context);
-            Assert.assertEquals(markerMap, extension.parameters);
-            Assert.assertEquals(markerSet, extension.resources);
+            Assert.assertEquals(markerMap, extension.getParameters());
+            Assert.assertEquals(markerSet, extension.getResources());
         }
     }
 

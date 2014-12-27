@@ -40,6 +40,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.internal.cache.DocumentCache;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -151,7 +152,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * @param renderedContent rendered page content
      * @return properly cached item
      */
-    private CachedItem buildCachedItem(XWikiContext context, String renderedContent) {
+    private CachedItem buildCachedItem(XWikiContext context, String renderedContent)
+    {
         CachedItem cachedItem = new CachedItem();
 
         for (RenderingCacheAware component: renderingCacheAwareProvider.get()) {
@@ -186,7 +188,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * @param cachedItem The cache item to return
      * @return the rendered text
      */
-    private String restoreCachedItem(XWikiContext context, CachedItem cachedItem) {
+    private String restoreCachedItem(XWikiContext context, CachedItem cachedItem)
+    {
         for (Map.Entry<RenderingCacheAware, UsedExtension> item : cachedItem.extensions.entrySet()) {
             item.getKey().restoreCacheResources(context, item.getValue());
         }

@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.xpn.xwiki.cache.rendering.RenderingCacheAware;
+
 /**
  * Cached item including any extensions.
  * 
  * @version $Id$
- * @since 6.2
+ * @since 6.2M1
  */
 public class CachedItem
 {
@@ -50,15 +52,9 @@ public class CachedItem
      */
     public static class UsedExtension
     {
-        /**
-         * Needed resources to rebuild extension.
-         */
-        public Set<String> resources;
 
-        /**
-         * Extension parameters.
-         */
-        public Map<String, Map<String, Object>> parameters;
+        private Set<String> resources;
+        private Map<String, Map<String, Object>> parameters;
 
         /**
          *  
@@ -68,6 +64,24 @@ public class CachedItem
         public UsedExtension(Set<String> resources, Map<String, Map<String, Object>> parameters) {
             this.resources = resources;
             this.parameters = parameters;
+        }
+
+        /**
+         * Needed resources to rebuild extension.
+         *
+         * @return used resources
+         */
+        public Set<String> getResources()
+        {
+            return resources;
+        }
+
+        /**
+         * @return extension parameters
+         */
+        public Map<String, Map<String, Object>> getParameters()
+        {
+            return parameters;
         }
     }
 }

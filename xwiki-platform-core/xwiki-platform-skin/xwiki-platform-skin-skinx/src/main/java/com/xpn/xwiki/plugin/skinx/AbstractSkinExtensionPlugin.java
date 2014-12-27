@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
-import com.xpn.xwiki.internal.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
@@ -345,7 +345,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     @Override
     public void restoreCacheResources(XWikiContext context,
                    UsedExtension extension) {
-        getPulledResources(context).addAll(extension.resources);
-        getParametersMap(context).putAll(extension.parameters);
+        getPulledResources(context).addAll(extension.getResources());
+        getParametersMap(context).putAll(extension.getParameters());
     }
 }

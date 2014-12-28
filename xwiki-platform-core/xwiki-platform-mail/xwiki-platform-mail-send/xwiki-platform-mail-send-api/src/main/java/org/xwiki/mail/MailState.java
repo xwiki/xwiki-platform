@@ -21,7 +21,7 @@
 package org.xwiki.mail;
 
 /**
- * Used to specify the state of Mail.
+ * Represents a state of mail (ie a Mail can have Ready, Sent or Failed state).
  *
  * @version $Id$
  * @since 6.4M3
@@ -42,6 +42,9 @@ public enum MailState
      */
     FAILED;
 
+    /**
+     * @return the lower case String version of the enum, to use lowercase String on database
+     */
     @Override
     public String toString()
     {

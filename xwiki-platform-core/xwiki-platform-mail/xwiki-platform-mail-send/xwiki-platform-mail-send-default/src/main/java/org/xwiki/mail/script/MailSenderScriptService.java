@@ -54,7 +54,9 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
- * Expose Mail Sending API to scripts. <p/> Example for sending an HTML message with attachments and a text
+ * Expose Mail Sending API to scripts.
+ * <p/>
+ * Example for sending an HTML message with attachments and a text
  * alternative:
  * <pre><code>
  *   #set ($message = $services.mailSender.createMessage(to, subject))

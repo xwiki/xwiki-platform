@@ -46,9 +46,6 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, 
 
     protected Map<String, Object> parameters;
 
-    /**
-     * Provides access to the logger.
-     */
     @Inject
     private Logger logger;
 

@@ -283,7 +283,7 @@
  *#
 #macro (admin_spaceSwitch)
 {{html clean="false"}}
-  &lt;form id="change-context" class="xformInline" action=""&gt;
+  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action, $request.queryString)"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       &lt;select id="goto-select" name="target"&gt;

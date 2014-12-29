@@ -49,7 +49,7 @@ public class MemoryMailListenerTest
         MimeMessage message = mock(MimeMessage.class);
         listener.onError(message, new Exception("error"));
         assertTrue(listener.getErrors().hasNext());
-        String exception = listener.getErrors().next().getException();
-        assertEquals("Exception: error", exception );
+        String error = listener.getErrors().next().getError();
+        assertEquals("Exception: error", error );
     }
 }

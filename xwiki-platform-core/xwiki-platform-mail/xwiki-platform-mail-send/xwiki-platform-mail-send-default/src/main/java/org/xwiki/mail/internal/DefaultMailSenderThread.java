@@ -51,6 +51,24 @@ import org.xwiki.mail.script.MimeMessageWrapper;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultMailSenderThread extends Thread implements MailSenderThread
 {
+    /**
+     * Name of the custom JavaMail header used by XWiki to uniquely identify a mail. This header allows us to follow
+     * the state of the mail (prepared, sent successfully or failed to be sent).
+     * <p/>
+     * Note that we wanted to use the standard "Message-ID" header but unfortunately the JavaMail implementation
+     * modifies this header's value when the mail is sent (even if you have called
+     * {@link javax.mail.internet.MimeMessage#saveChanges()}!). Thus if we want to save the mail's state before the
+     * mail is sent and then update it after it's been sent we won't find the same id...
+     */
+    private static final String HEADER_MAIL_ID = "X-MailID";
+
+    /**
+     * Name of the custom JavaMail header used by XWiki to uniquely identify a group of emails being sent together.
+     * This can be seen as representing a mail sending session. This makes it easier to list the status of all mails
+     * sent together in a session for example or to resend failed mails from a specific session.
+     */
+    private static final String HEADER_BATCH_ID = "X-BatchID";
+
     @Inject
     private Logger logger;
 
@@ -182,10 +200,13 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
                 message = mimeMessage;
             }
 
+            // Set custom XWiki mail headers.
+            // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
+            message.setHeader(HEADER_BATCH_ID, batchID.toString());
+            message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
+
             // If the user has not set the From header then use the default value from configuration and if it's not
             // set then raise an error since a message must have a from set!
-            message.setHeader("X-BatchID", batchID.toString());
-            message.setHeader("X-MailID", UUID.randomUUID().toString());
             // Perform some basic verification to avoid NPEs in JavaMail
             if (message.getFrom() == null) {
                 // Try using the From address in the Session

@@ -94,9 +94,10 @@ public class JavaIntegrationTest
 
     private MailListener listener = new MailListener()
     {
-        @Override public void onPrepare(MimeMessage message)
+        @Override
+        public void onPrepare(MimeMessage message)
         {
-            // Do nothing
+            // Do nothing, we check below that the mail has been received!
         }
 
         @Override
@@ -172,12 +173,12 @@ public class JavaIntegrationTest
         assertEquals(9, messages.length);
 
         // Assert the email parts that are the same for all mails
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
         BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
         // messages ;) But we chekced that we received 9 emails above so that's good enough.
@@ -240,8 +241,8 @@ public class JavaIntegrationTest
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 

@@ -126,6 +126,7 @@ public class MemoryMailListener implements MailListener
     {
         return batchID;
     }
+
     /**
      * @return the list of exceptions raised when sending mails in the current thread
      */

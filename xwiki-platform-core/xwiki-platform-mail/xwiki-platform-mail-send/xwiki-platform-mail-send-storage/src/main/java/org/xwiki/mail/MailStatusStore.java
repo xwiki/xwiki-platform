@@ -19,40 +19,45 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.internet.MimeMessage;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Allows listening to Mail sending results.
+ * Save, load and search mail results.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M3
  */
 @Role
 @Unstable
-public interface MailListener
+public interface MailStatusStore
 {
     /**
-     * Called when the mail is ready to be sent but before it is actually sent.
+     * Saves mail status in the store.
      *
-     * @param message the message to be sent
+     * @param status the mail status to be saved
+     * @throws MailStoreException when an error occurs saving the data
      */
-    void onPrepare(MimeMessage message);
+    void save(MailStatus status) throws MailStoreException;
 
     /**
-     * Called when the mail has been sent successfully.
+     * Load a message status from the store.
      *
-     * @param message the message sent
+     * @param messageID the id of the message to load
+     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
+     * @throws MailStoreException when an error occurs when loading the data
      */
-    void onSuccess(MimeMessage message);
+    MailStatus load(String messageID) throws MailStoreException;
 
     /**
-     * Called when the mail has failed to be sent.
+     * Loads all message statuses matching the passed state and batch id from the store.
      *
-     * @param message the message that was tried to be sent
-     * @param e the exception explaining why the message couldn't be sent
+     * @param batchID the batch id of the message statuses to load
+     * @param state the state to match (only statuses having that state will be loaded)
+     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
+     * @throws MailStoreException when an error occurs when loading the data
      */
-    void onError(MimeMessage message, Exception e);
+    List<MailStatus> load(String batchID, MailState state) throws MailStoreException;
 }

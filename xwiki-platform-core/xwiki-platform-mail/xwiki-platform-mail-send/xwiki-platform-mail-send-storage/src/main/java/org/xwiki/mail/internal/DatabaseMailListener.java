@@ -19,9 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,22 +26,14 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MailStore;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.xwiki.mail.MailContentStore;
+import org.xwiki.mail.MailStatusStore;
+import org.xwiki.mail.MailStoreException;
 
 /**
  * @version $Id$
@@ -55,82 +44,71 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 @Named("database")
 public class DatabaseMailListener implements MailListener
 {
-    /**
-     * Used to get the XWiki Context.
-     */
-    @Inject
-    private Execution execution;
-
-    @Inject
-    @Named("hibernate")
-    private XWikiStoreInterface hibernateStore;
-
-    /**
-     * Log in case of problem.
-     */
     @Inject
     private Logger logger;
 
     @Inject
-    private MailStore mailStore;
+    @Named("filesystem")
+    private MailContentStore mailContentStore;
 
-    private XWikiContext context = getXWikiContext();
-
-    private XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
-
-    private String batchID;
-
-    private String fromQuery = "from " + MailStatus.class.getName();
+    @Inject
+    @Named("database")
+    private MailStatusStore mailStatusStore;
 
     @Override
     public void onPrepare(MimeMessage message)
     {
-        this.batchID = getMessageBatchID(message);
         final MailStatus result = new MailStatus(getMessageID(message));
         result.setBatchID(getMessageBatchID(message));
-        result.setStatus(MailState.READY);
-        saveResult(result);
+        result.setState(MailState.READY);
+        saveStatus(result);
     }
 
     @Override
     public void onSuccess(MimeMessage message)
     {
         String messageID = getMessageID(message);
-        MailStatus result = getMailResult(messageID);
-        if (result != null) {
-            result.setStatus(MailState.SENT);
-            saveResult(result);
+        MailStatus status = getMailStatus(messageID);
+        if (status != null) {
+            // If the mail has previously failed to be sent, then remove it from the file system since it has now
+            // succeeded!
+            if (status.getState().equals(MailState.FAILED.toString())) {
+                String batchID = getMessageBatchID(message);
+                try {
+                    this.mailContentStore.delete(batchID, messageID);
+                } catch (MailStoreException e) {
+                    // Failed to delete saved mail, raise a warning but continue since it's not critical
+                    this.logger.warn("Failed to remove previously failing message from the file system. Reason [{}]. "
+                        + "However it has now been sent successfully.", ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+            status.setState(MailState.SENT);
+            saveStatus(status);
         }
     }
 
     @Override
-    public void onError(MimeMessage message, Exception e)
+    public void onError(MimeMessage message, Exception exception)
     {
         String messageID = getMessageID(message);
-        MailStatus result = getMailResult(messageID);
-        if (result != null) {
-            mailStore.save(message);
-            result.setReference(messageID);
-            result.setStatus(MailState.FAILED);
-            result.setException(ExceptionUtils.getMessage(e));
-            saveResult(result);
+        MailStatus status = getMailStatus(messageID);
+        if (status != null) {
+            // Since there's been an error, we save the message to the file system so that it can be resent later on
+            // if need be.
+            try {
+                this.mailContentStore.save(message);
+            } catch (MailStoreException e) {
+                // The mail has failed to be saved on disk, which means we won't be able to resend it. Since this can
+                // an important problem we log an error but we don't throw an Exception since that would cause an
+                // infinite loop as we're already here because the mail has already failed to be sent and raising an
+                // exception would call us again!
+                this.logger.error("Failed to save message to the file system, this message "
+                    + "won't be able to be sent again later on.", e);
+            }
+            status.setState(MailState.FAILED);
+            status.setError(exception);
+            saveStatus(status);
         }
-    }
-
-    /**
-     * @return errors raised during the send of all emails
-     */
-    public Iterator<MailStatus> getErrors()
-    {
-        return getMailResults(this.batchID, MailState.FAILED).iterator();
-    }
-
-    /**
-     * @return the number of errors
-     */
-    public int getErrorsNumber()
-    {
-        return getMailResults(this.batchID, MailState.FAILED).size();
     }
 
     private String getMessageID(MimeMessage message)
@@ -138,8 +116,7 @@ public class DatabaseMailListener implements MailListener
         try {
             return message.getHeader("X-MailID", null);
         } catch (MessagingException e) {
-            this.logger.warn("Failed to retrieve Message ID from message. Reason: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.error("Failed to retrieve Message ID from message.", e);
             return null;
         }
     }
@@ -147,72 +124,33 @@ public class DatabaseMailListener implements MailListener
     private String getMessageBatchID(MimeMessage message)
     {
         try {
-            return message.getHeader("X-BatchID")[0];
+            return message.getHeader("X-BatchID", null);
         } catch (MessagingException e) {
-            this.logger.warn("Failed to retrieve Batch ID from message. Reason: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.error("Failed to retrieve Batch ID from message.", e);
             return null;
         }
     }
 
-    private MailStatus getMailResult(final String messageID)
+    private MailStatus getMailStatus(String messageID)
     {
-        return this.store
-            .failSafeExecuteRead(this.context, new XWikiHibernateBaseStore.HibernateCallback<MailStatus>()
-            {
-                @Override public MailStatus doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    Query query = session.createQuery(fromQuery + " where mail_id=:id");
-                    query.setParameter("id", messageID);
-                    List<MailStatus> queryResult = (List<MailStatus>) query.list();
-                    if (!queryResult.isEmpty()) {
-                        return queryResult.get(0);
-                    }
-                    return null;
-                }
-            });
+        MailStatus status;
+        try {
+            status = this.mailStatusStore.load(messageID);
+        } catch (MailStoreException e) {
+            // Failed to load the status in the DB, we continue but log an error
+            this.logger.error("Failed to load mail status for message id [{}] from the database", messageID, e);
+            status = null;
+        }
+        return status;
     }
 
-    private List<MailStatus> getMailResults(final String batchID, final MailState state)
-    {
-        return this.store
-            .failSafeExecuteRead(this.context, new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
-            {
-                @Override public List<MailStatus> doInHibernate(Session session)
-                    throws HibernateException, XWikiException
-                {
-                    Query query =
-                        session.createQuery(fromQuery + " where mail_batchid=:batchid an mail_status=:state");
-                    query.setParameter("batchid", batchID).setParameter("state", state);
-                    List<MailStatus> queryResult = (List<MailStatus>) query.list();
-                    return queryResult;
-                }
-            });
-    }
-
-    private void saveResult(final MailStatus result)
+    private void saveStatus(MailStatus status)
     {
         try {
-            this.store.executeWrite(this.context, new XWikiHibernateBaseStore.HibernateCallback<Object>()
-            {
-                @Override public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    session.save(result);
-                    return null;
-                }
-            });
-        } catch (XWikiException e) {
-            this.logger.warn("Failed to save status id to database. Reason: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.mailStatusStore.save(status);
+        } catch (MailStoreException e) {
+            // Failed to save the status in the DB, we continue but log an error
+            this.logger.error("Failed to save mail status [{}] to the database", status, e);
         }
-    }
-
-    /**
-     * @return XWikiContext
-     */
-    private XWikiContext getXWikiContext()
-    {
-        ExecutionContext executionContext = this.execution.getContext();
-        return (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

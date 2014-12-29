@@ -31,12 +31,11 @@
       <generator class="assigned" />
     </id>
     <property name="batchID" type="string" column="mail_batchid" length="255" index="MAIL_BATCH_ID" />
-    <property name="status" type="string" column="mail_status" length="255" index="MAIL_STATUS" />
+    <property name="state" type="string" column="mail_state" length="255" index="MAIL_STATUS" />
     <property name="date" type="timestamp" column="mail_date" index="MAIL_DATE" />
-    <property name="recipient" type="string" column="mail_recipient" length="255" index="MAIL_RECIPIENT" />
+    <property name="recipients" type="string" column="mail_recipients" length="2000" index="MAIL_RECIPIENT" />
     <property name="type" type="string" column="mail_type" length="255" index="MAIL_TYPE" />
-    <property name="reference" type="string" column="mail_reference" length="255" />
-    <property name="exception" type="string" column="mail_exception" length="2000" />
+    <property name="error" type="string" column="mail_error" length="2000" />
   </class>
 
 </hibernate-mapping>

@@ -154,8 +154,8 @@ public class AuthenticatingIntegrationTest
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
 

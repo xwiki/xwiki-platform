@@ -19,36 +19,38 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
 /**
- * Save and load mail to/from disk.
+ * Encapsulate a Mail Store error.
  *
  * @version $Id$
  * @since 6.4M3
  */
-@Role
-@Unstable
-public interface MailStore
+public class MailStoreException extends Exception
 {
     /**
-     * Same MimeMessage to disk.
-     *
-     * @param message the save.
+     * Class ID for serialization.
      */
-    void save(MimeMessage message);
+    private static final long serialVersionUID = 442523704445037944L;
 
     /**
-     * Load message saved on disk.
+     * Construct a new exception with the specified detail message.
      *
-     * @param session the JavaMail session used to send the mail
-     * @param batchID correspond to directory name on permanent directory
-     * @param messageID correspond to file name of serialized MimeMessage
-     * @return MimeMessage serialised on disk
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    MimeMessage load(Session session, String batchID, String messageID);
+    public MailStoreException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * Construct a new exception with the specified detail message and cause.
+     *
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
+     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
+     *            permitted, and indicates that the cause is nonexistent or unknown)
+     */
+    public MailStoreException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

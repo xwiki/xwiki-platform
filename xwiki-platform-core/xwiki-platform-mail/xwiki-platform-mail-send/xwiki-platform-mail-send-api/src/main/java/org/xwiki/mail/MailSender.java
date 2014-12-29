@@ -61,7 +61,8 @@ public interface MailSender
     UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener);
 
     /**
-     * Wait for all messages on the sending queue to be sent before returning.
+     * Wait till all messages on the sending queue have been sent before returning, for the messages sent on the
+     * current thread.
      *
      * @param timeout the maximum amount of time to wait in milliseconds
      */

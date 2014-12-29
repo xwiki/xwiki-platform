@@ -21,10 +21,16 @@ package org.xwiki.mail;
 
 import java.util.Date;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Contains information about mail to sent.
+ * Contains information about a mail (when it was sent, its status, etc).
  *
  * @version $Id$
  * @since 6.4M3
@@ -32,46 +38,39 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public class MailStatus
 {
     /**
-     * ID.
+     * @see #getMessageID()
      */
     private String messageID;
 
     /*
-     * Mail Status.
+     * @see #getState()
      */
-    private String status;
+    private String state;
 
     /*
-     * Mail Batch ID.
+     * @see #getBatchID()
      */
     private String batchID;
 
     /*
-     * Mail Date.
+     * @see #getDate()
      */
     private Date date;
 
     /*
-     * Mail To email address.
+     * @see #getRecipients()
      */
-    private String recipient;
+    private String recipients;
 
     /*
-     * Mail Type.
+     * @see #getType()
      */
     private String type;
 
     /*
-     * Mail Reference to emails stored in the permanent directory.
+     * @see #getError()
      */
-    private String reference;
-
-    /*
-     * Mail Exception
-     */
-    private String exception;
-
-
+    private String error;
 
     /**
      * Constructor initializing the MailStatus with the MimeMessage ID.
@@ -87,13 +86,13 @@ public class MailStatus
     /**
      * Constructor initializing the MailStatus with the MimeMessage ID and root cause message of exception.
      *
-     * @param messageID the id of Message
-     * @param exception the root cause message of exception that was encountered during sending mail
+     * @param messageID see {@link #getMessageID()}
+     * @param error see {@link #getError()}
      */
-    public MailStatus(String messageID, String exception)
+    public MailStatus(String messageID, String error)
     {
         this.messageID = messageID;
-        setException(exception);
+        setError(error);
         setDate(new Date());
     }
 
@@ -106,8 +105,19 @@ public class MailStatus
     public MailStatus(String messageID, Exception exception)
     {
         this.messageID = messageID;
-        setException(exception);
+        setError(exception);
         setDate(new Date());
+    }
+
+    /**
+     * @param message the message for which to construct a status
+     * @param error the error encountered when sending the mail (if it failed), can be null
+     * @throws MessagingException when the passed message has invalid recipients
+     */
+    public MailStatus(MimeMessage message, String error) throws MessagingException
+    {
+        this(message.getHeader("X-MailID", null), error);
+        setRecipients(InternetAddress.toString(message.getAllRecipients()));
     }
 
     /**
@@ -119,19 +129,20 @@ public class MailStatus
     }
 
     /**
-     * @return the status of the mail
+     * @return the state of the mail: ready to be sent, sent successfully, failed to be sent
+     * @see MailState
      */
-    public String getStatus()
+    public String getState()
     {
-        return this.status;
+        return this.state;
     }
 
     /**
-     * @param status of the mail
+     * @param state see {@link #getState()}
      */
-    public void setStatus(MailState status)
+    public void setState(MailState state)
     {
-        this.status = status.toString();
+        this.state = state.toString();
     }
 
     /**
@@ -167,19 +178,19 @@ public class MailStatus
     }
 
     /**
-     * @return the mail To email address
+     * @return the comma-separated list of email addresses to which the mail was addressed to
      */
-    public String getRecipient()
+    public String getRecipients()
     {
-        return this.recipient;
+        return this.recipients;
     }
 
     /**
-     * @param recipient the mail To email address
+     * @param recipients see {@link #getRecipients()}
      */
-    public void setRecipient(String recipient)
+    public void setRecipients(String recipients)
     {
-        this.recipient = recipient;
+        this.recipients = recipients;
     }
 
     /**
@@ -199,42 +210,40 @@ public class MailStatus
     }
 
     /**
-     * @return the reference of serialized MimeMessage in permanent directory
+     * @return the error message when the mail has failed to be sent
      */
-    public String getReference()
+    public String getError()
     {
-        return this.reference;
+        return this.error;
     }
 
     /**
-     * @param reference of serialized MimeMessage in permanent directory
+     * @param error see {@link #getError()}
      */
-    public void setReference(String reference)
+    public void setError(String error)
     {
-        this.reference = reference;
-    }
-
-    /**
-     * @return the root cause message of exception
-     */
-    public String getException()
-    {
-        return this.exception;
-    }
-
-    /**
-     * @param exception the root cause message of exception that was encountered during sending mail
-     */
-    public void setException(String exception)
-    {
-        this.exception = exception;
+        this.error = error;
     }
 
     /**
      * @param exception the exception that was encountered during sending mail
      */
-    public void setException(Exception exception)
+    public void setError(Exception exception)
     {
-        this.exception = ExceptionUtils.getRootCauseMessage(exception);
+        this.error = ExceptionUtils.getRootCauseMessage(exception);
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("messageID", getMessageID());
+        builder.append("batchID", getBatchID());
+        builder.append("state", getState());
+        builder.append("date", getDate());
+        builder.append("recipients", getRecipients());
+        builder.append("type", getType());
+        builder.append("error", getError());
+        return builder.toString();
     }
 }

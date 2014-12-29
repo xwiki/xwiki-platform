@@ -21,7 +21,7 @@
 package org.xwiki.mail;
 
 /**
- * Represents a state of mail (ie a Mail can have Ready, Sent or Failed state).
+ * Represents the state of a mail (ready to be sent, sent successfully or failed to be sent).
  *
  * @version $Id$
  * @since 6.4M3

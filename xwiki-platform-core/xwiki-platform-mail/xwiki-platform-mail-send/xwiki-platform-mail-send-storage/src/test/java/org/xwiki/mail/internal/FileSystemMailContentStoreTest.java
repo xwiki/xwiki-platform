@@ -42,20 +42,20 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultMailStore}.
+ * Unit tests for {@link FileSystemMailContentStore}.
  *
  * @version $Id$
  * @since 6.4M3
  */
-public class DefaultMailStoreTest
+public class FileSystemMailContentStoreTest
 {
     // Passed at the Maven level in the pom.xml file.
     private static final String TEMPORARY_DIRECTORY =
         System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
 
     @Rule
-    public MockitoComponentMockingRule<DefaultMailStore> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailStore.class);
+    public MockitoComponentMockingRule<FileSystemMailContentStore> mocker =
+        new MockitoComponentMockingRule<>(FileSystemMailContentStore.class);
 
     @Before
     public void deleteMailStore() throws Exception

@@ -227,7 +227,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             MetaDataBlock metaDataBlock =
                 new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
 
-            // Make sure the context XDOM contains the html macro content
+            // Make sure the context XDOM contains the wiki macro content
             wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
             try {

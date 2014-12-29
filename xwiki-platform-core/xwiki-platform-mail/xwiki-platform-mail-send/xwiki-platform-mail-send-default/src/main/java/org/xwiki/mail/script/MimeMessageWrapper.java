@@ -36,7 +36,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
@@ -54,8 +53,6 @@ public class MimeMessageWrapper extends MimeMessage
 {
     private ComponentManager componentManager;
 
-    private MailSender mailSender;
-
     private Execution execution;
 
     private MailSenderConfiguration configuration;
@@ -66,7 +63,6 @@ public class MimeMessageWrapper extends MimeMessage
     /**
      * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
-     * @param mailSender the component to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param configuration the mail sender configuration component
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
@@ -74,13 +70,12 @@ public class MimeMessageWrapper extends MimeMessage
     // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
-    MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
+    MimeMessageWrapper(ExtendedMimeMessage message, Session session, Execution execution,
         MailSenderConfiguration configuration, ComponentManager componentManager)
     {
         super(session);
         this.message = message;
         this.session = session;
-        this.mailSender = mailSender;
         this.execution = execution;
         this.configuration = configuration;
         this.componentManager = componentManager;

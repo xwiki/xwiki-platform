@@ -62,9 +62,9 @@ In addition to these XWiki-specific syntaxes we've also changed our underlying r
 
 === 2.1 Introduction ===
 
-The XWiki Syntax 2.0 has proven to be quite useful and robust in general; however since it's introduction a few shortcomings have been found. The corresponding improvements have been consolidated in the current XWiki Syntax 2.1. Some new features of this syntax are:
+The XWiki Syntax 2.0 has proven to be quite useful and robust in general; however since its introduction a few shortcomings have been found. The corresponding improvements have been consolidated in XWiki Syntax 2.1. Some new features of this syntax are:
 * Homogenize the link and image syntax for better clarity, consistency and extensibility.
-* Added ability to display icons, embed images via the Data URI scheme, to link to files using the UNC notation and to link to relative URLs.
+* Added ability to display icons, to embed images via the Data URI scheme, to link to files using the UNC notation and to link to relative URLs.
 
 {{info}}Since XWiki Syntax 2.1 is based on XWiki Syntax 2.0 all syntax from XWiki Syntax 2.0 is valid unless the 2.1 specifications suggest differently.{{/info}}
 

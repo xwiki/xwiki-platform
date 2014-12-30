@@ -39,12 +39,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named(RatingsManager.RATINGS_CLASSNAME)
 @Singleton
-public class RatingClassDocumentInitialization extends AbstractMandatoryDocumentInitializer
+public class RatingClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     /**
      * Default constructor.
      */
-    public RatingClassDocumentInitialization()
+    public RatingClassDocumentInitializer()
     {
         super(XWiki.SYSTEM_SPACE, RatingsManager.RATINGS_CLASSPAGE);
     }

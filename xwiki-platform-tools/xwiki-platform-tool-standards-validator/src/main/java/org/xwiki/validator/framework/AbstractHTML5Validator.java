@@ -261,6 +261,12 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      */
     protected Document html5Document;
 
+    @Override
+    public void setDocument(InputStream document)
+    {
+        setHTML5Document(document);
+    }
+
     /**
      * Set document to validate.
      *
@@ -280,7 +286,7 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
     }
 
     /**
-     * @return the XML html5 document
+     * @return the parsed html5 document
      */
     public Document getHTML5Document()
     {

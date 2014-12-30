@@ -17,43 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+
+package org.xwiki.mail.internal.iterator.factory;
+
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
+
 /**
- * Since there's no easy way to verify if the content of a {@link javax.mail.internet.MimeMessage} has been set we
- * need to extend it to allow for this.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class ExtendedMimeMessage extends MimeMessage
+@Role
+public interface GroupMimeMessageIteratorFactory
 {
     /**
-     * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
+     * Create Iterator of MimeMessages.
+     *
+     * @param groupReference the group that contains the list of user.
+     * @param factory factory to create MimeMessage
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a users in group (groupReference)
+     * @throws MessagingException when an error occurs
      */
-    public ExtendedMimeMessage(Session session)
-    {
-        super(session);
-    }
-
-    /**
-     * @param source see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     */
-    public ExtendedMimeMessage(MimeMessage source) throws MessagingException
-    {
-        super(source);
-    }
-
-    /**
-     * @return true if no body content has been defined yet for this message or false otherwise
-     */
-    public boolean isEmpty()
-    {
-        return this.dh == null;
-    }
+    Iterator<MimeMessage> create(DocumentReference groupReference, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException;
 }

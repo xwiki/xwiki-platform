@@ -17,43 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
+
 /**
- * Since there's no easy way to verify if the content of a {@link javax.mail.internet.MimeMessage} has been set we
- * need to extend it to allow for this.
+ * Allows listening to Mail sending results.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.1M2
  */
-public class ExtendedMimeMessage extends MimeMessage
+@Role
+@Unstable
+public interface MailListener
 {
     /**
-     * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
+     * Called when the mail is ready to be sent but before it is actually sent.
+     *
+     * @param message the message to be sent
      */
-    public ExtendedMimeMessage(Session session)
-    {
-        super(session);
-    }
+    void onPrepare(MimeMessage message);
 
     /**
-     * @param source see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
+     * Called when the mail has been sent successfully.
+     *
+     * @param message the message sent
      */
-    public ExtendedMimeMessage(MimeMessage source) throws MessagingException
-    {
-        super(source);
-    }
+    void onSuccess(MimeMessage message);
 
     /**
-     * @return true if no body content has been defined yet for this message or false otherwise
+     * Called when the mail has failed to be sent.
+     *
+     * @param message the message that was tried to be sent
+     * @param e the exception explaining why the message couldn't be sent
      */
-    public boolean isEmpty()
-    {
-        return this.dh == null;
-    }
+    void onError(MimeMessage message, Exception e);
 }

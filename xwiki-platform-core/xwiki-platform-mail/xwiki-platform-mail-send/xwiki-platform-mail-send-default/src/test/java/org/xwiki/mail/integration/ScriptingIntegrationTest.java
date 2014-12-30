@@ -19,12 +19,12 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.mail.BodyPart;
 import javax.mail.internet.MimeMessage;
@@ -44,6 +44,7 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
@@ -54,6 +55,10 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -67,7 +72,8 @@ import com.icegreen.greenmail.util.ServerSetupTest;
     DefaultMailSenderThread.class,
     DefaultExecution.class,
     ContextComponentManagerProvider.class,
-    DefaultMimeBodyPartFactory.class
+    DefaultMimeBodyPartFactory.class,
+    MemoryMailListener.class
 })
 public class ScriptingIntegrationTest
 {
@@ -116,21 +122,20 @@ public class ScriptingIntegrationTest
         message.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        message.sendAsynchronously();
-        message.sendAsynchronously();
-        message.sendAsynchronously();
-        message.waitTillSent(10000L);
+        String hint = "memory";
+        List<MimeMessageWrapper> messagesList = Arrays.asList(message, message, message);
+        UUID batchID = this.scriptService.sendAsynchronously(messagesList, hint);
 
         // Verify that there are no errors
-        assertEquals(0, message.getErrors().size());
+        assertNull(this.scriptService.getErrors(batchID));
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(3, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
 
@@ -178,18 +183,18 @@ public class ScriptingIntegrationTest
             Collections.<String, Object>singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
-        message.send();
+        UUID batchID = this.scriptService.send(Arrays.asList(message), "memory");
 
         // Verify that there are no errors
-        assertEquals(0, message.getErrors().size());
+        assertNull(this.scriptService.getErrors(batchID));
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 

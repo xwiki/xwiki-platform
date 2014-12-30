@@ -19,12 +19,17 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Iterator;
 import java.util.Queue;
+import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -32,11 +37,13 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.script.MimeMessageWrapper;
 
 /**
  * Thread that regularly check for mails on a Queue, and for each mail tries to send it.
- * 
+ *
  * @version $Id$
  * @since 6.1M2
  */
@@ -44,8 +51,29 @@ import org.xwiki.mail.MailResultListener;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultMailSenderThread extends Thread implements MailSenderThread
 {
+    /**
+     * Name of the custom JavaMail header used by XWiki to uniquely identify a mail. This header allows us to follow
+     * the state of the mail (prepared, sent successfully or failed to be sent).
+     * <p/>
+     * Note that we wanted to use the standard "Message-ID" header but unfortunately the JavaMail implementation
+     * modifies this header's value when the mail is sent (even if you have called
+     * {@link javax.mail.internet.MimeMessage#saveChanges()}!). Thus if we want to save the mail's state before the
+     * mail is sent and then update it after it's been sent we won't find the same id...
+     */
+    private static final String HEADER_MAIL_ID = "X-MailID";
+
+    /**
+     * Name of the custom JavaMail header used by XWiki to uniquely identify a group of emails being sent together.
+     * This can be seen as representing a mail sending session. This makes it easier to list the status of all mails
+     * sent together in a session for example or to resend failed mails from a specific session.
+     */
+    private static final String HEADER_BATCH_ID = "X-BatchID";
+
     @Inject
     private Logger logger;
+
+    @Inject
+    private MailSenderConfiguration configuration;
 
     /**
      * The queue containing mails to send.
@@ -124,37 +152,92 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
      */
     protected void sendMail(MailSenderQueueItem item)
     {
-        MimeMessage message = item.getMessage();
-        MailResultListener listener = item.getListener();
+        Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
+        MailListener listener = item.getListener();
+        UUID batchID = item.getBatchID();
+        while (messages.hasNext()) {
+            MimeMessage mimeMessage = messages.next();
+            MimeMessage message = initializeMessage(mimeMessage, listener, batchID);
+            try {
+                // Step 1: If the current Session in use is different from the one passed then close
+                // the current Transport, get a new one and reconnect.
+                // Also do that every 100 mails sent.
+                // TODO: explain why!
+                // TODO: Also explain why we don't use Transport.send()
+                if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
+                    closeTransport();
+                    this.currentSession = item.getSession();
+                    this.currentTransport = this.currentSession.getTransport("smtp");
+                    this.currentTransport.connect();
+                } else if (!this.currentTransport.isConnected()) {
+                    this.currentTransport.connect();
+                }
 
+                // Step 2: Send the mail
+                this.currentTransport.sendMessage(message, message.getAllRecipients());
+                this.count++;
+
+                // Step 3: Notify the user of the success if a listener has been provided
+                if (listener != null) {
+                    listener.onSuccess(message);
+                }
+            } catch (Exception e) {
+                // An error occurred, notify the user if a listener has been provided
+                if (listener != null) {
+                    listener.onError(message, e);
+                }
+            }
+        }
+    }
+
+    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchID)
+    {
+        MimeMessage message = null;
         try {
-            // Step 1: If the current Session in use is different from the one passed then close the current Transport,
-            // get a new one and reconnect. Also do that every 100 mails sent.
-            // TODO: explain why!
-            // TODO: Also explain why we don't use Transport.send()
-            if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
-                closeTransport();
-                this.currentSession = item.getSession();
-                this.currentTransport = this.currentSession.getTransport("smtp");
-                this.currentTransport.connect();
-            } else if (!this.currentTransport.isConnected()) {
-                this.currentTransport.connect();
+            if ((mimeMessage instanceof MimeMessageWrapper)) {
+                message = ((MimeMessageWrapper) mimeMessage).getMessage();
+            } else {
+                message = mimeMessage;
             }
 
-            // Step 2: Send the mail
-            this.currentTransport.sendMessage(message, message.getAllRecipients());
-            this.count++;
+            // Set custom XWiki mail headers.
+            // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
+            message.setHeader(HEADER_BATCH_ID, batchID.toString());
+            message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
 
-            // Step 3: Notify the user of the success if a listener has been provided
+            // If the user has not set the From header then use the default value from configuration and if it's not
+            // set then raise an error since a message must have a from set!
+            // Perform some basic verification to avoid NPEs in JavaMail
+            if (message.getFrom() == null) {
+                // Try using the From address in the Session
+                String from = this.configuration.getFromAddress();
+                if (from != null) {
+                    message.setFrom(new InternetAddress(from));
+                } else {
+                    throw new MessagingException("Missing the From Address for sending the mail. "
+                        + "You need to either define it in the Mail Configuration or pass it in your message.");
+                }
+            }
+
+            // If the user has not set the BCC header then use the default value from configuration
+            Address[] bccAddresses = message.getRecipients(Message.RecipientType.BCC);
+            if (bccAddresses == null || bccAddresses.length == 0) {
+                for (String address : this.configuration.getBCCAddresses()) {
+                    message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
+                }
+            }
+
+            // Mail ready to be sent, notify the user if a listener has been provided
             if (listener != null) {
-                listener.onSuccess(message);
+                listener.onPrepare(message);
             }
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
                 listener.onError(message, e);
             }
         }
+        return message;
     }
 
     private void closeTransport()

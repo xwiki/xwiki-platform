@@ -21,24 +21,23 @@ package org.xwiki.mail.internal;
 
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.mail.Address;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 
@@ -62,6 +61,9 @@ public class DefaultMailSender implements MailSender, Initializable
     @Inject
     private Logger logger;
 
+    @Inject
+    private ComponentManager componentManager;
+
     /**
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
@@ -76,48 +78,20 @@ public class DefaultMailSender implements MailSender, Initializable
     }
 
     @Override
-    public void send(MimeMessage message, Session session) throws MessagingException
+    public UUID send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException
     {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        sendAsynchronously(message, session, listener);
+        MailListener listener = getListener("memory");
+        UUID batchID = sendAsynchronously(messages, session, listener);
         waitTillSent(Long.MAX_VALUE);
-        BlockingQueue<Exception> errorQueue = listener.getExceptionQueue();
-        if (!errorQueue.isEmpty()) {
-            throw new MessagingException(String.format("Failed to send mail message [%s]", message), errorQueue.peek());
-        }
+        return batchID;
     }
 
     @Override
-    public void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener)
+    public UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener)
     {
-        try {
-            // If the user has not set the From header then use the default value from configuration and if it's not
-            // set then raise an error since a message must have a from set!
-            if (message.getFrom() == null) {
-                // Try using the From address in the Session
-                String from = this.configuration.getFromAddress();
-                if (from != null) {
-                    message.setFrom(new InternetAddress(from));
-                } else {
-                    throw new MessagingException("Missing the From Address for sending the mail. "
-                        + "You need to either define it in the Mail Configuration or pass it in your message.");
-                }
-            }
-
-            // If the user has not set the BCC header then use the default value from configuration
-            Address[] bccAddresses = message.getRecipients(Message.RecipientType.BCC);
-            if (bccAddresses == null || bccAddresses.length == 0) {
-                for (String address : this.configuration.getBCCAddresses()) {
-                    message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
-                }
-            }
-
-            // Push new mail message on the queue
-            getMailQueue().add(new MailSenderQueueItem(message, session, listener));
-        } catch (Exception e) {
-            // Save any exception in the listener
-            listener.onError(message, e);
-        }
+        UUID batchID = UUID.randomUUID();
+        getMailQueue().add(new MailSenderQueueItem(messages, session, listener, batchID));
+        return batchID;
     }
 
     /**
@@ -158,6 +132,7 @@ public class DefaultMailSender implements MailSender, Initializable
 
     /**
      * Stops the sending thread. Should be called when the application is stopped for a clean shutdown.
+     *
      * @throws InterruptedException if the thread failed to be stopped
      */
     public void stopMailSenderThread() throws InterruptedException
@@ -165,5 +140,16 @@ public class DefaultMailSender implements MailSender, Initializable
         this.mailSenderThread.stopProcessing();
         // Wait till the thread goes away
         this.mailSenderThread.join();
+    }
+
+    private MailListener getListener(String hint) throws MessagingException
+    {
+        MailListener listener;
+        try {
+            listener = this.componentManager.getInstance(MailListener.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate [%s] Event listener. ", hint), e);
+        }
+        return listener;
     }
 }

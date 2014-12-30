@@ -132,7 +132,7 @@ public class MailTest extends AbstractTest
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
-            + "#set ($discard = $message.send())\n"
+            + "#set ($id = $services.mailsender.send($message))\n"
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
             + "#end\n"

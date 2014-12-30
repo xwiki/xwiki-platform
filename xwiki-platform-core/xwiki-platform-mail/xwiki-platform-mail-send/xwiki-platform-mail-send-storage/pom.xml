@@ -28,28 +28,17 @@
     <version>6.4-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
-  <artifactId>xwiki-platform-mail-send-default</artifactId>
-  <name>XWiki Platform - Mail - Send - Default Implementation</name>
-  <description>Default implementation of the API to send emails</description>
+  <artifactId>xwiki-platform-mail-send-storage</artifactId>
+  <name>XWiki Platform - Mail - Send - Storage</name>
+  <description>API to store mails and their statuses</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
+    <xwiki.extension.name>Mail Sender Storage</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -57,43 +46,18 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Only needed if some of the component's APIs must be made visible to scripting in wiki pages -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-text</artifactId>
+      <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Test Dependencies -->
-    <!-- Override the Servlet environment that is drawn by the oldcore dependency. This works because the
-        StandardEnvironment component has a higher priority than the ServletEnvironment one (they both implement
-        Environment). -->
+    <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <artifactId>xwiki-commons-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.icegreen</groupId>
-      <artifactId>greenmail</artifactId>
-      <version>1.4.0</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- Needed at runtime by the Extension Manager to properly load some components
-         (e.g. DefaultXWikiStubContextProvider) -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <!-- Used by unit tests to set the temporary directory to be the Maven target directory -->

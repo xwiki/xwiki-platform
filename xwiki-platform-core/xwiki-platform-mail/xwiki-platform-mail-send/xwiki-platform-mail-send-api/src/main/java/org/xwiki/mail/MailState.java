@@ -17,30 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
 
-import javax.mail.internet.MimeMessage;
-
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+package org.xwiki.mail;
 
 /**
- * Unit tests for {@link DefaultMailResultListener}.
+ * Represents the state of a mail (ready to be sent, sent successfully or failed to be sent).
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class DefaultMailResultListenerTest
+public enum MailState
 {
-    @Test
-    public void errorAndRetrieveError() throws Exception
+    /**
+     *  Mail ready to be sent.
+     */
+    READY,
+
+    /**
+     * Mail sent with success.
+     */
+    SENT,
+    /**
+     * Error was encountered during sending mail.
+     */
+    FAILED;
+
+    /**
+     * @return the lower case String version of the enum, to use lowercase String on database
+     */
+    @Override
+    public String toString()
     {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        MimeMessage message = mock(MimeMessage.class);
-        listener.onError(message, new Exception("error"));
-        assertEquals(1, listener.getExceptionQueue().size());
-        assertEquals("error", listener.getExceptionQueue().take().getMessage());
+        return super.toString().toLowerCase();
     }
 }

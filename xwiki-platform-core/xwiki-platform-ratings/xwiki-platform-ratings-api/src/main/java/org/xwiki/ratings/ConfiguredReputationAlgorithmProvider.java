@@ -44,6 +44,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Singleton
 @Unstable
+//TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider<ReputationAlgorithm>
 {
     @Inject

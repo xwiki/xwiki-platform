@@ -5,6 +5,7 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set($discard = $services.template.execute('job_macros.vm'))
+#set($discard = $services.template.execute('rating_macros.vm'))
 
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)

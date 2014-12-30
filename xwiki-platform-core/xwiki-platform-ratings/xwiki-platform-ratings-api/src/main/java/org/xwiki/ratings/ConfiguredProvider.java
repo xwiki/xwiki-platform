@@ -32,7 +32,7 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-// TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
+//TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public interface ConfiguredProvider<T>
 {
     /**

@@ -41,8 +41,6 @@
   <hidden>true</hidden>
   <content>{{template name="extension.vm" output="false"/}}
 
-{{include reference="XWiki.RatingsMacros"/}}
-
 {{velocity}}
 ## HTML cleaner messes up the content of the legend tag.
 {{html clean="false"}}

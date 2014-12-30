@@ -129,6 +129,14 @@ public class MailStatus
     }
 
     /**
+     * @param messageID see {@link #getMessageID()}
+     */
+    public void setMessageID(String messageID)
+    {
+        this.messageID = messageID;
+    }
+
+    /**
      * @return the state of the mail: ready to be sent, sent successfully, failed to be sent
      * @see MailState
      */

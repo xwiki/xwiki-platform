@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-ratings-ui</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Ratings - Application</name>
+  <name>XWiki Platform - Ratings - UI</name>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Ratings Application</xwiki.extension.name>

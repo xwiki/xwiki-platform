@@ -323,7 +323,8 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP);
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html",
+                Collections.<String, String>emptyMap());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals("Failed to evaluate property [html] for Document [wiki:space.page] and locale [null]",

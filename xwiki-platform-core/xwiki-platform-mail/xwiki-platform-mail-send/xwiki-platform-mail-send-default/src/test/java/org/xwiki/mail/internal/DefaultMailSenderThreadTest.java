@@ -19,8 +19,10 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Arrays;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.mail.Session;
@@ -29,9 +31,11 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.mail.MailListener;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.DefaultMailSenderThread}.
@@ -39,6 +43,9 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentList({
+    MemoryMailListener.class
+})
 public class DefaultMailSenderThreadTest
 {
     @Rule
@@ -55,8 +62,9 @@ public class DefaultMailSenderThreadTest
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        MailSenderQueueItem item = new MailSenderQueueItem(message, session, listener);
+        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        UUID batchID = UUID.randomUUID();
+        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchID);
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 
@@ -73,7 +81,7 @@ public class DefaultMailSenderThreadTest
         boolean success = true;
         try {
             long time = System.currentTimeMillis();
-            while (listener.getExceptionQueue().size() != 2) {
+            while (listener.getErrorsNumber() != 2) {
                 if (System.currentTimeMillis() - time > 5000L) {
                     success = false;
                     break;

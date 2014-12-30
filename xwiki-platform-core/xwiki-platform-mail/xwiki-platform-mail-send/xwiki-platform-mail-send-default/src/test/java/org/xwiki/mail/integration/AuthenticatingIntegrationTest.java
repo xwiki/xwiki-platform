@@ -20,6 +20,7 @@
 package org.xwiki.mail.integration;
 
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -45,6 +46,7 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -67,7 +69,8 @@ import static org.junit.Assert.assertEquals;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    DefaultMailSenderThread.class,
+    MemoryMailListener.class
 })
 public class AuthenticatingIntegrationTest
 {
@@ -144,15 +147,15 @@ public class AuthenticatingIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail synchronously
-        this.sender.send(message, session);
+        this.sender.send(Arrays.asList(message), session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
 

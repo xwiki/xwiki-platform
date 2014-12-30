@@ -19,41 +19,37 @@
  */
 package org.xwiki.mail.internal;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.mail.MailListener;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 /**
- * Since there's no easy way to verify if the content of a {@link javax.mail.internet.MimeMessage} has been set we
- * need to extend it to allow for this.
+ * Unit tests for {@link MemoryMailListener}.
  *
  * @version $Id$
  * @since 6.2M1
  */
-public class ExtendedMimeMessage extends MimeMessage
+public class MemoryMailListenerTest
 {
-    /**
-     * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
-     */
-    public ExtendedMimeMessage(Session session)
-    {
-        super(session);
-    }
+    @Rule
+    public MockitoComponentMockingRule<MemoryMailListener> mocker =
+        new MockitoComponentMockingRule<>(MemoryMailListener.class);
 
-    /**
-     * @param source see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     */
-    public ExtendedMimeMessage(MimeMessage source) throws MessagingException
+    @Test
+    public void errorAndRetrieveError() throws Exception
     {
-        super(source);
-    }
-
-    /**
-     * @return true if no body content has been defined yet for this message or false otherwise
-     */
-    public boolean isEmpty()
-    {
-        return this.dh == null;
+        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        MimeMessage message = mock(MimeMessage.class);
+        listener.onError(message, new Exception("error"));
+        assertTrue(listener.getErrors().hasNext());
+        String error = listener.getErrors().next().getError();
+        assertEquals("Exception: error", error );
     }
 }

@@ -19,9 +19,6 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,7 +41,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.environment.internal.StandardEnvironment;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
@@ -53,12 +50,16 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -72,7 +73,8 @@ import com.icegreen.greenmail.util.ServerSetupTest;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    DefaultMailSenderThread.class,
+    MemoryMailListener.class
 })
 public class JavaIntegrationTest
 {
@@ -90,8 +92,14 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailResultListener listener = new MailResultListener()
+    private MailListener listener = new MailListener()
     {
+        @Override
+        public void onPrepare(MimeMessage message)
+        {
+            // Do nothing, we check below that the mail has been received!
+        }
+
         @Override
         public void onSuccess(MimeMessage message)
         {
@@ -155,10 +163,7 @@ public class JavaIntegrationTest
 
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.waitTillSent(10000L);
+        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, this.listener);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
@@ -168,12 +173,12 @@ public class JavaIntegrationTest
         assertEquals(9, messages.length);
 
         // Assert the email parts that are the same for all mails
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
         BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
         // messages ;) But we chekced that we received 9 emails above so that's good enough.
@@ -230,14 +235,14 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(message, session);
+        this.sender.send(Arrays.asList(message), session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 

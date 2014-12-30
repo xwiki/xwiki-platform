@@ -17,43 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+package org.xwiki.mail.internal.iterator.factory;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Saves errors when sending messages, in a local variable.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class DefaultMailResultListener implements MailResultListener
+@Role
+public interface UsersMimeMessageIteratorFactory
 {
-    private BlockingQueue<Exception> errorQueue = new LinkedBlockingQueue<>(100);
-
-    @Override
-    public void onSuccess(MimeMessage message)
-    {
-        // We're only interested in errors in the scripting API.
-    }
-
-    @Override
-    public void onError(MimeMessage message, Exception e)
-    {
-        // Add the error to the queue
-        this.errorQueue.add(e);
-    }
-
     /**
-     * @return the list of exceptions raised when sending mails in the current thread
+     * Create Iterator of MimeMessages.
+     *
+     * @param userReferences the list of recipients
+     * @param factory factory to create MimeMessage
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a user references (userReferences)
+     * @throws MessagingException when an error occurs
      */
-    public BlockingQueue<Exception> getExceptionQueue()
-    {
-        return this.errorQueue;
-    }
+    Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException;
 }

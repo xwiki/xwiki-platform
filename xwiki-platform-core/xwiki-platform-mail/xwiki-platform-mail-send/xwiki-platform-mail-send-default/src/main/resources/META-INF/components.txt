@@ -7,6 +7,7 @@ org.xwiki.mail.internal.DefaultMailSenderThread
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
 org.xwiki.mail.internal.AddressConverter
+org.xwiki.mail.internal.MemoryMailListener
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
 org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.template.SecureTemplateMimeBodyPartFactory
@@ -19,3 +20,6 @@ org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration
 org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource
+org.xwiki.mail.internal.iterator.factory.DefaultUsersMimeMessageIteratorFactory
+org.xwiki.mail.internal.iterator.factory.DefaultGroupMimeMessageIteratorFactory
+org.xwiki.mail.internal.iterator.factory.DefaultSerializedFilesMimeMessageIteratorFactory

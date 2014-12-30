@@ -17,43 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.iterator.factory;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.mail.internal.iterator.SerializedFilesMimeMessageIterator;
+
 /**
- * Since there's no easy way to verify if the content of a {@link javax.mail.internet.MimeMessage} has been set we
- * need to extend it to allow for this.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class ExtendedMimeMessage extends MimeMessage
+@Component
+@Singleton
+public class DefaultSerializedFilesMimeMessageIteratorFactory implements SerializedFilesMimeMessageIteratorFactory
 {
-    /**
-     * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
-     */
-    public ExtendedMimeMessage(Session session)
-    {
-        super(session);
-    }
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
-    /**
-     * @param source see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     */
-    public ExtendedMimeMessage(MimeMessage source) throws MessagingException
+    @Override public Iterator<MimeMessage> create(UUID batchID, Map<String, Object> parameters)
+        throws MessagingException
     {
-        super(source);
-    }
-
-    /**
-     * @return true if no body content has been defined yet for this message or false otherwise
-     */
-    public boolean isEmpty()
-    {
-        return this.dh == null;
+        ComponentManager cm = componentManagerProvider.get();
+        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchID, parameters, cm);
+        return iterator;
     }
 }

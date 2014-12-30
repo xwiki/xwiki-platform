@@ -52,21 +52,7 @@
     </dependency>
   </dependencies>
   <build>
-    <!-- Needed to add support for the XAR packaging -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
     <plugins>
-      <!-- The XAR packaging uses the XAR plugin and thus we need to define what version to use -->
-      <plugin>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <version>${commons.version}</version>
-      </plugin>
       <!-- Force the "use" field of JSX and CSS extensions to be the correct ones when building the final XAR.
            This is to avoid programmers mistakes, as it is very easy to forget to check they have the proper ones
            When committing changes based on a XAR export.

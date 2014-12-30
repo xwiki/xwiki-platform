@@ -23,16 +23,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.Event;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.ReputationAlgorithm;
 import org.xwiki.ratings.UpdateRatingEvent;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
 
 /**
  * @version $Id$

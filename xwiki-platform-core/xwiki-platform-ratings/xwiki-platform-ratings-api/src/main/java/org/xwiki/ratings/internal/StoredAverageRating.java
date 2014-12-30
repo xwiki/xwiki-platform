@@ -54,71 +54,43 @@ public class StoredAverageRating implements AverageRating
         this.object = ratingObject;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getNbVotes()
-     */
+    @Override
     public int getNbVotes()
     {
         return object.getIntValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setNbVotes()
-     */
+    @Override
     public void setNbVotes(int nbVotes)
     {
         object.setIntValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, nbVotes);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getAverageVote()
-     */
+    @Override
     public float getAverageVote()
     {
         return object.getFloatValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setAverageVote()
-     */
+    @Override
     public void setAverageVote(float averageVote)
     {
         object.setFloatValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, averageVote);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getMethod()
-     */
+    @Override
     public String getMethod()
     {
         return object.getStringValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setMethod()
-     */
+    @Override
     public void setMethod(String method)
     {
         object.setStringValue(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD, method);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#save()
-     */
+    @Override
     public void save() throws RatingsException
     {
         try {

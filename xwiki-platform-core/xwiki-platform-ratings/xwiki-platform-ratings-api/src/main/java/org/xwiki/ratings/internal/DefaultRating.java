@@ -58,9 +58,10 @@ public class DefaultRating implements Rating
      * @param vote the author's vote
      * @param context the context in which the rating was created
      * @param ratingsManager the ratings manager used when the rating was created
+     * @throws XWikiException when failing to create object
      */
     public DefaultRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context,
-        DefaultRatingsManager ratingsManager)
+        DefaultRatingsManager ratingsManager) throws XWikiException
     {
         this(documentRef, author, new Date(), vote, context, ratingsManager);
     }
@@ -74,9 +75,10 @@ public class DefaultRating implements Rating
      * @param vote the author's vote
      * @param context the context in which the rating was created
      * @param ratingsManager the ratings manager used when the rating was created
+     * @throws XWikiException when failing to create object
      */
     public DefaultRating(DocumentReference documentRef, DocumentReference author, Date date, int vote,
-        XWikiContext context, DefaultRatingsManager ratingsManager)
+        XWikiContext context, DefaultRatingsManager ratingsManager) throws XWikiException
     {
         this.context = context;
         this.documentRef = documentRef;
@@ -109,6 +111,7 @@ public class DefaultRating implements Rating
      * 
      * @return the rating id
      */
+    @Override
     public String getRatingId()
     {
         return "" + object.getNumber();
@@ -119,6 +122,7 @@ public class DefaultRating implements Rating
      * 
      * @return the global rating id
      */
+    @Override
     public String getGlobalRatingId()
     {
         return document.getFullName() + ":" + object.getNumber();
@@ -129,6 +133,7 @@ public class DefaultRating implements Rating
      * 
      * @return an object containing the rating information
      */
+    @Override
     public BaseObject getAsObject()
     {
         return object;
@@ -151,71 +156,45 @@ public class DefaultRating implements Rating
         return document;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getAuthor()
-     */
+    @Override
     public DocumentReference getAuthor()
     {
         String objectVal = object.getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
         return this.ratingsManager.userReferenceResolver.resolve(objectVal, documentRef);
     }
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setAuthor()
-     */
+
+    @Override
     public void setAuthor(DocumentReference author)
     {
         object.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
             this.ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getDate()
-     */
+    @Override
     public Date getDate()
     {
         return object.getDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setDate()
-     */
+    @Override
     public void setDate(Date date)
     {
         object.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getVote()
-     */
+    @Override
     public int getVote()
     {
         return object.getIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE);
     }
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setVote()
-     */
+
+    @Override
     public void setVote(int vote)
     {
         object.setIntValue("vote", vote);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#get()
-     */
+    @Override
     public Object get(String propertyName)
     {
         try {
@@ -225,31 +204,19 @@ public class DefaultRating implements Rating
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#display()
-     */
+    @Override
     public String display(String propertyName, String mode)
     {
         return document.display(propertyName, mode, object, context);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getDocumentReference()
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         return this.documentRef;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#save()
-     */
+    @Override
     public void save() throws RatingsException
     {
         try {
@@ -269,11 +236,7 @@ public class DefaultRating implements Rating
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#remove()
-     */
+    @Override
     public boolean remove()
     {
         return remove(true);
@@ -289,7 +252,7 @@ public class DefaultRating implements Rating
     {
         try {
             XWikiDocument doc = getDocument();
-            if (!doc.removeObject(object)) {
+            if (!doc.removeXObject(object)) {
                 return false;
             } else {
                 // save is needed to remove effectively
@@ -311,21 +274,20 @@ public class DefaultRating implements Rating
      * @param author the author of the rating
      * @param date the date when the rating took place
      * @param vote the vote that the author gave
+     * @throws XWikiException when failig to create new object
      */
-    private void createObject(String documentName, String author, Date date, int vote)
+    private void createObject(String documentName, String author, Date date, int vote) throws XWikiException
     {
         XWikiDocument doc = getDocument();
 
-        String ratingsClassName = RatingsManager.RATINGS_CLASSNAME;
-        BaseObject obj = new BaseObject();
-        obj.setClassName(ratingsClassName);
-        obj.setName(doc.getFullName());
+        BaseObject obj = doc.newXObject(RatingsManager.RATINGS_CLASSREFERENCE, context);
+
         // read data from map
         obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, author);
         obj.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
         obj.setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
         obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, documentName);
-        doc.addObject(ratingsClassName, obj);
+
         // set the internal variable
         object = obj;
     }
@@ -335,6 +297,7 @@ public class DefaultRating implements Rating
      * 
      * @return the string representation of the rating
      */
+    @Override
     public String toString()
     {
         boolean shouldAddSpace = false;

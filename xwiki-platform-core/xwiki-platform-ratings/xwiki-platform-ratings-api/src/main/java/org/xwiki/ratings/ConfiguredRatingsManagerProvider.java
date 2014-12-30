@@ -77,9 +77,8 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
     }
 
     /**
-     * Retrieve an instance of the desired RatingsManager (default/separate).
-     * - default: save the rating information in the same page
-     * - separate: save the rating information in a specified space
+     * Retrieve an instance of the desired RatingsManager (default/separate). - default: save the rating information in
+     * the same page - separate: save the rating information in a specified space
      *
      * @param documentRef the document to which the ratings are associated to
      * @return the ratings manager selected by looking at the current configuration settings
@@ -99,14 +98,14 @@ public class ConfiguredRatingsManagerProvider implements ConfiguredProvider<Rati
                 getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
                     getXWikiContext());
             XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
             XWikiDocument configDoc =
-                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
                     : spaceConfigDoc;
 
-            if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 ratingsHint = (hint == null) ? ratingsHint : hint;

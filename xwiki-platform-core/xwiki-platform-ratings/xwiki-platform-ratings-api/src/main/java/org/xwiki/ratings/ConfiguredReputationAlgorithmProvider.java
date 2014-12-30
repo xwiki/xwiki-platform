@@ -100,20 +100,20 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
                 getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
                     getXWikiContext());
             XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
             XWikiDocument configDoc =
-                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
                     : spaceConfigDoc;
 
             if (configDoc != null && !configDoc.isNew()
-                && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+                && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                         RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_ALGORITHM_HINT);
                 String hint = (prop == null) ? null : (String) prop.getValue();
                 if (hint == "custom") {
                     prop =
-                        (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(
+                        (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE).get(
                             RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_REPUTATION_CUSTOM_ALGORITHM);
                     hint = (prop == null) ? null : (String) prop.getValue();
                 }

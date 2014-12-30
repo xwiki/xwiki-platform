@@ -24,12 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.inject.Named;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -41,6 +37,10 @@ import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.UpdateRatingEvent;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+
 /**
  * @version $Id$
  * @see RatingsManager
@@ -51,11 +51,12 @@ import org.xwiki.ratings.UpdateRatingEvent;
 @Named("separate")
 public class SeparatePageRatingsManager extends AbstractRatingsManager
 {
-    public static final String RATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.separatepage.";
+    public static final String SEPARATERATINGS_CONFIG_PARAM_PREFIX = "xwiki.ratings.separatepage.";
 
-    public static final String RATINGS_CONFIG_FIELDNAME_SEPARATEPAGE_SPACE = "space";
+    public static final String SEPARATERATINGS_CONFIG_FIELDNAME_SEPARATEPAGE_SPACE = "space";
 
-    public static final String RATINGS_CONFIG_FIELDNAME_SEPARATEPAGE_RATINGS_SPACE_PER_SPACE = "ratingsSpacePerSpace";
+    public static final String SEPARATERATINGS_CONFIG_FIELDNAME_SEPARATEPAGE_RATINGS_SPACE_PER_SPACE =
+        "ratingsSpacePerSpace";
 
     @Inject
     private Logger LOGGER;
@@ -131,11 +132,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#setRating()
-     */
+    @Override
     public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
     {
         Rating rating = getRating(documentRef, author);
@@ -160,11 +157,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         return rating;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRatings()
-     */
+    @Override
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
     {
@@ -199,11 +192,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         return ratings;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRatings()
-     */
+    @Override
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
         String sql =
@@ -230,11 +219,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRating()
-     */
+    @Override
     public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
     {
         try {
@@ -249,11 +234,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRatings()
-     */
+    @Override
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
@@ -285,7 +266,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     }
 
     /**
-     * Gets a SeparatePageRating instance from a document 
+     * Gets a SeparatePageRating instance from a document
      * 
      * @param documentRef the reference of the document which the ratings are for
      * @param doc the document which the ratings are for

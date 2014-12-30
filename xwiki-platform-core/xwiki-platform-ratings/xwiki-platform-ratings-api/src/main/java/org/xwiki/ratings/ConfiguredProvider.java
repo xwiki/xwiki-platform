@@ -32,10 +32,11 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
+// TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public interface ConfiguredProvider<T>
 {
     /**
-     * Returns an instance of the required RatingsManager based on the current configuration.
+     * Returns an instance of a component based on the current configuration.
      * 
      * @param documentRef the document to which the ratings are associated to
      * @return an instance of RatingsManager (default or separate)

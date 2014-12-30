@@ -19,12 +19,12 @@
  */
 package org.xwiki.ratings;
 
-import com.xpn.xwiki.objects.BaseObject;
+import java.util.Date;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
-import java.util.Date;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Represent a rating : a note given by a user to a container. A container can be: A Wiki Document A section of a wiki
@@ -144,5 +144,6 @@ public interface Rating
      *
      * @return the string representation of the vote
      */
+    @Override
     String toString();
 }

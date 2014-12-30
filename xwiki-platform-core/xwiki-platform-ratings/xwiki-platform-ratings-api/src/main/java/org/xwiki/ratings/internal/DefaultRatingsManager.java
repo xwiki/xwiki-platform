@@ -28,11 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,6 +35,10 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.UpdateRatingEvent;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * The default ratings manager.
@@ -61,18 +60,19 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     @Inject
     private Logger logger;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#setRating()
-     */
+    @Override
     public Rating setRating(DocumentReference documentRef, DocumentReference author, int vote) throws RatingsException
     {
         Rating rating = getRating(documentRef, author);
         int oldVote;
         if (rating == null) {
             oldVote = 0;
-            rating = new DefaultRating(documentRef, author, vote, getXWikiContext(), this);
+            try {
+                rating = new DefaultRating(documentRef, author, vote, getXWikiContext(), this);
+            } catch (XWikiException e) {
+                throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS, e.getCode(),
+                    "Failed to create new rating object", e);
+            }
         } else {
             oldVote = rating.getVote();
             rating.setVote(vote);
@@ -89,11 +89,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         return rating;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRatings()
-     */
+    @Override
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
     {
@@ -128,11 +124,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRating()
-     */
+    @Override
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
@@ -166,11 +158,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRating()
-     */
+    @Override
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
         try {
@@ -194,11 +182,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRating()
-     */
+    @Override
     public Rating getRating(DocumentReference documentRef, DocumentReference author) throws RatingsException
     {
         try {

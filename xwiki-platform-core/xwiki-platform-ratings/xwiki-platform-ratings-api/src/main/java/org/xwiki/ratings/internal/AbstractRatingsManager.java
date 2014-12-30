@@ -25,13 +25,13 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.ReputationException;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -55,11 +55,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
     @Inject
     private Execution execution;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getRatingsClassName()
-     */
+    @Override
     public String getRatingsClassName()
     {
         return RATINGS_CLASSNAME;
@@ -113,14 +109,15 @@ public abstract class AbstractRatingsManager implements RatingsManager
                 getXWiki().getDocument(sourceDoc.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
                     getXWikiContext());
             XWikiDocument globalConfigDoc =
-                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE, getXWikiContext());
+                getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
             XWikiDocument configDoc =
-                (spaceConfigDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) == null) ? globalConfigDoc
+                (spaceConfigDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) == null) ? globalConfigDoc
                     : spaceConfigDoc;
 
-            if (!configDoc.isNew() && configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME) != null) {
+            if (!configDoc.isNew() && configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE) != null) {
                 BaseProperty prop =
-                    (BaseProperty) configDoc.getObject(RatingsManager.RATINGS_CONFIG_CLASSNAME).get(parameterName);
+                    (BaseProperty) configDoc.getXObject(RatingsManager.RATINGS_CONFIG_CLASSREFERENCE)
+                        .get(parameterName);
                 String propValue = (prop == null) ? defaultValue : prop.getValue().toString();
 
                 return (propValue.equals("") ? defaultValue : propValue);
@@ -143,11 +140,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return (getXWiki().getXWikiPreferenceAsInt("ratings", result, getXWikiContext()) == 1);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#isAverageRatingStored()
-     */
+    @Override
     public boolean isAverageRatingStored(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.averagerating.stored", "1");
@@ -156,11 +149,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
             result).equals("1"));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#isReputationStored()
-     */
+    @Override
     public boolean isReputationStored(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.reputation.stored", "0");
@@ -169,11 +158,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
             .equals("1"));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#hasReputation()
-     */
+    @Override
     public boolean hasReputation(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.reputation", "0");
@@ -182,11 +167,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
             .equals("1"));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getDefaultReputationMethods()
-     */
+    @Override
     public String[] getDefaultReputationMethods(DocumentReference documentRef)
     {
         String method = getXWiki().Param("xwiki.ratings.reputation.defaultmethod", RATING_REPUTATION_METHOD_DEFAULT);
@@ -196,11 +177,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return method.split(",");
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#updateAverageRatings()
-     */
+    @Override
     public void updateAverageRatings(DocumentReference documentRef, Rating rating, int oldVote) throws RatingsException
     {
         String[] methods = getDefaultReputationMethods(documentRef);
@@ -209,31 +186,19 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getAverageRatingFromQuery()
-     */
+    @Override
     public AverageRating getAverageRatingFromQuery(String fromsql, String wheresql) throws RatingsException
     {
         return getAverageRatingFromQuery(fromsql, wheresql, RATING_REPUTATION_METHOD_AVERAGE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getAverageRating()
-     */
+    @Override
     public AverageRating getAverageRating(DocumentReference documentRef) throws RatingsException
     {
         return getAverageRating(documentRef, RATING_REPUTATION_METHOD_AVERAGE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getAverageRatingFromQuery()
-     */
+    @Override
     public AverageRating getAverageRatingFromQuery(String fromsql, String wheresql, String method)
         throws RatingsException
     {
@@ -259,28 +224,20 @@ public abstract class AbstractRatingsManager implements RatingsManager
             float vote = ((Number) ((Object[]) result.get(0))[0]).floatValue();
             int nbvotes = ((Number) ((Object[]) result.get(0))[1]).intValue();
 
-            AverageRating avgr = new MemoryAverageRating(null, nbvotes, vote / (float) nbvotes, method);
+            AverageRating avgr = new MemoryAverageRating(null, nbvotes, vote / nbvotes, method);
             return avgr;
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#removeRating()
-     */
+    @Override
     public boolean removeRating(Rating rating) throws RatingsException
     {
         return rating.remove();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getUserReputation()
-     */
+    @Override
     public AverageRating getUserReputation(DocumentReference username) throws ReputationException
     {
         try {
@@ -290,11 +247,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#calcAverageRating()
-     */
+    @Override
     public AverageRating calcAverageRating(DocumentReference documentRef, String method) throws RatingsException
     {
         int nbVotes = 0;
@@ -333,11 +286,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         return new MemoryAverageRating(documentRef, nbVotes, averageVote, method);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#updateAverageRating()
-     */
+    @Override
     public void updateAverageRating(DocumentReference documentRef, Rating rating, int oldVote, String method)
         throws RatingsException
     {
@@ -358,11 +307,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#updateUserReputation()
-     */
+    @Override
     public void updateUserReputation(DocumentReference author, AverageRating voterRating) throws RatingsException
     {
         try {
@@ -377,21 +322,13 @@ public abstract class AbstractRatingsManager implements RatingsManager
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getAverageRating()
-     */
+    @Override
     public AverageRating getAverageRating(DocumentReference documentRef, String method) throws RatingsException
     {
         return getAverageRating(documentRef, method, false);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.RatingsManager#getAverageRating()
-     */
+    @Override
     public AverageRating getAverageRating(DocumentReference documentRef, String method, boolean create)
         throws RatingsException
     {

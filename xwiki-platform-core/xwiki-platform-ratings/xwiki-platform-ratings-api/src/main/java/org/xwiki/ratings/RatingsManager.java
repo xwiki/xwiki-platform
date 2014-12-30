@@ -23,10 +23,10 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * 
  * @version $Id$
  * @since 6.4M3
  */
@@ -36,7 +36,13 @@ public interface RatingsManager
 {
     public static final String RATINGS_CLASSNAME = "XWiki.RatingsClass";
 
+    public static final LocalDocumentReference RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
+        "RatingsClass");
+
     public static final String AVERAGE_RATINGS_CLASSNAME = "XWiki.AverageRatingsClass";
+
+    public static final LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
+        "AverageRatingsClass");
 
     public static final String RATING_CLASS_FIELDNAME_DATE = "date";
 
@@ -62,9 +68,13 @@ public interface RatingsManager
 
     public static final String RATINGS_CONFIG_GLOBAL_PAGE = "XWiki.RatingsConfig";
 
+    public static final LocalDocumentReference RATINGS_CONFIG_GLOBAL_REFERENCE = new LocalDocumentReference("XWiki",
+        "RatingsConfig");
+
     public static final String RATINGS_CONFIG_SPACE_PAGE = "WebPreferences";
 
-    public static final String RATINGS_CONFIG_CLASSNAME = "XWiki.RatingsConfigClass";
+    public static final LocalDocumentReference RATINGS_CONFIG_CLASSREFERENCE = new LocalDocumentReference("XWiki",
+        "RatingsConfigClass");
 
     public static final String RATINGS_CONFIG_CLASS_FIELDNAME_MANAGER_HINT = "managerHint";
 

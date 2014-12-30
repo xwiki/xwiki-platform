@@ -54,7 +54,7 @@ public class SeparatePageRating implements Rating
      * @param author the author of the rating
      * @param vote the authors vote
      * @param context the context in which the rating took place
-     * @param ratingsManager the RatingsManager to be used in processing the rating 
+     * @param ratingsManager the RatingsManager to be used in processing the rating
      * @throws RatingsException when encountering an error while instantiating a SeparatePageRating
      */
     public SeparatePageRating(DocumentReference documentRef, DocumentReference author, int vote, XWikiContext context,
@@ -71,7 +71,7 @@ public class SeparatePageRating implements Rating
      * @param date the date when the rating took place
      * @param vote the authors vote
      * @param context the context in which the rating took place
-     * @param ratingsManager the RatingsManager to be used in processing the rating 
+     * @param ratingsManager the RatingsManager to be used in processing the rating
      * @throws RatingsException when encountering an error while instantiating a SeparatePageRating
      */
     public SeparatePageRating(DocumentReference documentRef, DocumentReference author, Date date, int vote,
@@ -89,7 +89,7 @@ public class SeparatePageRating implements Rating
      * @param documentRef the document reference of the document with which the rating is associated
      * @param doc the document with which the rating is associated
      * @param context the context in which the rating took place
-     * @param ratingsManager the RatingsManager to be used in processing the rating 
+     * @param ratingsManager the RatingsManager to be used in processing the rating
      * @throws RatingsException when encountering an error while instantiating a SeparatePageRating
      */
     public SeparatePageRating(DocumentReference documentRef, XWikiDocument doc, XWikiContext context,
@@ -101,42 +101,25 @@ public class SeparatePageRating implements Rating
         this.document = doc;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getRatingId()
-     */
+    @Override
     public String getRatingId()
     {
         return getDocument().getFullName();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getGlobalRatingId()
-     */
+    @Override
     public String getGlobalRatingId()
     {
         return getRatingId();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getAsObject()
-     */
+    @Override
     public BaseObject getAsObject()
     {
-        return getDocument().getObject(RatingsManager.RATINGS_CLASSNAME);
+        return getDocument().getXObject(RatingsManager.RATINGS_CLASSREFERENCE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getDocument()
-     */
-    public XWikiDocument getDocument()
+    private XWikiDocument getDocument()
     {
         if (document == null) {
             try {
@@ -148,74 +131,46 @@ public class SeparatePageRating implements Rating
         return document;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getAuthor()
-     */
+    @Override
     public DocumentReference getAuthor()
     {
         String objectVal = getAsObject().getStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR);
         return ratingsManager.userReferenceResolver.resolve(objectVal, documentRef);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getDate()
-     */
+    @Override
     public Date getDate()
     {
 
         return getAsObject().getDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setAuthor(String)
-     */
+    @Override
     public void setAuthor(DocumentReference author)
     {
         getAsObject().setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
             ratingsManager.entityReferenceSerializer.serialize(author));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setDate()
-     */
+    @Override
     public void setDate(Date date)
     {
         getAsObject().setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getVote()
-     */
+    @Override
     public int getVote()
     {
         return getAsObject().getIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#setVote()
-     */
+    @Override
     public void setVote(int vote)
     {
         getAsObject().setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#get()
-     */
+    @Override
     public Object get(String propertyName)
     {
         try {
@@ -225,21 +180,13 @@ public class SeparatePageRating implements Rating
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#display()
-     */
+    @Override
     public String display(String propertyName, String mode)
     {
         return document.display(propertyName, mode, getAsObject(), context);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#save()
-     */
+    @Override
     public void save() throws RatingsException
     {
         try {
@@ -264,11 +211,7 @@ public class SeparatePageRating implements Rating
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#remove()
-     */
+    @Override
     public boolean remove() throws RatingsException
     {
         try {
@@ -306,7 +249,7 @@ public class SeparatePageRating implements Rating
     }
 
     /**
-     * Gets a unique page name. 
+     * Gets a unique page name.
      * 
      * @param space the space in which the document should be
      * @param name the name of the document
@@ -316,11 +259,10 @@ public class SeparatePageRating implements Rating
      */
     private String getUniquePageName(String space, String name, String postfix, boolean forcepostfix)
     {
-        String separator = ".";
         String pageName = context.getWiki().clearName(name, context);
-        if (forcepostfix || context.getWiki().exists(space + separator + pageName, context)) {
+        if (forcepostfix || context.getWiki().exists(space + '.' + pageName, context)) {
             int i = 1;
-            while (context.getWiki().exists(space + separator + pageName + postfix + i, context)) {
+            while (context.getWiki().exists(space + '.' + pageName + postfix + i, context)) {
                 i++;
             }
             return pageName + postfix + i;
@@ -342,32 +284,25 @@ public class SeparatePageRating implements Rating
         throws RatingsException
     {
         try {
-            String ratingsClassName = RatingsManager.RATINGS_CLASSNAME;
             DocumentReference pageRef = getPageReference(documentRef);
             String parentDocName = ratingsManager.entityReferenceSerializer.serialize(documentRef);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(pageRef, context);
             doc.setParent(parentDocName);
-            BaseObject obj = new BaseObject();
-            obj.setClassName(ratingsClassName);
-            obj.setName(ratingsManager.entityReferenceSerializer.serialize(pageRef));
+            BaseObject obj = doc.newXObject(RatingsManager.RATINGS_CLASSREFERENCE, context);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
                 ratingsManager.entityReferenceSerializer.serialize(author));
             obj.setDateValue(RatingsManager.RATING_CLASS_FIELDNAME_DATE, date);
             obj.setIntValue(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, vote);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, parentDocName);
-            doc.addObject(ratingsClassName, obj);
+
             return doc;
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#toString()
-     */
+    @Override
     public String toString()
     {
         boolean shouldAddSpace = false;
@@ -390,11 +325,7 @@ public class SeparatePageRating implements Rating
         return sb.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.Rating#getDocumentReference()
-     */
+    @Override
     public DocumentReference getDocumentReference()
     {
         return this.documentRef;

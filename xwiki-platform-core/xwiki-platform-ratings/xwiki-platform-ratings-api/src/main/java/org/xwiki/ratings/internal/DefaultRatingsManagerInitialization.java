@@ -23,20 +23,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.inject.Named;
-
-import org.slf4j.Logger;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.ratings.RatingsManager;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.ratings.RatingsManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -51,21 +51,23 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Named("ratingswikiinit")
 @Singleton
+// TODO: refactor to MandatoryDocumentInitializer
 public class DefaultRatingsManagerInitialization implements EventListener, Initializable
 {
+    private static final String BASE_TYPE_INTEGER = "integer";
+
+    private static final String BASE_TYPE_FLOAT = "float";
+
+    private static final String XWIKI_ADMIN = "xwiki:XWiki.Admin";
+
+    private static final LocalDocumentReference XWIKICLASSES_REFERENCE = new LocalDocumentReference("XWiki",
+        "XWikiClasses");
+
     @Inject
     private Logger logger;
 
     @Inject
     private Execution execution;
-
-    private final String baseTypeInteger = "integer";
-
-    private final String baseTypeFloat = "float";
-
-    private final String xwikiAdmin = "xwiki:XWiki.Admin";
-
-    private final String xwikiClasses = "XWiki.XWikiClasses";
 
     @Override
     public List<Event> getEvents()
@@ -127,32 +129,31 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
             XWikiDocument doc;
             XWiki xwiki = getXWiki();
             boolean needsUpdate = false;
-            String averageRatingsClassName = RatingsManager.AVERAGE_RATINGS_CLASSNAME;
 
-            doc = xwiki.getDocument(averageRatingsClassName, getXWikiContext());
+            doc = xwiki.getDocument(RatingsManager.AVERAGE_RATINGS_CLASSREFERENCE, getXWikiContext());
             BaseClass bclass = doc.getXClass();
 
             needsUpdate |=
                 bclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_NBVOTES, "Number of Votes", 5,
-                    baseTypeInteger);
+                    BASE_TYPE_INTEGER);
             needsUpdate |=
                 bclass.addNumberField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE, "Average Vote", 5,
-                    baseTypeFloat);
+                    BASE_TYPE_FLOAT);
             needsUpdate |=
                 bclass.addTextField(RatingsManager.AVERAGERATING_CLASS_FIELDNAME_AVERAGEVOTE_METHOD,
                     "Average Vote method", 10);
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;
-                doc.setAuthor(xwikiAdmin);
+                doc.setAuthor(XWIKI_ADMIN);
             }
             if (StringUtils.isBlank(doc.getCreator())) {
                 needsUpdate = true;
-                doc.setCreator(xwikiAdmin);
+                doc.setCreator(XWIKI_ADMIN);
             }
             if (StringUtils.isBlank(doc.getParent())) {
                 needsUpdate = true;
-                doc.setParent(xwikiClasses);
+                doc.setParentReference(XWIKICLASSES_REFERENCE);
             }
 
             String title = doc.getTitle();
@@ -162,7 +163,6 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
             }
 
             if (needsUpdate) {
-                bclass.setName(averageRatingsClassName);
                 xwiki.saveDocument(doc, getXWikiContext());
             }
         } catch (Exception e) {
@@ -179,28 +179,27 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
             XWikiDocument doc;
             XWiki xwiki = getXWiki();
             boolean needsUpdate = false;
-            String ratingsClassName = RatingsManager.RATINGS_CLASSNAME;
 
-            doc = xwiki.getDocument(ratingsClassName, getXWikiContext());
+            doc = xwiki.getDocument(RatingsManager.RATINGS_CLASSREFERENCE, getXWikiContext());
             BaseClass bclass = doc.getXClass();
 
             needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR, "Author", 30);
             needsUpdate |=
-                bclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, baseTypeInteger);
+                bclass.addNumberField(RatingsManager.RATING_CLASS_FIELDNAME_VOTE, "Vote", 5, BASE_TYPE_INTEGER);
             needsUpdate |= bclass.addDateField(RatingsManager.RATING_CLASS_FIELDNAME_DATE, "Date");
             needsUpdate |= bclass.addTextField(RatingsManager.RATING_CLASS_FIELDNAME_PARENT, "Parent", 30);
 
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;
-                doc.setAuthor(xwikiAdmin);
+                doc.setAuthor(XWIKI_ADMIN);
             }
             if (StringUtils.isBlank(doc.getCreator())) {
                 needsUpdate = true;
-                doc.setCreator(xwikiAdmin);
+                doc.setCreator(XWIKI_ADMIN);
             }
             if (StringUtils.isBlank(doc.getParent())) {
                 needsUpdate = true;
-                doc.setParent(xwikiClasses);
+                doc.setParentReference(XWIKICLASSES_REFERENCE);
             }
 
             String title = doc.getTitle();
@@ -210,7 +209,6 @@ public class DefaultRatingsManagerInitialization implements EventListener, Initi
             }
 
             if (needsUpdate) {
-                bclass.setName(ratingsClassName);
                 xwiki.saveDocument(doc, getXWikiContext());
             }
         } catch (Exception e) {

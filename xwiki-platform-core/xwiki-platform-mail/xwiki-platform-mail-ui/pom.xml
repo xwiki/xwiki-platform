@@ -40,7 +40,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <artifactId>xwiki-platform-mail-send-storage</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

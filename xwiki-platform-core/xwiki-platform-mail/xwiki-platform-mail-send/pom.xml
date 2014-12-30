@@ -31,10 +31,6 @@
   <artifactId>xwiki-platform-mail-send</artifactId>
   <name>XWiki Platform - Mail - Send - Parent POM</name>
   <description>XWiki Platform - Mail - Send - Parent POM</description>
-  <properties>
-    <!-- Don't run CLIRR in this Young API, to remove after we release the current version as final-->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-send-api</module>

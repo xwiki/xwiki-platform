@@ -454,30 +454,6 @@
               <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
             <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/mail/MailSenderConfiguration</className>
-              <method>java.lang.String getScriptServicePermissionCheckerHint()</method>
-              <justification>Young API, adding method to check permissions for sending mail.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/mail/MailSenderConfiguration</className>
-              <method>java.util.List getBCCAddresses()</method>
-              <justification>Young API, adding method to configure default BCC addresses to use when sending mail.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
-              <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
-              <justification>Young API, this method should not have been made public.</justification>
-            </difference>
-            <difference>
-              <differenceType>7009</differenceType>
-              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
-              <method>MimeMessageWrapper(org.xwiki.mail.internal.ExtendedMimeMessage, javax.mail.Session, org.xwiki.mail.MailSender, org.xwiki.context.Execution, org.xwiki.component.manager.ComponentManager)</method>
-              <justification>Young API, this method should not have been made public.</justification>
-            </difference>
-            <difference>
               <differenceType>7002</differenceType>
               <className>org/xwiki/lesscss/LessCompilerScriptService</className>
               <method>boolean clearCacheFromFileSystemSkin(java.lang.String)</method>
@@ -516,6 +492,8 @@
              a bug in the clirr plugin.
              Do not forget to also change that file for the final release!-->
             <exclude>**/xwiki-platform-lesscss/**</exclude>
+            <!-- Lots of refactoring on the new Mail module, which is a young API -->
+            <exclude>**/org/xwiki/mail/**</exclude>
           </excludes>
         </configuration>
       </plugin>

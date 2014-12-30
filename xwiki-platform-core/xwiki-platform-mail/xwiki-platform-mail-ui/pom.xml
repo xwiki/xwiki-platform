@@ -51,5 +51,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We also need a default implementation of the Mail Sender API at runtime -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

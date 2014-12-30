@@ -284,10 +284,8 @@ public class MailSenderScriptService implements ScriptService
      */
     public UUID send(Iterable<? extends MimeMessage> messages, String hint)
     {
-        MailListener listener;
         try {
             checkPermissions();
-            listener = getListener(hint);
             return this.mailSender.send(messages, createSession());
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getLastError() API

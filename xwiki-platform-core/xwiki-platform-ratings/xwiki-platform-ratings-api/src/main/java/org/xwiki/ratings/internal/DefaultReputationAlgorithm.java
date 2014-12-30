@@ -46,6 +46,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  * @see ReputationAlgorithm
+ * @since 6.4M3
  */
 @Component
 @Singleton

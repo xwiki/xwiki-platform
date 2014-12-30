@@ -34,15 +34,19 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface RatingsManager
 {
-    public static final String RATINGS_CLASSNAME = "XWiki.RatingsClass";
+    public static final String RATINGS_CLASSPAGE = "RatingsClass";
+
+    public static final String RATINGS_CLASSNAME = "XWiki." + RATINGS_CLASSPAGE;
 
     public static final LocalDocumentReference RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
-        "RatingsClass");
+        RATINGS_CLASSPAGE);
 
-    public static final String AVERAGE_RATINGS_CLASSNAME = "XWiki.AverageRatingsClass";
+    public static final String AVERAGE_RATINGS_CLASSPAGE = "AverageRatingsClass";
+
+    public static final String AVERAGE_RATINGS_CLASSNAME = "XWiki." + AVERAGE_RATINGS_CLASSPAGE;
 
     public static final LocalDocumentReference AVERAGE_RATINGS_CLASSREFERENCE = new LocalDocumentReference("XWiki",
-        "AverageRatingsClass");
+        AVERAGE_RATINGS_CLASSPAGE);
 
     public static final String RATING_CLASS_FIELDNAME_DATE = "date";
 

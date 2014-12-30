@@ -43,6 +43,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 /**
  * @version $Id$
  * @see RatingsManager
+ * @since 6.4M3
  */
 public abstract class AbstractRatingsManager implements RatingsManager
 {

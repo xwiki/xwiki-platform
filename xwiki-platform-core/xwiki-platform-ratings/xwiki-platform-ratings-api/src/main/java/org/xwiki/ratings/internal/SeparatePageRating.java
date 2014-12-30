@@ -36,6 +36,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 /**
  * @version $Id$
  * @see Rating
+ * @since 6.4M3
  */
 public class SeparatePageRating implements Rating
 {

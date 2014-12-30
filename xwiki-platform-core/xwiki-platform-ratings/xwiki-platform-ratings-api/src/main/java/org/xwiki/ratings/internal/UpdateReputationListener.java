@@ -36,6 +36,7 @@ import org.xwiki.ratings.UpdateRatingEvent;
 
 /**
  * @version $Id$
+ * @since 6.4M3
  */
 @Component
 @Named("updatereputation")

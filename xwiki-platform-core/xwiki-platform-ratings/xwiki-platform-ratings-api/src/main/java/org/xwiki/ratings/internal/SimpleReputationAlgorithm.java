@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @see ReputationAlgorithm
+ * @since 6.4M3
  */
 @Component
 @Singleton

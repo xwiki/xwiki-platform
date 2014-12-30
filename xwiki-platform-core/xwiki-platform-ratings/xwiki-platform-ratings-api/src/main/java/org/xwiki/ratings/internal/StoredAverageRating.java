@@ -31,6 +31,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * @version $Id$
  * @see AverageRating
+ * @since 6.4M3
  */
 public class StoredAverageRating implements AverageRating
 {

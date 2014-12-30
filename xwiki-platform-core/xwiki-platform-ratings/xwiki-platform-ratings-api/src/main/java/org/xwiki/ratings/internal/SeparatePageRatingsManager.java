@@ -45,6 +45,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @see RatingsManager
  * @see AbstractRatingsManager
+ * @since 6.4M3
  */
 @Component
 @Singleton

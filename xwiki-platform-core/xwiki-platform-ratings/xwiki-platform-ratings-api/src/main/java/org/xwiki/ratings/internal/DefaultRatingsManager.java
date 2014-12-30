@@ -44,6 +44,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * The default ratings manager.
  * 
  * @version $Id$
+ * @since 6.4M3
  */
 @Component
 @Singleton

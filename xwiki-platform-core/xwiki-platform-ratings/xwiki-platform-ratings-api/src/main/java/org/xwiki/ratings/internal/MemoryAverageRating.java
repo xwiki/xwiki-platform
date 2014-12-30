@@ -26,6 +26,7 @@ import org.xwiki.ratings.RatingsException;
 /**
  * @version $Id$
  * @see AverageRating
+ * @since 6.4M3
  */
 public class MemoryAverageRating implements AverageRating
 {

@@ -37,6 +37,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * 
  * @see Rating
  * @version $Id$
+ * @since 6.4M3
  */
 public class DefaultRating implements Rating
 {

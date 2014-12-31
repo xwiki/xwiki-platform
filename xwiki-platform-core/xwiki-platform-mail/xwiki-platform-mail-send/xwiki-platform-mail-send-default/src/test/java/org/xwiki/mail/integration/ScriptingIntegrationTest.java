@@ -39,10 +39,10 @@ import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
@@ -69,11 +69,12 @@ import static org.mockito.Mockito.mock;
 @ComponentList({
     MailSenderScriptService.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class,
     DefaultExecution.class,
     ContextComponentManagerProvider.class,
     DefaultMimeBodyPartFactory.class,
-    MemoryMailListener.class
+    MemoryMailListener.class,
+    DefaultExecutionContextManager.class,
+    DefaultExecution.class
 })
 public class ScriptingIntegrationTest
 {

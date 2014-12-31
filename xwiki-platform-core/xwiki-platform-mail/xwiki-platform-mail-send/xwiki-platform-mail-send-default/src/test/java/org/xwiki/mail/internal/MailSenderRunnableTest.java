@@ -31,29 +31,42 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.DefaultMailSenderThread}.
+ * Unit tests for {@link org.xwiki.mail.internal.MailSenderRunnable}.
  *
  * @version $Id$
  * @since 6.1RC1
  */
 @ComponentList({
-    MemoryMailListener.class
+    MemoryMailListener.class,
+    DefaultExecution.class
 })
-public class DefaultMailSenderThreadTest
+public class MailSenderRunnableTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultMailSenderThread> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailSenderThread.class);
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+
+    private MailSenderConfiguration configuration;
+
+    @BeforeComponent
+    public void setUpComponents() throws Exception
+    {
+        this.configuration = this.componentManager.registerMockComponent(MailSenderConfiguration.class);
+//        this.componentManager.registerMockComponent(ExecutionContextManager.class);
+    }
 
     @Test
-    public void runWhenMailSendingFails() throws Exception
+    public void runInternalWhenMailSendingFails() throws Exception
     {
         // Create a Session with an invalid host so that it generates an error
         Properties properties = new Properties();
@@ -62,7 +75,7 @@ public class DefaultMailSenderThreadTest
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
         UUID batchID = UUID.randomUUID();
         MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchID);
 
@@ -73,8 +86,9 @@ public class DefaultMailSenderThreadTest
         mailQueue.add(item);
         mailQueue.add(item);
 
-        DefaultMailSenderThread thread = this.mocker.getComponentUnderTest();
-        thread.startProcessing(mailQueue);
+        MailSenderRunnable runnable = new MailSenderRunnable(this.configuration, mailQueue);
+        Thread thread = new Thread(runnable);
+        thread.start();
 
         // This is the real test: we verify that there's been an error while sending each email and that it's been
         // logged. This also proves that the Mail Sender Thread doesn't stop when there's an error sending an email.
@@ -89,7 +103,8 @@ public class DefaultMailSenderThreadTest
                 Thread.sleep(100L);
             }
         } finally {
-            thread.stopProcessing();
+            runnable.stopProcessing();
+            thread.interrupt();
             thread.join();
         }
         assertTrue(success);

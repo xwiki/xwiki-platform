@@ -37,13 +37,13 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 
 /**
- * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
- * asynchronously.
+ * Default implementation using the {@link org.xwiki.mail.internal.MailSenderRunnable} to send emails asynchronously.
  *
  * @version $Id$
  * @since 6.1M2
@@ -52,9 +52,6 @@ import org.xwiki.mail.MailSenderConfiguration;
 @Singleton
 public class DefaultMailSender implements MailSender, Initializable
 {
-    @Inject
-    private MailSenderThread mailSenderThread;
-
     @Inject
     private MailSenderConfiguration configuration;
 
@@ -70,11 +67,19 @@ public class DefaultMailSender implements MailSender, Initializable
      */
     private Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 
+    private Thread mailSenderThread;
+
+    private MailSenderRunnable mailSenderRunnable;
+
     @Override
     public void initialize() throws InitializationException
     {
+        // Start the Mail Sending Thread
+        this.mailSenderRunnable = new MailSenderRunnable(this.configuration, getMailQueue());
+        this.mailSenderThread =
+            new Thread(new ExecutionContextRunnable(this.mailSenderRunnable, this.componentManager));
         this.mailSenderThread.setName("Mail Sender Thread");
-        this.mailSenderThread.startProcessing(getMailQueue());
+        this.mailSenderThread.start();
     }
 
     @Override
@@ -137,7 +142,9 @@ public class DefaultMailSender implements MailSender, Initializable
      */
     public void stopMailSenderThread() throws InterruptedException
     {
-        this.mailSenderThread.stopProcessing();
+        this.mailSenderRunnable.stopProcessing();
+        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
+        this.mailSenderThread.interrupt();
         // Wait till the thread goes away
         this.mailSenderThread.join();
     }

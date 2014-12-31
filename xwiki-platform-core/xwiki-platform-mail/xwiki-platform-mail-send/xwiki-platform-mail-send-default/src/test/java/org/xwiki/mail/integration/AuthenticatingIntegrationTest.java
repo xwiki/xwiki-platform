@@ -36,6 +36,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -44,7 +46,6 @@ import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
-import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -69,8 +70,9 @@ import static org.junit.Assert.assertEquals;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class,
-    MemoryMailListener.class
+    MemoryMailListener.class,
+    DefaultExecutionContextManager.class,
+    DefaultExecution.class
 })
 public class AuthenticatingIntegrationTest
 {

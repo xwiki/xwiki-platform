@@ -40,6 +40,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -47,7 +49,6 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
@@ -73,8 +74,9 @@ import static org.junit.Assert.fail;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class,
-    MemoryMailListener.class
+    MemoryMailListener.class,
+    DefaultExecutionContextManager.class,
+    DefaultExecution.class
 })
 public class JavaIntegrationTest
 {

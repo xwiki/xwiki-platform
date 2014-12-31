@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.UUID;
 
-import javax.inject.Inject;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -34,22 +33,18 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.slf4j.LoggerFactory;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.script.MimeMessageWrapper;
 
 /**
- * Thread that regularly check for mails on a Queue, and for each mail tries to send it.
+ * Runnable that regularly check for mails on a Queue, and for each mail tries to send it.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M3
  */
-@Component
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DefaultMailSenderThread extends Thread implements MailSenderThread
+public class MailSenderRunnable implements Runnable
 {
     /**
      * Name of the custom JavaMail header used by XWiki to uniquely identify a mail. This header allows us to follow
@@ -69,10 +64,8 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
      */
     private static final String HEADER_BATCH_ID = "X-BatchID";
 
-    @Inject
-    private Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailSenderRunnable.class);
 
-    @Inject
     private MailSenderConfiguration configuration;
 
     /**
@@ -91,18 +84,14 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
 
     private int count;
 
-    @Override
-    public void startProcessing(Queue<MailSenderQueueItem> mailQueue)
+    /**
+     * @param configuration the mail sender configuration from which we extract default from and BCC email addresses
+     * @param mailQueue the queue containing the mails to be sent
+     */
+    public MailSenderRunnable(MailSenderConfiguration configuration, Queue<MailSenderQueueItem> mailQueue)
     {
+        this.configuration = configuration;
         this.mailQueue = mailQueue;
-        start();
-    }
-
-    @Override
-    public void run(Queue<MailSenderQueueItem> mailQueue)
-    {
-        this.mailQueue = mailQueue;
-        run();
     }
 
     @Override
@@ -123,26 +112,16 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
                 }
                 // Make some pause to not overload the server
                 try {
-                    DefaultMailSenderThread.sleep(100L);
+                    Thread.sleep(100L);
                 } catch (Exception e) {
                     // There was an unexpected problem, we stop this thread and log the problem.
-                    this.logger.debug("Mail Sender Thread was forcefully stopped", e);
+                    LOGGER.debug("Mail Sender Thread was forcefully stopped", e);
                     break;
                 }
             } while (!this.shouldStop);
         } finally {
             closeTransport();
         }
-    }
-
-    /**
-     * Stop the thread.
-     */
-    public void stopProcessing()
-    {
-        this.shouldStop = true;
-        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
-        interrupt();
     }
 
     /**
@@ -240,13 +219,21 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
         return message;
     }
 
+    /**
+     * Stop the processing to stop the thread.
+     */
+    public void stopProcessing()
+    {
+        this.shouldStop = true;
+    }
+
     private void closeTransport()
     {
         if (this.currentTransport != null) {
             try {
                 this.currentTransport.close();
             } catch (MessagingException e) {
-                this.logger.warn("Failed to close JavaMail Transport connection. Reason [{}]",
+                LOGGER.warn("Failed to close JavaMail Transport connection. Reason [{}]",
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }

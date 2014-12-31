@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -37,10 +38,14 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.MailSenderRunnable} to send emails asynchronously.
@@ -61,6 +66,15 @@ public class DefaultMailSender implements MailSender, Initializable
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private ModelContext modelContext;
+
+    @Inject
+    private ExecutionContextManager executionContextManager;
+
+    @Inject
+    private Provider<XWikiContext> xwikiContextProvider;
+
     /**
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
@@ -75,9 +89,9 @@ public class DefaultMailSender implements MailSender, Initializable
     public void initialize() throws InitializationException
     {
         // Start the Mail Sending Thread
-        this.mailSenderRunnable = new MailSenderRunnable(this.configuration, getMailQueue());
-        this.mailSenderThread =
-            new Thread(new ExecutionContextRunnable(this.mailSenderRunnable, this.componentManager));
+        this.mailSenderRunnable = new MailSenderRunnable(getMailQueue(), this.configuration, this.xwikiContextProvider,
+            this.executionContextManager);
+        this.mailSenderThread = new Thread(this.mailSenderRunnable);
         this.mailSenderThread.setName("Mail Sender Thread");
         this.mailSenderThread.start();
     }
@@ -86,17 +100,22 @@ public class DefaultMailSender implements MailSender, Initializable
     public UUID send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException
     {
         MailListener listener = getListener("memory");
-        UUID batchID = sendAsynchronously(messages, session, listener);
+        UUID batchId = sendAsynchronously(messages, session, listener);
         waitTillSent(Long.MAX_VALUE);
-        return batchID;
+        return batchId;
     }
 
     @Override
     public UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener)
     {
-        UUID batchID = UUID.randomUUID();
-        getMailQueue().add(new MailSenderQueueItem(messages, session, listener, batchID));
-        return batchID;
+        UUID batchId = UUID.randomUUID();
+
+        // Pass the current wiki so that the mail message will be prepared and sent in the context of that wiki.
+        String wikiId = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
+
+        getMailQueue().add(new MailSenderQueueItem(messages, session, listener, batchId, wikiId));
+
+        return batchId;
     }
 
     /**

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -35,7 +36,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
@@ -48,6 +51,8 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -55,8 +60,10 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API when using an
@@ -70,9 +77,7 @@ import static org.junit.Assert.assertEquals;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    MemoryMailListener.class,
-    DefaultExecutionContextManager.class,
-    DefaultExecution.class
+    MemoryMailListener.class
 })
 public class AuthenticatingIntegrationTest
 {
@@ -107,6 +112,16 @@ public class AuthenticatingIntegrationTest
         this.configuration = new TestMailSenderConfiguration(
             this.mail.getSmtps().getPort(), "peter", "password", properties);
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
+
+        // Set the current wiki in the Context
+        ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
+
+        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+
+        this.componentManager.registerMockComponent(ExecutionContextManager.class);
     }
 
     @Before

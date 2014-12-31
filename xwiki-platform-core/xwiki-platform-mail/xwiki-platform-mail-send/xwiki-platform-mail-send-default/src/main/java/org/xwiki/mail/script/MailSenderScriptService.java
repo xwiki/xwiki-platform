@@ -333,12 +333,12 @@ public class MailSenderScriptService implements ScriptService
     }
 
     /**
-     * @param batchID the UUID of the Batch mail
+     * @param batchId the UUID of the Batch mail
      * @return errors raised during the send of all emails
      */
-    public Iterator<MailStatus> getErrors(UUID batchID)
+    public Iterator<MailStatus> getErrors(UUID batchId)
     {
-        return MemoryMailListener.getErrors(batchID);
+        return MemoryMailListener.getErrors(batchId);
     }
 
     private MailListener getListener(String hint) throws MessagingException

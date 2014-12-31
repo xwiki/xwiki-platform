@@ -43,9 +43,10 @@ public class MailSenderQueueItemTest
     {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        UUID batchID = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchID);
+        UUID batchId = UUID.randomUUID();
+        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
 
-        assertEquals("batchID = ["+ batchID +"], threadId = [" + Thread.currentThread().getId() + "]", item.toString());
+        assertEquals("batchId = [" + batchId + "], threadId = [" + Thread.currentThread().getId()
+            + "], wikiId = [wiki]", item.toString());
     }
 }

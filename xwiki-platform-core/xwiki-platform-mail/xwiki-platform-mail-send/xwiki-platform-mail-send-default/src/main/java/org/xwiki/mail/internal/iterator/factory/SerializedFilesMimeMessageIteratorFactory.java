@@ -40,10 +40,10 @@ public interface SerializedFilesMimeMessageIteratorFactory
     /**
      * Create Iterator of MimeMessages.
      *
-     * @param batchID batchID the name of the directory that contains serialized MimeMessages
+     * @param batchId the name of the directory that contains serialized MimeMessages
      * @param parameters the parameters from which to extract the session, source and the headers
      * @return Iterator of MimeMessage generated from a serialized files MimeMessage
      * @throws MessagingException when an error occurs
      */
-    Iterator<MimeMessage> create(UUID batchID, Map<String, Object> parameters) throws MessagingException;
+    Iterator<MimeMessage> create(UUID batchId, Map<String, Object> parameters) throws MessagingException;
 }

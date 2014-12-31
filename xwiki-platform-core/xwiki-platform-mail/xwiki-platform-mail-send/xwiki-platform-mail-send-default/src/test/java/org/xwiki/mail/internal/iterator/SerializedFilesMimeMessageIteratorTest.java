@@ -57,20 +57,18 @@ public class SerializedFilesMimeMessageIteratorTest
     private static final String TEMPORARY_DIRECTORY =
         System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
 
-    private UUID batchID;
+    private UUID batchId;
 
     private File batchDirectory;
 
     @Before
     public void setUp() throws Exception
     {
-        this.batchID = UUID.randomUUID();
-
-        String mailID2 = UUID.randomUUID().toString();
+        this.batchId = UUID.randomUUID();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         this.batchDirectory =
-            new File(new File(tempDir, SerializedFilesMimeMessageIterator.ROOT_DIRECTORY), this.batchID.toString());
+            new File(new File(tempDir, SerializedFilesMimeMessageIterator.ROOT_DIRECTORY), this.batchId.toString());
         this.batchDirectory.mkdirs();
     }
 
@@ -79,7 +77,7 @@ public class SerializedFilesMimeMessageIteratorTest
     {
         // Delete created messages and directories
         FileUtils.deleteDirectory(
-            new File(TEMPORARY_DIRECTORY, this.batchID.toString()));
+            new File(TEMPORARY_DIRECTORY, this.batchId.toString()));
     }
 
     @Test
@@ -106,7 +104,7 @@ public class SerializedFilesMimeMessageIteratorTest
         when(componentManager.getInstance(eq(Environment.class))).thenReturn(environment);
 
         SerializedFilesMimeMessageIterator iterator =
-            new SerializedFilesMimeMessageIterator(this.batchID, parameters, componentManager);
+            new SerializedFilesMimeMessageIterator(this.batchId, parameters, componentManager);
 
         ArrayList<String> listID = new ArrayList<>();
         listID.add(mailID1.toString());
@@ -144,7 +142,7 @@ public class SerializedFilesMimeMessageIteratorTest
         fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
         fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
         fileWriter.append("X-MailID: " + mailID.toString() + newLine);
-        fileWriter.append("X-BatchID: " + this.batchID.toString() + newLine + newLine);
+        fileWriter.append("X-BatchID: " + this.batchId.toString() + newLine + newLine);
         fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         fileWriter.close();
     }

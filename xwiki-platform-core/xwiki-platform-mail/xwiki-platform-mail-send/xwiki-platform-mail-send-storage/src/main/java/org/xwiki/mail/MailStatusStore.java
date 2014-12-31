@@ -45,19 +45,19 @@ public interface MailStatusStore
     /**
      * Load a message status from the store.
      *
-     * @param messageID the id of the message to load
+     * @param messageId the id of the message to load
      * @return the loaded {@link org.xwiki.mail.MailStatus} instance
      * @throws MailStoreException when an error occurs when loading the data
      */
-    MailStatus load(String messageID) throws MailStoreException;
+    MailStatus load(String messageId) throws MailStoreException;
 
     /**
      * Loads all message statuses matching the passed state and batch id from the store.
      *
-     * @param batchID the batch id of the message statuses to load
+     * @param batchId the batch id of the message statuses to load
      * @param state the state to match (only statuses having that state will be loaded)
      * @return the loaded {@link org.xwiki.mail.MailStatus} instance
      * @throws MailStoreException when an error occurs when loading the data
      */
-    List<MailStatus> load(String batchID, MailState state) throws MailStoreException;
+    List<MailStatus> load(String batchId, MailState state) throws MailStoreException;
 }

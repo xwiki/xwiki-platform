@@ -53,7 +53,7 @@ public class MemoryMailListener implements MailListener
 {
     private static List<WeakReference<MemoryMailListener>> instances = new ArrayList<>();
 
-    private String batchID;
+    private String batchId;
 
     @Inject
     private Logger logger;
@@ -84,7 +84,7 @@ public class MemoryMailListener implements MailListener
     public void onError(MimeMessage message, Exception e)
     {
         try {
-            this.batchID = message.getHeader("X-BatchID", null);
+            this.batchId = message.getHeader("X-BatchID", null);
             this.errorQueue.add(new MailStatus(message.getHeader("X-MailID", null), ExceptionUtils.getMessage(e)));
         } catch (MessagingException ex) {
             this.logger.warn("Failed to retrieve Message ID from message. Reason: [{}]",
@@ -101,16 +101,16 @@ public class MemoryMailListener implements MailListener
     }
 
     /**
-     * @param batchID the UUID of the Batch mail
+     * @param batchId the UUID of the Batch mail
      * @return errors raised during the send of all emails
      */
-    public static Iterator<MailStatus> getErrors(UUID batchID)
+    public static Iterator<MailStatus> getErrors(UUID batchId)
     {
         for (WeakReference<MemoryMailListener> instance : instances) {
             if (instance != null) {
                 MemoryMailListener listener = instance.get();
                 if (listener != null) {
-                    if (batchID.toString().equals(listener.getBatchID())) {
+                    if (batchId.toString().equals(listener.getBatchId())) {
                         return listener.getErrors();
                     }
                 }
@@ -122,9 +122,9 @@ public class MemoryMailListener implements MailListener
     /**
      * @return the batch ID of the batch mail
      */
-    public String getBatchID()
+    public String getBatchId()
     {
-        return batchID;
+        return batchId;
     }
 
     /**

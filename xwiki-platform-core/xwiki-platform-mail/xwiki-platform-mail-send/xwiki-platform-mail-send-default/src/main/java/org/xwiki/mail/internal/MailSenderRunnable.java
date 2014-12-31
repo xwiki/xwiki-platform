@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.UUID;
 
+import javax.inject.Provider;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -34,9 +35,14 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.script.MimeMessageWrapper;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Runnable that regularly check for mails on a Queue, and for each mail tries to send it.
@@ -68,6 +74,10 @@ public class MailSenderRunnable implements Runnable
 
     private MailSenderConfiguration configuration;
 
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    private ExecutionContextManager executionContextManager;
+
     /**
      * The queue containing mails to send.
      */
@@ -85,24 +95,38 @@ public class MailSenderRunnable implements Runnable
     private int count;
 
     /**
-     * @param configuration the mail sender configuration from which we extract default from and BCC email addresses
      * @param mailQueue the queue containing the mails to be sent
+     * @param configuration the mail sender configuration from which we extract default from and BCC email addresses
+     * @param xwikiContextProvider used to create a new XWiki Context when sending a mail (to provide isolation)
+     * @param executionContextManager used to create a new execution context when sending a mail (to provide isolation)
      */
-    public MailSenderRunnable(MailSenderConfiguration configuration, Queue<MailSenderQueueItem> mailQueue)
+    public MailSenderRunnable(Queue<MailSenderQueueItem> mailQueue, MailSenderConfiguration configuration,
+        Provider<XWikiContext> xwikiContextProvider, ExecutionContextManager executionContextManager)
     {
-        this.configuration = configuration;
         this.mailQueue = mailQueue;
+        this.configuration = configuration;
+        this.xwikiContextProvider = xwikiContextProvider;
+        this.executionContextManager = executionContextManager;
     }
 
     @Override
     public void run()
     {
         try {
-            do {
+            runInternal();
+        } finally {
+            closeTransport();
+        }
+    }
+
+    private void runInternal()
+    {
+        do {
+            try {
                 // Handle next message in the queue
                 if (!this.mailQueue.isEmpty()) {
-                    // Important: only remove the mail item from the queue after the mail has been sent as otherwise,
-                    // MailSender.waitTillSent() may return before the mail is actually sent!
+                    // Important: only remove the mail item from the queue after the mail has been sent as
+                    // otherwise, MailSender.waitTillSent() may return before the mail is actually sent!
                     MailSenderQueueItem mailItem = this.mailQueue.peek();
                     try {
                         sendMail(mailItem);
@@ -111,17 +135,33 @@ public class MailSenderRunnable implements Runnable
                     }
                 }
                 // Make some pause to not overload the server
-                try {
-                    Thread.sleep(100L);
-                } catch (Exception e) {
-                    // There was an unexpected problem, we stop this thread and log the problem.
-                    LOGGER.debug("Mail Sender Thread was forcefully stopped", e);
-                    break;
-                }
-            } while (!this.shouldStop);
-        } finally {
-            closeTransport();
-        }
+                Thread.sleep(100L);
+            } catch (Exception e) {
+                // There was an unexpected problem, we stop this thread and log the problem.
+                LOGGER.debug("Mail Sender Thread was forcefully stopped", e);
+                break;
+            }
+        } while (!this.shouldStop);
+    }
+
+    /**
+     * Prepare the contexts for sending the mail.
+     *
+     * @param mailItem the queue item containing all the data for sending the mail
+     */
+    protected void sendMail(MailSenderQueueItem mailItem) throws ExecutionContextException
+    {
+        // Isolate the context when sending a mail by creating a new context
+        ExecutionContext executionContext = new ExecutionContext();
+        this.executionContextManager.initialize(executionContext);
+
+        // Since the Execution Context has been created there's no XWikiContext in it and we initialize one
+        XWikiContext xwikiContext = this.xwikiContextProvider.get();
+
+        // Set the wiki in which to execute
+        xwikiContext.setWikiId(mailItem.getWikiId());
+
+        sendMailInternal(mailItem);
     }
 
     /**
@@ -129,14 +169,14 @@ public class MailSenderRunnable implements Runnable
      *
      * @param item the queue item containing all the data for sending the mail
      */
-    protected void sendMail(MailSenderQueueItem item)
+    private void sendMailInternal(MailSenderQueueItem item)
     {
         Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
         MailListener listener = item.getListener();
-        UUID batchID = item.getBatchID();
+        UUID batchId = item.getBatchId();
         while (messages.hasNext()) {
             MimeMessage mimeMessage = messages.next();
-            MimeMessage message = initializeMessage(mimeMessage, listener, batchID);
+            MimeMessage message = initializeMessage(mimeMessage, listener, batchId);
             try {
                 // Step 1: If the current Session in use is different from the one passed then close
                 // the current Transport, get a new one and reconnect.
@@ -169,7 +209,7 @@ public class MailSenderRunnable implements Runnable
         }
     }
 
-    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchID)
+    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchId)
     {
         MimeMessage message = null;
         try {
@@ -181,7 +221,7 @@ public class MailSenderRunnable implements Runnable
 
             // Set custom XWiki mail headers.
             // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
-            message.setHeader(HEADER_BATCH_ID, batchID.toString());
+            message.setHeader(HEADER_BATCH_ID, batchId.toString());
             message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
 
             // Note: We don't cache the default From and BCC addresses because they can be modified at runtime

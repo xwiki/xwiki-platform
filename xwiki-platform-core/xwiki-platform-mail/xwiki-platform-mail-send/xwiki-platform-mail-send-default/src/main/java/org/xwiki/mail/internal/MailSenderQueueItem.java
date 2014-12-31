@@ -44,22 +44,26 @@ public class MailSenderQueueItem
 
     private long threadId;
 
-    private UUID batchID;
+    private UUID batchId;
+
+    private String wikiId;
 
     /**
      * @param messages see {@link #getMessages()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
-     * @param batchID see {@link #getBatchID()}
+     * @param batchId see {@link #getBatchId()}
+     * @param wikiId see {@link #getWikiId()}
      */
     public MailSenderQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
-        UUID batchID)
+        UUID batchId, String wikiId)
     {
         this.messages = messages;
         this.session = session;
         this.listener = listener;
-        this.batchID = batchID;
+        this.batchId = batchId;
         this.threadId = Thread.currentThread().getId();
+        this.wikiId = wikiId;
     }
 
     /**
@@ -98,16 +102,25 @@ public class MailSenderQueueItem
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("batchID", this.batchID);
+        builder.append("batchId", this.batchId);
         builder.append("threadId", getThreadId());
+        builder.append("wikiId", getWikiId());
         return builder.toString();
     }
 
     /**
      * @return the UUID of the batch
      */
-    public UUID getBatchID()
+    public UUID getBatchId()
     {
-        return this.batchID;
+        return this.batchId;
+    }
+
+    /**
+     * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message
+     */
+    public String getWikiId()
+    {
+        return this.wikiId;
     }
 }

@@ -58,8 +58,8 @@ public class DatabaseMailListener implements MailListener
     @Override
     public void onPrepare(MimeMessage message)
     {
-        final MailStatus result = new MailStatus(getMessageID(message));
-        result.setBatchID(getMessageBatchID(message));
+        final MailStatus result = new MailStatus(getMessageId(message));
+        result.setBatchId(getMessageBatchId(message));
         result.setState(MailState.READY);
         saveStatus(result);
     }
@@ -67,15 +67,15 @@ public class DatabaseMailListener implements MailListener
     @Override
     public void onSuccess(MimeMessage message)
     {
-        String messageID = getMessageID(message);
-        MailStatus status = getMailStatus(messageID);
+        String messageId = getMessageId(message);
+        MailStatus status = getMailStatus(messageId);
         if (status != null) {
             // If the mail has previously failed to be sent, then remove it from the file system since it has now
             // succeeded!
             if (status.getState().equals(MailState.FAILED.toString())) {
-                String batchID = getMessageBatchID(message);
+                String batchId = getMessageBatchId(message);
                 try {
-                    this.mailContentStore.delete(batchID, messageID);
+                    this.mailContentStore.delete(batchId, messageId);
                 } catch (MailStoreException e) {
                     // Failed to delete saved mail, raise a warning but continue since it's not critical
                     this.logger.warn("Failed to remove previously failing message from the file system. Reason [{}]. "
@@ -90,8 +90,8 @@ public class DatabaseMailListener implements MailListener
     @Override
     public void onError(MimeMessage message, Exception exception)
     {
-        String messageID = getMessageID(message);
-        MailStatus status = getMailStatus(messageID);
+        String messageId = getMessageId(message);
+        MailStatus status = getMailStatus(messageId);
         if (status != null) {
             // Since there's been an error, we save the message to the file system so that it can be resent later on
             // if need be.
@@ -111,7 +111,7 @@ public class DatabaseMailListener implements MailListener
         }
     }
 
-    private String getMessageID(MimeMessage message)
+    private String getMessageId(MimeMessage message)
     {
         try {
             return message.getHeader("X-MailID", null);
@@ -121,7 +121,7 @@ public class DatabaseMailListener implements MailListener
         }
     }
 
-    private String getMessageBatchID(MimeMessage message)
+    private String getMessageBatchId(MimeMessage message)
     {
         try {
             return message.getHeader("X-BatchID", null);
@@ -131,14 +131,14 @@ public class DatabaseMailListener implements MailListener
         }
     }
 
-    private MailStatus getMailStatus(String messageID)
+    private MailStatus getMailStatus(String messageId)
     {
         MailStatus status;
         try {
-            status = this.mailStatusStore.load(messageID);
+            status = this.mailStatusStore.load(messageId);
         } catch (MailStoreException e) {
             // Failed to load the status in the DB, we continue but log an error
-            this.logger.error("Failed to load mail status for message id [{}] from the database", messageID, e);
+            this.logger.error("Failed to load mail status for message id [{}] from the database", messageId, e);
             status = null;
         }
         return status;

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -35,11 +36,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -48,6 +51,8 @@ import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -55,10 +60,12 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -72,9 +79,7 @@ import static org.mockito.Mockito.mock;
     DefaultExecution.class,
     ContextComponentManagerProvider.class,
     DefaultMimeBodyPartFactory.class,
-    MemoryMailListener.class,
-    DefaultExecutionContextManager.class,
-    DefaultExecution.class
+    MemoryMailListener.class
 })
 public class ScriptingIntegrationTest
 {
@@ -96,6 +101,16 @@ public class ScriptingIntegrationTest
         // Register a test Permission Checker that allows sending mails
         ScriptServicePermissionChecker checker = mock(ScriptServicePermissionChecker.class);
         this.componentManager.registerComponent(ScriptServicePermissionChecker.class, "test", checker);
+
+        // Set the current wiki in the Context
+        ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
+        Mockito.when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
+
+        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+
+        this.componentManager.registerMockComponent(ExecutionContextManager.class);
     }
 
     @Before
@@ -125,10 +140,10 @@ public class ScriptingIntegrationTest
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         String hint = "memory";
         List<MimeMessageWrapper> messagesList = Arrays.asList(message, message, message);
-        UUID batchID = this.scriptService.sendAsynchronously(messagesList, hint);
+        UUID batchId = this.scriptService.sendAsynchronously(messagesList, hint);
 
         // Verify that there are no errors
-        assertNull(this.scriptService.getErrors(batchID));
+        assertNull(this.scriptService.getErrors(batchId));
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
@@ -184,10 +199,10 @@ public class ScriptingIntegrationTest
             Collections.<String, Object>singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
-        UUID batchID = this.scriptService.send(Arrays.asList(message), "memory");
+        UUID batchId = this.scriptService.send(Arrays.asList(message), "memory");
 
         // Verify that there are no errors
-        assertNull(this.scriptService.getErrors(batchID));
+        assertNull(this.scriptService.getErrors(batchId));
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

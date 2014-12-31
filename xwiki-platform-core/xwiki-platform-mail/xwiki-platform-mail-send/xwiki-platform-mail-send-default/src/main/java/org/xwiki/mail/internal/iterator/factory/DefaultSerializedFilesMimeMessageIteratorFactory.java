@@ -47,11 +47,11 @@ public class DefaultSerializedFilesMimeMessageIteratorFactory implements Seriali
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    @Override public Iterator<MimeMessage> create(UUID batchID, Map<String, Object> parameters)
+    @Override public Iterator<MimeMessage> create(UUID batchId, Map<String, Object> parameters)
         throws MessagingException
     {
         ComponentManager cm = componentManagerProvider.get();
-        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchID, parameters, cm);
+        SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchId, parameters, cm);
         return iterator;
     }
 }

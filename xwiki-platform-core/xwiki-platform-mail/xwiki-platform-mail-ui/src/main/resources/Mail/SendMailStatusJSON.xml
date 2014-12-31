@@ -86,9 +86,9 @@
 ## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
 
 #set($filterQuery = '')
-#set($filterId = "$!{request.get(messageID)}")
+#set($filterId = "$!{request.get(messageId)}")
 #if("$!{filterId}" != '')
-  #set($filterQuery = "and status.messageID like '%${filterId.trim()}%' ")
+  #set($filterQuery = "and status.messageId like '%${filterId.trim()}%' ")
 #end
 
 #set($filterRecipients = "$!{request.get(recipients)}")
@@ -103,7 +103,7 @@
 
 #set($totalrows = $services.query.xwql("from MailStatus as status").count())
 #set($results = [])
-#set($xwql = "from MailStatus as status where status.messageID&lt;&gt;'' $!filterQuery order by status.date $!orderDirection")
+#set($xwql = "from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.date $!orderDirection")
 #set($results = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).execute())
 ## ===
 ## JSON
@@ -123,11 +123,11 @@
     {
       "doc_viewable" : true,
       "date" : "$status.date",
-      "batchID" : "$status.batchID",
+      "batchId" : "$status.batchId",
       "recipients" : "$escapetool.javascript($status.recipients)",
       "state" : "$status.state",
       "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
-              &lt;input name='mail_id' value='$status.messageID' type='hidden'/&gt;
+              &lt;input name='mail_id' value='$status.messageId' type='hidden'/&gt;
               &lt;span class='buttonwrapper'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='button' type='submit'&gt;&lt;/span&gt;
             &lt;/form&gt;")}"
     }

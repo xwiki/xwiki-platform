@@ -58,58 +58,58 @@ public class FileSystemMailContentStore implements MailContentStore
     @Override
     public void save(MimeMessage message) throws MailStoreException
     {
-        String messageID = null;
-        String batchID = null;
+        String messageId = null;
+        String batchId = null;
         File batchDirectory = null;
         try {
-            messageID = message.getHeader("X-MailID", null);
-            batchID = message.getHeader("X-BatchID", null);
-            batchDirectory = getBatchDirectory(batchID);
+            messageId = message.getHeader("X-MailID", null);
+            batchId = message.getHeader("X-BatchID", null);
+            batchDirectory = getBatchDirectory(batchId);
             batchDirectory.mkdirs();
-            File file = new File(batchDirectory, messageID);
+            File file = new File(batchDirectory, messageId);
             OutputStream os = new FileOutputStream(file);
             message.writeTo(os);
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to save message (id [%s], batch id [%s]) to the file system at [%s]",
-                messageID, batchID, batchDirectory), e);
+                messageId, batchId, batchDirectory), e);
         }
     }
 
     @Override
-    public MimeMessage load(Session session, String batchID, String messageID) throws MailStoreException
+    public MimeMessage load(Session session, String batchId, String messageId) throws MailStoreException
     {
         File batchDirectory = null;
         try {
-            batchDirectory = getBatchDirectory(batchID);
-            File file = new File(batchDirectory, messageID);
+            batchDirectory = getBatchDirectory(batchId);
+            File file = new File(batchDirectory, messageId);
             InputStream is = new FileInputStream(file);
             MimeMessage message = new MimeMessage(session, is);
             return message;
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to load message (id [%s], batch id [%s]) from the file system at [%s]",
-                messageID, batchID, batchDirectory), e);
+                messageId, batchId, batchDirectory), e);
         }
     }
 
     @Override
-    public void delete(String batchID, String messageID) throws MailStoreException
+    public void delete(String batchId, String messageId) throws MailStoreException
     {
         File batchDirectory = null;
         try {
-            batchDirectory = getBatchDirectory(batchID);
-            File file = new File(batchDirectory, messageID);
+            batchDirectory = getBatchDirectory(batchId);
+            File file = new File(batchDirectory, messageId);
             file.delete();
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to delete message (id [%s], batch id [%s]) from the file system at [%s]",
-                messageID, batchID, batchDirectory), e);
+                messageId, batchId, batchDirectory), e);
         }
     }
 
-    private File getBatchDirectory(String batchID)
+    private File getBatchDirectory(String batchId)
     {
-        return new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchID);
+        return new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchId);
     }
 }

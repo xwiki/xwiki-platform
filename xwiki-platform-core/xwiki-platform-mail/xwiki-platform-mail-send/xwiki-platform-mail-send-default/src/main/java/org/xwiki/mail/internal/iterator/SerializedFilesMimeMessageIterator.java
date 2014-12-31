@@ -55,12 +55,12 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
     private File batchDirectory;
 
     /**
-     * @param batchID the name of the directory that contains serialized MimeMessages
+     * @param batchId the name of the directory that contains serialized MimeMessages
      * @param parameters the parameters from which to extract the session
      * @param componentManager used to dynamically load components
      * @throws MessagingException when an error occurs when retrieving messages
      */
-    public SerializedFilesMimeMessageIterator(UUID batchID, Map<String, Object> parameters,
+    public SerializedFilesMimeMessageIterator(UUID batchId, Map<String, Object> parameters,
         ComponentManager componentManager) throws MessagingException
     {
         this.componentManager = componentManager;
@@ -70,7 +70,7 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
             throw new MessagingException("Failed to find default Environment", e);
         }
         this.batchDirectory =
-            new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchID.toString());
+            new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchId.toString());
         this.files = this.batchDirectory.listFiles();
         this.iteratorSize = this.files.length;
         this.parameters = parameters;

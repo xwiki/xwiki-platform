@@ -26,11 +26,11 @@
 <hibernate-mapping auto-import="true">
 
   <class name="org.xwiki.mail.MailStatus" table="mailstream_events">
-    <id name="messageID" type="string" unsaved-value="any">
+    <id name="messageId" type="string" unsaved-value="any">
       <column name="mail_id" not-null="true" />
       <generator class="assigned" />
     </id>
-    <property name="batchID" type="string" column="mail_batchid" length="255" index="MAIL_BATCH_ID" />
+    <property name="batchId" type="string" column="mail_batchid" length="255" index="MAIL_BATCH_ID" />
     <property name="state" type="string" column="mail_state" length="255" index="MAIL_STATUS" />
     <property name="date" type="timestamp" column="mail_date" index="MAIL_DATE" />
     <property name="recipients" type="string" column="mail_recipients" length="2000" index="MAIL_RECIPIENT" />

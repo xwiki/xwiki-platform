@@ -71,26 +71,26 @@ public class FileSystemMailContentStoreTest
         Environment environment = this.mocker.getInstance(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
-        String batchID = UUID.randomUUID().toString();
-        String mailID = UUID.randomUUID().toString();
+        String batchId = UUID.randomUUID().toString();
+        String mailId = UUID.randomUUID().toString();
 
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setHeader("X-BatchID", batchID);
-        message.setHeader("X-MailID", mailID);
+        message.setHeader("X-BatchID", batchId);
+        message.setHeader("X-MailID", mailId);
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
         this.mocker.getComponentUnderTest().save(message);
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchID);
-        File messageFile = new File(batchDirectory, mailID);
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchId);
+        File messageFile = new File(batchDirectory, mailId);
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in);
 
-        assertTrue(messageContent.contains("X-BatchID: " + batchID));
-        assertTrue(messageContent.contains("X-MailID: " + mailID));
+        assertTrue(messageContent.contains("X-BatchID: " + batchId));
+        assertTrue(messageContent.contains("X-MailID: " + mailId));
         assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
     }
 
@@ -100,14 +100,14 @@ public class FileSystemMailContentStoreTest
         Environment environment = this.mocker.getInstance(Environment.class);
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
-        String batchID = UUID.randomUUID().toString();
-        String mailID = UUID.randomUUID().toString();
+        String batchId = UUID.randomUUID().toString();
+        String mailId = UUID.randomUUID().toString();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchID);
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchId);
         batchDirectory.mkdirs();
-        File messageFile = new File(batchDirectory, mailID);
+        File messageFile = new File(batchDirectory, mailId);
         messageFile.createNewFile();
 
         String newLine = System.getProperty("line.separator");
@@ -118,16 +118,16 @@ public class FileSystemMailContentStoreTest
         fileWriter.append("MIME-Version: 1.0" + newLine);
         fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
         fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
-        fileWriter.append("X-MailID: " + mailID + newLine);
-        fileWriter.append("X-BatchID: " + batchID + newLine + newLine);
+        fileWriter.append("X-MailID: " + mailId + newLine);
+        fileWriter.append("X-BatchID: " + batchId + newLine + newLine);
         fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         fileWriter.close();
 
         Session session = Session.getInstance(new Properties());
-        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchID, mailID);
+        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, mailId);
 
-        assertEquals(batchID, message.getHeader("X-BatchID", null));
-        assertEquals(mailID, message.getHeader("X-MailID", null));
+        assertEquals(batchId, message.getHeader("X-BatchID", null));
+        assertEquals(mailId, message.getHeader("X-MailID", null));
         assertEquals("Lorem ipsum dolor sit amet, consectetur adipiscing elit", message.getContent());
     }
 }

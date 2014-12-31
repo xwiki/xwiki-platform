@@ -79,7 +79,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public MailStatus load(final String messageID) throws MailStoreException
+    public MailStatus load(final String messageId) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
         try {
@@ -89,7 +89,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     @Override public MailStatus doInHibernate(Session session) throws HibernateException, XWikiException
                     {
                         Query query = session.createQuery(FROM_QUERY + " where mail_id=:id");
-                        query.setParameter("id", messageID);
+                        query.setParameter("id", messageId);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         if (!queryResult.isEmpty()) {
                             return queryResult.get(0);
@@ -99,12 +99,12 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 });
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to load mail status for message [%s] from the database.",
-                messageID), e);
+                messageId), e);
         }
     }
 
     @Override
-    public List<MailStatus> load(final String batchID, final MailState state) throws MailStoreException
+    public List<MailStatus> load(final String batchId, final MailState state) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
         try {
@@ -116,14 +116,14 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query =
                             session.createQuery(FROM_QUERY + " where mail_batchid=:batchid an mail_status=:state");
-                        query.setParameter("batchid", batchID).setParameter("state", state);
+                        query.setParameter("batchid", batchId).setParameter("state", state);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
                     }
                 });
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to load mail statuses "
-                + "(for batch id [%s] and state [%s]) from the database.", batchID, state), e);
+                + "(for batch id [%s] and state [%s]) from the database.", batchId, state), e);
         }
     }
 }

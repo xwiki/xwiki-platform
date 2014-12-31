@@ -47,19 +47,19 @@ public interface MailContentStore
      * Load message from the store.
      *
      * @param session the JavaMail session used to send the mail
-     * @param batchID the batch id of the message that was originally saved
-     * @param messageID the id of the message that was originally saved
+     * @param batchId the batch id of the message that was originally saved
+     * @param messageId the id of the message that was originally saved
      * @return the MimeMessage instance deserialized from the store
      * @throws MailStoreException when an error occurs when loading the message from the store
      */
-    MimeMessage load(Session session, String batchID, String messageID) throws MailStoreException;
+    MimeMessage load(Session session, String batchId, String messageId) throws MailStoreException;
 
     /**
      * Remove a message from the store.
      *
-     * @param batchID the batch id of the message that was originally saved
-     * @param messageID the id of the message that was originally saved
+     * @param batchId the batch id of the message that was originally saved
+     * @param messageId the id of the message that was originally saved
      * @throws MailStoreException when an error occurs when deleting the message from the store
      */
-    void delete(String batchID, String messageID) throws MailStoreException;
+    void delete(String batchId, String messageId) throws MailStoreException;
 }

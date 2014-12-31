@@ -49,10 +49,10 @@
 ##
 ## Livetable #
 ##
-#set($columns = ["date", "batchID", "recipients", "state", "actions"])
+#set($columns = ["date", "batchId", "recipients", "state", "actions"])
 #set($columnsProperties = {
     "date" : { 'type' : 'date' },
-    "batchID" : { "type" : "text"},
+    "batchId" : { "type" : "text"},
     "recipients" : { "type" : "text" , "html" : "true"},
     "state" : { "type" : "text", "size" : 8},
     "actions" : { "type" : "text", "html" : "true", "size" : 8, "filterable" : "false", "sortable" : "false"}

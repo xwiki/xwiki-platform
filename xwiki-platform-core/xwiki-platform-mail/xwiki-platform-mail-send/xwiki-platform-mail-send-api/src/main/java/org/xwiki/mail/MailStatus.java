@@ -38,9 +38,9 @@ import org.xwiki.text.XWikiToStringBuilder;
 public class MailStatus
 {
     /**
-     * @see #getMessageID()
+     * @see #getMessageId()
      */
-    private String messageID;
+    private String messageId;
 
     /*
      * @see #getState()
@@ -50,7 +50,7 @@ public class MailStatus
     /*
      * @see #getBatchID()
      */
-    private String batchID;
+    private String batchId;
 
     /*
      * @see #getDate()
@@ -75,23 +75,23 @@ public class MailStatus
     /**
      * Constructor initializing the MailStatus with the MimeMessage ID.
      *
-     * @param messageID the id of Message
+     * @param messageId the id of Message
      */
-    public MailStatus(String messageID)
+    public MailStatus(String messageId)
     {
-        this.messageID = messageID;
+        this.messageId = messageId;
         setDate(new Date());
     }
 
     /**
      * Constructor initializing the MailStatus with the MimeMessage ID and root cause message of exception.
      *
-     * @param messageID see {@link #getMessageID()}
+     * @param messageId see {@link #getMessageId()}
      * @param error see {@link #getError()}
      */
-    public MailStatus(String messageID, String error)
+    public MailStatus(String messageId, String error)
     {
-        this.messageID = messageID;
+        this.messageId = messageId;
         setError(error);
         setDate(new Date());
     }
@@ -99,12 +99,12 @@ public class MailStatus
     /**
      * Constructor initializing the MailStatus with the MimeMessage ID the exception.
      *
-     * @param messageID the id of Message
+     * @param messageId the id of Message
      * @param exception the exception that was encountered during sending mail
      */
-    public MailStatus(String messageID, Exception exception)
+    public MailStatus(String messageId, Exception exception)
     {
-        this.messageID = messageID;
+        this.messageId = messageId;
         setError(exception);
         setDate(new Date());
     }
@@ -123,17 +123,17 @@ public class MailStatus
     /**
      * @return the MimeMessage ID
      */
-    public String getMessageID()
+    public String getMessageId()
     {
-        return this.messageID;
+        return this.messageId;
     }
 
     /**
-     * @param messageID see {@link #getMessageID()}
+     * @param messageId see {@link #getMessageId()}
      */
-    public void setMessageID(String messageID)
+    public void setMessageId(String messageId)
     {
-        this.messageID = messageID;
+        this.messageId = messageId;
     }
 
     /**
@@ -156,17 +156,17 @@ public class MailStatus
     /**
      * @return the ID of the batch mail sender
      */
-    public String getBatchID()
+    public String getBatchId()
     {
-        return this.batchID;
+        return this.batchId;
     }
 
     /**
-     * @param batchID the ID of the batch mail sender
+     * @param batchId the ID of the batch mail sender
      */
-    public void setBatchID(String batchID)
+    public void setBatchId(String batchId)
     {
-        this.batchID = batchID;
+        this.batchId = batchId;
     }
 
     /**
@@ -245,8 +245,8 @@ public class MailStatus
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("messageID", getMessageID());
-        builder.append("batchID", getBatchID());
+        builder.append("messageId", getMessageId());
+        builder.append("batchId", getBatchId());
         builder.append("state", getState());
         builder.append("date", getDate());
         builder.append("recipients", getRecipients());

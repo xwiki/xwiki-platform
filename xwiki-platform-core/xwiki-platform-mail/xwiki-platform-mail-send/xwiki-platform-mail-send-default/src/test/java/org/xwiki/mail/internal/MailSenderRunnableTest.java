@@ -25,21 +25,26 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.inject.Provider;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.MailSenderRunnable}.
@@ -48,8 +53,7 @@ import static org.junit.Assert.assertTrue;
  * @since 6.1RC1
  */
 @ComponentList({
-    MemoryMailListener.class,
-    DefaultExecution.class
+    MemoryMailListener.class
 })
 public class MailSenderRunnableTest
 {
@@ -58,11 +62,20 @@ public class MailSenderRunnableTest
 
     private MailSenderConfiguration configuration;
 
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    private ExecutionContextManager executionContextManager;
+
     @BeforeComponent
     public void setUpComponents() throws Exception
     {
         this.configuration = this.componentManager.registerMockComponent(MailSenderConfiguration.class);
-//        this.componentManager.registerMockComponent(ExecutionContextManager.class);
+
+        this.xwikiContextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(this.xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+
+        this.executionContextManager = this.componentManager.registerMockComponent(ExecutionContextManager.class);
     }
 
     @Test
@@ -76,8 +89,8 @@ public class MailSenderRunnableTest
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
         MemoryMailListener listener = this.componentManager.getInstance(MailListener.class, "memory");
-        UUID batchID = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchID);
+        UUID batchId = UUID.randomUUID();
+        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchId, "wiki");
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 
@@ -86,7 +99,8 @@ public class MailSenderRunnableTest
         mailQueue.add(item);
         mailQueue.add(item);
 
-        MailSenderRunnable runnable = new MailSenderRunnable(this.configuration, mailQueue);
+        MailSenderRunnable runnable = new MailSenderRunnable(mailQueue, this.configuration, this.xwikiContextProvider,
+            this.executionContextManager);
         Thread thread = new Thread(runnable);
         thread.start();
 

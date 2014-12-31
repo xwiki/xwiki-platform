@@ -143,17 +143,11 @@ public class MailSenderScriptService implements ScriptService
     public Iterator<? extends MimeMessage> createMessages(String hint, Object source, String factoryHint,
         Map<String, Object> parameters)
     {
-        MimeMessageFactory factory;
         try {
-            factory = getMimeMessageFactory(factoryHint, parameters.get("source").getClass());
-        } catch (ComponentLookupException e) {
-            setError(e);
-            return null;
-        }
-        try {
+            MimeMessageFactory factory = getMimeMessageFactory(factoryHint, parameters.get("source").getClass());
             MimeMessageIteratorFactory iteratorFactory = new MimeMessageIteratorFactory();
-            return
-                iteratorFactory.createIterator(hint, source, factory, parameters, this.componentManagerProvider.get());
+            return iteratorFactory.createIterator(hint, source, factory, parameters,
+                this.componentManagerProvider.get());
         } catch (Exception e) {
             setError(e);
             return null;

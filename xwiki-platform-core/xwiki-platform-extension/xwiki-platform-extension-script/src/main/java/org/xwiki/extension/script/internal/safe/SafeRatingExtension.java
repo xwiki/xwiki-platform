@@ -19,20 +19,21 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingExtension;
+import org.xwiki.extension.wrap.WrappingRatingExtension;
 
 /**
- * Provide a public script access to an extension.
+ * Provide a public script access to a rating extension.
  * 
  * @param <T> the extension type
  * @version $Id$
- * @since 4.0M2
+ * @since 6.4M3
  */
-public class SafeExtension<T extends Extension> extends WrappingExtension<T>
+public class SafeRatingExtension<T extends RatingExtension> extends WrappingRatingExtension<T> implements
+    RatingExtension
 {
     /**
      * The provider of instances safe for public scripts.
@@ -40,12 +41,12 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     private ScriptSafeProvider<Object> safeProvider;
 
     /**
-     * @param extension the wrapped extension
+     * @param ratingExtension the wrapped rating extension
      * @param safeProvider the provider of instances safe for public scripts
      */
-    public SafeExtension(T extension, ScriptSafeProvider<Object> safeProvider)
+    public SafeRatingExtension(T ratingExtension, ScriptSafeProvider<Object> safeProvider)
     {
-        super(extension);
+        super(ratingExtension);
 
         this.safeProvider = safeProvider;
     }
@@ -65,7 +66,7 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     @Override
     public ExtensionFile getFile()
     {
-        return safe(super.getRepository());
+        return safe(super.getFile());
     }
 
     @Override

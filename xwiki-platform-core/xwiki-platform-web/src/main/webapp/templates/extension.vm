@@ -165,7 +165,7 @@
 #end
 
 #macro (displayExtensionRating $extension)
-  #set ($rating = $services.extension.rating.getRating($extension.id))
+  #set ($rating = $extension.getRating())
   #if ($rating != $NULL)
     #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
     <div class="extension-rating">

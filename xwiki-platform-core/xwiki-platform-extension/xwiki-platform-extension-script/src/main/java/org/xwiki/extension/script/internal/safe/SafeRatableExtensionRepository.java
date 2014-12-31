@@ -20,21 +20,23 @@
 package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.extension.rating.ExtensionRating;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.SearchException;
-import org.xwiki.extension.repository.search.Searchable;
+import org.xwiki.extension.repository.rating.Ratable;
+import org.xwiki.extension.version.Version;
 
 /**
- * Provide a public script access to a {@link Searchable} extension repository.
+ * Provide a public script access to a ratable extension repository.
  * 
- * @param <T>
+ * @param <T> the extension type
  * @version $Id$
+ * @since 6.4M3
  */
-public class SafeSearchableExtensionRepository<T extends ExtensionRepository> extends SafeExtensionRepository<T>
-    implements Searchable
+public class SafeRatableExtensionRepository<T extends ExtensionRepository> extends SafeSearchableExtensionRepository<T>
+    implements Ratable
 {
     /**
      * @param repository wrapped repository
@@ -42,25 +44,29 @@ public class SafeSearchableExtensionRepository<T extends ExtensionRepository> ex
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeSearchableExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeRatableExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
-    // Searchable
-    
+    // Ratable
+
     @Override
-    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
+    public ExtensionRating getRating(ExtensionId extensionId) throws ResolveException
     {
-        setError(null);
+        return safe(((Ratable) getWrapped()).getRating(extensionId));
+    }
 
-        try {
-            return safe(((Searchable) getWrapped()).search(pattern, offset, nb));
-        } catch (Exception e) {
-            setError(e);
-        }
+    @Override
+    public ExtensionRating getRating(String extensionId, Version extensionVersion) throws ResolveException
+    {
+        return safe(((Ratable) getWrapped()).getRating(extensionId, extensionVersion));
+    }
 
-        return null;
+    @Override
+    public ExtensionRating getRating(String extensionId, String extensionVersion) throws ResolveException
+    {
+        return safe(((Ratable) getWrapped()).getRating(extensionId, extensionVersion));
     }
 }

@@ -19,58 +19,47 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionFile;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingExtension;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.search.Searchable;
 
 /**
- * Provide a public script access to an extension.
+ * Provide a public script access to a {@link Searchable} ratable extension repository.
  * 
- * @param <T> the extension type
+ * @param <T>
  * @version $Id$
- * @since 4.0M2
+ * @since 6.4M3
  */
-public class SafeExtension<T extends Extension> extends WrappingExtension<T>
+public class SafeSearchableRatableExtensionRepository<T extends ExtensionRepository> extends
+    SafeRatableExtensionRepository<T> implements Searchable
 {
     /**
-     * The provider of instances safe for public scripts.
-     */
-    private ScriptSafeProvider<Object> safeProvider;
-
-    /**
-     * @param extension the wrapped extension
+     * @param repository wrapped repository
      * @param safeProvider the provider of instances safe for public scripts
+     * @param execution provide access to the current context
+     * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeExtension(T extension, ScriptSafeProvider<Object> safeProvider)
+    public SafeSearchableRatableExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider,
+        Execution execution, boolean hasProgrammingRight)
     {
-        super(extension);
-
-        this.safeProvider = safeProvider;
-    }
-
-    /**
-     * @param <S> the type of the object
-     * @param unsafe the unsafe object
-     * @return the safe version of the object
-     */
-    protected <S> S safe(Object unsafe)
-    {
-        return this.safeProvider.get(unsafe);
-    }
-
-    // Extension
-
-    @Override
-    public ExtensionFile getFile()
-    {
-        return safe(super.getRepository());
+        super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     @Override
-    public ExtensionRepository getRepository()
+    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        return safe(super.getRepository());
+        setError(null);
+
+        try {
+            return safe(((Searchable) getWrapped()).search(pattern, offset, nb));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
     }
 }

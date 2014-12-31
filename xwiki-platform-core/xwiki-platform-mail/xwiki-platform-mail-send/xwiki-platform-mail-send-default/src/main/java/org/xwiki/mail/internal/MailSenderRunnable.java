@@ -184,6 +184,9 @@ public class MailSenderRunnable implements Runnable
             message.setHeader(HEADER_BATCH_ID, batchID.toString());
             message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
 
+            // Note: We don't cache the default From and BCC addresses because they can be modified at runtime
+            // (from the Admin UI for example) and we need to always get the latest configured values.
+
             // If the user has not set the From header then use the default value from configuration and if it's not
             // set then raise an error since a message must have a from set!
             // Perform some basic verification to avoid NPEs in JavaMail

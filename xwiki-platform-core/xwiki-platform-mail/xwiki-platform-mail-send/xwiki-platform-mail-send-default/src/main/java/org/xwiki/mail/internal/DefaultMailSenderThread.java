@@ -19,6 +19,9 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 
 import javax.inject.Inject;
@@ -33,6 +36,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.event.EmailErrorEvent;
+import org.xwiki.mail.event.EmailSendingEvent;
+import org.xwiki.mail.event.EmailSentEvent;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * Thread that regularly check for mails on a Queue, and for each mail tries to send it.
@@ -47,6 +54,8 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     @Inject
     private Logger logger;
 
+    @Inject
+    private ObservationManager observationManager;
     /**
      * The queue containing mails to send.
      */
@@ -125,8 +134,13 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     protected void sendMail(MailSenderQueueItem item)
     {
         MimeMessage message = item.getMessage();
-        MailResultListener listener = item.getListener();
+        //Data to be passed to the events
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("date", new Date());
+        //send event when the mail is ready te be send
+        this.observationManager.notify(new EmailSendingEvent(), message, eventData);
 
+        MailResultListener listener = item.getListener();
         try {
             // Step 1: If the current Session in use is different from the one passed then close the current Transport,
             // get a new one and reconnect. Also do that every 100 mails sent.
@@ -145,6 +159,9 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             this.currentTransport.sendMessage(message, message.getAllRecipients());
             this.count++;
 
+            eventData.put("date", new Date());
+            //send event when the mail is sent
+            this.observationManager.notify(new EmailSentEvent(), message, eventData);
             // Step 3: Notify the user of the success if a listener has been provided
             if (listener != null) {
                 listener.onSuccess(message);
@@ -154,6 +171,9 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             if (listener != null) {
                 listener.onError(message, e);
             }
+            eventData.put("date", new Date());
+            //send event when failing to send mail
+            this.observationManager.notify(new EmailErrorEvent(), message, eventData);
         }
     }
 

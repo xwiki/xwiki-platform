@@ -3276,6 +3276,11 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * Check whether a user is authenticated.
+     *
+     * @see XWikiAuthService#checkAuth(XWikiContext)
+     */
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
         return getAuthService().checkAuth(context);

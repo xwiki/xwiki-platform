@@ -207,7 +207,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
 
                 if ((user == null) && (needsAuth)) {
-                    logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
+                    logDeny("unauthenticated", doc.getFullName(), action, "Authentication needed");
                     if (context.getRequest() != null) {
                         if (!context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                             context.getWiki().getAuthService().showLogin(context);
@@ -262,7 +262,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         if (user == null) {
             // Denied Guest need to be authenticated
-            logDeny("unauthentified", doc.getFullName(), action, "Guest has been denied");
+            logDeny("unauthenticated", doc.getFullName(), action, "Guest has been denied");
             if (context.getRequest() != null
                 && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                 context.getWiki().getAuthService().showLogin(context);

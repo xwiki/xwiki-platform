@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.gwt.api.server;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -803,12 +804,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     {
         try {
             XWikiContext context = getXWikiContext();
-            XWikiUser user =
-                context.getWiki().getAuthService().checkAuth(username, password, rememberme ? "yes" : "no", context);
-            if (user == null)
-                return "XWiki.XWikiGuest";
-            else
-                return user.getUser();
+            Principal principal = context.getWiki().getAuthService().authenticate(username, password, context);
+            return (principal != null) ? principal.getName() : "XWiki.XWikiGuest";
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }

@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
@@ -139,9 +140,9 @@ public class DefaultWikiComponentManagerEventListener implements EventListener
                     for (WikiComponent component : components) {
                         this.wikiComponentManager.registerWikiComponent(component);
                     }
-                } catch (WikiComponentException e) {
+                } catch (Exception e) {
                     this.logger.warn("Failed to register the wiki component located in the document [{}]: {}",
-                        reference, e.getMessage());
+                        reference, ExceptionUtils.getRootCauseMessage(e));
                 }
             }
         }

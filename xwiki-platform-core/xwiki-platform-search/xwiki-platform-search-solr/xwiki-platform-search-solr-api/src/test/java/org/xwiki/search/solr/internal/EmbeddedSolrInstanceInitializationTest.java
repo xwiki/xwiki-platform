@@ -73,12 +73,6 @@ public class EmbeddedSolrInstanceInitializationTest
         this.mockXWikiProperties = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
     }
 
-    @After
-    public void tearDown() throws Exception
-    {
-        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
-    }
-
     @Test
     public void testInitialization() throws Exception
     {

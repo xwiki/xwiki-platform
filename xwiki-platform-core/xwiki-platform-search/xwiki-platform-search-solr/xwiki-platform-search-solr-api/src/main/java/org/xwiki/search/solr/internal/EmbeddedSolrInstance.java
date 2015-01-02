@@ -21,14 +21,16 @@ package org.xwiki.search.solr.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -167,10 +169,18 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
 
             // Initialize the Solr Home with the default configuration files if the folder does not already exist.
             // Add the configuration files required by Solr.
-            Map<String, URL> homeDirectoryConfiguration = this.solrConfiguration.getHomeDirectoryConfiguration();
-            for (Map.Entry<String, URL> file : homeDirectoryConfiguration.entrySet()) {
-                File destinationFile = new File(solrHomeDirectory, file.getKey());
-                FileUtils.copyURLToFile(file.getValue(), destinationFile);
+
+            InputStream stream = this.solrConfiguration.getHomeDirectoryConfiguration();
+            try (ZipInputStream zstream = new ZipInputStream(stream)) {
+                for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
+                    if (entry.isDirectory()) {
+                        File destinationDirectory = new File(solrHomeDirectory, entry.getName());
+                        destinationDirectory.mkdirs();
+                    } else {
+                        File destinationFile = new File(solrHomeDirectory, entry.getName());
+                        FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), destinationFile);
+                    }
+                }
             }
         }
     }

@@ -24,16 +24,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr</artifactId>
+    <artifactId>xwiki-platform-search-solr-server</artifactId>
     <version>6.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-plugin</artifactId>
-  <name>XWiki Platform - Search - Solr - Plugin</name>
+  <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
+  <name>XWiki Platform - Search - Solr - Server - Plugin</name>
   <description>This module provides various Solr plugins specific to XWiki. See http://wiki.apache.org/solr/SolrPlugins .</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search Plugin</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-search-solr-plugin</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

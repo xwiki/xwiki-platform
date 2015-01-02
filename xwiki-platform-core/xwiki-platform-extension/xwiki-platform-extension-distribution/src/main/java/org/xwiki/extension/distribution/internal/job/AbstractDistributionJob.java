@@ -184,6 +184,9 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     }
                 }
 
+                // Save the status so that we remember the answer even if the DW is stopped before the end
+                this.store.storeAsync(this.status);
+
                 notifyStepPropress();
             }
         } finally {

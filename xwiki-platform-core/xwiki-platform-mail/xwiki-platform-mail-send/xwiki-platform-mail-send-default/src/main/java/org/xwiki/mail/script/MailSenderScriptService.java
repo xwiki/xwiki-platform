@@ -122,7 +122,7 @@ public class MailSenderScriptService implements ScriptService
             }
 
             messageWrapper = new MimeMessageWrapper(extendedMimeMessage, session, this.execution,
-                this.configuration, componentManagerProvider.get());
+                componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -227,7 +227,7 @@ public class MailSenderScriptService implements ScriptService
         Session session = createSession();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
-            this.configuration, this.componentManagerProvider.get());
+            this.componentManagerProvider.get());
 
         try {
             if (from != null) {
@@ -258,7 +258,7 @@ public class MailSenderScriptService implements ScriptService
     }
 
     /**
-     * Send the list of mails synchronously with Memory MailListener.
+     * Send the list of mails synchronously, using a Memory {@link }MailListener} to store the results.
      *
      * @param messages the list of messages that was tried to be sent
      * @return UUID of the Batch mail
@@ -321,9 +321,24 @@ public class MailSenderScriptService implements ScriptService
      */
     private void checkPermissions() throws MessagingException
     {
-        /*
-         * TODO: we need check permissions once, so we can't use ScriptServicePermissionChecker#check(MimeMessage)
-         */
+        // Load the configured permission checker
+        ScriptServicePermissionChecker checker;
+        String hint = this.configuration.getScriptServicePermissionCheckerHint();
+        try {
+            checker = this.componentManagerProvider.get().getInstance(ScriptServicePermissionChecker.class, hint);
+        } catch (ComponentLookupException e) {
+            // Failed to load the user-configured hint, in order not to have a security hole, consider that we're not
+            // authorized to send emails!
+            throw new MessagingException(String.format("Failed to locate Permission Checker [%s]. "
+                + "The mail has not been sent.", hint), e);
+        }
+
+        try {
+            checker.check();
+        } catch (MessagingException e) {
+            throw new MessagingException(String.format("Not authorized by the Permission Checker [%s] to send mail! "
+                + "No mail has been sent.", hint), e);
+        }
     }
 
     /**

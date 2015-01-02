@@ -36,7 +36,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
@@ -55,8 +54,6 @@ public class MimeMessageWrapper extends MimeMessage
 
     private Execution execution;
 
-    private MailSenderConfiguration configuration;
-
     private Session session;
 
     private ExtendedMimeMessage message;
@@ -64,20 +61,18 @@ public class MimeMessageWrapper extends MimeMessage
      * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
-     * @param configuration the mail sender configuration component
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
     // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
     MimeMessageWrapper(ExtendedMimeMessage message, Session session, Execution execution,
-        MailSenderConfiguration configuration, ComponentManager componentManager)
+        ComponentManager componentManager)
     {
         super(session);
         this.message = message;
         this.session = session;
         this.execution = execution;
-        this.configuration = configuration;
         this.componentManager = componentManager;
     }
 
@@ -269,27 +264,5 @@ public class MimeMessageWrapper extends MimeMessage
             }
         }
         return multipart;
-    }
-
-    protected void checkPermissions() throws MessagingException
-    {
-        // Load the configured permission checker
-        ScriptServicePermissionChecker checker;
-        String hint = this.configuration.getScriptServicePermissionCheckerHint();
-        try {
-            checker = this.componentManager.getInstance(ScriptServicePermissionChecker.class, hint);
-        } catch (ComponentLookupException e) {
-            // Failed to load the user-configured hint, in order not to have a security hole, consider that we're not
-            // authorized to send emails!
-            throw new MessagingException(String.format("Failed to locate Permission Checker [%s]. "
-                + "The mail has not been sent.", hint), e);
-        }
-
-        try {
-            checker.check(getMessage());
-        } catch (MessagingException e) {
-            throw new MessagingException(String.format("Not authorized to send mail with subject [%s], using "
-                + "Permission Checker [%s]. The mail has not been sent.", getMessage().getSubject(), hint), e);
-        }
     }
 }

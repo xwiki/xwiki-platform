@@ -22,13 +22,12 @@ package org.xwiki.mail.internal.script;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 
 /**
- * No check is performed and all mails are allowed to be sent. This is useful when setting up XWiki in a secure
+ * No check is performed and mails are allowed to be sent. This is useful when setting up XWiki in a secure
  * environment where we want to allow all users to be able to send emails through the Script Service.
  *
  * @version $Id$
@@ -40,7 +39,7 @@ import org.xwiki.mail.script.ScriptServicePermissionChecker;
 public class AlwaysAllowScriptServicePermissionChecker implements ScriptServicePermissionChecker
 {
     @Override
-    public void check(MimeMessage message) throws MessagingException
+    public void check() throws MessagingException
     {
         // Nothing to do, we always authorize!
     }

@@ -19,33 +19,37 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Arrays;
-import java.util.Properties;
 import java.util.UUID;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import org.xwiki.mail.MailResult;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-/**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
- *
- * @version $Id$
- * @since 6.1RC1
- */
-public class MailSenderQueueItemTest
+public class DefaultMailResult implements MailResult
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
+    private UUID batchId;
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
+    private MailQueueManager mailQueueManager;
+
+    public DefaultMailResult(UUID batchId, MailQueueManager mailQueueManager)
+    {
+        this.batchId = batchId;
+        this.mailQueueManager = mailQueueManager;
+    }
+
+    @Override
+    public void waitTillSent(long timeout)
+    {
+        this.mailQueueManager.waitTillSent(getBatchId(), timeout);
+    }
+
+    @Override
+    public boolean isSent()
+    {
+        return this.mailQueueManager.isSent(getBatchId());
+    }
+
+    @Override
+    public UUID getBatchId()
+    {
+        return this.batchId;
     }
 }

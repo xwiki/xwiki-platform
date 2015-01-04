@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal;
 
 import java.util.Iterator;
-import java.util.Queue;
 import java.util.UUID;
 
 import javax.inject.Provider;
@@ -78,10 +77,7 @@ public class MailSenderRunnable implements Runnable
 
     private ExecutionContextManager executionContextManager;
 
-    /**
-     * The queue containing mails to send.
-     */
-    private Queue<MailSenderQueueItem> mailQueue;
+    private MailQueueManager mailQueueManager;
 
     /**
      * Allows to stop this thread, used in {@link #stopProcessing()}.
@@ -95,15 +91,15 @@ public class MailSenderRunnable implements Runnable
     private int count;
 
     /**
-     * @param mailQueue the queue containing the mails to be sent
+     * @param mailQueueManager the manager to handle mail-sending-queue-related operations
      * @param configuration the mail sender configuration from which we extract default from and BCC email addresses
      * @param xwikiContextProvider used to create a new XWiki Context when sending a mail (to provide isolation)
      * @param executionContextManager used to create a new execution context when sending a mail (to provide isolation)
      */
-    public MailSenderRunnable(Queue<MailSenderQueueItem> mailQueue, MailSenderConfiguration configuration,
+    public MailSenderRunnable(MailQueueManager mailQueueManager, MailSenderConfiguration configuration,
         Provider<XWikiContext> xwikiContextProvider, ExecutionContextManager executionContextManager)
     {
-        this.mailQueue = mailQueue;
+        this.mailQueueManager = mailQueueManager;
         this.configuration = configuration;
         this.xwikiContextProvider = xwikiContextProvider;
         this.executionContextManager = executionContextManager;
@@ -124,14 +120,14 @@ public class MailSenderRunnable implements Runnable
         do {
             try {
                 // Handle next message in the queue
-                if (!this.mailQueue.isEmpty()) {
+                if (this.mailQueueManager.hasMessageToSend()) {
                     // Important: only remove the mail item from the queue after the mail has been sent as
                     // otherwise, MailSender.waitTillSent() may return before the mail is actually sent!
-                    MailSenderQueueItem mailItem = this.mailQueue.peek();
+                    MailSenderQueueItem mailItem = this.mailQueueManager.peekMessage();
                     try {
                         sendMail(mailItem);
                     } finally {
-                        this.mailQueue.remove(mailItem);
+                        this.mailQueueManager.removeMessageFromQueue(mailItem);
                     }
                 }
                 // Make some pause to not overload the server
@@ -174,6 +170,12 @@ public class MailSenderRunnable implements Runnable
         Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
         MailListener listener = item.getListener();
         UUID batchId = item.getBatchId();
+
+// TODO: this is not correct I think, we need to prepare all the mails before sending them as otherwise they'll be in
+// memory till they are sent... and if XWiki crashes they're lost and in any case we won't have any status for them
+// till their turn comes which isn't good!
+// ==> we need to serialize them all and reload them when their turn comes...
+
         while (messages.hasNext()) {
             MimeMessage mimeMessage = messages.next();
             MimeMessage message = initializeMessage(mimeMessage, listener, batchId);

@@ -50,4 +50,26 @@ public enum MailState
     {
         return super.toString().toLowerCase();
     }
+
+    /**
+     * Create a MailState object from a String.
+     *
+     * @param state the state represented as a string
+     * @return the MailState object
+     * @throws java.lang.IllegalArgumentException if the passed stated is invalid
+     */
+    public static MailState parse(String state)
+    {
+        MailState result;
+        if (state.equalsIgnoreCase(READY.toString())) {
+            result = READY;
+        } else if (state.equalsIgnoreCase(SENT.toString())) {
+            result = SENT;
+        } else if (state.equalsIgnoreCase(FAILED.toString())) {
+            result = FAILED;
+        } else {
+            throw new IllegalArgumentException(String.format("Invalid mail state [%s]", state));
+        }
+        return result;
+    }
 }

@@ -19,33 +19,41 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Arrays;
-import java.util.Properties;
+import java.util.Iterator;
 import java.util.UUID;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import org.xwiki.mail.MailState;
+import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusResult;
+import org.xwiki.mail.MailStatusStore;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-/**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
- *
- * @version $Id$
- * @since 6.1RC1
- */
-public class MailSenderQueueItemTest
+public class DatabaseMailStatusResult implements MailStatusResult
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
+    private MailStatusStore mailStatusStore;
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
+    private UUID batchId;
+
+    public DatabaseMailStatusResult(UUID batchId,  MailStatusStore mailStatusStore)
+    {
+        this.batchId = batchId;
+        this.mailStatusStore = mailStatusStore;
+    }
+
+    @Override
+    public long getSize()
+    {
+        return this.mailStatusStore.count(this.batchId);
+    }
+
+    @Override
+    public Iterator<MailStatus> getAll()
+    {
+        return this.mailStatusStore.lo
+    }
+
+    @Override
+    public Iterator<MailStatus> getByState(MailState state)
+    {
+        return null;
     }
 }

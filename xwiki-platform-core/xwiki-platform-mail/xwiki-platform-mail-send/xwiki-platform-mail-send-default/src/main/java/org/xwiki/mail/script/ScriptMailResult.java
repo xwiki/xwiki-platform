@@ -17,35 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.script;
 
-import java.util.Arrays;
-import java.util.Properties;
 import java.util.UUID;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import org.xwiki.mail.MailResult;
+import org.xwiki.mail.MailStatusResult;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-/**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
- *
- * @version $Id$
- * @since 6.1RC1
- */
-public class MailSenderQueueItemTest
+public class ScriptMailResult implements MailResult
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
+    private MailResult wrappedMailResult;
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
+    private MailStatusResult mailStatusResults;
+
+    public ScriptMailResult(MailResult wrappedMailResult, MailStatusResult mailStatusResults)
+    {
+        this.wrappedMailResult = wrappedMailResult;
+        this.mailStatusResults = mailStatusResults;
+    }
+
+    public MailStatusResult getStatusResults()
+    {
+        return this.mailStatusResults;
+    }
+
+    @Override
+    public void waitTillSent(long timeout)
+    {
+        this.wrappedMailResult.waitTillSent(timeout);
+    }
+
+    @Override
+    public boolean isSent()
+    {
+        return this.wrappedMailResult.isSent();
+    }
+
+    @Override
+    public UUID getBatchId()
+    {
+        return this.wrappedMailResult.getBatchId();
     }
 }

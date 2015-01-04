@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 import javax.inject.Provider;
 import javax.mail.BodyPart;
@@ -45,11 +44,13 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
+import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
@@ -62,10 +63,8 @@ import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -138,12 +137,20 @@ public class ScriptingIntegrationTest
         message.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        String hint = "memory";
         List<MimeMessageWrapper> messagesList = Arrays.asList(message, message, message);
-        UUID batchId = this.scriptService.sendAsynchronously(messagesList, hint);
+        ScriptMailResult result = this.scriptService.sendAsynchronously(messagesList, "memory");
 
         // Verify that there are no errors
-        assertNull(this.scriptService.getErrors(batchId));
+        assertNull(this.scriptService.getLastError());
+
+        // Wait for all mails to be sent
+        result.waitTillSent(10000L);
+
+        // Verify that all mails have been sent properly
+        assertFalse("There should not be any failed result!",
+            result.getStatusResults().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any mails in the ready state!",
+            result.getStatusResults().getByState(MailState.READY).hasNext());
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
@@ -199,10 +206,19 @@ public class ScriptingIntegrationTest
             Collections.<String, Object>singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
-        UUID batchId = this.scriptService.send(Arrays.asList(message), "memory");
+        ScriptMailResult result = this.scriptService.send(Arrays.asList(message));
 
         // Verify that there are no errors
-        assertNull(this.scriptService.getErrors(batchId));
+        assertNull(this.scriptService.getLastError());
+
+        // Wait for all mails to be sent
+        result.waitTillSent(10000L);
+
+        // Verify that all mails have been sent properly
+        assertFalse("There should not be any failed result!",
+            result.getStatusResults().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any mails in the ready state!",
+            result.getStatusResults().getByState(MailState.READY).hasNext());
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

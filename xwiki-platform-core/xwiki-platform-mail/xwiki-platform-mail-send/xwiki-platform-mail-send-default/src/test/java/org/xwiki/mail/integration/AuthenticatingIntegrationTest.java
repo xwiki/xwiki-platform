@@ -39,8 +39,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;

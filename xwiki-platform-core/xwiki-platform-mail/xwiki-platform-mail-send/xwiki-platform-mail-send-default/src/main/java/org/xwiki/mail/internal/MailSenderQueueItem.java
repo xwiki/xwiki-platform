@@ -42,8 +42,6 @@ public class MailSenderQueueItem
 
     private MailListener listener;
 
-    private long threadId;
-
     private UUID batchId;
 
     private String wikiId;
@@ -62,7 +60,6 @@ public class MailSenderQueueItem
         this.session = session;
         this.listener = listener;
         this.batchId = batchId;
-        this.threadId = Thread.currentThread().getId();
         this.wikiId = wikiId;
     }
 
@@ -90,20 +87,11 @@ public class MailSenderQueueItem
         return this.listener;
     }
 
-    /**
-     * @return the id of the thread that wants to send this email
-     */
-    public long getThreadId()
-    {
-        return this.threadId;
-    }
-
     @Override
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder.append("batchId", this.batchId);
-        builder.append("threadId", getThreadId());
         builder.append("wikiId", getWikiId());
         return builder.toString();
     }

@@ -28,10 +28,13 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailContentStore;
+import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
 
@@ -42,7 +45,7 @@ import org.xwiki.mail.MailStoreException;
 @Component
 @Singleton
 @Named("database")
-public class DatabaseMailListener implements MailListener
+public class DatabaseMailListener implements MailListener, Initializable
 {
     @Inject
     private Logger logger;
@@ -54,6 +57,14 @@ public class DatabaseMailListener implements MailListener
     @Inject
     @Named("database")
     private MailStatusStore mailStatusStore;
+
+    private DatabaseMailStatusResult mailStatusResult;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.mailStatusResult = new DatabaseMailStatusResult(this.mailStatusStore);
+    }
 
     @Override
     public void onPrepare(MimeMessage message)
@@ -109,6 +120,12 @@ public class DatabaseMailListener implements MailListener
             status.setError(exception);
             saveStatus(status);
         }
+    }
+
+    @Override
+    public MailStatusResult getMailStatusResult()
+    {
+        return null;
     }
 
     private String getMessageId(MimeMessage message)

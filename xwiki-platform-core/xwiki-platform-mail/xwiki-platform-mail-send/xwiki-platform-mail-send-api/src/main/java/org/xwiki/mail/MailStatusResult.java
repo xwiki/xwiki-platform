@@ -17,35 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
 
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Iterator;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
+ * Provides status for each mail in the batch of mails that have been sent.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.4M3
  */
-public class MailSenderQueueItemTest
+public interface MailStatusResult
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
+    /**
+     * @return the number of emails that have started the sending process (i.e. that have been through the "ready to
+     *         send" state at least.
+     */
+    long getSize();
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
-    }
+    /**
+     * @return the status for all mails
+     */
+    Iterator<MailStatus> getAll();
+
+    /**
+     * @param state the stats to match (ready to send, sent successfully or failed to send)
+     * @return the status for all mails matching the passed state
+     */
+    Iterator<MailStatus> getByState(MailState state);
 }

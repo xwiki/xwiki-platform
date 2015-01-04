@@ -17,35 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
 
-import java.util.Arrays;
-import java.util.Properties;
 import java.util.UUID;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
+ * The result of the batch of emails being sent.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.4M3
  */
-public class MailSenderQueueItemTest
+@Role
+public interface MailResult
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
+    /**
+     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     */
+    void waitTillSent(long timeout);
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
-    }
+    /**
+     * @return true if all the mails from this batch have been sent (successfully or not) or false otherwise
+     */
+    boolean isSent();
+
+    /**
+     * @return the batch id for this session of mail sending
+     */
+    UUID getBatchId();
 }

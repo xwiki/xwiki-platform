@@ -115,7 +115,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                         throws HibernateException, XWikiException
                     {
                         Query query =
-                            session.createQuery(FROM_QUERY + " where mail_batchid=:batchid an mail_status=:state");
+                            session.createQuery(FROM_QUERY + " where mail_batchid=:batchid and mail_status=:state");
                         query.setParameter("batchid", batchId).setParameter("state", state);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;

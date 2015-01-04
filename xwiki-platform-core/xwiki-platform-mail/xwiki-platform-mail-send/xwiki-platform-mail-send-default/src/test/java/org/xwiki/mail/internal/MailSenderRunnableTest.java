@@ -20,10 +20,9 @@
 package org.xwiki.mail.internal;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Properties;
-import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Provider;
 import javax.mail.Session;
@@ -37,13 +36,15 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailState;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -92,35 +93,40 @@ public class MailSenderRunnableTest
         UUID batchId = UUID.randomUUID();
         MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchId, "wiki");
 
-        Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
+        MailQueueManager mailQueueManager = new MailQueueManager();
 
         // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
-        mailQueue.add(item);
-        mailQueue.add(item);
+        mailQueueManager.addToQueue(item);
+        mailQueueManager.addToQueue(item);
 
-        MailSenderRunnable runnable = new MailSenderRunnable(mailQueue, this.configuration, this.xwikiContextProvider,
-            this.executionContextManager);
+        MailSenderRunnable runnable = new MailSenderRunnable(mailQueueManager, this.configuration,
+            this.xwikiContextProvider, this.executionContextManager);
         Thread thread = new Thread(runnable);
         thread.start();
 
-        // This is the real test: we verify that there's been an error while sending each email and that it's been
-        // logged. This also proves that the Mail Sender Thread doesn't stop when there's an error sending an email.
-        boolean success = true;
+        // Wait for the mails to have been processed.
         try {
-            long time = System.currentTimeMillis();
-            while (listener.getErrorsNumber() != 2) {
-                if (System.currentTimeMillis() - time > 5000L) {
-                    success = false;
-                    break;
-                }
-                Thread.sleep(100L);
-            }
+            mailQueueManager.waitTillSent(batchId, 10000L);
         } finally {
             runnable.stopProcessing();
             thread.interrupt();
             thread.join();
         }
-        assertTrue(success);
+
+        // This is the real test: we verify that there's been an error while sending each email.
+        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.FAILED);
+        int errorCount = 0;
+        while (statuses.hasNext()) {
+            MailStatus status = statuses.next();
+            // Note: I would have liked to assert the exact message but it seems there can be different ones returned.
+            // During my tests I got 2 different ones:
+            // "UnknownHostException: xwiki-unknown"
+            // "ConnectException: Connection refused"
+            // Thus for now I only assert that there's an error set, but not its content.
+            assertTrue(status.getError() != null);
+            errorCount++;
+        }
+        assertEquals(2, errorCount);
     }
 }

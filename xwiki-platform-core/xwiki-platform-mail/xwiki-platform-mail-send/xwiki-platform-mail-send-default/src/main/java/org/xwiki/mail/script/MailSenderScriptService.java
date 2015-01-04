@@ -23,9 +23,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,11 +43,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
-import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -250,9 +246,9 @@ public class MailSenderScriptService implements ScriptService
      * Send one mail synchronously with Memory MailListener .
      *
      * @param message the message that was tried to be sent
-     * @return UUID of the Batch mail
+     * @return the result and status of the send batch
      */
-    public UUID send(MimeMessage message)
+    public ScriptMailResult send(MimeMessage message)
     {
         return send(Arrays.asList(message));
     }
@@ -261,31 +257,29 @@ public class MailSenderScriptService implements ScriptService
      * Send the list of mails synchronously, using a Memory {@link }MailListener} to store the results.
      *
      * @param messages the list of messages that was tried to be sent
-     * @return UUID of the Batch mail
+     * @return the result and status of the send batch
      */
-    public UUID send(Iterable<? extends MimeMessage> messages)
+    public ScriptMailResult send(Iterable<? extends MimeMessage> messages)
     {
         return send(messages, "memory");
     }
 
     /**
-     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling {@link
-     * #getErrors(UUID)}.
+     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by using the
+     * returned {@link ScriptMailResult}.
      *
      * @param messages the list of messages that was tried to be sent
      * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
-     * @return UUID of the Batch mail
+     * @return the result and status of the send batch
      */
-    public UUID send(Iterable<? extends MimeMessage> messages, String hint)
+    public ScriptMailResult send(Iterable<? extends MimeMessage> messages, String hint)
     {
-        try {
-            checkPermissions();
-            return this.mailSender.send(messages, createSession());
-        } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getLastError() API
-            setError(e);
-        }
-        return null;
+        ScriptMailResult scriptMailResult = sendAsynchronously(messages, hint);
+
+        // Wait for all messages from this batch to have been sent before returning
+        scriptMailResult.waitTillSent(Long.MAX_VALUE);
+
+        return scriptMailResult;
     }
 
     /**
@@ -293,14 +287,14 @@ public class MailSenderScriptService implements ScriptService
      *
      * @param messages the list of messages that was tried to be sent
      * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
-     * @return UUID of the Batch mail
+     * @return the result and status of the send batch
      */
-    public UUID sendAsynchronously(List<? extends MimeMessage> messages, String hint)
+    public ScriptMailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, String hint)
     {
         final MailListener listener;
         try {
-            listener = getListener(hint);
             checkPermissions();
+            listener = getListener(hint);
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -310,8 +304,8 @@ public class MailSenderScriptService implements ScriptService
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        UUID sender = this.mailSender.sendAsynchronously(messages, createSession(), listener);
-        return sender;
+        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, createSession(), listener),
+            listener.getMailStatusResult());
     }
 
     /**
@@ -339,15 +333,6 @@ public class MailSenderScriptService implements ScriptService
             throw new MessagingException(String.format("Not authorized by the Permission Checker [%s] to send mail! "
                 + "No mail has been sent.", hint), e);
         }
-    }
-
-    /**
-     * @param batchId the UUID of the Batch mail
-     * @return errors raised during the send of all emails
-     */
-    public Iterator<MailStatus> getErrors(UUID batchId)
-    {
-        return MemoryMailListener.getErrors(batchId);
     }
 
     private MailListener getListener(String hint) throws MessagingException

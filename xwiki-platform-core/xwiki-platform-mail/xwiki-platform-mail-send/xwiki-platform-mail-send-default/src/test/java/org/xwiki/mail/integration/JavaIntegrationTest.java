@@ -35,7 +35,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,8 +42,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
@@ -66,7 +63,6 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 /**
@@ -98,28 +94,6 @@ public class JavaIntegrationTest
     private MimeBodyPartFactory<String> htmlBodyPartFactory;
 
     private MailSender sender;
-
-    private MailListener listener = new MailListener()
-    {
-        @Override
-        public void onPrepare(MimeMessage message)
-        {
-            // Do nothing, we check below that the mail has been received!
-        }
-
-        @Override
-        public void onSuccess(MimeMessage message)
-        {
-            // Do nothing, we check below that the mail has been received!
-        }
-
-        @Override
-        public void onError(MimeMessage message, Exception e)
-        {
-            // Shouldn't happen, fail the test!
-            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
-        }
-    };
 
     @BeforeComponent
     public void registerConfiguration() throws Exception
@@ -180,7 +154,11 @@ public class JavaIntegrationTest
 
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, this.listener);
+        MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
+        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, memoryMailListener);
+
+        // Note: we don't test status reporting from the listener since this is already tested in the
+        // ScriptingIntegrartionTest test class.
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);

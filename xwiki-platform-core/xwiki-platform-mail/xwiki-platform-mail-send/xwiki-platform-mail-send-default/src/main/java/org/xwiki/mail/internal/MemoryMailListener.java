@@ -19,26 +19,19 @@
  */
 package org.xwiki.mail.internal;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusResult;
 
 /**
  * Saves errors when sending messages, in a local variable.
@@ -47,99 +40,62 @@ import org.xwiki.mail.MailStatus;
  * @since 6.4M3
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named("memory")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class MemoryMailListener implements MailListener
 {
-    private static List<WeakReference<MemoryMailListener>> instances = new ArrayList<>();
-
-    private String batchId;
-
     @Inject
     private Logger logger;
 
-    private BlockingQueue<MailStatus> errorQueue = new LinkedBlockingQueue<>(100);
-
-    /**
-     * Constructor adding the WeakReference to {@link #instances}.
-     */
-    public MemoryMailListener()
-    {
-        instances.add(new WeakReference<>(this));
-    }
+    private MemoryMailStatusResult mailStatusResult = new MemoryMailStatusResult();
 
     @Override
     public void onPrepare(MimeMessage message)
     {
-        // We're only interested in errors in the scripting API.
+        try {
+            MailStatus status = createMailStatus(message);
+            status.setState(MailState.READY);
+            this.mailStatusResult.setStatus(status);
+        } catch (MessagingException e) {
+            this.logger.error("Invalid prepared message [{}]", message, e);
+        }
     }
 
     @Override
     public void onSuccess(MimeMessage message)
     {
-        // We're only interested in errors in the scripting API.
+        try {
+            MailStatus status = createMailStatus(message);
+            status.setState(MailState.SENT);
+            this.mailStatusResult.setStatus(status);
+        } catch (MessagingException e) {
+            this.logger.error("Invalid success message [{}]", message, e);
+        }
     }
 
     @Override
     public void onError(MimeMessage message, Exception e)
     {
         try {
-            this.batchId = message.getHeader("X-BatchID", null);
-            this.errorQueue.add(new MailStatus(message.getHeader("X-MailID", null), ExceptionUtils.getMessage(e)));
+            MailStatus status = createMailStatus(message);
+            status.setState(MailState.FAILED);
+            status.setError(e);
+            this.mailStatusResult.setStatus(status);
         } catch (MessagingException ex) {
-            this.logger.warn("Failed to retrieve Message ID from message. Reason: [{}]",
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.error("Invalid error message [{}]", message, ex);
         }
     }
 
-    /**
-     * @return the list of WeakReference of the instances
-     */
-    private static List<WeakReference<MemoryMailListener>> getInstances()
+    @Override
+    public MailStatusResult getMailStatusResult()
     {
-        return instances;
+        return this.mailStatusResult;
     }
 
-    /**
-     * @param batchId the UUID of the Batch mail
-     * @return errors raised during the send of all emails
-     */
-    public static Iterator<MailStatus> getErrors(UUID batchId)
+    private MailStatus createMailStatus(MimeMessage message) throws MessagingException
     {
-        for (WeakReference<MemoryMailListener> instance : instances) {
-            if (instance != null) {
-                MemoryMailListener listener = instance.get();
-                if (listener != null) {
-                    if (batchId.toString().equals(listener.getBatchId())) {
-                        return listener.getErrors();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return the batch ID of the batch mail
-     */
-    public String getBatchId()
-    {
-        return batchId;
-    }
-
-    /**
-     * @return the list of exceptions raised when sending mails in the current thread
-     */
-    public Iterator<MailStatus> getErrors()
-    {
-        return this.errorQueue.iterator();
-    }
-
-    /**
-     * @return the number of errors
-     */
-    public int getErrorsNumber()
-    {
-        return this.errorQueue.size();
+        MailStatus mailStatus = new MailStatus(message, null);
+        mailStatus.setBatchId(message.getHeader("X-BatchID", null));
+        return mailStatus;
     }
 }

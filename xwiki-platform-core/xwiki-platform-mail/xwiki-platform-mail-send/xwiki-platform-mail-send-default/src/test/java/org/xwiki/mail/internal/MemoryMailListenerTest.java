@@ -19,11 +19,15 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Iterator;
+
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailState;
+import org.xwiki.mail.MailStatus;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -48,8 +52,9 @@ public class MemoryMailListenerTest
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         MimeMessage message = mock(MimeMessage.class);
         listener.onError(message, new Exception("error"));
-        assertTrue(listener.getErrors().hasNext());
-        String error = listener.getErrors().next().getError();
+        Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.FAILED);
+        assertTrue("These should be mails in error!", results.hasNext());
+        String error = results.next().getError();
         assertEquals("Exception: error", error );
     }
 }

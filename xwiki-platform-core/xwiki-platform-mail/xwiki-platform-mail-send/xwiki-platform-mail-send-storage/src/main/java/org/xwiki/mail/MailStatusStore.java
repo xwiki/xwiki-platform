@@ -20,6 +20,7 @@
 package org.xwiki.mail;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -50,6 +51,8 @@ public interface MailStatusStore
      * @throws MailStoreException when an error occurs when loading the data
      */
     MailStatus load(String messageId) throws MailStoreException;
+
+    long count(UUID batchId) throws MailStoreException;
 
     /**
      * Loads all message statuses matching the passed state and batch id from the store.

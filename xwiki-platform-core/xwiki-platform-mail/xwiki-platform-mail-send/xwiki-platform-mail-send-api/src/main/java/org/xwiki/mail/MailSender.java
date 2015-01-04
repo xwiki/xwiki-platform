@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail;
 
-import java.util.UUID;
-
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
@@ -43,28 +41,19 @@ public interface MailSender
      *
      * @param messages the list of messages to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
-     * @return UUID of the Batch mail
-     * @throws MessagingException when an error occurs when sending the mail
+     * @return the result of the mail sending
+     * @throws MessagingException when an error occurs when sending the mail or if the mail has failed to be sent
      */
-    UUID send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException;
+    MailResult send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException;
 
     /**
-     * Send a list of mails asynchronously (the call returns immediately and you need to call {@link #waitTillSent(long)} if you
-     * wish to wait till it's been effectively sent).
+     * Send a list of mails asynchronously (the call returns immediately).
      *
      * @param messages the list of messages to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @param listener a listener called when the mail is sent successfully or when there is an error
-     * @return UUID of the Batch mail
+     * @return the result of the mail sending
      * @since 6.2M1
      */
-    UUID sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener);
-
-    /**
-     * Wait till all messages on the sending queue have been sent before returning, for the messages sent on the
-     * current thread.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     */
-    void waitTillSent(long timeout);
+    MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener);
 }

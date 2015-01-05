@@ -97,7 +97,7 @@
       <picker>0</picker>
       <prettyName>Password</prettyName>
       <size>30</size>
-      <storageType>Hash</storageType>
+      <storageType>Clear</storageType>
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>

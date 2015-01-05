@@ -21,8 +21,6 @@ package org.xwiki.mail;
 
 import java.util.UUID;
 
-import org.xwiki.component.annotation.Role;
-
 /**
  * The result of the batch of emails being sent.
  *

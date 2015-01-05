@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -159,8 +160,9 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
                 }
             } catch (Exception e) {
                 // Log and fallback on default.
-                logger.warn("Failed to get the avatar for user [{}]. Using default.",
-                    this.compactWikiEntityReferenceSerializer.serialize(userReference), e);
+                logger.warn("Failed to get the avatar for user [{}]: [{}]. Using default.",
+                    this.compactWikiEntityReferenceSerializer.serialize(userReference),
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
         ImageBlock imageBlock = new ImageBlock(imageReference, false);

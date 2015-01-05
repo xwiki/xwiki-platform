@@ -78,12 +78,19 @@
     color: @text-color;
     // The title is stored in the data-title attribute of the cell
     content: attr(data-title);
+    display: inline-block;
     font-weight: bold;
     left: @table-cell-padding;
+    overflow: hidden;
     padding-right: @table-cell-padding;
+    // The position is absolute to be able to put the fake cell exactly where we want and to express width relative
+    // to the screen size.
     position: absolute;
     text-align: left;
+    text-overflow: ellipsis;
     top: @table-cell-padding;
+    // Because of the "absolute" position, we cannot make the text wrap, because it won't resize the whole row and the
+    // results is not good looking (see: http://jira.xwiki.org/secure/attachment/30083/30083_Prop3_wrap.png).
     white-space: nowrap;
     width: 45%;
   }

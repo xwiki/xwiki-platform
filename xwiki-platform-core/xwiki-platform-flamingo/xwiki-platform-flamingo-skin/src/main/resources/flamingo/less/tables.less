@@ -55,14 +55,15 @@
   clear: left;
 }
 .responsive-table-tbody-tr() {
+  .clearfix();
   border-top: 2px solid @table-border-color;
 }
 // The cell (td or th) must be displayed as a row. The content is displayed on the right side to let display fake
 // headers on the left
 .responsive-table-tbody-tr-tdth() {
-  .clearfix();
   border: none;
   border-bottom: 1px solid @table-border-color;
+  float: left;
   min-height: @input-height-base;
   overflow: hidden;
   position: relative;
@@ -71,6 +72,7 @@
   top: 0;
   text-align:left;
   text-overflow: ellipsis;
+  width: 100%;
   white-space: normal;
   
   // Fake header: display a fake cell to display the title of the current cell

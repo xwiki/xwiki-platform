@@ -43,8 +43,15 @@
 ##
 ## Resending an email ##
 ##
-#if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id)
-    ## resending email
+#if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
+  ## resending email
+  #set ($result = $services.mailsender.sendAsynchronously($request.batch_id, $request.mail_id, "database"))
+  #if ($services.mailsender.lastError)
+    {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}
+  #end
+  #foreach ($status in $result.statusResult.getByState('FAILED'))
+    {{error}}$status.messageId - $status.error{{/error}}
+  #end
 #end
 ##
 ## Livetable #
@@ -54,8 +61,8 @@
     "date" : { 'type' : 'date' },
     "batchId" : { "type" : "text"},
     "recipients" : { "type" : "text" , "html" : "true"},
-    "state" : { "type" : "text", "size" : 8},
-    "actions" : { "type" : "text", "html" : "true", "size" : 8, "filterable" : "false", "sortable" : "false"}
+    "state" : { "type" : "text", "size" : 6},
+    "actions" : { "type" : "text", "html" : "true", "filterable" : "false", "sortable" : "false"}
 })
 #set($options = { 
    "resultPage":"Mail.SendMailStatusJSON",

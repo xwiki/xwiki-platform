@@ -215,10 +215,7 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                 message = mimeMessage;
             }
 
-            // Set custom XWiki mail headers.
-            // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
-            message.setHeader(HEADER_BATCH_ID, batchId.toString());
-            message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
+            setCustomHeaders(message, batchId);
 
             // Note: We don't cache the default From and BCC addresses because they can be modified at runtime
             // (from the Admin UI for example) and we need to always get the latest configured values.
@@ -256,6 +253,18 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
             }
         }
         return message;
+    }
+
+    private void setCustomHeaders(MimeMessage message, UUID batchId) throws MessagingException
+    {
+        // Set custom XWiki mail headers.
+        // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
+        message.setHeader(HEADER_BATCH_ID, batchId.toString());
+        //For serialized message we keep the existent #HEADER_MAIL_ID
+        if (message.getHeader(HEADER_MAIL_ID, null) == null)
+        {
+            message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
+        }
     }
 
     @Override

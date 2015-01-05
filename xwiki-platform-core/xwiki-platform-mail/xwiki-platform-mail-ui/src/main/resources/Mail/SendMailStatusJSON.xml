@@ -73,10 +73,12 @@
 ##==========
 #set($order = "$!request.sort")
 #if($order != '')
-  #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+  #set($orderDirection = "$!{request.get('dir')}")
   #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
     #set($orderDirection = 'desc')
   #end
+#else
+  #set($order = "date")
 #end
 ## ===========
 ## Filter Data here...
@@ -84,26 +86,22 @@
 ## TODO: Add code to filter data 
 ## Each column can be filtered and the filter for a column can be retrieved with:
 ## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
-
 #set($filterQuery = '')
-#set($filterId = "$!{request.get(messageId)}")
+#set($filterId = "$!{request.get('batchId')}")
 #if("$!{filterId}" != '')
-  #set($filterQuery = "and status.messageId like '%${filterId.trim()}%' ")
+  #set($filterQuery = "and status.batchId like '%${filterId.trim()}%' ")
 #end
-
-#set($filterRecipients = "$!{request.get(recipients)}")
+#set($filterRecipients = "$!{request.get('recipients')}")
 #if("$!{filterRecipients}" != '')
   #set($filterQuery = $filterQuery + "and status.recipients like '%${filterRecipients.trim()}%' ")
 #end
-
-#set($filterStatus = "$!{request.get(status)}")
+#set($filterStatus = "$!{request.get('state')}")
 #if("$!{filterStatus}" != '')
   #set($filterQuery = $filterQuery + "and status.state like '%${filterStatus.trim()}%' ")
 #end
-
-#set($totalrows = $services.query.xwql("from MailStatus as status").count())
+#set($totalrows = $services.query.xwql("select count(status) from MailStatus as status").count())
 #set($results = [])
-#set($xwql = "from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.date $!orderDirection")
+#set($xwql = "select status from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.${order} $!orderDirection")
 #set($results = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).execute())
 ## ===
 ## JSON
@@ -118,18 +116,25 @@
   "dir": "$request.dir",
   "reqNo": $mathtool.toInteger($request.reqNo),
   "rows": [
-  #foreach( $status in $results )
+  #foreach( $item in $results )
     #if($velocityCount &gt; 1) , #end
     {
+      #set($recipients = "$!item.recipients")
       "doc_viewable" : true,
-      "date" : "$status.date",
-      "batchId" : "$status.batchId",
-      "recipients" : "$escapetool.javascript($status.recipients)",
-      "state" : "$status.state",
+      "date" : "$!item.date",
+      "batchId" : "$!item.batchId",
+      "recipients" : "$escapetool.javascript($recipients)",
+      "state" : "$!item.state",
+      #if("$!item.state" != "sent")
       "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
-              &lt;input name='mail_id' value='$status.messageId' type='hidden'/&gt;
-              &lt;span class='buttonwrapper'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='button' type='submit'&gt;&lt;/span&gt;
+              &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
+              &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
+              &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
+&lt;/span&gt;
             &lt;/form&gt;")}"
+      #else
+      "actions" : ""
+      #end  
     }
   #end
   ]

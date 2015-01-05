@@ -51,6 +51,11 @@ public interface MailStatusStore
      */
     MailStatus loadFromMessageId(String messageId) throws MailStoreException;
 
+    /**
+     * @param batchId the batch id of the message statuses to load
+     * @return the number of emails matching the passed batch id from the store.
+     * @throws MailStoreException when an error occurs when loading the data
+     */
     long count(String batchId) throws MailStoreException;
 
     /**
@@ -63,5 +68,12 @@ public interface MailStatusStore
      */
     List<MailStatus> loadFromBatchId(String batchId, MailState state) throws MailStoreException;
 
+    /**
+     * Loads all message statuses matching the passed batch id from the store.
+     *
+     * @param batchId the batch id of the message statuses to load
+     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
+     * @throws MailStoreException when an error occurs when loading the data
+     */
     List<MailStatus> loadFromBatchId(String batchId) throws MailStoreException;
 }

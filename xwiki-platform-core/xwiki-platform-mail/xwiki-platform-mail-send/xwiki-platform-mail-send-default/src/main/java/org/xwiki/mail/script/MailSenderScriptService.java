@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.script;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,11 +37,12 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
@@ -91,6 +91,10 @@ public class MailSenderScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named("filesystem")
+    private MailContentStore mailContentStore;
+
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
      * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
@@ -104,7 +108,8 @@ public class MailSenderScriptService implements ScriptService
     {
         MimeMessageWrapper messageWrapper;
         try {
-            MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
+            MimeMessageFactory factory = MimeMessageFactoryProvider
+                .get(hint, source.getClass(), this.componentManagerProvider.get());
             Session session = createSession();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
@@ -140,33 +145,14 @@ public class MailSenderScriptService implements ScriptService
         Map<String, Object> parameters)
     {
         try {
-            MimeMessageFactory factory = getMimeMessageFactory(factoryHint, parameters.get("source").getClass());
-            MimeMessageIteratorFactory iteratorFactory = new MimeMessageIteratorFactory();
-            return iteratorFactory.createIterator(hint, source, factory, parameters,
+            MimeMessageFactory factory = MimeMessageFactoryProvider
+                .get(factoryHint, parameters.get("source").getClass(), this.componentManagerProvider.get());
+            return MimeMessageIteratorFactoryProvider.get(hint, source, factory, parameters,
                 this.componentManagerProvider.get());
         } catch (Exception e) {
             setError(e);
             return null;
         }
-    }
-
-    private MimeMessageFactory getMimeMessageFactory(String hint, Type type) throws ComponentLookupException
-    {
-        MimeMessageFactory factory;
-
-        // Step 1: Look for a secure version first
-        ComponentManager componentManager = this.componentManagerProvider.get();
-        try {
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type),
-                String.format("%s/secure", hint));
-        } catch (ComponentLookupException e) {
-            // Step 2: Look for a non secure version if a secure one doesn't exist...
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null), hint);
-        }
-
-        return factory;
     }
 
     /**
@@ -306,6 +292,49 @@ public class MailSenderScriptService implements ScriptService
         // the passed listener.
         return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, createSession(), listener),
             listener.getMailStatusResult());
+    }
+
+    /**
+     * Send the serialized MimeMessage synchronously.
+     *
+     * @param batchId the name of the directory that contains serialized MimeMessage
+     * @param mailId the name of the serialized MimeMessage
+     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
+     * @return UUID of the Batch mail
+     */
+    public ScriptMailResult send(String batchId, String mailId, String hint)
+    {
+        try {
+            checkPermissions();
+            MimeMessage message = this.mailContentStore.load(createSession(), batchId, mailId);
+            return send(Arrays.asList(message), hint);
+        } catch (MessagingException | MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+        }
+        return null;
+    }
+
+    /**
+     * Send the serialized MimeMessage asynchronously.
+     *
+     * @param batchId the name of the directory that contains serialized MimeMessage
+     * @param mailId the name of the serialized MimeMessage
+     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
+     * @return UUID of the Batch mail
+     */
+    public ScriptMailResult sendAsynchronously(String batchId, String mailId, String hint)
+    {
+        MimeMessage message;
+        try {
+            message = this.mailContentStore.load(createSession(), batchId, mailId);
+        } catch (MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+            // Don't send the mail!
+            return null;
+        }
+        return sendAsynchronously(Arrays.asList(message), hint);
     }
 
     /**

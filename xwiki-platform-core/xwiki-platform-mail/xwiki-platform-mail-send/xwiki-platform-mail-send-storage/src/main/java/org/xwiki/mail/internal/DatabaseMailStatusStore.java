@@ -53,6 +53,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
 {
     private static final String FROM_QUERY = "from " + MailStatus.class.getName();
 
+    private static final String BATCHID_PARAMETER_NAME = "batchid";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -116,7 +118,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query =
                             session.createQuery(FROM_QUERY + " where mail_batchid=:batchid and mail_status=:state");
-                        query.setParameter("batchid", batchId).setParameter("state", state);
+                        query.setParameter(BATCHID_PARAMETER_NAME, batchId).setParameter("state", state);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
                     }
@@ -140,7 +142,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query =
                             session.createQuery(FROM_QUERY + " where mail_batchid=:batchid");
-                        query.setParameter("batchid", batchId);
+                        query.setParameter(BATCHID_PARAMETER_NAME, batchId);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
                     }
@@ -154,6 +156,6 @@ public class DatabaseMailStatusStore implements MailStatusStore
     @Override
     public long count(String batchId) throws MailStoreException
     {
-        return 0;
+        return loadFromBatchId(batchId).size();
     }
 }

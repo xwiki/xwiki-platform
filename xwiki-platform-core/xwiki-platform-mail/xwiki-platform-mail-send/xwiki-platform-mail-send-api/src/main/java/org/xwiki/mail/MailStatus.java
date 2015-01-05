@@ -73,6 +73,14 @@ public class MailStatus
     private String error;
 
     /**
+     * Default constructor to avoid org.Hibernate.InstantiationException.
+     */
+    public MailStatus()
+    {
+        //
+    }
+
+    /**
      * Constructor initializing the MailStatus with the MimeMessage ID.
      *
      * @param messageId the id of Message
@@ -152,6 +160,15 @@ public class MailStatus
     {
         this.state = state.toString();
     }
+
+    /**
+     * @param state see {@link #getState()}
+     */
+    public void setState(String state)
+    {
+        this.state = state;
+    }
+
 
     /**
      * @return the ID of the batch mail sender

@@ -39,8 +39,13 @@ import org.xwiki.stability.Unstable;
  * @since 6.4M3
  */
 @Unstable
-public class MimeMessageIteratorFactory
+public final class MimeMessageIteratorFactoryProvider
 {
+    private MimeMessageIteratorFactoryProvider()
+    {
+        //Hide the default constructor for utility classes
+    }
+
     /**
      *
      * @param hint the MimeMessageIterator factories hint
@@ -51,7 +56,7 @@ public class MimeMessageIteratorFactory
      * @return Iterator of MimeMessage
      * @throws Exception when an error occurs
      */
-    public Iterator<MimeMessage> createIterator(String hint, Object source, MimeMessageFactory factory,
+    public static Iterator<MimeMessage> get(String hint, Object source, MimeMessageFactory factory,
         Map<String, Object> parameters, ComponentManager componentManager) throws Exception
     {
         Iterator<MimeMessage> iterator;

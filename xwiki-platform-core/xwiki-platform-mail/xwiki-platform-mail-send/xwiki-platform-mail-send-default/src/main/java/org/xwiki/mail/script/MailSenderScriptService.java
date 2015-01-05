@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.script;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,14 +37,14 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
+import org.xwiki.mail.internal.MimeMessageFactoryProvider;
+import org.xwiki.mail.internal.MimeMessageIteratorFactoryProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -91,6 +90,9 @@ public class MailSenderScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    @Inject
+    private Provider<Session> sessionProvider;
+
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
      * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
@@ -104,8 +106,9 @@ public class MailSenderScriptService implements ScriptService
     {
         MimeMessageWrapper messageWrapper;
         try {
-            MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
-            Session session = createSession();
+            MimeMessageFactory factory = MimeMessageFactoryProvider
+                .get(hint, source.getClass(), this.componentManagerProvider.get());
+            Session session = this.sessionProvider.get();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -140,33 +143,14 @@ public class MailSenderScriptService implements ScriptService
         Map<String, Object> parameters)
     {
         try {
-            MimeMessageFactory factory = getMimeMessageFactory(factoryHint, parameters.get("source").getClass());
-            MimeMessageIteratorFactory iteratorFactory = new MimeMessageIteratorFactory();
-            return iteratorFactory.createIterator(hint, source, factory, parameters,
+            MimeMessageFactory factory = MimeMessageFactoryProvider
+                .get(factoryHint, parameters.get("source").getClass(), this.componentManagerProvider.get());
+            return MimeMessageIteratorFactoryProvider.get(hint, source, factory, parameters,
                 this.componentManagerProvider.get());
         } catch (Exception e) {
             setError(e);
             return null;
         }
-    }
-
-    private MimeMessageFactory getMimeMessageFactory(String hint, Type type) throws ComponentLookupException
-    {
-        MimeMessageFactory factory;
-
-        // Step 1: Look for a secure version first
-        ComponentManager componentManager = this.componentManagerProvider.get();
-        try {
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type),
-                String.format("%s/secure", hint));
-        } catch (ComponentLookupException e) {
-            // Step 2: Look for a non secure version if a secure one doesn't exist...
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null), hint);
-        }
-
-        return factory;
     }
 
     /**
@@ -220,7 +204,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = createSession();
+        Session session = this.sessionProvider.get();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
             this.componentManagerProvider.get());
@@ -304,7 +288,7 @@ public class MailSenderScriptService implements ScriptService
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, createSession(), listener),
+        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, this.sessionProvider.get(), listener),
             listener.getMailStatusResult());
     }
 
@@ -352,18 +336,6 @@ public class MailSenderScriptService implements ScriptService
     public MailSenderConfiguration getConfiguration()
     {
         return this.configuration;
-    }
-
-    private Session createSession()
-    {
-        Session session;
-        if (this.configuration.usesAuthentication()) {
-            session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
-        } else {
-            session = Session.getInstance(this.configuration.getAllProperties());
-        }
-        return session;
     }
 
     // Error management

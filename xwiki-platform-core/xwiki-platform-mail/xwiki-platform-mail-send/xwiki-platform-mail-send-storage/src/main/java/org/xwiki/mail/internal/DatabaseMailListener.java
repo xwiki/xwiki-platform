@@ -22,6 +22,7 @@ package org.xwiki.mail.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -77,6 +78,7 @@ public class DatabaseMailListener implements MailListener, Initializable
         final MailStatus result = new MailStatus(getMessageId(message));
         result.setBatchId(batchId);
         result.setState(MailState.READY);
+        result.setRecipients(getMessageRecipients(message));
         saveStatus(result);
     }
 
@@ -149,6 +151,16 @@ public class DatabaseMailListener implements MailListener, Initializable
             return message.getHeader("X-BatchID", null);
         } catch (MessagingException e) {
             this.logger.error("Failed to retrieve Batch ID from message.", e);
+            return null;
+        }
+    }
+
+    private String getMessageRecipients(MimeMessage message)
+    {
+        try {
+            return InternetAddress.toString(message.getAllRecipients());
+        } catch (MessagingException e) {
+            this.logger.error("Failed to retrieve recipients from message.", e);
             return null;
         }
     }

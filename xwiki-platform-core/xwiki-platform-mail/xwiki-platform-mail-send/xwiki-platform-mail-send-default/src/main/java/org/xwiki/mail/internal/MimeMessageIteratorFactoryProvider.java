@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.script;
+package org.xwiki.mail.internal;
 
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +32,18 @@ import org.xwiki.mail.internal.iterator.factory.GroupMimeMessageIteratorFactory;
 import org.xwiki.mail.internal.iterator.factory.SerializedFilesMimeMessageIteratorFactory;
 import org.xwiki.mail.internal.iterator.factory.UsersMimeMessageIteratorFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 6.4M3
  */
-@Unstable
-public class MimeMessageIteratorFactory
+public final class MimeMessageIteratorFactoryProvider
 {
+    private MimeMessageIteratorFactoryProvider()
+    {
+        //Hide the default constructor for utility classes
+    }
+
     /**
      *
      * @param hint the MimeMessageIterator factories hint
@@ -51,7 +54,7 @@ public class MimeMessageIteratorFactory
      * @return Iterator of MimeMessage
      * @throws Exception when an error occurs
      */
-    public Iterator<MimeMessage> createIterator(String hint, Object source, MimeMessageFactory factory,
+    public static Iterator<MimeMessage> get(String hint, Object source, MimeMessageFactory factory,
         Map<String, Object> parameters, ComponentManager componentManager) throws Exception
     {
         Iterator<MimeMessage> iterator;

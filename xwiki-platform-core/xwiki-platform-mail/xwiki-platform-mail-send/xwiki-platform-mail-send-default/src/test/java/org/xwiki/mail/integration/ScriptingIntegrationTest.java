@@ -42,6 +42,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
@@ -50,6 +51,7 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.SessionProvider;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptMailResult;
@@ -65,8 +67,11 @@ import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import com.xpn.xwiki.XWikiContext;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -82,7 +87,9 @@ import static org.mockito.Mockito.*;
     DefaultMimeBodyPartFactory.class,
     MemoryMailListener.class,
     DefaultMailSenderRunnable.class,
-    DefaultMailQueueManager.class
+    DefaultMailQueueManager.class,
+    StandardEnvironment.class,
+    SessionProvider.class
 })
 public class ScriptingIntegrationTest
 {

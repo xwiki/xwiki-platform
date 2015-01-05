@@ -45,11 +45,20 @@ public class DatabaseMailStatusResult implements MailStatusResult
 
     private String batchId;
 
+    /**
+     * Constructor initializing the DatabaseMailStatusResult with MailStatusStore.
+     * @param mailStatusStore the MailStatusStore
+     */
     public DatabaseMailStatusResult(MailStatusStore mailStatusStore)
     {
         this.mailStatusStore = mailStatusStore;
     }
 
+    /**
+     * Set the batch id of the message statuses to save or load.
+     *
+     * @param batchId the batch id of the message statuses
+     */
     public void setBatchId(String batchId)
     {
         this.batchId = batchId;

@@ -5,6 +5,7 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set($discard = $services.template.execute('job_macros.vm'))
+#set($discard = $services.template.execute('rating_macros.vm'))
 
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
@@ -164,7 +165,7 @@
 #end
 
 #macro (displayExtensionRating $extension)
-  #set ($rating = $services.extension.rating.getRating($extension.id))
+  #set ($rating = $extension.getRating())
   #if ($rating != $NULL)
     #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
     <div class="extension-rating">

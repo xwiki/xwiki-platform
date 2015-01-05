@@ -46,6 +46,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  * @see ReputationAlgorithm
+ * @since 6.4M3
  */
 @Component
 @Singleton
@@ -81,21 +82,13 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return getXWikiContext().getWiki();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#getRatingsManager()
-     */
+    @Override
     public RatingsManager getRatingsManager(DocumentReference documentRef)
     {
         return ratingsManagerProvider.get(documentRef);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#updateReputation()
-     */
+    @Override
     public void updateReputation(DocumentReference documentRef, Rating rating, int oldVote)
     {
         // we only update if we are in stored mode and if the vote changed
@@ -160,19 +153,11 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
                         logger.error("Error while calculating authors reputation for document " + documentRef, e);
                     }
                 }
-            } catch (XWikiException e) {
-                if (logger.isErrorEnabled()) {
-                    logger.error("Error while calculating authors for document " + documentRef, e);
-                }
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewVoterReputation()
-     */
+    @Override
     public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
         int oldVote) throws ReputationException
     {
@@ -180,11 +165,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewContributorReputation()
-     */
+    @Override
     public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
         Rating rating, int oldVote) throws ReputationException
     {
@@ -192,11 +173,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
-     */
+    @Override
     public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
         throws ReputationException
     {
@@ -204,11 +181,7 @@ public class DefaultReputationAlgorithm implements ReputationAlgorithm
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#recalcAllReputation()
-     */
+    @Override
     public Map<String, AverageRating> recalcAllReputation() throws ReputationException
     {
         notimplemented();

@@ -17,19 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ratings;
+package org.xwiki.ratings.script;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.ratings.AverageRatingApi;
+import org.xwiki.ratings.ConfiguredProvider;
+import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -49,7 +54,7 @@ import com.xpn.xwiki.api.Document;
 public class RatingsScriptService implements ScriptService
 {
     @Inject
-    private Provider<XWikiContext> xcontext;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private ConfiguredProvider<RatingsManager> ratingsManagerProvider;
@@ -57,6 +62,10 @@ public class RatingsScriptService implements ScriptService
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<EntityReference> referenceDocumentReferenceResolver;
 
     @Inject
     @Named("user/current")
@@ -68,9 +77,9 @@ public class RatingsScriptService implements ScriptService
      * @return the XWiki context
      * @throws RuntimeException If there was an error retrieving the context
      */
-    protected XWikiContext getXWikiContext()
+    private XWikiContext getXWikiContext()
     {
-        return xcontext.get();
+        return this.xcontextProvider.get();
     }
 
     /**
@@ -86,11 +95,11 @@ public class RatingsScriptService implements ScriptService
     /**
      * Retrieve the global configuration document.
      *
-     * @return a reference to the global configuration document
+     * @return an absolute reference to the global configuration document
      */
     private DocumentReference getGlobalConfig()
     {
-        return documentReferenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_PAGE);
+        return this.referenceDocumentReferenceResolver.resolve(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE);
     }
 
     /**
@@ -99,7 +108,7 @@ public class RatingsScriptService implements ScriptService
      * @param ratings a list of rating object
      * @return list of object wrapped with the RatingAPI
      */
-    protected static List<RatingApi> wrapRatings(List<Rating> ratings)
+    private static List<RatingApi> wrapRatings(List<Rating> ratings)
     {
         if (ratings == null) {
             return null;
@@ -120,12 +129,13 @@ public class RatingsScriptService implements ScriptService
      * @param author the author giving the rating
      * @param vote the number of stars given (from 1 to 5)
      * @return the new rating object
+     * @deprecated use {@link #setRating(DocumentReference, DocumentReference, int)} instead
      */
     @Deprecated
     public RatingApi setRating(Document doc, String author, int vote)
     {
         DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = userReferenceResolver.resolve(author);
+        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
         return setRating(documentRef, authorRef, vote);
     }
 
@@ -144,7 +154,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new RatingApi(ratingsManagerProvider.get(document).setRating(document, author, vote));
+            return new RatingApi(this.ratingsManagerProvider.get(document).setRating(document, author, vote));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -157,12 +167,13 @@ public class RatingsScriptService implements ScriptService
      * @param doc the document to which the rating belongs to
      * @param author the user that gave the rating
      * @return a rating object
+     * @deprecated use {@link #getRating(DocumentReference, DocumentReference)} instead
      */
     @Deprecated
     public RatingApi getRating(Document doc, String author)
     {
         DocumentReference documentRef = doc.getDocumentReference();
-        DocumentReference authorRef = userReferenceResolver.resolve(author);
+        DocumentReference authorRef = this.userReferenceResolver.resolve(author);
         return getRating(documentRef, authorRef);
     }
 
@@ -178,7 +189,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            Rating rating = ratingsManagerProvider.get(document).getRating(document, author);
+            Rating rating = this.ratingsManagerProvider.get(document).getRating(document, author);
             if (rating == null) {
                 return null;
             }
@@ -196,6 +207,7 @@ public class RatingsScriptService implements ScriptService
      * @param start the offset from which to start
      * @param count number of ratings to return
      * @return a list of rating objects
+     * @deprecated use {@link #getRatings(DocumentReference, int, int)} instead
      */
     @Deprecated
     public List<RatingApi> getRatings(Document doc, int start, int count)
@@ -224,6 +236,7 @@ public class RatingsScriptService implements ScriptService
      * @param count number of ratings to return
      * @param asc in ascending order or not
      * @return a list of rating objects
+     * @deprecated use {@link #getRatings(DocumentReference, int, int, boolean)} instead
      */
     @Deprecated
     public List<RatingApi> getRatings(Document doc, int start, int count, boolean asc)
@@ -245,7 +258,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return wrapRatings(ratingsManagerProvider.get(document).getRatings(document, start, count, asc));
+            return wrapRatings(this.ratingsManagerProvider.get(document).getRatings(document, start, count, asc));
         } catch (Exception e) {
             setError(e);
             return null;
@@ -258,6 +271,7 @@ public class RatingsScriptService implements ScriptService
      * @param doc the document to which the average rating belongs to
      * @param method the method of calculating the average
      * @return a average rating API object
+     * @deprecated use {@link #getAverageRating(DocumentReference, String)} instead
      */
     @Deprecated
     public AverageRatingApi getAverageRating(Document doc, String method)
@@ -277,7 +291,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(document).getAverageRating(document, method));
+            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document, method));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -289,6 +303,7 @@ public class RatingsScriptService implements ScriptService
      * 
      * @param doc the document to which the average rating belongs to
      * @return a average rating API object
+     * @deprecated use {@link #getAverageRating(DocumentReference)} instead
      */
     @Deprecated
     public AverageRatingApi getAverageRating(Document doc)
@@ -307,7 +322,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(document).getAverageRating(document));
+            return new AverageRatingApi(this.ratingsManagerProvider.get(document).getAverageRating(document));
         } catch (Throwable e) {
             setError(e);
             return null;
@@ -327,7 +342,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
+            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
                 fromsql, wheresql, method));
         } catch (Throwable e) {
             setError(e);
@@ -347,7 +362,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
+            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getAverageRatingFromQuery(
                 fromsql, wheresql));
         } catch (Throwable e) {
             setError(e);
@@ -361,10 +376,9 @@ public class RatingsScriptService implements ScriptService
      * @param username the user document
      * @return a average rating API object
      */
-    @Deprecated
     public AverageRatingApi getUserReputation(String username)
     {
-        DocumentReference userRef = userReferenceResolver.resolve(username);
+        DocumentReference userRef = this.userReferenceResolver.resolve(username);
         return getUserReputation(userRef);
     }
 
@@ -379,7 +393,7 @@ public class RatingsScriptService implements ScriptService
         setError(null);
 
         try {
-            return new AverageRatingApi(ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
+            return new AverageRatingApi(this.ratingsManagerProvider.get(getGlobalConfig()).getUserReputation(username));
         } catch (Throwable e) {
             setError(e);
             return null;

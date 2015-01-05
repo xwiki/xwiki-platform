@@ -86,14 +86,8 @@ admin.ratings.uninstallratings=Uninstalling the ratings application will delete 
 admin.ratings.ratingsactivated=Ratings have been activated
 admin.ratings.ratingsdeactivated=Ratings have been deactivated
 admin.ratings.illegalrequest=Illegal request
-rating.one-star=Poor
-rating.two-stars=Satisfactory
-rating.three-stars=Good
-rating.four-stars=Very good
-rating.five-stars=Excellent
 rating.rate=Rate!
 rating.yourvote=Your vote
-rating.votes=Votes
 rating.logintorate=Login to rate
 rating.novotes=No votes yet</content>
 </xwikidoc>

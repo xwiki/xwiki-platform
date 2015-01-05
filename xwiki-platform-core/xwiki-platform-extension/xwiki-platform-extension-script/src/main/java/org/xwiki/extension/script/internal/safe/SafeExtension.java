@@ -46,8 +46,18 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     public SafeExtension(T extension, ScriptSafeProvider<Object> safeProvider)
     {
         super(extension);
-        
+
         this.safeProvider = safeProvider;
+    }
+
+    /**
+     * @param <S> the type of the object
+     * @param unsafe the unsafe object
+     * @return the safe version of the object
+     */
+    protected <S> S safe(Object unsafe)
+    {
+        return this.safeProvider.get(unsafe);
     }
 
     // Extension
@@ -55,12 +65,12 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     @Override
     public ExtensionFile getFile()
     {
-        return this.safeProvider.get(super.getRepository());
+        return safe(super.getRepository());
     }
-    
+
     @Override
     public ExtensionRepository getRepository()
     {
-        return this.safeProvider.get(super.getRepository());
+        return safe(super.getRepository());
     }
 }

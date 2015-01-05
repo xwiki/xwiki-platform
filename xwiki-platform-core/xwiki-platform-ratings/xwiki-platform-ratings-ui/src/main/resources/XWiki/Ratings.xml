@@ -43,60 +43,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <attachment>
-    <filename>star.gif</filename>
-    <filesize>1120</filesize>
-    <author>XWiki.Admin</author>
-    <date>1223392182000</date>
-    <version>1.1</version>
-    <comment/>
-    <content>R0lGODlhGQBLAOYAAPWGNf784eTi49TR0f3ANvu+bf/MmfPy8uPg4filTv7dSvzGcvioT/3guvu0
-Tuvq6/7xYfq5af7mif3LXP////7w3d/e3vidQfTz9P3ixP/nnP7kUv7ncf/MM/7+9fm1gv7Uaf3G
-Wf76xOvq6tfV1f75sf7WSvmtSv7Zef3v5f7PQ/7vlPaSOv7ngv7emPnAmf748/7tptvY2f7oWf/M
-Zv7fUfzYpv7uw/ilRf7XQ/7vuP70Y/7JPvu3T+fm5vmvU/712PqyTP738v7Xc/73nP72gP7hZff3
-9+/v7/aPOf/elP/fefeUQv7sXfy8U/ioWPq/df3kzv7FO/7UUf70bP756P786v76uv73k/7dh//Q
-O/7yq/7iav3kvf743PvVrP7wzf7uv/7ql/8zAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5
-BAEHAGMALAAAAAAZAEsAAAf/gBSCg4SFhoeHR4qIjIRHSCM+GI2NGAgUlkeUiA8Pgj5Im4ZHFpqC
-FgemohQPFoRIMg8Ys4uJjzKhhBYyvDIII5ODRwcPCCQyPps+I6ZHxbKrFMvCktGsFsGCDwLRlgeF
-zgiqjEcy34cH5pQyI43p54i4lCO5iNONSPWHSOKND/DxxoGrNsiHhQeqBAh0hCDYCHaQLAiY5GOh
-sIlHBEwUhsQHKIuDOn4cVYtcSWsoU6oUdhLlIwEVV2JApREkpU6CSOhbRepIGCBIsKFsVaWDChgI
-Gtp0BAuJBi1alhw55uNBPgzjFB0YYWHAABgmcojVMewAsQcjKTyyYOFjFQli/+Ny4SIhhgdWCAVl
-1ORFDBcFgAMDrkEYCAVU1DS1CEyY8IbHj1dQEAAQkwAkHjjUECtFCoHPUlRwmLxT0AGJHlB0Xq2i
-9RQYNRGRurSktYnbt41QGFCaULoRMRQ0rjGjuBUEvakd2FK8SRMI0CGIwElOEhHoVEpcKbJjR4nT
-NkkdwLIDi4cDoQKUCHA4fCkP7A0KaGuKGTluFE4jUfSoKobkIWHQSWX8LaUWfyslqOCC0SC4kjMC
-5KUSEqnIk9IRl1AQlIH7+JDCC0LEwqEj2HwAwAflyDILVuRg4AMJMCQhYxQ+DNDLQQINUwwJJBxg
-ABNAPpGCaWZ1ogqE0KTwRb0CF1yAw5M4RABFA2rFpFcuBjAAJQ4ndHlCEGDaMBlAR9j3g5dfngCl
-Aw4sAFtpGFxWQQEXyAgAADLKyABsCqEjkRBPsCBok03ikMEIPZLDFgxaPtllED104UM/jCAxAAVs
-OuCEEyF06sKG7pBAQacTlGrqEBTIkM0hllBQKgg3UACGCxOAIM2qhrhIQRYueABLRR5UgQmuhRyQ
-jCBJjcCVBaGY1cgj1yDEHyRpMbLVCKmA05ItIzLo7beCBAIAOw==
-</content>
-  </attachment>
-  <attachment>
-    <filename>smallstar.gif</filename>
-    <filesize>891</filesize>
-    <author>XWiki.Admin</author>
-    <date>1223394833000</date>
-    <version>1.1</version>
-    <comment/>
-    <content>R0lGODlhFAA8AOYAAOfm5vTz9OTi4/Py8tvY2ePg4filRevq6v7dSv7fUf3LXPaPOfmtSv7XQ/7x
-Yf7oWf3GWf7489fV1f7kUv7WSvu0TvqyTP7FO/7+9f7PQ/m1gv7tpvidQf/fef7iav756P70Y/3v
-5f3ANtTR0fWGNf738v7sXfzGcv/nnPilTv/MM/7hZf7uv//Mmf7ngv743P7yq/72gP7wzf7w3f7v
-lP7UafmvU/ioT/7ql/7ncfvVrP3guvq/df/QO/712P7emP76uv7mifu3T/3kzv70bPzYpv784fy8
-U/73nN/e3uvq6+/v7/f39////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5
-BAAAAAAALAAAAAAUADwAAAf/gE2Cg4SFhodMTIeLggEFTQWKjIVKSk0AS5OETEmSSQOSk0pJg0sE
-SgEBiYQDSgUSAJMAkkwFqJqXg0wBuE2jhAK4jgOFAwTEhwQHi8aLBJmLy4cA0ofQhkuRiLGDSUqS
-AqGbj00HzwdJwbOI4QICvE1MS5jihPNL9au9+/yM+vzywvWr1ETCNU2cmLBYkgSeplEfVEQoUMDh
-IibPUPTowETCqSVLHHJKgulDkAYoG3jwsAGDL1qKXuBAQLMmggQJfDQhJWiVC5o4E0wYOoFGEwHI
-BAlYgiEHygsXRIi4kOHowZ5JCnTIkIGCVworRlwdZGzDTZwP0hYY2xMAjLQm2BzIdUBwGxK5RIDE
-AAFiQCdESTAYuSSApKID9XoG84tPHoAAbAUtqZQ03j9DiRL328x5k+ZJTCp9RvSI4ehC80KUOHUa
-awANGjCiSqWZCQAJERYsGAJgBAEC3ggpEYAqhI4UHAwoN8Bjh+VSglosN8CgugULRY4SQtzERnUG
-FpZXOBFhKaEAS2dw0E1Ct+7yAgtxinBDuXUhALRZa1Kh/xEIAJrGTBMAKmCggU0QYNF5TRhYQxMy
-/KDAJQuSNUgBB6BDygCVbeKLN5ndM1qGoHgGWmudpShIIAA7
-</content>
-  </attachment>
   <object>
     <class>
       <name>XWiki.JavaScriptExtension</name>
@@ -227,7 +173,7 @@ function showMsg(msgdiv, i)
  {
    if (msgdiv.prevmsg=="")
     msgdiv.prevmsg = msgdiv.innerHTML;
-   var msgs = ["$msg.get("rating.one-star")", "$msg.get("rating.two-stars")", "$msg.get("rating.three-stars")", "$msg.get("rating.four-stars")", "$msg.get("rating.five-stars")"];
+   var msgs = ["$services.localization.render("rating.one-star")", "$services.localization.render("rating.two-stars")", "$services.localization.render("rating.three-stars")", "$services.localization.render("rating.four-stars")", "$services.localization.render("rating.five-stars")"];
    msgdiv.update(msgs[i]);
  }
 }
@@ -352,114 +298,6 @@ document.observe("dom:loaded", function()
     </property>
     <property>
       <code>/* ratings */
-.star-rating,
-.star-rating a:hover,
-.star-rating a:active,
-.star-rating a:focus,
-.star-rating .current-rating{
-background: url($doc.getAttachmentURL("star.gif")) left -1000px repeat-x;
-}
-.star-rating{
-position:relative;
-width:125px;
-height:25px;
-overflow:hidden;
-list-style:none;
-margin:0px !important;
-padding:0px !important;
-background-position: left top;
-}
-.star-rating li{
-display: inline;
-}
-.star-rating a,
-.star-rating .current-rating{
-position:absolute;
-top:0;
-left:0;
-text-indent:-1000em;
-height:25px;
-line-height:25px;
-outline:none;
-overflow:hidden;
-border: none;
-}
-.star-rating a:hover,
-.star-rating a:active,
-.star-rating a:focus{
-background-position: left bottom;
-}
-.star-rating a.one-star{
-width:20%;
-z-index:6;
-}
-.star-rating a.two-stars{
-width:40%;
-z-index:5;
-}
-.star-rating a.three-stars{
-width:60%;
-z-index:4;
-}
-.star-rating a.four-stars{
-width:80%;
-z-index:3;
-}
-.star-rating a.five-stars{
-width:100%;
-z-index:2;
-}
-.star-rating .current-rating{
-z-index:1;
-background-position: left center;
-}
-
-.small-star{
-width:100px;
-height:20px;
-}
-
-.small-star,
-.small-star a:hover,
-.small-star a:active,
-.small-star a:focus,
-.small-star .current-rating{
-background-image: url($doc.getAttachmentURL("smallstar.gif"));
-line-height: 20px;
-height: 20px;
-}
-
-ul.locked a,
-ul.locked a:hover,
-ul.locked a:active,
-ul.locked a:focus {
-background: transparent none;
-}
-
-ul.locked a {
-cursor: default !important;
-}
-
-.rating-container {
-line-height: 25px;
-}
-
-.rating-header {
-font-size: 11px;
-font-weight: bold;
-margin-right: 2px;
-line-height: 25px;
-}
-
-.rating-message {
-font-size: 10px;
-color: #333;
-font-style: italic;
-margin-right: 5px;
-float: right;
-position: relative;
-}
-
 .login-to-rate {
 font-size: 11px;
 font-weight: bold;
@@ -556,7 +394,9 @@ position: relative;
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
-      <content>{{include document='XWiki.RatingsMacros'/}}{{velocity}}
+      <content>{{include document='XWiki.RatingsMacros'/}}
+
+{{velocity}}
 #set($configClass     = 'XWiki.RatingsConfigClass')
 #set($globalConfigDoc = $xwiki.getDocument('XWiki.RatingsConfig'))
 #set($webPrefDoc      = $xwiki.getDocument("${doc.space}.WebPreferences"))
@@ -573,7 +413,8 @@ position: relative;
 ##
 #if($displayRatings &amp;&amp; !$listtool.contains($excludedPages, $doc.name))
   #displayFullRating($doc.getDocumentReference() "")
-#end{{/velocity}}</content>
+#end
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.template.title.before</extensionPointId>
@@ -590,7 +431,9 @@ icon=icon:star</parameters>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{include document="XWiki.RatingsMacros"/}}{{velocity}}
+  <content>{{include document="XWiki.RatingsMacros"/}}
+
+{{velocity}}
 #if("$!{request.xpage}" == "plain")
   #if("$!{request.vote}" != "")
     #set($requestDocRef = $services.model.resolveDocument($request.doc))
@@ -610,13 +453,14 @@ icon=icon:star</parameters>
        $response.setContentType('application/json')
        {"avgvote" : "${avgvote}", "uservote" :  "${uservote.vote}", "totalvotes" : "${nbVotes}" }
       #else 
-        $msg.get("rating.saveexception")
+        {{translation key="rating.saveexception"/}}
       #end
     #elseif($vote == 0)
-      $msg.get("rating.votenotvalid")
+      {{translation key="rating.votenotvalid"/}}
     #else
-      $msg.get("rating.voteoutofbounds")
+      {{translation key="rating.voteoutofbounds"/}}
     #end
   #end
-#end{{/velocity}}</content>
+#end
+{{/velocity}}</content>
 </xwikidoc>

@@ -79,7 +79,7 @@ public abstract class AbstractXMLValidator implements Validator
         this.errorHandler = createXMLErrorHandler();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(validateXML);
+        factory.setValidating(true);
 
         try {
             this.documentBuilder = factory.newDocumentBuilder();

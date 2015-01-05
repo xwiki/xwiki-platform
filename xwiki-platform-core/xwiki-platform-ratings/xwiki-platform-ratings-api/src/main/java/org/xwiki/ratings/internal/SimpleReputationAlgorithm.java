@@ -22,8 +22,8 @@ package org.xwiki.ratings.internal;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Singleton;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,6 +41,7 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @see ReputationAlgorithm
+ * @since 6.4M3
  */
 @Component
 @Singleton
@@ -76,11 +77,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         }
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewVoterReputation()
-     */
+    @Override
     public AverageRating calcNewVoterReputation(DocumentReference voter, DocumentReference documentRef, Rating rating,
         int oldVote) throws ReputationException
     {
@@ -88,11 +85,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewContributorReputation()
-     */
+    @Override
     public AverageRating calcNewContributorReputation(DocumentReference contributor, DocumentReference documentRef,
         Rating rating, int oldVote) throws ReputationException
     {
@@ -153,11 +146,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return constantY;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
-     */
+    @Override
     public Map<String, AverageRating> calcNewAuthorsReputation(DocumentReference documentRef, Rating rating, int oldVote)
         throws ReputationException
     {
@@ -165,11 +154,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.ReputationAlgorithm#calcNewAuthorsReputation()
-     */
+    @Override
     public Map<String, AverageRating> recalcAllReputation() throws ReputationException
     {
         notimplemented();
@@ -181,6 +166,7 @@ public class SimpleReputationAlgorithm extends DefaultReputationAlgorithm
      * 
      * @throws ReputationException when the method is called
      */
+    @Override
     protected void notimplemented() throws ReputationException
     {
         throw new ReputationException(ReputationException.MODULE_PLUGIN_RATINGS_REPUTATION,

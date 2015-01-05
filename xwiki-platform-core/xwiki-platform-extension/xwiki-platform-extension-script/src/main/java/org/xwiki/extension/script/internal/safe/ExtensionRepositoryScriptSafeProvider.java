@@ -29,6 +29,8 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
+import org.xwiki.extension.repository.rating.Ratable;
+import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.repository.search.Searchable;
 
 /**
@@ -73,9 +75,19 @@ public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafePro
                 new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,
                     this.defaultSafeProvider, this.execution, hasProgrammingRights());
         } else if (unsafe instanceof Searchable) {
+            if (unsafe instanceof Ratable) {
+                safe =
+                    new SafeSearchableRatableExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider,
+                        this.execution, hasProgrammingRights());
+            } else {
+                safe =
+                    new SafeSearchableExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider,
+                        this.execution, hasProgrammingRights());
+            }
+        } else if (unsafe instanceof Ratable) {
             safe =
-                new SafeSearchableExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider,
-                    this.execution, hasProgrammingRights());
+                new SafeRatableExtensionRepository<RatableExtensionRepository>((RatableExtensionRepository) unsafe,
+                    this.defaultSafeProvider, this.execution, hasProgrammingRights());
         } else {
             safe =
                 new SafeExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider, this.execution,

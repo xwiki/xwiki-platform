@@ -26,6 +26,7 @@ import org.xwiki.ratings.RatingsException;
 /**
  * @version $Id$
  * @see AverageRating
+ * @since 6.4M3
  */
 public class MemoryAverageRating implements AverageRating
 {
@@ -73,71 +74,43 @@ public class MemoryAverageRating implements AverageRating
         this.documentRef = documentRef;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getNbVotes()
-     */
+    @Override
     public int getNbVotes()
     {
         return nbVotes;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setNbVotes()
-     */
+    @Override
     public void setNbVotes(int nbVotes)
     {
         this.nbVotes = nbVotes;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getAverageVote()
-     */
+    @Override
     public float getAverageVote()
     {
         return averageVote;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setAverageVote()
-     */
+    @Override
     public void setAverageVote(float averageVote)
     {
         this.averageVote = averageVote;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#getMethod()
-     */
+    @Override
     public String getMethod()
     {
         return method;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#setMethod()
-     */
+    @Override
     public void setMethod(String method)
     {
         this.method = method;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.ratings.AverageRating#save()
-     */
+    @Override
     public void save() throws RatingsException
     {
     }

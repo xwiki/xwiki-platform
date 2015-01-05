@@ -48,6 +48,8 @@ public class SafeSearchableExtensionRepository<T extends ExtensionRepository> ex
         super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
+    // Searchable
+    
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {

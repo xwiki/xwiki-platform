@@ -55,20 +55,24 @@
   clear: left;
 }
 .responsive-table-tbody-tr() {
+  .clearfix();
   border-top: 2px solid @table-border-color;
 }
 // The cell (td or th) must be displayed as a row. The content is displayed on the right side to let display fake
 // headers on the left
 .responsive-table-tbody-tr-tdth() {
-  .clearfix();
   border: none;
   border-bottom: 1px solid @table-border-color;
+  float: left;
   min-height: @input-height-base;
+  overflow: hidden;
   position: relative;
   padding-left: 50%;
   padding-top: @table-cell-padding;
   top: 0;
   text-align:left;
+  text-overflow: ellipsis;
+  width: 100%;
   white-space: normal;
   
   // Fake header: display a fake cell to display the title of the current cell
@@ -78,12 +82,19 @@
     color: @text-color;
     // The title is stored in the data-title attribute of the cell
     content: attr(data-title);
+    display: inline-block;
     font-weight: bold;
     left: @table-cell-padding;
+    overflow: hidden;
     padding-right: @table-cell-padding;
+    // The position is absolute to be able to put the fake cell exactly where we want and to express width relative
+    // to the screen size.
     position: absolute;
     text-align: left;
+    text-overflow: ellipsis;
     top: @table-cell-padding;
+    // Because of the "absolute" position, we cannot make the text wrap, because it won't resize the whole row and the
+    // results is not good looking (see: http://jira.xwiki.org/secure/attachment/30083/30083_Prop3_wrap.png).
     white-space: nowrap;
     width: 45%;
   }

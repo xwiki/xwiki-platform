@@ -27,8 +27,8 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionRating;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.rating.ExtensionRating;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.rating.Ratable;

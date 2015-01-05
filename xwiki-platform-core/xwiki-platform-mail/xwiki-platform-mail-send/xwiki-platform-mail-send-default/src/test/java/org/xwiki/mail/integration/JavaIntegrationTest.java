@@ -48,7 +48,9 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.DefaultMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
+import org.xwiki.mail.internal.DefaultMailSenderRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
@@ -77,7 +79,9 @@ import static org.mockito.Mockito.when;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    MemoryMailListener.class
+    MemoryMailListener.class,
+    DefaultMailSenderRunnable.class,
+    DefaultMailQueueManager.class
 })
 public class JavaIntegrationTest
 {

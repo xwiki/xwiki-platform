@@ -23,32 +23,26 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
-import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
- * Default implementation using the {@link org.xwiki.mail.internal.MailSenderRunnable} to send emails asynchronously.
+ * Default implementation using the {@link DefaultMailSenderRunnable} to send emails asynchronously.
  *
  * @version $Id$
  * @since 6.1M2
@@ -58,41 +52,26 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultMailSender implements MailSender, Initializable
 {
     @Inject
-    private MailSenderConfiguration configuration;
-
-    @Inject
-    private Logger logger;
-
-    @Inject
     private ComponentManager componentManager;
 
     @Inject
     private ModelContext modelContext;
 
     @Inject
-    private ExecutionContextManager executionContextManager;
+    private MailSenderRunnable mailSenderRunnable;
 
     @Inject
-    private Provider<XWikiContext> xwikiContextProvider;
-
     private MailQueueManager mailQueueManager;
 
     private Thread mailSenderThread;
 
-    private MailSenderRunnable mailSenderRunnable;
-
     @Override
     public void initialize() throws InitializationException
     {
-        this.mailQueueManager = new MailQueueManager();
-
         // Start the Mail Sending Thread
-        this.mailSenderRunnable = new MailSenderRunnable(this.mailQueueManager, this.configuration,
-            this.xwikiContextProvider, this.executionContextManager);
         this.mailSenderThread = new Thread(this.mailSenderRunnable);
         this.mailSenderThread.setName("Mail Sender Thread");
         this.mailSenderThread.start();
-
     }
 
     @Override

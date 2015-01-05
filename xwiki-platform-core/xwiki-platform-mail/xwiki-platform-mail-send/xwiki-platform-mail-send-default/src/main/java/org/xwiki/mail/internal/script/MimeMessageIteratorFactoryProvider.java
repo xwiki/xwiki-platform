@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.script;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +34,9 @@ import org.xwiki.mail.internal.iterator.factory.UsersMimeMessageIteratorFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * Get an {@link Iterator} of {@link javax.mail.internet.MimeMessage} by internally finding some Iterator Factory
+ * component based on various parameters passed.
+ *
  * @version $Id$
  * @since 6.4M3
  */
@@ -41,7 +44,7 @@ public final class MimeMessageIteratorFactoryProvider
 {
     private MimeMessageIteratorFactoryProvider()
     {
-        //Hide the default constructor for utility classes
+        // Hide the default constructor for utility classes
     }
 
     /**

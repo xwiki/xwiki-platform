@@ -43,8 +43,8 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
-import org.xwiki.mail.internal.MimeMessageFactoryProvider;
-import org.xwiki.mail.internal.MimeMessageIteratorFactoryProvider;
+import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
+import org.xwiki.mail.internal.script.MimeMessageIteratorFactoryProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -106,8 +106,8 @@ public class MailSenderScriptService implements ScriptService
     {
         MimeMessageWrapper messageWrapper;
         try {
-            MimeMessageFactory factory = MimeMessageFactoryProvider
-                .get(hint, source.getClass(), this.componentManagerProvider.get());
+            MimeMessageFactory factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
+                this.componentManagerProvider.get());
             Session session = this.sessionProvider.get();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts

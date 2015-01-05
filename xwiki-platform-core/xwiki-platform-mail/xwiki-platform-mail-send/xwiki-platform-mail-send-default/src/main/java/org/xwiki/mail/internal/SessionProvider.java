@@ -21,11 +21,10 @@ package org.xwiki.mail.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.XWikiAuthenticator;
 
@@ -36,7 +35,7 @@ import org.xwiki.mail.XWikiAuthenticator;
  * @since 6.4M3
  */
 @Component
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Singleton
 public class SessionProvider implements Provider<Session>
 {
     @Inject

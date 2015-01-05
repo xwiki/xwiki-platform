@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.script;
 
 import java.lang.reflect.Type;
 
@@ -27,7 +27,9 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeMessageFactory;
 
 /**
- * Provide {@link MimeMessageFactory}.
+ * Get a {@link MimeMessageFactory} component instance for a Script Service, based on a component hint and a source
+ * Type.
+ *
  * @version $Id$
  * @since 6.4M3
  */
@@ -35,11 +37,10 @@ public final class MimeMessageFactoryProvider
 {
     private MimeMessageFactoryProvider()
     {
-        //Hide the default constructor for utility classes
+        // Hide the default constructor for utility classes
     }
 
     /**
-     *
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
      * @param type the type of the source from which to prefill the Mime Message
      * @param componentManager used to dynamically load all MimeMessageIterator

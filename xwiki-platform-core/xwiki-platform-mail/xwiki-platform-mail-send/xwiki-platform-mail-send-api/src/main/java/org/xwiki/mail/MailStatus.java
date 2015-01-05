@@ -73,11 +73,11 @@ public class MailStatus
     private String error;
 
     /**
-     * Default constructor to avoid org.Hibernate.InstantiationException.
+     * Default constructor used by Hibernate to load an instance from the Database.
      */
     public MailStatus()
     {
-        //
+        // Empty voluntarily.
     }
 
     /**
@@ -145,6 +145,9 @@ public class MailStatus
     }
 
     /**
+     * Note: the returned value is a String and not {@link MailState} to allow Hibernate to save that property to the
+     * database.
+     *
      * @return the state of the mail: ready to be sent, sent successfully, failed to be sent
      * @see MailState
      */
@@ -162,6 +165,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database.
+     *
      * @param state see {@link #getState()}
      */
     public void setState(String state)
@@ -169,8 +174,9 @@ public class MailStatus
         this.state = state;
     }
 
-
     /**
+     * Used by Hibernate to save that property to the database.
+     *
      * @return the ID of the batch mail sender
      */
     public String getBatchId()
@@ -179,6 +185,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database.
+     *
      * @param batchId the ID of the batch mail sender
      */
     public void setBatchId(String batchId)
@@ -187,6 +195,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to save that property to the database.
+     *
      * @return the date of status of mail
      */
     public Date getDate()
@@ -195,6 +205,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database.
+     *
      * @param date of status of mail
      */
     public void setDate(Date date)
@@ -203,6 +215,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to save that property to the database (hence the String).
+     *
      * @return the comma-separated list of email addresses to which the mail was addressed to
      */
     public String getRecipients()
@@ -211,6 +225,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database (hence the reason why it's a String).
+     *
      * @param recipients see {@link #getRecipients()}
      */
     public void setRecipients(String recipients)
@@ -219,6 +235,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to save that property to the database.
+     *
      * @return the type of batch mail (Watchlist, news ...)
      */
     public String getType()
@@ -227,6 +245,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database.
+     *
      * @param type of batch mail (Watchlist, news ...)
      */
     public void setType(String type)
@@ -235,6 +255,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to save that property to the database.
+     *
      * @return the error message when the mail has failed to be sent
      */
     public String getError()
@@ -243,6 +265,8 @@ public class MailStatus
     }
 
     /**
+     * Used by Hibernate to load that property from the database.
+     *
      * @param error see {@link #getError()}
      */
     public void setError(String error)

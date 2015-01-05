@@ -77,19 +77,29 @@ public class DefaultMailSenderRunnableTest
         Properties properties = new Properties();
         properties.setProperty("mail.smtp.host", "xwiki-unknown");
         Session session = Session.getDefaultInstance(properties);
-        MimeMessage message = new MimeMessage(session);
-        message.setSubject("subject");
-        message.setFrom(InternetAddress.parse("john@doe.com")[0]);
+
+        MimeMessage message1 = new MimeMessage(session);
+        message1.setSubject("subject1");
+        message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
+
+        MimeMessage message2 = new MimeMessage(session);
+        message2.setSubject("subject2");
+        message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
+
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, listener, batchId, "wiki");
+
+        MailSenderQueueItem item1 =
+            new MailSenderQueueItem(Arrays.asList(message1), session, listener, batchId, "wiki1");
+        MailSenderQueueItem item2 =
+            new MailSenderQueueItem(Arrays.asList(message2), session, listener, batchId, "wiki2");
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(MailQueueManager.class);
 
         // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
-        mailQueueManager.addToQueue(item);
-        mailQueueManager.addToQueue(item);
+        mailQueueManager.addToQueue(item1);
+        mailQueueManager.addToQueue(item2);
 
         MailSenderRunnable runnable = this.mocker.getComponentUnderTest();
         Thread thread = new Thread(runnable);

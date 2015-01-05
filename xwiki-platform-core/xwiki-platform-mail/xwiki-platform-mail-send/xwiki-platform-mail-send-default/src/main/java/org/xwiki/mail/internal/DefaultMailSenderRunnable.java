@@ -260,7 +260,9 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
         // Set custom XWiki mail headers.
         // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
         message.setHeader(HEADER_BATCH_ID, batchId.toString());
-        //For serialized message we keep the existent #HEADER_MAIL_ID
+
+        // If the message Id is already set, then don't generate an id. This is what happens for example when a
+        // serialized MimeMessage is loaded to be resent.
         if (message.getHeader(HEADER_MAIL_ID, null) == null)
         {
             message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());

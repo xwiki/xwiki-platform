@@ -39,6 +39,7 @@ import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.iterator.factory.GroupMimeMessageIteratorFactory;
 import org.xwiki.mail.internal.iterator.factory.SerializedFilesMimeMessageIteratorFactory;
 import org.xwiki.mail.internal.iterator.factory.UsersMimeMessageIteratorFactory;
+import org.xwiki.mail.internal.script.MimeMessageIteratorFactoryProvider;
 import org.xwiki.model.reference.DocumentReference;
 
 import static org.mockito.Matchers.eq;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link MimeMessageIteratorFactoryProvider}.
+ * Unit tests for {@link org.xwiki.mail.internal.script.MimeMessageIteratorFactoryProvider}.
  *
  * @version $Id$
  * @since 6.4M3

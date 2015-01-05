@@ -37,8 +37,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -47,7 +45,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -125,13 +123,7 @@ public class FileSystemMailContentStoreTest
         when(message.getHeader("X-BatchID", null)).thenReturn(batchId);
         when(message.getHeader("X-MailID", null)).thenReturn(mailId);
         when(message.getContent()).thenReturn("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
-        doAnswer(new Answer()
-        {
-            @Override public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                throw new IOException();
-            }
-        }).when(message).writeTo(any(OutputStream.class));
+        doThrow(new IOException()).when(message).writeTo(any(OutputStream.class));
         this.mocker.getComponentUnderTest().save(message);
     }
 

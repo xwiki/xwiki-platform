@@ -50,8 +50,8 @@ import org.xwiki.mail.internal.DefaultMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultMailSenderRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
-import org.xwiki.mail.internal.FileSystemMailContentStore;
 import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.SessionProvider;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptMailResult;
@@ -89,7 +89,7 @@ import static org.mockito.Mockito.when;
     DefaultMailSenderRunnable.class,
     DefaultMailQueueManager.class,
     StandardEnvironment.class,
-    FileSystemMailContentStore.class
+    SessionProvider.class
 })
 public class ScriptingIntegrationTest
 {

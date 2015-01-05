@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.script;
+package org.xwiki.mail.internal;
 
 import java.lang.reflect.Type;
 
@@ -25,13 +25,12 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.stability.Unstable;
 
 /**
+ * Provide {@link MimeMessageFactory}.
  * @version $Id$
  * @since 6.4M3
  */
-@Unstable
 public final class MimeMessageFactoryProvider
 {
     private MimeMessageFactoryProvider()

@@ -45,7 +45,8 @@
 ##
 #if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
   ## resending email
-  #set ($result = $services.mailsender.sendAsynchronously($request.batch_id, $request.mail_id, "database"))
+  #set($message = $services.mailstorage.load($request.batch_id, $request.mail_id))
+  #set($result = $services.mailsender.sendAsynchronously([$message], "database"))
   #if ($services.mailsender.lastError)
     {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}
   #end

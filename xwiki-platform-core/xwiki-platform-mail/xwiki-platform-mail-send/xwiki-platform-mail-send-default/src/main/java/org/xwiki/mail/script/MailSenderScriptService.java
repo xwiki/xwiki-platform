@@ -38,14 +38,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
+import org.xwiki.mail.internal.MimeMessageFactoryProvider;
+import org.xwiki.mail.internal.MimeMessageIteratorFactoryProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -92,8 +91,7 @@ public class MailSenderScriptService implements ScriptService
     private Execution execution;
 
     @Inject
-    @Named("filesystem")
-    private MailContentStore mailContentStore;
+    private Provider<Session> sessionProvider;
 
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
@@ -110,7 +108,7 @@ public class MailSenderScriptService implements ScriptService
         try {
             MimeMessageFactory factory = MimeMessageFactoryProvider
                 .get(hint, source.getClass(), this.componentManagerProvider.get());
-            Session session = createSession();
+            Session session = this.sessionProvider.get();
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -206,7 +204,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = createSession();
+        Session session = this.sessionProvider.get();
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
             this.componentManagerProvider.get());
@@ -290,51 +288,8 @@ public class MailSenderScriptService implements ScriptService
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, createSession(), listener),
+        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, this.sessionProvider.get(), listener),
             listener.getMailStatusResult());
-    }
-
-    /**
-     * Send the serialized MimeMessage synchronously.
-     *
-     * @param batchId the name of the directory that contains serialized MimeMessage
-     * @param mailId the name of the serialized MimeMessage
-     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
-     * @return UUID of the Batch mail
-     */
-    public ScriptMailResult send(String batchId, String mailId, String hint)
-    {
-        try {
-            checkPermissions();
-            MimeMessage message = this.mailContentStore.load(createSession(), batchId, mailId);
-            return send(Arrays.asList(message), hint);
-        } catch (MessagingException | MailStoreException e) {
-            // Save the exception for reporting through the script services's getLastError() API
-            setError(e);
-        }
-        return null;
-    }
-
-    /**
-     * Send the serialized MimeMessage asynchronously.
-     *
-     * @param batchId the name of the directory that contains serialized MimeMessage
-     * @param mailId the name of the serialized MimeMessage
-     * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
-     * @return UUID of the Batch mail
-     */
-    public ScriptMailResult sendAsynchronously(String batchId, String mailId, String hint)
-    {
-        MimeMessage message;
-        try {
-            message = this.mailContentStore.load(createSession(), batchId, mailId);
-        } catch (MailStoreException e) {
-            // Save the exception for reporting through the script services's getLastError() API
-            setError(e);
-            // Don't send the mail!
-            return null;
-        }
-        return sendAsynchronously(Arrays.asList(message), hint);
     }
 
     /**
@@ -381,18 +336,6 @@ public class MailSenderScriptService implements ScriptService
     public MailSenderConfiguration getConfiguration()
     {
         return this.configuration;
-    }
-
-    private Session createSession()
-    {
-        Session session;
-        if (this.configuration.usesAuthentication()) {
-            session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
-        } else {
-            session = Session.getInstance(this.configuration.getAllProperties());
-        }
-        return session;
     }
 
     // Error management

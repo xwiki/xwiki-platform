@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.Role;
  * @version $Id$
  * @since 6.4M3
  */
-@Role
 public interface MailResult
 {
     /**

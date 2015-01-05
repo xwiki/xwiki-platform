@@ -369,7 +369,13 @@ public class MailSenderScriptService implements ScriptService
     // Error management
 
     /**
-     * Get the error generated while performing the previously called action.
+     * Get the error generated while performing the previously called action. An error can happen for example when:
+     * <ul>
+     *   <li>creating the message to send</li>
+     *   <li>if there isn't enough permissions to send mails (for example if the page containing the sending script
+     *       doesn't have Programming Rights)</li>
+     *   <li>if the MailListener corresponding to the passed hint doesn't exist</li>
+     * </ul>
      *
      * @return the exception or {@code null} if no exception was thrown
      */

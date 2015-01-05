@@ -98,8 +98,6 @@ public class AuthenticatingIntegrationTest
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
-    private MimeBodyPartFactory<String> htmlBodyPartFactory;
-
     private MailSender sender;
 
     @BeforeComponent

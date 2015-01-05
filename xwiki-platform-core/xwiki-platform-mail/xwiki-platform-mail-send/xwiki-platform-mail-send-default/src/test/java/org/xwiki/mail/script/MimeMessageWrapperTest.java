@@ -31,7 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -56,7 +55,6 @@ public class MimeMessageWrapperTest
     public void setUp() throws Exception
     {
         Execution execution = mock(Execution.class);
-        MailSenderConfiguration configuration = mock(MailSenderConfiguration.class);
         ComponentManager componentManager = mock(ComponentManager.class);
 
         this.session = Session.getInstance(new Properties());
@@ -100,8 +98,7 @@ public class MimeMessageWrapperTest
     public void addRecipients() throws Exception
     {
         Address[] address = InternetAddress.parse("john@doe.com,jane@doe.com,jannie@doe.com");
-        this.messageWrapper
-            .addRecipients(Message.RecipientType.TO, address);
+        this.messageWrapper.addRecipients(Message.RecipientType.TO, address);
         ExtendedMimeMessage message = this.messageWrapper.getMessage();
         assertArrayEquals(message.getRecipients(Message.RecipientType.TO), address);
     }
@@ -109,8 +106,7 @@ public class MimeMessageWrapperTest
     @Test
     public void addRecipient() throws Exception
     {
-        this.messageWrapper
-            .addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
+        this.messageWrapper.addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
         ExtendedMimeMessage message = this.messageWrapper.getMessage();
         assertArrayEquals(message.getRecipients(Message.RecipientType.TO), InternetAddress.parse("john@doe.com"));
     }

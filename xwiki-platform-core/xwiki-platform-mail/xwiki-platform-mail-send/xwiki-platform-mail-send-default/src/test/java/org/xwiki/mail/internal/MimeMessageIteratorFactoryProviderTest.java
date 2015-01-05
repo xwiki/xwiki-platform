@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -93,8 +92,8 @@ public class MimeMessageIteratorFactoryProviderTest
         UsersMimeMessageIteratorFactory userFactory = mock(UsersMimeMessageIteratorFactory.class);
         when(this.componentManager.getInstance(eq(UsersMimeMessageIteratorFactory.class))).thenReturn(userFactory);
 
-        Iterator<MimeMessage> iterator = MimeMessageIteratorFactoryProvider
-            .get("users", userReferences, this.mimeMessageFactory, this.parameters, this.componentManager);
+        MimeMessageIteratorFactoryProvider.get("users", userReferences, this.mimeMessageFactory, this.parameters,
+            this.componentManager);
 
         verify(this.componentManager).getInstance(UsersMimeMessageIteratorFactory.class);
         verify(userFactory).create(eq(userReferences), eq(this.mimeMessageFactory), eq(this.parameters));
@@ -108,8 +107,8 @@ public class MimeMessageIteratorFactoryProviderTest
         GroupMimeMessageIteratorFactory groupFactory = mock(GroupMimeMessageIteratorFactory.class);
         when(this.componentManager.getInstance(eq(GroupMimeMessageIteratorFactory.class))).thenReturn(groupFactory);
 
-        Iterator<MimeMessage> iterator = MimeMessageIteratorFactoryProvider
-            .get("group", groupReference, this.mimeMessageFactory, this.parameters, this.componentManager);
+        MimeMessageIteratorFactoryProvider.get("group", groupReference, this.mimeMessageFactory, this.parameters,
+            this.componentManager);
 
         verify(this.componentManager).getInstance(GroupMimeMessageIteratorFactory.class);
         verify(groupFactory).create(eq(groupReference), eq(this.mimeMessageFactory), eq(this.parameters));
@@ -124,8 +123,8 @@ public class MimeMessageIteratorFactoryProviderTest
         when(this.componentManager.getInstance(eq(SerializedFilesMimeMessageIteratorFactory.class)))
             .thenReturn(filesFactory);
 
-        Iterator<MimeMessage> iterator = MimeMessageIteratorFactoryProvider
-            .get("files", batchId, this.mimeMessageFactory, this.parameters, this.componentManager);
+        MimeMessageIteratorFactoryProvider.get("files", batchId, this.mimeMessageFactory, this.parameters,
+            this.componentManager);
 
         verify(this.componentManager).getInstance(SerializedFilesMimeMessageIteratorFactory.class);
         verify(filesFactory).create(eq(batchId), eq(this.parameters));

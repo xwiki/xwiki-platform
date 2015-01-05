@@ -30,6 +30,8 @@ import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 
 /**
+ * Implementation that saves all mail statuses in a Map in memory.
+ * <p/>
  * This implementation is not meant for scalability. Don't use it if you're sending a large number of emails. Instead
  * use a Database Mail Listener for example.
  *
@@ -43,6 +45,11 @@ public class MemoryMailStatusResult implements MailStatusResult
      */
     private Map<String, MailStatus> statusMap = new HashMap<>();
 
+    /**
+     * Changes the status for the message referenced in the passed status object.
+     *
+     * @param status the new status. Also contains the message id representing the target message
+     */
     public void setStatus(MailStatus status)
     {
         this.statusMap.put(status.getMessageId(), status);

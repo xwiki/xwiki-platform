@@ -23,12 +23,23 @@ import java.util.UUID;
 
 import org.xwiki.mail.MailResult;
 
+/**
+ * Default implementation used when using the Mail Sender Java API.
+ *
+ * @version $Id$
+ * @since 6.4M3
+ */
 public class DefaultMailResult implements MailResult
 {
     private UUID batchId;
 
     private MailQueueManager mailQueueManager;
 
+    /**
+     * @param batchId the unique id for the batch of emails being sent together, used to verify when they've all been
+     *        sent
+     * @param mailQueueManager the class we used to check when the emails have been sent
+     */
     public DefaultMailResult(UUID batchId, MailQueueManager mailQueueManager)
     {
         this.batchId = batchId;

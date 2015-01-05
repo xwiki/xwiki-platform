@@ -24,18 +24,34 @@ import java.util.UUID;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailStatusResult;
 
+/**
+ * Implementation used by the Mail Sender Script Service. It wraps the Java {@link org.xwiki.mail.MailResult} class to
+ * add a new {@link #getStatusResults()} method since in the Scripting API the {@link org.xwiki.mail.MailListener} is
+ * passed as a hint and thus the user cannot call {@link org.xwiki.mail.MailListener#getMailStatusResult()} on it.
+ *
+ * @version $Id$
+ * @since 6.4M3
+ */
 public class ScriptMailResult implements MailResult
 {
     private MailResult wrappedMailResult;
 
     private MailStatusResult mailStatusResults;
 
+    /**
+     * @param wrappedMailResult the {@link org.xwiki.mail.MailResult} instance to wrap
+     * @param mailStatusResults see {@link #getStatusResults()}
+     */
     public ScriptMailResult(MailResult wrappedMailResult, MailStatusResult mailStatusResults)
     {
         this.wrappedMailResult = wrappedMailResult;
         this.mailStatusResults = mailStatusResults;
     }
 
+    /**
+     * @return the {@link org.xwiki.mail.MailListener}'s {@link org.xwiki.mail.MailStatusResult} object which is useful
+     *         for script users to get the status of each mail from the batch
+     */
     public MailStatusResult getStatusResults()
     {
         return this.mailStatusResults;

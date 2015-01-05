@@ -96,6 +96,7 @@ public class MemoryMailListener implements MailListener
     {
         MailStatus mailStatus = new MailStatus(message, null);
         mailStatus.setBatchId(message.getHeader("X-BatchID", null));
+        mailStatus.setType(message.getHeader("X-MailType", null));
         return mailStatus;
     }
 }

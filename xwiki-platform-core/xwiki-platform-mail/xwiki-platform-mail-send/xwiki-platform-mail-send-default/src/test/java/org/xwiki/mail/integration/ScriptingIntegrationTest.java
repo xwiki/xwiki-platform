@@ -42,7 +42,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
@@ -88,7 +87,6 @@ import static org.mockito.Mockito.when;
     MemoryMailListener.class,
     DefaultMailSenderRunnable.class,
     DefaultMailQueueManager.class,
-    StandardEnvironment.class,
     SessionProvider.class
 })
 public class ScriptingIntegrationTest

@@ -20,8 +20,8 @@
 package org.xwiki.mail.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,8 +42,11 @@ public class MemoryMailStatusResult implements MailStatusResult
 {
     /**
      * The Map's key is the unique message ID.
+     *
+     * Note that we keep the order in which messages are passed (i.e. the first status result will contain the first
+     * mail sent, etc).
      */
-    private Map<String, MailStatus> statusMap = new HashMap<>();
+    private Map<String, MailStatus> statusMap = new LinkedHashMap<>();
 
     /**
      * Changes the status for the message referenced in the passed status object.

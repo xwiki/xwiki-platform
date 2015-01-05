@@ -26,7 +26,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -50,63 +49,42 @@ public class MemoryMailListenerTest
         new MockitoComponentMockingRule<>(MemoryMailListener.class);
 
     @Test
-    public void errorAndRetrieveError() throws Exception
+    public void onErrorAndGetError() throws Exception
     {
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
-        MimeMessage message = mock(MimeMessage.class);
-        listener.onError(message, new Exception("error"));
-        Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.FAILED);
-        assertTrue("These should be mails in error!", results.hasNext());
-        String error = results.next().getError();
-        assertEquals("Exception: error", error );
-    }
+        MemoryMailListener listener = this.mocker.getComponentUnderTest();
 
-    @Test
-    public void getErrorsForBatchId() throws Exception
-    {
         UUID batchId = UUID.randomUUID();
 
         UUID mailId1 = UUID.randomUUID();
         UUID mailId2 = UUID.randomUUID();
-        UUID mailId3 = UUID.randomUUID();
-
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
 
         MimeMessage message1 = mock(MimeMessage.class);
         when(message1.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
         when(message1.getHeader("X-MailID", null)).thenReturn(mailId1.toString());
-        when(message1.getHeader("X-MailType", null)).thenReturn("watchlist");
-        listener.onError(message1, new Exception("error"));
+        when(message1.getHeader("X-MailType", null)).thenReturn("mailtype1");
+        listener.onError(message1, new Exception("error1"));
 
         MimeMessage message2 = mock(MimeMessage.class);
         when(message2.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
         when(message2.getHeader("X-MailID", null)).thenReturn(mailId2.toString());
-        when(message2.getHeader("X-MailType", null)).thenReturn("watchlist");
-        listener.onError(message2, new Exception("error"));
+        when(message2.getHeader("X-MailType", null)).thenReturn("mailtype2");
+        listener.onError(message2, new Exception("error2"));
 
-        MimeMessage message3 = mock(MimeMessage.class);
-        when(message3.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
-        when(message3.getHeader("X-MailID", null)).thenReturn(mailId3.toString());
-        when(message3.getHeader("X-MailType", null)).thenReturn("watchlist");
-        listener.onError(message3, new Exception("error"));
+        Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.FAILED);
+        assertTrue("These should be mails in error!", results.hasNext());
 
-        Iterator<MailStatus> iterator = listener.getMailStatusResult().getByState(MailState.FAILED);
+        MailStatus status = results.next();
+        assertEquals("Exception: error1", status.getError());
+        assertEquals(batchId.toString(), status.getBatchId());
+        assertEquals(mailId1.toString(), status.getMessageId());
+        assertEquals("mailtype1", status.getType());
 
-        assertTrue(iterator.hasNext());
-        MailStatus status1 = iterator.next();
-        assertEquals("Exception: error", status1.getError());
-        assertEquals(status1.getBatchId(), batchId.toString());
+        status = results.next();
+        assertEquals("Exception: error2", status.getError());
+        assertEquals(batchId.toString(), status.getBatchId());
+        assertEquals(mailId2.toString(), status.getMessageId());
+        assertEquals("mailtype2", status.getType());
 
-        assertTrue(iterator.hasNext());
-        MailStatus status2 = iterator.next();
-        assertEquals("Exception: error", status2.getError());
-        assertEquals(status2.getBatchId(), batchId.toString());
-
-        assertTrue(iterator.hasNext());
-        MailStatus status3 = iterator.next();
-        assertEquals("Exception: error", status3.getError());
-        assertEquals(status3.getBatchId(), batchId.toString());
-
-        assertFalse(iterator.hasNext());
+        assertFalse(results.hasNext());
     }
 }

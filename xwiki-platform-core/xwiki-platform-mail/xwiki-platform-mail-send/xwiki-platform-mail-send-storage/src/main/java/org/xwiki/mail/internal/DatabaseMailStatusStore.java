@@ -79,7 +79,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public MailStatus load(final String messageId) throws MailStoreException
+    public MailStatus loadFromMessageId(final String messageId) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
         try {
@@ -104,7 +104,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public List<MailStatus> load(final String batchId, final MailState state) throws MailStoreException
+    public List<MailStatus> loadFromBatchId(final String batchId, final MailState state) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
         try {
@@ -125,5 +125,35 @@ public class DatabaseMailStatusStore implements MailStatusStore
             throw new MailStoreException(String.format("Failed to load mail statuses "
                 + "(for batch id [%s] and state [%s]) from the database.", batchId, state), e);
         }
+    }
+
+    @Override
+    public List<MailStatus> loadFromBatchId(final String batchId) throws MailStoreException
+    {
+        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        try {
+            return store.executeRead(this.contextProvider.get(),
+                new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
+                {
+                    @Override public List<MailStatus> doInHibernate(Session session)
+                        throws HibernateException, XWikiException
+                    {
+                        Query query =
+                            session.createQuery(FROM_QUERY + " where mail_batchid=:batchid");
+                        query.setParameter("batchid", batchId);
+                        List<MailStatus> queryResult = (List<MailStatus>) query.list();
+                        return queryResult;
+                    }
+                });
+        } catch (Exception e) {
+            throw new MailStoreException(String.format("Failed to load mail statuses from the database "
+                + "for batch id [%s].", batchId), e);
+        }
+    }
+
+    @Override
+    public long count(String batchId) throws MailStoreException
+    {
+        return 0;
     }
 }

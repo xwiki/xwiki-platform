@@ -29,6 +29,13 @@ import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 
+/**
+ * This implementation is not meant for scalability. Don't use it if you're sending a large number of emails. Instead
+ * use a Database Mail Listener for example.
+ *
+ * @version $Id$
+ * @since 6.4M3
+ */
 public class MemoryMailStatusResult implements MailStatusResult
 {
     /**

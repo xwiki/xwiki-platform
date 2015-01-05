@@ -21,13 +21,14 @@ package org.xwiki.mail.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailListener;
@@ -43,8 +44,8 @@ import org.xwiki.mail.MailStoreException;
  * @since 6.4M3
  */
 @Component
-@Singleton
 @Named("database")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DatabaseMailListener implements MailListener, Initializable
 {
     @Inject
@@ -69,8 +70,12 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepare(MimeMessage message)
     {
+        // Initialize the DatabaseMailStatusResult on first execution, in order to save the Batch ID
+        String batchId = getMessageBatchId(message);
+        this.mailStatusResult.setBatchId(batchId);
+
         final MailStatus result = new MailStatus(getMessageId(message));
-        result.setBatchId(getMessageBatchId(message));
+        result.setBatchId(batchId);
         result.setState(MailState.READY);
         saveStatus(result);
     }
@@ -125,7 +130,7 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public MailStatusResult getMailStatusResult()
     {
-        return null;
+        return this.mailStatusResult;
     }
 
     private String getMessageId(MimeMessage message)
@@ -152,7 +157,7 @@ public class DatabaseMailListener implements MailListener, Initializable
     {
         MailStatus status;
         try {
-            status = this.mailStatusStore.load(messageId);
+            status = this.mailStatusStore.loadFromMessageId(messageId);
         } catch (MailStoreException e) {
             // Failed to load the status in the DB, we continue but log an error
             this.logger.error("Failed to load mail status for message id [{}] from the database", messageId, e);

@@ -19,41 +19,84 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
+import org.xwiki.mail.MailStoreException;
 
+/**
+ * This implementation is not meant for scalability. Don't use it if you're sending a large number of emails. Instead
+ * use the Query Manager to perform database queries.
+ *
+ * @version $Id$
+ * @since 6.4M3
+ */
 public class DatabaseMailStatusResult implements MailStatusResult
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMailStatusResult.class);
+
     private MailStatusStore mailStatusStore;
 
-    private UUID batchId;
+    private String batchId;
 
-    public DatabaseMailStatusResult(UUID batchId,  MailStatusStore mailStatusStore)
+    public DatabaseMailStatusResult(MailStatusStore mailStatusStore)
+    {
+        this.mailStatusStore = mailStatusStore;
+    }
+
+    public void setBatchId(String batchId)
     {
         this.batchId = batchId;
-        this.mailStatusStore = mailStatusStore;
     }
 
     @Override
     public long getSize()
     {
-        return this.mailStatusStore.count(this.batchId);
+        if (this.batchId == null) {
+            return 0;
+        }
+
+        try {
+            return this.mailStatusStore.count(this.batchId);
+        } catch (MailStoreException e) {
+            LOGGER.error("Failed to get size of results. Returning an empty result.", e);
+            return 0;
+        }
     }
 
     @Override
     public Iterator<MailStatus> getAll()
     {
-        return this.mailStatusStore.lo
+        if (this.batchId == null) {
+            return Collections.emptyIterator();
+        }
+
+        try {
+            return this.mailStatusStore.loadFromBatchId(this.batchId).iterator();
+        } catch (MailStoreException e) {
+            LOGGER.error("Failed to get all results. Returning an empty result.", e);
+            return Collections.emptyIterator();
+        }
     }
 
     @Override
     public Iterator<MailStatus> getByState(MailState state)
     {
-        return null;
+        if (this.batchId == null) {
+            return Collections.emptyIterator();
+        }
+
+        try {
+            return this.mailStatusStore.loadFromBatchId(this.batchId, state).iterator();
+        } catch (MailStoreException e) {
+            LOGGER.error("Failed to get results by state. Returning an empty result.", e);
+            return Collections.emptyIterator();
+        }
     }
 }

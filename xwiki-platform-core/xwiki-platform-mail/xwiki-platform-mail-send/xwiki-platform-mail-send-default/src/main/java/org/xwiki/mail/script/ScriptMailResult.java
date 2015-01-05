@@ -26,7 +26,7 @@ import org.xwiki.mail.MailStatusResult;
 
 /**
  * Implementation used by the Mail Sender Script Service. It wraps the Java {@link org.xwiki.mail.MailResult} class to
- * add a new {@link #getStatusResults()} method since in the Scripting API the {@link org.xwiki.mail.MailListener} is
+ * add a new {@link #getStatusResult()} method since in the Scripting API the {@link org.xwiki.mail.MailListener} is
  * passed as a hint and thus the user cannot call {@link org.xwiki.mail.MailListener#getMailStatusResult()} on it.
  *
  * @version $Id$
@@ -36,25 +36,25 @@ public class ScriptMailResult implements MailResult
 {
     private MailResult wrappedMailResult;
 
-    private MailStatusResult mailStatusResults;
+    private MailStatusResult mailStatusResult;
 
     /**
      * @param wrappedMailResult the {@link org.xwiki.mail.MailResult} instance to wrap
-     * @param mailStatusResults see {@link #getStatusResults()}
+     * @param mailStatusResult see {@link #getStatusResult()}
      */
-    public ScriptMailResult(MailResult wrappedMailResult, MailStatusResult mailStatusResults)
+    public ScriptMailResult(MailResult wrappedMailResult, MailStatusResult mailStatusResult)
     {
         this.wrappedMailResult = wrappedMailResult;
-        this.mailStatusResults = mailStatusResults;
+        this.mailStatusResult = mailStatusResult;
     }
 
     /**
      * @return the {@link org.xwiki.mail.MailListener}'s {@link org.xwiki.mail.MailStatusResult} object which is useful
      *         for script users to get the status of each mail from the batch
      */
-    public MailStatusResult getStatusResults()
+    public MailStatusResult getStatusResult()
     {
-        return this.mailStatusResults;
+        return this.mailStatusResult;
     }
 
     @Override

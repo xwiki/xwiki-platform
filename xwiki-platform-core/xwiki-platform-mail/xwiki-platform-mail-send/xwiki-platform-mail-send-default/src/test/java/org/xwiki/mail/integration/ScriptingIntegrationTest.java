@@ -152,9 +152,9 @@ public class ScriptingIntegrationTest
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",
-            result.getStatusResults().getByState(MailState.FAILED).hasNext());
+            result.getStatusResult().getByState(MailState.FAILED).hasNext());
         assertFalse("There should not be any mails in the ready state!",
-            result.getStatusResults().getByState(MailState.READY).hasNext());
+            result.getStatusResult().getByState(MailState.READY).hasNext());
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
@@ -220,9 +220,9 @@ public class ScriptingIntegrationTest
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",
-            result.getStatusResults().getByState(MailState.FAILED).hasNext());
+            result.getStatusResult().getByState(MailState.FAILED).hasNext());
         assertFalse("There should not be any mails in the ready state!",
-            result.getStatusResults().getByState(MailState.READY).hasNext());
+            result.getStatusResult().getByState(MailState.READY).hasNext());
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

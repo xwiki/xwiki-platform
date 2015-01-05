@@ -132,9 +132,12 @@ public class MailTest extends AbstractTest
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
-            + "#set ($id = $services.mailsender.send($message))\n"
+            + "#set ($result = $services.mailsender.send($message))\n"
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#end\n"
+            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
+            + "  {{error}}$status.messageId - $status.error{{/error}}\n"
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail

@@ -25,14 +25,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -72,7 +70,7 @@ public class LDAPProfileXClass
 
     private XWikiContext context;
 
-    private BaseClass ldapClass;
+    private final BaseClass ldapClass;
 
     public LDAPProfileXClass(XWikiContext context) throws XWikiException
     {
@@ -158,7 +156,8 @@ public class LDAPProfileXClass
     public void updateLDAPObject(String xwikiUserName, String dn, String uid) throws XWikiException
     {
         XWikiDocument userDocument =
-            this.context.getWiki().getDocument(XWIKI_USER_SPACE + "." + xwikiUserName, this.context);
+            this.context.getWiki().getDocument(new LocalDocumentReference(XWIKI_USER_SPACE, xwikiUserName),
+                this.context);
 
         boolean needsUpdate = updateLDAPObject(userDocument, dn, uid);
 
@@ -226,7 +225,7 @@ public class LDAPProfileXClass
                     .getWiki()
                     .getStore()
                     .searchDocuments(sql, false, false, false, 0, 0,
-                        Arrays.asList(ldapClass.getName(), LDAP_XFIELD_UID, uid.toLowerCase()), this.context);
+                        Arrays.asList(LDAP_XCLASS, LDAP_XFIELD_UID, uid.toLowerCase()), this.context);
         } catch (XWikiException e) {
             LOGGER.error("Fail to search for document containing ldap uid [" + uid + "]", e);
 

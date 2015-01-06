@@ -40,11 +40,6 @@ import org.xwiki.script.service.ScriptService;
  */
 public abstract class AbstractMailScriptService implements ScriptService
 {
-    /**
-     * The key under which the last encountered error is stored in the current execution context.
-     */
-    static final String ERROR_KEY = "scriptservice.mailsender";
-
     @Inject
     protected MailSender mailSender;
 
@@ -133,7 +128,7 @@ public abstract class AbstractMailScriptService implements ScriptService
      */
     public Exception getLastError()
     {
-        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
+        return (Exception) this.execution.getContext().getProperty(getErrorKey());
     }
 
     /**
@@ -144,6 +139,11 @@ public abstract class AbstractMailScriptService implements ScriptService
      */
     protected void setError(Exception e)
     {
-        this.execution.getContext().setProperty(ERROR_KEY, e);
+        this.execution.getContext().setProperty(getErrorKey(), e);
     }
+
+    /**
+     * @return The key under which the last encountered error is stored in the current execution context.
+     */
+    protected abstract String getErrorKey();
 }

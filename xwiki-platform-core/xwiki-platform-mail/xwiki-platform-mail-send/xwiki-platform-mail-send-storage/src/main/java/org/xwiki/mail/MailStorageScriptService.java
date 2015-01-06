@@ -44,11 +44,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class MailStorageScriptService extends AbstractMailScriptService
 {
-    /**
-     * The key under which the last encountered error is stored in the current execution context.
-     */
-    static final String ERROR_KEY = "scriptservice.mailstorage.error";
-
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
@@ -72,24 +67,31 @@ public class MailStorageScriptService extends AbstractMailScriptService
             return null;
         }
 
-        MimeMessage message = loadMessage(batchId, mailId);
-
-        ScriptMailResult  scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
-
-        // Wait for all messages from this batch to have been sent before returning
-        scriptMailResult.waitTillSent(Long.MAX_VALUE);
-
-        return scriptMailResult;
-    }
-
-    private MimeMessage loadMessage(String batchId, String mailId)
-    {
+        MimeMessage message = null;
         try {
-            MimeMessage message = this.mailContentStore.load(this.sessionProvider.get(), batchId, mailId);
+            message = loadMessage(batchId, mailId);
+            ScriptMailResult  scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
+
+            // Wait for all messages from this batch to have been sent before returning
+            scriptMailResult.waitTillSent(Long.MAX_VALUE);
+
+            return scriptMailResult;
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
+            return null;
         }
-        return null;
+    }
+
+    private MimeMessage loadMessage(String batchId, String mailId) throws MailStoreException
+    {
+        MimeMessage message = this.mailContentStore.load(this.sessionProvider.get(), batchId, mailId);
+        return message;
+    }
+
+    @Override
+    protected String getErrorKey()
+    {
+        return "scriptservice.mailstorage.error";
     }
 }

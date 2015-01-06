@@ -282,4 +282,10 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         return this.configuration;
     }
+
+    @Override
+    protected String getErrorKey()
+    {
+        return ERROR_KEY;
+    }
 }

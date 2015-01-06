@@ -60,13 +60,15 @@ Mail.SendMailConfigClass_password=Email Server Password (optional)
 Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, for authenticating servers
 Mail.SendMailConfigClass_properties=Additional Properties
 Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
-Mail.SendMailStatus_livetable.date=Date of event
+Mail.SendMailStatus_livetable.date= Date
 Mail.SendMailStatus_livetable.batchId=Sending ID
 Mail.SendMailStatus_livetable.messageId=Message ID
 Mail.SendMailStatus_livetable.recipients=Recipients
 Mail.SendMailStatus_livetable.state=Status
 Mail.SendMailStatus_livetable.actions=Actions
-Mail.SendMailStatus_livetable.resend=Resend </content>
+Mail.SendMailStatus_livetable.resend=Resend
+Mail.SendMailStatus_livetable.resend.success=The mail has been sent successfully
+Mail.SendMailStatus_livetable.more=More</content>
   <object>
     <name>Mail.Translations</name>
     <number>0</number>

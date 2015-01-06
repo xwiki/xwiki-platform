@@ -46,12 +46,18 @@
 #if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
   ## resending email
   #set($result = $services.mailstorage.resend($request.batch_id, $request.mail_id))
+
   #if ($services.mailstorage.lastError)
     {{error}}$exceptiontool.getStackTrace($services.mailstorage.lastError){{/error}}
   #end
-  #foreach ($status in $result.statusResult.getByState('FAILED'))
-    {{error}}$status.messageId - $status.error{{/error}}
+  #if($result.isSent())
+    {{success}}$services.localization.render('Mail.SendMailStatus_livetable.resend.success'){{/success}}
+  #else
+    #foreach ($status in $result.statusResult.getByState('FAILED'))
+      {{error}}$status.messageId - $status.error{{/error}}
+    #end
   #end
+
 #end
 ##
 ## Livetable #

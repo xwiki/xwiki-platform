@@ -46,7 +46,8 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $util.parseInt($request.get('offset')))
+#set ($offset = 0)
+#set ($offset = $offset.parseInt($request.get('offset')))
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
 #if($offset &lt; 0)

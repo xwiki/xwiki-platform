@@ -229,8 +229,7 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                 if (from != null) {
                     message.setFrom(new InternetAddress(from));
                 } else {
-                    throw new MessagingException("Missing the From Address for sending the mail. "
-                        + "You need to either define it in the Mail Configuration or pass it in your message.");
+                    // JavaMail won't be able to send the mail but we'll get the error in the status.
                 }
             }
 

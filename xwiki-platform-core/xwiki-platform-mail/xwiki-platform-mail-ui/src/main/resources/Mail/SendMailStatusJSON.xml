@@ -31,113 +31,114 @@
   <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1419905350000</date>
-  <contentUpdateDate>1419905228000</contentUpdateDate>
+  <date>1420563418000</date>
+  <contentUpdateDate>1420563418000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>Send Mail Status JSON</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity wiki="false"}}
-#if("$!{request.xpage}" == 'plain')
+#if("$!{request.outputSyntax}" == 'plain' || "$!{request.xpage}" == 'plain')
   $response.setContentType('application/json')
-#end
-##==============================
-## Offset = item # at which to start displaying data
-##==============================
-#set ($offset = 0)
-#if ("$!request.offset" != '')
-  #set ($offset = $offset.parseInt($request.offset))
-  ## offset starts from 0 in velocity and 1 in javascript
+  ##==============================
+  ## Offset = item # at which to start displaying data
+  ##==============================
+  #set($offset = $mathtool.toInteger($request.get('offset')))
+  ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
-#end
-##==================
-## Limit = # of items to display
-##==================
-## If no limit is specified, limit at 15 items
-#set ($limit = 15)
-#if ("$!request.limit" != '')
-  #set($limit = $limit.parseInt($request.limit))
-#end
-##==================
-## Tag = one parameter per tag
-##==================
-#if($request.tag)
-  #foreach($tag in $request.getParameterValues('tag'))
-    ## TODO: Add code to filter items based on the selected tags
+  #if(!$offset || $offset &lt; 0)
+    #set($offset = 0)
   #end
-#end
-##==========
-## Sort direction
-##==========
-#set($order = "$!request.sort")
-#if($order != '')
-  #set($orderDirection = "$!{request.get('dir')}")
-  #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
-    #set($orderDirection = 'desc')
+  ##==================
+  ## Limit = # of items to display
+  ##==================
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if(!$limit)
+    #set ($limit = 15)
   #end
-#else
-  #set($order = "date")
-#end
-## ===========
-## Filter Data here...
-## ===========
-## TODO: Add code to filter data 
-## Each column can be filtered and the filter for a column can be retrieved with:
-## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
-#set($filterQuery = '')
-#set($filterId = "$!{request.get('batchId')}")
-#if("$!{filterId}" != '')
-  #set($filterQuery = "and status.batchId like '%${filterId.trim()}%' ")
-#end
-#set($filterRecipients = "$!{request.get('recipients')}")
-#if("$!{filterRecipients}" != '')
-  #set($filterQuery = $filterQuery + "and status.recipients like '%${filterRecipients.trim()}%' ")
-#end
-#set($filterStatus = "$!{request.get('state')}")
-#if("$!{filterStatus}" != '')
-  #set($filterQuery = $filterQuery + "and status.state like '%${filterStatus.trim()}%' ")
-#end
-#set($totalrows = $services.query.xwql("select count(status) from MailStatus as status").count())
-#set($results = [])
-#set($xwql = "select status from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.${order} $!orderDirection")
-#set($results = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).execute())
-## ===
-## JSON
-## ===
-{
-  "totalrows": $totalrows,
-  "matchingtags": {},
-  "tags" : [],
-  "returnedrows": $results.size(),
-  "offset": $mathtool.toInteger($request.offset),
-  "sort": "$request.sort",
-  "dir": "$request.dir",
-  "reqNo": $mathtool.toInteger($request.reqNo),
-  "rows": [
-  #foreach( $item in $results )
-    #if($velocityCount &gt; 1) , #end
-    {
-      #set($recipients = "$!item.recipients")
-      "doc_viewable" : true,
-      "date" : "$!item.date",
-      "batchId" : "$!item.batchId",
-      "recipients" : "$escapetool.javascript($recipients)",
-      "state" : "$!item.state",
-      #if("$!item.state" != "sent")
-      "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+  ##==================
+  ## Tag = one parameter per tag
+  ##==================
+  #if($request.tag)
+    #foreach($tag in $request.getParameterValues('tag'))
+      ## TODO: Add code to filter items based on the selected tags
+    #end
+  #end
+  ##==========
+  ## Sort direction
+  ##==========
+  #set($order = "$!request.sort")
+  #if($order != '')
+    #set($orderDirection = "$!{request.get('dir')}")
+    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+      #set($orderDirection = 'desc')
+    #end
+  #else
+    #set($order = "date")
+  #end
+  ## ===========
+  ## Filter Data here...
+  ## ===========
+  ## TODO: Add code to filter data 
+  ## Each column can be filtered and the filter for a column can be retrieved with:
+  ## #set($filterValue = "$!{request.get(&lt;columnname&gt;)}")
+  #set($filterQuery = '')
+  #set($filterId = "$!{request.get('batchId')}")
+  #if("$!{filterId}" != '')
+    #set($filterQuery = "and status.batchId like '%${filterId.trim()}%' ")
+  #end
+  #set($filterRecipients = "$!{request.get('recipients')}")
+  #if("$!{filterRecipients}" != '')
+    #set($filterQuery = $filterQuery + "and status.recipients like '%${filterRecipients.trim()}%' ")
+  #end
+  #set($filterStatus = "$!{request.get('state')}")
+  #if("$!{filterStatus}" != '')
+    #set($filterQuery = $filterQuery + "and status.state like '%${filterStatus.trim()}%' ")
+  #end
+  #set($totalrows = $services.query.xwql("select count(status) from MailStatus as status").count())
+  #set($results = [])
+  #set($xwql = "select status from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.${order} $!orderDirection")
+  #set($results = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).execute())
+  ## ===
+  ## JSON
+  ## ===
+  {
+    "totalrows": $totalrows,
+    "matchingtags": {},
+    "tags" : [],
+    "returnedrows": $results.size(),
+    "offset": $mathtool.toInteger($request.offset),
+    "sort": "$request.sort",
+    "dir": "$request.dir",
+    "reqNo": $mathtool.toInteger($request.reqNo),
+    "rows": [
+    #foreach( $item in $results )
+      #if($velocityCount &gt; 1) , #end
+      {
+        #set($recipients = "$!item.recipients")
+        "doc_viewable" : true,
+        "date" : "$!item.date",
+        "batchId" : "$!item.batchId",
+        "recipients" : "$escapetool.javascript($recipients)",
+        "state" : "$!item.state",
+        #if("$!item.state" != "sent")
+          "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
               &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
               &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
               &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
 &lt;/span&gt;
             &lt;/form&gt;")}"
-      #else
-      "actions" : ""
-      #end  
-    }
-  #end
-  ]
-}
+        #else
+          "actions" : ""
+        #end  
+      }
+    #end
+    ]
+  }
+#else
+  This page should be called by Mail.SenMailStatus with parameters.
+#end
 {{/velocity}}</content>
 </xwikidoc>

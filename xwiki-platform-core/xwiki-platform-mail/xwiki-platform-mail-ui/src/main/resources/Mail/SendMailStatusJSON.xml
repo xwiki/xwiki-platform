@@ -47,19 +47,18 @@
 ## Offset = item # at which to start displaying data
 ##==============================
 #set ($offset = 0)
-#set ($offset = $offset.parseInt($request.get('offset')))
-## offset starts from 0 in velocity and 1 in javascript
-#set($offset = $offset - 1)
-#if($offset &lt; 0)
-  #set($offset = 0)
+#if ("$!request.offset" != '')
+  #set ($offset = $offset.parseInt($request.offset))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
 #end
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $util.parseInt($request.get('limit')))
 ## If no limit is specified, limit at 15 items
-#if (!$limit)
-  #set ($limit = 15)
+#set ($limit = 15)
+#if ("$!request.limit" != '')
+  #set($limit = $limit.parseInt($request.limit))
 #end
 ##==================
 ## Tag = one parameter per tag

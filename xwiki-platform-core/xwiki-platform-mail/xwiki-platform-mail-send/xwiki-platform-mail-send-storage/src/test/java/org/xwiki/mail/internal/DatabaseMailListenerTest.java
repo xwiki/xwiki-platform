@@ -24,12 +24,10 @@ import java.util.UUID;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.xwiki.mail.MailContentStore;
-import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
@@ -54,11 +52,9 @@ public class DatabaseMailListenerTest
 
     private MimeMessage message;
 
-    final UUID batchId = UUID.randomUUID();
+    private UUID batchId = UUID.randomUUID();
 
-    final UUID mailId = UUID.randomUUID();
-
-    DatabaseMailListener listener;
+    private UUID mailId = UUID.randomUUID();
 
     @Before
     public void setUp() throws Exception
@@ -66,49 +62,48 @@ public class DatabaseMailListenerTest
         this.message = mock(MimeMessage.class);
         when(this.message.getHeader("X-MailID", null)).thenReturn(this.mailId.toString());
         when(this.message.getHeader("X-BatchID", null)).thenReturn(this.batchId.toString());
-        when(this.message.getHeader("X-MailType", null)).thenReturn("watchlist");
-
-        this.listener = this.mocker.getInstance(MailListener.class, "database");
+        when(this.message.getHeader("X-MailType", null)).thenReturn("type");
     }
 
     @Test
-    @Ignore
     public void prepareAndSaveStatus() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
 
-        this.listener.onPrepare(this.message);
+        this.mocker.getComponentUnderTest().onPrepare(this.message);
 
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.READY)));
     }
 
     @Test
-    @Ignore
     public void successAndSaveStatus() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.mailId.toString());
         status.setState(MailState.READY);
+        status.setType("type");
+        status.setBatchId(this.batchId.toString());
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
-        this.listener.onSuccess(this.message);
+        this.mocker.getComponentUnderTest().onSuccess(this.message);
 
         verify(mailStatusStore).loadFromMessageId(this.mailId.toString());
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT)));
     }
 
     @Test
-    @Ignore
     public void successAndSaveStatusWithPreviouslyFailedMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.mailId.toString());
         status.setState(MailState.FAILED);
+        status.setType("type");
+        status.setBatchId(this.batchId.toString());
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
 
-        this.listener.onSuccess(this.message);
+        this.mocker.getComponentUnderTest().onSuccess(this.message);
 
         verify(mailStatusStore).loadFromMessageId(this.mailId.toString());
 
@@ -118,17 +113,18 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    @Ignore
     public void errorAndSaveStatusAndMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.mailId.toString());
         status.setState(MailState.READY);
+        status.setType("type");
+        status.setBatchId(this.batchId.toString());
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
 
-        this.listener.onError(this.message, new Exception("Error"));
+        this.mocker.getComponentUnderTest().onError(this.message, new Exception("Error"));
 
         verify(mailStatusStore).loadFromMessageId(this.mailId.toString());
 
@@ -142,7 +138,7 @@ public class DatabaseMailListenerTest
      */
     class isSameMailStatus extends ArgumentMatcher<MailStatus>
     {
-        String state;
+        private String state;
 
         public isSameMailStatus(MailState state)
         {
@@ -155,7 +151,7 @@ public class DatabaseMailListenerTest
             MailStatus statusArgument = (MailStatus) argument;
             return statusArgument.getBatchId().equals(batchId.toString()) &&
                 statusArgument.getMessageId().equals(mailId.toString()) &&
-                statusArgument.getType().equals("watchlist") &&
+                statusArgument.getType().equals("type") &&
                 statusArgument.getState().equals(state);
         }
     }

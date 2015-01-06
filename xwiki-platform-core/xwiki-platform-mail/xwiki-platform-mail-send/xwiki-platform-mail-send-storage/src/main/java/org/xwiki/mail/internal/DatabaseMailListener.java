@@ -79,6 +79,7 @@ public class DatabaseMailListener implements MailListener, Initializable
         result.setBatchId(batchId);
         result.setState(MailState.READY);
         result.setRecipients(getMessageRecipients(message));
+        result.setType(getMailType(message));
         saveStatus(result);
     }
 
@@ -137,20 +138,25 @@ public class DatabaseMailListener implements MailListener, Initializable
 
     private String getMessageId(MimeMessage message)
     {
-        try {
-            return message.getHeader("X-MailID", null);
-        } catch (MessagingException e) {
-            this.logger.error("Failed to retrieve Message ID from message.", e);
-            return null;
-        }
+        return getSafeHeader("X-MailID", message);
+    }
+
+    private String getMailType(MimeMessage message)
+    {
+        return getSafeHeader("X-MailType", message);
     }
 
     private String getMessageBatchId(MimeMessage message)
     {
+        return getSafeHeader("X-BatchID", message);
+    }
+
+    private String getSafeHeader(String headerName, MimeMessage message)
+    {
         try {
-            return message.getHeader("X-BatchID", null);
+            return message.getHeader(headerName, null);
         } catch (MessagingException e) {
-            this.logger.error("Failed to retrieve Batch ID from message.", e);
+            this.logger.error("Failed to retrieve [{}] header from the message.", headerName, e);
             return null;
         }
     }

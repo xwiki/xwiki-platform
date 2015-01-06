@@ -32,6 +32,7 @@
   <name>XWiki Platform - Mail - Send - Storage</name>
   <description>API to store mails and their statuses</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Storage</xwiki.extension.name>
   </properties>

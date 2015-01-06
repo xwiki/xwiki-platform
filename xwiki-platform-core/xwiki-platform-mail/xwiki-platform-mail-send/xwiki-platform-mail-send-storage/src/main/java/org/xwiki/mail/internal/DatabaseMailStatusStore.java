@@ -55,6 +55,12 @@ public class DatabaseMailStatusStore implements MailStatusStore
 
     private static final String BATCHID_PARAMETER_NAME = "batchid";
 
+    private static final String WHERE_QUERY_BATCH_ID = " where mail_batchid=:batchid";
+
+    private static final String WHERE_QUERY_MAIL_ID = " where mail_id=:id";
+
+    private static final String ID_PARAMETER_NAME = "id";
+
     @Inject
     private Provider<XWikiContext> contextProvider;
 
@@ -71,6 +77,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
             {
                 @Override public Object doInHibernate(Session session) throws HibernateException, XWikiException
                 {
+                    //Delete previous state of the message
+                    session.createQuery("delete " + FROM_QUERY + WHERE_QUERY_MAIL_ID)
+                        .setParameter(ID_PARAMETER_NAME, status.getMessageId()).executeUpdate();
                     session.save(status);
                     return null;
                 }
@@ -90,8 +99,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 {
                     @Override public MailStatus doInHibernate(Session session) throws HibernateException, XWikiException
                     {
-                        Query query = session.createQuery(FROM_QUERY + " where mail_id=:id");
-                        query.setParameter("id", messageId);
+                        Query query = session.createQuery(FROM_QUERY + WHERE_QUERY_MAIL_ID);
+                        query.setParameter(ID_PARAMETER_NAME, messageId);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         if (!queryResult.isEmpty()) {
                             return queryResult.get(0);
@@ -141,7 +150,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                         throws HibernateException, XWikiException
                     {
                         Query query =
-                            session.createQuery(FROM_QUERY + " where mail_batchid=:batchid");
+                            session.createQuery(FROM_QUERY + WHERE_QUERY_BATCH_ID);
                         query.setParameter(BATCHID_PARAMETER_NAME, batchId);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
@@ -154,8 +163,26 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public long count(String batchId) throws MailStoreException
+    public long count(final String batchId) throws MailStoreException
     {
-        return loadFromBatchId(batchId).size();
+        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        try {
+            Long count = store.executeRead(this.contextProvider.get(),
+                new XWikiHibernateBaseStore.HibernateCallback<Long>()
+                {
+                    @Override public Long doInHibernate(Session session)
+                        throws HibernateException, XWikiException
+                    {
+                        Query query =
+                            session.createQuery("select count(*) " + FROM_QUERY + WHERE_QUERY_BATCH_ID);
+                        query.setParameter(BATCHID_PARAMETER_NAME, batchId);
+                        return (Long) query.uniqueResult();
+                    }
+                });
+            return count;
+        } catch (Exception e) {
+            throw new MailStoreException(String.format("Failed to get count of mail statuses with batch id "
+                + "[%s] from the database .", batchId), e);
+        }
     }
 }

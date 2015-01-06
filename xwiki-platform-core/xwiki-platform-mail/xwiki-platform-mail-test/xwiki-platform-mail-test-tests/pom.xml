@@ -35,6 +35,7 @@
   <description>XWiki Platform - Mail - Functional Tests</description>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <xwikiDbHbmCommonExtraMappings>mailstream.hbm.xml</xwikiDbHbmCommonExtraMappings>
   </properties>
   <dependencies>
     <dependency>

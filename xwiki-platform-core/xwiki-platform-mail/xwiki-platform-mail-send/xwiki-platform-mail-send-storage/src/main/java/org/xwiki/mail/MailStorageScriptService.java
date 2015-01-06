@@ -19,15 +19,17 @@
  */
 package org.xwiki.mail;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.mail.script.AbstractMailScriptService;
+import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -40,7 +42,7 @@ import org.xwiki.stability.Unstable;
 @Named("mailstorage")
 @Singleton
 @Unstable
-public class MailStorageScriptService
+public class MailStorageScriptService extends AbstractMailScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
@@ -52,22 +54,35 @@ public class MailStorageScriptService
     private MailContentStore mailContentStore;
 
     /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
-    @Inject
-    private Provider<Session> sessionProvider;
-
-    /**
-     * Load the serialized MimeMessage synchronously.
+     * Resend the serialized MimeMessage synchronously.
      *
      * @param batchId the name of the directory that contains serialized MimeMessage
      * @param mailId the name of the serialized MimeMessage
-     * @return the MimeMessage instance deserialized from the store
+     * @return the result and status of the send batch
      */
-    public MimeMessage loadMessage(String batchId, String mailId)
+    public ScriptMailResult resend(String batchId, String mailId)
+    {
+        MailListener listener = null;
+        try {
+            listener = this.componentManagerProvider.get().getInstance(MailListener.class, "database");
+        } catch (ComponentLookupException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+            // Don't send the mail!
+            return null;
+        }
+
+        MimeMessage message = loadMessage(batchId, mailId);
+
+        ScriptMailResult  scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
+
+        // Wait for all messages from this batch to have been sent before returning
+        scriptMailResult.waitTillSent(Long.MAX_VALUE);
+
+        return scriptMailResult;
+    }
+
+    private MimeMessage loadMessage(String batchId, String mailId)
     {
         try {
             MimeMessage message = this.mailContentStore.load(this.sessionProvider.get(), batchId, mailId);
@@ -76,26 +91,5 @@ public class MailStorageScriptService
             setError(e);
         }
         return null;
-    }
-
-    /**
-     * Get the error generated while performing the previously called action. An error can happen for example when:
-     *
-     * @return the exception or {@code null} if no exception was thrown
-     */
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
-    }
-
-    /**
-     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     *
-     * @param e the exception to store, can be {@code null} to clear the previously stored exception
-     * @see #getLastError()
-     */
-    private void setError(Exception e)
-    {
-        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

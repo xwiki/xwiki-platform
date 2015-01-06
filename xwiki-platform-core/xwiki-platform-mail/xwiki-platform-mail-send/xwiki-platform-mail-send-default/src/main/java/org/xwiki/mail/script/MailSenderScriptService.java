@@ -24,9 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -36,16 +34,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
 import org.xwiki.mail.internal.script.MimeMessageIteratorFactoryProvider;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -67,31 +61,12 @@ import org.xwiki.stability.Unstable;
 @Named("mailsender")
 @Singleton
 @Unstable
-public class MailSenderScriptService implements ScriptService
+public class MailSenderScriptService extends AbstractMailScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
     static final String ERROR_KEY = "scriptservice.mailsender.error";
-
-    @Inject
-    private MailSenderConfiguration configuration;
-
-    @Inject
-    private MailSender mailSender;
-
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
-
-    /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
-    @Inject
-    private Provider<Session> sessionProvider;
 
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
@@ -277,7 +252,6 @@ public class MailSenderScriptService implements ScriptService
     {
         final MailListener listener;
         try {
-            checkPermissions();
             listener = getListener(hint);
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getLastError() API
@@ -285,39 +259,10 @@ public class MailSenderScriptService implements ScriptService
             // Don't send the mail!
             return null;
         }
-
-        // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
-        // the passed listener.
-        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, this.sessionProvider.get(), listener),
-            listener.getMailStatusResult());
+        return sendAsynchronously(messages, listener, true);
     }
 
-    /**
-     * Check authorization to send mail.
-     *
-     * @throws MessagingException when not authorized to send mail
-     */
-    private void checkPermissions() throws MessagingException
-    {
-        // Load the configured permission checker
-        ScriptServicePermissionChecker checker;
-        String hint = this.configuration.getScriptServicePermissionCheckerHint();
-        try {
-            checker = this.componentManagerProvider.get().getInstance(ScriptServicePermissionChecker.class, hint);
-        } catch (ComponentLookupException e) {
-            // Failed to load the user-configured hint, in order not to have a security hole, consider that we're not
-            // authorized to send emails!
-            throw new MessagingException(String.format("Failed to locate Permission Checker [%s]. "
-                + "The mail has not been sent.", hint), e);
-        }
 
-        try {
-            checker.check();
-        } catch (MessagingException e) {
-            throw new MessagingException(String.format("Not authorized by the Permission Checker [%s] to send mail! "
-                + "No mail has been sent.", hint), e);
-        }
-    }
 
     private MailListener getListener(String hint) throws MessagingException
     {
@@ -336,34 +281,5 @@ public class MailSenderScriptService implements ScriptService
     public MailSenderConfiguration getConfiguration()
     {
         return this.configuration;
-    }
-
-    // Error management
-
-    /**
-     * Get the error generated while performing the previously called action. An error can happen for example when:
-     * <ul>
-     *   <li>creating the message to send</li>
-     *   <li>if there isn't enough permissions to send mails (for example if the page containing the sending script
-     *       doesn't have Programming Rights)</li>
-     *   <li>if the MailListener corresponding to the passed hint doesn't exist</li>
-     * </ul>
-     *
-     * @return the exception or {@code null} if no exception was thrown
-     */
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
-    }
-
-    /**
-     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     *
-     * @param e the exception to store, can be {@code null} to clear the previously stored exception
-     * @see #getLastError()
-     */
-    private void setError(Exception e)
-    {
-        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

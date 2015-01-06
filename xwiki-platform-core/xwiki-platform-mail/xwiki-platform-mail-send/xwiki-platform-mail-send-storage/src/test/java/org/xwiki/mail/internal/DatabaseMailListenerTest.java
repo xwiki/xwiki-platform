@@ -72,6 +72,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
+    @Ignore
     public void prepareAndSaveStatus() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
@@ -82,6 +83,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
+    @Ignore
     public void successAndSaveStatus() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
@@ -116,6 +118,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
+    @Ignore
     public void errorAndSaveStatusAndMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");

@@ -17,50 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
 
-import java.util.Queue;
+package org.xwiki.mail.internal.iterator.factory;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Makes a component out of a Thread.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M3
  */
 @Role
-public interface MailSenderThread extends Runnable
+public interface UsersMimeMessageIteratorFactory
 {
     /**
-     * See {@link Thread#setName(String)}.
+     * Create Iterator of MimeMessages.
      *
-     * @param threadName see {@link Thread#setName(String)}
+     * @param userReferences the list of recipients
+     * @param factory factory to create MimeMessage
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a user references (userReferences)
+     * @throws MessagingException when an error occurs
      */
-    void setName(String threadName);
-
-    /**
-     * See {@link Thread#join()}.
-     * @throws InterruptedException see {@link Thread#join()}
-     */
-    void join() throws InterruptedException;
-
-    /**
-     * Starts sending mail found on the queue.
-     *
-     * @param mailQueue the queue where pending emails to send are located
-     */
-    void startProcessing(Queue<MailSenderQueueItem> mailQueue);
-
-    /**
-     * Stops sending mails from the queue.
-     */
-    void stopProcessing();
-
-    /**
-     * Starts sending mail found on the queue.
-     *
-     * @param mailQueue the queue where pending emails to send are located
-     */
-    void run(Queue<MailSenderQueueItem> mailQueue);
+    Iterator<MimeMessage> create(List<DocumentReference> userReferences, MimeMessageFactory factory,
+        Map<String, Object> parameters) throws MessagingException;
 }

@@ -3014,7 +3014,7 @@ public class XWiki implements EventListener
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(Message.RecipientType.TO, email);
             MailSender mailSender = Utils.getComponent(MailSender.class);
-            mailSender.send(message, session);
+            mailSender.send(Arrays.asList(message), session);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                 XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending validation email", e);

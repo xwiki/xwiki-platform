@@ -20,96 +20,108 @@
 package org.xwiki.mail.script;
 
 import java.util.Properties;
+import java.util.UUID;
 
-import javax.mail.MessagingException;
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetAddress;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.mail.MailSender;
-import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
- * Unit tests for {@link org.xwiki.mail.script.MimeMessageWrapper}.
+ * Unit tests for {@link MimeMessageWrapper}.
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 6.4M3
  */
 public class MimeMessageWrapperTest
 {
-    @Test
-    public void sendWhenNotAllowed() throws Exception
+    private MimeMessageWrapper messageWrapper;
+
+    private ExtendedMimeMessage extendedMimeMessage;
+
+    private Session session;
+
+    @Before
+    public void setUp() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        message.setText("test");
-        message.setSubject("subject");
-        ExtendedMimeMessage extendedMessage = new ExtendedMimeMessage(message);
-
-        MailSender sender = mock(MailSender.class);
-
         Execution execution = mock(Execution.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
-
-        MailSenderConfiguration configuration = mock(MailSenderConfiguration.class);
-        when(configuration.getScriptServicePermissionCheckerHint()).thenReturn("test");
-
-        ScriptServicePermissionChecker checker = mock(ScriptServicePermissionChecker.class);
-        doThrow(new MessagingException("notauthorized")).when(checker).check(any(MimeMessage.class));
-
         ComponentManager componentManager = mock(ComponentManager.class);
-        when(componentManager.getInstance(ScriptServicePermissionChecker.class, "test")).thenReturn(checker);
 
-        MimeMessageWrapper wrapper =
-            new MimeMessageWrapper(extendedMessage, session, sender, execution, configuration, componentManager);
+        this.session = Session.getInstance(new Properties());
+        this.extendedMimeMessage = new ExtendedMimeMessage(session);
 
-        wrapper.send();
-
-        // Check errors (we should have one, stored in the EC!)
-        Exception expectedException = (Exception) executionContext.getProperty(MailSenderScriptService.ERROR_KEY);
-        assertEquals("Not authorized to send mail with subject [subject], using Permission Checker [test]. The mail "
-            + "has not been sent.", expectedException.getMessage());
+        this.messageWrapper =
+            new MimeMessageWrapper(extendedMimeMessage, session, execution, componentManager);
     }
 
     @Test
-    public void sendWhenCheckerNotFound() throws Exception
+    public void getMessage() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        message.setText("test");
-        message.setSubject("subject");
-        ExtendedMimeMessage extendedMessage = new ExtendedMimeMessage(message);
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        assertEquals(message, this.extendedMimeMessage);
+    }
 
-        MailSender sender = mock(MailSender.class);
+    @Test
+    public void getSession() throws Exception
+    {
+        Session session = this.messageWrapper.getSession();
+        assertEquals(session, this.session);
+    }
 
-        Execution execution = mock(Execution.class);
-        ExecutionContext executionContext = new ExecutionContext();
-        when(execution.getContext()).thenReturn(executionContext);
+    @Test
+    public void setSubject() throws Exception
+    {
+        this.messageWrapper.setSubject("lorem ipsum");
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        assertEquals(message.getSubject(), "lorem ipsum");
+    }
 
-        MailSenderConfiguration configuration = mock(MailSenderConfiguration.class);
-        when(configuration.getScriptServicePermissionCheckerHint()).thenReturn("test");
+    @Test
+    public void setFrom() throws Exception
+    {
+        this.messageWrapper.setFrom(InternetAddress.parse("john@doe.com")[0]);
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        assertArrayEquals(message.getFrom(), InternetAddress.parse("john@doe.com"));
+    }
 
-        ComponentManager componentManager = mock(ComponentManager.class);
-        when(componentManager.getInstance(ScriptServicePermissionChecker.class, "test")).thenThrow(
-            new ComponentLookupException("not found"));
+    @Test
+    public void addRecipients() throws Exception
+    {
+        Address[] address = InternetAddress.parse("john@doe.com,jane@doe.com,jannie@doe.com");
+        this.messageWrapper.addRecipients(Message.RecipientType.TO, address);
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        assertArrayEquals(message.getRecipients(Message.RecipientType.TO), address);
+    }
 
-        MimeMessageWrapper wrapper =
-            new MimeMessageWrapper(extendedMessage, session, sender, execution, configuration, componentManager);
+    @Test
+    public void addRecipient() throws Exception
+    {
+        this.messageWrapper.addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        assertArrayEquals(message.getRecipients(Message.RecipientType.TO), InternetAddress.parse("john@doe.com"));
+    }
 
-        wrapper.send();
+    @Test
+    public void addHeader() throws Exception
+    {
+        String batchId = UUID.randomUUID().toString();
+        String mailId = UUID.randomUUID().toString();
 
-        // Check errors (we should have one, stored in the EC!)
-        Exception expectedException = (Exception) executionContext.getProperty(MailSenderScriptService.ERROR_KEY);
-        assertEquals("Failed to locate Permission Checker [test]. The mail has not been sent.",
-            expectedException.getMessage());
+        this.messageWrapper.addHeader("X-BatchID", batchId);
+        this.messageWrapper.addHeader("X-MailID", mailId);
+        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+
+        assertEquals(message.getHeader("X-BatchID", null), batchId);
+        assertEquals(message.getHeader("X-MailID", null), mailId);
     }
 }

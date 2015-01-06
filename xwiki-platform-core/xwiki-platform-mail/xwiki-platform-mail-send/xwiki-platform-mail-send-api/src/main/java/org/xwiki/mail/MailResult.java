@@ -17,21 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail;
+
+import java.util.UUID;
 
 /**
- * Override {@link #sendMail(MailSenderQueueItem)} in order to throw an exception for the test to simulate an error
- * sending an email
+ * The result of the batch of emails being sent.
  *
- * @see org.xwiki.mail.internal.DefaultMailSenderThreadTest
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.4M3
  */
-public class TestableDefaultMailSenderThread extends DefaultMailSenderThread
+public interface MailResult
 {
-    @Override
-    protected void sendMail(MailSenderQueueItem item)
-    {
-        throw new RuntimeException("error");
-    }
+    /**
+     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     */
+    void waitTillSent(long timeout);
+
+    /**
+     * @return true if all the mails from this batch have been sent (successfully or not) or false otherwise
+     */
+    boolean isSent();
+
+    /**
+     * @return the batch id for this session of mail sending
+     */
+    UUID getBatchId();
 }

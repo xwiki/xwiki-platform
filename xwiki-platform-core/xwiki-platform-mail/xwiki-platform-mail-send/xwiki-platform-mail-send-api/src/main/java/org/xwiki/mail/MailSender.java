@@ -37,29 +37,23 @@ import org.xwiki.stability.Unstable;
 public interface MailSender
 {
     /**
-     * Send a mail and wait for it to be sent.
+     * Send a list of mails and wait for it to be sent.
      *
-     * @param message the message to sent
+     * @param messages the list of messages to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
-     * @throws MessagingException when an error occurs when sending the mail
+     * @return the result of the mail sending
+     * @throws MessagingException when an error occurs when sending the mail or if the mail has failed to be sent
      */
-    void send(MimeMessage message, Session session) throws MessagingException;
+    MailResult send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException;
 
     /**
-     * Send a mail asynchronously (the call returns immediately and you need to call {@link #waitTillSent(long)} if you
-     * wish to wait till it's been effectively sent).
+     * Send a list of mails asynchronously (the call returns immediately).
      *
-     * @param message the message to sent
+     * @param messages the list of messages to sent
      * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
      * @param listener a listener called when the mail is sent successfully or when there is an error
+     * @return the result of the mail sending
      * @since 6.2M1
      */
-    void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener);
-
-    /**
-     * Wait for all messages on the sending queue to be sent before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     */
-    void waitTillSent(long timeout);
+    MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session, MailListener listener);
 }

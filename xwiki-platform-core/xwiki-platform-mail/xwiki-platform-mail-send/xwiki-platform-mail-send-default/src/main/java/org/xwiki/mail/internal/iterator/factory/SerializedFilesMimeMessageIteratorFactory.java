@@ -17,30 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
 
+package org.xwiki.mail.internal.iterator.factory;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Test;
-
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Unit tests for {@link DefaultMailResultListener}.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class DefaultMailResultListenerTest
+@Role
+public interface SerializedFilesMimeMessageIteratorFactory
 {
-    @Test
-    public void errorAndRetrieveError() throws Exception
-    {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        MimeMessage message = mock(MimeMessage.class);
-        listener.onError(message, new Exception("error"));
-        assertEquals(1, listener.getExceptionQueue().size());
-        assertEquals("error", listener.getExceptionQueue().take().getMessage());
-    }
+    /**
+     * Create Iterator of MimeMessages.
+     *
+     * @param batchId the name of the directory that contains serialized MimeMessages
+     * @param parameters the parameters from which to extract the session, source and the headers
+     * @return Iterator of MimeMessage generated from a serialized files MimeMessage
+     * @throws MessagingException when an error occurs
+     */
+    Iterator<MimeMessage> create(UUID batchId, Map<String, Object> parameters) throws MessagingException;
 }

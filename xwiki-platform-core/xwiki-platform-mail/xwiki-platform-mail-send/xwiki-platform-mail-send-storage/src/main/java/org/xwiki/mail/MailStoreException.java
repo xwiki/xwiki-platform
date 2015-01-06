@@ -19,31 +19,38 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.internet.MimeMessage;
-
-import org.xwiki.stability.Unstable;
-
 /**
- * Allows listening to Mail sending results.
+ * Encapsulate a Mail Store error.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4M3
  */
-@Unstable
-public interface MailResultListener
+public class MailStoreException extends Exception
 {
     /**
-     * Called when the mail is sent successfully.
-     *
-     * @param message the message sent
+     * Class ID for serialization.
      */
-    void onSuccess(MimeMessage message);
+    private static final long serialVersionUID = 442523704445037944L;
 
     /**
-     * Called when the mail has failed to be sent.
+     * Construct a new exception with the specified detail message.
      *
-     * @param message the message that was tried to be sent
-     * @param e the exception explaining why the message couldn't be sent
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    void onError(MimeMessage message, Exception e);
+    public MailStoreException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * Construct a new exception with the specified detail message and cause.
+     *
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
+     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
+     *            permitted, and indicates that the cause is nonexistent or unknown)
+     */
+    public MailStoreException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

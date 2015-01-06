@@ -70,13 +70,14 @@ public class TemplateMimeMessageFactoryTest
         this.templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
 
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"), anyMap(), any(Locale.class)))
-            .thenReturn("XWiki news");
+        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"),
+            anyMapOf(String.class, String.class), any(Locale.class))).thenReturn("XWiki news");
 
         MimeBodyPartFactory<DocumentReference> templateBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, DocumentReference.class), "xwiki/template");
         this.mimeBodyPart = mock(MimeBodyPart.class);
-        when(templateBodyPartFactory.create(same(this.templateReference), anyMap())).thenReturn(this.mimeBodyPart);
+        when(templateBodyPartFactory.create(same(this.templateReference),
+            anyMapOf(String.class, Object.class))).thenReturn(this.mimeBodyPart);
 
         this.session = Session.getDefaultInstance(new Properties());
     }

@@ -35,5 +35,6 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-send-api</module>
     <module>xwiki-platform-mail-send-default</module>
+    <module>xwiki-platform-mail-send-storage</module>
   </modules>
 </project>

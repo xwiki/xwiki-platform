@@ -19,41 +19,48 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.UUID;
 
-import javax.mail.internet.MimeMessage;
-
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailResult;
 
 /**
- * Saves errors when sending messages, in a local variable.
+ * Default implementation used when using the Mail Sender Java API.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.4M3
  */
-public class DefaultMailResultListener implements MailResultListener
+public class DefaultMailResult implements MailResult
 {
-    private BlockingQueue<Exception> errorQueue = new LinkedBlockingQueue<>(100);
+    private UUID batchId;
 
-    @Override
-    public void onSuccess(MimeMessage message)
-    {
-        // We're only interested in errors in the scripting API.
-    }
-
-    @Override
-    public void onError(MimeMessage message, Exception e)
-    {
-        // Add the error to the queue
-        this.errorQueue.add(e);
-    }
+    private MailQueueManager mailQueueManager;
 
     /**
-     * @return the list of exceptions raised when sending mails in the current thread
+     * @param batchId the unique id for the batch of emails being sent together, used to verify when they've all been
+     *        sent
+     * @param mailQueueManager the class we used to check when the emails have been sent
      */
-    public BlockingQueue<Exception> getExceptionQueue()
+    public DefaultMailResult(UUID batchId, MailQueueManager mailQueueManager)
     {
-        return this.errorQueue;
+        this.batchId = batchId;
+        this.mailQueueManager = mailQueueManager;
+    }
+
+    @Override
+    public void waitTillSent(long timeout)
+    {
+        this.mailQueueManager.waitTillSent(getBatchId(), timeout);
+    }
+
+    @Override
+    public boolean isSent()
+    {
+        return this.mailQueueManager.isSent(getBatchId());
+    }
+
+    @Override
+    public UUID getBatchId()
+    {
+        return this.batchId;
     }
 }

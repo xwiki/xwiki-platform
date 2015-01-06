@@ -20,9 +20,11 @@
 package org.xwiki.mail.integration;
 
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -34,17 +36,23 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.DefaultMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
+import org.xwiki.mail.internal.DefaultMailSenderRunnable;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
-import org.xwiki.mail.internal.DefaultMailSenderThread;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
@@ -52,8 +60,10 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API when using an
@@ -67,7 +77,9 @@ import static org.junit.Assert.assertEquals;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    MemoryMailListener.class,
+    DefaultMailSenderRunnable.class,
+    DefaultMailQueueManager.class
 })
 public class AuthenticatingIntegrationTest
 {
@@ -86,8 +98,6 @@ public class AuthenticatingIntegrationTest
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
-    private MimeBodyPartFactory<String> htmlBodyPartFactory;
-
     private MailSender sender;
 
     @BeforeComponent
@@ -102,6 +112,16 @@ public class AuthenticatingIntegrationTest
         this.configuration = new TestMailSenderConfiguration(
             this.mail.getSmtps().getPort(), "peter", "password", properties);
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
+
+        // Set the current wiki in the Context
+        ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
+
+        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+
+        this.componentManager.registerMockComponent(ExecutionContextManager.class);
     }
 
     @Before
@@ -144,15 +164,15 @@ public class AuthenticatingIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail synchronously
-        this.sender.send(message, session);
+        this.sender.send(Arrays.asList(message), session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         assertEquals(1, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
 

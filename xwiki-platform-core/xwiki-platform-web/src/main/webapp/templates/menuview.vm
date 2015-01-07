@@ -271,7 +271,7 @@
     #if ($hasPreviousMenuSection)
       #submenuseparator()
     #end
-    #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
+    #set ($spaceIndexUrl = $xwiki.getURL($services.model.createDocumentReference('', $doc.space, 'WebHome'), 'view','sheet=Main.SpaceIndex'))
     #submenuitem($spaceIndexUrl $services.localization.render('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)
   #end

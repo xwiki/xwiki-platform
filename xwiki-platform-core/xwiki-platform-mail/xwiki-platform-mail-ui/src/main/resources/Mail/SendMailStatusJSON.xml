@@ -119,7 +119,7 @@
       {
         #set($recipients = "$!item.recipients")
         "doc_viewable" : true,
-        "date" : "$!item.date",
+        "date" : "$xwiki.formatDate($!item.date)",
         "batchId" : "$!item.batchId",
         "recipients" : "$escapetool.javascript($recipients)",
         "state" : "$!item.state",

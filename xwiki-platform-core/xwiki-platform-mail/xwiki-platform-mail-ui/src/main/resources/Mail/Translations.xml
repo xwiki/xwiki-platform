@@ -40,10 +40,13 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>admin.email=Email
-admin.email.description=Configure email (general, mail sending, etc).
-admin.email.general=General
-admin.email.send=Mail Sending
-admin.email.status=Mail Sending Status
+admin.email.description=Configure email (general, mail sending) and view mail statuses.
+admin.emailgeneral=General
+admin.emailgeneral.description=Configure general email parameters.
+admin.emailsend=Mail Sending
+admin.emailsend.description=Configure mail sending parameters.
+admin.emailstatus=Mail Sending Status
+admin.emailstatus.description=View the statuses of sent mails.
 Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 Mail.GeneralMailConfigClass_obfuscate.hint=This affects only the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 Mail.SendMailConfigClass_from=Email address to send from

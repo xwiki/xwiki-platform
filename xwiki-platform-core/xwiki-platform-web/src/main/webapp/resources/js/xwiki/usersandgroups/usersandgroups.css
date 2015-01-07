@@ -25,8 +25,10 @@
 }
 
 .rights {
+  text-align: center;
   padding-left: 0px !important;
   padding-top: 4px;
+  white-space: nowrap;
   width: 9%;
 }
 .rights th, .rights td {

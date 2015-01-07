@@ -2391,7 +2391,8 @@ var $jsVarName = {
   #end
   $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
-    #foreach ($child in $item.children)
+    #set ($children = $sorttool.sort($item.children, 'order'))
+    #foreach ($child in $children)
       #verticalNavigationItem($child $level.concat('*') $options)
     #end
   #end

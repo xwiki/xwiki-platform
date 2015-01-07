@@ -77,28 +77,28 @@
   {
     'id' : 'usersgroups',
     'children': [
-       {'id' : 'Users'},
-       {'id' : 'Groups'},
-       {'id' : 'Rights', 'perSpace' : true},
-       {'id' : 'Registration'},
-       {'id' : 'UserProfile'}
+       {'id' : 'Users', 'order' : '10'},
+       {'id' : 'Groups', 'order' : '20'},
+       {'id' : 'Rights', 'perSpace' : true, 'order' : '30'},
+       {'id' : 'Registration', 'order' : '40'},
+       {'id' : 'UserProfile', 'order' : '50'}
     ]
   },
   {
     'id' : 'content',
     'children': [
-       {'id' : 'Import', 'action' : 'import'},
-       {'id' : 'Export', 'action' : 'export'},
-       {'id' : 'Templates'}
+       {'id' : 'Import', 'action' : 'import', 'order' : '10'},
+       {'id' : 'Export', 'action' : 'export', 'order' : '20'},
+       {'id' : 'Templates', 'order' : '30'}
     ]
   },
   {
     'id' : 'extensionmanager',
     'children': [
-       {'id' : 'XWiki.AddExtensions'},
-       {'id' : 'XWiki.InstalledExtensions'},
-       {'id' : 'XWiki.CoreExtensions'},
-       {'id' : 'XWiki.ExtensionUpdater'}
+       {'id' : 'XWiki.AddExtensions', 'order' : '10'},
+       {'id' : 'XWiki.InstalledExtensions', 'order' : '20'},
+       {'id' : 'XWiki.CoreExtensions', 'order' : '30'},
+       {'id' : 'XWiki.ExtensionUpdater', 'order' : '40'}
     ]
   },
   {
@@ -244,7 +244,7 @@
  *#
 #macro(admin_displayCategory $sections $translationPrefix)
 (% class="admin-category" %)
-  #foreach ($section in $sections)
+  #foreach ($section in $sorttool.sort($sections, 'order'))
     * {{html wiki="true"}}&lt;a href="$section.url"&gt;[[image:${section.iconReference}]] **${section.name}**&lt;/a&gt;{{/html}} (% class="description" %)$!{section.description}
   #end
 #end

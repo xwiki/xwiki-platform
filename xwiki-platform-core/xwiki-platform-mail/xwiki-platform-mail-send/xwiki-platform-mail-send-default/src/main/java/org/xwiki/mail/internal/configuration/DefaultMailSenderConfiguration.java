@@ -89,6 +89,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final int DEFAULT_PORT = 25;
 
+    /**
+     * By default we wait 8 seconds between each mail in order to throttle the mail sending and not be considered as
+     * a spammer by mail servers.
+     */
+    private static final long DEFAULT_SEND_WAIT_TIME = 8 * 1000L;
+
     private static final String FROM_PROPERTY = "from";
     private static final String BCC_PROPERTY = "bcc";
     private static final String HOST_PROPERTY = "host";
@@ -96,6 +102,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     private static final String USERNAME_PROPERTY = "username";
     private static final String PASSWORD_PROPERTY = "password";
     private static final String PROPERTIES_PROPERTY = "properties";
+    private static final String SEND_WAIT_TIME = "sendWaitTime";
 
     @Inject
     private Logger logger;
@@ -301,5 +308,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getScriptServicePermissionCheckerHint()
     {
         return this.xwikiPropertiesSource.getProperty(PREFIX + "scriptServiceCheckerHint", "programmingrights");
+    }
+
+    @Override
+    public long getSendWaitTime()
+    {
+        return this.mailConfigSource.getProperty(SEND_WAIT_TIME,
+            this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME));
     }
 }

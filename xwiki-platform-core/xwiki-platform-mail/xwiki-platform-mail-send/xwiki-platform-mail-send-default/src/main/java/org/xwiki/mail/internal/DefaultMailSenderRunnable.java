@@ -124,8 +124,8 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                         this.mailQueueManager.removeMessageFromQueue(mailItem);
                     }
                 }
-                // Make some pause to not overload the server
-                Thread.sleep(100L);
+                // Note: a short pause to catch thread interruptions and to be kind on CPU.
+                Thread.sleep(50L);
             } catch (Exception e) {
                 // There was an unexpected problem, we stop this thread and log the problem.
                 this.logger.debug("Mail Sender Thread was forcefully stopped", e);
@@ -201,6 +201,15 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                 if (listener != null) {
                     listener.onError(message, e);
                 }
+            }
+
+            // Step 4: Email throttling: Wait before sending the next mail
+            long sendWaitTime = this.configuration.getSendWaitTime();
+            try {
+                Thread.sleep(sendWaitTime);
+            } catch (InterruptedException e) {
+                // The thread has been interrupted (for example when XWiki is being shut down)
+                throw new RuntimeException("Mail Throttling has been interrupted");
             }
         }
     }

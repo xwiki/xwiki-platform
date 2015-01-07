@@ -98,6 +98,12 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
         return "test";
     }
 
+    @Override
+    public long getSendWaitTime()
+    {
+        return 0;
+    }
+
     public void setBCCAddresses(List<String> addresses)
     {
         this.bccAddresses = addresses;

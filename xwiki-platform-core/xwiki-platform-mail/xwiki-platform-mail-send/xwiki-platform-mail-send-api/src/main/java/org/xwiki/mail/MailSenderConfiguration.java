@@ -96,4 +96,11 @@ public interface MailSenderConfiguration
      * @since 6.4M2
      */
     String getScriptServicePermissionCheckerHint();
+
+    /**
+     * @return the delay to wait between each mail being sent, in milliseconds. This is done to support mail throttling
+     *         and not considered a spammer by mail servers.
+     * @since 6.4RC1
+     */
+    long getSendWaitTime();
 }

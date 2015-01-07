@@ -710,4 +710,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# optional default email addresses to add to the BCC mail header when sending email.
 # mail.sender.bcc = john@doe.com,mary@doe.com
 
+#-# [Since 6.4RC1]
+#-# The delay to wait between each mail being sent, in milliseconds. This is done to support mail throttling and not
+#-# be considered a spammer by mail servers.
+#-# The default is 8 seconds:
+# mail.sender.sendWaitTime = 8000
+
 $!xwikiPropertiesAdditionalProperties

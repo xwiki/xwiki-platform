@@ -138,7 +138,8 @@ function enhanceNextStepButton(nextStepButton, actionButtons) {
   Object.extend(saveAndViewButton, {
     id: nextStepButton.id,
     value: nextStepButton.value,
-    title: nextStepButton.title
+    title: nextStepButton.title,
+    className: nextStepButton.className
   });
 }
 

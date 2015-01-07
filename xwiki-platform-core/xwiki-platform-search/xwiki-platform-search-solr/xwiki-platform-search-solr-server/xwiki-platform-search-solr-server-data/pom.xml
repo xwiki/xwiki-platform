@@ -32,6 +32,10 @@
   <name>XWiki Plarform - Search - SOLR - Server - Data</name>
   <packaging>jar</packaging>
   <description>A package containing SOLR configuration for XWiki</description>
+  <properties>
+    <!-- Does not contain a single line of Java and clirr seems to have issue with dependency plugin and copy (probably related to https://jira.codehaus.org/browse/MDEP-291) -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
   <dependencies>
     <dependency>
       <!-- This is needed at runtime by solrconfig.xml. -->

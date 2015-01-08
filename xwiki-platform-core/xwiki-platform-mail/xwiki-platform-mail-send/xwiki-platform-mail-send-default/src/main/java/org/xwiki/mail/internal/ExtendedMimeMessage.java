@@ -32,8 +32,6 @@ import javax.mail.internet.MimeMessage;
  */
 public class ExtendedMimeMessage extends MimeMessage
 {
-    private boolean isEmpty;
-
     /**
      * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
      */

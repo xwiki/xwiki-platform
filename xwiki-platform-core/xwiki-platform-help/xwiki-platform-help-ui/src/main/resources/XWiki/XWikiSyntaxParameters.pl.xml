@@ -47,7 +47,8 @@
 
 == Parametry ==
 
-=== Parametry 1.0 ===
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Parameters ===
 
 W Gramatyce XWiki 1.0 nie ma możliwości wprowadzania parametrów i jedynym sposobem aby to zrobić jest wprowadzenie kodu XHTML bezpośrednio do zawartości tak jak jest to pokazane w tabeli poniżej.
 
@@ -58,7 +59,7 @@ W Gramatyce XWiki 1.0 nie ma możliwości wprowadzania parametrów i jedynym spo
 &lt;h1 class="myClass" style="myStyle" id="myId"&gt;nagłówek&lt;/h1&gt;
 }}})))
 
-=== Parametry 2.0 ===
+=== 2.0 Parameters ===
 
 W XWiki wersji {{velocity}}$crtSyntaxVer{{/velocity}} można przekazać parametry do róznych elementów gramatycznych a także bloków tekstu. Jest to używane np. do ich stylizowania. Możesz ustawić dowolny parametr jako parę typu klucz/wartość. Renderer XHTML przekaże te argumenty jako atrybuty XHTML do wewnętrnzej reprezentacji róznych elementów gramatycznych.
 

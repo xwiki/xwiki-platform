@@ -69,4 +69,9 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
         return super.getResult(new LESSSkinFileResourceReference(fileName), false, true, skin, force);
     }
 
+    @Override
+    protected ColorTheme cloneResult(ColorTheme toClone)
+    {
+        return new ColorTheme(toClone);
+    }
 }

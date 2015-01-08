@@ -19,49 +19,56 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.UUID;
+
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Represents a Mail message placed on the queue for sending.
+ * Represents a Mail messages placed on the queue for sending.
  *
  * @version $Id$
  * @since 6.1M2
  */
 public class MailSenderQueueItem
 {
-    private MimeMessage message;
+    private Iterable<? extends MimeMessage> messages;
 
     private Session session;
 
-    private MailResultListener listener;
+    private MailListener listener;
 
-    private long threadId;
+    private UUID batchId;
+
+    private String wikiId;
 
     /**
-     * @param message see {@link #getMessage()}
+     * @param messages see {@link #getMessages()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
+     * @param batchId see {@link #getBatchId()}
+     * @param wikiId see {@link #getWikiId()}
      */
-    public MailSenderQueueItem(MimeMessage message, Session session, MailResultListener listener)
+    public MailSenderQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
+        UUID batchId, String wikiId)
     {
-        this.message = message;
+        this.messages = messages;
         this.session = session;
         this.listener = listener;
-        this.threadId = Thread.currentThread().getId();
+        this.batchId = batchId;
+        this.wikiId = wikiId;
     }
 
     /**
-     * @return the mail message to be sent
+     * @return the list of mail messages to be sent
      */
-    public MimeMessage getMessage()
+    public Iterable<? extends MimeMessage> getMessages()
     {
-        return this.message;
+        return this.messages;
     }
 
     /**
@@ -75,46 +82,33 @@ public class MailSenderQueueItem
     /**
      * @return an optional listener to call when the mail is sent successfully or when there's an error
      */
-    public MailResultListener getListener()
+    public MailListener getListener()
     {
         return this.listener;
-    }
-
-    /**
-     * @return the id of the thread that wants to send this email
-     */
-    public long getThreadId()
-    {
-        return this.threadId;
     }
 
     @Override
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-
-        ToStringBuilder messageBuilder = new XWikiToStringBuilder(this);
-
-        String subjectValue;
-        try {
-            subjectValue = getMessage().getSubject();
-        } catch (Exception e) {
-            subjectValue = String.format("<couldn't get message, reason: [%s]>",
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-        messageBuilder.append("subject", subjectValue);
-
-        String fromValue;
-        try {
-            fromValue = getMessage().getFrom()[0].toString();
-        } catch (Exception e) {
-            fromValue = String.format("<couldn't get from, reason: [%s]>",
-                ExceptionUtils.getRootCauseMessage(e));
-        }
-        messageBuilder.append("from", fromValue);
-
-        builder.append("message", getMessage() == null ? null : messageBuilder.toString());
-        builder.append("threadId", getThreadId());
+        builder.append("batchId", this.batchId);
+        builder.append("wikiId", getWikiId());
         return builder.toString();
+    }
+
+    /**
+     * @return the UUID of the batch
+     */
+    public UUID getBatchId()
+    {
+        return this.batchId;
+    }
+
+    /**
+     * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message
+     */
+    public String getWikiId()
+    {
+        return this.wikiId;
     }
 }

@@ -31,7 +31,7 @@
   <name>XWiki Platform - Tools - Web Standards Validator</name>
   <description>XWiki Platform - Tools - Web Standard Validator</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -51,6 +51,11 @@
       <groupId>nu.validator</groupId>
       <artifactId>vnu-lite</artifactId>
       <version>20141020-xwiki</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.8.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

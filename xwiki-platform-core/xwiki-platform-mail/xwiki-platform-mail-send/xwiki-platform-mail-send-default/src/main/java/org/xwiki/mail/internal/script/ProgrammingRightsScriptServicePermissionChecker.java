@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
@@ -32,7 +31,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
- * The current document must have Programming Rights for the email to be authorized for sending.
+ * The current document must have Programming Rights for emails to be authorized for sending.
  *
  * @version $Id$
  * @since 6.4M2
@@ -46,7 +45,7 @@ public class ProgrammingRightsScriptServicePermissionChecker implements ScriptSe
     private ContextualAuthorizationManager authorizationManager;
 
     @Override
-    public void check(MimeMessage message) throws MessagingException
+    public void check() throws MessagingException
     {
         // If the current document doesn't have Programming Rights then do not authorize the mail to be sent.
         try {

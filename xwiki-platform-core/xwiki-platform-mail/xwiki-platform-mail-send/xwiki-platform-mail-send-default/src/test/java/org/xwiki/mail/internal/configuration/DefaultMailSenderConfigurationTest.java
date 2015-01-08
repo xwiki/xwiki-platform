@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.configuration;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.junit.Rule;
@@ -26,12 +27,10 @@ import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration}.
@@ -43,7 +42,7 @@ public class DefaultMailSenderConfigurationTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultMailSenderConfiguration> mocker =
-            new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
+        new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
 
     @Test
     public void getFromAddressWhenNotConfigured() throws Exception
@@ -123,7 +122,7 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn(null);
 
         ConfigurationSource xwikiPropertiesSource =
-                this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
         properties.setProperty("key2", "value2");
@@ -146,8 +145,8 @@ public class DefaultMailSenderConfigurationTest
 
         // Verify the logs
         verify(this.mocker.getMockedLogger()).warn(
-                "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-                "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
+            "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
+            "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
     }
 
     @Test
@@ -200,6 +199,26 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("smtp_port")).thenReturn("25");
         ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
         when(mailConfigDocumentSource.getProperty("port", 25)).thenReturn(25);
+
+        assertEquals(25, this.mocker.getComponentUnderTest().getPort());
+    }
+
+    @Test
+    public void getBCCAddressesFromMailConfig() throws Exception
+    {
+        ConfigurationSource mailConfigDocumentSource = this.mocker.getInstance(ConfigurationSource.class, "mailsend");
+        when(mailConfigDocumentSource.getProperty("bcc", String.class)).thenReturn("john@doe.com, mary@doe.com");
+
+        assertThat(Arrays.asList("john@doe.com", "mary@doe.com"),
+            containsInAnyOrder(this.mocker.getComponentUnderTest().getBCCAddresses().toArray()));
+    }
+
+    @Test
+    public void getPortWhenMailConfigDoesntExist() throws Exception
+    {
+        ConfigurationSource xwikiPropertiesSource =
+            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        when(xwikiPropertiesSource.getProperty("mail.sender.port", 25)).thenReturn(25);
 
         assertEquals(25, this.mocker.getComponentUnderTest().getPort());
     }

@@ -227,20 +227,25 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             MetaDataBlock metaDataBlock =
                 new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
 
-            // otherwise the inner macros will not be able to access the parent DOM
-            metaDataBlock.setParent(wikiMacroBlock.getParent());
+            // Make sure the context XDOM contains the wiki macro content
+            wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
-            if (observation != null) {
-                observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+            try {
+                if (observation != null) {
+                    observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+                }
+
+                // Perform internal macro transformations.
+                TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+                txContext.setId(context.getId());
+
+                RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
+                    wikiMacroMarker);
+            } finally {
+                // Restore context XDOM to its previous state
+                metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
             }
-
-            // Perform internal macro transformations.
-            TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
-            txContext.setId(context.getId());
-
-            RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
-                wikiMacroMarker);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {

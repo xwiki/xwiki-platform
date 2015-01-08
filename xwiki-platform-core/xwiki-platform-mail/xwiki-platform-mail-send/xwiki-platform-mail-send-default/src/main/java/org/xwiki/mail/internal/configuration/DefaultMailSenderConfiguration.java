@@ -21,6 +21,8 @@ package org.xwiki.mail.internal.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -87,12 +89,20 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final int DEFAULT_PORT = 25;
 
+    /**
+     * By default we wait 8 seconds between each mail in order to throttle the mail sending and not be considered as
+     * a spammer by mail servers.
+     */
+    private static final long DEFAULT_SEND_WAIT_TIME = 8 * 1000L;
+
     private static final String FROM_PROPERTY = "from";
+    private static final String BCC_PROPERTY = "bcc";
     private static final String HOST_PROPERTY = "host";
     private static final String PORT_PROPERTY = "port";
     private static final String USERNAME_PROPERTY = "username";
     private static final String PASSWORD_PROPERTY = "password";
     private static final String PROPERTIES_PROPERTY = "properties";
+    private static final String SEND_WAIT_TIME = "sendWaitTime";
 
     @Inject
     private Logger logger;
@@ -129,7 +139,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        Integer port;
+        Integer port = null;
 
         // First, look in the document sources
         String portAsString = this.documentsSource.getProperty("smtp_port");
@@ -140,7 +150,10 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
                 port = DEFAULT_PORT;
             }
         } else {
-            port = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class).intValue();
+            Long portAsLong = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class);
+            if (portAsLong != null) {
+                port = portAsLong.intValue();
+            }
         }
 
         // If not found, look in the xwiki properties source
@@ -183,6 +196,29 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         }
 
         return password;
+    }
+
+    @Override
+    public List<String> getBCCAddresses()
+    {
+        List<String> bccAddresses = new ArrayList<>();
+
+        // First, look in the document source
+        String bccAsString = this.mailConfigSource.getProperty(BCC_PROPERTY, String.class);
+
+        // If not found, look in the xwiki properties source
+        if (bccAsString == null) {
+            bccAsString = this.xwikiPropertiesSource.getProperty(PREFIX + BCC_PROPERTY, String.class);
+        }
+
+        // Convert into a list (if property is found and not null)
+        if (bccAsString != null) {
+            for (String address : StringUtils.split(bccAsString, ',')) {
+                bccAddresses.add(StringUtils.trim(address));
+            }
+        }
+
+        return bccAddresses;
     }
 
     @Override
@@ -272,5 +308,17 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getScriptServicePermissionCheckerHint()
     {
         return this.xwikiPropertiesSource.getProperty(PREFIX + "scriptServiceCheckerHint", "programmingrights");
+    }
+
+    @Override
+    public long getSendWaitTime()
+    {
+        Long waitTime = this.mailConfigSource.getProperty(SEND_WAIT_TIME);
+
+        if (waitTime == null) {
+            waitTime = this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME);
+        }
+
+        return waitTime;
     }
 }

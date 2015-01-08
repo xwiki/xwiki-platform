@@ -267,11 +267,19 @@
     #submenuitem($adminspaceaction $services.localization.render('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($xwiki.exists('Main.SpaceIndex'))
+  #set($spaceIndexReference = $services.model.createDocumentReference('', 'Main', 'SpaceIndex'))
+  #if ($xwiki.exists($spaceIndexReference))
     #if ($hasPreviousMenuSection)
       #submenuseparator()
     #end
-    #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
+    #set ($spaceHomeReference = $services.model.createDocumentReference('', $doc.space, 'WebHome'))
+    #if ($xwiki.exist($spaceHomeReference))
+      #set ($spaceIndexUrl = $xwiki.getURL($spaceHomeReference, 'view', 'sheet=Main.SpaceIndex'))
+    #elseif ($xwiki.exists($doc.documentReference))
+      #set ($spaceIndexUrl = $xwiki.getURL($doc.documentReference, 'view', 'sheet=Main.SpaceIndex'))
+    #else
+      #set ($spaceIndexUrl = $xwiki.getURL($spaceIndexReference, 'view', "space=${escapetool.url($doc.space)}"))
+    #end
     #submenuitem($spaceIndexUrl $services.localization.render('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)
   #end

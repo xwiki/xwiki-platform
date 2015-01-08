@@ -19,25 +19,15 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-
-import com.google.common.base.Predicates;
 
 /**
  * Default implementation for {@link SolrConfiguration} that uses the xwiki.properties file.
@@ -145,30 +135,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public Map<String, URL> getHomeDirectoryConfiguration()
+    public InputStream getHomeDirectoryConfiguration()
     {
-        // Build the result
-        Map<String, URL> result = new HashMap<String, URL>();
-
-        // Home directory.
-        for (String file : HOME_DIRECTORY_FILE_NAMES) {
-            result.put(file, this.getClass().getResource(String.format(CLASSPATH_LOCATION_PREFIX, file)));
-        }
-
-        // Core directory
-        Collection<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
-        Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(solrCoreResourcess)
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CORE_PACKAGE))));
-
-        for (String resource : reflections.getResources(Predicates.<String> alwaysTrue())) {
-            URL resourceURL = getClass().getResource("/" + resource);
-            if (resourceURL != null) {
-                result.put(resource.substring(HOME_DIRECTORY_PREFIX.length()), resourceURL);
-            }
-        }
-
-        return result;
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
     }
 
     @Override

@@ -441,6 +441,10 @@ return XWiki;
   width: 13em;
 }
 
+#avatar p {
+  text-align: center;
+}
+
 #avatar img {
   border: 1px solid $theme.borderColor;
   border-radius: 5px 5px 5px 5px;

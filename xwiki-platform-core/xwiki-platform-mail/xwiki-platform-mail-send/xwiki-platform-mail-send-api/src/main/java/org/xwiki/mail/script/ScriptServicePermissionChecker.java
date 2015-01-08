@@ -20,7 +20,6 @@
 package org.xwiki.mail.script;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -36,8 +35,9 @@ import org.xwiki.stability.Unstable;
 public interface ScriptServicePermissionChecker
 {
     /**
-     * @param message the message to check for authorization
-     * @exception MessagingException if the message is not allowed to be sent
+     * @exception MessagingException if mails are not allowed to be sent (current user not having the right permission,
+     *            etc)
+     * @since 6.4M3
      */
-    void check(MimeMessage message) throws MessagingException;
+    void check() throws MessagingException;
 }

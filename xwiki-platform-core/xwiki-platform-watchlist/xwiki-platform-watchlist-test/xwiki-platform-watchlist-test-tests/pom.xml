@@ -59,8 +59,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-watchlist-ui</artifactId>
       <type>xar</type>
-      <scope>runtime</scope>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Since we send email in the test we need a Mail Sender API implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Test dependencies -->
     <dependency>

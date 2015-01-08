@@ -5,6 +5,7 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set($discard = $services.template.execute('job_macros.vm'))
+#set($discard = $services.template.execute('rating_macros.vm'))
 
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
@@ -160,6 +161,16 @@
     #else
       #extensionActionButtons($installedExtension 'downgrade' true)
     #end
+  #end
+#end
+
+#macro (displayExtensionRating $extension)
+  #set ($rating = $extension.getRating())
+  #if ($rating != $NULL)
+    #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+    <div class="extension-rating">
+      #ratingstars($id "" "" $rating.averageVote $rating.totalVotes true)
+    </div>
   #end
 #end
 
@@ -322,17 +333,14 @@ $namespace##
 #end
 
 #macro (displayExtensionDetails_description_versions $extension)
-  #if (!$request.listVersions)
-    <dt></dt>
-    <dd>
+  <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
+  <dd>
+    #if (!$request.listVersions)
       <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
         class="extension-versions-link">
         $services.localization.render('extensions.info.stableVersions.linkLabel')
       </a>
-    </dd>
-  #else
-    <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
-    <dd>
+    #else
       #set ($stableVersions = [])
       #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
         #if ($version.type == 'STABLE')
@@ -350,8 +358,8 @@ $namespace##
       #else
         $services.localization.render('extensions.info.stableVersions.noResults')
       #end
-    </dd>
-  #end
+    #end
+  </dd>
 #end
 
 #**
@@ -751,6 +759,7 @@ $namespace##
         <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
       #end
       #displayExtensionActionButtons($extension)
+      #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
       #end

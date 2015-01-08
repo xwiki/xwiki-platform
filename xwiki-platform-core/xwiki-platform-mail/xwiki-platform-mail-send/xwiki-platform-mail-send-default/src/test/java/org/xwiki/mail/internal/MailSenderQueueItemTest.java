@@ -19,14 +19,16 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
@@ -41,11 +43,9 @@ public class MailSenderQueueItemTest
     {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setSubject("subject");
-        message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        MailSenderQueueItem item = new MailSenderQueueItem(message, session, null);
+        UUID batchId = UUID.randomUUID();
+        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
 
-        assertEquals("message = [subject = [subject], from = [john@doe.com]], threadId = ["
-            + Thread.currentThread().getId() + "]", item.toString());
+        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
     }
 }

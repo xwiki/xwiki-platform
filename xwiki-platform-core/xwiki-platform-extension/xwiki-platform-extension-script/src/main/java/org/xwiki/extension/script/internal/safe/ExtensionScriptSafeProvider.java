@@ -28,6 +28,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.extension.rating.RatingExtension;
 
 /**
  * Provide safe Extension.
@@ -58,6 +59,8 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
                 new SafeInstalledExtension<InstalledExtension>((InstalledExtension) unsafe, this.defaultSafeProvider);
         } else if (unsafe instanceof LocalExtension) {
             safe = new SafeLocalExtension<LocalExtension>((LocalExtension) unsafe, this.defaultSafeProvider);
+        } else if (unsafe instanceof RatingExtension) {
+            safe = new SafeRatingExtension<RatingExtension>((RatingExtension) unsafe, this.defaultSafeProvider);
         } else {
             safe = new SafeExtension<Extension>(unsafe, this.defaultSafeProvider);
         }

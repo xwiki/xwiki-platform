@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.integration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
@@ -37,6 +39,8 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     private String password;
 
     private Properties additionalProperties;
+
+    private List<String> bccAddresses = new ArrayList<>();
 
     public TestMailSenderConfiguration(int port, String username, String password, Properties additionalProperties)
     {
@@ -65,6 +69,12 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     }
 
     @Override
+    public List<String> getBCCAddresses()
+    {
+        return this.bccAddresses;
+    }
+
+    @Override
     public String getUsername()
     {
         return this.username;
@@ -86,5 +96,16 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     public String getScriptServicePermissionCheckerHint()
     {
         return "test";
+    }
+
+    @Override
+    public long getSendWaitTime()
+    {
+        return 0;
+    }
+
+    public void setBCCAddresses(List<String> addresses)
+    {
+        this.bccAddresses = addresses;
     }
 }

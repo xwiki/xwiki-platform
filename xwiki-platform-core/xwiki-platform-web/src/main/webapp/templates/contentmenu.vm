@@ -62,7 +62,7 @@
   #end
   #submenuitem($doc.getURL('export', "format=html&amp;$cleanQueryString") $services.localization.render('core.menu.export.html') 'tmExportHtml', '')
   #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
-    #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $services.localization.render('core.menu.export.xar') 'tmExportXar', '')
+    #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.documentReference)&amp;$!docvariant") $services.localization.render('core.menu.export.xar') 'tmExportXar', '')
   #end
   #xwikitopmenuentryend()
 #end

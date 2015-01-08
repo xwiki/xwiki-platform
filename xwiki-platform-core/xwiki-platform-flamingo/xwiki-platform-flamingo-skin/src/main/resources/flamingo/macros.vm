@@ -2325,10 +2325,44 @@ var $jsVarName = {
   #end
   $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>#if($item.glyphicon)#glyphicon($item.glyphicon) #end$name</a>{{/html}}
   #if ($hasChildren)
-    #foreach ($child in $item.children)
+    #set ($children = [])
+    #sortCollectionOfMapsByField($item.children, 'order', 9999, 'asc', $children)
+    #foreach ($child in $children)
       #verticalNavigationItem($child $level.concat('*') $options)
     #end
   #end
+#end
+
+#**
+ * Sort a collection containing maps by a field.
+ *
+ *
+ * @param $collection - List - Collection to sort.
+ *
+ * @param $field - String - Name of the field of the map to sort on.
+ *
+ * @param $defaultValue - Any - The default value for the sort if one of the elements has a NULL field
+ *
+ * @param $order - String - Must be 'asc' for ascending, or 'desc' for descending
+ *
+ * @param $outList - List - The returns from this macro will be put in this list, passing the list as a parameter
+ *                          a safety measure because macros can't return values.
+ *#
+#macro (sortCollectionOfMapsByField $collection $field $defaultValue $order $outputList)
+  ## If an alement has a null field, $sorttool.sort() won't return anything.
+  ## To avoid this situation, we create a new list that contains the elements with a default field if it is missing
+  #set ($newList = [])
+  #foreach ($element in $collection)
+    #if ("$!element.get($field)" == '')
+      #set ($elementCopy = {})
+      #set ($discard = $elementCopy.putAll($element))
+      #set ($discard = $elementCopy.put($field, $defaultValue))
+      #set ($discard = $newList.add($elementCopy))
+    #else
+      #set ($discard = $newList.add($element))
+    #end
+  #end
+  #set ($discard = $outputList.addAll($sorttool.sort($newList, "${field}:${order}")))
 #end
 
 #**

@@ -43,6 +43,9 @@
   #if ($docextralink.size()>3)
     #set ($glyphIcon = $docextralink.get(3))
   #end
+  #if ($extraCount > 0)
+    #set ($extraText = "$extraText ($extraCount)")
+  #end
   #submenuitem($doc.getURL('view', "viewer=$!{escapetool.url(${extraAnchor})}"), ${escapetool.xml(${extraText})}, '', '', $glyphIcon)
 #end
 #if($xcontext.action == 'view' && $viewer != 'content')

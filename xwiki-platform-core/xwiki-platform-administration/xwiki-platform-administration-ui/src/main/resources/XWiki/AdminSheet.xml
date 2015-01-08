@@ -61,44 +61,44 @@
   {
     'id' : 'configuration',
     'children': [
-       {'id' : 'Editing'},
-       {'id' : 'Localization'},
-       {'id' : 'XWiki.OfficeImporterAdmin'}
+       {'id' : 'Editing', 'order' : 10},
+       {'id' : 'Localization', 'order' : 20},
+       {'id' : 'XWiki.OfficeImporterAdmin', 'order' : 30}
     ]
   },
   {
     'id' : 'lf',
     'children': [
-       {'id' : 'Presentation', 'perSpace' : true},
-       {'id' : 'Elements', 'perSpace' : true},
-       {'id' : 'Panels.PanelWizard', 'perSpace' : true}
+       {'id' : 'Presentation', 'perSpace' : true, 'order' : 10},
+       {'id' : 'Elements', 'perSpace' : true, 'order' : 20},
+       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 30}
     ]
   },
   {
     'id' : 'usersgroups',
     'children': [
-       {'id' : 'Users'},
-       {'id' : 'Groups'},
-       {'id' : 'Rights', 'perSpace' : true},
-       {'id' : 'Registration'},
-       {'id' : 'UserProfile'}
+       {'id' : 'Users', 'order' : 10},
+       {'id' : 'Groups', 'order' : 20},
+       {'id' : 'Rights', 'perSpace' : true, 'order' : 30},
+       {'id' : 'Registration', 'order' : 40},
+       {'id' : 'UserProfile', 'order' : 50}
     ]
   },
   {
     'id' : 'content',
     'children': [
-       {'id' : 'Import', 'action' : 'import'},
-       {'id' : 'Export', 'action' : 'export'},
-       {'id' : 'Templates'}
+       {'id' : 'Import', 'action' : 'import', 'order' : 10},
+       {'id' : 'Export', 'action' : 'export', 'order' : 20},
+       {'id' : 'Templates', 'order' : 30}
     ]
   },
   {
     'id' : 'extensionmanager',
     'children': [
-       {'id' : 'XWiki.AddExtensions'},
-       {'id' : 'XWiki.InstalledExtensions'},
-       {'id' : 'XWiki.CoreExtensions'},
-       {'id' : 'XWiki.ExtensionUpdater'}
+       {'id' : 'XWiki.AddExtensions', 'order' : 10},
+       {'id' : 'XWiki.InstalledExtensions', 'order' : 20},
+       {'id' : 'XWiki.CoreExtensions', 'order' : 30},
+       {'id' : 'XWiki.ExtensionUpdater', 'order' : 40}
     ]
   },
   {
@@ -244,7 +244,9 @@
  *#
 #macro(admin_displayCategory $sections $translationPrefix)
 (% class="admin-category" %)
-  #foreach ($section in $sections)
+  #set ($sortedSections = [])
+  #sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)
+  #foreach ($section in $sortedSections)
     * {{html wiki="true"}}&lt;a href="$section.url"&gt;[[image:${section.iconReference}]] **${section.name}**&lt;/a&gt;{{/html}} (% class="description" %)$!{section.description}
   #end
 #end
@@ -283,7 +285,7 @@
  *#
 #macro (admin_spaceSwitch)
 {{html clean="false"}}
-  &lt;form id="change-context" class="xformInline" action=""&gt;
+  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action, $request.queryString)"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       &lt;select id="goto-select" name="target"&gt;

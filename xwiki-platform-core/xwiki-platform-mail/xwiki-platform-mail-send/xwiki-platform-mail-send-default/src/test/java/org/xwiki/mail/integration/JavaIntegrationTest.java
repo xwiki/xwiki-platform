@@ -19,15 +19,14 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -36,28 +35,37 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.internal.StandardEnvironment;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.DefaultMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderThread;
+import org.xwiki.mail.internal.DefaultMailSenderRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.HTMLMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -71,7 +79,9 @@ import com.icegreen.greenmail.util.ServerSetupTest;
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
-    DefaultMailSenderThread.class
+    MemoryMailListener.class,
+    DefaultMailSenderRunnable.class,
+    DefaultMailQueueManager.class
 })
 public class JavaIntegrationTest
 {
@@ -81,7 +91,7 @@ public class JavaIntegrationTest
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
-    private MailSenderConfiguration configuration;
+    private TestMailSenderConfiguration configuration;
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
@@ -89,28 +99,22 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailResultListener listener = new MailResultListener()
-    {
-        @Override
-        public void onSuccess(MimeMessage message)
-        {
-            // Do nothing, we check below that the mail has been received!
-        }
-
-        @Override
-        public void onError(MimeMessage message, Exception e)
-        {
-            // Shouldn't happen, fail the test!
-            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
-        }
-    };
-
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
         this.configuration = new TestMailSenderConfiguration(
             this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
+
+        // Set the current wiki in the Context
+        ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
+
+        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
+
+        this.componentManager.registerMockComponent(ExecutionContextManager.class);
     }
 
     @Before
@@ -149,26 +153,34 @@ public class JavaIntegrationTest
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
+        // We also test using some default BCC addresses from configuration in this test
+        this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
+
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.waitTillSent(10000L);
+        MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
+        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, memoryMailListener);
+
+        // Note: we don't test status reporting from the listener since this is already tested in the
+        // ScriptingIntegrartionTest test class.
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals(3, messages.length);
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
+        assertEquals(9, messages.length);
 
+        // Assert the email parts that are the same for all mails
+        assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
-
         BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
+
+        // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
+        // messages ;) But we chekced that we received 9 emails above so that's good enough.
     }
 
     @Test
@@ -222,14 +234,14 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(message, session);
+        this.sender.send(Arrays.asList(message), session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 

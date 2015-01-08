@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -36,6 +37,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
+import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionRating;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
@@ -44,6 +46,8 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.ObjectFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.ratings.AverageRatingApi;
+import org.xwiki.ratings.RatingsManager;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.XWikiResource;
@@ -118,6 +122,10 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     @Inject
     protected ContextualAuthorizationManager authorization;
+
+    @Inject
+    @Named("separate")
+    protected RatingsManager ratingsManager;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -273,6 +281,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     protected <E extends AbstractExtension> E createExtension(XWikiDocument extensionDocument, String version)
     {
         BaseObject extensionObject = getExtensionObject(extensionDocument);
+        DocumentReference extensionDocumentReference = extensionDocument.getDocumentReference();
 
         if (extensionObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -303,6 +312,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         license.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
         extension.getLicenses().add(license);
 
+        extension.setRating(getExtensionRating(extensionDocumentReference));
         extension.setSummary((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
@@ -384,6 +394,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     private ExtensionVersion createExtensionVersionFromQueryResult(Object[] entry)
     {
+        XWikiContext xcontext = getXWikiContext();
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));
@@ -392,10 +403,13 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setSummary(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
 
+        // Rating
+        DocumentReference extensionDocumentReference = new DocumentReference(xcontext.getWikiId(), (String) entry[1], (String) entry[0]);
+        extension.setRating(getExtensionRating(extensionDocumentReference));
+
         // Website
         extension.setWebsite(this.<String> getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
         if (StringUtils.isBlank(extension.getWebsite())) {
-            XWikiContext xcontext = getXWikiContext();
             extension.setWebsite(xcontext.getWiki().getURL(
                 new DocumentReference(xcontext.getWikiId(), (String) entry[1], (String) entry[0]), "view", xcontext));
         }
@@ -423,6 +437,22 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // * dependencies
 
         return extension;
+    }
+
+    private ExtensionRating getExtensionRating(DocumentReference extensionDocumentReference)
+    {
+        ExtensionRating extensionRating = this.extensionObjectFactory.createExtensionRating();
+
+        try {
+            AverageRatingApi averageRating = new AverageRatingApi(ratingsManager.getAverageRating(extensionDocumentReference));
+            extensionRating.setTotalVotes(averageRating.getNbVotes());
+            extensionRating.setAverageVote(averageRating.getAverageVote());
+        } catch (XWikiException e) {
+            extensionRating.setTotalVotes(0);
+            extensionRating.setAverageVote(0);
+        }
+
+        return extensionRating;
     }
 
     protected <E extends ExtensionSummary> void getExtensionSummaries(List<E> extensions, Query query)

@@ -23,17 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
@@ -51,6 +53,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder}.
+ * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -79,6 +82,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     private DocumentReferenceResolver<String> referenceResolver;
 
     @Inject
+    @Named("user")
+    private DocumentReferenceResolver<String> userReferenceResolver;
+
+    @Inject
     private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
@@ -90,10 +97,16 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     @Inject
     private Logger logger;
 
-    private String getFullReference(String userId)
+    private String getFullReference(String userId, String wikiId)
     {
-        DocumentReference userReference = referenceResolver.resolve(userId);
-        return referenceSerializer.serialize(userReference);
+        String result = null;
+
+        if (!StringUtils.isBlank(userId)) {
+            DocumentReference userReference = userReferenceResolver.resolve(userId, new WikiReference(wikiId));
+            result = referenceSerializer.serialize(userReference);
+        }
+
+        return result;
     }
 
     @Override
@@ -113,14 +126,15 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             }
 
             // load properties
-            descriptor.setMainPageReference(referenceResolver.resolve(
-                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
-            descriptor.setPrettyName(
-                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
-            descriptor.setOwnerId(getFullReference(mainServerClassObject.getStringValue(
-                XWikiServerClassDocumentInitializer.FIELD_OWNER)));
-            descriptor.setDescription(mainServerClassObject.getStringValue(
-                XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+            descriptor.setMainPageReference(referenceResolver.resolve(mainServerClassObject
+                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
+            descriptor.setPrettyName(mainServerClassObject
+                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
+            descriptor.setOwnerId(getFullReference(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER),
+                descriptor.getId()));
+            descriptor.setDescription(mainServerClassObject
+                .getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
 
             // load the property groups
             try {
@@ -194,22 +208,23 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // Create the server class object
             BaseObject obj = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS, true, context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, descriptor.getDefaultAlias(), context);
-            obj.set(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE, referenceSerializer.serialize(
-                    descriptor.getMainPageReference()), context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE,
+                referenceSerializer.serialize(descriptor.getMainPageReference()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_OWNER,
-                    getFullReference(descriptor.getOwnerId()), context);
+                getFullReference(descriptor.getOwnerId(), descriptor.getId()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, descriptor.getPrettyName(), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, descriptor.getDescription(), context);
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();
-            DocumentReference serverClass = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                    DefaultWikiDescriptor.SERVER_CLASS.getParent().getName(),
-                    DefaultWikiDescriptor.SERVER_CLASS.getName());
+            DocumentReference serverClass =
+                new DocumentReference(wikiDescriptorManager.getMainWikiId(), DefaultWikiDescriptor.SERVER_CLASS
+                    .getParent().getName(), DefaultWikiDescriptor.SERVER_CLASS.getName());
             for (int i = 1; i < aliases.size(); ++i) {
                 String alias = aliases.get(i);
-                BaseObject objAlias = descriptorDoc.getXObject(serverClass,
-                        XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
+                BaseObject objAlias =
+                    descriptorDoc
+                        .getXObject(serverClass, XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 

@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.query.QueryException;
@@ -62,6 +61,7 @@ public class DeleteSpaceAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+        String wiki = context.getDoc().getDocumentReference().getWikiReference().getName();
         String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();
         EntityReferenceResolver<String> nameResolver =
             Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
@@ -85,8 +85,7 @@ public class DeleteSpaceAction extends XWikiAction
         } else {
             // Delete to recycle bin
             for (String docName : documentsInSpace) {
-                DocumentReference docReference =
-                    new DocumentReference(nameResolver.resolve(docName, EntityType.DOCUMENT));
+                DocumentReference docReference = new DocumentReference(wiki, space, docName);
                 xwiki.deleteAllDocuments(xwiki.getDocument(docReference, context), context);
             }
         }

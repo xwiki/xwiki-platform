@@ -73,8 +73,8 @@ Mail.SendMailStatus_livetable.state=Status
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend
-Mail.SendMailStatus_livetable.resend.success=The mail has been sent successfully
-Mail.SendMailStatus_livetable.more=More</content>
+mailSender.admin.resendSuccess=The mail has been resent successfully
+mailSender.admin.resendFailure=The mail has failed again to be sent. Click for more details.</content>
   <object>
     <name>Mail.Translations</name>
     <number>0</number>

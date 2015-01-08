@@ -44,6 +44,11 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class MailStorageScriptService extends AbstractMailScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    static final String ERROR_KEY = "scriptservice.mailstorage.error";
+
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
@@ -57,7 +62,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     public ScriptMailResult resend(String batchId, String mailId)
     {
-        MailListener listener = null;
+        MailListener listener;
         try {
             listener = this.componentManagerProvider.get().getInstance(MailListener.class, "database");
         } catch (ComponentLookupException e) {
@@ -67,7 +72,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
             return null;
         }
 
-        MimeMessage message = null;
+        MimeMessage message;
         try {
             message = loadMessage(batchId, mailId);
             ScriptMailResult  scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
@@ -92,6 +97,6 @@ public class MailStorageScriptService extends AbstractMailScriptService
     @Override
     protected String getErrorKey()
     {
-        return "scriptservice.mailstorage.error";
+        return ERROR_KEY;
     }
 }

@@ -160,7 +160,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   </table>
   ## Global settings: mandatory authentication for view/edit, captcha
   #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'Wikis')
+  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'wikis.right')
     <dl class="rights-settings">
       #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
         #set ($auth_view = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())

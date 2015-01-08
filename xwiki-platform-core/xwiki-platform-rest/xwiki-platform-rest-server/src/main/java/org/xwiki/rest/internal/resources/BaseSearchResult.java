@@ -245,7 +245,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setModified(calendar);
 
                     if (withPrettyNames) {
-                        searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+                        searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthorReference(), componentManager));
                     }
 
                     String pageUri = null;
@@ -487,7 +487,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setModified(calendar);
 
                     if (withPrettyNames) {
-                        searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthor(), componentManager));
+                        searchResult.setAuthorName(Utils.getAuthorName(doc.getAuthorReference(), componentManager));
                     }
 
                     String pageUri =

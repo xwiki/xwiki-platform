@@ -359,7 +359,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         if (document != null && !document.isNew()) {
-            author.setName(xcontext.getWiki().getUserName(authorId, null, false, xcontext));
+            author.setName(xcontext.getWiki().getPlainUserName(document.getDocumentReference(), xcontext));
             author.setUrl(document.getExternalURL("view", xcontext));
         } else {
             author.setName(authorId);

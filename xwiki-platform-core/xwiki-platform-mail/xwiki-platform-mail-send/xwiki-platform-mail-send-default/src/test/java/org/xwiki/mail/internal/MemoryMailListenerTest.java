@@ -74,14 +74,14 @@ public class MemoryMailListenerTest
         assertTrue("These should be mails in error!", results.hasNext());
 
         MailStatus status = results.next();
-        assertEquals("error1", status.getErrorSummary());
+        assertEquals("Exception: error1", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error1"));
         assertEquals(batchId.toString(), status.getBatchId());
         assertEquals(mailId1.toString(), status.getMessageId());
         assertEquals("mailtype1", status.getType());
 
         status = results.next();
-        assertEquals("error2", status.getErrorSummary());
+        assertEquals("Exception: error2", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error2"));
         assertEquals(batchId.toString(), status.getBatchId());
         assertEquals(mailId2.toString(), status.getMessageId());

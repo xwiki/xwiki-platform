@@ -283,7 +283,7 @@ public class MailStatus
      */
     public void setError(Exception exception)
     {
-        this.errorSummary = exception.getMessage();
+        this.errorSummary = ExceptionUtils.getRootCauseMessage(exception);
         this.errorDescription  = ExceptionUtils.getStackTrace(exception);
     }
 

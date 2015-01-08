@@ -74,7 +74,8 @@ public class DatabaseMailStatusResult implements MailStatusResult
         try {
             return this.mailStatusStore.count(this.batchId);
         } catch (MailStoreException e) {
-            LOGGER.error("Failed to get size of results. Returning an empty result.", e);
+            LOGGER.error("Failed to get size of results for batch id [{}]. Returning an empty result.",
+                this.batchId, e);
             return 0;
         }
     }

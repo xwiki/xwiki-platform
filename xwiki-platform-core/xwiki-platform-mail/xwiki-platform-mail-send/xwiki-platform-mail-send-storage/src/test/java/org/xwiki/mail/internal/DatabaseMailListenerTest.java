@@ -67,7 +67,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    public void prepareAndSaveStatus() throws Exception
+    public void onPrepare() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
 
@@ -77,7 +77,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    public void successAndSaveStatus() throws Exception
+    public void onSuccess() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.message, MailState.READY);
@@ -90,7 +90,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    public void successAndSaveStatusWithPreviouslyFailedMessage() throws Exception
+    public void onSuccessWithPreviouslyFailedMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.message, MailState.FAILED);
@@ -108,7 +108,7 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    public void errorAndSaveStatusAndMessage() throws Exception
+    public void onError() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         MailStatus status = new MailStatus(this.message, MailState.READY);

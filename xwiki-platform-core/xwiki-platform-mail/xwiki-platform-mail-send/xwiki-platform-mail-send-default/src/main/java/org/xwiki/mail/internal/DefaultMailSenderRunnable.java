@@ -123,6 +123,11 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                     } finally {
                         this.mailQueueManager.removeMessageFromQueue(mailItem);
                     }
+                    // Email throttling: Wait before processing the next mail queue item
+                    // Note: it's important that we wait after the previous item has been removed from the queue in
+                    // order to let users know as soon as possible that their mail has been sent (otherwise when sending
+                    // a synchronous mail, the user would have to wait the send wait time!).
+                    waitSendWaitTime();
                 }
                 // Note: a short pause to catch thread interruptions and to be kind on CPU.
                 Thread.sleep(50L);
@@ -204,13 +209,22 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
             }
 
             // Step 4: Email throttling: Wait before sending the next mail
-            long sendWaitTime = this.configuration.getSendWaitTime();
-            try {
-                Thread.sleep(sendWaitTime);
-            } catch (InterruptedException e) {
-                // The thread has been interrupted (for example when XWiki is being shut down)
-                throw new RuntimeException("Mail Throttling has been interrupted");
+            // Only wait here if there are more messages to send as otherwise when we send a single message
+            // synchronously the user would have to wait the wait time...
+            if (messages.hasNext()) {
+                waitSendWaitTime();
             }
+        }
+    }
+
+    private void waitSendWaitTime()
+    {
+        long sendWaitTime = this.configuration.getSendWaitTime();
+        try {
+            Thread.sleep(sendWaitTime);
+        } catch (InterruptedException e) {
+            // The thread has been interrupted (for example when XWiki is being shut down)
+            throw new RuntimeException("Mail Throttling has been interrupted");
         }
     }
 

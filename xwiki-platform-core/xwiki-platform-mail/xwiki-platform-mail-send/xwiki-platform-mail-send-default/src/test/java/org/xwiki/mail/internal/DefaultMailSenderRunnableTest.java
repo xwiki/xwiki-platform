@@ -124,7 +124,7 @@ public class DefaultMailSenderRunnableTest
             // "UnknownHostException: xwiki-unknown"
             // "ConnectException: Connection refused"
             // Thus for now I only assert that there's an error set, but not its content.
-            assertTrue(status.getError() != null);
+            assertTrue(status.getErrorSummary() != null);
             errorCount++;
         }
         assertEquals(2, errorCount);

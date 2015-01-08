@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -71,23 +70,18 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepare(MimeMessage message)
     {
-        // Initialize the DatabaseMailStatusResult on first execution, in order to save the Batch ID
-        String batchId = getMessageBatchId(message);
-        this.mailStatusResult.setBatchId(batchId);
+        MailStatus status = new MailStatus(message, MailState.READY);
+        saveStatus(status);
 
-        final MailStatus result = new MailStatus(getMessageId(message));
-        result.setBatchId(batchId);
-        result.setState(MailState.READY);
-        result.setRecipients(getMessageRecipients(message));
-        result.setType(getMailType(message));
-        saveStatus(result);
+        // Initialize the DatabaseMailStatusResult on first execution, in order to save the Batch ID
+        this.mailStatusResult.setBatchId(status.getBatchId());
     }
 
     @Override
     public void onSuccess(MimeMessage message)
     {
         String messageId = getMessageId(message);
-        MailStatus status = getMailStatus(messageId);
+        MailStatus status = loadMailStatus(messageId);
         if (status != null) {
             // If the mail has previously failed to be sent, then remove it from the file system since it has now
             // succeeded!
@@ -110,7 +104,7 @@ public class DatabaseMailListener implements MailListener, Initializable
     public void onError(MimeMessage message, Exception exception)
     {
         String messageId = getMessageId(message);
-        MailStatus status = getMailStatus(messageId);
+        MailStatus status = loadMailStatus(messageId);
         if (status != null) {
             // Since there's been an error, we save the message to the file system so that it can be resent later on
             // if need be.
@@ -141,37 +135,12 @@ public class DatabaseMailListener implements MailListener, Initializable
         return getSafeHeader("X-MailID", message);
     }
 
-    private String getMailType(MimeMessage message)
-    {
-        return getSafeHeader("X-MailType", message);
-    }
-
     private String getMessageBatchId(MimeMessage message)
     {
         return getSafeHeader("X-BatchID", message);
     }
 
-    private String getSafeHeader(String headerName, MimeMessage message)
-    {
-        try {
-            return message.getHeader(headerName, null);
-        } catch (MessagingException e) {
-            this.logger.error("Failed to retrieve [{}] header from the message.", headerName, e);
-            return null;
-        }
-    }
-
-    private String getMessageRecipients(MimeMessage message)
-    {
-        try {
-            return InternetAddress.toString(message.getAllRecipients());
-        } catch (MessagingException e) {
-            this.logger.error("Failed to retrieve recipients from message.", e);
-            return null;
-        }
-    }
-
-    private MailStatus getMailStatus(String messageId)
+    private MailStatus loadMailStatus(String messageId)
     {
         MailStatus status;
         try {
@@ -191,6 +160,17 @@ public class DatabaseMailListener implements MailListener, Initializable
         } catch (MailStoreException e) {
             // Failed to save the status in the DB, we continue but log an error
             this.logger.error("Failed to save mail status [{}] to the database", status, e);
+        }
+    }
+
+    private String getSafeHeader(String headerName, MimeMessage message)
+    {
+        try {
+            return message.getHeader(headerName, null);
+        } catch (MessagingException e) {
+            // This cannot happen in practice since the implementation never throws any exception!
+            this.logger.error("Failed to retrieve [{}] header from the message.", headerName, e);
+            return null;
         }
     }
 }

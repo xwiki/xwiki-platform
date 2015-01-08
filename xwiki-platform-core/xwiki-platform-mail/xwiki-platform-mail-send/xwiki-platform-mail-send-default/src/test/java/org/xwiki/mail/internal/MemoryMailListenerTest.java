@@ -49,7 +49,7 @@ public class MemoryMailListenerTest
         new MockitoComponentMockingRule<>(MemoryMailListener.class);
 
     @Test
-    public void onErrorAndGetError() throws Exception
+    public void onErrorAndGetMailStatusResult() throws Exception
     {
         MemoryMailListener listener = this.mocker.getComponentUnderTest();
 
@@ -74,13 +74,15 @@ public class MemoryMailListenerTest
         assertTrue("These should be mails in error!", results.hasNext());
 
         MailStatus status = results.next();
-        assertEquals("Exception: error1", status.getError());
+        assertEquals("error1", status.getErrorSummary());
+        assertTrue(status.getErrorDescription().contains("error1"));
         assertEquals(batchId.toString(), status.getBatchId());
         assertEquals(mailId1.toString(), status.getMessageId());
         assertEquals("mailtype1", status.getType());
 
         status = results.next();
-        assertEquals("Exception: error2", status.getError());
+        assertEquals("error2", status.getErrorSummary());
+        assertTrue(status.getErrorDescription().contains("error2"));
         assertEquals(batchId.toString(), status.getBatchId());
         assertEquals(mailId2.toString(), status.getMessageId());
         assertEquals("mailtype2", status.getType());

@@ -68,64 +68,48 @@ public class MailStatus
     private String type;
 
     /*
-     * @see #getError()
+     * @see #getErrorSummary()
      */
-    private String error;
+    private String errorSummary;
+
+    /*
+     * @see #getErrorDescription()
+    */
+    private String errorDescription;
 
     /**
      * Default constructor used by Hibernate to load an instance from the Database.
      */
     public MailStatus()
     {
-        // Empty voluntarily.
+        // Empty voluntarily (used by Hibernate)
     }
 
     /**
-     * Constructor initializing the MailStatus with the MimeMessage ID.
+     * Constructor initializing the MailStatus with mandatory fields (message id, batch id and recipients are extracted
+     * from the passed message, the date is set as now and the state is passed).
+     * Also sets the Type if set in the passed message.
      *
-     * @param messageId the id of Message
-     */
-    public MailStatus(String messageId)
-    {
-        this.messageId = messageId;
-        setDate(new Date());
-    }
-
-    /**
-     * Constructor initializing the MailStatus with the MimeMessage ID and root cause message of exception.
-     *
-     * @param messageId see {@link #getMessageId()}
-     * @param error see {@link #getError()}
-     */
-    public MailStatus(String messageId, String error)
-    {
-        this.messageId = messageId;
-        setError(error);
-        setDate(new Date());
-    }
-
-    /**
-     * Constructor initializing the MailStatus with the MimeMessage ID the exception.
-     *
-     * @param messageId the id of Message
-     * @param exception the exception that was encountered during sending mail
-     */
-    public MailStatus(String messageId, Exception exception)
-    {
-        this.messageId = messageId;
-        setError(exception);
-        setDate(new Date());
-    }
-
-    /**
      * @param message the message for which to construct a status
-     * @param error the error encountered when sending the mail (if it failed), can be null
-     * @throws MessagingException when the passed message has invalid recipients
+     * @param state the state of the referenced mail (ready, failed to send, success)
      */
-    public MailStatus(MimeMessage message, String error) throws MessagingException
+    public MailStatus(MimeMessage message, MailState state)
     {
-        this(message.getHeader("X-MailID", null), error);
-        setRecipients(InternetAddress.toString(message.getAllRecipients()));
+        try {
+            setMessageId(message.getHeader("X-MailID", null));
+            setBatchId(message.getHeader("X-BatchID", null));
+            setType(message.getHeader("X-MailType", null));
+            setRecipients(InternetAddress.toString(message.getAllRecipients()));
+            setState(state);
+            setDate(new Date());
+        } catch (MessagingException e) {
+            // This should never happen since the implementation for getHeader() never throws an exception (even
+            // though the interface specifies it can) and similarly getAllRecipients() will also never throw an
+            // exception since the only reason would be if an address is malformed but there's a check when setting
+            // it already in the MimeMessage and thus in practice it cannot happen.
+            throw new RuntimeException(String.format(
+                "Unexpected exception constructing the Mail Status for state [%s]", state, e));
+        }
     }
 
     /**
@@ -257,21 +241,41 @@ public class MailStatus
     /**
      * Used by Hibernate to save that property to the database.
      *
-     * @return the error message when the mail has failed to be sent
+     * @return the error message summary when the mail has failed to be sent
      */
-    public String getError()
+    public String getErrorSummary()
     {
-        return this.error;
+        return this.errorSummary;
+    }
+
+    /**
+     * Used by Hibernate to save that property to the database.
+     *
+     * @return the error message description (the full stack trace for example) when the mail has failed to be sent
+     */
+    public String getErrorDescription()
+    {
+        return this.errorDescription;
     }
 
     /**
      * Used by Hibernate to load that property from the database.
      *
-     * @param error see {@link #getError()}
+     * @param errorSummary see {@link #getErrorSummary()}
      */
-    public void setError(String error)
+    public void setErrorSummary(String errorSummary)
     {
-        this.error = error;
+        this.errorSummary = errorSummary;
+    }
+
+    /**
+     * Used by Hibernate to load that property from the database.
+     *
+     * @param errorDescription see {@link #getErrorDescription()}
+     */
+    public void setErrorDescription(String errorDescription)
+    {
+        this.errorDescription = errorDescription;
     }
 
     /**
@@ -279,7 +283,8 @@ public class MailStatus
      */
     public void setError(Exception exception)
     {
-        this.error = ExceptionUtils.getRootCauseMessage(exception);
+        this.errorSummary = exception.getMessage();
+        this.errorDescription  = ExceptionUtils.getStackTrace(exception);
     }
 
     @Override
@@ -291,8 +296,15 @@ public class MailStatus
         builder.append("state", getState());
         builder.append("date", getDate());
         builder.append("recipients", getRecipients());
-        builder.append("type", getType());
-        builder.append("error", getError());
+        if (getType() != null) {
+            builder.append("type", getType());
+        }
+        if (getErrorSummary() != null) {
+            builder.append("errorSummary", getErrorSummary());
+        }
+        if (getErrorDescription() != null) {
+            builder.append("errorDescription", getErrorDescription());
+        }
         return builder.toString();
     }
 }

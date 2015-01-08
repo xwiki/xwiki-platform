@@ -19,8 +19,10 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
@@ -34,9 +36,7 @@ import org.xwiki.mail.MailStatusStore;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DatabaseMailListener}.
@@ -59,10 +59,11 @@ public class DatabaseMailListenerTest
     @Before
     public void setUp() throws Exception
     {
-        this.message = mock(MimeMessage.class);
-        when(this.message.getHeader("X-MailID", null)).thenReturn(this.mailId.toString());
-        when(this.message.getHeader("X-BatchID", null)).thenReturn(this.batchId.toString());
-        when(this.message.getHeader("X-MailType", null)).thenReturn("type");
+        Session session = Session.getInstance(new Properties());
+        this.message = new MimeMessage(session);
+        this.message.setHeader("X-MailID", this.mailId.toString());
+        this.message.setHeader("X-BatchID", this.batchId.toString());
+        this.message.setHeader("X-MailType", "type");
     }
 
     @Test
@@ -79,10 +80,7 @@ public class DatabaseMailListenerTest
     public void successAndSaveStatus() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        MailStatus status = new MailStatus(this.mailId.toString());
-        status.setState(MailState.READY);
-        status.setType("type");
-        status.setBatchId(this.batchId.toString());
+        MailStatus status = new MailStatus(this.message, MailState.READY);
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
         this.mocker.getComponentUnderTest().onSuccess(this.message);
@@ -95,10 +93,7 @@ public class DatabaseMailListenerTest
     public void successAndSaveStatusWithPreviouslyFailedMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        MailStatus status = new MailStatus(this.mailId.toString());
-        status.setState(MailState.FAILED);
-        status.setType("type");
-        status.setBatchId(this.batchId.toString());
+        MailStatus status = new MailStatus(this.message, MailState.FAILED);
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
@@ -116,10 +111,7 @@ public class DatabaseMailListenerTest
     public void errorAndSaveStatusAndMessage() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        MailStatus status = new MailStatus(this.mailId.toString());
-        status.setState(MailState.READY);
-        status.setType("type");
-        status.setBatchId(this.batchId.toString());
+        MailStatus status = new MailStatus(this.message, MailState.READY);
         when(mailStatusStore.loadFromMessageId(this.mailId.toString())).thenReturn(status);
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");

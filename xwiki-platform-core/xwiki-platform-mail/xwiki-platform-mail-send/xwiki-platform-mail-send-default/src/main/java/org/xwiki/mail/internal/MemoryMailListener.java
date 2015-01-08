@@ -21,7 +21,6 @@ package org.xwiki.mail.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
@@ -52,51 +51,28 @@ public class MemoryMailListener implements MailListener
     @Override
     public void onPrepare(MimeMessage message)
     {
-        try {
-            MailStatus status = createMailStatus(message);
-            status.setState(MailState.READY);
-            this.mailStatusResult.setStatus(status);
-        } catch (MessagingException e) {
-            this.logger.error("Invalid prepared message [{}]", message, e);
-        }
+        MailStatus status = new MailStatus(message, MailState.READY);
+        this.mailStatusResult.setStatus(status);
     }
 
     @Override
     public void onSuccess(MimeMessage message)
     {
-        try {
-            MailStatus status = createMailStatus(message);
-            status.setState(MailState.SENT);
-            this.mailStatusResult.setStatus(status);
-        } catch (MessagingException e) {
-            this.logger.error("Invalid success message [{}]", message, e);
-        }
+        MailStatus status = new MailStatus(message, MailState.SENT);
+        this.mailStatusResult.setStatus(status);
     }
 
     @Override
     public void onError(MimeMessage message, Exception e)
     {
-        try {
-            MailStatus status = createMailStatus(message);
-            status.setState(MailState.FAILED);
-            status.setError(e);
-            this.mailStatusResult.setStatus(status);
-        } catch (MessagingException ex) {
-            this.logger.error("Invalid error message [{}]", message, ex);
-        }
+        MailStatus status = new MailStatus(message, MailState.FAILED);
+        status.setError(e);
+        this.mailStatusResult.setStatus(status);
     }
 
     @Override
     public MailStatusResult getMailStatusResult()
     {
         return this.mailStatusResult;
-    }
-
-    private MailStatus createMailStatus(MimeMessage message) throws MessagingException
-    {
-        MailStatus mailStatus = new MailStatus(message, null);
-        mailStatus.setBatchId(message.getHeader("X-BatchID", null));
-        mailStatus.setType(message.getHeader("X-MailType", null));
-        return mailStatus;
     }
 }

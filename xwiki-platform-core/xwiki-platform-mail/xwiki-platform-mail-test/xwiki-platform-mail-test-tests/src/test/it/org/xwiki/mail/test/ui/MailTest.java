@@ -137,7 +137,10 @@ public class MailTest extends AbstractTest
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
             + "#end\n"
             + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
-            + "  {{error}}$status.messageId - $status.error{{/error}}\n"
+            + "  {{error}}\n"
+            + "    $status.messageId - $status.errorSummary\n"
+            + "    $status.errorDescription\n"
+            + "  {{/error}}\n"
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail

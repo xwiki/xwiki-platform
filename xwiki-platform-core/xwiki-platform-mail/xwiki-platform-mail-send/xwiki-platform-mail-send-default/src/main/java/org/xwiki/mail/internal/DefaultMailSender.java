@@ -89,7 +89,10 @@ public class DefaultMailSender implements MailSender, Initializable
                 new StringBuilder("Some messages have failed to be sent for the following reasons: [");
             while (statuses.hasNext()) {
                 MailStatus status = statuses.next();
-                builder.append(status.getError());
+                builder.append('[');
+                builder.append('[').append(status.getErrorSummary()).append(']').append(',');
+                builder.append('[').append(status.getErrorDescription()).append(']');
+                builder.append(']');
             }
             builder.append(']');
             throw new MessagingException(builder.toString());

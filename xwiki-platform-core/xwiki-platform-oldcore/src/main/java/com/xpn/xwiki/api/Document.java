@@ -30,8 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.inject.Provider;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -48,7 +45,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -72,9 +68,9 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -89,6 +85,10 @@ import com.xpn.xwiki.web.Utils;
  * {@link com.xpn.xwiki.doc.XWikiDocument} In scripting, an object representing the document in which the script resides
  * will be bound to a variable called doc.
  *
+ * @version $Id$
+ */
+/**
+ * 
  * @version $Id$
  */
 public class Document extends Api
@@ -410,6 +410,15 @@ public class Document extends Api
     }
 
     /**
+     * @return the document author reference
+     * @since 6.4RC1
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return this.doc.getAuthorReference();
+    }
+
+    /**
      * Get fullName of the profile document of the author of the content modification of this document version. Example:
      * XWiki.Admin.
      * 
@@ -426,6 +435,15 @@ public class Document extends Api
         }
 
         return contentAuthor;
+    }
+
+    /**
+     * @return the document content author reference
+     * @since 6.4RC1
+     */
+    public DocumentReference getContentAuthorReference()
+    {
+        return this.doc.getContentAuthorReference();
     }
 
     /**
@@ -479,6 +497,15 @@ public class Document extends Api
         }
 
         return creator;
+    }
+
+    /**
+     * @return the document creator reference
+     * @since 6.4RC1
+     */
+    public DocumentReference getCreatorReference()
+    {
+        return this.doc.getCreatorReference();
     }
 
     /**

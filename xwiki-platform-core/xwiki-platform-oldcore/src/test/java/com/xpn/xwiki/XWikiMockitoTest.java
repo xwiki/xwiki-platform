@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -55,8 +56,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.internal.skin.SkinManager;
-import com.xpn.xwiki.internal.template.TemplateManager;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -89,6 +89,8 @@ public class XWikiMockitoTest
 
     private ConfigurationSource xwikiCfgConfigurationSource;
 
+    private XWikiStoreInterface storeMock;
+    
     @Before
     public void setUp() throws Exception
     {
@@ -118,8 +120,8 @@ public class XWikiMockitoTest
         xwiki = new XWiki();
         when(context.getWiki()).thenReturn(xwiki);
 
-        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
-        xwiki.setStore(store);
+        this.storeMock = mock(XWikiStoreInterface.class);
+        xwiki.setStore(storeMock);
 
         XWikiVersioningStoreInterface versioningStore = mock(XWikiVersioningStoreInterface.class);
         xwiki.setVersioningStore(versioningStore);
@@ -268,5 +270,20 @@ public class XWikiMockitoTest
 
         // Verify that deleteXWikiDoc() is called
         verify(storeInterface).deleteXWikiDoc(document, xwikiContext);
+    }
+
+    @Test
+    public void getPlainUserName() throws XWikiException
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference userReference = new DocumentReference("wiki", "XWiki", "user");
+        when(document.getDocumentReference()).thenReturn(userReference);
+        when(this.storeMock.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(document);
+        BaseObject userObject = mock(BaseObject.class);
+        when(document.getObject("XWiki.XWikiUsers")).thenReturn(userObject);
+        when(userObject.getStringValue("first_name")).thenReturn("first<name");
+        when(userObject.getStringValue("last_name")).thenReturn("last'name");
+
+        assertEquals("first<name last'name", xwiki.getPlainUserName(userReference, context));
     }
 }

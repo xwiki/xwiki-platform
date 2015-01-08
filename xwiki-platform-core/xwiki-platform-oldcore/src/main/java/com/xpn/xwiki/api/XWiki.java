@@ -1827,6 +1827,19 @@ public class XWiki extends Api
     }
 
     /**
+     * Generate and return an unescaped user display name.
+     * 
+     * @param userReference the user reference
+     * @param context the XWiki context
+     * @return the unescaped display user name
+     * @since 6.4RC1
+     */
+    public String getPlainUserName(DocumentReference userReference)
+    {
+        return this.xwiki.getPlainUserName(userReference, getXWikiContext());
+    }
+
+    /**
      * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
      * will link to the page on the wiki where the user is registered
      * 

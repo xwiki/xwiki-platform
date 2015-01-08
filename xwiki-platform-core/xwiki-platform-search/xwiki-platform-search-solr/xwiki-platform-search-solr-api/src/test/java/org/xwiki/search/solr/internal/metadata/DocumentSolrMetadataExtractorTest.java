@@ -179,8 +179,7 @@ public class DocumentSolrMetadataExtractorTest
         when(entityReferenceSerializer.serialize(creatorReference)).thenReturn(creatorStringReference);
 
         String creatorDisplayName = "Crea Tor";
-        when(this.xcontext.getWiki().getUserName(creatorStringReference, null, false, this.xcontext)).thenReturn(
-            creatorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(creatorReference, this.xcontext)).thenReturn(creatorDisplayName);
 
         // Author.
         DocumentReference authorReference = new DocumentReference("wiki", "Space", "Author");
@@ -190,8 +189,7 @@ public class DocumentSolrMetadataExtractorTest
         when(entityReferenceSerializer.serialize(authorReference)).thenReturn(authorStringReference);
 
         String authorDisplayName = "Au Thor";
-        when(this.xcontext.getWiki().getUserName(authorStringReference, null, false, this.xcontext)).thenReturn(
-            authorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
         // Creation Date
         Date creationDate = new Date();
@@ -501,18 +499,17 @@ public class DocumentSolrMetadataExtractorTest
         when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content.getBytes()));
 
         String authorFullName = "XWiki." + authorAlias;
-        when(attachment.getAuthor()).thenReturn(authorFullName);
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
+        when(attachment.getAuthorReference()).thenReturn(authorReference);
 
         DocumentReferenceResolver<String> resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
         when(resolver.resolve(authorFullName, attachment.getReference())).thenReturn(authorReference);
 
         EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         String authorStringReference = "wiki:" + authorFullName;
         when(serializer.serialize(authorReference)).thenReturn(authorStringReference);
 
-        when(this.xcontext.getWiki().getUserName(authorStringReference, null, false, this.xcontext)).thenReturn(
-            authorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
         return attachment;
     }

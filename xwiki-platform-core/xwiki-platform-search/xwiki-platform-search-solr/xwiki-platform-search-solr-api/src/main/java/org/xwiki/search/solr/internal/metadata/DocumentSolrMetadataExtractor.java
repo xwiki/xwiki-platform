@@ -168,7 +168,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String authorString = entityReferenceSerializer.serialize(translatedDocument.getAuthorReference());
         solrDocument.setField(FieldUtils.AUTHOR, authorString);
         try {
-            String authorDisplayString = xcontext.getWiki().getUserName(authorString, null, false, xcontext);
+            String authorDisplayString =
+                xcontext.getWiki().getPlainUserName(translatedDocument.getAuthorReference(), xcontext);
             solrDocument.setField(FieldUtils.AUTHOR_DISPLAY, authorDisplayString);
         } catch (Throwable e) {
             this.logger.error("Failed to get author display name for document [{}]", entityReference);
@@ -177,7 +178,8 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         String creatorString = entityReferenceSerializer.serialize(translatedDocument.getCreatorReference());
         solrDocument.setField(FieldUtils.CREATOR, creatorString);
         try {
-            String creatorDisplayString = xcontext.getWiki().getUserName(creatorString, null, false, xcontext);
+            String creatorDisplayString =
+                xcontext.getWiki().getPlainUserName(translatedDocument.getCreatorReference(), xcontext);
             solrDocument.setField(FieldUtils.CREATOR_DISPLAY, creatorDisplayString);
         } catch (Throwable e) {
             this.logger.error("Failed to get creator display name for document [{}]", entityReference);
@@ -303,13 +305,11 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.addField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, locale), attachmentTextContent);
 
         // Index the full author reference for exact matching (faceting).
-        DocumentReference authorReference =
-            documentReferenceResolver.resolve(attachment.getAuthor(), attachment.getReference());
-        String authorStringReference = entityReferenceSerializer.serialize(authorReference);
+        String authorStringReference = entityReferenceSerializer.serialize(attachment.getAuthorReference());
         solrDocument.addField(FieldUtils.ATTACHMENT_AUTHOR, authorStringReference);
         try {
             // Index the author display name for free text search.
-            String authorDisplayName = xcontext.getWiki().getUserName(authorStringReference, null, false, xcontext);
+            String authorDisplayName = xcontext.getWiki().getPlainUserName(attachment.getAuthorReference(), xcontext);
             solrDocument.addField(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY, authorDisplayName);
         } catch (Exception e) {
             this.logger.error("Failed to get author display name for attachment [{}]", attachment.getReference(), e);

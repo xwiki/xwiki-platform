@@ -4704,20 +4704,41 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(user)) {
             return context.getMessageTool().get("core.users.unknownUser");
         }
+
+        DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
+
+        return getUserName(userReference, format, link, true, context);
+    }
+
+    /**
+     * Generate a display user name and return it.
+     * 
+     * @param userReference
+     * @param format a Velocity scnippet used to format the user name
+     * @param link true if a full html link snippet should be returned
+     * @param escapeXML true if the returned name should be escaped (forced true if <code>link</link> is true)
+     * @param context the XWiki context
+     * @return the display user name or a html snippet with the link to the passed user
+     * @since 6.4RC1
+     */
+    public String getUserName(DocumentReference userReference, String format, boolean link, boolean escapeXML, XWikiContext context)
+    {
+        if (userReference == null) {
+            return context.getMessageTool().get("core.users.unknownUser");
+        }
+
         XWikiDocument userdoc = null;
         try {
-            DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
             userdoc = getDocument(userReference, context);
             if (userdoc == null) {
-                return XMLUtils.escape(user);
+                return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return XMLUtils.escape(userdoc.getDocumentReference().getName());
+                return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName()) : userdoc.getDocumentReference().getName();
             }
 
-            Set<String> proplist = userobj.getPropertyList();
             String text;
 
             if (format == null) {
@@ -4727,7 +4748,7 @@ public class XWiki implements EventListener
                 }
             } else {
                 VelocityContext vcontext = new VelocityContext();
-                for (String propname : proplist) {
+                for (String propname : userobj.getPropertyList()) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text =
@@ -4735,7 +4756,9 @@ public class XWiki implements EventListener
                         + context.getDoc().getDocumentReference() + ">", vcontext, context);
             }
 
-            text = XMLUtils.escape(text.trim());
+            if (escapeXML || link) {
+                text = XMLUtils.escape(text.trim());
+            }
 
             if (link) {
                 text =
@@ -4746,12 +4769,21 @@ public class XWiki implements EventListener
         } catch (Exception e) {
             LOGGER.error("Failed to get user profile page", e);
 
-            if (userdoc != null) {
-                return userdoc.getDocumentReference().getName();
-            }
-
-            return user;
+            return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
         }
+    }
+
+    /**
+     * Generate and return an unescaped user display name.
+     * 
+     * @param userReference the user reference
+     * @param context the XWiki context
+     * @return the unescaped display user name
+     * @since 6.4RC1
+     */
+    public String getPlainUserName(DocumentReference userReference, XWikiContext context)
+    {
+        return getUserName(userReference, null, false, false, context);
     }
 
     public boolean hasCentralizedAuthentication(XWikiContext context)
@@ -6134,7 +6166,8 @@ public class XWiki implements EventListener
         getVirtualWikiList().remove(event.getWikiId());
     }
 
-    private void onMandatoryDocumentInitializerAdded(ComponentDescriptorAddedEvent event, ComponentManager componentManager)
+    private void onMandatoryDocumentInitializerAdded(ComponentDescriptorAddedEvent event,
+        ComponentManager componentManager)
     {
         String namespace;
         if (componentManager instanceof NamespacedComponentManager) {
@@ -6161,7 +6194,7 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to lookup mandatory document initializer", e);
         }
     }
-    
+
     private void onServerObjectEvent(Event event, XWikiDocument doc, XWikiContext context)
     {
         flushVirtualWikis(doc.getOriginalDocument());

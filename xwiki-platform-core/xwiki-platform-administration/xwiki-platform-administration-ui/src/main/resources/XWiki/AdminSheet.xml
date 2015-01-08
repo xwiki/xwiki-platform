@@ -244,7 +244,9 @@
  *#
 #macro(admin_displayCategory $sections $translationPrefix)
 (% class="admin-category" %)
-  #foreach ($section in $sorttool.sort($sections, 'order'))
+  #set ($sortedSections = [])
+  #sortCollectionOfMapsByField($sections, 'order', 9999, 'asc', $sortedSections)
+  #foreach ($section in $sortedSections)
     * {{html wiki="true"}}&lt;a href="$section.url"&gt;[[image:${section.iconReference}]] **${section.name}**&lt;/a&gt;{{/html}} (% class="description" %)$!{section.description}
   #end
 #end

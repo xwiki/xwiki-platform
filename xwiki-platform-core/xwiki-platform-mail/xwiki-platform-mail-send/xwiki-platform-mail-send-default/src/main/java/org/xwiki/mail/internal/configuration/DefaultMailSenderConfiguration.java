@@ -313,7 +313,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public long getSendWaitTime()
     {
-        return this.mailConfigSource.getProperty(SEND_WAIT_TIME,
-            this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME));
+        Long waitTime = this.mailConfigSource.getProperty(SEND_WAIT_TIME);
+
+        if (waitTime == null) {
+            waitTime = this.xwikiPropertiesSource.getProperty(PREFIX + SEND_WAIT_TIME, DEFAULT_SEND_WAIT_TIME);
+        }
+
+        return waitTime;
     }
 }

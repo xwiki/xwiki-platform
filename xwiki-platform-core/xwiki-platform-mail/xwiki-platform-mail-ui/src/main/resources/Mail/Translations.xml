@@ -68,6 +68,7 @@ Mail.SendMailStatus_livetable.batchId=Sending ID
 Mail.SendMailStatus_livetable.messageId=Message ID
 Mail.SendMailStatus_livetable.recipients=Recipients
 Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend
 Mail.SendMailStatus_livetable.resend.success=The mail has been sent successfully

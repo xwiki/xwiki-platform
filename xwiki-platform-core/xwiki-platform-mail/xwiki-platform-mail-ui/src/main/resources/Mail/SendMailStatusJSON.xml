@@ -105,33 +105,34 @@
   ## JSON
   ## ===
   {
-    "totalrows": $totalrows,
-    "matchingtags": {},
-    "tags" : [],
-    "returnedrows": $results.size(),
-    "offset": $mathtool.toInteger($request.offset),
-    "sort": "$request.sort",
-    "dir": "$request.dir",
-    "reqNo": $mathtool.toInteger($request.reqNo),
-    "rows": [
+    'totalrows': $totalrows,
+    'matchingtags': {},
+    'tags' : [],
+    'returnedrows': $results.size(),
+    'offset': $mathtool.toInteger($request.offset),
+    'sort': "$request.sort",
+    'dir': "$request.dir",
+    'reqNo': $mathtool.toInteger($request.reqNo),
+    'rows': [
     #foreach( $item in $results )
       #if($velocityCount &gt; 1) , #end
       {
         #set($recipients = "$!item.recipients")
-        "doc_viewable" : true,
-        "date" : "$xwiki.formatDate($!item.date)",
-        "batchId" : "$!item.batchId",
-        "recipients" : "$escapetool.javascript($recipients)",
-        "state" : "$!item.state",
-        #if("$!item.state" != "sent")
-          "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
+        'doc_viewable' : true,
+        'date' : "$xwiki.formatDate($!item.date)",
+        'batchId' : "$!item.batchId",
+        'recipients' : "$escapetool.javascript($recipients)",
+        'state' : "$!item.state",
+        'error' : "$!item.errorSummary",
+        #if("$!item.state" != 'sent')
+          'actions' : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
               &lt;input name='mail_id' value='$!item.messageId' type='hidden'/&gt;
               &lt;input name='batch_id' value='$!item.batchId' type='hidden'/&gt;
               &lt;span class='btn-group text-left'&gt;&lt;input name='mailsendingaction_resend' value='${escapetool.xml($services.localization.render('Mail.SendMailStatus_livetable.resend'))}' class='btn btn-primary btn-sm' type='submit'&gt;
 &lt;/span&gt;
             &lt;/form&gt;")}"
         #else
-          "actions" : ""
+          'actions' : ''
         #end  
       }
     #end

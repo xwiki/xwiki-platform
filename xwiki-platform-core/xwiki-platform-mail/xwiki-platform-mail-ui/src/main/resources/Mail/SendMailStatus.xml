@@ -62,19 +62,20 @@
 ##
 ## Livetable #
 ##
-#set($columns = ["date", "batchId", "recipients", "state", "actions"])
+#set($columns = ['date', 'batchId', 'recipients', 'state', 'error', 'actions'])
 #set($columnsProperties = {
-    "date" : { 'type' : 'date' },
-    "batchId" : { "type" : "text"},
-    "recipients" : { "type" : "text" , "html" : "true"},
-    "state" : { "type" : "text", "size" : 6},
-    "actions" : { "type" : "text", "html" : "true", "filterable" : "false", "sortable" : "false"}
+    'date" : { 'type' : 'date' },
+    'batchId' : { 'type' : 'text' },
+    'recipients' : { 'type' : 'text' , 'html' : 'true' },
+    'state' : { 'type' : 'text', 'size' : 6 },
+    'error' : { 'type' : 'text' },
+    'actions' : { 'type' : 'text', 'html' : 'true', 'filterable' : 'false', 'sortable' : 'false' }
 })
 #set($options = { 
-   "resultPage":"Mail.SendMailStatusJSON",
-   "translationPrefix" : "Mail.SendMailStatus_livetable.",
-   "tagCloud" : false
+   'resultPage': 'Mail.SendMailStatusJSON',
+   'translationPrefix' : 'Mail.SendMailStatus_livetable.',
+   'tagCloud' : false
 })
-#livetable("sendmailstatus" $columns $columnsProperties $options)
+#livetable('sendmailstatus' $columns $columnsProperties $options)
 {{/velocity}}</content>
 </xwikidoc>

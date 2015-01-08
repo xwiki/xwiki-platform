@@ -53,9 +53,9 @@ public class DefaultMailResult implements MailResult
     }
 
     @Override
-    public boolean isSent()
+    public boolean isProcessed()
     {
-        return this.mailQueueManager.isSent(getBatchId());
+        return this.mailQueueManager.isProcessed(getBatchId());
     }
 
     @Override

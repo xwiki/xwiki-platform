@@ -37,9 +37,10 @@ public interface MailResult
     void waitTillSent(long timeout);
 
     /**
-     * @return true if all the mails from this batch have been sent (successfully or not) or false otherwise
+     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
+     * @since 6.4RC1
      */
-    boolean isSent();
+    boolean isProcessed();
 
     /**
      * @return the batch id for this session of mail sending

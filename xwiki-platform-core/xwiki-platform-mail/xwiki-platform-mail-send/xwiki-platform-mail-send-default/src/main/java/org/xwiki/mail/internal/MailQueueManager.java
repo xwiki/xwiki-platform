@@ -69,5 +69,5 @@ public interface MailQueueManager
      * @param batchId the batch id for the batch we're inspecting
      * @return true if all mails from the passed batch id have been processed or false otherwise
      */
-    boolean isSent(UUID batchId);
+    boolean isProcessed(UUID batchId);
 }

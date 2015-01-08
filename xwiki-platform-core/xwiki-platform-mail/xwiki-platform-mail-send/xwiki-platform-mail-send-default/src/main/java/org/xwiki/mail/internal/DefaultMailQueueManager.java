@@ -86,7 +86,7 @@ public class DefaultMailQueueManager implements MailQueueManager
     public void waitTillSent(UUID batchId, long timeout)
     {
         long startTime = System.currentTimeMillis();
-        while (!isSent(batchId) && System.currentTimeMillis() - startTime < timeout) {
+        while (!isProcessed(batchId) && System.currentTimeMillis() - startTime < timeout) {
             try {
                 Thread.sleep(100L);
             } catch (InterruptedException e) {
@@ -99,7 +99,7 @@ public class DefaultMailQueueManager implements MailQueueManager
     }
 
     @Override
-    public boolean isSent(UUID batchId)
+    public boolean isProcessed(UUID batchId)
     {
         Iterator<MailSenderQueueItem> iterator = getMailQueue().iterator();
         while (iterator.hasNext()) {

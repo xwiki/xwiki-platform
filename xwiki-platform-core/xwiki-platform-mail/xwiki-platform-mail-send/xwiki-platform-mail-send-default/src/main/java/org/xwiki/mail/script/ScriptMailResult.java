@@ -64,9 +64,9 @@ public class ScriptMailResult implements MailResult
     }
 
     @Override
-    public boolean isSent()
+    public boolean isProcessed()
     {
-        return this.wrappedMailResult.isSent();
+        return this.wrappedMailResult.isProcessed();
     }
 
     @Override

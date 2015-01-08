@@ -83,7 +83,7 @@
           #end
           <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.html')</a>
           #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
-            <a href="$doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.documentReference)&amp;$!docvariant")" class="btn btn-primary">$services.localization.render('core.menu.export.xar')</a>
+            <a href="$doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($services.model.serialize($doc.getDocumentReference(),'default'))&amp;$!docvariant")" class="btn btn-primary">$services.localization.render('core.menu.export.xar')</a>
           #end
           <button type="button" class="btn btn-default" data-dismiss="modal">$services.localization.render('cancel')</button>
         </div>

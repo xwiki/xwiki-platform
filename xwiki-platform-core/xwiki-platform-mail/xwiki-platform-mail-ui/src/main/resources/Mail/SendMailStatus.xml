@@ -64,7 +64,7 @@
 ##
 #set($columns = ['date', 'batchId', 'recipients', 'state', 'error', 'actions'])
 #set($columnsProperties = {
-    'date" : { 'type' : 'date' },
+    'date' : { 'type' : 'date' },
     'batchId' : { 'type' : 'text' },
     'recipients' : { 'type' : 'text' , 'html' : 'true' },
     'state' : { 'type' : 'text', 'size' : 6 },

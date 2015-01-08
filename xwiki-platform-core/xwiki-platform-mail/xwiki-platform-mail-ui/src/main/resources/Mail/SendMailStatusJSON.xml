@@ -89,6 +89,10 @@
   #if("$!{filterId}" != '')
     #set($filterQuery = "and status.batchId like '%${filterId.trim()}%' ")
   #end
+  #set($filterType = "$!{request.get('type')}")
+  #if("$!{filterType}" != '')
+    #set($filterQuery = $filterQuery + "and status.type like '%${filterType.trim()}%' ")
+  #end
   #set($filterRecipients = "$!{request.get('recipients')}")
   #if("$!{filterRecipients}" != '')
     #set($filterQuery = $filterQuery + "and status.recipients like '%${filterRecipients.trim()}%' ")
@@ -96,6 +100,10 @@
   #set($filterStatus = "$!{request.get('state')}")
   #if("$!{filterStatus}" != '')
     #set($filterQuery = $filterQuery + "and status.state like '%${filterStatus.trim()}%' ")
+  #end
+  #set($filterError = "$!{request.get('error')}")
+  #if("$!{filterError}" != '')
+    #set($filterQuery = $filterQuery + "and status.errorSummary like '%${filterError.trim()}%' ")
   #end
   #set($totalrows = $services.query.xwql("select count(status) from MailStatus as status").count())
   #set($results = [])
@@ -121,6 +129,7 @@
         'doc_viewable' : true,
         'date' : "$xwiki.formatDate($!item.date)",
         'batchId' : "$!item.batchId",
+        'type' : "$!item.type",
         'recipients' : "$escapetool.javascript($recipients)",
         'state' : "$!item.state",
         'error' : "$!item.errorSummary",

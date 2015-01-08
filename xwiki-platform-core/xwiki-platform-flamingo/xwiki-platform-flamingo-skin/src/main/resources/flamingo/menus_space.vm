@@ -29,9 +29,17 @@
       #set ($hasPreviousMenuSection = true)
     #end
     ## DOCUMENT INDEX
-    #if ($xwiki.exists('Main.SpaceIndex'))
+    #set($spaceIndexReference = $services.model.createDocumentReference('', 'Main', 'SpaceIndex'))
+    #if ($xwiki.exists($spaceIndexReference))
       #submenuseparator()
-      #set ($spaceIndexUrl = $xwiki.getURL($services.model.createDocumentReference('', $doc.space, 'WebHome'), 'view','sheet=Main.SpaceIndex'))
+      #set ($spaceHomeReference = $services.model.createDocumentReference('', $doc.space, 'WebHome'))
+      #if ($xwiki.exist($spaceHomeReference))
+        #set ($spaceIndexUrl = $xwiki.getURL($spaceHomeReference, 'view', 'sheet=Main.SpaceIndex'))
+      #elseif ($xwiki.exists($doc.documentReference))
+        #set ($spaceIndexUrl = $xwiki.getURL($doc.documentReference, 'view', 'sheet=Main.SpaceIndex'))
+      #else
+        #set ($spaceIndexUrl = $xwiki.getURL($spaceIndexReference, 'view', "space=${escapetool.url($doc.space)}"))
+      #end 
       #submenuitem($spaceIndexUrl $services.localization.render('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '' 'book')
       #set ($hasPreviousMenuSection = true)
     #end

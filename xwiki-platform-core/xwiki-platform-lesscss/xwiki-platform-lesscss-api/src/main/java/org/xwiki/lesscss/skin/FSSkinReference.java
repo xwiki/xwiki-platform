@@ -65,7 +65,7 @@ public class FSSkinReference implements SkinReference
     @Override
     public String toString()
     {
-        return String.format("SkinName[%s]", skinName);
+        return String.format("SkinFS[%s]", skinName);
     }
 
 }

@@ -132,7 +132,8 @@ public class MailTest extends AbstractTest
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
-            + "#set ($result = $services.mailsender.send($message))\n"
+            + "#set ($discard = $message.setType('Test'))\n"
+            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
             + "#end\n"
@@ -154,5 +155,9 @@ public class MailTest extends AbstractTest
         assertEquals(1, this.mail.getReceivedMessages().length);
         assertEquals("Status for John on " + getTestClassName() + ".SendMail",
             this.mail.getReceivedMessages()[0].getSubject());
+
+        // Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for the sent
+        // mail
+        // TODO
     }
 }

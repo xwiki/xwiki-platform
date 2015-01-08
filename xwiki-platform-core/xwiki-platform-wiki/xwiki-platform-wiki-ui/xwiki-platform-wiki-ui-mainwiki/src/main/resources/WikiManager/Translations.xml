@@ -271,9 +271,9 @@ platform.wiki.create.wizard.step.next=Go to next step
 platform.wiki.create.wizard.step.create=Create
 
 ## Admin
-admin.wikis=Wikis
-admin.wikis.template=Wiki Template
-admin.wikis.rights=Wiki Creation Right
+admin.wikis.description=Wikis management.
+admin.wikis.templates=Templates
+admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
@@ -312,6 +312,12 @@ platform.wiki.sheet.aliases=An alias is an other name for the wiki. You can add 
 ## until 6.1
 #######################################
 platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

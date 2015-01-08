@@ -21,7 +21,7 @@
 
 <xwikidoc version="1.1">
   <web>WikiManager</web>
-  <name>AdminWikiSheet</name>
+  <name>AdminWikiDescriptorSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -30,10 +30,10 @@
   <parent>XWiki.XWikiPreferences</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418726024000</date>
-  <contentUpdateDate>1418725828000</contentUpdateDate>
+  <date>1420720635000</date>
+  <contentUpdateDate>1420720635000</contentUpdateDate>
   <version>1.1</version>
-  <title>AdminWikiSheet</title>
+  <title>AdminWikiDescriptorSheet</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -88,71 +88,73 @@
     {{html}}
     &lt;div class='xform half'&gt;
       &lt;form method='post' action="$xwiki.getURL($sheetDocFullName, 'get', 'outputSyntax=plain')"&gt;
-        &lt;h2&gt;$services.localization.render('admin.wiki')&lt;/h2&gt;
-        &lt;dl&gt;
-          &lt;dt&gt;
-            &lt;label for='prettyName'&gt;$services.localization.render('platform.wiki.sheet.prop.wikiprettyname')&lt;/label&gt;
-            &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.wikiprettyname')&lt;/span&gt;
-          &lt;/dt&gt;
-          &lt;dd&gt;
-            &lt;input id='prettyName' name='prettyName' type='text' size='30' value="$!{escapetool.xml($descriptor.prettyName)}" /&gt;
-          &lt;/dd&gt;
+        &lt;fieldset&gt;
+          &lt;legend&gt;$services.localization.render('admin.wikis.descriptor')&lt;/legend&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for='prettyName'&gt;$services.localization.render('platform.wiki.sheet.prop.wikiprettyname')&lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.wikiprettyname')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;input id='prettyName' name='prettyName' type='text' size='30' value="$!{escapetool.xml($descriptor.prettyName)}" /&gt;
+            &lt;/dd&gt;
 
-          &lt;dt&gt;
-            &lt;label for='description'&gt;$services.localization.render('platform.wiki.sheet.prop.description')&lt;/label&gt;
-            &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.description')&lt;/span&gt;
-          &lt;/dt&gt;
-          &lt;dd&gt;
-            &lt;textarea id='description' name='description'&gt;$!{escapetool.xml($descriptor.description)}&lt;/textarea&gt;
-          &lt;/dd&gt;
+            &lt;dt&gt;
+              &lt;label for='description'&gt;$services.localization.render('platform.wiki.sheet.prop.description')&lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.description')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;textarea id='description' name='description'&gt;$!{escapetool.xml($descriptor.description)}&lt;/textarea&gt;
+            &lt;/dd&gt;
 
-          &lt;dt&gt;
-            &lt;label for='homepage'&gt;
-              $services.localization.render('platform.wiki.sheet.prop.homepage') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
-            &lt;/label&gt;
-            &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.homepage')&lt;/span&gt;
-          &lt;/dt&gt;
-          &lt;dd&gt;
-            #if ($descriptor.mainPageReference)
-              #set ($homepage = $services.model.serialize($descriptor.mainPageReference, 'local'))
-            #else
-              #set ($homepage = '')
+            &lt;dt&gt;
+              &lt;label for='homepage'&gt;
+                $services.localization.render('platform.wiki.sheet.prop.homepage') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
+              &lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.homepage')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #if ($descriptor.mainPageReference)
+                #set ($homepage = $services.model.serialize($descriptor.mainPageReference, 'local'))
+              #else
+                #set ($homepage = '')
+              #end
+              &lt;input id='homepage' name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
+            &lt;/dd&gt;
+
+            ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).
+            #set ($currentUserString = $services.model.serialize($xcontext.userReference))
+            #set ($descriptorReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', "XWikiServer${stringtool.capitalize($descriptor.id)}"))
+            #set ($descriptorFullName = $services.model.serialize($descriptorReference))
+            #set ($hasEditOnDescriptor = $xwiki.hasAccessLevel('edit', $currentUserString, $descriptorFullName))
+            #if ($currentUserString == "$!{services.wiki.currentWikiDescriptor.ownerId}" || $hasEditOnDescriptor)
+            &lt;dt&gt;
+              &lt;label for='owner'&gt;
+                $services.localization.render('platform.wiki.sheet.prop.owner') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
+              &lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.owner')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #userPicker_import()
+              #set ($class = 'suggestUsers')
+              #set ($userScope = "$!services.wiki.user.userScope")
+              #if ($userScope == 'LOCAL_AND_GLOBAL')
+                #set ($class = "$class withScope")
+              #elseif ($userScope == 'GLOBAL_ONLY')
+                #set ($class = "$class global")
+              #end
+              &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
+            &lt;/dd&gt;
+
+            &lt;dt class='warning'&gt;
+              &lt;label for='owner'&gt;
+                &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
+              &lt;/label&gt;
+            &lt;/dt&gt;
             #end
-            &lt;input id='homepage' name='homepage' type='text' size='30' class='suggestDocuments' value="$!{escapetool.xml($homepage)}" /&gt;
-          &lt;/dd&gt;
 
-          ## Only show the owner change form element if the current user is the current owner or a global admin (has edit on the wiki's descriptor document).
-          #set ($currentUserString = $services.model.serialize($xcontext.userReference))
-          #set ($descriptorReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', "XWikiServer${stringtool.capitalize($descriptor.id)}"))
-          #set ($descriptorFullName = $services.model.serialize($descriptorReference))
-          #set ($hasEditOnDescriptor = $xwiki.hasAccessLevel('edit', $currentUserString, $descriptorFullName))
-          #if ($currentUserString == "$!{services.wiki.currentWikiDescriptor.ownerId}" || $hasEditOnDescriptor)
-          &lt;dt&gt;
-            &lt;label for='owner'&gt;
-              $services.localization.render('platform.wiki.sheet.prop.owner') &lt;span class="xRequired"&gt;$services.localization.render('core.validation.required')&lt;/span&gt;
-            &lt;/label&gt;
-            &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.sheet.desc.owner')&lt;/span&gt;
-          &lt;/dt&gt;
-          &lt;dd&gt;
-            #userPicker_import()
-            #set ($class = 'suggestUsers')
-            #set ($userScope = "$!services.wiki.user.userScope")
-            #if ($userScope == 'LOCAL_AND_GLOBAL')
-              #set ($class = "$class withScope")
-            #elseif ($userScope == 'GLOBAL_ONLY')
-              #set ($class = "$class global")
-            #end
-            &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
-          &lt;/dd&gt;
-
-          &lt;dt class='warning'&gt;
-            &lt;label for='owner'&gt;
-              &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
-            &lt;/label&gt;
-          &lt;/dt&gt;
-          #end
-
-        &lt;/dl&gt;
+          &lt;/dl&gt;
+        &lt;/fieldset&gt;
 
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
 
@@ -172,10 +174,10 @@
 {{/velocity}}
 </content>
   <object>
-    <name>WikiManager.AdminWikiSheet</name>
+    <name>WikiManager.AdminWikiDescriptorSheet</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>1d051080-a763-42d9-b058-c678344bc5f3</guid>
+    <guid>d2862776-25f2-48fa-a799-c6a0eddcc6db</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -339,12 +341,25 @@
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
     </class>
     <property>
-      <categoryIcon/>
+      <categoryIcon>world</categoryIcon>
     </property>
     <property>
-      <codeToExecute>{{include reference="WikiManager.AdminWikiSheet" /}}</codeToExecute>
+      <codeToExecute>{{include reference="WikiManager.AdminWikiDescriptorSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -353,13 +368,13 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayBeforeCategory/>
+      <displayBeforeCategory>usersgroups</displayBeforeCategory>
     </property>
     <property>
-      <displayInCategory>configuration</displayInCategory>
+      <displayInCategory>wikis</displayInCategory>
     </property>
     <property>
-      <displayInSection>wiki</displayInSection>
+      <displayInSection>wikis.descriptor</displayInSection>
     </property>
     <property>
       <heading/>
@@ -373,12 +388,15 @@
     <property>
       <propertiesToShow/>
     </property>
+    <property>
+      <sectionOrder>10</sectionOrder>
+    </property>
   </object>
   <object>
-    <name>WikiManager.AdminWikiSheet</name>
+    <name>WikiManager.AdminWikiDescriptorSheet</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>67228345-88ba-4827-ad6d-bdd3585c4b12</guid>
+    <guid>c1496f50-c653-459e-9bec-c92b10033a70</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -503,10 +521,10 @@ var init = function() {
     </property>
   </object>
   <object>
-    <name>WikiManager.AdminWikiSheet</name>
+    <name>WikiManager.AdminWikiDescriptorSheet</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>8a5f110a-3849-47b4-9222-dce57acfd65c</guid>
+    <guid>73d9bafd-0545-41b4-b75b-250d40624814</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>

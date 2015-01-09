@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -75,8 +77,8 @@ public class DatabaseMailListener implements MailListener, Initializable
         MailStatus status = createMailStatus(message, parameters);
         saveStatus(status, parameters);
 
-        // Initialize the DatabaseMailStatusResult on first execution by passing some context data (batch id + params)
-        this.mailStatusResult.setContextData(status.getBatchId(), parameters);
+        // Initialize the DatabaseMailStatusResult on first execution by passing the batch id
+        this.mailStatusResult.setBatchId(status.getBatchId());
     }
 
     @Override
@@ -147,7 +149,13 @@ public class DatabaseMailListener implements MailListener, Initializable
     {
         MailStatus status;
         try {
-            status = this.mailStatusStore.loadFromMessageId(messageId, parameters);
+            List<MailStatus> statuses = this.mailStatusStore.load(
+                Collections.<String, Object>singletonMap("messageId", messageId));
+            if (statuses.isEmpty()) {
+                status = null;
+            } else {
+                status = statuses.get(0);
+            }
         } catch (MailStoreException e) {
             // Failed to load the status in the DB, we continue but log an error
             this.logger.error("Failed to load mail status for message id [{}] from the database", messageId, e);

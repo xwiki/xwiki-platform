@@ -97,11 +97,12 @@ public class DatabaseMailListenerTest
         Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
         MailStatus status = new MailStatus(this.message, MailState.READY);
         status.setWiki("otherwiki");
-        when(mailStatusStore.loadFromMessageId(this.mailId.toString(), parameters)).thenReturn(status);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("messageId",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
 
         this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
 
-        verify(mailStatusStore).loadFromMessageId(this.mailId.toString(), parameters);
+        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("messageId", this.mailId.toString()));
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT, "otherwiki")), eq(parameters));
     }
 
@@ -112,13 +113,14 @@ public class DatabaseMailListenerTest
         Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
         MailStatus status = new MailStatus(this.message, MailState.FAILED);
         status.setWiki("otherwiki");
-        when(mailStatusStore.loadFromMessageId(this.mailId.toString(), parameters)).thenReturn(status);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("messageId",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
 
         this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
 
-        verify(mailStatusStore).loadFromMessageId(this.mailId.toString(), parameters);
+        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("messageId", this.mailId.toString()));
 
         verify(mailContentStore).delete(this.batchId.toString(), this.mailId.toString());
 
@@ -131,7 +133,8 @@ public class DatabaseMailListenerTest
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         Map<String, Object> parameters = Collections.emptyMap();
         MailStatus status = new MailStatus(this.message, MailState.FAILED);
-        when(mailStatusStore.loadFromMessageId(this.mailId.toString(), parameters)).thenReturn(status);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("messageId",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
         doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId.toString(),
@@ -151,15 +154,16 @@ public class DatabaseMailListenerTest
         Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
         MailStatus status = new MailStatus(this.message, MailState.READY);
         status.setWiki("otherwiki");
-        when(mailStatusStore.loadFromMessageId(this.mailId.toString(), parameters)).thenReturn(status);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("messageId",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
 
         this.mocker.getComponentUnderTest().onError(this.message, new Exception("Error"), parameters);
 
-        verify(mailStatusStore).loadFromMessageId(this.mailId.toString(), parameters);
+        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("messageId", this.mailId.toString()));
 
-        verify(mailContentStore).save(this.message);
+            verify(mailContentStore).save(this.message);
 
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.FAILED, "otherwiki")), eq(parameters));
     }

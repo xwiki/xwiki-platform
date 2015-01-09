@@ -65,6 +65,11 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <!-- Used by unit tests to set the temporary directory to be the Maven target directory -->
   <build>

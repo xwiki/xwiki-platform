@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,10 +51,10 @@ public class DatabaseMailStatusResultTest
     public void getSize() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
-        when(store.count("batchid", Collections.singletonMap("wikiId", (Object) "mywiki"))).thenReturn(1L);
+        when(store.count(Collections.<String, Object>emptyMap())).thenReturn(1L);
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
-        result.setContextData("batchid", Collections.singletonMap("wikiId", (Object) "mywiki"));
+        result.setBatchId("batchid");
 
         assertEquals(1, result.getSize());
     }
@@ -64,11 +63,10 @@ public class DatabaseMailStatusResultTest
     public void getSizeWhenStorageError() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        when(store.count("batchid", parameters)).thenThrow(new MailStoreException("error"));
+        when(store.count(Collections.<String, Object>emptyMap())).thenThrow(new MailStoreException("error"));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
-        result.setContextData("batchid", parameters);
+        result.setBatchId("batchid");
 
         assertEquals(0, result.getSize());
         assertEquals("Failed to get size of results for batch id [batchid]. Returning an empty result.",
@@ -79,12 +77,11 @@ public class DatabaseMailStatusResultTest
     public void getAll() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
         MailStatus status = new MailStatus();
-        when(store.loadFromBatchId("batchid", parameters)).thenReturn(Arrays.asList(status));
+        when(store.load(Collections.<String, Object>emptyMap())).thenReturn(Arrays.asList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
-        result.setContextData("batchid", parameters);
+        result.setBatchId("batchid");
 
         Iterator<MailStatus> resultStatuses = result.getAll();
         MailStatus resultStatus = resultStatuses.next();

@@ -20,9 +20,13 @@
 package org.xwiki.mail;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.internet.MimeMessage;
 
@@ -30,7 +34,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.mail.script.AbstractMailScriptService;
 import org.xwiki.mail.script.ScriptMailResult;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Expose Mail Storage API to scripts.
@@ -52,6 +60,16 @@ public class MailStorageScriptService extends AbstractMailScriptService
     @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
+
+    @Inject
+    @Named("database")
+    private MailStatusStore mailStatusStore;
+
+    @Inject
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
 
     /**
      * Resend the serialized MimeMessage synchronously.
@@ -86,6 +104,66 @@ public class MailStorageScriptService extends AbstractMailScriptService
             setError(e);
             return null;
         }
+    }
+
+    /**
+     * Loads all message statuses matching the passed filters.
+     *
+     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @return the loaded {@link org.xwiki.mail.MailStatus} instances or null if not allowed or an error happens
+     */
+    public List<MailStatus> load(Map<String, Object> filterMap)
+    {
+        // Only admins are allowed
+        if (this.authorizationManager.hasAccess(Right.ADMIN)) {
+            try {
+                return this.mailStatusStore.load(normalizeFilterMap(filterMap));
+            } catch (MailStoreException e) {
+                // Save the exception for reporting through the script services's getLastError() API
+                setError(e);
+                return null;
+            }
+        } else {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(new MailStoreException("You need Admin rights to load mail statuses"));
+            return null;
+        }
+    }
+
+    /**
+     * Count the number of message statuses matching the passed filters.
+     *
+     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @return the number of mail statuses or 0 if not allowed or an error happens
+     */
+    public long count(Map<String, Object> filterMap)
+    {
+        // Only admins are allowed
+        if (this.authorizationManager.hasAccess(Right.ADMIN)) {
+            try {
+                return this.mailStatusStore.count(normalizeFilterMap(filterMap));
+            } catch (MailStoreException e) {
+                // Save the exception for reporting through the script services's getLastError() API
+                setError(e);
+                return 0;
+            }
+        } else {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(new MailStoreException("You need Admin rights to count mail statuses"));
+            return 0;
+        }
+    }
+
+    private Map<String, Object> normalizeFilterMap(Map<String, Object> filterMap)
+    {
+        // Force the wiki to be the current wiki to prevent any subwiki to see the list of mail statuses from other
+        // wikis
+        Map<String, Object> normalizedMap = new HashMap<>(filterMap);
+        XWikiContext xwikiContext = this.xwikiContextProvider.get();
+        if (!xwikiContext.isMainWiki()) {
+            normalizedMap.put("wiki", xwikiContext.getWikiId());
+        }
+        return normalizedMap;
     }
 
     private MimeMessage loadMessage(String batchId, String mailId) throws MailStoreException

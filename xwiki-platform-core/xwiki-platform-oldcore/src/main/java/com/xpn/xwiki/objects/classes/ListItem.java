@@ -25,7 +25,7 @@ import org.apache.commons.collections4.ComparatorUtils;
 
 /**
  * An entry in a List or in a Tree.
- * 
+ *
  * @version $Id$
  */
 public class ListItem
@@ -36,7 +36,7 @@ public class ListItem
         {
             /**
              * Case insensitive comparison of two Strings.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -56,7 +56,7 @@ public class ListItem
             /**
              * Sorts the items on their ID: the option with the lower ID (case insensitive String comparison) will be
              * placed before the other one.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -76,7 +76,7 @@ public class ListItem
             /**
              * Sorts the items on their value: the option with the lower value (case insensitive String comparison) will
              * be placed before the other one.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -101,7 +101,7 @@ public class ListItem
     /**
      * Constructor that initializes both the {@link #id internal ID} and the {@link #value displayed value} with the
      * same value, leaving the {@link #parent} field empty.
-     * 
+     *
      * @param id the value to use for the id and the displayed value
      */
     public ListItem(String id)
@@ -113,7 +113,7 @@ public class ListItem
     /**
      * Constructor that initializes the {@link #id internal ID} and the {@link #value displayed value}, leaving the
      * {@link #parent} field empty.
-     * 
+     *
      * @param id the value to use for the internal id
      * @param value the value to use for the displayed value
      */
@@ -126,7 +126,7 @@ public class ListItem
     /**
      * Constructor that initializes all of the {@link #id internal ID}, the {@link #value displayed value}, and the
      * {@link #parent} fields.
-     * 
+     *
      * @param id the value to use for the internal id
      * @param value the value to use for the displayed value
      * @param parent the value to use for the item's parent

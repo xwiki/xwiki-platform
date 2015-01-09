@@ -57,7 +57,7 @@ import com.xpn.xwiki.web.ViewAction;
 
 /**
  * Reader statistics from XWiki database.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -76,7 +76,7 @@ public class XWikiStatsReader
 
     /**
      * Return the statistics action stored.
-     * 
+     *
      * @param action the action.
      * @param size the maximum size of the list to return.
      * @param context the XWiki context.
@@ -87,7 +87,7 @@ public class XWikiStatsReader
         List<Object> list = new ArrayList<Object>();
 
         if ((action.equals(ViewAction.VIEW_ACTION) || (action.equals(SaveAction.ACTION_NAME)))) {
-            Collection< ? > actions = StatsUtil.getRecentActionFromSessions(context, action);
+            Collection<?> actions = StatsUtil.getRecentActionFromSessions(context, action);
 
             if (actions != null) {
                 Object[] actionsarray = actions.toArray();
@@ -162,7 +162,7 @@ public class XWikiStatsReader
 
     /**
      * Shows how the statistics for the specified action have evolved over the specified period of time.
-     * 
+     *
      * @param action the action for which to retrieve statistics.
      * @param scope the set of documents to consider.
      * @param period the period of time, including its start date but excluding its end date.
@@ -200,7 +200,7 @@ public class XWikiStatsReader
 
     /**
      * Retrieves document statistics.
-     * 
+     *
      * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the documents are ordered by the number of times they have been viewed so far.
      * @param scope the set of documents for which to retrieve statistics.
@@ -232,7 +232,7 @@ public class XWikiStatsReader
             paramList.add(period.getStartCode());
             paramList.add(period.getEndCode());
 
-            List< ? > solist =
+            List<?> solist =
                 store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             documentStatsList = getDocumentStatistics(solist, action);
@@ -248,13 +248,13 @@ public class XWikiStatsReader
 
     /**
      * Converts the rows retrieved from the database to a list of DocumentStats instances.
-     * 
+     *
      * @param resultSet the result of a database query for document statistics.
      * @param action the action for which the statistics were retrieved.
      * @return a list of {@link com.xpn.xwiki.stats.impl.DocumentStats} objects.
      * @see #getDocumentStatistics(String, Scope, com.xpn.xwiki.criteria.impl.Period , Range , XWikiContext)
      */
-    private List<DocumentStats> getDocumentStatistics(List< ? > resultSet, String action)
+    private List<DocumentStats> getDocumentStatistics(List<?> resultSet, String action)
     {
         List<DocumentStats> documentStatsList = new ArrayList<DocumentStats>(resultSet.size());
 
@@ -274,7 +274,7 @@ public class XWikiStatsReader
 
     /**
      * Retrieves back-link statistics.
-     * 
+     *
      * @param domain the domain used for filtering the results.
      * @param scope the scope of referred documents for which to retrieve statistics.
      * @param period the period of time, including its start date but excluding its end date.
@@ -304,7 +304,7 @@ public class XWikiStatsReader
             paramList.add(period.getStartCode());
             paramList.add(period.getEndCode());
 
-            List< ? > solist =
+            List<?> solist =
                 store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             documentStatsList = getDocumentStatistics(solist, "refer");
@@ -320,7 +320,7 @@ public class XWikiStatsReader
 
     /**
      * Retrieves referrer statistics.
-     * 
+     *
      * @param domain the domain for which to retrieve statistics. To retrieve statistics for all domains use the empty
      *            string.
      * @param scope the scope of referred documents to use for filtering the results.
@@ -351,7 +351,7 @@ public class XWikiStatsReader
             paramList.add(period.getStartCode());
             paramList.add(period.getEndCode());
 
-            List< ? > solist =
+            List<?> solist =
                 store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             refererList = getRefererStatistics(solist);
@@ -368,12 +368,12 @@ public class XWikiStatsReader
     /**
      * Converts the rows retrieved from the database to a list of {@link com.xpn.xwiki.stats.impl.RefererStats}
      * instances.
-     * 
+     *
      * @param resultSet The result of a database query for referer statistics
      * @return A list of {@link com.xpn.xwiki.stats.impl.RefererStats} objects
      * @see #getRefererStatistics(String, Scope, Period, Range , XWikiContext)
      */
-    private List<RefererStats> getRefererStatistics(List< ? > resultSet)
+    private List<RefererStats> getRefererStatistics(List<?> resultSet)
     {
         Date now = new Date();
         List<RefererStats> stats = new ArrayList<RefererStats>(resultSet.size());
@@ -393,7 +393,7 @@ public class XWikiStatsReader
 
     /**
      * Generate the HQL query used in {@link #getVisitStatistics(String, Period, Range, XWikiContext)}.
-     * 
+     *
      * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the visitors are ordered by the number of pages they have viewed so far.
      * @param period the period of time, including its start date but excluding its end date.
@@ -461,7 +461,7 @@ public class XWikiStatsReader
 
     /**
      * Retrieves visit statistics.
-     * 
+     *
      * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the visitors are ordered by the number of pages they have viewed so far.
      * @param period the period of time, including its start date but excluding its end date.
@@ -479,7 +479,7 @@ public class XWikiStatsReader
 
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
-            List< ? > solist =
+            List<?> solist =
                 store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             visiStatList = getVisitStatistics(solist, new DateTime(period.getStart()), new DateTime(period.getEnd()));
@@ -497,14 +497,14 @@ public class XWikiStatsReader
 
     /**
      * Converts the rows retrieved from the database to a list of VisitStats instances.
-     * 
+     *
      * @param resultSet the result of a database query for visitor statistics.
      * @param startDate the start date used in the query.
      * @param endDate the end date used in the query.
      * @return a list of {@link com.xpn.xwiki.stats.impl.VisitStats} objects.
      * @see #getVisitStatistics(String, Period, Range, XWikiContext)
      */
-    private List<VisitStats> getVisitStatistics(List< ? > resultSet, DateTime startDate, DateTime endDate)
+    private List<VisitStats> getVisitStatistics(List<?> resultSet, DateTime startDate, DateTime endDate)
     {
         List<VisitStats> stats = new ArrayList<VisitStats>(resultSet.size());
 
@@ -540,7 +540,7 @@ public class XWikiStatsReader
 
     /**
      * Gets monthly statistics on a document for a specific action.
-     * 
+     *
      * @param docname fully qualified document name.
      * @param action can be "view", "edit", "save", etc..
      * @param month the month.
@@ -565,7 +565,7 @@ public class XWikiStatsReader
 
     /**
      * Gets monthly referer statistics.
-     * 
+     *
      * @param docName fully qualified document name.
      * @param month the month.
      * @param context the XWiki context.
@@ -574,11 +574,11 @@ public class XWikiStatsReader
      * @deprecated use {@link #getRefererStatistics(String, Scope, Period, Range, XWikiContext)} instead.
      */
     @Deprecated
-    public List< ? > getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
+    public List<?> getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
     {
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
 
-        List< ? > solist;
+        List<?> solist;
         if (store != null) {
             List<Object> paramList = new ArrayList<Object>(1);
             paramList.add(docName);

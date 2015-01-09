@@ -44,7 +44,7 @@ import org.xwiki.properties.ConverterManager;
 
 /**
  * Looks for configuration data in {@code /WEB-INF/xwiki.cfg}.
- * 
+ *
  * @version $Id$
  * @since 6.1M2
  */

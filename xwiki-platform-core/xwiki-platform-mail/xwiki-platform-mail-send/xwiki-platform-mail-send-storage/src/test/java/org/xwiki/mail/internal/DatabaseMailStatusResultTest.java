@@ -51,7 +51,7 @@ public class DatabaseMailStatusResultTest
     public void getSize() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
-        when(store.count(Collections.<String, Object>emptyMap())).thenReturn(1L);
+        when(store.count(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenReturn(1L);
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
         result.setBatchId("batchid");
@@ -63,7 +63,8 @@ public class DatabaseMailStatusResultTest
     public void getSizeWhenStorageError() throws Exception
     {
         MailStatusStore store = mock(MailStatusStore.class);
-        when(store.count(Collections.<String, Object>emptyMap())).thenThrow(new MailStoreException("error"));
+        when(store.count(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenThrow(
+            new MailStoreException("error"));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
         result.setBatchId("batchid");
@@ -78,7 +79,8 @@ public class DatabaseMailStatusResultTest
     {
         MailStatusStore store = mock(MailStatusStore.class);
         MailStatus status = new MailStatus();
-        when(store.load(Collections.<String, Object>emptyMap())).thenReturn(Arrays.asList(status));
+        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenReturn(
+            Arrays.asList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
         result.setBatchId("batchid");

@@ -150,7 +150,7 @@ public class DatabaseMailListener implements MailListener, Initializable
         MailStatus status;
         try {
             List<MailStatus> statuses = this.mailStatusStore.load(
-                Collections.<String, Object>singletonMap("messageId", messageId));
+                Collections.<String, Object>singletonMap("id", messageId));
             if (statuses.isEmpty()) {
                 status = null;
             } else {

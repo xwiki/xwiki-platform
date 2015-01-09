@@ -20,7 +20,9 @@
 package org.xwiki.mail.internal;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,8 @@ import org.xwiki.mail.MailStoreException;
  */
 public class DatabaseMailStatusResult implements MailStatusResult
 {
+    private static final String BATCHID_KEY = "batchId";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMailStatusResult.class);
 
     private MailStatusStore mailStatusStore;
@@ -72,7 +76,7 @@ public class DatabaseMailStatusResult implements MailStatusResult
         }
 
         try {
-            return this.mailStatusStore.count(Collections.<String, Object>emptyMap());
+            return this.mailStatusStore.count(Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId));
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get size of results for batch id [{}]. Returning an empty result.",
                 this.batchId, e);
@@ -88,7 +92,8 @@ public class DatabaseMailStatusResult implements MailStatusResult
         }
 
         try {
-            return this.mailStatusStore.load(Collections.<String, Object>emptyMap()).iterator();
+            return this.mailStatusStore.load(
+                Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId)).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get all results. Returning an empty result.", e);
             return Collections.emptyIterator();
@@ -103,8 +108,10 @@ public class DatabaseMailStatusResult implements MailStatusResult
         }
 
         try {
-            return this.mailStatusStore.load(
-                Collections.<String, Object>singletonMap("state", state.toString())).iterator();
+            Map<String, Object> filterMap = new HashMap<>();
+            filterMap.put(BATCHID_KEY, this.batchId);
+            filterMap.put("state", state.toString());
+            return this.mailStatusStore.load(filterMap).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get results by state. Returning an empty result.", e);
             return Collections.emptyIterator();

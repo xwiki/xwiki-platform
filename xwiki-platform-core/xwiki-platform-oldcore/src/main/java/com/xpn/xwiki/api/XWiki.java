@@ -2691,6 +2691,15 @@ public class XWiki extends Api
     }
 
     /**
+     * @return true if section editing is enabled (can be configured through the
+     *         {@code xwiki.section.edit} configuration property. Defaults to 1 (=enabeld) of not defined
+     */
+    public boolean hasSectionEdit()
+    {
+        return this.xwiki.hasSectionEdit(getXWikiContext());
+    }
+
+    /**
      * @return the section depth for which section editing is available (can be configured through
      *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
      */

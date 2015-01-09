@@ -20,6 +20,7 @@
 package org.xwiki.mail;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -38,42 +39,53 @@ public interface MailStatusStore
      * Saves mail status in the store.
      *
      * @param status the mail status to be saved
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @throws MailStoreException when an error occurs saving the data
      */
-    void save(MailStatus status) throws MailStoreException;
+    void save(MailStatus status, Map<String, Object> parameters) throws MailStoreException;
 
     /**
      * Load a message status from the store.
      *
      * @param messageId the id of the message to load
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @return the loaded {@link org.xwiki.mail.MailStatus} instance
      * @throws MailStoreException when an error occurs when loading the data
      */
-    MailStatus loadFromMessageId(String messageId) throws MailStoreException;
+    MailStatus loadFromMessageId(String messageId, Map<String, Object> parameters) throws MailStoreException;
 
     /**
      * @param batchId the batch id of the message statuses to load
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @return the number of emails matching the passed batch id from the store.
      * @throws MailStoreException when an error occurs when loading the data
      */
-    long count(String batchId) throws MailStoreException;
+    long count(String batchId, Map<String, Object> parameters) throws MailStoreException;
 
     /**
      * Loads all message statuses matching the passed state and batch id from the store.
      *
      * @param batchId the batch id of the message statuses to load
      * @param state the state to match (only statuses having that state will be loaded)
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @return the loaded {@link org.xwiki.mail.MailStatus} instance
      * @throws MailStoreException when an error occurs when loading the data
      */
-    List<MailStatus> loadFromBatchId(String batchId, MailState state) throws MailStoreException;
+    List<MailStatus> loadFromBatchId(String batchId, MailState state, Map<String, Object> parameters)
+        throws MailStoreException;
 
     /**
      * Loads all message statuses matching the passed batch id from the store.
      *
      * @param batchId the batch id of the message statuses to load
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @return the loaded {@link org.xwiki.mail.MailStatus} instance
      * @throws MailStoreException when an error occurs when loading the data
      */
-    List<MailStatus> loadFromBatchId(String batchId) throws MailStoreException;
+    List<MailStatus> loadFromBatchId(String batchId, Map<String, Object> parameters) throws MailStoreException;
 }

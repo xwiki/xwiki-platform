@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -62,13 +63,13 @@ public class MemoryMailListenerTest
         when(message1.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
         when(message1.getHeader("X-MailID", null)).thenReturn(mailId1.toString());
         when(message1.getHeader("X-MailType", null)).thenReturn("mailtype1");
-        listener.onError(message1, new Exception("error1"));
+        listener.onError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
 
         MimeMessage message2 = mock(MimeMessage.class);
         when(message2.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
         when(message2.getHeader("X-MailID", null)).thenReturn(mailId2.toString());
         when(message2.getHeader("X-MailType", null)).thenReturn("mailtype2");
-        listener.onError(message2, new Exception("error2"));
+        listener.onError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
 
         Iterator<MailStatus> results = listener.getMailStatusResult().getByState(MailState.FAILED);
         assertTrue("These should be mails in error!", results.hasNext());

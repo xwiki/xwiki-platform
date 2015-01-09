@@ -21,6 +21,7 @@ package org.xwiki.mail.internal;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,8 @@ public class DatabaseMailStatusResult implements MailStatusResult
 
     private String batchId;
 
+    private Map<String, Object> parameters;
+
     /**
      * Constructor initializing the DatabaseMailStatusResult with MailStatusStore.
      * @param mailStatusStore the MailStatusStore
@@ -55,24 +58,28 @@ public class DatabaseMailStatusResult implements MailStatusResult
     }
 
     /**
-     * Set the batch id of the message statuses to save or load.
+     * Set the batch id of the message statuses to save or load along with context parameters (such as the wiki id of
+     * the wiki from which the batch is being sent from).
      *
      * @param batchId the batch id of the message statuses
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      */
-    public void setBatchId(String batchId)
+    public void setContextData(String batchId, Map<String, Object> parameters)
     {
         this.batchId = batchId;
+        this.parameters = parameters;
     }
 
     @Override
     public long getSize()
     {
-        if (this.batchId == null) {
+        if (this.batchId == null || this.parameters == null) {
             return 0;
         }
 
         try {
-            return this.mailStatusStore.count(this.batchId);
+            return this.mailStatusStore.count(this.batchId, this.parameters);
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get size of results for batch id [{}]. Returning an empty result.",
                 this.batchId, e);
@@ -83,12 +90,12 @@ public class DatabaseMailStatusResult implements MailStatusResult
     @Override
     public Iterator<MailStatus> getAll()
     {
-        if (this.batchId == null) {
+        if (this.batchId == null || this.parameters == null) {
             return Collections.emptyIterator();
         }
 
         try {
-            return this.mailStatusStore.loadFromBatchId(this.batchId).iterator();
+            return this.mailStatusStore.loadFromBatchId(this.batchId, this.parameters).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get all results. Returning an empty result.", e);
             return Collections.emptyIterator();
@@ -98,12 +105,12 @@ public class DatabaseMailStatusResult implements MailStatusResult
     @Override
     public Iterator<MailStatus> getByState(MailState state)
     {
-        if (this.batchId == null) {
+        if (this.batchId == null || this.parameters == null) {
             return Collections.emptyIterator();
         }
 
         try {
-            return this.mailStatusStore.loadFromBatchId(this.batchId, state).iterator();
+            return this.mailStatusStore.loadFromBatchId(this.batchId, state, parameters).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get results by state. Returning an empty result.", e);
             return Collections.emptyIterator();

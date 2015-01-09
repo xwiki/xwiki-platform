@@ -86,4 +86,23 @@ public class MailStatusTest
             + "date = [" + date.toString() + "], recipients = [john@doe.com], type = [type], "
             + "errorSummary = [Exception: inner], errorDescription = ["));
     }
+
+    @Test
+    public void verifyToStringWhenWiki() throws Exception
+    {
+        Session session = Session.getInstance(new Properties());
+        MimeMessage message = new MimeMessage(session);
+        message.setHeader("X-MailID", "mailid");
+        message.setHeader("X-BatchID", "batchid");
+        message.setHeader("X-MailType", "type");
+        message.setRecipients(Message.RecipientType.TO, "john@doe.com");
+
+        MailStatus status = new MailStatus(message, MailState.READY);
+        Date date = new Date();
+        status.setDate(date);
+        status.setWiki("wiki");
+
+        assertEquals("messageId = [mailid], batchId = [batchid], state = [ready], date = [" + date.toString()
+            + "], recipients = [john@doe.com], type = [type], wiki = [wiki]", status.toString());
+    }
 }

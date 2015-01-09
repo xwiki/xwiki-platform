@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -72,6 +73,8 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
      * sent together in a session for example or to resend failed mails from a specific session.
      */
     private static final String HEADER_BATCH_ID = "X-BatchID";
+
+    private static final String WIKI_PARAMETER_KEY = "wikiId";
 
     @Inject
     private Logger logger;
@@ -177,7 +180,8 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
 
         while (messages.hasNext()) {
             MimeMessage mimeMessage = messages.next();
-            MimeMessage message = initializeMessage(mimeMessage, listener, batchId);
+            MimeMessage message = initializeMessage(mimeMessage, listener, batchId, item.getWikiId());
+
             try {
                 // Step 1: If the current Session in use is different from the one passed then close
                 // the current Transport, get a new one and reconnect.
@@ -199,12 +203,14 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
 
                 // Step 3: Notify the user of the success if a listener has been provided
                 if (listener != null) {
-                    listener.onSuccess(message);
+                    listener.onSuccess(message,
+                        Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
                 }
             } catch (Exception e) {
                 // An error occurred, notify the user if a listener has been provided
                 if (listener != null) {
-                    listener.onError(message, e);
+                    listener.onError(message, e,
+                        Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
                 }
             }
 
@@ -228,7 +234,7 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
         }
     }
 
-    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchId)
+    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchId, String wikiId)
     {
         MimeMessage message = null;
         try {
@@ -266,12 +272,12 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
 
             // Mail ready to be sent, notify the user if a listener has been provided
             if (listener != null) {
-                listener.onPrepare(message);
+                listener.onPrepare(message, Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) wikiId));
             }
         } catch (MessagingException e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
-                listener.onError(message, e);
+                listener.onError(message, e, Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) wikiId));
             }
         }
         return message;

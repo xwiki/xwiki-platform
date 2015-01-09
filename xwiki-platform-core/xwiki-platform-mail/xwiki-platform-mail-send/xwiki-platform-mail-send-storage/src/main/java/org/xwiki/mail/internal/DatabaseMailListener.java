@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
@@ -68,20 +70,20 @@ public class DatabaseMailListener implements MailListener, Initializable
     }
 
     @Override
-    public void onPrepare(MimeMessage message)
+    public void onPrepare(MimeMessage message, Map<String, Object> parameters)
     {
-        MailStatus status = new MailStatus(message, MailState.READY);
-        saveStatus(status);
+        MailStatus status = createMailStatus(message, parameters);
+        saveStatus(status, parameters);
 
-        // Initialize the DatabaseMailStatusResult on first execution, in order to save the Batch ID
-        this.mailStatusResult.setBatchId(status.getBatchId());
+        // Initialize the DatabaseMailStatusResult on first execution by passing some context data (batch id + params)
+        this.mailStatusResult.setContextData(status.getBatchId(), parameters);
     }
 
     @Override
-    public void onSuccess(MimeMessage message)
+    public void onSuccess(MimeMessage message, Map<String, Object> parameters)
     {
         String messageId = getMessageId(message);
-        MailStatus status = loadMailStatus(messageId);
+        MailStatus status = loadMailStatus(messageId, parameters);
         if (status != null) {
             // If the mail has previously failed to be sent, then remove it from the file system since it has now
             // succeeded!
@@ -91,20 +93,21 @@ public class DatabaseMailListener implements MailListener, Initializable
                     this.mailContentStore.delete(batchId, messageId);
                 } catch (MailStoreException e) {
                     // Failed to delete saved mail, raise a warning but continue since it's not critical
-                    this.logger.warn("Failed to remove previously failing message from the file system. Reason [{}]. "
-                        + "However it has now been sent successfully.", ExceptionUtils.getRootCauseMessage(e));
+                    this.logger.warn("Failed to remove previously failing message [{}] (batch id [{}]) from the file "
+                        + "system. Reason [{}]. However it has now been sent successfully.", messageId, batchId,
+                        ExceptionUtils.getRootCauseMessage(e));
                 }
             }
             status.setState(MailState.SENT);
-            saveStatus(status);
+            saveStatus(status, parameters);
         }
     }
 
     @Override
-    public void onError(MimeMessage message, Exception exception)
+    public void onError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         String messageId = getMessageId(message);
-        MailStatus status = loadMailStatus(messageId);
+        MailStatus status = loadMailStatus(messageId, parameters);
         if (status != null) {
             // Since there's been an error, we save the message to the file system so that it can be resent later on
             // if need be.
@@ -120,7 +123,7 @@ public class DatabaseMailListener implements MailListener, Initializable
             }
             status.setState(MailState.FAILED);
             status.setError(exception);
-            saveStatus(status);
+            saveStatus(status, parameters);
         }
     }
 
@@ -140,11 +143,11 @@ public class DatabaseMailListener implements MailListener, Initializable
         return getSafeHeader("X-BatchID", message);
     }
 
-    private MailStatus loadMailStatus(String messageId)
+    private MailStatus loadMailStatus(String messageId, Map<String, Object> parameters)
     {
         MailStatus status;
         try {
-            status = this.mailStatusStore.loadFromMessageId(messageId);
+            status = this.mailStatusStore.loadFromMessageId(messageId, parameters);
         } catch (MailStoreException e) {
             // Failed to load the status in the DB, we continue but log an error
             this.logger.error("Failed to load mail status for message id [{}] from the database", messageId, e);
@@ -153,10 +156,10 @@ public class DatabaseMailListener implements MailListener, Initializable
         return status;
     }
 
-    private void saveStatus(MailStatus status)
+    private void saveStatus(MailStatus status, Map<String, Object> parameters)
     {
         try {
-            this.mailStatusStore.save(status);
+            this.mailStatusStore.save(status, parameters);
         } catch (MailStoreException e) {
             // Failed to save the status in the DB, we continue but log an error
             this.logger.error("Failed to save mail status [{}] to the database", status, e);
@@ -172,5 +175,12 @@ public class DatabaseMailListener implements MailListener, Initializable
             this.logger.error("Failed to retrieve [{}] header from the message.", headerName, e);
             return null;
         }
+    }
+
+    private MailStatus createMailStatus(MimeMessage message, Map<String, Object> parameters)
+    {
+        MailStatus status = new MailStatus(message, MailState.READY);
+        status.setWiki((String) parameters.get("wikiId"));
+        return status;
     }
 }

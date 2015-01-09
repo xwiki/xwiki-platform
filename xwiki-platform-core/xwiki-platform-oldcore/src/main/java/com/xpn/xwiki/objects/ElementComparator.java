@@ -21,7 +21,7 @@ package com.xpn.xwiki.objects;
 
 import java.util.Comparator;
 
-import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 
 /**
  * Compare and sort instances of ElementInterface by name.

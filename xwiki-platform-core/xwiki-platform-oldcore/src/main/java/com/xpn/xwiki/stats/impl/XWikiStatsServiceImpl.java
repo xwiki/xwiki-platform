@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
@@ -159,7 +159,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
             if (!action.equals(DownloadAction.ACTION_NAME)) {
                 Collection actions = StatsUtil.getRecentActionFromSessions(context, action);
                 if (actions == null) {
-                    actions = new CircularFifoBuffer(StatsUtil.getRecentVisitSize(context));
+                    actions = new CircularFifoQueue(StatsUtil.getRecentVisitSize(context));
                     StatsUtil.setRecentActionsFromSession(context, action, actions);
                 }
 

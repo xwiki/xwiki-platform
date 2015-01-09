@@ -32,7 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;

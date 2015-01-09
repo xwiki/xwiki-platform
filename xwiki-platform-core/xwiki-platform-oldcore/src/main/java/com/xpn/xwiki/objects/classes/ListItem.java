@@ -21,7 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Comparator;
 
-import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 
 /**
  * An entry in a List or in a Tree.
@@ -31,7 +31,6 @@ import org.apache.commons.collections.ComparatorUtils;
 public class ListItem
 {
     /** Comparator that orders two strings in their natural order, keeping nulls at the end. */
-    @SuppressWarnings("unchecked")
     private static final Comparator<String> BASE_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<String>()
         {
@@ -51,7 +50,6 @@ public class ListItem
         });
 
     /** Comparator that orders list items on their identifiers, keeping null items at the end. */
-    @SuppressWarnings("unchecked")
     protected static final Comparator<ListItem> ID_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<ListItem>()
         {
@@ -72,7 +70,6 @@ public class ListItem
         });
 
     /** Comparator that orders list items on their values, keeping null items at the end. */
-    @SuppressWarnings("unchecked")
     protected static final Comparator<ListItem> VALUE_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<ListItem>()
         {

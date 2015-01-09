@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.jfree.util.Log;
@@ -894,7 +894,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
         // Make sure to have unique instances of the various caches
         context.displayedFields = Collections.synchronizedList(new ArrayList<String>(this.displayedFields));
-        context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+        context.classCache = Collections.synchronizedMap(new LRUMap<DocumentReference, BaseClass>(this.classCacheSize));
 
         return context;
     }

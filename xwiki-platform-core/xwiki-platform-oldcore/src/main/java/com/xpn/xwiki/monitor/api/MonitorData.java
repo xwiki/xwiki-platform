@@ -35,9 +35,11 @@ public class MonitorData {
     private Date startTime;
     private Date endTime;
 
-    private Map timers = new HashMap();
-    private Map timerSummaries = new HashMap();
-    private List timerList = new ArrayList();
+    private Map<String, MonitorTimer> timers = new HashMap<>();
+
+    private Map<String, MonitorTimerSummary> timerSummaries = new HashMap<>();
+
+    private List<MonitorTimer> timerList = new ArrayList<>();
 
     public MonitorData(String wikiPage, String action, URL url, String threadName) {
         this.setWikiPage(wikiPage);
@@ -99,7 +101,7 @@ public class MonitorData {
     }
 
     public long getDuration(String timer) {
-        MonitorTimerSummary tsummary = (MonitorTimerSummary) timerSummaries.get(timer);
+        MonitorTimerSummary tsummary = this.timerSummaries.get(timer);
         if (tsummary==null)
          return 0;
         else
@@ -112,7 +114,7 @@ public class MonitorData {
             return;
 
         MonitorTimer timer;
-        timer = (MonitorTimer)timers.get(timername);
+        timer = this.timers.get(timername);
         if (timer!=null) {
           if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("MONITOR: error recursive timers for " + timername);
@@ -130,7 +132,7 @@ public class MonitorData {
 
     public void setTimerDetails(String timername, String details) {
         MonitorTimer timer;
-        timer = (MonitorTimer)timers.get(timername);
+        timer = this.timers.get(timername);
         if (timer==null) {
           if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("MONITOR: could not find timer for " + timername);
@@ -145,7 +147,7 @@ public class MonitorData {
             return;
 
         MonitorTimer timer;
-        timer = (MonitorTimer)timers.get(timername);
+        timer = this.timers.get(timername);
         if (timer==null) {
           if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("MONITOR: could not find timer for " + timername);
@@ -155,7 +157,7 @@ public class MonitorData {
           if (timer.getDetails()!=null)
            timerList.add(timer);
           timers.remove(timername);
-          MonitorTimerSummary tsummary = (MonitorTimerSummary) timerSummaries.get(timername);
+          MonitorTimerSummary tsummary = this.timerSummaries.get(timername);
           if (tsummary==null) {
               tsummary = new MonitorTimerSummary(timername);
               timerSummaries.put(timername, tsummary);
@@ -167,20 +169,20 @@ public class MonitorData {
         }
     }
 
-    public List getTimerList() {
+    public List<MonitorTimer> getTimerList() {
         return timerList;
     }
 
-    public Map getTimerSummaries() {
+    public Map<String, MonitorTimerSummary> getTimerSummaries() {
         return timerSummaries;
     }
 
     public void log() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("MONITOR " + wikiPage + ": " + getDuration() + "ms");
-            Iterator it = timerSummaries.values().iterator();
+            Iterator<MonitorTimerSummary> it = timerSummaries.values().iterator();
             while (it.hasNext()) {
-                MonitorTimerSummary tsummary = (MonitorTimerSummary) it.next();
+                MonitorTimerSummary tsummary = it.next();
                 LOGGER.debug("MONITOR " + wikiPage + " " + action + " " + tsummary.getName() + ": " + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
             }
         }
@@ -195,7 +197,7 @@ public class MonitorData {
     }
 
     public long getNbCalls(String timer) {
-        MonitorTimerSummary tsummary = (MonitorTimerSummary) timerSummaries.get(timer);
+        MonitorTimerSummary tsummary = this.timerSummaries.get(timer);
         if (tsummary==null)
          return 0;
         else

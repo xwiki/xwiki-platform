@@ -347,14 +347,11 @@ ol.tagCloud .ultraPopular {
 ##
 $xwiki.ssx.use('XWiki.TagCloud')##
 ##
-##if (!("$!tagCloudSpace" =="") &amp;&amp; !("$!tagCloudSpaces" ==""))
 #if( $tagCloudSpace &amp;&amp; $tagCloudSpaces )
-{{html}}
-  &lt;div class="box errormessage"&gt;
+  {{error}}
   ##Do not use space and spaces parameter in the same time.
-  $services.localization.render('xe.tag.paramerror')
-  &lt;/div&gt;
-{{/html}}
+  {{translation key="xe.tag.paramerror" /}}
+  {{/error}}
   #break
 #end
 

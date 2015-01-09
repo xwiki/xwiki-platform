@@ -107,8 +107,15 @@
   #end
   #set($totalrows = $services.query.xwql("select count(status) from MailStatus as status").count())
   #set($results = [])
-  #set($xwql = "select status from MailStatus as status where status.messageId&lt;&gt;'' $!filterQuery order by status.${order} $!orderDirection")
-  #set($results = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).execute())
+  #if (!$xcontext.isMainWiki())
+    #set($filterQuery = $filterQuery + "and status.wiki = :wiki ")
+  #end
+  #set($xwql = "select status from MailStatus as status where status.messageId&lt;&gt;''  $!filterQuery order by status.${order} $!orderDirection")
+  #set ($query = $services.query.xwql($xwql).setOffset($offset).setLimit($limit).setWiki($xcontext.mainWikiName))
+  #if (!$xcontext.isMainWiki())
+    #set ($query = $query.bindValue('wiki', $xcontext.context.wikiId))
+  #end
+  #set($results = $query.execute())
   ## ===
   ## JSON
   ## ===

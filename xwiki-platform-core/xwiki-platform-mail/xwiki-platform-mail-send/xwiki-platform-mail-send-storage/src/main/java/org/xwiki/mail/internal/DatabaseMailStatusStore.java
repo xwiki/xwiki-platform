@@ -69,8 +69,13 @@ public class DatabaseMailStatusStore implements MailStatusStore
     public void save(final MailStatus status, Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
         try {
-            XWikiContext xwikiContext = this.contextProvider.get();
             store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
             {
                 @Override
@@ -86,6 +91,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
             });
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to save mail status [%s] to the database.", status), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
@@ -94,19 +101,22 @@ public class DatabaseMailStatusStore implements MailStatusStore
         throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Only display the message statuses for the current wiki except if we're on the main wiki.
+        final String queryString;
+        if (xwikiContext.isMainWiki()) {
+            queryString = String.format("from %s where mail_id=:id", MailStatus.class.getName());
+        } else {
+            queryString = String.format("from %s where mail_id=:id and mail_wiki=:wiki",
+                MailStatus.class.getName());
+        }
+
         try {
-            final XWikiContext xwikiContext = this.contextProvider.get();
-
-            // Only display the message statuses for the current wiki except if we're on the main wiki.
-            final String queryString;
-            final boolean isMainWiki = isMainWiki(xwikiContext, parameters);
-            if (isMainWiki) {
-                queryString = String.format("from %s where mail_id=:id", MailStatus.class.getName());
-            } else {
-                queryString = String.format("from %s where mail_id=:id and mail_wiki=:wiki",
-                    MailStatus.class.getName());
-            }
-
             return store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<MailStatus>()
                 {
@@ -115,8 +125,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query = session.createQuery(queryString);
                         query.setParameter(ID_PARAMETER_NAME, messageId);
-                        if (!isMainWiki) {
-                            query.setParameter(WIKI_PARAMETER_NAME, getWikiId(parameters));
+                        if (!xwikiContext.isMainWiki()) {
+                            query.setParameter(WIKI_PARAMETER_NAME, xwikiContext.getWikiId());
                         }
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         if (!queryResult.isEmpty()) {
@@ -128,6 +138,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to load mail status for message [%s] from the database.",
                 messageId), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
@@ -136,20 +148,23 @@ public class DatabaseMailStatusStore implements MailStatusStore
         final Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Only display the message statuses for the current wiki except if we're on the main wiki.
+        final String queryString;
+        if (xwikiContext.isMainWiki()) {
+            queryString = String.format("from %s where mail_batchid=:batchid and mail_state=:state",
+                MailStatus.class.getName());
+        } else {
+            queryString = String.format("from %s where mail_batchid=:batchid and mail_state=:state "
+                + "and mail_wiki=:wiki", MailStatus.class.getName());
+        }
+
         try {
-            final XWikiContext xwikiContext = this.contextProvider.get();
-
-            // Only display the message statuses for the current wiki except if we're on the main wiki.
-            final String queryString;
-            final boolean isMainWiki = isMainWiki(xwikiContext, parameters);
-            if (isMainWiki) {
-                queryString = String.format("from %s where mail_batchid=:batchid and mail_state=:state",
-                    MailStatus.class.getName());
-            } else {
-                queryString = String.format("from %s where mail_batchid=:batchid and mail_state=:state "
-                    + "and mail_wiki=:wiki", MailStatus.class.getName());
-            }
-
             return store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
                 {
@@ -159,8 +174,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query = session.createQuery(queryString);
                         query.setParameter(BATCHID_PARAMETER_NAME, batchId).setParameter("state", state.toString());
-                        if (!isMainWiki) {
-                            query.setParameter(WIKI_PARAMETER_NAME, getWikiId(parameters));
+                        if (!xwikiContext.isMainWiki()) {
+                            query.setParameter(WIKI_PARAMETER_NAME, xwikiContext.getWikiId());
                         }
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
@@ -169,6 +184,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to load mail statuses "
                 + "(for batch id [%s] and state [%s]) from the database.", batchId, state), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
@@ -177,20 +194,23 @@ public class DatabaseMailStatusStore implements MailStatusStore
         throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Only display the message statuses for the current wiki except if we're on the main wiki.
+        final String queryString;
+        if (xwikiContext.isMainWiki()) {
+            queryString = String.format("from %s where mail_batchid=:batchid",
+                MailStatus.class.getName());
+        } else {
+            queryString = String.format("from %s where mail_batchid=:batchid and mail_wiki=:wiki",
+                MailStatus.class.getName());
+        }
+
         try {
-            final XWikiContext xwikiContext = this.contextProvider.get();
-
-            // Only display the message statuses for the current wiki except if we're on the main wiki.
-            final String queryString;
-            final boolean isMainWiki = isMainWiki(xwikiContext, parameters);
-            if (isMainWiki) {
-                queryString = String.format("from %s where mail_batchid=:batchid",
-                    MailStatus.class.getName());
-            } else {
-                queryString = String.format("from %s where mail_batchid=:batchid and mail_wiki=:wiki",
-                    MailStatus.class.getName());
-            }
-
             return store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
                 {
@@ -200,8 +220,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query = session.createQuery(queryString);
                         query.setParameter(BATCHID_PARAMETER_NAME, batchId);
-                        if (!isMainWiki) {
-                            query.setParameter(WIKI_PARAMETER_NAME, getWikiId(parameters));
+                        if (!xwikiContext.isMainWiki()) {
+                            query.setParameter(WIKI_PARAMETER_NAME, xwikiContext.getWikiId());
                         }
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
@@ -210,6 +230,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to load mail statuses from the database "
                 + "for batch id [%s].", batchId), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
@@ -217,20 +239,23 @@ public class DatabaseMailStatusStore implements MailStatusStore
     public long count(final String batchId, final Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Only count the message statuses for the current wiki except if we're on the main wiki.
+        final String queryString;
+        if (xwikiContext.isMainWiki()) {
+            queryString = String.format("select count(*) from %s where mail_batchid=:batchid",
+                MailStatus.class.getName());
+        } else {
+            queryString = String.format("select count(*) from %s where mail_batchid=:batchid and "
+                + "mail_wiki=:wiki", MailStatus.class.getName());
+        }
+
         try {
-            final XWikiContext xwikiContext = this.contextProvider.get();
-
-            // Only count the message statuses for the current wiki except if we're on the main wiki.
-            final String queryString;
-            final boolean isMainWiki = isMainWiki(xwikiContext, parameters);
-            if (isMainWiki) {
-                queryString = String.format("select count(*) from %s where mail_batchid=:batchid",
-                    MailStatus.class.getName());
-            } else {
-                queryString = String.format("select count(*) from %s where mail_batchid=:batchid and "
-                    + "mail_wiki=:wiki", MailStatus.class.getName());
-            }
-
             Long count = store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<Long>()
                 {
@@ -240,8 +265,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     {
                         Query query = session.createQuery(queryString);
                         query.setParameter(BATCHID_PARAMETER_NAME, batchId);
-                        if (!isMainWiki) {
-                            query.setParameter(WIKI_PARAMETER_NAME, getWikiId(parameters));
+                        if (!xwikiContext.isMainWiki()) {
+                            query.setParameter(WIKI_PARAMETER_NAME, xwikiContext.getWikiId());
                         }
                         return (Long) query.uniqueResult();
                     }
@@ -250,26 +275,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to get count of mail statuses with batch id "
                 + "[%s] from the database .", batchId), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
-    }
-
-    private boolean isMainWiki(XWikiContext xwikiContext, Map<String, Object> parameters)
-    {
-        boolean isMainWiki;
-
-        String mailWikiId = getWikiId(parameters);
-        if (mailWikiId == null) {
-            // No wiki id specified, we consider that the mail was sent from the main wiki
-            isMainWiki = true;
-        } else {
-            isMainWiki = xwikiContext.isMainWiki(mailWikiId);
-        }
-
-        return isMainWiki;
-    }
-
-    private String getWikiId(Map<String, Object> parameters)
-    {
-        return (String) parameters.get("wikiId");
     }
 }

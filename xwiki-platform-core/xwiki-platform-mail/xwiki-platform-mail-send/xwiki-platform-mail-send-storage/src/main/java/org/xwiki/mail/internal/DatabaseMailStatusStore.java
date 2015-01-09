@@ -103,7 +103,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
             if (isMainWiki) {
                 queryString = String.format("from %s where mail_id=:id", MailStatus.class.getName());
             } else {
-                queryString = String.format("from %s where mail_id=:id and mail_xwiki=:wiki",
+                queryString = String.format("from %s where mail_id=:id and mail_wiki=:wiki",
                     MailStatus.class.getName());
             }
 
@@ -147,7 +147,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     MailStatus.class.getName());
             } else {
                 queryString = String.format("from %s where mail_batchid=:batchid and mail_state=:state "
-                    + "and mail_xwiki=:wiki", MailStatus.class.getName());
+                    + "and mail_wiki=:wiki", MailStatus.class.getName());
             }
 
             return store.executeRead(xwikiContext,
@@ -187,7 +187,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 queryString = String.format("from %s where mail_batchid=:batchid",
                     MailStatus.class.getName());
             } else {
-                queryString = String.format("from %s where mail_batchid=:batchid and mail_xwiki=:wiki",
+                queryString = String.format("from %s where mail_batchid=:batchid and mail_wiki=:wiki",
                     MailStatus.class.getName());
             }
 
@@ -228,7 +228,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
                     MailStatus.class.getName());
             } else {
                 queryString = String.format("select count(*) from %s where mail_batchid=:batchid and "
-                    + "mail_xwiki=:wiki", MailStatus.class.getName());
+                    + "mail_wiki=:wiki", MailStatus.class.getName());
             }
 
             Long count = store.executeRead(xwikiContext,

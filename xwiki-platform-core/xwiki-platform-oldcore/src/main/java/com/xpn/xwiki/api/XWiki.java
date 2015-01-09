@@ -2692,7 +2692,7 @@ public class XWiki extends Api
 
     /**
      * @return true if section editing is enabled (can be configured through the
-     *         {@code xwiki.section.edit} configuration property. Defaults to 1 (=enabeld) of not defined
+     *         {@code xwiki.section.edit} configuration property. Defaults to 1 (=enabled) when not defined
      */
     public boolean hasSectionEdit()
     {

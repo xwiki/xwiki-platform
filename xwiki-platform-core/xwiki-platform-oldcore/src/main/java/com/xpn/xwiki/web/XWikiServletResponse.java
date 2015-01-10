@@ -169,7 +169,7 @@ public class XWikiServletResponse implements XWikiResponse
 
     /**
      * Remove a cookie.
-     * 
+     *
      * @param request The servlet request needed to find the cookie to remove
      * @param cookieName The name of the cookie that must be removed.
      */

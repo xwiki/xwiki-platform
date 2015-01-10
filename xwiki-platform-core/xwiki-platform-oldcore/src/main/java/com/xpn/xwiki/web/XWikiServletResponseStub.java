@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
  * context. This trick is used in to give a daemon thread access to the XWiki api.
- * 
+ *
  * @version $Id$
  */
 public class XWikiServletResponseStub implements XWikiResponse
@@ -43,7 +43,7 @@ public class XWikiServletResponseStub implements XWikiResponse
         @Override
         public void write(int b) throws IOException
         {
-            outputStream.write(b);
+            XWikiServletResponseStub.this.outputStream.write(b);
         }
     };
 
@@ -205,7 +205,7 @@ public class XWikiServletResponseStub implements XWikiResponse
     @Override
     public ServletOutputStream getOutputStream() throws IOException
     {
-        return servletOutputStream;
+        return this.servletOutputStream;
     }
 
     @Override

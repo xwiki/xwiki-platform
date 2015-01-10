@@ -44,17 +44,17 @@ public class MyFilterConfig implements FilterConfig
     @Override
     public String getInitParameter(String s)
     {
-        return (String) params.get(s);
+        return (String) this.params.get(s);
     }
 
     @Override
     public Enumeration getInitParameterNames()
     {
-        return params.keys();
+        return this.params.keys();
     }
 
     public void setInitParameter(String key, String s)
     {
-        params.put(key, s);
+        this.params.put(key, s);
     }
 }

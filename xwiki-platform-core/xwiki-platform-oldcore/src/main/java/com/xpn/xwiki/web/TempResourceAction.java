@@ -43,9 +43,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Action responsible for downloading temporary resources created by various modules. The temporary resource is put
- * in the temporary directory in a directory named "temp" and in subdirectories
- * "(module)/(wiki)/(space)/(page)/(file)" where:
+ * Action responsible for downloading temporary resources created by various modules. The temporary resource is put in
+ * the temporary directory in a directory named "temp" and in subdirectories "(module)/(wiki)/(space)/(page)/(file)"
+ * where:
  * <ul>
  *   <li>(module): it's the 3rd path segment in the request URL (format: {code .../temp/1/2/3/4})</li>
  *   <li>(wiki): the name of the current wiki (extracted from the URL too)</li>
@@ -56,7 +56,7 @@ import com.xpn.xwiki.XWikiException;
  * <p/>
  * For example if the URL is {@code http://localhost:8080/xwiki/bin/temp/Main/WebHome/test/test.png} then the resource
  * will be fetched from {@code TMPDIR/temp/test/xwiki/Main/WebHome/test.png}.
- * 
+ *
  * @version $Id$
  * @since 2.4M1
  */
@@ -110,7 +110,7 @@ public class TempResourceAction extends XWikiAction
         response.setDateHeader("Last-Modified", tempFile.lastModified());
         String contentType = MimeTypes.OCTET_STREAM;
         try {
-            contentType = tika.detect(tempFile);
+            contentType = this.tika.detect(tempFile);
         } catch (IOException ex) {
             LOGGER.warn(
                 String.format("Unable to determine mime type for temporary resource [%s]", tempFile.getAbsolutePath()),
@@ -129,7 +129,7 @@ public class TempResourceAction extends XWikiAction
 
     /**
      * Returns the temporary file corresponding to the specified URI.
-     * 
+     *
      * @param uri request URI.
      * @param context xwiki context.
      * @return temporary file corresponding to the specified URI or null if no such file can be located.
@@ -173,7 +173,7 @@ public class TempResourceAction extends XWikiAction
      * This method also ensures that the path to the temporary file is fully encoded (has the canonical form) even if
      * the URL used to access the file is partially decoded (which can happen for instance when XWiki is behind Apache's
      * {@code mode_proxy} with {@code nocanon} option disabled).
-     * 
+     *
      * @param encodedPathSegment an encoded URL path segment
      * @return the given string with minimal URL encoding
      */

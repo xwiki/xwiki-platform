@@ -44,7 +44,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
     /**
      * Show the login page.
-     * 
+     *
      * @param request the current request
      * @param response the current response
      */
@@ -106,7 +106,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * Process any login information that was included in the request, if any. Returns true if SecurityFilter should
      * abort further processing after the method completes (for example, if a redirect was sent as part of the login
      * processing).
-     * 
+     *
      * @param request
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
@@ -180,7 +180,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * Process any login information passed in parameter (username, password). Returns true if SecurityFilter should
      * abort further processing after the method completes (for example, if a redirect was sent as part of the login
      * processing).
-     * 
+     *
      * @param request
      * @param response
      * @return true if the filter should return after this method ends, false otherwise
@@ -250,7 +250,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     /**
      * FormAuthenticator has a special case where the user should be sent to a default page if the user spontaneously
      * submits a login request.
-     * 
+     *
      * @param request
      * @return a URL to send the user to after logging in
      */

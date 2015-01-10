@@ -33,7 +33,7 @@ import com.xpn.xwiki.XWikiException;
  * Action for processing logout requests. The actual logout request processing is done before this action is invoked,
  * the URL will trigger the authenticator automatically. This action just cleans up the session and redirects to a view
  * page.
- * 
+ *
  * @version $Id$
  */
 public class LogoutAction extends XWikiAction

@@ -71,7 +71,7 @@ public interface XWikiURLFactory
      * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
      * transformations or not on the URL. For example some implementations will convert the URL to a relative URL if the
      * URL is an internal XWiki URL.
-     * 
+     *
      * @param url the URL to convert
      * @return the converted URL as a string
      */
@@ -79,7 +79,7 @@ public interface XWikiURLFactory
 
     /**
      * Generate the base external URL to access this server.
-     * 
+     *
      * @param context the XWiki context.
      * @return the URL of the server.
      * @throws MalformedURLException error when creating the {@link URL}.

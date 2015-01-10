@@ -44,7 +44,7 @@ public class TOCGenerator
 
         LinkedHashMap<String, Map<String, Object>> tocData = new LinkedHashMap<String, Map<String, Object>>();
 
-        int previousNumbers[] = {0, 0, 0, 0, 0, 0, 0};
+        int previousNumbers[] = { 0, 0, 0, 0, 0, 0, 0 };
 
         Pattern pattern = Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(content);

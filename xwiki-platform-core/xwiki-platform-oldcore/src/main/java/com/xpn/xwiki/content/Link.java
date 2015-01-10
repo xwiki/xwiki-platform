@@ -376,8 +376,9 @@ public class Link implements Cloneable
     /**
      * Perform a series of normalization steps on the link. The steps are:
      * <ul>
-     * <li>if the link is not a URI and it doesn't have a page defined then make it point to WebHome</li>
-     * <li>if the link is internal and doesn't have a space defined, fill it in with the current document's space name</li>
+     *   <li>if the link is not a URI and it doesn't have a page defined then make it point to WebHome</li>
+     *   <li>if the link is internal and doesn't have a space defined, fill it in with the current document's space name
+     *   </li>
      * </ul>
      *
      * @param currentSpace the space to use when no space has been defined in the link

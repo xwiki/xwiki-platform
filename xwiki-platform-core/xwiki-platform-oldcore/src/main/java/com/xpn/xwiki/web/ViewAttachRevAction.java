@@ -46,10 +46,11 @@ public class ViewAttachRevAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
         String filename;
-        if (context.getMode() == XWikiContext.MODE_PORTLET)
+        if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
-        else
+        } else {
             filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
+        }
 
         XWikiAttachment attachment = null;
 

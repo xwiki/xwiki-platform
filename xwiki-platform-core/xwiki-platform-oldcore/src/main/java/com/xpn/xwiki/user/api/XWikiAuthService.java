@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.user.api;
 
+import java.security.Principal;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import java.security.Principal;
 
 public interface XWikiAuthService
 {
@@ -34,9 +34,9 @@ public interface XWikiAuthService
      * @param username the user name for the user to authenticate
      * @param password the password of the user to authenticate
      * @param context the XWiki context object
-     * @return null if the user is not authenticated properly or a {@link XWikiUser} object
-     *         representing the authenticated user if successful
-     * @throws XWikiException in case of authentication error 
+     * @return null if the user is not authenticated properly or a {@link XWikiUser} object representing the
+     *         authenticated user if successful
+     * @throws XWikiException in case of authentication error
      */
     public XWikiUser checkAuth(String username, String password, String rememberme,
         XWikiContext context) throws XWikiException;
@@ -44,8 +44,8 @@ public interface XWikiAuthService
     public void showLogin(XWikiContext context) throws XWikiException;
 
     /**
-     * @return a null Principal Object if the user hasn't been authenticated or a valid Principal
-     *         Object if the user is correctly authenticated
+     * @return a null Principal Object if the user hasn't been authenticated or a valid Principal Object if the user is
+     *         correctly authenticated
      */
     public Principal authenticate(String username, String password, XWikiContext context)
         throws XWikiException;

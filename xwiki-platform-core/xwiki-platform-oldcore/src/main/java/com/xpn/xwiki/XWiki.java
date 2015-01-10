@@ -4737,7 +4737,8 @@ public class XWiki implements EventListener
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName()) : userdoc.getDocumentReference().getName();
+                return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName()) : userdoc
+                    .getDocumentReference().getName();
             }
 
             String text;
@@ -6243,7 +6244,7 @@ public class XWiki implements EventListener
 
     /**
      * Return the document reference to the wiki preferences.
-     * 
+     *
      * @param context The current xwiki context.
      * @since 4.3M2
      */
@@ -6262,7 +6263,7 @@ public class XWiki implements EventListener
     /**
      * Search attachments by passing HQL where clause values as parameters. You can specify properties of the "attach"
      * (the attachment) or "doc" (the document it is attached to)
-     * 
+     *
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
      * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
@@ -6323,7 +6324,7 @@ public class XWiki implements EventListener
 
     /**
      * Count attachments returned by a given parameterized query
-     * 
+     *
      * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @param context the underlying context used for running the database query
@@ -6394,7 +6395,7 @@ public class XWiki implements EventListener
         try {
             initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
         } catch (FileNotFoundException e) {
-            Object[] args = {xwikicfgpath};
+            Object[] args = { xwikicfgpath };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
         }

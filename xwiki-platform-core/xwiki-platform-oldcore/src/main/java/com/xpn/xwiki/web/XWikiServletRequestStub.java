@@ -36,7 +36,7 @@ import javax.servlet.http.HttpSession;
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
  * context. This trick is used in to give a daemon thread access to the XWiki api.
- * 
+ *
  * @version $Id$
  */
 public class XWikiServletRequestStub implements XWikiRequest
@@ -311,7 +311,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getScheme()
     {
-        return scheme;
+        return this.scheme;
     }
 
     @Override

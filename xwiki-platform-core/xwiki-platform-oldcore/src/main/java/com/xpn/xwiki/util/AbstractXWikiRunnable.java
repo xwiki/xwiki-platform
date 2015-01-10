@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for any XWiki daemon class. It provide tools to initialize execution context.
- * 
+ *
  * @since 1.8.4,1.9RC1,2.0M1
  * @version $Id$
  */
@@ -86,7 +86,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     /**
      * Initialize execution context for the current thread.
-     * 
+     *
      * @return the new execution context
      * @throws ExecutionContextException error when try to initialize execution context
      */

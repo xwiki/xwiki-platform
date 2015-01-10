@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Handle URL generation in rendered wiki pages. This implementation makes sure URL will be local URL for exported
  * content (like skin, attachment and pages).
- * 
+ *
  * @version $Id$
  */
 public class ExportURLFactory extends XWikiServletURLFactory
@@ -69,6 +69,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * Pages for which to convert URL to local.
+     *
      * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
      */
     @Deprecated
@@ -76,6 +77,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * Directory where to export attachment.
+     *
      * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
      */
     @Deprecated
@@ -117,7 +119,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * Init the url factory.
-     * 
+     *
      * @param exportedPages the pages that will be exported.
      * @param exportDir the directory where to copy exported objects (attachments).
      * @param context the XWiki context.
@@ -338,7 +340,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     String fileName = matcher.group(1);
 
                     // Adjust path for links inside CSS files.
-                    while(fileName.startsWith("../")) {
+                    while (fileName.startsWith("../")) {
                         fileName = StringUtils.removeStart(fileName, "../");
                     }
 
@@ -447,7 +449,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     /**
      * Generate an url targeting attachment in provided wiki page.
-     * 
+     *
      * @param filename the name of the attachment.
      * @param space the space of the page containing the attachment.
      * @param name the name of the page containing the attachment.

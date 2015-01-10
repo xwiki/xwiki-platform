@@ -54,7 +54,7 @@ public class XWikiUser
 
     public String getUser()
     {
-        return user;
+        return this.user;
     }
 
     private DocumentReference getUserReference(XWikiContext context)
@@ -68,9 +68,9 @@ public class XWikiUser
     }
 
     /**
-     * Check if the user belongs to a group or not.
-     * This method only check direct membership (no recursive checking) in the current wiki.
-     * 
+     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
+     * the current wiki.
+     *
      * @param groupName The group to check.
      * @param context The current {@link XWikiContext context}.
      * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
@@ -97,7 +97,7 @@ public class XWikiUser
 
     public boolean isMain()
     {
-        return main;
+        return this.main;
     }
 
     public void setMain(boolean main)
@@ -121,7 +121,7 @@ public class XWikiUser
         boolean equals;
         if (obj instanceof XWikiUser) {
             XWikiUser otherUser = (XWikiUser) obj;
-            equals = otherUser.main == this.main && user.equals(otherUser.user);
+            equals = otherUser.main == this.main && this.user.equals(otherUser.user);
         } else {
             equals = false;
         }

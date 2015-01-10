@@ -64,7 +64,8 @@ public class PluginException extends XWikiException
      */
     public PluginException(String pluginName, int code, String message, Throwable e)
     {
-        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] { pluginName, message }), e);
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, CUSTOM_MESSAGE.format(new Object[] { pluginName, message }),
+            e);
         this.pluginName = pluginName;
     }
 

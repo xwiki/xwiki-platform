@@ -56,7 +56,7 @@ import com.xpn.xwiki.web.Utils;
  * database before any modification but in the case of observation it's used as the previous version of the document).
  * TODO: we should probably think about a separation of theses two notions in something more clear, something for the
  * new model.
- * 
+ *
  * @version $Id$
  * @since 2.0M4
  */
@@ -83,7 +83,7 @@ public class LazyXWikiDocument extends XWikiDocument
 
     /**
      * Load and return the document in the database.
-     * 
+     *
      * @return the real document
      */
     private XWikiDocument getDocument()

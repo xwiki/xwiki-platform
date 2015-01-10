@@ -479,6 +479,20 @@
               <method>org.xwiki.wiki.descriptor.WikiDescriptor getCurrentWikiDescriptor()</method>
               <justification>Young API, this method needs to be available for consistency with the getMainWikiDescriptor/Id pair of methods</justification>
             </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/monitor/api/MonitorPlugin</className>
+              <method>org.apache.commons.collections.buffer.CircularFifoBuffer getLastTimerData()</method>
+              <to>org.apache.commons.collections4.queue.CircularFifoQueue</to>
+              <justification>Switched to the generics-aware commons-collections4.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/monitor/api/MonitorPlugin</className>
+              <method>org.apache.commons.collections.buffer.CircularFifoBuffer getLastUnfinishedTimerData()</method>
+              <to>org.apache.commons.collections4.queue.CircularFifoQueue</to>
+              <justification>Switched to the generics-aware commons-collections4.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

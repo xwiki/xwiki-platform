@@ -42,33 +42,25 @@
   <content>{{velocity wiki="false"}}
 #if("$!{request.outputSyntax}" == 'plain' || "$!{request.xpage}" == 'plain')
   $response.setContentType('application/json')
-  ##==============================
+  ##==================================================
   ## Offset = item # at which to start displaying data
-  ##==============================
+  ##==================================================
   #set($offset = $mathtool.toInteger($request.get('offset')))
   ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if(!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  ##==================
+  ##==============================
   ## Limit = # of items to display
-  ##==================
+  ##==============================
   #set($limit = $mathtool.toInteger($request.get('limit')))
   #if(!$limit)
     #set ($limit = 15)
   #end
-  ##==================
-  ## Tag = one parameter per tag
-  ##==================
-  #if($request.tag)
-    #foreach($tag in $request.getParameterValues('tag'))
-      ## TODO: Add code to filter items based on the selected tags
-    #end
-  #end
-  ##==========
+  ##===============
   ## Sort direction
-  ##==========
+  ##===============
   #set($order = "$!request.sort")
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir')}")
@@ -104,9 +96,9 @@
   #end
   #set ($totalrows = $services.mailstorage.count($filterMap))
   #set ($results = $services.mailstorage.load($filterMap))
-  ## ===
-  ## JSON
-  ## ===
+  ## ===============
+  ## JSON Generation
+  ## ===============
   {
     'totalrows': $totalrows,
     'matchingtags': {},

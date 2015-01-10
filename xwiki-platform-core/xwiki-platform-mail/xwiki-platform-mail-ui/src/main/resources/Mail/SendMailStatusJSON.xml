@@ -92,7 +92,7 @@
   #end
   #set($filterError = "$!{request.get('error')}")
   #if("$!{filterError}" != '')
-    #set ($discard = $filterMap.put('error', "%${filterError.trim()}%"))
+    #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
   #end
   #set ($totalrows = $services.mailstorage.count($filterMap))
   #set ($results = $services.mailstorage.load($filterMap))
@@ -109,7 +109,7 @@
     'dir': "$request.dir",
     'reqNo': $mathtool.toInteger($request.reqNo),
     'rows': [
-    #foreach( $item in $results )
+    #foreach($item in $results)
       #if($velocityCount &gt; 1) , #end
       {
         #set($recipients = "$!item.recipients")

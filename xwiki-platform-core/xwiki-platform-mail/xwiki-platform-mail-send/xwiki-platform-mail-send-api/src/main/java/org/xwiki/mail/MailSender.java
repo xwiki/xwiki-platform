@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
@@ -36,16 +35,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface MailSender
 {
-    /**
-     * Send a list of mails and wait for it to be sent.
-     *
-     * @param messages the list of messages to sent
-     * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
-     * @return the result of the mail sending
-     * @throws MessagingException when an error occurs when sending the mail or if the mail has failed to be sent
-     */
-    MailResult send(Iterable<? extends MimeMessage> messages, Session session) throws MessagingException;
-
     /**
      * Send a list of mails asynchronously (the call returns immediately).
      *

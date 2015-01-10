@@ -109,8 +109,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStatusResultSerializer;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -3013,11 +3016,20 @@ public class XWiki implements EventListener
             MimeMessage message = new MimeMessage(session, is);
             message.setFrom(new InternetAddress(sender));
             message.setRecipients(Message.RecipientType.TO, email);
+            message.setHeader("X-MailType", "Account Validation");
             MailSender mailSender = Utils.getComponent(MailSender.class);
-            mailSender.send(Arrays.asList(message), session);
+            MailListener mailListener = Utils.getComponent(MailListener.class, "database");
+            MailResult mailResult = mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
+            mailResult.waitTillSent(Long.MAX_VALUE);
+            String errorMessage = MailStatusResultSerializer.serializeErrors(mailListener.getMailStatusResult());
+            if (errorMessage != null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                    XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, String.format(
+                    "Error while sending the validation email. %s", errorMessage));
+            }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending validation email", e);
+                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending the validation email", e);
         }
     }
 

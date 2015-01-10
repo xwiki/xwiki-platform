@@ -234,7 +234,7 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(Arrays.asList(message), session);
+        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

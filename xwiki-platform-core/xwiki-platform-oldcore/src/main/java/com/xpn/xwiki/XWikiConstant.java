@@ -31,7 +31,7 @@ public class XWikiConstant
     /**
      * The class that holds the default edit mode for a document. The object of this class can be attached either to the
      * document itself or to an included sheet. If both are found, the one attached to the document is used.
-     * 
+     *
      * @since 3.1M2
      */
     public static final EntityReference EDIT_MODE_CLASS = new EntityReference("EditModeClass", EntityType.DOCUMENT,

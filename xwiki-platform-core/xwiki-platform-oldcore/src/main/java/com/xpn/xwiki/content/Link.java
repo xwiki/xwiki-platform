@@ -126,9 +126,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the string which will be displayed to the user when the link is rendered or null
-     *         if no alias has been specified (in that case the page name or the URI will be
-     *         displayed. Example: "My Page" 
+     * @return the string which will be displayed to the user when the link is rendered or null if no alias has been
+     *         specified (in that case the page name or the URI will be displayed. Example: "My Page"
      */
     public String getAlias()
     {
@@ -144,10 +143,9 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the browser window in which the link should be opened into or null if not defined.
-     *         This element corresponds to the HTML <code>target</code> attribute for the
-     *         <code>a</code> element. It is used when rendering the link and defauts to opening
-     *         the link in the current page. Example: "_self", "_blank".
+     * @return the browser window in which the link should be opened into or null if not defined. This element
+     *         corresponds to the HTML <code>target</code> attribute for the <code>a</code> element. It is used when
+     *         rendering the link and defauts to opening the link in the current page. Example: "_self", "_blank".
      */
     public String getTarget()
     {
@@ -163,8 +161,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the name of the virtual wiki to which the link is pointing to or null if the link
-     *         is pointing to the current wiki. Example: "mywiki"
+     * @return the name of the virtual wiki to which the link is pointing to or null if the link is pointing to the
+     *         current wiki. Example: "mywiki"
      */
     public String getVirtualWikiAlias()
     {
@@ -180,8 +178,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the wiki Space name in which the link points to or null if not defined (in that case
-     *         the link points to the current space). Example: "Main"
+     * @return the wiki Space name in which the link points to or null if not defined (in that case the link points to
+     *         the current space). Example: "Main"
      */
     public String getSpace()
     {
@@ -197,9 +195,9 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias to which
-     *         the link is pointing to or null if not defined. Mappings between Inter Wiki aliases
-     *         and actual locations are defined in the Inter Wiki Map. Example: "wikipedia"
+     * @return the <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias to which the link is pointing
+     *         to or null if not defined. Mappings between Inter Wiki aliases and actual locations are defined in the
+     *         Inter Wiki Map. Example: "wikipedia"
      */
     public String getInterWikiAlias()
     {
@@ -215,10 +213,9 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the anchor name pointing to an anchor defined in the referenced link or null if no
-     *         anchor has been specified (in which case the link points to the top of the page).
-     *         Note that in XWiki anchors are automatically created for titles.
-     *         Example: "TableOfContentAnchor"
+     * @return the anchor name pointing to an anchor defined in the referenced link or null if no anchor has been
+     *         specified (in which case the link points to the top of the page). Note that in XWiki anchors are
+     *         automatically created for titles. Example: "TableOfContentAnchor"
      */
     public String getAnchor()
     {
@@ -234,14 +231,14 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the query string for specifying parameters that will be used in the rendered URL or
-     *         null if no query string has been specified. Example: "mydata1=5&mydata2=Hello"
+     * @return the query string for specifying parameters that will be used in the rendered URL or null if no query
+     *         string has been specified. Example: "mydata1=5&mydata2=Hello"
      */
     public String getQueryString()
     {
         return this.queryString;
     }
-    
+
     /**
      * @param page see {@link #getPage()}
      */
@@ -251,8 +248,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the Wiki page pointed to by this link or null if the link is pointing to an external
-     *         URI. Example: "WebHome".
+     * @return the Wiki page pointed to by this link or null if the link is pointing to an external URI. Example:
+     *         "WebHome".
      */
     public String getPage()
     {
@@ -268,8 +265,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return the URI this link is pointing to. Valid URIs are mailto links
-     *         (Example: "mailto:john@smith.com") or URL (Example: "http://www.xwiki.org").
+     * @return the URI this link is pointing to. Valid URIs are mailto links (Example: "mailto:john@smith.com") or URL
+     *         (Example: "http://www.xwiki.org").
      */
     public URI getURI()
     {
@@ -277,8 +274,8 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return true if the link is using the Pipe symbol ("|") as its separator between alias,
-     *         target and link name, or false if it's using the greater than symbol (">")
+     * @return true if the link is using the Pipe symbol ("|") as its separator between alias, target and link name, or
+     *         false if it's using the greater than symbol (">")
      */
     public boolean isUsingPipeDelimiter()
     {
@@ -286,7 +283,7 @@ public class Link implements Cloneable
     }
 
     /**
-     * @param isUsingPipeDelimiter see {@link #isUsingPipeDelimiter()} 
+     * @param isUsingPipeDelimiter see {@link #isUsingPipeDelimiter()}
      */
     public void setUsePipeDelimiterSymbol(boolean isUsingPipeDelimiter)
     {
@@ -294,8 +291,7 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return a String representation of the link without alias nor target.
-     *         Example: "Space.WebHome#anchor?param1=1"
+     * @return a String representation of the link without alias nor target. Example: "Space.WebHome#anchor?param1=1"
      */
     private String getLinkName()
     {
@@ -337,6 +333,7 @@ public class Link implements Cloneable
 
     /**
      * Append a delimiter symbol. See {@link #isUsingPipeDelimiter()}
+     *
      * @param buffer the buffer to append to
      */
     private void appendDelimiterSymbol(StringBuffer buffer)
@@ -369,8 +366,7 @@ public class Link implements Cloneable
     }
 
     /**
-     * @return true if the link is external (ie it's not a link on the current local wiki) or false
-     *         otherwise
+     * @return true if the link is external (ie it's not a link on the current local wiki) or false otherwise
      */
     public boolean isExternal()
     {
@@ -380,10 +376,8 @@ public class Link implements Cloneable
     /**
      * Perform a series of normalization steps on the link. The steps are:
      * <ul>
-     *   <li>if the link is not a URI and it doesn't have a page defined then make it point to
-     *       WebHome</li>
-     *   <li>if the link is internal and doesn't have a space defined, fill it in with the current
-     *       document's space name</li>
+     * <li>if the link is not a URI and it doesn't have a page defined then make it point to WebHome</li>
+     * <li>if the link is internal and doesn't have a space defined, fill it in with the current document's space name</li>
      * </ul>
      *
      * @param currentSpace the space to use when no space has been defined in the link

@@ -22,10 +22,9 @@ package com.xpn.xwiki.content.parsers;
 import com.xpn.xwiki.content.Link;
 
 /**
- * Decides what strategy to use when replacing wiki links. Namely decides when two links are
- * equal and what the replacement link will be. This is because there can different strategy when
- * comparing links: for example are 2 links the same if they have different aliases or different
- * query strings?
+ * Decides what strategy to use when replacing wiki links. Namely decides when two links are equal and what the
+ * replacement link will be. This is because there can different strategy when comparing links: for example are 2 links
+ * the same if they have different aliases or different query strings?
  *
  * @version $Id$
  */
@@ -41,13 +40,12 @@ public interface ReplaceLinkHandler
     boolean compare(Link linkToLookFor, Link linkToReplace);
 
     /**
-     * Compute the link that will be used to replace matching links in the parsed content. This is
-     * useful for example to implement a strategy where you only want to replace the space and page
-     * names but keep the existing alias, target, query string, etc. 
-     * 
-     * @param newLink the link to use to replace the matched link. It's possible that only some
-     *        fields are set and the replacement algorithm will compute what the others fields
-     *        should be
+     * Compute the link that will be used to replace matching links in the parsed content. This is useful for example to
+     * implement a strategy where you only want to replace the space and page names but keep the existing alias, target,
+     * query string, etc.
+     *
+     * @param newLink the link to use to replace the matched link. It's possible that only some fields are set and the
+     *            replacement algorithm will compute what the others fields should be
      * @param linkToReplace the link to be replaced
      * @return the link to use for replacing the linkToReplace link
      */

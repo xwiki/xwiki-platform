@@ -26,9 +26,8 @@ public class RevisionCriteriaFactory
     }
 
     /**
-     * Creates a default RevisionCriteria, the default criteria matches the versions created by any
-     * author, from January 1, 1970, 00:00:00 GMT (epoch) to the current date, minor versions aren't
-     * included.
+     * Creates a default RevisionCriteria, the default criteria matches the versions created by any author, from January
+     * 1, 1970, 00:00:00 GMT (epoch) to the current date, minor versions aren't included.
      */
     public RevisionCriteria createRevisionCriteria()
     {
@@ -61,8 +60,7 @@ public class RevisionCriteriaFactory
     }
 
     /**
-     * Creates a revision criteria matching the revisions created by any author, during the given
-     * period.
+     * Creates a revision criteria matching the revisions created by any author, during the given period.
      *
      * @param period the time period during which the revisions has been created
      * @return a new revision criteria
@@ -73,8 +71,7 @@ public class RevisionCriteriaFactory
     }
 
     /**
-     * Creates a revision criteria matching the revisions created by any author, during the given
-     * period.
+     * Creates a revision criteria matching the revisions created by any author, during the given period.
      *
      * @param period the time period during which the revisions has been created
      * @param includeMinorVersions include minor versions in the set
@@ -86,8 +83,7 @@ public class RevisionCriteriaFactory
     }
 
     /**
-     * Creates a revision criteria matching the revisions created by the given author, during the
-     * given period.
+     * Creates a revision criteria matching the revisions created by the given author, during the given period.
      *
      * @param author the author of the result set
      * @param period the time period during which the revisions has been created
@@ -99,8 +95,7 @@ public class RevisionCriteriaFactory
     }
 
     /**
-     * Creates a revision criteria matching the revisions created by the given author, during the
-     * given period.
+     * Creates a revision criteria matching the revisions created by the given author, during the given period.
      *
      * @param author the author of the result set
      * @param period the time period during which the revisions has been created

@@ -28,7 +28,7 @@ import org.xwiki.context.Execution;
 
 /**
  * Default implementation of {@link SkinAccessBridge}.
- * 
+ *
  * @see org.xwiki.bridge.SkinAccessBridge
  * @version $Id$
  * @since 1.7

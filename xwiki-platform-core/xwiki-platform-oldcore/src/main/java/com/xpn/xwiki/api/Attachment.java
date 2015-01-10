@@ -239,7 +239,7 @@ public class Attachment extends Api
 
     /**
      * Allow to easily access any revision of an attachment.
-     * 
+     *
      * @param rev Version to access, in the "Major.minor" format.
      * @return Attachment API object, or <tt>null</tt> if the requested version does not exist.
      * @throws XWikiException In case of an error.

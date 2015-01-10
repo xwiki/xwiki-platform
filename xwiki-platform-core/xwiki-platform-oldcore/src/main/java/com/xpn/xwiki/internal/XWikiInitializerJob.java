@@ -36,7 +36,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Job dedicated to XWiki initialization.
- * 
+ *
  * @version $Id$
  * @since 6.1M1
  */

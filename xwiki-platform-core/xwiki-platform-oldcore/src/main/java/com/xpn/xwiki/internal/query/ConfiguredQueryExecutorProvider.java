@@ -35,7 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * A provider of QueryExecutor. Allows providing of a QueryExecutor defined by the configuration.
- * 
+ *
  * @version $Id$
  * @since 4.0M1
  */
@@ -73,7 +73,7 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
     {
         final XWikiContext context;
         try {
-            context = (XWikiContext) exec.getContext().getProperty("xwikicontext");
+            context = (XWikiContext) this.exec.getContext().getProperty("xwikicontext");
         } catch (NullPointerException e) {
             this.logger.warn("The QueryExecutor was called without an XWikiContext available. "
                 + "This means the old core (and likely the storage engine) is probably "

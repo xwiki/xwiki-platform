@@ -210,8 +210,8 @@ public abstract class ListClass extends PropertyClass
 
         String[] result = StringUtils.split(val, separators);
         String item = "";
-        for (int i = 0; i < result.length; i++) {
-            String element = StringUtils.replace(result[i], "%PIPE%", separators);
+        for (String element2 : result) {
+            String element = StringUtils.replace(element2, "%PIPE%", separators);
             if (withMap && (element.indexOf('=') != -1)) {
                 item = StringUtils.split(element, "=")[0];
             } else {
@@ -233,8 +233,8 @@ public abstract class ListClass extends PropertyClass
 
         String val = StringUtils.replace(value, "\\|", "%PIPE%");
         String[] result = StringUtils.split(val, "|");
-        for (int i = 0; i < result.length; i++) {
-            String element = StringUtils.replace(result[i], "%PIPE%", "|");
+        for (String element2 : result) {
+            String element = StringUtils.replace(element2, "%PIPE%", "|");
             if (element.indexOf('=') != -1) {
                 String[] data = StringUtils.split(element, "=");
                 map.put(data[0], new ListItem(data[0], data[1]));
@@ -296,8 +296,7 @@ public abstract class ListClass extends PropertyClass
         }
 
         // If Multiselect and multiple results
-        for (int i = 0; i < strings.length; i++) {
-            String item = strings[i];
+        for (String item : strings) {
             if (!item.trim().equals("")) {
                 list.add(item);
             }

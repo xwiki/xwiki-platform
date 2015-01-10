@@ -24,7 +24,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Base class for all entity {@link org.xwiki.observation.event.Event events}.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -68,7 +68,7 @@ public abstract class AbstractEntityEvent implements EntityEvent
 
     /**
      * Try to match the provided reference.
-     * 
+     *
      * @param otherReference the reference to match
      * @return true if the provided reference is matched
      */

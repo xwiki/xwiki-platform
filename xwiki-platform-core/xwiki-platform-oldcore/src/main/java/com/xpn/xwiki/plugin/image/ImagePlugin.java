@@ -57,7 +57,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     /**
      * The name used for retrieving this plugin from the context.
-     * 
+     *
      * @see XWikiPluginInterface#getName()
      */
     private static final String PLUGIN_NAME = "image";
@@ -84,7 +84,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     /**
      * Creates a new instance of this plugin.
-     * 
+     *
      * @param name the name of the plugin
      * @param className the class name
      * @param context the XWiki context
@@ -129,7 +129,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     /**
      * Tries to initializes the image cache. If the initialization fails the image cache remains {@code null}.
-     * 
+     *
      * @param context the XWiki context
      */
     private void initCache(XWikiContext context)
@@ -178,7 +178,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * Allows to scale images server-side, in order to have real thumbnails for reduced traffic. The new image
      * dimensions are passed in the request as the {@code width} and {@code height} parameters. If only one of the
      * dimensions is specified, then the other one is computed to preserve the original aspect ratio of the image.
-     * 
+     *
      * @see XWikiDefaultPlugin#downloadAttachment(XWikiAttachment, XWikiContext)
      */
     @Override
@@ -227,7 +227,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     /**
      * Transforms the given image (i.e. shrinks the image and changes its quality) before it is downloaded.
-     * 
+     *
      * @param image the image to be downloaded
      * @param width the desired image width; this value is taken into account only if it is greater than zero and less
      *            than the current image width
@@ -246,8 +246,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
         boolean keepAspectRatio = Boolean.valueOf(context.getRequest().getParameter("keepAspectRatio"));
 
         XWikiAttachment thumbnail = (this.imageCache == null)
-                ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
-                : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
+            ? shrinkImage(image, width, height, keepAspectRatio, quality, context)
+            : downloadImageFromCache(image, width, height, keepAspectRatio, quality, context);
 
         // If the image has been transformed, update the file name extension to match the image format.
         String fileName = thumbnail.getFilename();
@@ -261,7 +261,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     /**
      * Downloads the given image from cache.
-     * 
+     *
      * @param image the image to be downloaded
      * @param width the desired image width; this value is taken into account only if it is greater than zero and less
      *            than the current image width
@@ -291,7 +291,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
     /**
      * Reduces the size (i.e. the number of bytes) of an image by scaling its width and height and by reducing its
      * compression quality. This helps decreasing the time needed to download the image attachment.
-     * 
+     *
      * @param attachment the image to be shrunk
      * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
      *            and less than the current image width
@@ -334,9 +334,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         OutputStream acos = thumbnail.getAttachment_content().getContentOutputStream();
         this.imageProcessor.writeImage(shrunkImage,
-                                       attachment.getMimeType(context),
-                                       quality,
-                                       acos);
+            attachment.getMimeType(context),
+            quality,
+            acos);
 
         IOUtils.closeQuietly(acos);
 
@@ -349,7 +349,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * <li>uses the requested width and height only if both are smaller than the current values</li>
      * <li>preserves the aspect ratio when width or height is not specified.</li>
      * </ul>
-     * 
+     *
      * @param currentWidth the current image width
      * @param currentHeight the current image height
      * @param requestedWidth the desired image width; this value is taken into account only if it is greater than zero
@@ -395,7 +395,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             height = requestedHeight;
         }
 
-        return new int[] {width, height};
+        return new int[] { width, height };
     }
 
     /**

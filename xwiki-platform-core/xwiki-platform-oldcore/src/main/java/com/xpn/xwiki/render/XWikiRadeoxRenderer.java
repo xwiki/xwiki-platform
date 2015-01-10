@@ -78,6 +78,7 @@ public class XWikiRadeoxRenderer implements XWikiRenderer, Initializable
     /**
      * @deprecated since 6.1M2, use component with role {@link XWikiRenderer} and hint <code>wiki</code> instead
      */
+    @Deprecated
     public XWikiRadeoxRenderer(boolean removePre)
     {
         this();

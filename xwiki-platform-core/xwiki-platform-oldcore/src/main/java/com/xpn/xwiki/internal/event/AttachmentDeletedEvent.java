@@ -30,7 +30,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
- * 
+ *
  * @version $Id$
  * @since 2.6RC2
  */
@@ -56,7 +56,7 @@ public class AttachmentDeletedEvent extends AbstractAttachmentEvent
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only attachment delete events affecting the document matching the passed
      * document name.
-     * 
+     *
      * @param documentName the name of the document to match
      * @param name the name of the deleted attachment
      */
@@ -67,7 +67,7 @@ public class AttachmentDeletedEvent extends AbstractAttachmentEvent
 
     /**
      * Constructor using a custom {@link EventFilter}.
-     * 
+     *
      * @param eventFilter the filter to use for matching events
      */
     public AttachmentDeletedEvent(EventFilter eventFilter)

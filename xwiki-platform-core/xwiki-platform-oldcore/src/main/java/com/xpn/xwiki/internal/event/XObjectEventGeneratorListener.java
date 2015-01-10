@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce {@link XObjectEvent} based on document events.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -55,7 +55,7 @@ public class XObjectEventGeneratorListener implements EventListener
     /**
      * The events to match.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
     @Override
@@ -162,7 +162,7 @@ public class XObjectEventGeneratorListener implements EventListener
 
     /**
      * Generate object property related events.
-     * 
+     *
      * @param observation the object manager
      * @param doc the new version of the document
      * @param diff the diff entry

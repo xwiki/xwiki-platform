@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Allow executing some code with the right of a provided user.
- * 
+ *
  * @version $Id$
  * @since 6.3M2
  */
@@ -48,7 +48,7 @@ public class SUExecutor
 {
     /**
      * Contain the informations to restore.
-     * 
+     *
      * @version $Id$
      */
     public static final class SUExecutorContext
@@ -76,7 +76,7 @@ public class SUExecutor
 
     /**
      * Execute the passed {@link Callable} with the rights of the passed user.
-     * 
+     *
      * @param callable the the task to execute
      * @param author the user to check rights on
      * @return computed result
@@ -99,7 +99,7 @@ public class SUExecutor
      * <p>
      * The returned {@link SUExecutorContext} should be given to {@link #after(SUExecutorContext)} to restore the
      * context to its previous state.
-     * 
+     *
      * @param user the user to check rights on
      * @return the context to restore
      * @see #after(SUExecutorContext)
@@ -141,7 +141,7 @@ public class SUExecutor
 
     /**
      * Restore the context to it's previous state as defined by the provided {@link SUExecutorContext}.
-     * 
+     *
      * @param suContext the context to restore
      * @see #before(DocumentReference)
      */
@@ -170,7 +170,7 @@ public class SUExecutor
      * Setup the context so that following code is executed with provided user rights.
      * <p>
      * {@link #pop()} should be called to restore the context to its previous state.
-     * 
+     *
      * @param user the user to check rights on
      * @see #pop()
      */

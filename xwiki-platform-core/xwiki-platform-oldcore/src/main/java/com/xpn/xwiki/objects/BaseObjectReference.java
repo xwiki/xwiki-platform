@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
  * className). In this case, {@link #getObjectNumber()} will return {@code null} and {@code className} is obtained by
  * calling {@link #getXClassReference()}.
  * </dl>
- * 
+ *
  * @version $Id$
  */
 public class BaseObjectReference extends ObjectReference
@@ -73,7 +73,7 @@ public class BaseObjectReference extends ObjectReference
     /**
      * Constructor which would raise exceptions if the source entity reference does not have the appropriate type or
      * parent, etc.
-     * 
+     *
      * @param reference the raw reference to build this object reference from
      */
     public BaseObjectReference(EntityReference reference)
@@ -84,7 +84,7 @@ public class BaseObjectReference extends ObjectReference
     /**
      * Builds an indexed object reference for the object of class {@code className} with index {@code objectNumber} in
      * the document referenced by {@code parent}.
-     * 
+     *
      * @param classReference the name of the class of the object
      * @param objectNumber the number of the object in the document, or {@code null} if the default object should be
      *            referenced
@@ -98,7 +98,7 @@ public class BaseObjectReference extends ObjectReference
 
     /**
      * Convert provided class reference and object number into object reference name.
-     * 
+     *
      * @param classReference the class reference
      * @param objectNumber the object number
      * @return the object reference name
@@ -106,7 +106,7 @@ public class BaseObjectReference extends ObjectReference
     private static String toName(DocumentReference classReference, Integer objectNumber)
     {
         String name =
-            Utils.<EntityReferenceSerializer<String>> getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
+            Utils.<EntityReferenceSerializer<String>>getComponent(EntityReferenceSerializer.TYPE_STRING).serialize(
                 classReference);
 
         if (objectNumber != null) {
@@ -151,7 +151,7 @@ public class BaseObjectReference extends ObjectReference
     /**
      * {@inheritDoc} <br/>
      * Overridden to always compute the class name and the object number.
-     * 
+     *
      * @see org.xwiki.model.reference.EntityReference#setName(java.lang.String)
      */
     @Override
@@ -177,7 +177,7 @@ public class BaseObjectReference extends ObjectReference
         }
 
         this.xclassReference =
-            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+            Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
                 classReferenceStr);
         if (objectNumberStr != null) {
             this.objectNumber = Integer.valueOf(objectNumberStr);

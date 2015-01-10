@@ -24,7 +24,7 @@ import org.xwiki.job.Request;
 
 /**
  * Request to use with {@link XWikiInitializerJob}.
- * 
+ *
  * @version $Id$
  * @since 6.1M1
  */

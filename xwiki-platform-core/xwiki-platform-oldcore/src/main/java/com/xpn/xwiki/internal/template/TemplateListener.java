@@ -40,7 +40,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 
 /**
  * Listener to modification to wiki based template and generate related {@link TemplateEvent}s.
- * 
+ *
  * @version $Id$
  */
 @Component

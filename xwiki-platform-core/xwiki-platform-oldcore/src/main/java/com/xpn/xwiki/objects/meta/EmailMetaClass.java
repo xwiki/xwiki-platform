@@ -30,7 +30,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 /**
  * Email Field Class allows to create a field for email values. This will allow using a custom displayer assigned to
  * that field by default. The field also includes a default regexp for validation.
- * 
+ *
  * @version $Id$
  * @since 4.2M2
  */

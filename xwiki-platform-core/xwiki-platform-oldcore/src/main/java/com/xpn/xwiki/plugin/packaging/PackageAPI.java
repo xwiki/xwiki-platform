@@ -24,12 +24,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.json.JSONObject;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.util.Util;
+
+import net.sf.json.JSONObject;
 
 public class PackageAPI extends Api
 {
@@ -125,12 +125,12 @@ public class PackageAPI extends Api
      * able to import has backup pack the user must have the admin right on the XWiki.XWikiPreferences document from the
      * main wiki (xwiki:XWiki.XWikiPreferences). The goal is to prevent local wiki administrators from importing
      * documents saved with a global administrator as the author (rights escalation).
-     * 
+     *
      * @return true if the current user has the rights to import a package as a backup pack, false otherwise
      */
     public boolean hasBackupPackImportRights()
     {
-        return pack.hasBackupPackImportRights(context);
+        return this.pack.hasBackupPackImportRights(this.context);
     }
 
     public boolean isVersionPreserved()
@@ -142,7 +142,7 @@ public class PackageAPI extends Api
      * Sets the flag for the packager to preserve or not existing versions of documents when installing with
      * {@link #install()}. If set to true, the existing history revisions of documents will be preserve, if not, the
      * history will be overridden.
-     * 
+     *
      * @param preserveVersion
      */
     public void setPreserveVersion(boolean preserveVersion)
@@ -160,7 +160,7 @@ public class PackageAPI extends Api
      * {@link #install()}. This flag will be ignored if {@link #isWithVersions()} flag is set to true. This means it's
      * not possible to import with versions, preserving the existing document history. The behavior of the packager in
      * this case fall backs on just adding a new version to the exsting history (ignoring the history from the package).
-     * 
+     *
      * @param withVersions should the versions contained in the archive (if any) be imported when installing.
      */
     public void setWithVersions(boolean withVersions)
@@ -217,7 +217,7 @@ public class PackageAPI extends Api
     {
         getXWikiContext().getResponse().setContentType("application/zip");
         getXWikiContext().getResponse().addHeader("Content-disposition",
-            "attachment; filename=" + Util.encodeURI(pack.getName(), context) + ".xar");
+            "attachment; filename=" + Util.encodeURI(this.pack.getName(), this.context) + ".xar");
         getXWikiContext().setFinished(true);
 
         return this.pack.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
@@ -227,10 +227,10 @@ public class PackageAPI extends Api
      * Similar to {@link #Import(byte[])}, except expected errors are catch. This version should be privileged when
      * using the packager API from velocity scripts since it will not display stack-trace in case of error (for example
      * if the passed file is not a valid package).
-     * 
+     *
      * @param data the file to create the package from, as a byte array.
-     * @return true if the package creation succeeded, false otherwise. If the package creation failed, the error message
-     *         is placed in the velocity context under the <code>import_error</code> key,
+     * @return true if the package creation succeeded, false otherwise. If the package creation failed, the error
+     *         message is placed in the velocity context under the <code>import_error</code> key,
      * @since 2.2M1
      */
     public boolean importPackageFromByteArray(byte data[])
@@ -250,7 +250,7 @@ public class PackageAPI extends Api
     /**
      * Load a package in memory from a byte array. It may be installed later using {@link #install()}. Your should
      * prefer {@link #Import(InputStream)} which may avoid loading the package twice in memory.
-     * 
+     *
      * @param file an byte array containing a zipped package file
      * @return an empty string, useless.
      * @throws IOException while reading the ZipFile
@@ -263,7 +263,7 @@ public class PackageAPI extends Api
 
     /**
      * Load a package in memory from an InputStream. It may be installed later using {@link #install()}.
-     * 
+     *
      * @param file is an InputStream of a zipped package file
      * @return an empty string, useless.
      * @throws IOException while reading the ZipFile

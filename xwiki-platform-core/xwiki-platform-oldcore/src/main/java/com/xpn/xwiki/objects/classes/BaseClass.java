@@ -63,7 +63,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
  * {@link PropertyClass} and defines a single XClass property.
- * 
+ *
  * @version $Id$
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
@@ -114,7 +114,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -129,7 +129,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * <p>
      * Note: BaseElement#setName() does not support setting reference anymore since 2.4M2. This was broken and has been
      * replaced by this overridden method. See XWIKI-5285
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -160,7 +160,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * {@inheritDoc}
      * <p>
      * This insures natural ordering between properties.
-     * 
+     *
      * @see com.xpn.xwiki.objects.BaseCollection#addField(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
      */
     @Override
@@ -181,7 +181,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Mark a property as disabled. A disabled property should not be editable, but existing object values are still
      * kept in the database.
-     * 
+     *
      * @param name the name of the property to disable
      * @since 2.4M2
      */
@@ -198,7 +198,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     /**
      * Re-enable a property. This field will appear again in object instances.
-     * 
+     *
      * @param name the name of the property to enable
      * @since 2.4M2
      */
@@ -229,7 +229,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Get the list of enabled (the default, normal state) property definitions that exist in this class. The resulting
      * list is unmodifiable, but the contained elements are live.
-     * 
+     *
      * @return an unmodifiable list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
      * @since 2.4M2
@@ -257,7 +257,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     /**
      * Get the list of disabled property definitions that exist in this class. The resulting list is unmodifiable, but
      * the contained elements are live.
-     * 
+     *
      * @return an unmodifiable list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
      * @since 2.4M2
@@ -286,7 +286,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * Get the list of disabled properties that exist in a given object. This list is a subset of all the disabled
      * properties in a class, since the object could have been created and stored before some of the class properties
      * were added. The resulting list is unmodifiable, but the contained elements are live.
-     * 
+     *
      * @param object the instance of this class where the disabled properties must exist
      * @return an unmodifiable list containing the disabled properties of the given object
      * @see PropertyClass#isDisabled()
@@ -318,7 +318,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
      * which exists in the Object but doesn't exist anymore in the Class, or which has the wrong data type. This is used
      * for synchronization of existing or imported Objects with respect to the modifications of their associated Class.
-     * 
+     *
      * @param object the instance of this class where to look for undefined properties
      * @return an unmodifiable list containing the properties of the object which don't exist in the class
      * @since 2.4M2
@@ -629,7 +629,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            Object[] args = {xml};
+            Object[] args = { xml };
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
                 "Error parsing xml {0}", e, args);
         }
@@ -1062,7 +1062,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 return (BaseObject) Class.forName(getCustomClass()).newInstance();
             }
         } catch (Exception e) {
-            Object[] args = {customClass};
+            Object[] args = { customClass };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}",
                 e, args);
@@ -1167,8 +1167,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         boolean isValid = true;
         Object[] props = getPropertyNames();
-        for (int i = 0; i < props.length; i++) {
-            String propname = (String) props[i];
+        for (Object prop : props) {
+            String propname = (String) prop;
             BaseProperty property = (BaseProperty) obj.get(propname);
             PropertyClass propclass = (PropertyClass) get(propname);
             isValid &= propclass.validateProperty(property, context);
@@ -1198,8 +1198,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void flushCache()
     {
         Object[] props = getPropertyNames();
-        for (int i = 0; i < props.length; i++) {
-            String propname = (String) props[i];
+        for (Object prop : props) {
+            String propname = (String) prop;
             PropertyClass propclass = (PropertyClass) get(propname);
             if (propclass != null) {
                 propclass.flushCache();
@@ -1316,6 +1316,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);
@@ -1324,7 +1325,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             setDocumentReference(this.ownerDocument.getDocumentReference());
         }
 
-        if (ownerDocument != null && isDirty) {
+        if (ownerDocument != null && this.isDirty) {
             ownerDocument.setContentDirty(true);
         }
     }
@@ -1336,8 +1337,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public void setDirty(boolean isDirty)
     {
         this.isDirty = isDirty;
-        if (isDirty && ownerDocument != null) {
-            ownerDocument.setContentDirty(true);
+        if (isDirty && this.ownerDocument != null) {
+            this.ownerDocument.setContentDirty(true);
         }
     }
 }

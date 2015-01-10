@@ -25,6 +25,7 @@ import org.xwiki.observation.ObservationManager;
 
 /**
  * Used to expose {@link XWikiInitializerJob} status.
+ *
  * @version $Id$
  * @since 6.0M1
  */

@@ -67,7 +67,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return a list of Delta objects representing line differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -104,7 +104,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return a list of Delta objects representing word differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -123,7 +123,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing word diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -201,7 +201,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -213,7 +213,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @param allDoc show all document

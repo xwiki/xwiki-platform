@@ -132,7 +132,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
             return writer.toString();
         } catch (Exception e) {
             LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
-            Object[] args = {name};
+            Object[] args = { name };
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
@@ -147,10 +147,10 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         List<String> unnamedparams = new ArrayList<String>();
         if ((param != null) && (!param.trim().equals(""))) {
             String[] params = StringUtils.split(param, "|");
-            for (int i = 0; i < params.length; i++) {
-                String[] rparam = StringUtils.split(params[i], "=");
+            for (String param2 : params) {
+                String[] rparam = StringUtils.split(param2, "=");
                 if (rparam.length == 1) {
-                    unnamedparams.add(params[i]);
+                    unnamedparams.add(param2);
                 } else {
                     namedparams.put(rparam[0], rparam[1]);
                 }

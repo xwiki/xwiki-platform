@@ -31,10 +31,9 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Generate an entity reference string that doesn't contain reference parts that are the same as either the current
- * entity in the execution context or as the passed entity reference (if any).
- * Note that the terminal part is always kept (eg the document's page for a document reference or the attachment's
- * filename for an attachment reference).
- * 
+ * entity in the execution context or as the passed entity reference (if any). Note that the terminal part is always
+ * kept (eg the document's page for a document reference or the attachment's filename for an attachment reference).
+ *
  * @version $Id$
  * @since 2.2M1
  */

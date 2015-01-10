@@ -35,7 +35,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
  * component to resolve {@link org.xwiki.model.reference.DocumentReference} objects from Entity Reference (when they
  * miss some parent references or have NULL values). The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

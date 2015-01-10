@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
  * Defines an XClass property type whose value is a list of user references.
- * 
+ *
  * @version $Id$
  */
 public class UsersClass extends ListClass
@@ -57,7 +57,7 @@ public class UsersClass extends ListClass
 
     /**
      * Creates a new Users List property that is described by the given meta class.
-     * 
+     *
      * @param metaClass the meta class that defines the list of meta properties associated with this property type
      */
     public UsersClass(PropertyMetaClass metaClass)
@@ -125,7 +125,7 @@ public class UsersClass extends ListClass
     /**
      * Sets whether to list all the available users in the list box used to select the users. This property should not
      * be set when the number of users is very large.
-     * 
+     *
      * @param usesList {@code true} to fill the list box that is used to select the users with all the available users,
      *            {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
@@ -178,7 +178,7 @@ public class UsersClass extends ListClass
 
     /**
      * Splits the given string into a list of user names.
-     * 
+     *
      * @param value a comma separate list of user names
      * @return the list of user names
      */
@@ -195,7 +195,7 @@ public class UsersClass extends ListClass
     }
 
     @Override
-    public List<String> toList(BaseProperty< ? > property)
+    public List<String> toList(BaseProperty<?> property)
     {
         List<String> selectlist;
 
@@ -209,7 +209,7 @@ public class UsersClass extends ListClass
     }
 
     @Override
-    public void fromList(BaseProperty< ? > property, List<String> list)
+    public void fromList(BaseProperty<?> property, List<String> list)
     {
         property.setValue(list != null ? StringUtils.join(list, ',') : null);
     }

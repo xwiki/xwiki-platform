@@ -30,7 +30,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Update XWiki.SheetClass document with all required informations.
- * 
+ *
  * @version $Id$
  * @deprecated since 3.1M2 edit mode class should be used for this purpose, not the sheet class
  * @since 4.3M1

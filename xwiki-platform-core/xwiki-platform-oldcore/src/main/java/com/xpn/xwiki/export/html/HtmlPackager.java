@@ -53,7 +53,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
- * 
+ *
  * @version $Id$
  * @since XWiki Platform 1.3M1
  */
@@ -113,7 +113,7 @@ public class HtmlPackager
 
     /**
      * Modify the name of the package for which packager append ".zip".
-     * 
+     *
      * @param name the name of the page.
      */
     public void setName(String name)
@@ -131,7 +131,7 @@ public class HtmlPackager
 
     /**
      * Modify the description of the package.
-     * 
+     *
      * @param description the description of the package.
      */
     public void setDescription(String description)
@@ -149,7 +149,7 @@ public class HtmlPackager
 
     /**
      * Add a page to export.
-     * 
+     *
      * @param page the name of the page to export.
      */
     public void addPage(String page)
@@ -159,7 +159,7 @@ public class HtmlPackager
 
     /**
      * Add a range of pages to export.
-     * 
+     *
      * @param pages a range of pages to export.
      */
     public void addPages(Collection<String> pages)
@@ -169,7 +169,7 @@ public class HtmlPackager
 
     /**
      * Add rendered document to ZIP stream.
-     * 
+     *
      * @param pageName the name (used with {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page to
      *            render.
      * @param zos the ZIP output stream.
@@ -242,7 +242,7 @@ public class HtmlPackager
 
     /**
      * Init provided {@link ExportURLFactory} and add rendered documents to ZIP stream.
-     * 
+     *
      * @param zos the ZIP output stream.
      * @param tempdir the directory where to copy attached files.
      * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the documents.
@@ -285,7 +285,7 @@ public class HtmlPackager
 
                 for (String pageName : this.pages) {
                     renderDocument(pageName, zos, renderContext, vcontext);
-                } 
+                }
             } finally {
                 execution.popContext();
             }
@@ -301,7 +301,7 @@ public class HtmlPackager
 
     /**
      * Apply export and create the ZIP package.
-     * 
+     *
      * @param context the XWiki context used to render pages.
      * @throws IOException error when creating the package.
      * @throws XWikiException error when render the pages.
@@ -347,7 +347,7 @@ public class HtmlPackager
 
     /**
      * Delete a directory and all with all it's content.
-     * 
+     *
      * @param directory the directory to delete.
      */
     private static void deleteDirectory(File directory)
@@ -362,9 +362,7 @@ public class HtmlPackager
             return;
         }
 
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
-
+        for (File file : files) {
             if (file.isDirectory()) {
                 deleteDirectory(file);
                 continue;
@@ -378,7 +376,7 @@ public class HtmlPackager
 
     /**
      * Add skin to the package in sub-directory "skins".
-     * 
+     *
      * @param skinName the name of the skin.
      * @param out the ZIP output stream where to put the skin.
      * @param context the XWiki context.
@@ -393,7 +391,7 @@ public class HtmlPackager
 
     /**
      * Add a directory and all its sub-directories to the package.
-     * 
+     *
      * @param directory the directory to add.
      * @param out the ZIP output stream where to put the skin.
      * @param basePath the path where to put the directory in the package.
@@ -416,8 +414,7 @@ public class HtmlPackager
             return;
         }
 
-        for (int i = 0; i < files.length; ++i) {
-            File file = files[i];
+        for (File file : files) {
             if (file.isDirectory()) {
                 addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
             } else {

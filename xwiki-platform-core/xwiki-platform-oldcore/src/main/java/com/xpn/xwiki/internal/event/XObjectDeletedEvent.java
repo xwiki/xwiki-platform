@@ -30,7 +30,7 @@ import org.xwiki.model.reference.EntityReference;
  * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */

@@ -36,7 +36,7 @@ public class MonitorTimerSummary
 
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public void addTimer(long duration)
@@ -48,31 +48,31 @@ public class MonitorTimerSummary
 
     public long getDuration()
     {
-        return duration;
+        return this.duration;
     }
 
     public long getNbCalls()
     {
-        return nbcalls;
+        return this.nbcalls;
     }
 
     public void add(MonitorTimerSummary stimer)
     {
-        duration += stimer.getDuration();
-        nbcalls += stimer.getNbCalls();
-        nbrequests++;
+        this.duration += stimer.getDuration();
+        this.nbcalls += stimer.getNbCalls();
+        this.nbrequests++;
     }
 
     public long getRequests()
     {
-        return nbrequests;
+        return this.nbrequests;
     }
 
     @Override
     public String toString()
     {
         StringBuffer str = new StringBuffer();
-        str.append(name);
+        str.append(this.name);
         str.append(": duration=");
         str.append(getDuration());
         str.append(" nbcalls=");

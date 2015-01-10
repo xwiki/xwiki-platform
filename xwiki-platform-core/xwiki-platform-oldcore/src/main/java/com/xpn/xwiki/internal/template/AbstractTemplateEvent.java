@@ -23,7 +23,7 @@ import java.util.Objects;
 
 /**
  * Base class for all events related to templates.
- * 
+ *
  * @version $Id$
  * @since 6.4M1
  */

@@ -124,8 +124,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
             if (!"1".equals(refresh)) {
                 CachedItem cachedItem =
-                        this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
-                                getRequestParameters(context));
+                    this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
+                        getRequestParameters(context));
                 if (cachedItem != null) {
                     renderedContent = restoreCachedItem(context, cachedItem);
                 }
@@ -137,10 +137,11 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
     @Override
     public void setRenderedContent(DocumentReference documentReference, String source, String renderedContent,
-            XWikiContext context) {
+        XWikiContext context)
+    {
         if (this.configuration.isCached(documentReference)) {
             this.cache.set(buildCachedItem(context, renderedContent), documentReference, source, getAction(context),
-                           context.getLanguage(), getRequestParameters(context));
+                context.getLanguage(), getRequestParameters(context));
         }
     }
 
@@ -151,27 +152,28 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * @param renderedContent rendered page content
      * @return properly cached item
      */
-    private CachedItem buildCachedItem(XWikiContext context, String renderedContent) {
+    private CachedItem buildCachedItem(XWikiContext context, String renderedContent)
+    {
         CachedItem cachedItem = new CachedItem();
 
-        for (RenderingCacheAware component: renderingCacheAwareProvider.get()) {
+        for (RenderingCacheAware component : this.renderingCacheAwareProvider.get()) {
             cachedItem.extensions.put(component, component.getCacheResources(context));
         }
 
         // support for legacy core -> build non-blocking list (lazy)
-        if (legacyRenderingCacheAware == null) {
-            legacyRenderingCacheAware = new LinkedList<RenderingCacheAware>();
+        if (this.legacyRenderingCacheAware == null) {
+            this.legacyRenderingCacheAware = new LinkedList<RenderingCacheAware>();
             XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
-            for (String pluginName: pluginManager.getPlugins()) {
+            for (String pluginName : pluginManager.getPlugins()) {
                 XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
 
                 if (plugin instanceof RenderingCacheAware) {
-                    legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
+                    this.legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
                 }
             }
         }
 
-        for (RenderingCacheAware component: legacyRenderingCacheAware) {
+        for (RenderingCacheAware component : this.legacyRenderingCacheAware) {
             cachedItem.extensions.put(component, component.getCacheResources(context));
         }
 
@@ -186,7 +188,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      * @param cachedItem The cache item to return
      * @return the rendered text
      */
-    private String restoreCachedItem(XWikiContext context, CachedItem cachedItem) {
+    private String restoreCachedItem(XWikiContext context, CachedItem cachedItem)
+    {
         for (Map.Entry<RenderingCacheAware, UsedExtension> item : cachedItem.extensions.entrySet()) {
             item.getKey().restoreCacheResources(context, item.getValue());
         }
@@ -247,7 +250,7 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
                     }
                     try {
                         sb.append(URLEncoder.encode(entry.getKey(), UTF8)).append('=')
-                                .append(URLEncoder.encode(value, UTF8));
+                            .append(URLEncoder.encode(value, UTF8));
                     } catch (UnsupportedEncodingException e) {
                         // That should never happen since UTF-8 is supposed to be available in any JVM.
                         throw new RuntimeException(

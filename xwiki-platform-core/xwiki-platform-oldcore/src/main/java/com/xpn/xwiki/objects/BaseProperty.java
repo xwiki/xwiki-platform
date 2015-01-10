@@ -150,8 +150,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
         cloneInternal(property);
 
-        property.isValueDirty = isValueDirty;
-        property.ownerDocument = ownerDocument;
+        property.isValueDirty = this.isValueDirty;
+        property.ownerDocument = this.ownerDocument;
 
         property.setObject(getObject());
 
@@ -270,7 +270,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
     /**
      * Try to apply 3 ways merge on property value.
-     * 
+     *
      * @param previousValue the previous version of the value
      * @param newValue the new version of the value
      * @param mergeResult merge report
@@ -305,7 +305,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public boolean isValueDirty()
     {
-        return isValueDirty;
+        return this.isValueDirty;
     }
 
     /**
@@ -315,7 +315,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void setValueDirty(Object newValue)
     {
-        if (!isValueDirty && !Objects.equals(newValue, getValue())) {
+        if (!this.isValueDirty && !Objects.equals(newValue, getValue())) {
             setValueDirty(true);
         }
     }
@@ -326,9 +326,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public void setValueDirty(boolean valueDirty)
     {
-        isValueDirty = valueDirty;
-        if (valueDirty && ownerDocument != null) {
-            ownerDocument.setMetaDataDirty(true);
+        this.isValueDirty = valueDirty;
+        if (valueDirty && this.ownerDocument != null) {
+            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 
@@ -338,11 +338,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);
 
-        if (ownerDocument != null && isValueDirty) {
+        if (ownerDocument != null && this.isValueDirty) {
             ownerDocument.setMetaDataDirty(true);
         }
     }

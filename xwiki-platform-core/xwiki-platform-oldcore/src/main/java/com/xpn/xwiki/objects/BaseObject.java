@@ -69,7 +69,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #getDocumentReference()}
      */
     @Deprecated
@@ -83,7 +83,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * {@inheritDoc}
      * <p>
      * Note: BaseElement.setName() does not support setting reference anymore since 2.4M2.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
      */
     @Deprecated
@@ -202,7 +202,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     /**
      * Similar to {@link #clone()} but whereas a clone is an exact copy (with the same GUID), a duplicate keeps the same
      * data but with a different identity.
-     * 
+     *
      * @since 2.2.3
      */
     public BaseObject duplicate()
@@ -444,10 +444,11 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
 
     /**
      * Set the owner document of this base object.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);

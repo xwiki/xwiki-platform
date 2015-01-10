@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -260,8 +259,8 @@ public class XWikiStatsReader
 
         Date now = new Date();
 
-        for (Iterator< ? > it = resultSet.iterator(); it.hasNext();) {
-            Object[] result = (Object[]) it.next();
+        for (Object name : resultSet) {
+            Object[] result = (Object[]) name;
             // We can't represent a custom period (e.g. year, week or some time interval) in the
             // database and thus we use a default one, which sould be ignored
             DocumentStats docStats = new DocumentStats((String) result[0], action, now, PeriodType.DAY);
@@ -378,8 +377,8 @@ public class XWikiStatsReader
         Date now = new Date();
         List<RefererStats> stats = new ArrayList<RefererStats>(resultSet.size());
 
-        for (Iterator< ? > it = resultSet.iterator(); it.hasNext();) {
-            Object[] result = (Object[]) it.next();
+        for (Object name : resultSet) {
+            Object[] result = (Object[]) name;
 
             // We can't represent a custom period (e.g. year, week or some time interval) in the
             // database and thus we use a default one, which sould be ignored
@@ -508,8 +507,8 @@ public class XWikiStatsReader
     {
         List<VisitStats> stats = new ArrayList<VisitStats>(resultSet.size());
 
-        for (Iterator< ? > it = resultSet.iterator(); it.hasNext();) {
-            Object[] result = (Object[]) it.next();
+        for (Object name2 : resultSet) {
+            Object[] result = (Object[]) name2;
 
             String name = (String) result[0];
             String uniqueID = "";

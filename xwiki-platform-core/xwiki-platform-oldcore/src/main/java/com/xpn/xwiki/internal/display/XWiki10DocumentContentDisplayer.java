@@ -39,7 +39,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 
 /**
  * Document content displayer specific for the XWiki 1.0 syntax.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -81,12 +81,12 @@ public class XWiki10DocumentContentDisplayer extends DocumentContentDisplayer
 
     /**
      * Generates an XDOM from the given rendered content by wrapping it in a {@link RawBlock}.
-     * 
+     *
      * @param renderedContent the rendered content
      * @return an XDOM that produces the given rendered content when rendered
      */
     private XDOM generateXDOM(String renderedContent)
     {
-        return new XDOM(Collections.<Block> singletonList(new RawBlock(renderedContent, Syntax.XHTML_1_0)));
+        return new XDOM(Collections.<Block>singletonList(new RawBlock(renderedContent, Syntax.XHTML_1_0)));
     }
 }

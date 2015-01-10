@@ -46,7 +46,7 @@ import org.dom4j.io.OutputFormat;
  * tags by maintaining a state stack of opened tags. New writeDocumentStart/End function also ensure proper starting and
  * ending of the document it self.
  * </p>
- * 
+ *
  * @version $Id$
  */
 public class XMLWriter extends org.dom4j.io.XMLWriter
@@ -65,7 +65,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
 
     /**
      * Default constructor used by <code>{@link DOMXMLWriter}</code>.
-     * 
+     *
      * @see DOMXMLWriter
      */
     protected XMLWriter()
@@ -80,7 +80,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that the writer is buffered and only a call to flush() or writeDocuemntEnd() will ensure the output has been
      * fully written to the <code>{@link OutputStream}</code>.
      * </p>
-     * 
+     *
      * @param out an <code>{@link OutputStream}</code> where to output the XML produced.
      * @param format an <code>{@link OutputFormat}</code> defining the encoding that should be used and esthetics of the
      *            produced XML.
@@ -95,7 +95,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     /**
      * Write the <code>{@link Document}</code> declaration, and its <code>{@link org.dom4j.DocumentType}</code> if
      * available to the output stream.
-     * 
+     *
      * @param doc <code>{@link Document}</code> to be started, may specify a <code>{@link org.dom4j.DocumentType}</code>
      *            .
      * @throws IOException a problem occurs during writing
@@ -114,7 +114,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Close all remaining opened <code>{@link Element}</code> including the root element to terminate the current
      * document. Also flush the writer to ensure the whole document has been written to the
      * <code>{@link OutputStream}</code>.
-     * 
+     *
      * @param doc <code>{@link Document}</code> to be end, actually unused.
      * @throws IOException a problem occurs during writing.
      */
@@ -134,7 +134,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that proper decoding/encoding will occurs during this operation, converting the encoding of the Reader into
      * the encoding of the Writer.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @param rd <code>{@link Reader}</code> that will be fully read and transfered into the element content.
      * @throws IOException a problem occurs during reading or writing.
@@ -153,7 +153,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Note that no decoding/encoding of the InputStream will be ensured during this operation. The byte content is
      * transfered untouched.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @param is <code>{@link InputStream}</code> that will be fully read and transfered into the element content.
      * @throws IOException a problem occurs during reading or writing.
@@ -169,7 +169,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
     /**
      * Writes the <code>{@link Element}</code>, including its <code>{@link
      * org.dom4j.Attribute}</code>s, using the <code>{@link InputStream}</code> encoded in Base64 for its content.
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @param is <code>{@link InputStream}</code> that will be fully read and encoded in Base64 into the element
      *            content.
@@ -190,7 +190,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * <p>
      * Compared to the DOM4J implementation, this function keeps track of opened elements.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @throws IOException a problem occurs during writing.
      * @see org.dom4j.io.XMLWriter#writeOpen(org.dom4j.Element)
@@ -208,7 +208,7 @@ public class XMLWriter extends org.dom4j.io.XMLWriter
      * Compared to the DOM4J implementation, this function ensure closing of all opened element including the one that
      * is requested to be closed.
      * </p>
-     * 
+     *
      * @param element <code>{@link Element}</code> to output.
      * @throws IOException a problem occurs during writing.
      * @see org.dom4j.io.XMLWriter#writeClose(org.dom4j.Element)

@@ -36,31 +36,31 @@ import com.xpn.xwiki.stats.impl.VisitStats;
 
 /**
  * Store and retrieve statistics.
- * 
+ *
  * @version $Id$
  */
 public interface XWikiStatsService
 {
     /**
      * Methods called just one time at XWiki initialization.
-     * 
+     *
      * @param context the XWiki context.
      */
     void init(XWikiContext context);
 
     /**
      * Return the statistics action stored.
-     * 
+     *
      * @param action the action.
      * @param size the maximum size of the list to return.
      * @param context the XWiki context.
      * @return the list of recent statistics action stored.
      */
-    Collection< ? > getRecentActions(String action, int size, XWikiContext context);
+    Collection<?> getRecentActions(String action, int size, XWikiContext context);
 
     /**
      * Retrieves document statistics.
-     * 
+     *
      * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the documents are ordered by the number of times they have been viewed so far.
      * @param scope the set of documents for which to retrieve statistics.
@@ -74,7 +74,7 @@ public interface XWikiStatsService
 
     /**
      * Retrieves visit statistics.
-     * 
+     *
      * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
      *            action is "view" then the visitors are ordered by the number of pages they have viewed so far.
      * @param period the period of time.
@@ -86,7 +86,7 @@ public interface XWikiStatsService
 
     /**
      * Retrieves referrer statistics.
-     * 
+     *
      * @param domain the domain for which to retrieve statistics. To retrieve statistics for all domains use the empty
      *            string.
      * @param scope the scope of referred documents to use for filtering the results.
@@ -100,7 +100,7 @@ public interface XWikiStatsService
 
     /**
      * Retrieves back-link statistics.
-     * 
+     *
      * @param domain the domain used for filtering the results.
      * @param scope the scope of referred documents for which to retrieve statistics.
      * @param period the period of time.
@@ -108,11 +108,11 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a list of DocumentStats objects.
      */
-    List< ? > getBackLinkStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
+    List<?> getBackLinkStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
 
     /**
      * Shows how the statistics for the specified action have evolved over the specified period of time.
-     * 
+     *
      * @param action the action for which to retrieve statistics.
      * @param scope the set of documents to consider.
      * @param period the period of time.
@@ -120,7 +120,7 @@ public interface XWikiStatsService
      * @param context the XWiki context.
      * @return a map of (date, actionCount) pairs.
      */
-    Map< ? , ? > getActionStatistics(String action, Scope scope, Period period, Duration step, XWikiContext context);
+    Map<?, ?> getActionStatistics(String action, Scope scope, Period period, Duration step, XWikiContext context);
 
     // ////////////////////////////////////////////////////////////////////////////////////////
     // Deprecated methods
@@ -128,7 +128,7 @@ public interface XWikiStatsService
 
     /**
      * Gets total statistics on a document for a specific action.
-     * 
+     *
      * @param docname fully qualified document name.
      * @param action can be "view", "edit", "save", etc..
      * @param context the XWiki context.
@@ -140,7 +140,7 @@ public interface XWikiStatsService
 
     /**
      * Gets monthly statistics on a document for a specific action.
-     * 
+     *
      * @param docname fully qualified document name.
      * @param action can be "view", "edit", "save", etc..
      * @param month the month.
@@ -153,7 +153,7 @@ public interface XWikiStatsService
 
     /**
      * Gets day statistics on a document for a specific action.
-     * 
+     *
      * @param docname fully qualified document name.
      * @param action can be "view", "edit", "save", etc..
      * @param day the day.
@@ -166,7 +166,7 @@ public interface XWikiStatsService
 
     /**
      * Gets monthly referer statistics.
-     * 
+     *
      * @param docName fully qualified document name.
      * @param month the month.
      * @param context the XWiki context.

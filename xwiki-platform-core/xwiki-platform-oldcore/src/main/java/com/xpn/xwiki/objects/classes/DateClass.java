@@ -36,7 +36,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
  * Defines an XClass property type whose value is a Date.
- * 
+ *
  * @version $Id$
  */
 public class DateClass extends PropertyClass
@@ -66,7 +66,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Creates a new Date property that is described by the given meta class.
-     * 
+     *
      * @param metaClass the meta class that defines the list of meta properties associated with this property type
      */
     public DateClass(PropertyMetaClass metaClass)
@@ -97,7 +97,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets whether to use a date picker or not to select the date in edit mode.
-     * 
+     *
      * @param picker {@code 1} to use a date picker, {@code 0} otherwise
      */
     public void setPicker(int picker)
@@ -115,7 +115,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets the size of the date input in edit mode.
-     * 
+     *
      * @param size the size of the date input in edit mode
      */
     public void setSize(int size)
@@ -133,7 +133,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets whether an empty date value represents the current date or not.
-     * 
+     *
      * @param emptyIsToday {@code 1} if an empty date value should represent the current date, {@code 0} otherwise
      */
     public void setEmptyIsToday(int emptyIsToday)
@@ -151,7 +151,7 @@ public class DateClass extends PropertyClass
 
     /**
      * Sets the date format.
-     * 
+     *
      * @param format the new date format
      */
     public void setDateFormat(String format)

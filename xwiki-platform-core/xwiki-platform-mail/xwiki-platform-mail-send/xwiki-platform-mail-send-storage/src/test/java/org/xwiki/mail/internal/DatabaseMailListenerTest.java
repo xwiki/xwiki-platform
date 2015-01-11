@@ -91,6 +91,45 @@ public class DatabaseMailListenerTest
     }
 
     @Test
+    public void onPrepareWithPreviouslyFailedMessageAndWhenContentStoreFails() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        Map<String, Object> parameters = Collections.emptyMap();
+        MailStatus status = new MailStatus(this.message, MailState.FAILED);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
+
+        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId.toString(),
+            this.mailId.toString());
+
+        this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
+
+        assertEquals("Failed to remove previously failing message [" + this.mailId + "] (batch id [" + this.batchId
+            + "]) from the file system. Reason [MailStoreException: error].", this.logRule.getMessage(0));
+    }
+
+    @Test
+    public void onPrepareWithPreviouslyFailedMessage() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        MailStatus status = new MailStatus(this.message, MailState.FAILED);
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
+            this.mailId.toString()))).thenReturn(Arrays.asList(status));
+
+        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+
+        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
+        this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
+
+        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()));
+
+        verify(mailContentStore).delete(this.batchId.toString(), this.mailId.toString());
+
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.READY, "mywiki")), eq(parameters));
+    }
+
+    @Test
     public void onSuccess() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
@@ -104,47 +143,6 @@ public class DatabaseMailListenerTest
 
         verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()));
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT, "otherwiki")), eq(parameters));
-    }
-
-    @Test
-    public void onSuccessWithPreviouslyFailedMessage() throws Exception
-    {
-        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        MailStatus status = new MailStatus(this.message, MailState.FAILED);
-        status.setWiki("otherwiki");
-        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
-            this.mailId.toString()))).thenReturn(Arrays.asList(status));
-
-        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-
-        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
-
-        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()));
-
-        verify(mailContentStore).delete(this.batchId.toString(), this.mailId.toString());
-
-        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT, "otherwiki")), eq(parameters));
-    }
-
-    @Test
-    public void onSuccessWithPreviouslyFailedMessageAndWhenContentStoreFails() throws Exception
-    {
-        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.emptyMap();
-        MailStatus status = new MailStatus(this.message, MailState.FAILED);
-        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
-            this.mailId.toString()))).thenReturn(Arrays.asList(status));
-
-        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId.toString(),
-            this.mailId.toString());
-
-        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
-
-        assertEquals("Failed to remove previously failing message [" + this.mailId + "] (batch id [" + this.batchId
-            + "]) from the file system. Reason [MailStoreException: error]. However it has now been sent successfully.",
-            this.logRule.getMessage(0));
     }
 
     @Test

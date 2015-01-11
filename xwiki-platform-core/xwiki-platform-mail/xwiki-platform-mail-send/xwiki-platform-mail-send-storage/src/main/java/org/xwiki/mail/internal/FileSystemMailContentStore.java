@@ -101,6 +101,8 @@ public class FileSystemMailContentStore implements MailContentStore
             batchDirectory = getBatchDirectory(batchId);
             File file = new File(batchDirectory, messageId);
             file.delete();
+            // Also remove the directory. Note that it'll succeed only the directory is empty which is what we want.
+            batchDirectory.delete();
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to delete message (id [%s], batch id [%s]) from the file system at [%s]",

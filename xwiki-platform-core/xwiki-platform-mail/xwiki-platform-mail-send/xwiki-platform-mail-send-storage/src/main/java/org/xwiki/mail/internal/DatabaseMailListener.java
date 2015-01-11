@@ -74,6 +74,25 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepare(MimeMessage message, Map<String, Object> parameters)
     {
+        // Try to load a previous status (in case the message has failed to be sent before) and in this case we
+        // remove the previously serialized message since it means we're resending it!
+        String messageId = getMessageId(message);
+        MailStatus currentStatus = loadMailStatus(messageId, parameters);
+        if (currentStatus != null) {
+            // If the mail has previously failed to be sent, then remove it from the file system since it has now
+            // succeeded!
+            if (currentStatus.getState().equals(MailState.FAILED.toString())) {
+                String batchId = getMessageBatchId(message);
+                try {
+                    this.mailContentStore.delete(batchId, messageId);
+                } catch (MailStoreException e) {
+                    // Failed to delete saved mail, raise a warning but continue since it's not critical
+                    this.logger.warn("Failed to remove previously failing message [{}] (batch id [{}]) from the file "
+                            + "system. Reason [{}].", messageId, batchId, ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
+
         MailStatus status = createMailStatus(message, parameters);
         saveStatus(status, parameters);
 
@@ -87,19 +106,6 @@ public class DatabaseMailListener implements MailListener, Initializable
         String messageId = getMessageId(message);
         MailStatus status = loadMailStatus(messageId, parameters);
         if (status != null) {
-            // If the mail has previously failed to be sent, then remove it from the file system since it has now
-            // succeeded!
-            if (status.getState().equals(MailState.FAILED.toString())) {
-                String batchId = getMessageBatchId(message);
-                try {
-                    this.mailContentStore.delete(batchId, messageId);
-                } catch (MailStoreException e) {
-                    // Failed to delete saved mail, raise a warning but continue since it's not critical
-                    this.logger.warn("Failed to remove previously failing message [{}] (batch id [{}]) from the file "
-                        + "system. Reason [{}]. However it has now been sent successfully.", messageId, batchId,
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
-            }
             status.setState(MailState.SENT);
             saveStatus(status, parameters);
         }

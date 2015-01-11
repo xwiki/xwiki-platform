@@ -93,7 +93,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
         MimeMessage message;
         try {
             message = loadMessage(batchId, mailId);
-            ScriptMailResult  scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
+            ScriptMailResult scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
 
             // Wait for all messages from this batch to have been sent before returning
             scriptMailResult.waitTillSent(Long.MAX_VALUE);

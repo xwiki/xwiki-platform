@@ -134,10 +134,13 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                 }
                 // Note: a short pause to catch thread interruptions and to be kind on CPU.
                 Thread.sleep(50L);
-            } catch (Exception e) {
-                // There was an unexpected problem, we stop this thread and log the problem.
-                this.logger.error("Mail Sender Thread was forcefully stopped", e);
+            } catch (InterruptedException e) {
+                // Thread has been stopped, exit
+                this.logger.debug("Mail Sender Thread was forcefully stopped", e);
                 break;
+            } catch (Exception e) {
+                // There was an unexpected problem, we just log the problem but keep the thread alive!
+                this.logger.error("Unexpected error in the Mail Sender Thread", e);
             }
         } while (!this.shouldStop);
     }
@@ -173,52 +176,57 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
         MailListener listener = item.getListener();
         UUID batchId = item.getBatchId();
 
-// TODO: this is not correct I think, we need to prepare all the mails before sending them as otherwise they'll be in
-// memory till they are sent... and if XWiki crashes they're lost and in any case we won't have any status for them
-// till their turn comes which isn't good!
-// ==> we need to serialize them all and reload them when their turn comes...
+        // TODO: VMA: this is not correct I think, we need to prepare all the mails before sending them as otherwise
+        // they'll be in memory till they are sent... and if XWiki crashes they're lost and in any case we won't have
+        // any status for them till their turn comes which isn't good!
+        // ==> we need to serialize them all and reload them when their turn comes...
 
         while (messages.hasNext()) {
             MimeMessage mimeMessage = messages.next();
-            MimeMessage message = initializeMessage(mimeMessage, listener, batchId, item.getWikiId());
+            sendSingleMail(mimeMessage, listener, batchId, item);
 
-            try {
-                // Step 1: If the current Session in use is different from the one passed then close
-                // the current Transport, get a new one and reconnect.
-                // Also do that every 100 mails sent.
-                // TODO: explain why!
-                // TODO: Also explain why we don't use Transport.send()
-                if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
-                    closeTransport();
-                    this.currentSession = item.getSession();
-                    this.currentTransport = this.currentSession.getTransport("smtp");
-                    this.currentTransport.connect();
-                } else if (!this.currentTransport.isConnected()) {
-                    this.currentTransport.connect();
-                }
-
-                // Step 2: Send the mail
-                this.currentTransport.sendMessage(message, message.getAllRecipients());
-                this.count++;
-
-                // Step 3: Notify the user of the success if a listener has been provided
-                if (listener != null) {
-                    listener.onSuccess(message,
-                        Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
-                }
-            } catch (Exception e) {
-                // An error occurred, notify the user if a listener has been provided
-                if (listener != null) {
-                    listener.onError(message, e,
-                        Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
-                }
-            }
-
-            // Step 4: Email throttling: Wait before sending the next mail
+            // Email throttling: Wait before sending the next mail.
             // Only wait here if there are more messages to send as otherwise when we send a single message
             // synchronously the user would have to wait the wait time...
             if (messages.hasNext()) {
                 waitSendWaitTime();
+            }
+        }
+    }
+
+    private void sendSingleMail(MimeMessage mimeMessage, MailListener listener, UUID batchId, MailSenderQueueItem item)
+    {
+        MimeMessage message = initializeMessage(mimeMessage, listener, batchId, item.getWikiId());
+
+        try {
+            // Step 1: If the current Session in use is different from the one passed then close
+            // the current Transport, get a new one and reconnect.
+            // Also do that every 100 mails sent.
+            // TODO: explain why!
+            // TODO: Also explain why we don't use Transport.send()
+            if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
+                closeTransport();
+                this.currentSession = item.getSession();
+                this.currentTransport = this.currentSession.getTransport("smtp");
+                this.currentTransport.connect();
+            } else if (!this.currentTransport.isConnected()) {
+                this.currentTransport.connect();
+            }
+
+            // Step 2: Send the mail
+            this.currentTransport.sendMessage(message, message.getAllRecipients());
+            this.count++;
+
+            // Step 3: Notify the user of the success if a listener has been provided
+            if (listener != null) {
+                listener.onSuccess(message,
+                    Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
+            }
+        } catch (Exception e) {
+            // An error occurred, notify the user if a listener has been provided
+            if (listener != null) {
+                listener.onError(message, e,
+                    Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
             }
         }
     }

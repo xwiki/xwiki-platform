@@ -136,7 +136,7 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
                 Thread.sleep(50L);
             } catch (Exception e) {
                 // There was an unexpected problem, we stop this thread and log the problem.
-                this.logger.debug("Mail Sender Thread was forcefully stopped", e);
+                this.logger.error("Mail Sender Thread was forcefully stopped", e);
                 break;
             }
         } while (!this.shouldStop);

@@ -30,14 +30,17 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.mail.test.po.MailStatusAdministrationSectionPage;
+import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * UI tests for the Mail application.
@@ -83,12 +86,16 @@ public class MailTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("Email", "General"));
         Assert.assertTrue(administrationPage.hasSection("Email", "Mail Sending"));
 
-        // Step 2: Navigate to each mail section
+        // Step 2: Navigate to each mail section and set the mail sending parameters (SMTP host/port)
 
         administrationPage.clickSection("Email", "General");
         administrationPage.clickSection("Email", "Mail Sending");
+        SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
+        sendMailPage.setHost("localhost");
+        sendMailPage.setPort("3025");
+        sendMailPage.clickSave();
 
-        // Step 3: verify that there are no admin email sections when administering a space
+        // Step 3: Verify that there are no admin email sections when administering a space
 
         // Select XWiki space administration.
         AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
@@ -108,11 +115,6 @@ public class MailTest extends AbstractTest
         // Remove existing pages (for pages that we create below)
         getUtil().deletePage(getTestClassName(), "MailTemplate");
         getUtil().deletePage(getTestClassName(), "SendMail");
-
-        // Configure the SMTP host/port for the wiki so that it points to GreenMail.
-        // TODO: Replace this by user actions on the UI to prove that it works...
-        getUtil().updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "port", 3025);
-        getUtil().updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost");
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
@@ -158,6 +160,14 @@ public class MailTest extends AbstractTest
 
         // Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for the sent
         // mail
-        // TODO
+        administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Email", "Mail Sending Status");
+        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
+        LiveTableElement liveTableElement = statusPage.getLiveTable();
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
+        assertTrue(liveTableElement.getRowCount() > 0);
+        assertTrue(liveTableElement.hasRow("Error", ""));
     }
 }

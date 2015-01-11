@@ -24,22 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-mail</artifactId>
+    <artifactId>xwiki-platform-mail-test</artifactId>
     <version>6.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-mail-test</artifactId>
-  <name>XWiki Platform - Mail - Tests - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Mail - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-mail-test-pageobjects</module>
-    <module>xwiki-platform-mail-test-tests</module>
-  </modules>
+  <artifactId>xwiki-platform-mail-test-pageobjects</artifactId>
+  <name>XWiki Platform - Mail - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Mail - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

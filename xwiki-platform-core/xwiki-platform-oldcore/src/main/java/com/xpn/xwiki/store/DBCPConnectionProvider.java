@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * To use this connection provider set:<br>
  * <code>hibernate.connection.provider_class&nbsp;org.hibernate.connection.DBCPConnectionProvider</code>
  * </p>
- * 
+ *
  * <pre>
  * Supported Hibernate properties:
  *   hibernate.connection.driver_class
@@ -55,13 +55,13 @@ import org.slf4j.LoggerFactory;
  *   hibernate.connection.pool_size
  *   hibernate.connection (JDBC driver properties)
  * </pre>
- * 
+ *
  * <br>
  * All DBCP properties are also supported by using the hibernate.dbcp prefix. A complete list can be found on the DBCP
  * configuration page: <a
  * href="http://jakarta.apache.org/commons/dbcp/configuration.html">http://jakarta.apache.org/commons
  * /dbcp/configuration.html</a>. <br>
- * 
+ *
  * <pre>
  * Example:
  *   hibernate.connection.provider_class org.hibernate.connection.DBCPConnectionProvider
@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * href="http://jakarta.apache.org/commons/dbcp/">DBCP website</a>. There you will also find the DBCP wiki, mailing
  * lists, issue tracking and other support facilities
  * </p>
- * 
+ *
  * @see org.hibernate.connection.ConnectionProvider
  * @author Dirk Verbeeck
  */
@@ -169,8 +169,8 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Copy all DBCP properties removing the prefix
-            for (Iterator iter = props.keySet().iterator(); iter.hasNext();) {
-                String key = String.valueOf(iter.next());
+            for (Object element : props.keySet()) {
+                String key = String.valueOf(element);
                 if (key.startsWith(PREFIX)) {
                     String property = key.substring(PREFIX.length());
                     String value = props.getProperty(key);
@@ -193,12 +193,12 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Let the factory create the pool
-            ds = (BasicDataSource) BasicDataSourceFactory.createDataSource(dbcpProperties);
+            this.ds = (BasicDataSource) BasicDataSourceFactory.createDataSource(dbcpProperties);
 
             // The BasicDataSource has lazy initialization
             // borrowing a connection will start the DataSource
             // and make sure it is configured correctly.
-            Connection conn = ds.getConnection();
+            Connection conn = this.ds.getConnection();
             conn.close();
 
             // Log pool statistics before continuing.
@@ -208,13 +208,13 @@ public class DBCPConnectionProvider implements ConnectionProvider
                 "Could not create a DBCP pool. "
                     + "There is an error in the hibernate configuration file, please review it.";
             LOGGER.error(message, e);
-            if (ds != null) {
+            if (this.ds != null) {
                 try {
-                    ds.close();
+                    this.ds.close();
                 } catch (Exception e2) {
                     // ignore
                 }
-                ds = null;
+                this.ds = null;
             }
             throw new HibernateException(message, e);
         }
@@ -226,13 +226,13 @@ public class DBCPConnectionProvider implements ConnectionProvider
     {
         // Check if the database has not been already stopped to avoid NPE. This could also possibly happen if the init
         // has not been already executed and some code calls getConnection().
-        if (ds == null) {
+        if (this.ds == null) {
             throw new SQLException("Database Connection Pool has not been started or is already stopped!");
         }
 
         Connection conn = null;
         try {
-            conn = ds.getConnection();
+            conn = this.ds.getConnection();
         } finally {
             logStatistics();
         }
@@ -255,9 +255,9 @@ public class DBCPConnectionProvider implements ConnectionProvider
         SHUTDOWN_LOGGER.debug("Stopping Database Connection Pool...");
         logStatistics();
         try {
-            if (ds != null) {
-                ds.close();
-                ds = null;
+            if (this.ds != null) {
+                this.ds.close();
+                this.ds = null;
             } else {
                 LOGGER.warn("Cannot close Database Connection Pool (not initialized)");
             }
@@ -287,8 +287,8 @@ public class DBCPConnectionProvider implements ConnectionProvider
     protected void logStatistics()
     {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", ds.getNumActive(), ds.getMaxActive(),
-                ds.getNumIdle(), ds.getMaxIdle());
+            LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
+                this.ds.getMaxActive(), this.ds.getNumIdle(), this.ds.getMaxIdle());
         }
     }
 }

@@ -3025,7 +3025,7 @@ public class XWiki implements EventListener
             if (errorMessage != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, String.format(
-                    "Error while sending the validation email. %s", errorMessage));
+                        "Error while sending the validation email. %s", errorMessage));
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,

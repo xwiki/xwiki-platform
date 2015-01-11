@@ -21,8 +21,8 @@
 package com.xpn.xwiki.store.migration;
 
 /**
- * Exception issued by the data migration components when an access is attempted on a database that have
- * not been migrated to the latest version.
+ * Exception issued by the data migration components when an access is attempted on a database that have not been
+ * migrated to the latest version.
  *
  * @version $Id$
  * @since 3.4M1
@@ -36,6 +36,7 @@ public class MigrationRequiredException extends Exception
 
     /**
      * Build a simple exception with a message.
+     *
      * @param s message
      */
     public MigrationRequiredException(String s)

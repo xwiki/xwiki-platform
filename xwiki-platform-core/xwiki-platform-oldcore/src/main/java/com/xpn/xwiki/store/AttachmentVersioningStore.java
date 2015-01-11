@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
 /**
  * Interface for storing attachment versions.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -37,7 +37,7 @@ public interface AttachmentVersioningStore
 {
     /**
      * Load attachment archive from store.
-     * 
+     *
      * @return attachment archive. not null. return empty archive if it is not exist in store.
      * @param attachment The attachment of archive.
      * @param context The current context.
@@ -49,7 +49,7 @@ public interface AttachmentVersioningStore
 
     /**
      * Save or update attachment archive.
-     * 
+     *
      * @param archive The attachment archive to save.
      * @param context The current context.
      * @param bTransaction Should use old transaction (false) or create new (true).
@@ -59,7 +59,7 @@ public interface AttachmentVersioningStore
 
     /**
      * Permanently delete attachment archive.
-     * 
+     *
      * @param attachment The attachment to delete.
      * @param context The current context.
      * @param bTransaction Should use old transaction (false) or create new (true).

@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Writable;
-import groovy.text.Template;
-
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;

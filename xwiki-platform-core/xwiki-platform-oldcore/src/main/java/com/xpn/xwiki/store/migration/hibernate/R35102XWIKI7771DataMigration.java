@@ -132,7 +132,7 @@ public class R35102XWIKI7771DataMigration extends AbstractHibernateDataMigration
          * @param tableName the name of the table to fix
          * @param columnName the name of the column to fix
          * @param idColumnName the name of the column containing an identifier that should be printed in the logs when a
-         *        migration fails
+         *            migration fails
          * @param dataType the data type printed in the logs when a migration fails
          */
         public R35102Work(String tableName, String columnName, String idColumnName, String dataType)

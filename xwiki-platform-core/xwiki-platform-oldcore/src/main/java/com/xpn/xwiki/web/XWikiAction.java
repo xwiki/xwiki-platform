@@ -50,9 +50,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
@@ -62,7 +60,6 @@ import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

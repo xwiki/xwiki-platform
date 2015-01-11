@@ -28,6 +28,8 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -42,6 +44,8 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public class UsersMimeMessageIterator extends AbstractMessageIterator
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UsersMimeMessageIterator.class);
+
     private DocumentAccessBridge documentAccessBridge;
 
     private final List<DocumentReference> users;
@@ -77,7 +81,8 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
         return accessBridge;
     }
 
-    @Override protected MimeMessage createMessage() throws MessagingException
+    @Override
+    protected MimeMessage createMessage() throws MessagingException
     {
         DocumentReference userReference = users.get(this.position);
 
@@ -91,5 +96,11 @@ public class UsersMimeMessageIterator extends AbstractMessageIterator
         mimeMessage.addRecipient(Message.RecipientType.TO, InternetAddress.parse(email)[0]);
 
         return mimeMessage;
+    }
+
+    @Override
+    protected Logger getLogger()
+    {
+        return LOGGER;
     }
 }

@@ -29,6 +29,8 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
@@ -41,6 +43,8 @@ import org.xwiki.environment.Environment;
  */
 public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerializedFilesMimeMessageIterator.class);
+
     /**
      * The mails store directory name.
      */
@@ -87,5 +91,11 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
             throw new MessagingException(
                 String.format("Failed to create mime message from file [%s]", file.getPath()), e);
         }
+    }
+
+    @Override
+    protected Logger getLogger()
+    {
+        return LOGGER;
     }
 }

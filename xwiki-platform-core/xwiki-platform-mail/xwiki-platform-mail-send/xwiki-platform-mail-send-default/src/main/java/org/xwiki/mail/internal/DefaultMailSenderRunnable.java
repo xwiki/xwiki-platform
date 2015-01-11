@@ -183,13 +183,16 @@ public class DefaultMailSenderRunnable implements MailSenderRunnable
 
         while (messages.hasNext()) {
             MimeMessage mimeMessage = messages.next();
-            sendSingleMail(mimeMessage, listener, batchId, item);
+            // Skip message is message has failed to be created.
+            if (mimeMessage != null) {
+                sendSingleMail(mimeMessage, listener, batchId, item);
 
-            // Email throttling: Wait before sending the next mail.
-            // Only wait here if there are more messages to send as otherwise when we send a single message
-            // synchronously the user would have to wait the wait time...
-            if (messages.hasNext()) {
-                waitSendWaitTime();
+                // Email throttling: Wait before sending the next mail.
+                // Only wait here if there are more messages to send as otherwise when we send a single message
+                // synchronously the user would have to wait the wait time...
+                if (messages.hasNext()) {
+                    waitSendWaitTime();
+                }
             }
         }
     }

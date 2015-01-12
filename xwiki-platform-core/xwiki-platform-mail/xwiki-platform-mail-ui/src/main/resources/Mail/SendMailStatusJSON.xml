@@ -95,7 +95,7 @@
     #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
   #end
   #set ($totalrows = $services.mailstorage.count($filterMap))
-  #set ($results = $services.mailstorage.load($filterMap))
+  #set ($results = $services.mailstorage.load($filterMap, $offset, $limit))
   ## ===============
   ## JSON Generation
   ## ===============

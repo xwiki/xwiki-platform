@@ -93,7 +93,7 @@ public class DatabaseMailStatusResult implements MailStatusResult
 
         try {
             return this.mailStatusStore.load(
-                Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId)).iterator();
+                Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId), 0, Integer.MAX_VALUE).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get all results. Returning an empty result.", e);
             return Collections.emptyIterator();
@@ -111,7 +111,7 @@ public class DatabaseMailStatusResult implements MailStatusResult
             Map<String, Object> filterMap = new HashMap<>();
             filterMap.put(BATCHID_KEY, this.batchId);
             filterMap.put("state", state.toString());
-            return this.mailStatusStore.load(filterMap).iterator();
+            return this.mailStatusStore.load(filterMap, 0, Integer.MAX_VALUE).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get results by state. Returning an empty result.", e);
             return Collections.emptyIterator();

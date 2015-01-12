@@ -96,7 +96,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public List<MailStatus> load(final Map<String, Object> filterMap) throws MailStoreException
+    public List<MailStatus> load(final Map<String, Object> filterMap, final int offset, final int count)
+        throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
@@ -117,6 +118,12 @@ public class DatabaseMailStatusStore implements MailStatusStore
                         throws HibernateException, XWikiException
                     {
                         Query query = session.createQuery(queryString);
+                        if (offset > 0) {
+                            query.setFirstResult(offset);
+                        }
+                        if (count > 0) {
+                            query.setMaxResults(count);
+                        }
                         query.setProperties(filterMap);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;

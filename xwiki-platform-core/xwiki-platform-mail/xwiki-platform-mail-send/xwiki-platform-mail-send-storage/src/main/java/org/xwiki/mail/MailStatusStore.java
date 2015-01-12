@@ -62,4 +62,14 @@ public interface MailStatusStore
      * @throws MailStoreException when an error occurs when loading the data
      */
     long count(Map<String, Object> filterMap) throws MailStoreException;
+
+    /**
+     * Delete a message.
+     *
+     * @param messageId the id of the message to delete
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
+     * @throws MailStoreException when an error occurs deleting the message
+     */
+    void delete(String messageId, Map<String, Object> parameters) throws MailStoreException;
 }

@@ -66,7 +66,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
     private XWikiStoreInterface hibernateStore;
 
     @Override
-    public void save(final MailStatus status, Map<String, Object> parameters) throws MailStoreException
+    public void save(final MailStatus status, final Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
@@ -76,15 +76,14 @@ public class DatabaseMailStatusStore implements MailStatusStore
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
         try {
+            // Delete any previous state of the message
+            delete(status.getMessageId(), parameters);
+
             store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
             {
                 @Override
                 public Object doInHibernate(Session session) throws HibernateException, XWikiException
                 {
-                    // Delete previous state of the message
-                    String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
-                    session.createQuery(queryString)
-                        .setParameter(ID_PARAMETER_NAME, status.getMessageId()).executeUpdate();
                     session.save(status);
                     return null;
                 }
@@ -102,7 +101,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
         final XWikiContext xwikiContext = this.contextProvider.get();
-        // Save in the main wiki
+        // Load from the main wiki
         String currentWiki = xwikiContext.getWikiId();
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
@@ -137,7 +136,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
         final XWikiContext xwikiContext = this.contextProvider.get();
-        // Save in the main wiki
+        // Count in the main wiki
         String currentWiki = xwikiContext.getWikiId();
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
@@ -161,6 +160,36 @@ public class DatabaseMailStatusStore implements MailStatusStore
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to count mail statuses matching the filter [%s] from the database.", filterMap), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
+        }
+    }
+
+    @Override
+    public void delete(final String messageId, Map<String, Object> parameters) throws MailStoreException
+    {
+        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        XWikiContext xwikiContext = this.contextProvider.get();
+        // Delete from the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        try {
+            store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
+            {
+                @Override
+                public Object doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    // Delete the message
+                    String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
+                    session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, messageId).executeUpdate();
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            throw new MailStoreException(String.format("Failed to delete mail status (message id [%s]) "
+                + "from the database.", messageId), e);
         } finally {
             xwikiContext.setWikiId(currentWiki);
         }

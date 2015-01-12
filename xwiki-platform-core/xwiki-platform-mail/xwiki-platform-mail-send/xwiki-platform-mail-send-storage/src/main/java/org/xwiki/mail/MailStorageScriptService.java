@@ -20,6 +20,7 @@
 package org.xwiki.mail;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,11 +76,14 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * Resend the serialized MimeMessage synchronously.
      *
      * @param batchId the name of the directory that contains serialized MimeMessage
-     * @param mailId the name of the serialized MimeMessage
+     * @param messageId the name of the serialized MimeMessage
      * @return the result and status of the send batch
      */
-    public ScriptMailResult resend(String batchId, String mailId)
+    public ScriptMailResult resend(String batchId, String messageId)
     {
+        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
+        // to be able to call this method and for it to have any effect.
+
         MailListener listener;
         try {
             listener = this.componentManagerProvider.get().getInstance(MailListener.class, "database");
@@ -92,7 +96,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
 
         MimeMessage message;
         try {
-            message = loadMessage(batchId, mailId);
+            message = loadMessage(batchId, messageId);
             ScriptMailResult scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
 
             // Wait for all messages from this batch to have been sent before returning
@@ -151,6 +155,45 @@ public class MailStorageScriptService extends AbstractMailScriptService
             // Save the exception for reporting through the script services's getLastError() API
             setError(new MailStoreException("You need Admin rights to count mail statuses"));
             return 0;
+        }
+    }
+
+    /**
+     * Delete all messages from a batch (both the statuses in the database and the serialized messages on the file
+     * system).
+     *
+     * @param batchId the id of the batch for which to delete all messages
+     */
+    public void delete(String batchId)
+    {
+        Map<String, Object> filterMap = Collections.<String, Object>singletonMap("batchId", batchId);
+        List<MailStatus> statuses = load(filterMap);
+        if (statuses != null) {
+            for (MailStatus status : statuses) {
+                delete(batchId, status.getMessageId());
+            }
+        }
+    }
+
+    /**
+     * Delete a message (both the status in the database and the serialized messages on the file system).
+     *
+     * @param batchId the id of the batch for the message to delete
+     * @param messageId the id of the message to delete
+     */
+    public void delete(String batchId, String messageId)
+    {
+        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
+        // to be able to call this method and for it to have any effect.
+
+        try {
+            // Step 1: Delete mail status from store
+            this.mailStatusStore.delete(messageId, Collections.<String, Object>emptyMap());
+            // Step 2: Delete any matching serialized mail
+            this.mailContentStore.delete(batchId, messageId);
+        } catch (MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
         }
     }
 

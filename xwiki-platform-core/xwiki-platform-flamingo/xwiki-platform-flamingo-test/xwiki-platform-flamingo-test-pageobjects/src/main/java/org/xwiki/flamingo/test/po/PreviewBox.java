@@ -19,8 +19,11 @@
  */
 package org.xwiki.flamingo.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.TestUtils;
 
 public class PreviewBox extends CSSGetterPage
 {
@@ -31,6 +34,18 @@ public class PreviewBox extends CSSGetterPage
             getDriver().switchTo().frame("iframe");
             WebElement element = getDriver().findElement(locator);
             return element.getCssValue(attribute);
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
+    }
+
+    public boolean hasError()
+    {
+        try {
+            getDriver().switchTo().frame("iframe");
+            TestUtils utils = new TestUtils();
+            List<WebElement> errors = utils.findElementsWithoutWaiting(getDriver(), By.className("less-error-message"));
+            return !errors.isEmpty();
         } finally {
             getDriver().switchTo().defaultContent();
         }

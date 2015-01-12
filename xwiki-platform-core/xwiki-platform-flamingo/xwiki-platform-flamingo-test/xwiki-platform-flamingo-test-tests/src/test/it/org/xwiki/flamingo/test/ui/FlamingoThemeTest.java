@@ -99,6 +99,9 @@ public class FlamingoThemeTest extends AbstractTest
         // First, disable auto refresh because it slows down the test
         // (and can even make it fails if the computer is slow)
         editThemePage.setAutoRefresh(false);
+        // Verify that the preview is working with the current values
+        PreviewBox previewBox = editThemePage.getPreviewBox();
+        assertFalse(previewBox.hasError());
         // Select a variable category and change value
         editThemePage.selectVariableCategory("Base colors");
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");
@@ -107,8 +110,9 @@ public class FlamingoThemeTest extends AbstractTest
         editThemePage.setVariableValue("font-family-base", "Monospace");
         // Refresh
         editThemePage.refreshPreview();
+        // Verify that there is still no errors
+        assertFalse(previewBox.hasError());
         // Verify that the modification have been made in the preview
-        PreviewBox previewBox = editThemePage.getPreviewBox();
         assertEquals("rgba(255, 0, 0, 1)", previewBox.getPageBackgroundColor());
         assertEquals("monospace", previewBox.getFontFamily());
     }

@@ -48,7 +48,7 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
     /**
      * The mails store directory name.
      */
-    public static final String ROOT_DIRECTORY = "mailstore";
+    private static final String ROOT_DIRECTORY = "mailstore";
 
     private final File[] files;
 

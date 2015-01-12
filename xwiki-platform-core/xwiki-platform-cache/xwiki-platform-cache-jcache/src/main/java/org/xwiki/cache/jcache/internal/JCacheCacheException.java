@@ -17,41 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache;
+package org.xwiki.cache.jcache.internal;
+
+import org.xwiki.cache.CacheException;
 
 /**
- * Any exception raised in the XWiki Cache component must raise an exception of this type.
+ * Exception raised when failed to load JCache configuration.
  * 
  * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
+ * @since 7.0M1
  */
-@Deprecated
-public class CacheException extends Exception
+public class JCacheCacheException extends CacheException
 {
-    /**
-     * Provides an id for serialization.
-     */
-    private static final long serialVersionUID = -8860020664723282003L;
-
     /**
      * Constructs a new exception with the specified detail message. The cause is not initialized, and may
      * subsequently be initialized by a call to {@link #initCause(Throwable)}.
-     *  
+     *
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      */
-    public CacheException(String message)
+    public JCacheCacheException(String message)
     {
         super(message);
     }
 
     /**
      * Constructs a new exception with the specified detail message and cause.
-     * 
+     *
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
      *        permitted, and indicates that the cause is nonexistent or unknown
      */
-    public CacheException(String message, Throwable cause)
+    public JCacheCacheException(String message, Throwable cause)
     {
         super(message, cause);
     }

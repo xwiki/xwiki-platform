@@ -25,8 +25,10 @@ import org.xwiki.component.annotation.Role;
  * Get {@link CacheManager} configuration.
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
 @Role
+@Deprecated
 public interface CacheManagerConfiguration
 {
     /**

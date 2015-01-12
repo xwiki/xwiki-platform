@@ -38,9 +38,11 @@ import org.xwiki.component.manager.ComponentManager;
  * 
  * @version $Id$
  * @since 1.7M1
+ * @deprecated since 7.0M1, use JCache instead
  */
 @Component
 @Singleton
+@Deprecated
 public class DefaultCacheManager implements CacheManager
 {
     /**

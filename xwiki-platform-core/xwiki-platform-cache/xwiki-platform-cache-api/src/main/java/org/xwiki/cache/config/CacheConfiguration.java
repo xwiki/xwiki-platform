@@ -36,7 +36,9 @@ import org.xwiki.cache.eviction.EntryEvictionConfiguration;
  * 
  * @version $Id$
  * @see org.xwiki.cache.eviction.EntryEvictionConfiguration
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public class CacheConfiguration extends HashMap<String, Object>
 {
     /**

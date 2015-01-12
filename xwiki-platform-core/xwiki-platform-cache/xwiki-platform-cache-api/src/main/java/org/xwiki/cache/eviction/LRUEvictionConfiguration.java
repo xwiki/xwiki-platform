@@ -24,7 +24,9 @@ package org.xwiki.cache.eviction;
  * when thresholds are hit.
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public class LRUEvictionConfiguration extends EntryEvictionConfiguration
 {
     /**

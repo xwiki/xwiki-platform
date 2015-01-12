@@ -17,30 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.infinispan;
 
-import javax.inject.Singleton;
+import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
 
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Component;
-
-/**
- * Default implementation of {@link CacheFactory}.
- * 
- * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
- */
-@Component
-@Singleton
-@Deprecated
-public class DefaultCacheFactory implements CacheFactory
+public class JCacheCacheTest extends AbstractEvictionGenericTestCache
 {
-    @Override
-    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    public JCacheCacheTest()
     {
-        return new DefaultCache<T>();
+        super("infinispan", true);
     }
 }

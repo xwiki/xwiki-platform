@@ -24,7 +24,9 @@ import java.util.EventListener;
 /**
  * @param <T> the class of the data stored in the cache.
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public interface CacheEntryListener<T> extends EventListener
 {
     /**

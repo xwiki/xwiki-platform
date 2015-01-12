@@ -17,30 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.jcache.internal.event;
 
-import javax.inject.Singleton;
-
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Component;
+import org.xwiki.cache.CacheEntry;
+import org.xwiki.cache.jcache.internal.JCacheCache;
+import org.xwiki.cache.jcache.internal.JCacheCacheEntry;
 
 /**
- * Default implementation of {@link CacheFactory}.
+ * Implements {@link org.xwiki.cache.event.CacheEntryEvent} based on JCache.
  * 
+ * @param <T> the class of the data stored in the cache.
  * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
+ * @since 7.0M1
  */
-@Component
-@Singleton
-@Deprecated
-public class DefaultCacheFactory implements CacheFactory
+public class JCacheCacheEntryEvent<T> extends JCacheCacheEvent<T> implements
+    org.xwiki.cache.event.CacheEntryEvent<T>
 {
-    @Override
-    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    /**
+     * The cache entry associated with the event.
+     */
+    private JCacheCacheEntry<T> entry;
+
+    /**
+     * @param entry the cache entry associated with the event.
+     */
+    public JCacheCacheEntryEvent(JCacheCacheEntry<T> entry)
     {
-        return new DefaultCache<T>();
+        super((JCacheCache<T>) entry.getCache());
+
+        this.entry = entry;
+    }
+
+    @Override
+    public CacheEntry<T> getEntry()
+    {
+        return entry;
     }
 }

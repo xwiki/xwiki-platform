@@ -24,7 +24,9 @@ package org.xwiki.cache;
  * all resource used by this data when it is removed from the cache.
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public interface DisposableCacheValue
 {
     /**

@@ -34,7 +34,9 @@ import org.xwiki.cache.event.CacheEntryListener;
  * 
  * @param <T>
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public abstract class AbstractCache<T> implements Cache<T>
 {
     /**

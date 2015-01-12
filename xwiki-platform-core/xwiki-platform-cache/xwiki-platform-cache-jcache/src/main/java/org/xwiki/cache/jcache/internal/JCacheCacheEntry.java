@@ -17,30 +17,62 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.jcache.internal;
 
-import javax.inject.Singleton;
-
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Component;
+import org.xwiki.cache.CacheEntry;
 
 /**
- * Default implementation of {@link CacheFactory}.
+ * Implements {@link org.xwiki.cache.CacheEntry} based on JCache.
  * 
+ * @param <T> the class of the data stored in the cache.
  * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
+ * @since 7.0M1
  */
-@Component
-@Singleton
-@Deprecated
-public class DefaultCacheFactory implements CacheFactory
+public class JCacheCacheEntry<T> implements CacheEntry<T>
 {
-    @Override
-    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    /**
+     * The cache.
+     */
+    private Cache<T> cache;
+
+    /**
+     * The entry key.
+     */
+    private String key;
+
+    /**
+     * the entry data.
+     */
+    private T data;
+
+    /**
+     * @param cache the cache where this entry comes from.
+     * @param key the entry key.
+     * @param data the entry data.
+     */
+    public JCacheCacheEntry(Cache<T> cache, String key, T data)
     {
-        return new DefaultCache<T>();
+        this.cache = cache;
+        this.key = key;
+        this.data = data;
+    }
+
+    @Override
+    public Cache<T> getCache()
+    {
+        return cache;
+    }
+
+    @Override
+    public T getValue()
+    {
+        return this.data;
+    }
+
+    @Override
+    public String getKey()
+    {
+        return this.key;
     }
 }

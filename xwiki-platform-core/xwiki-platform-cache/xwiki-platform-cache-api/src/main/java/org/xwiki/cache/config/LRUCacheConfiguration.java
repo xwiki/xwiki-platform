@@ -27,7 +27,9 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
  * 
  * @version $Id$
  * @since 4.3M1
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public class LRUCacheConfiguration extends CacheConfiguration
 {
     /**

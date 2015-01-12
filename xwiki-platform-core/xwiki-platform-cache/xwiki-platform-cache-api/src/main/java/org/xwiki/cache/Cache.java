@@ -29,7 +29,9 @@ import org.xwiki.cache.event.CacheEntryListener;
  * 
  * @param <T> the class of the data stored in the cache.
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public interface Cache<T>
 {
     /**

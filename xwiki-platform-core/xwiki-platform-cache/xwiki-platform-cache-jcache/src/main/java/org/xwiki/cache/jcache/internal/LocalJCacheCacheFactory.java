@@ -17,30 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.jcache.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Default implementation of {@link CacheFactory}.
+ * Implements {@link org.xwiki.cache.CacheFactory} based on JCache.
  * 
  * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
+ * @since 7.0M1
  */
 @Component
+@Named("jcache/local")
 @Singleton
 @Deprecated
-public class DefaultCacheFactory implements CacheFactory
+public class LocalJCacheCacheFactory implements CacheFactory
 {
+    /**
+     * Don't do anything special and redirect to standard JCache implementation instead.
+     */
+    @Inject
+    @Named("infinispan")
+    private CacheFactory infinispanCacheFactory;
+
     @Override
     public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
     {
-        return new DefaultCache<T>();
+        return this.infinispanCacheFactory.newCache(config);
     }
 }

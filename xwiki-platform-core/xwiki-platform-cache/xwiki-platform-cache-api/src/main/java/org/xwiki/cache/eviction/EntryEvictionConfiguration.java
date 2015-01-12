@@ -34,7 +34,9 @@ import java.util.HashMap;
  * </code>
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public class EntryEvictionConfiguration extends HashMap<String, Object>
 {
     /**

@@ -24,7 +24,9 @@ import org.xwiki.cache.Cache;
 /**
  * @param <T> the class of the data stored in the cache.
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public interface CacheEvent<T>
 {
     /**

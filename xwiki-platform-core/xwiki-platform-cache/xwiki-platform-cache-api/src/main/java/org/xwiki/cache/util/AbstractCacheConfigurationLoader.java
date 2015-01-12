@@ -27,7 +27,9 @@ import org.xwiki.cache.config.CacheConfiguration;
  * Base class to load cache configuration.
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public abstract class AbstractCacheConfigurationLoader
 {
     /**

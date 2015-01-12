@@ -17,30 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.jcache.internal.event;
 
-import javax.inject.Singleton;
-
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.annotation.Component;
+import org.xwiki.cache.event.CacheEvent;
+import org.xwiki.cache.jcache.internal.JCacheCache;
 
 /**
- * Default implementation of {@link CacheFactory}.
+ * Implements {@link CacheEvent} based on JCache.
  * 
+ * @param <T> the class of the data stored in the cache.
  * @version $Id$
- * @deprecated since 7.0M1, use JCache instead
+ * @since 7.0M1
  */
-@Component
-@Singleton
-@Deprecated
-public class DefaultCacheFactory implements CacheFactory
+public class JCacheCacheEvent<T> implements CacheEvent<T>
 {
-    @Override
-    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    /**
+     * The cache which generated this event.
+     */
+    private JCacheCache<T> cache;
+
+    /**
+     * @param cache the cache which generated this event.
+     */
+    public JCacheCacheEvent(JCacheCache<T> cache)
     {
-        return new DefaultCache<T>();
+        this.cache = cache;
+    }
+
+    @Override
+    public Cache<T> getCache()
+    {
+        return cache;
     }
 }

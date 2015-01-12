@@ -27,8 +27,10 @@ import org.xwiki.component.annotation.Role;
  * point of the cache component.
  * 
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
 @Role
+@Deprecated
 public interface CacheFactory
 {
     /**

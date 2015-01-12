@@ -28,7 +28,9 @@ import org.xwiki.cache.event.CacheEntryListener;
  * 
  * @param <T> the type of data stored in the cache
  * @version $Id$
+ * @deprecated since 7.0M1, use JCache instead
  */
+@Deprecated
 public class DefaultCache<T> implements Cache<T>
 {
     @Override

@@ -61,44 +61,44 @@
   {
     'id' : 'configuration',
     'children': [
-       {'id' : 'Editing', 'order' : 10},
-       {'id' : 'Localization', 'order' : 20},
-       {'id' : 'XWiki.OfficeImporterAdmin', 'order' : 30}
+       {'id' : 'Editing', 'order' : 100},
+       {'id' : 'Localization', 'order' : 200},
+       {'id' : 'XWiki.OfficeImporterAdmin', 'order' : 300}
     ]
   },
   {
     'id' : 'lf',
     'children': [
-       {'id' : 'Presentation', 'perSpace' : true, 'order' : 10},
-       {'id' : 'Elements', 'perSpace' : true, 'order' : 20},
-       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 30}
+       {'id' : 'Presentation', 'perSpace' : true, 'order' : 100},
+       {'id' : 'Elements', 'perSpace' : true, 'order' : 200},
+       {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 300}
     ]
   },
   {
     'id' : 'usersgroups',
     'children': [
-       {'id' : 'Users', 'order' : 10},
-       {'id' : 'Groups', 'order' : 20},
-       {'id' : 'Rights', 'perSpace' : true, 'order' : 30},
-       {'id' : 'Registration', 'order' : 40},
-       {'id' : 'UserProfile', 'order' : 50}
+       {'id' : 'Users', 'order' : 100},
+       {'id' : 'Groups', 'order' : 200},
+       {'id' : 'Rights', 'perSpace' : true, 'order' : 300},
+       {'id' : 'Registration', 'order' : 400},
+       {'id' : 'UserProfile', 'order' : 500}
     ]
   },
   {
     'id' : 'content',
     'children': [
-       {'id' : 'Import', 'action' : 'import', 'order' : 10},
-       {'id' : 'Export', 'action' : 'export', 'order' : 20},
-       {'id' : 'Templates', 'order' : 30}
+       {'id' : 'Import', 'action' : 'import', 'order' : 100},
+       {'id' : 'Export', 'action' : 'export', 'order' : 200},
+       {'id' : 'Templates', 'order' : 300}
     ]
   },
   {
     'id' : 'extensionmanager',
     'children': [
-       {'id' : 'XWiki.AddExtensions', 'order' : 10},
-       {'id' : 'XWiki.InstalledExtensions', 'order' : 20},
-       {'id' : 'XWiki.CoreExtensions', 'order' : 30},
-       {'id' : 'XWiki.ExtensionUpdater', 'order' : 40}
+       {'id' : 'XWiki.AddExtensions', 'order' : 100},
+       {'id' : 'XWiki.InstalledExtensions', 'order' : 200},
+       {'id' : 'XWiki.CoreExtensions', 'order' : 300},
+       {'id' : 'XWiki.ExtensionUpdater', 'order' : 400}
     ]
   },
   {

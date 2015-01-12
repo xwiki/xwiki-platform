@@ -4977,7 +4977,12 @@ public class XWiki implements EventListener
             String text;
 
             if (format == null) {
-                text = userobj.getStringValue("first_name") + " " + userobj.getStringValue("last_name");
+                text = userobj.getStringValue("first_name");
+                String lastName = userobj.getStringValue("last_name");
+                if (!text.isEmpty() && !lastName.isEmpty()) {
+                    text += ' ';
+                }
+                text += userobj.getStringValue("last_name");
                 if (StringUtils.isBlank(text)) {
                     text = userdoc.getDocumentReference().getName();
                 }

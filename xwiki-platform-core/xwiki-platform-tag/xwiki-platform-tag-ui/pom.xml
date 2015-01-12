@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-message</artifactId>
-      <version>${project.version}</version>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

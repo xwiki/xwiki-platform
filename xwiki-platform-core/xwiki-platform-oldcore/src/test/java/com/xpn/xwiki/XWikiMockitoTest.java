@@ -281,9 +281,17 @@ public class XWikiMockitoTest
         when(this.storeMock.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(document);
         BaseObject userObject = mock(BaseObject.class);
         when(document.getObject("XWiki.XWikiUsers")).thenReturn(userObject);
+
         when(userObject.getStringValue("first_name")).thenReturn("first<name");
         when(userObject.getStringValue("last_name")).thenReturn("last'name");
-
         assertEquals("first<name last'name", xwiki.getPlainUserName(userReference, context));
+
+        when(userObject.getStringValue("first_name")).thenReturn("first<name");
+        when(userObject.getStringValue("last_name")).thenReturn("");
+        assertEquals("first<name", xwiki.getPlainUserName(userReference, context));
+
+        when(userObject.getStringValue("first_name")).thenReturn("");
+        when(userObject.getStringValue("last_name")).thenReturn("last'name");
+        assertEquals("last'name", xwiki.getPlainUserName(userReference, context));
     }
 }

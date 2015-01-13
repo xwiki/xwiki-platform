@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Script</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.16</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

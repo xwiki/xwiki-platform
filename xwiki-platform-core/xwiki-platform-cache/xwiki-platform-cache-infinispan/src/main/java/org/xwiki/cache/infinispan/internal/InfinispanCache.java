@@ -27,9 +27,11 @@ import org.infinispan.Cache;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.notifications.Listener;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntriesEvicted;
+import org.infinispan.notifications.cachelistener.annotation.CacheEntryCreated;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryModified;
 import org.infinispan.notifications.cachelistener.annotation.CacheEntryRemoved;
 import org.infinispan.notifications.cachelistener.event.CacheEntriesEvictedEvent;
+import org.infinispan.notifications.cachelistener.event.CacheEntryCreatedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryModifiedEvent;
 import org.infinispan.notifications.cachelistener.event.CacheEntryRemovedEvent;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -68,7 +70,7 @@ public class InfinispanCache<T> extends AbstractCache<T>
     InfinispanCache(EmbeddedCacheManager cacheManager, CacheConfiguration configuration)
     {
         this.cacheManager = cacheManager;
-        this.cache = cacheManager.<String, T> getCache(configuration.getConfigurationId());
+        this.cache = cacheManager.<String, T>getCache(configuration.getConfigurationId());
 
         this.cache.addListener(this);
     }
@@ -145,6 +147,19 @@ public class InfinispanCache<T> extends AbstractCache<T>
             cacheEntryRemoved(event.getKey(), this.preEventData.get(key));
 
             this.preEventData.remove(key);
+        }
+    }
+
+    /**
+     * @param event the modification event.
+     */
+    @CacheEntryCreated
+    public void nodeCreated(CacheEntryCreatedEvent<String, T> event)
+    {
+        String key = event.getKey();
+
+        if (!event.isPre()) {
+            cacheEntryInserted(key, event.getValue());
         }
     }
 

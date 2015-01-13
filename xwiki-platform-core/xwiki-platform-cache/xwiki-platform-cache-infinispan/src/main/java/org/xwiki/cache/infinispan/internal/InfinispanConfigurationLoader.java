@@ -20,15 +20,16 @@
 package org.xwiki.cache.infinispan.internal;
 
 import org.apache.commons.lang3.StringUtils;
-import org.infinispan.configuration.Builder;
-import org.infinispan.configuration.ConfigurationUtils;
-import org.infinispan.configuration.cache.CacheLoaderConfiguration;
-import org.infinispan.configuration.cache.CacheLoaderConfigurationBuilder;
+import org.infinispan.commons.configuration.Builder;
+import org.infinispan.commons.configuration.ConfigurationUtils;
 import org.infinispan.configuration.cache.Configuration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
-import org.infinispan.configuration.cache.FileCacheStoreConfiguration;
-import org.infinispan.configuration.cache.FileCacheStoreConfigurationBuilder;
-import org.infinispan.configuration.cache.LoadersConfigurationBuilder;
+import org.infinispan.configuration.cache.PersistenceConfiguration;
+import org.infinispan.configuration.cache.PersistenceConfigurationBuilder;
+import org.infinispan.configuration.cache.SingleFileStoreConfiguration;
+import org.infinispan.configuration.cache.SingleFileStoreConfigurationBuilder;
+import org.infinispan.configuration.cache.StoreConfiguration;
+import org.infinispan.configuration.cache.StoreConfigurationBuilder;
 import org.infinispan.eviction.EvictionStrategy;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
@@ -45,7 +46,7 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
     /**
      * The default location of a filesystem based cache loader when not provided in the xml configuration file.
      */
-    private static final String DEFAULT_FILECACHESTORE_LOCATION = "Infinispan-FileCacheStore";
+    private static final String DEFAULT_SINGLEFILESTORE_LOCATION = "Infinispan-SingleFileStore";
 
     /**
      * @param configuration the XWiki cache configuration
@@ -81,13 +82,17 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
      */
     private boolean containsIncompleteFileLoader(Configuration isconfiguration)
     {
-        for (CacheLoaderConfiguration cacheLoaderConfig : isconfiguration.loaders().cacheLoaders()) {
-            if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
-                FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
-                String location = fileCacheLoaderConfig.location();
+        PersistenceConfiguration persistenceConfiguration = isconfiguration.persistence();
 
-                // "Infinispan-FileCacheStore" is the default location...
-                if (StringUtils.isBlank(location) || location.equals(DEFAULT_FILECACHESTORE_LOCATION)) {
+        for (StoreConfiguration storeConfiguration : persistenceConfiguration.stores()) {
+            if (storeConfiguration instanceof SingleFileStoreConfiguration) {
+                SingleFileStoreConfiguration singleFileStoreConfiguration =
+                    (SingleFileStoreConfiguration) storeConfiguration;
+
+                String location = singleFileStoreConfiguration.location();
+
+                // "Infinispan-SingleFileStore" is the default location...
+                if (StringUtils.isBlank(location) || location.equals(DEFAULT_SINGLEFILESTORE_LOCATION)) {
                     return true;
                 }
             }
@@ -147,28 +152,32 @@ public class InfinispanConfigurationLoader extends AbstractCacheConfigurationLoa
         if (containsIncompleteFileLoader(configuration)) {
             builder = builder(builder, configuration);
 
-            LoadersConfigurationBuilder loadersBuilder = builder.loaders();
-            loadersBuilder.clearCacheLoaders();
+            PersistenceConfigurationBuilder persistence = builder.persistence();
 
-            for (CacheLoaderConfiguration cacheLoaderConfig : configuration.loaders().cacheLoaders()) {
-                if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
-                    FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
+            persistence.clearStores();
 
-                    FileCacheStoreConfigurationBuilder loaderBuilder =
-                        loadersBuilder.addFileCacheStore().read(fileCacheLoaderConfig);
+            for (StoreConfiguration storeConfiguration : configuration.persistence().stores()) {
+                if (storeConfiguration instanceof SingleFileStoreConfiguration) {
+                    SingleFileStoreConfiguration singleFileStoreConfiguration =
+                        (SingleFileStoreConfiguration) storeConfiguration;
 
-                    String location = fileCacheLoaderConfig.location();
-                    // "Infinispan-FileCacheStore" is the default location...
-                    if (StringUtils.isBlank(location) || location.equals(DEFAULT_FILECACHESTORE_LOCATION)) {
-                        loaderBuilder.location(createTempDir());
+                    String location = singleFileStoreConfiguration.location();
+
+                    // "Infinispan-SingleFileStore" is the default location...
+                    if (StringUtils.isBlank(location) || location.equals(DEFAULT_SINGLEFILESTORE_LOCATION)) {
+                        SingleFileStoreConfigurationBuilder singleFileStoreConfigurationBuilder =
+                            persistence.addSingleFileStore();
+                        singleFileStoreConfigurationBuilder.read(singleFileStoreConfiguration);
+                        singleFileStoreConfigurationBuilder.location(createTempDir());
                     }
                 } else {
                     // Copy the loader as it is
-                    Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >> builderClass =
-                        (Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >>) ConfigurationUtils
-                            .builderFor(cacheLoaderConfig);
-                    Builder<Object> loaderBuilder = (Builder<Object>) loadersBuilder.addLoader(builderClass);
-                    loaderBuilder.read(cacheLoaderConfig);
+                    Class<? extends StoreConfigurationBuilder<?, ?>> storeBuilderClass =
+                        (Class<? extends StoreConfigurationBuilder<?, ?>>) ConfigurationUtils
+                            .<StoreConfiguration>builderFor(storeConfiguration);
+                    Builder<StoreConfiguration> storeBuilder =
+                        (Builder<StoreConfiguration>) persistence.addStore(storeBuilderClass);
+                    storeBuilder.read(storeConfiguration);
                 }
             }
         }

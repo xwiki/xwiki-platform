@@ -21,6 +21,7 @@ package org.xwiki.lesscss.internal;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
@@ -53,8 +54,9 @@ public class LESSExportActionListenerTest
     @Test
     public void getEvents() throws Exception
     {
-        assertEquals(1, this.mocker.getComponentUnderTest().getEvents().size());
+        assertEquals(2, this.mocker.getComponentUnderTest().getEvents().size());
         assertEquals(new ActionExecutingEvent("export"), this.mocker.getComponentUnderTest().getEvents().get(0));
+        assertEquals(new ActionExecutedEvent("export"), this.mocker.getComponentUnderTest().getEvents().get(1));
     }
 
     @Test

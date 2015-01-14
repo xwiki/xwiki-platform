@@ -21,21 +21,24 @@ package org.xwiki.lesscss.internal.listeners;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
-import org.xwiki.lesscss.internal.listeners.LESSExportActionListener;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LESSExportActionListener}.
@@ -58,8 +61,9 @@ public class LESSExportActionListenerTest
     @Test
     public void getEvents() throws Exception
     {
-        assertEquals(1, this.mocker.getComponentUnderTest().getEvents().size());
+        assertEquals(2, this.mocker.getComponentUnderTest().getEvents().size());
         assertEquals(new ActionExecutingEvent("export"), this.mocker.getComponentUnderTest().getEvents().get(0));
+        assertEquals(new ActionExecutedEvent("export"), this.mocker.getComponentUnderTest().getEvents().get(1));
     }
 
     @Test

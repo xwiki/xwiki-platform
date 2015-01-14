@@ -146,4 +146,10 @@ public class EnvironmentSkin extends AbstractSkin
 
         return resourcePath;
     }
+
+    @Override
+    public String getTargetSyntaxString()
+    {                
+        return getProperties().getString("targetSyntax");
+    }
 }

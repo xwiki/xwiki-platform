@@ -19,12 +19,6 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -51,6 +45,12 @@ import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link DefaultTemplateManager}.
@@ -130,6 +130,6 @@ public class TemplateManagerTest
     {
         setTemplateContent("##!source.syntax=xwiki/2.1\nfirst line\\\\second line");
 
-        assertEquals("first line\nsecond line", mocker.getComponentUnderTest().render("template"));
+        assertEquals("<p>first line<br/>second line</p>", mocker.getComponentUnderTest().render("template"));
     }
 }

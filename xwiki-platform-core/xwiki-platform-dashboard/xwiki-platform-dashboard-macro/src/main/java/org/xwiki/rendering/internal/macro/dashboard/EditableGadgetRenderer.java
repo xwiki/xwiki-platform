@@ -25,7 +25,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -35,7 +38,7 @@ import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
  * Editable gadget renderer, that renders the gadget as in view mode, but with additional metadata that allows editing
@@ -60,7 +63,12 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
      */
     @Inject
     @Named("annotatedxhtml/1.0")
-    protected BlockRenderer gadgetContentRenderer;
+    protected BlockRenderer defaultGadgetContentRenderer;
+    
+    protected ComponentManager componentManager;
+    
+    @Inject
+    protected RenderingContext renderingContext;
 
     /**
      * @param gadget the gadget to decorate
@@ -80,6 +88,18 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
         metadataBlock.addChild(isMacroBlock);
 
         if (isMacro) {
+            // Get the renderer corresponding to the current target syntax
+            BlockRenderer gadgetContentRenderer;
+            try {
+                String targetSyntax = renderingContext.getTargetSyntax().toIdString();
+                if (!StringUtils.startsWith(targetSyntax, "annotated")) {
+                    targetSyntax = "annotated" + targetSyntax;
+                }
+                gadgetContentRenderer = componentManager.getInstance(BlockRenderer.class, targetSyntax);
+            } catch (ComponentLookupException e) {
+                gadgetContentRenderer = defaultGadgetContentRenderer;
+            }
+
             // render the annotated macro call in the page, to be able to edit it. Only the macro call comments will be
             // rendered, since transformations are not ran, so there is no content in the macro. But annotation is
             // enough.
@@ -87,7 +107,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
             renderedContentBlock.setParameter(CLASS, "content");
             WikiPrinter printer = new DefaultWikiPrinter();
             gadgetContentRenderer.render(gadget.getContent(), printer);
-            RawBlock rawBlock = new RawBlock(printer.toString(), Syntax.XHTML_1_0);
+            RawBlock rawBlock = new RawBlock(printer.toString(), renderingContext.getTargetSyntax());
             renderedContentBlock.addChild(rawBlock);
 
             // render the title in the page as well, to be edited as source

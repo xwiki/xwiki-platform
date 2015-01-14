@@ -440,6 +440,12 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/skin/Skin</className>
+              <method>org.xwiki.rendering.syntax.Syntax getTargetSyntax()</method>
+              <justification>Add a new method to this young API</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

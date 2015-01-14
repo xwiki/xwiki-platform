@@ -342,7 +342,7 @@ public class Document extends Api
      */
     public String getDisplayTitle()
     {
-        return this.doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext());
+        return this.doc.getRenderedTitle(getXWikiContext());
     }
 
     /**

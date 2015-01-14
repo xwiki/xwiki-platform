@@ -22,6 +22,8 @@ package com.xpn.xwiki.internal.skin;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
@@ -54,6 +56,12 @@ public abstract class AbstractSkin implements Skin
 
         @Override
         public String getId()
+        {
+            return null;
+        }
+
+        @Override
+        public Syntax getTargetSyntax()
         {
             return null;
         }
@@ -114,4 +122,30 @@ public abstract class AbstractSkin implements Skin
     }
 
     protected abstract Skin createParent();
+
+    @Override
+    public Syntax getTargetSyntax()
+    {
+        Syntax targetSyntax = null;
+        String targetSyntaxString = getTargetSyntaxString();
+        if (StringUtils.isNotEmpty(targetSyntaxString)) {
+            targetSyntax = this.skinManager.parseSyntax(this, targetSyntaxString);
+            if (targetSyntax != null) {
+                return targetSyntax;
+            }
+        }
+        
+        Skin parent = getParent();
+        if (parent != null) {
+            targetSyntax = parent.getTargetSyntax();
+        }
+        
+        // Fallback to the XHTML 1.0 syntax for backward compatibility
+        return targetSyntax != null ? targetSyntax : Syntax.XHTML_1_0;
+    }
+
+    /**
+     * @return the id of the syntax to use for this skin
+     */
+    protected abstract String getTargetSyntaxString();
 }

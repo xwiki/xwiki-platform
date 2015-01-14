@@ -1773,13 +1773,7 @@ public class XWiki implements EventListener
     @Deprecated
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
-        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
-
-        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
         try {
-            // Force rendering with XHTML 1.0 syntax for retro-compatibility
-            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
-
             return getTemplateManager().render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
@@ -1791,8 +1785,6 @@ public class XWiki implements EventListener
                     "Error while evaluating velocity template {0}", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
-        } finally {
-            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
@@ -3571,7 +3563,8 @@ public class XWiki implements EventListener
         context.put("idoc", includingDoc);
         context.put("sdoc", includedDoc);
         try {
-            result = includedDoc.getRenderedContent(Syntax.XHTML_1_0, false, context);
+            result = includedDoc.getRenderedContent(Utils.getComponent(RenderingContext.class).getTargetSyntax(), false,
+                context);
         } finally {
             // Remove including doc or set the previous one
             if (idoc == null) {

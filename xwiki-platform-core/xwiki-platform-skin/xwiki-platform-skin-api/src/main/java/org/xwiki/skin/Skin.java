@@ -19,11 +19,12 @@
  */
 package org.xwiki.skin;
 
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.stability.Unstable;
 
 /**
  * Represent a skin.
- * 
+ *
  * @version $Id$
  * @since 7.0M1
  */
@@ -32,4 +33,9 @@ public interface Skin extends ResourceRepository
 {
     @Override
     Skin getParent();
+
+    /**
+     * @return the syntax used by the skin
+     */
+    Syntax getTargetSyntax();
 }

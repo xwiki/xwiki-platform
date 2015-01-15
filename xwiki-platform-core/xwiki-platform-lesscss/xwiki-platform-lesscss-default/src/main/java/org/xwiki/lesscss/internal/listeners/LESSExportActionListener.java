@@ -27,7 +27,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.cache.ColorThemeCache;
@@ -54,8 +53,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class LESSExportActionListener implements EventListener
 {
-    private static final String EVENT_TO_OBSERVE = "export";
-
     @Inject
     private LESSResourcesCache lessResourcesCache;
 
@@ -80,8 +77,7 @@ public class LESSExportActionListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event>asList(new ActionExecutingEvent(EVENT_TO_OBSERVE),
-            new ActionExecutedEvent(EVENT_TO_OBSERVE));
+        return Arrays.<Event>asList(new ActionExecutingEvent("export"));
     }
 
     @Override
@@ -89,9 +85,6 @@ public class LESSExportActionListener implements EventListener
     {
         // Flush the LESS cache if we're doing an HTML export because we need that URLs located in less file be
         // recomputed (see ExportURLFactory).
-        // We also flush the cache after the export is done, to avoid having in the cache the LESS output computed for
-        // the HTML exporter. Otherwise, it would be served to other requests that have nothing to do with the HTML
-        // export (see: http://jira.xwiki.org/browse/XWIKI-11497).
         XWikiContext xcontext = (XWikiContext) data;
         XWikiRequest request = xcontext.getRequest();
         String format = request.get("format");

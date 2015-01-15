@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-application-manager</artifactId>
-    <version>6.4-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-application-manager-ui</artifactId>
   <name>XWiki Platform - Application Manager - UI</name>

@@ -36,6 +36,7 @@
     <xwiki.extension.name>Tree Widget</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <jstree.version>3.0.8</jstree.version>
   </properties>
   <dependencies>
     <dependency>
@@ -49,7 +50,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jstree</artifactId>
-      <version>3.0.8</version>
+      <version>${jstree.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -60,6 +61,23 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <!-- We don't want to duplicate the jsTree version (when jsTree is loaded from CDN). -->
+        <filtering>true</filtering>
+        <includes>
+          <include>require-config.js</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>require-config.js</exclude>
+        </excludes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>com.cj.jshintmojo</groupId>

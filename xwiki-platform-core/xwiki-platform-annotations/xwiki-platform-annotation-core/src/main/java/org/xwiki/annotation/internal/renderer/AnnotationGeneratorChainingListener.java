@@ -267,14 +267,18 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
                 if (previous != null) {
                     startIndex = previous.getKey() + 1;
                 }
-                // compute the offset inside this event wrt the start index of this event and whether this is a left
-                // bound or right bound search
-                int offset = isEnd ? index - startIndex + 1 : index - startIndex;
+                // compute the offset inside this event wrt the start index of this event
+                int offset = index - startIndex;
 
                 // adjust this offset if the content of this event was altered
                 AlteredContent alteredEventContent = alteredEventsContent.get(evt);
                 if (alteredEventContent != null) {
                     offset = alteredEventContent.getInitialOffset(offset);
+                }
+
+                // end indexes are specified after the character/position
+                if (isEnd) {
+                    offset += 1;
                 }
 
                 // return the result

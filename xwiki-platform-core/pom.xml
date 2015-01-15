@@ -381,15 +381,10 @@
               <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
               <phase>none</phase>
               <goals>
-                <goal>copy-resources</goal>
+                <goal>resources</goal>
               </goals>
               <configuration>
                 <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-                <resources>
-                  <resource>
-                    <directory>src/main/resources</directory>
-                  </resource>
-                </resources>
               </configuration>
             </execution>
           </executions>

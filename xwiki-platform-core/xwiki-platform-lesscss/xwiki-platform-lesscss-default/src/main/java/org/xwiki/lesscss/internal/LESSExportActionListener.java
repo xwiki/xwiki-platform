@@ -55,6 +55,9 @@ public class LESSExportActionListener implements EventListener
     @Inject
     private CurrentColorThemeGetter currentColorThemeGetter;
 
+    @Inject
+    private LESSContext lessContext;
+
     @Override
     public String getName()
     {
@@ -70,15 +73,13 @@ public class LESSExportActionListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Flush the LESS cache if we're doing an HTML export because we need that URLs located in less file be
+        // Do not use the the LESS cache if we're doing an HTML export because we need that URLs located in less file be
         // recomputed (see ExportURLFactory).
         XWikiContext xcontext = (XWikiContext) data;
         XWikiRequest request = xcontext.getRequest();
         String format = request.get("format");
         if ("html".equals(format)) {
-            String colorTheme = currentColorThemeGetter.getCurrentColorTheme("default");
-            this.lessSkinFileCache.clearFromColorTheme(colorTheme);
-            this.colorThemeCache.clearFromColorTheme(colorTheme);
+            lessContext.disableCache();
         }
     }
 }

@@ -10,6 +10,7 @@
 ##
 ##############################################
 #set($doNotLoadColorThemeFromCSS = true)
+#set($themeObj = '')
 #template('colorThemeInit.vm')
 #if ("$!themeObj" != '')
   #initFromOldColorTheme()

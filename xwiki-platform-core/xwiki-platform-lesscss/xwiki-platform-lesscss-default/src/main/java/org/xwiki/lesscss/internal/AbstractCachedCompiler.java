@@ -48,6 +48,9 @@ public abstract class AbstractCachedCompiler<T>
     @Inject
     private CurrentColorThemeGetter currentColorThemeGetter;
 
+    @Inject
+    private LESSContext lessContext;
+
     private Map<String, Object> mutexList = new HashMap<>();
 
     /**
@@ -74,6 +77,11 @@ public abstract class AbstractCachedCompiler<T>
      */
     public T compileFromSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
     {
+        // If the cache is disabled, we just compile
+        if (lessContext.isCacheDisabled()) {
+            return compile(fileName, skin, force);
+        }
+
         T result;
 
         String colorTheme = currentColorThemeGetter.getCurrentColorTheme("default");

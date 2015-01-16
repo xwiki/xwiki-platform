@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Éditer =
+  <content>= Mise en forme =
 
 == Paragraphes ==
 
@@ -53,7 +53,7 @@
 Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
 
 {{info}}
-En syntaxe XWiki 2.0, on tient compte des lignes nouvelles, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
+La syntaxe XWiki 2.0 tient compte des sauts de ligne, ce qui n'est pas le cas en syntaxe XWiki 1.0 où il faut insérer une double barre de fraction inversée {{{\\}}}.
 {{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
@@ -64,7 +64,7 @@ plusieurs lignes
 |Deux paragraphes|Le premier paragraphe
 \\Le deuxième paragraphe|Le premier paragraphe
 \\Le deuxième paragraphe
-|Paragraphe paramétré|&lt;p style="text-align:center;
+|Paragraphe  personnalisé|&lt;p style="text-align:center;
 color:blue"&gt;
 Paragraphe centré et bleu&lt;/p&gt;|(% style="text-align: center; color: blue;" %)
 Paragraphe centré et bleu
@@ -74,7 +74,7 @@ Paragraphe centré et bleu
 Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
 
 {{info}}
-En syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, on tient compte des lignes nouvelles, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
+La syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}} tient compte des sauts de ligne, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
 {{/info}}
 
 |=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
@@ -85,7 +85,7 @@ plusieurs lignes
 |Deux paragraphes|Le premier paragraphe
 \\Le deuxième paragraphe|Le premier paragraphe
 \\Le deuxième paragraphe
-|Paragraphe paramétré|{{{(% style="text-align:center;
+|Paragraphe personnalisé|{{{(% style="text-align:center;
 color:blue" %)}}}
 Paragraphe centré et bleu|(% style="text-align: center; color: blue;" %)
 Paragraphe centré et bleu</content>

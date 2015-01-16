@@ -79,8 +79,8 @@ public class DatabaseMailStatusResultTest
     {
         MailStatusStore store = mock(MailStatusStore.class);
         MailStatus status = new MailStatus();
-        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenReturn(
-            Arrays.asList(status));
+        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"), 0,
+            Integer.MAX_VALUE)).thenReturn(Arrays.asList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
         result.setBatchId("batchid");

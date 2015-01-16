@@ -471,17 +471,14 @@ $namespace##
     #set ($jobStatusCollapsed = false)
     #if ($jobStatus.state == 'FINISHED')
       ## Check if there are any logged errors.
-      #foreach ($log in $jobStatus.log)
-        #if ($log.level.name() == 'ERROR' && $log.throwable)
-          #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-          #if ($message.contains('not compatible'))
-            #set ($jobStatusCollapsed = true)
-            #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
-            #set ($errorMessage = "${errorMessage}<br/>")
-            #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
-            <p>#error($errorMessage)</p>
-            #break
-          #end
+      #foreach ($log in $jobStatus.log.getLogs('ERROR'))
+        #if ($log.throwable && $exceptiontool.getRootCauseMessage($log.throwable).contains('not compatible'))
+          #set ($jobStatusCollapsed = true)
+          #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
+          #set ($errorMessage = "${errorMessage}<br/>")
+          #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
+          <p>#error($errorMessage)</p>
+          #break
         #end
       #end
     #end

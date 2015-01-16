@@ -114,14 +114,16 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * Loads all message statuses matching the passed filters.
      *
      * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
      * @return the loaded {@link org.xwiki.mail.MailStatus} instances or null if not allowed or an error happens
      */
-    public List<MailStatus> load(Map<String, Object> filterMap)
+    public List<MailStatus> load(Map<String, Object> filterMap, int offset, int count)
     {
         // Only admins are allowed
         if (this.authorizationManager.hasAccess(Right.ADMIN)) {
             try {
-                return this.mailStatusStore.load(normalizeFilterMap(filterMap));
+                return this.mailStatusStore.load(normalizeFilterMap(filterMap), offset, count);
             } catch (MailStoreException e) {
                 // Save the exception for reporting through the script services's getLastError() API
                 setError(e);
@@ -167,7 +169,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
     public void delete(String batchId)
     {
         Map<String, Object> filterMap = Collections.<String, Object>singletonMap("batchId", batchId);
-        List<MailStatus> statuses = load(filterMap);
+        List<MailStatus> statuses = load(filterMap, 0, 0);
         if (statuses != null) {
             for (MailStatus status : statuses) {
                 delete(batchId, status.getMessageId());

@@ -278,7 +278,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
         LOGGER.debug("Cache: Trying to get doc {} from cache", key);
 
-        XWikiDocument cachedoc = getCache().get(key);
+        XWikiDocument cachedoc;
+        try {
+            cachedoc = getCache().get(key);
+        } catch (Exception e) {
+            LOGGER.error("Failed to get document from the cache", e);
+
+            cachedoc = null;
+        }
 
         if (cachedoc != null) {
             doc = cachedoc;

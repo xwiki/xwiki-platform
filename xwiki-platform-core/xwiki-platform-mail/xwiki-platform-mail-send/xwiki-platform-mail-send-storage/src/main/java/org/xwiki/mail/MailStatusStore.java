@@ -49,10 +49,12 @@ public interface MailStatusStore
      * Loads all message statuses matching the passed filters.
      *
      * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
      * @return the loaded {@link org.xwiki.mail.MailStatus} instances
      * @throws MailStoreException when an error occurs when loading the data
      */
-    List<MailStatus> load(Map<String, Object> filterMap) throws MailStoreException;
+    List<MailStatus> load(Map<String, Object> filterMap, int offset, int count) throws MailStoreException;
 
     /**
      * Count the number of message statuses matching the passed filters.

@@ -35,7 +35,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * Action for deleting an entire space, optionally saving all the deleted documents to the document trash, if enabled.
- * 
+ *
  * @version $Id$
  * @since 3.4M1
  */

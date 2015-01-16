@@ -210,6 +210,10 @@
   position: relative;
   z-index: 2;
 }
+/* Add a space between icons of toolbox */
+.blog-entry-toolbox .wikiinternallink {
+  margin-left: 0.4em;
+}
 /* Add a space + line between consecutive blog entries */
 .hentry + .hentry {
   border-top: 1px solid $borderColor;

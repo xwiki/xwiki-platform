@@ -50,13 +50,13 @@ public class StyleFilter extends RegexTokenFilter
     @Override
     public void setInitialContext(InitialRenderContext context)
     {
-        macros = MacroRepository.getInstance();
-        macros.setInitialContext(context);
+        this.macros = MacroRepository.getInstance();
+        this.macros.setInitialContext(context);
     }
 
     protected Repository getMacroRepository()
     {
-        return macros;
+        return this.macros;
     }
 
     @Override

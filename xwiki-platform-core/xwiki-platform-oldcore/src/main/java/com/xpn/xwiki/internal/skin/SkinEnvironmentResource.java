@@ -34,12 +34,12 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 public class SkinEnvironmentResource extends AbstractEnvironmentResource
 {
-    public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository, Environment environment,
-        Provider<XWikiContext> xcontextProvider)
+    public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository,
+        Environment environment, Provider<XWikiContext> xcontextProvider)
     {
         super(path, resourceName, repository, environment, xcontextProvider);
     }
-    
+
     @Override
     public String getURL(boolean forceSkinAction) throws Exception
     {

@@ -26,7 +26,7 @@ package com.xpn.xwiki.store;
  * from Databases. However it happens that Hibernate doesn't support setting Catalogs on some databases and instead we
  * need to use our own tricks to do that and these tricks depend on the database. Hence the need to differentiate them
  * and hence the need for this class.
- * 
+ *
  * @version $Id$
  */
 public final class DatabaseProduct
@@ -91,7 +91,7 @@ public final class DatabaseProduct
 
     /**
      * Private constructor to prevent instantiations.
-     * 
+     *
      * @param productName the database product name as returned by
      *            {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
      */
@@ -125,7 +125,7 @@ public final class DatabaseProduct
 
     /**
      * Transform a product name represented as a string into a {@link DatabaseProduct} object.
-     * 
+     *
      * @param productNameAsString the string to transform
      * @return the {@link DatabaseProduct} object
      */

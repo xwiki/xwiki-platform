@@ -41,14 +41,14 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for all stored statistics object.
- * 
+ *
  * @version $Id$
  */
 public class XWikiStats extends BaseCollection
 {
     /**
      * The properties of statistics object.
-     * 
+     *
      * @version $Id$
      */
     public enum Property
@@ -149,7 +149,8 @@ public class XWikiStats extends BaseCollection
     }
 
     @Override
-    protected String getLocalKey() {
+    protected String getLocalKey()
+    {
         StringBuilder sb = new StringBuilder(64);
 
         // The R40000XWIKI6990DataMigration use a stubbed class to provide the above two values. If the ids depends
@@ -159,7 +160,7 @@ public class XWikiStats extends BaseCollection
 
         if (!StringUtils.isEmpty(name)) {
             // TODO: Refactor to get the original reference and fix the confusion when a space contains escaped chars
-            EntityReference ref = resolver.resolve(name, EntityType.DOCUMENT);
+            EntityReference ref = this.resolver.resolve(name, EntityType.DOCUMENT);
             if (ref.getName().equals(name)) {
                 ref = new EntityReference(name, EntityType.SPACE);
             }
@@ -173,10 +174,10 @@ public class XWikiStats extends BaseCollection
             String str = Integer.toString(nb);
             sb.append(str.length()).append(':').append(str);
         }
-        
+
         return sb.toString();
     }
-    
+
     // Satisfy checkstyle !
     @Override
     public int hashCode()
@@ -227,7 +228,7 @@ public class XWikiStats extends BaseCollection
         el.addText(getClassName());
         oel.add(el);
 
-        for (Iterator< ? > it = getFieldList().iterator(); it.hasNext();) {
+        for (Iterator<?> it = getFieldList().iterator(); it.hasNext();) {
             Element pel = new DOMElement(XMLNODE_PROPERTY);
             PropertyInterface bprop = (PropertyInterface) it.next();
             pel.add(bprop.toXML());
@@ -239,7 +240,7 @@ public class XWikiStats extends BaseCollection
 
     /**
      * Initialize statistics object from XML schema.
-     * 
+     *
      * @param oel the XML root node containing statistics datas.
      * @throws XWikiException error when parsing XML schema.
      */
@@ -253,7 +254,7 @@ public class XWikiStats extends BaseCollection
         }
 
         setName(oel.element(XMLNODE_NAME).getText());
-        List< ? > list = oel.elements(XMLNODE_PROPERTY);
+        List<?> list = oel.elements(XMLNODE_PROPERTY);
         for (int i = 0; i < list.size(); i++) {
             Element pcel = (Element) ((Element) list.get(i)).elements().get(0);
             String name = pcel.getName();

@@ -38,11 +38,6 @@ import com.google.common.collect.ImmutableBiMap.Builder;
 public class JCacheConfigurationLoader extends AbstractCacheConfigurationLoader
 {
     /**
-     * The default location of a filesystem based cache loader when not provided in the xml configuration file.
-     */
-    private static final String DEFAULT_FILECACHESTORE_LOCATION = "JCache-FileCacheStore";
-
-    /**
      * @param configuration the XWiki cache configuration
      */
     public JCacheConfigurationLoader(CacheConfiguration configuration)
@@ -56,17 +51,7 @@ public class JCacheConfigurationLoader extends AbstractCacheConfigurationLoader
      */
     private boolean containsIncompleteFileLoader(Configuration isconfiguration)
     {
-        for (CacheLoaderConfiguration cacheLoaderConfig : isconfiguration.loaders().cacheLoaders()) {
-            if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
-                FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
-                String location = fileCacheLoaderConfig.location();
-
-                // "JCache-FileCacheStore" is the default location...
-                if (StringUtils.isBlank(location) || location.equals(DEFAULT_FILECACHESTORE_LOCATION)) {
-                    return true;
-                }
-            }
-        }
+        // TODO
 
         return false;
     }
@@ -122,16 +107,12 @@ public class JCacheConfigurationLoader extends AbstractCacheConfigurationLoader
         if (containsIncompleteFileLoader(configuration)) {
             builder = builder(builder, configuration);
 
-            LoadersConfigurationBuilder loadersBuilder = builder.loaders();
-            loadersBuilder.clearCacheLoaders();
+            PersistenceConfigurationBuilder persistence = builder.persistence();
 
-            for (CacheLoaderConfiguration cacheLoaderConfig : configuration.loaders().cacheLoaders()) {
-                if (cacheLoaderConfig instanceof FileCacheStoreConfiguration) {
-                    FileCacheStoreConfiguration fileCacheLoaderConfig = (FileCacheStoreConfiguration) cacheLoaderConfig;
+            persistence.clearStores();
 
-                    FileCacheStoreConfigurationBuilder loaderBuilder =
-                        loadersBuilder.addFileCacheStore().read(fileCacheLoaderConfig);
-
+            for (StoreConfiguration storeConfiguration : configuration.persistence().stores()) {
+                if (storeConfiguration instanceof SingleFileStoreConfiguration) {
                     String location = fileCacheLoaderConfig.location();
                     // "JCache-FileCacheStore" is the default location...
                     if (StringUtils.isBlank(location) || location.equals(DEFAULT_FILECACHESTORE_LOCATION)) {
@@ -139,11 +120,12 @@ public class JCacheConfigurationLoader extends AbstractCacheConfigurationLoader
                     }
                 } else {
                     // Copy the loader as it is
-                    Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >> builderClass =
-                        (Class< ? extends CacheLoaderConfigurationBuilder< ? , ? >>) ConfigurationUtils
-                            .builderFor(cacheLoaderConfig);
-                    Builder<Object> loaderBuilder = (Builder<Object>) loadersBuilder.addLoader(builderClass);
-                    loaderBuilder.read(cacheLoaderConfig);
+                    Class<? extends StoreConfigurationBuilder<?, ?>> storeBuilderClass =
+                        (Class<? extends StoreConfigurationBuilder<?, ?>>) ConfigurationUtils
+                            .<StoreConfiguration>builderFor(storeConfiguration);
+                    Builder<StoreConfiguration> storeBuilder =
+                        (Builder<StoreConfiguration>) persistence.addStore(storeBuilderClass);
+                    storeBuilder.read(storeConfiguration);
                 }
             }
         }

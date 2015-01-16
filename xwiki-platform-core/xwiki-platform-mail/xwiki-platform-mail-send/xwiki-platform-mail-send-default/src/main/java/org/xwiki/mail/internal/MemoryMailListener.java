@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.internet.MimeMessage;
@@ -49,21 +51,21 @@ public class MemoryMailListener implements MailListener
     private MemoryMailStatusResult mailStatusResult = new MemoryMailStatusResult();
 
     @Override
-    public void onPrepare(MimeMessage message)
+    public void onPrepare(MimeMessage message, Map<String, Object> parameters)
     {
         MailStatus status = new MailStatus(message, MailState.READY);
         this.mailStatusResult.setStatus(status);
     }
 
     @Override
-    public void onSuccess(MimeMessage message)
+    public void onSuccess(MimeMessage message, Map<String, Object> parameters)
     {
         MailStatus status = new MailStatus(message, MailState.SENT);
         this.mailStatusResult.setStatus(status);
     }
 
     @Override
-    public void onError(MimeMessage message, Exception e)
+    public void onError(MimeMessage message, Exception e, Map<String, Object> parameters)
     {
         MailStatus status = new MailStatus(message, MailState.FAILED);
         status.setError(e);

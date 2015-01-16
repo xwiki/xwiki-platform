@@ -53,10 +53,11 @@ public class UseMacro extends BaseLocaleMacro
         String snb = params.get("nb", 1);
 
         // We find the corresponding object
-        if (snb != null)
+        if (snb != null) {
             obj = doc.getObject(classname, Integer.parseInt(snb));
-        else
+        } else {
             obj = doc.getObject(classname);
+        }
 
         // We assign this object as the used object
         // Future calls to doc.display() or {field} will make use of this object

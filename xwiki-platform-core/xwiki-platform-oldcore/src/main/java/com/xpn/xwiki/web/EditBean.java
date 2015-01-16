@@ -25,15 +25,14 @@ public class EditBean
 {
     // ---- Fields ------------------------------------------------------
     private XWikiDocument xWikiDoc;
-    
 
     // ---- Accessor Methods --------------------------------------------
-    
+
     public XWikiDocument getXWikiDoc()
     {
         return this.xWikiDoc;
     }
-    
+
     public void setXWikiDoc(XWikiDocument xWikiDoc)
     {
         this.xWikiDoc = xWikiDoc;
@@ -63,7 +62,3 @@ public class EditBean
     } 
     */
 }
-
-
-
-

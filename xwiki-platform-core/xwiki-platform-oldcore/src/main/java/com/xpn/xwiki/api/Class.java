@@ -44,7 +44,7 @@ public class Class extends Collection
 
     /**
      * Returns a String table of the property names.
-     * 
+     *
      * @see com.xpn.xwiki.api.Collection#getPropertyNames()
      */
     @Override
@@ -64,7 +64,7 @@ public class Class extends Collection
 
     /**
      * Get the names of the class properties that are enabled.
-     * 
+     *
      * @return a list of enabled property names
      * @see #getEnabledProperties()
      * @see PropertyClass#isDisabled()
@@ -84,7 +84,7 @@ public class Class extends Collection
 
     /**
      * Get the names of the class properties that are disabled.
-     * 
+     *
      * @return a list of disabled property names
      * @see #getDisabledProperties()
      * @see PropertyClass#isDisabled()
@@ -106,7 +106,7 @@ public class Class extends Collection
      * Get the names of the class properties that are disabled, and exist in the given object. This list is a subset of
      * all the disabled properties in a class, since the object could have been created and stored before some of the
      * class properties were added.
-     * 
+     *
      * @param object the instance of this class where the disabled properties must exist
      * @return a list of disabled property names
      * @see #getDisabledObjectProperties(Object)
@@ -130,7 +130,7 @@ public class Class extends Collection
      * Get the names of deprecated properties of the given object compared to the class. A deprecated property is a
      * property which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of
      * existing or imported Objects with respect to the modifications of their associated Class.
-     * 
+     *
      * @param object the instance of this class where to look for undefined properties
      * @return a list of deprecated property names
      * @see #getDeprecatedObjectProperties(Object)
@@ -170,7 +170,7 @@ public class Class extends Collection
 
     /**
      * Get the list of enabled (the default, normal state) property definitions that exist in this class.
-     * 
+     *
      * @return a list containing the enabled properties of the class
      * @see PropertyClass#isDisabled()
      * @see #getEnabledPropertyNames()
@@ -192,7 +192,7 @@ public class Class extends Collection
 
     /**
      * Get the list of disabled property definitions that exist in this class.
-     * 
+     *
      * @return a list containing the disabled properties of the class
      * @see PropertyClass#isDisabled()
      * @see #getDisabledPropertyNames()
@@ -216,7 +216,7 @@ public class Class extends Collection
      * Get the list of disabled properties that exist in a given object. This list is a subset of all the disabled
      * properties in a class, since the object could have been created and stored before some of the class properties
      * were added.
-     * 
+     *
      * @param object the instance of this class where the disabled properties must exist
      * @return a list containing the disabled properties of the given object
      * @see PropertyClass#isDisabled()
@@ -240,7 +240,7 @@ public class Class extends Collection
      * Retrieves deprecated properties of the given object compared to the class. A deprecated property is a property
      * which exists in the Object but doesn't exist anymore in the Class. This is used for synchronization of existing
      * or imported Objects with respect to the modifications of their associated Class.
-     * 
+     *
      * @param object the instance of this class where to look for undefined properties
      * @return a list containing the properties of the object which don't exist in the class
      * @see #getDeprecatedObjectPropertyNames(Object)

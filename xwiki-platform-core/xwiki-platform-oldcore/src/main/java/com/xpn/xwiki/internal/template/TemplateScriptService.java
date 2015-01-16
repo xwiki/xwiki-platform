@@ -28,7 +28,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Internal helper to manipulate wiki based templates from scripts.
- * 
+ *
  * @version $Id$
  * @since 6.2M1
  */
@@ -44,7 +44,7 @@ public class TemplateScriptService implements ScriptService
      * Execute and render passed template.
      * <p>
      * The current transformation id is used.
-     * 
+     *
      * @param template the template name
      * @return the result of the template execution and rendering
      */
@@ -57,7 +57,7 @@ public class TemplateScriptService implements ScriptService
      * Execute the passed template.
      * <p>
      * The current transformation id is used.
-     * 
+     *
      * @param template the template name
      */
     public void execute(String template) throws Exception

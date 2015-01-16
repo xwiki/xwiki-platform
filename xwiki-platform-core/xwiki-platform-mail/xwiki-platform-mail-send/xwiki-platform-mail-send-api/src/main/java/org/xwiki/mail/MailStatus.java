@@ -74,8 +74,13 @@ public class MailStatus
 
     /*
      * @see #getErrorDescription()
-    */
+     */
     private String errorDescription;
+
+    /*
+     * @see #getWiki()
+     */
+    private String wiki;
 
     /**
      * Default constructor used by Hibernate to load an instance from the Database.
@@ -283,8 +288,28 @@ public class MailStatus
      */
     public void setError(Exception exception)
     {
-        this.errorSummary = exception.getMessage();
+        this.errorSummary = ExceptionUtils.getRootCauseMessage(exception);
         this.errorDescription  = ExceptionUtils.getStackTrace(exception);
+    }
+
+    /**
+     * Used by Hibernate to save that property to the database.
+     *
+     * @return the wiki in which the message is trying to be sent (can be null, in which case it means the main wiki)
+     */
+    public String getWiki()
+    {
+        return this.wiki;
+    }
+
+    /**
+     * Used by Hibernate to load that property from the database.
+     *
+     * @param wiki see {@link #getWiki()()}
+     */
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
     }
 
     @Override
@@ -304,6 +329,9 @@ public class MailStatus
         }
         if (getErrorDescription() != null) {
             builder.append("errorDescription", getErrorDescription());
+        }
+        if (getWiki() != null) {
+            builder.append("wiki", getWiki());
         }
         return builder.toString();
     }

@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Interface for RecycleBin feature (XWIKI-543) store system.
- * 
+ *
  * @version $Id$
  * @since 1.2M1
  */
@@ -39,7 +39,7 @@ public interface XWikiRecycleBinStoreInterface
 {
     /**
      * Save document to recycle bin.
-     * 
+     *
      * @param doc - document to save
      * @param deleter - the user which delete document
      * @param date - date of delete action
@@ -84,7 +84,7 @@ public interface XWikiRecycleBinStoreInterface
 
     /**
      * Permanently delete document from recycle bin.
-     * 
+     *
      * @param doc - document to delete
      * @param index - which instance document in recycle bin to delete
      * @param context - used for environment

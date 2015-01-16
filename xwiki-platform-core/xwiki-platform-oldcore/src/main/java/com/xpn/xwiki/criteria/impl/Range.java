@@ -41,7 +41,7 @@ public class Range
 
     /**
      * Creates a new interval having the specified start and size.
-     * 
+     *
      * @param start The start of the interval
      * @param size The size of the interval
      */
@@ -95,7 +95,7 @@ public class Range
      * <li>Range 2 / -4 -> will return [0, 1] (not enough elements for the given size)</li>
      * <li>Range 0 / -4 -> will return [5, 6, 7, 8]</li>
      * </ul>
-     * 
+     *
      * @param list the list from which the sublist will be extracted
      * @return a sublist of the given list computed from this range
      */

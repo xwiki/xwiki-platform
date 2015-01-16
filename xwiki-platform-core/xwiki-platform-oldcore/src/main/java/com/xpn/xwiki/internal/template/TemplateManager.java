@@ -85,7 +85,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Internal toolkit to experiment on wiki bases templates.
- * 
+ *
  * @version $Id$
  * @since 6.3M2
  */
@@ -285,10 +285,10 @@ public class TemplateManager
             }
 
             try {
-                beanManager.populate(this, properties);
+                TemplateManager.this.beanManager.populate(this, properties);
             } catch (PropertyException e) {
                 // Should never happen
-                logger.error("Failed to populate properties of template", e);
+                TemplateManager.this.logger.error("Failed to populate properties of template", e);
             }
 
             // The default is xhtml to support old templates
@@ -336,7 +336,7 @@ public class TemplateManager
          * {@inheritDoc}
          * <p>
          * Allow filesystem template to indicate the user to executed them with.
-         * 
+         *
          * @see #setAuthorReference(DocumentReference)
          */
         @Override
@@ -347,7 +347,7 @@ public class TemplateManager
 
         /**
          * Made public to be seen as bean property.
-         * 
+         *
          * @since 6.3.1, 6.4M1
          */
         @SuppressWarnings("unused")
@@ -358,7 +358,7 @@ public class TemplateManager
 
         /**
          * Made public to be seen as bean property.
-         * 
+         *
          * @since 6.3.1, 6.4M1
          */
         @SuppressWarnings("unused")

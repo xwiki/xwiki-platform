@@ -31,7 +31,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * See http://www.graphviz.org/doc/info/lang.html for the dot language specification. See
  * http://www.graphviz.org/doc/info/output.html for the possible output formats
  * </p>
- * 
+ *
  * @deprecated the plugin technology is deprecated
  * @version $Id$
  */
@@ -40,7 +40,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 {
     /**
      * Default plugin API constructor.
-     * 
+     *
      * @param plugin the wrapped plugin instance
      * @param context the current request context
      */
@@ -51,7 +51,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Return the inner plugin object, if the user has the required programming rights.
-     * 
+     *
      * @return The wrapped plugin object.
      */
     public GraphVizPlugin getPlugin()
@@ -61,7 +61,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz and return the content of the resulting image (PNG format).
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @return the content of the generated image
@@ -74,7 +74,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz and return the content of the resulting image (PNG format).
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -88,7 +88,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz and returns the URL for the produced file, a PNG image.
-     * 
+     *
      * @param content the dot source
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @return the URL which can be used to access the generated image
@@ -102,7 +102,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
     /**
      * Executes GraphViz, writes the resulting image (PNG format) in a temporary file on disk, and returns the filename
      * which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @return the name of the file where the generated output is stored
@@ -116,7 +116,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
     /**
      * Executes GraphViz, writes the resulting image (in the requested format) in a temporary file on disk, and returns
      * the filename which can be later used in {@link #outputDotImageFromFile(String, XWikiContext)}.
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -130,7 +130,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz and writes the resulting image (PNG format) into the response.
-     * 
+     *
      * @param content the dot source code
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
      * @throws IOException if writing the input or output files to the disk fails, or if writing the response body fails
@@ -142,7 +142,7 @@ public class GraphVizPluginApi extends PluginApi<GraphVizPlugin>
 
     /**
      * Executes GraphViz and writes the resulting image (in the requested format) into the response.
-     * 
+     *
      * @param content the dot source code
      * @param extension the output file extension
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}

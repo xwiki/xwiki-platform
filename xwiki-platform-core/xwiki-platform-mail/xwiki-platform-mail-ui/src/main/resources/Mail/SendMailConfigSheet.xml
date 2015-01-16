@@ -107,7 +107,7 @@
 ## Step 1: Display form
 ## =======================================================
 #set ($params = {
-  'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties']
+  'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties', 'sendWaitTime']
 })
 #set ($paramDoc = $configDoc)
 #set ($paramClass = $configClassName)

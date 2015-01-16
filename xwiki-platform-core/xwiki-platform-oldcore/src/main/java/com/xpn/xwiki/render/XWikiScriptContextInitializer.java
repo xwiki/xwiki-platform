@@ -43,7 +43,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * Inject in the {@link ScriptContext} the XWiki context and the {@link XWiki} instance for backward compatibility.
  * <p>
  * Bridge. To be removed later.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -86,7 +86,9 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
                 ScriptContext.ENGINE_SCOPE);
 
             // Make deprecated XWiki message tool available from scripts
-            scriptContext.setAttribute("msg", new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class)), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("msg",
+                new XWikiMessageTool(Utils.getComponent(ContextualLocalizationManager.class)),
+                ScriptContext.ENGINE_SCOPE);
         }
 
         if (xcontext.getDoc() != null) {
@@ -95,7 +97,7 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
             try {
                 translatedDocument = apiDocument.getTranslatedDocument();
             } catch (XWikiException e) {
-                logger.warn("Failed to retrieve the translated document for [{}]. "
+                this.logger.warn("Failed to retrieve the translated document for [{}]. "
                     + "Continue using the default translation.", apiDocument.getFullName(), e);
             }
             scriptContext.setAttribute("doc", apiDocument, ScriptContext.ENGINE_SCOPE);

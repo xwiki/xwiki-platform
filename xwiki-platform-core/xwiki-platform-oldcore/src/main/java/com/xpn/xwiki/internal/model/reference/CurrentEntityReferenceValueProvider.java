@@ -45,7 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * reference (or if it was empty). If the current document reference is not defined then the default page value is used
  * instead.</li>
  * </ul>
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

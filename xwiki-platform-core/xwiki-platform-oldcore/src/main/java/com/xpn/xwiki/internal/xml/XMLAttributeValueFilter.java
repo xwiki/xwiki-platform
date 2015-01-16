@@ -26,7 +26,7 @@ import org.apache.ecs.filter.CharacterFilter;
  * {@link org.xwiki.xml.XMLUtils#escape(Object)}.
  * <p>
  * Fixes the encoding of the apostrophe character which by default is replaced with a left single quote..
- * 
+ *
  * @version $Id$
  * @since 4.3M2
  */

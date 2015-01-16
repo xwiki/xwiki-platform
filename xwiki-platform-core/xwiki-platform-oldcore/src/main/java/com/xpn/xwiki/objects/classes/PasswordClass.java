@@ -188,7 +188,7 @@ public class PasswordClass extends StringClass
      * Transforms a plain text password so that it has the same encryption as a password stored in the database. The
      * current configuration for this password XProperty cannot be used, as the user might have a different encryption
      * mechanism (for example, if the user was imported, or the password was not yet upgraded).
-     * 
+     *
      * @param storedPassword The stored password, which gives the storage type and algorithm.
      * @param plainPassword The plain text password to be encrypted.
      * @return The input password, encrypted with the same mechanism as the stored password.
@@ -289,8 +289,8 @@ public class PasswordClass extends StringClass
                 sb.append(SEPARATOR);
             }
             // The actual password hash.
-            for (int j = 0; j < digest.length; ++j) {
-                int b = digest[j] & 0xFF;
+            for (byte element : digest) {
+                int b = element & 0xFF;
                 if (b < 0x10) {
                     sb.append('0');
                 }
@@ -313,8 +313,7 @@ public class PasswordClass extends StringClass
         SecureRandom random = new SecureRandom();
         byte bytes[] = new byte[32];
         random.nextBytes(bytes);
-        for (int i = 0; i < bytes.length; i++) {
-            byte temp = bytes[i];
+        for (byte temp : bytes) {
             String s = Integer.toHexString(new Byte(temp));
             while (s.length() < 2) {
                 s = "0" + s;

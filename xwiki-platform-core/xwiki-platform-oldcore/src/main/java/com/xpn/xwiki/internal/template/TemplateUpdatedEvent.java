@@ -21,7 +21,7 @@ package com.xpn.xwiki.internal.template;
 
 /**
  * Fired when a template is modified.
- * 
+ *
  * @version $Id$
  * @since 6.4M1
  */

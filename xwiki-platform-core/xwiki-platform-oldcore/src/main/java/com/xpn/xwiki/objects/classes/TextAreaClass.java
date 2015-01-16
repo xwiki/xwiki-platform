@@ -235,7 +235,7 @@ public class TextAreaClass extends StringClass
 
     /**
      * Renders the given content without programming rights, in the context of the current document.
-     * 
+     *
      * @param content the content to be rendered
      * @param syntax the syntax of the given content
      * @param context the XWiki context, used to access the context document

@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.render;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class XWikiVirtualMacro
 {
@@ -50,8 +50,8 @@ public class XWikiVirtualMacro
         if (map.length != 2) {
             String[] aparams = StringUtils.split(map[2], ",");
             if (aparams.length > 0) {
-                for (int i = 0; i < aparams.length; i++) {
-                    String[] param = StringUtils.split(aparams[i], "|");
+                for (String aparam : aparams) {
+                    String[] param = StringUtils.split(aparam, "|");
                     String pname = param[0];
                     this.params.add(pname);
                     if (param.length > 1) {

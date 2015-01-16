@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 @Role
 public interface XWikiRenderingEngine

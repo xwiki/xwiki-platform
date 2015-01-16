@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +32,7 @@ import javax.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import org.apache.commons.collections.EnumerationUtils;
+import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -43,7 +44,7 @@ import org.xwiki.properties.ConverterManager;
 
 /**
  * Looks for configuration data in {@code /WEB-INF/xwiki.cfg}.
- * 
+ *
  * @version $Id$
  * @since 6.1M2
  */
@@ -195,7 +196,7 @@ public class XWikiCfgConfigurationSource implements ConfigurationSource, Initial
     @Override
     public List<String> getKeys()
     {
-        return EnumerationUtils.toList(this.properties.propertyNames());
+        return EnumerationUtils.toList((Enumeration<String>) this.properties.propertyNames());
     }
 
     @Override

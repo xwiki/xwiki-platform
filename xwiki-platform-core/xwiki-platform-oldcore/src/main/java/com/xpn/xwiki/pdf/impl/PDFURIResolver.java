@@ -67,7 +67,7 @@ public class PDFURIResolver implements URIResolver
 
     /**
      * @param context the XWiki Context from where we try to find the attachment map saved in the {@link PdfURLFactory}
-     *        earlier on
+     *            earlier on
      */
     public PDFURIResolver(XWikiContext context)
     {

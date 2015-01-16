@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * was chosen as the dispatcher. Currently this functionality is deprecated and maintained only for backwards
  * compatibility with older skins, since a cleaner dispatcher was implemented in {@link ActionFilter}.
  * </p>
- * 
+ *
  * @version $Id$
  */
 public class PreviewAction extends EditAction
@@ -53,7 +53,7 @@ public class PreviewAction extends EditAction
     /**
      * Check if a certain action was selected by the user. This is needed in older skins, which don't make use of the
      * {@link ActionFilter}'s dispatcher functionality, but rely on detecting the submit button that was clicked.
-     * 
+     *
      * @param action the request parameter value that should be tested
      * @return {@code true} if the value is a non-empty string, {@code false} otherwise
      */

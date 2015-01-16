@@ -37,6 +37,8 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,12 +48,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
-
 /**
  * Create document action.
- * 
+ *
  * @version $Id$
  * @since 2.4M2
  */
@@ -191,16 +190,16 @@ public class CreateAction extends XWikiAction
             SpaceReference spaceReference = newDocRef.getLastSpaceReference();
             AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
             if (!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)) {
-                Object[] args = {spaceReference.toString(), context.getUser()};
+                Object[] args = { spaceReference.toString(), context.getUser() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "The creation of a document into the space {0} has been denied to user {1}", null, args);
+                    "The creation of a document into the space {0} has been denied to user {1}", null, args);
             }
 
             XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {
-                Object[] args = {space, page};
+                Object[] args = { space, page };
                 XWikiException documentAlreadyExists =
                     new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
@@ -219,7 +218,7 @@ public class CreateAction extends XWikiAction
      * Checks if a document is empty, that is, if a document with that name could be created from a template. <br />
      * TODO: move this function to a more accessible place, to be used by the readFromTemplate method as well, so that
      * we have consistency.
-     * 
+     *
      * @param document the document to check
      * @return {@code true} if the document is empty (i.e. a document with the same name can be created (from
      *         template)), {@code false} otherwise
@@ -259,7 +258,7 @@ public class CreateAction extends XWikiAction
     {
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
-        // If no parent parameter was passed, use the current document if we're creating a new page, use the Main 
+        // If no parent parameter was passed, use the current document if we're creating a new page, use the Main
         // space's WebHome if we're creating a new space. Also don't set current document as parent if it's a new doc
         String parent = request.getParameter("parent");
         if (StringUtils.isEmpty(parent)) {
@@ -375,7 +374,7 @@ public class CreateAction extends XWikiAction
     /**
      * Verifies if the creation inside space {@code space} is allowed by the template provider described by
      * {@code templateProvider}. If the creation is not allowed, an exception will be set on the context.
-     * 
+     *
      * @param space the space to create page in
      * @param page the page to create
      * @param templateProvider the template provider to use for the creation
@@ -393,7 +392,7 @@ public class CreateAction extends XWikiAction
             // if there is no allowed spaces set, all spaces are allowed
             if (allowedSpaces.size() > 0 && !allowedSpaces.contains(space)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = {templateProvider.getStringValue(TEMPLATE), space, page};
+                Object[] args = { templateProvider.getStringValue(TEMPLATE), space, page };
                 XWikiException exception =
                     new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
@@ -453,7 +452,7 @@ public class CreateAction extends XWikiAction
 
     /**
      * Actually executes the create, after all preconditions have been verified.
-     * 
+     *
      * @param context the context of this action
      * @param newDocument the document to be created
      * @param isSpace whether the document is a space webhome or a page
@@ -490,7 +489,7 @@ public class CreateAction extends XWikiAction
             newDocument.readFromTemplate(templateReference, context);
             if (!StringUtils.isEmpty(parent)) {
                 DocumentReference parentReference = resolver.resolve(parent);
-                newDocument.setParentReference((EntityReference) parentReference);
+                newDocument.setParentReference(parentReference);
             }
             if (title != null) {
                 newDocument.setTitle(title);

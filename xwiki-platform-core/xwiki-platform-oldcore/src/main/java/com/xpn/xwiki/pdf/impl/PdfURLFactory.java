@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  * Computes Image and Link URLs for attachments by using an absolute URLs but stores a Map in the XWiki Context to
  * associate attachment URLs to Attachment Entity References so that when executing a PDF export the custom URI Resolver
  * we use can stream image attachment content so that they are embedded in the PDF.
- * 
+ *
  * @version $Id$
  */
 public class PdfURLFactory extends FileSystemURLFactory
@@ -53,6 +53,7 @@ public class PdfURLFactory extends FileSystemURLFactory
 
     /**
      * Key used to save image attachment data.
+     *
      * @see #saveAttachmentReference(java.net.URL, String, String, String, String, com.xpn.xwiki.XWikiContext)
      */
     static final String PDF_EXPORT_CONTEXT_KEY = "pdfExportImageURLMap";

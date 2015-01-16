@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Realization of {@link XWikiRecycleBinStoreInterface} for Hibernate store.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -60,7 +60,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 
         /**
          * Creates a new call-back for the given document.
-         * 
+         *
          * @param document the document whose deleted versions you want to retrieve from the recycle bin store
          */
         public DeletedDocumentsHibernateCallback(XWikiDocument document)
@@ -72,12 +72,12 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
         {
             Criteria c = session.createCriteria(XWikiDeletedDocument.class);
-            c.add(Restrictions.eq("fullName", document.getFullName()));
+            c.add(Restrictions.eq("fullName", this.document.getFullName()));
 
             // Note: We need to support databases who treats empty strings as NULL like Oracle. For those checking
             // for equality when the string is empty is not going to work and thus we need to handle the special
             // empty case separately.
-            String language = document.getLanguage();
+            String language = this.document.getLanguage();
             if (StringUtils.isEmpty(language)) {
                 c.add(Restrictions.or(Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""),
                     Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));

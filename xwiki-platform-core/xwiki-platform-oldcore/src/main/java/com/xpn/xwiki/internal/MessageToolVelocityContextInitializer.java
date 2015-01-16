@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Puts the {@code $msg} variable in the context.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -51,7 +51,7 @@ public class MessageToolVelocityContextInitializer implements VelocityContextIni
     @Override
     public void initialize(VelocityContext context)
     {
-        XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
         if (xcontext == null || xcontext.getWiki() == null) {
             // Nothing we can do yet, incomplete context
             return;

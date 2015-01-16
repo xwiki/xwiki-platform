@@ -21,7 +21,7 @@ package com.xpn.xwiki.internal.event;
 
 /**
  * Event related to XWiki object property.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */

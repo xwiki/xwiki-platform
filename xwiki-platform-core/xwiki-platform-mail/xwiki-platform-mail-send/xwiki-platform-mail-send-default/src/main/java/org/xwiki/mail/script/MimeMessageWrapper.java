@@ -195,6 +195,17 @@ public class MimeMessageWrapper extends MimeMessage
         }
     }
 
+    /**
+     * Specifies what type of email is being sent. This is useful for applications to sepcify a type when they send
+     * mail. This allows (for example) to filter these emails in the Mail Sender Status Admin UI.
+     *
+     * @param mailType the type of mail being sent (e.g "Watchlist", "Reset Password", "Send Page by Mail", etc)
+     */
+    public void setType(String mailType)
+    {
+        addHeader("X-MailType", mailType);
+    }
+
     private void setError(Exception e)
     {
         this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);

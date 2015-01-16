@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 
 /**
  * Defines the meta properties of a access rights levels XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

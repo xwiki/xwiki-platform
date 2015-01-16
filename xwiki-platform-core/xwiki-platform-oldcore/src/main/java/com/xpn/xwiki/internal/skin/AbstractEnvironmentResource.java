@@ -48,7 +48,7 @@ public abstract class AbstractEnvironmentResource extends AbstractResource<Input
     @Override
     public InputSource getInputSource()
     {
-        InputStream inputStream = environment.getResourceAsStream(getPath());
+        InputStream inputStream = this.environment.getResourceAsStream(getPath());
         if (inputStream != null) {
             return new DefaultInputStreamInputSource(inputStream, true);
         }

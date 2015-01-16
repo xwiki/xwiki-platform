@@ -38,7 +38,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.
- * 
+ *
  * @version $Id$
  * @since 2.0M4
  */

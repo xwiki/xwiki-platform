@@ -63,7 +63,7 @@ public class EscapeFilter extends LocaleRegexTokenFilter implements CacheFilter
     @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
-        buffer.append(handleMatch(result, context));                    
+        buffer.append(handleMatch(result, context));
     }
 
     public String handleMatch(MatchResult result, FilterContext context)

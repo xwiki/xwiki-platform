@@ -46,11 +46,10 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions (when the state
- * says "full" the isdiff column in the database should be false).
- *
- * Note: This data migration should only be executed if the R4359XWIKI1459 one has already been executed (i.e. if the
- * database is in version >= 4360). This is because it fixes a bug in R4359XWIKI1459 which has now been fixed.
+ * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions (when the state says
+ * "full" the isdiff column in the database should be false). Note: This data migration should only be executed if the
+ * R4359XWIKI1459 one has already been executed (i.e. if the database is in version >= 4360). This is because it fixes a
+ * bug in R4359XWIKI1459 which has now been fixed.
  *
  * @version $Id$
  */
@@ -90,7 +89,7 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
     private XWikiHibernateVersioningStore getVersioningStore() throws XWikiException
     {
         try {
-            return (XWikiHibernateVersioningStore) componentManager
+            return (XWikiHibernateVersioningStore) this.componentManager
                 .getInstance(XWikiVersioningStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -124,8 +123,8 @@ public class R6079XWIKI1878DataMigration extends AbstractHibernateDataMigration
 
                         while (it.hasNext()) {
                             Object[] result = (Object[]) it.next();
-                            if (logger.isInfoEnabled()) {
-                                logger.info("Fixing document [{}]...", result[2]);
+                            if (R6079XWIKI1878DataMigration.this.logger.isInfoEnabled()) {
+                                R6079XWIKI1878DataMigration.this.logger.info("Fixing document [{}]...", result[2]);
                             }
 
                             // Reconstruct a XWikiRCSNodeContent object with isDiff set to false and update it.

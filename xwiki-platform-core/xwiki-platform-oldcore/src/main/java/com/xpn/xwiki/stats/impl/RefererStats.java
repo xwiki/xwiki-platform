@@ -30,7 +30,7 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 
 /**
  * The referer statistics database object.
- * 
+ *
  * @version $Id$
  */
 public class RefererStats extends XWikiStats
@@ -42,7 +42,7 @@ public class RefererStats extends XWikiStats
 
     /**
      * The properties of document statistics object.
-     * 
+     *
      * @version $Id$
      */
     public enum Property

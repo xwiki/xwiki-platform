@@ -48,7 +48,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
-     * 
+     *
      * @param xwiki
      * @param context
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
@@ -71,7 +71,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
-     * 
+     *
      * @param hibpath
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
      */
@@ -118,7 +118,8 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     }
 
                     Query query =
-                        session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
+                        session
+                            .createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
                     query.setLong("id", content.getId());
                     if (query.uniqueResult() == null) {
                         session.save(content);
@@ -145,7 +146,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
-                Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+                Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachment {0} of document {1}", e, args);
@@ -229,7 +230,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                 "Exception while loading attachment {0} of document {1}", e, args);
@@ -311,7 +312,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
                 "Exception while deleting attachment {0} of document {1}", e, args);

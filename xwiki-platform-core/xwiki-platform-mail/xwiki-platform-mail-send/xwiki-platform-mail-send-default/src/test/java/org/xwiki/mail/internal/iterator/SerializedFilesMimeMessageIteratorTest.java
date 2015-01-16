@@ -67,8 +67,7 @@ public class SerializedFilesMimeMessageIteratorTest
         this.batchId = UUID.randomUUID();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
-        this.batchDirectory =
-            new File(new File(tempDir, SerializedFilesMimeMessageIterator.ROOT_DIRECTORY), this.batchId.toString());
+        this.batchDirectory = new File(new File(tempDir, "mailstore"), this.batchId.toString());
         this.batchDirectory.mkdirs();
     }
 

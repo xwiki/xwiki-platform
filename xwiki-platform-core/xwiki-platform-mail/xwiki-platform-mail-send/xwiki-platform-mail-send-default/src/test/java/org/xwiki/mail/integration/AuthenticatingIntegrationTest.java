@@ -163,8 +163,8 @@ public class AuthenticatingIntegrationTest
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
-        // Step 4: Send the mail synchronously
-        this.sender.send(Arrays.asList(message), session);
+        // Step 4: Send the mail
+        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

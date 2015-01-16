@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 /**
  * Defines the meta properties of a boolean XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

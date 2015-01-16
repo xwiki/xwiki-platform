@@ -27,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -34,8 +36,6 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.util.xml.XmlDocument;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -46,7 +46,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Default implementation for {@link HibernateSessionFactory}.
- * 
+ *
  * @version $Id$
  * @since 2.0M1
  */
@@ -168,7 +168,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
         public void add(XmlDocument metadataXml)
         {
             Element basePropertyElement = selectChildClassMappingElement(metadataXml.getDocumentTree().getRootElement(),
-                                                                         "class", "com.xpn.xwiki.objects.BaseProperty");
+                "class", "com.xpn.xwiki.objects.BaseProperty");
             if (basePropertyElement != null) {
                 decorateDBStringListMapping(basePropertyElement);
             }
@@ -208,14 +208,16 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
             final String collectionType = "com.xpn.xwiki.internal.objects.ListPropertyCollectionType";
 
             Element listClassElement = selectChildClassMappingElement(basePropertyElement, "joined-subclass",
-                                                                      className);
+                className);
 
             if (listClassElement != null) {
                 Element listElement = listClassElement.element("list");
                 if (listElement != null) {
                     listElement.addAttribute("collection-type",
-                                              collectionType);
-                    logger.debug("Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType, className);
+                        collectionType);
+                    DefaultHibernateSessionFactory.this.logger.debug(
+                        "Added collection-type attribute [{}] to hibernate mapping for [{}].", collectionType,
+                        className);
                 }
             }
         }
@@ -232,9 +234,9 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory, 
         }
 
         /**
-         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
-         * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value
-         * coming from the XWiki configuration.
+         * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that
+         * right now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the
+         * value coming from the XWiki configuration.
          *
          * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
          */

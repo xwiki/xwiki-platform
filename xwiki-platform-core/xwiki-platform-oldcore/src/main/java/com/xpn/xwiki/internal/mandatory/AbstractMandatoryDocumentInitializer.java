@@ -37,7 +37,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Base class for standard class providers.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
@@ -83,7 +83,7 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      * Set the fields of the class document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
      * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
      * otherwise generate XWiki Syntax 2.0.
-     * 
+     *
      * @param document the document
      * @param title the page title to set
      * @return true if the document has been modified, false otherwise

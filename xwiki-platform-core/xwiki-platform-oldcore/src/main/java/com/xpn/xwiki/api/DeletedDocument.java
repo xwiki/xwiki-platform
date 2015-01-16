@@ -34,7 +34,7 @@ import com.xpn.xwiki.util.Programming;
 
 /**
  * Information about a deleted document in the recycle bin.
- * 
+ *
  * @version $Id$
  */
 public class DeletedDocument extends Api
@@ -50,7 +50,7 @@ public class DeletedDocument extends Api
     /**
      * Simple constructor, initializes a new API object with the current {@link com.xpn.xwiki.XWikiContext context} and
      * the specified protected {@link com.xpn.xwiki.doc.XWikiDeletedDocument deleted document} object.
-     * 
+     *
      * @param deletedDoc the internal object wrapped by this API
      * @param context the current request context
      */
@@ -102,7 +102,7 @@ public class DeletedDocument extends Api
 
     /**
      * Check if the current user has the right to restore the document.
-     * 
+     *
      * @return {@code true} if the current user can restore this document, {@code false} otherwise
      */
     public boolean canUndelete()

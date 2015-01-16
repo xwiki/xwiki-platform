@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Listfilter checks for lists in in its input. These are transformed to output lists, e.g. in HTML. Recognizes
  * different lists like numbered lists, unnumbered lists, greek lists, alpha lists etc.
- * 
+ *
  * @version $Id$
  */
 public class XWikiListFilter extends ListFilter implements CacheFilter
@@ -93,7 +93,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Default constructor; builds predefined open and close lists.
-     * 
+     *
      * @todo Maybe the syntax can be configured somehow...
      */
     public XWikiListFilter()
@@ -132,7 +132,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Method called whenever the wiki source matches the list syntax. It converts the wiki syntax to HTML markup.
-     * 
+     *
      * @param buffer The output buffer, where the HTML code is printed.
      * @param result The regex match result; input is read from this Reader.
      * @param context The FilterContext object, used to get access to the Rendering context.
@@ -154,7 +154,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Converts a list item to the corresponding HTML markup, possibly closing or opening the neccessary lists.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param reader Input is read from this Reader.
      * @throws IOException if the input stream is broken.
@@ -190,7 +190,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Output the HTML code corresponding to opening a new list item.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param type The list item type.
      */
@@ -201,7 +201,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Output the HTML code corresponding to closing a list item.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param type The list item type.
      */
@@ -212,7 +212,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Output the HTML code corresponding to opening a new list.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param type The list item type.
      */
@@ -224,7 +224,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
 
     /**
      * Output the HTML code corresponding to closing a list.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param type The list item type.
      */
@@ -237,7 +237,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     /**
      * Makes the transition from the previous configuration of list types to the current one, closing and opening any
      * needed lists/items.
-     * 
+     *
      * @param buffer The output buffer to write HTML to.
      * @param previousBullets The previous list type configuration.
      * @param crtBullets The new list type configuration.

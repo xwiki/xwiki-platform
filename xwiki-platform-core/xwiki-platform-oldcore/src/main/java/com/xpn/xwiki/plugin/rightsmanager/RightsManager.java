@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Hidden toolkit used by the plugin API that make all the plugin's actions.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
@@ -159,7 +159,7 @@ public final class RightsManager
 
     /**
      * Get the number of users or groups in the main wiki and the current wiki.
-     * 
+     *
      * @param user indicate if methods search for users or groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -183,7 +183,7 @@ public final class RightsManager
 
     /**
      * Get the number of users or groups in the provided wiki.
-     * 
+     *
      * @param user indicate if methods search for users or groups.
      * @param wikiName the name of the wiki where to search for users or groups.
      * @param matchFields the field to math with values. It is a table of table with :
@@ -215,7 +215,7 @@ public final class RightsManager
 
     /**
      * Get the number of users or groups in the main wiki.
-     * 
+     *
      * @param user indicate if methods search for users or groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -239,7 +239,7 @@ public final class RightsManager
 
     /**
      * Get the number of users or groups in the current wiki.
-     * 
+     *
      * @param user indicate if methods search for users or groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -263,7 +263,7 @@ public final class RightsManager
 
     /**
      * Get all users or groups in the main wiki and the current.
-     * 
+     *
      * @param user indicate if it is a user or a group.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -284,7 +284,7 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+    public List<?> getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
@@ -320,7 +320,7 @@ public final class RightsManager
 
     /**
      * Get all users or groups in the main wiki.
-     * 
+     *
      * @param user indicate if it is a user or a group.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -341,7 +341,7 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+    public List<?> getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
@@ -354,7 +354,7 @@ public final class RightsManager
 
     /**
      * Get all users or groups in the provided wiki.
-     * 
+     *
      * @param user indicate if it is a user or a group.
      * @param wikiName the name of the wiki where to search.
      * @param matchFields the field to math with values. It is a table of table with :
@@ -376,7 +376,7 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
+    public List<?> getAllMatchedWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
@@ -388,7 +388,7 @@ public final class RightsManager
         try {
             context.setWikiId(wikiName);
 
-            List< ? > localGroupList =
+            List<?> localGroupList =
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
 
             if (localGroupList != null && !withdetails) {
@@ -408,7 +408,7 @@ public final class RightsManager
 
     /**
      * Get all users or groups in the current wiki.
-     * 
+     *
      * @param user indicate if it is a user or a group.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
@@ -429,7 +429,7 @@ public final class RightsManager
      *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+    public List<?> getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (user) {
@@ -443,7 +443,7 @@ public final class RightsManager
 
     /**
      * Get all groups containing provided user.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
      * @param start the index of the first found member to return.
@@ -459,7 +459,7 @@ public final class RightsManager
 
     /**
      * Get all users provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -475,7 +475,7 @@ public final class RightsManager
 
     /**
      * Get members of provided group.
-     * 
+     *
      * @param group the group.
      * @param matchField a string to search in result to filter.
      * @param nb the maximum number of result to return.
@@ -495,7 +495,7 @@ public final class RightsManager
 
     /**
      * Return the number of groups containing provided member.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param context the XWiki context.
      * @return the number of groups.
@@ -508,7 +508,7 @@ public final class RightsManager
 
     /**
      * Return the number of members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param context the XWiki context.
      * @return the number of members.
@@ -523,7 +523,7 @@ public final class RightsManager
 
     /**
      * Get the {@link LevelTree} {@link Map} for the provided rights levels.
-     * 
+     *
      * @param preferences the document containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
      * @param global indicate it is global rights (wiki or space) or document rights.
@@ -543,7 +543,7 @@ public final class RightsManager
 
     /**
      * Get the {@link LevelTree} {@link Map} for he provided rights levels.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
      * @param context the XWiki context.
@@ -560,7 +560,7 @@ public final class RightsManager
 
     /**
      * Fill the {@link LevelTree} {@link Map}.
-     * 
+     *
      * @param rightsMap the {@link LevelTree} {@link Map} to fill.
      * @param levelInherited the levels names for which to find inheritance.
      * @param bobj the object containing rights preferences.
@@ -616,7 +616,7 @@ public final class RightsManager
 
     /**
      * Fill the {@link LevelTree} {@link Map} inherited part.
-     * 
+     *
      * @param rightsMap the {@link LevelTree} {@link Map} to fill.
      * @param levelInheritedIn the levels names for which to find inheritance.
      * @param preferences the document containing rights preferences.
@@ -655,7 +655,7 @@ public final class RightsManager
 
     /**
      * Fill the {@link LevelTree} {@link Map}.
-     * 
+     *
      * @param rightsMap the {@link LevelTree} {@link Map} to fill.
      * @param preferences the document containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
@@ -689,7 +689,7 @@ public final class RightsManager
 
     /**
      * Get the document containing inherited rights of provided document.
-     * 
+     *
      * @param currentPreference the document for which to find parent preferences document.
      * @param currentGlobal indicate if current preferences document is global.
      * @param context the XWiki context.
@@ -732,7 +732,7 @@ public final class RightsManager
 
     /**
      * Get the document containing inherited rights of provided document.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param context the XWiki context.
      * @return the document containing inherited rights of provided document.
@@ -749,7 +749,7 @@ public final class RightsManager
 
     /**
      * Get level right tree.
-     * 
+     *
      * @param doc the document containing rights preferences.
      * @param levelName the level right name ("view", "delete"...).
      * @param global indicate it is global rights (wiki or space) or document rights.
@@ -774,7 +774,7 @@ public final class RightsManager
 
     /**
      * Get document containing rights preferences for provided wiki, space or document.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param context the XWiki context.
      * @return the document containing rights preferences.
@@ -799,7 +799,7 @@ public final class RightsManager
 
     /**
      * Indicate if provided document contains global or document rights.
-     * 
+     *
      * @param preferences the document containing rights preferences.
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @return true if provided document contains global rights, false otherwise.
@@ -811,7 +811,7 @@ public final class RightsManager
 
     /**
      * Get level right tree.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param levelName the level right name ("view", "delete"...).
      * @param context the XWiki context.
@@ -827,7 +827,7 @@ public final class RightsManager
 
     /**
      * Remove a user or group from rights preferences document for provided level.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param userOrGroup the name of the user or group.
      * @param user indicate if it is a user or group.
@@ -868,7 +868,7 @@ public final class RightsManager
 
     /**
      * Remove all references to provided user or group from provided right object.
-     * 
+     *
      * @param right the object containing the right preferences.
      * @param userOrGroupWiki the name of the wiki of the use or group.
      * @param userOrGroupSpace the name of the space of the use or group.
@@ -908,7 +908,7 @@ public final class RightsManager
 
     /**
      * Remove all references to provided user or group from provided rights document.
-     * 
+     *
      * @param rightsDocument the document containing the rights preferences.
      * @param userOrGroupWiki the name of the wiki of the use or group.
      * @param userOrGroupSpace the name of the space of the use or group.
@@ -947,7 +947,7 @@ public final class RightsManager
 
     /**
      * Remove all references to provided user or group from provided rights document.
-     * 
+     *
      * @param rightsDocument the document containing the rights preferences.
      * @param userOrGroupWiki the name of the wiki of the use or group.
      * @param userOrGroupSpace the name of the space of the use or group.
@@ -967,7 +967,7 @@ public final class RightsManager
 
     /**
      * Remove all references to provided user or group from all rights documents.
-     * 
+     *
      * @param userOrGroupWiki the name of the wiki of the use or group.
      * @param userOrGroupSpace the name of the space of the use or group.
      * @param userOrGroupName the name of the use or group.
@@ -1030,7 +1030,7 @@ public final class RightsManager
 
     /**
      * Remove "direct" rights for wiki, space or document. This means that after that inherited right will be used.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param levelNames the levels names to check ("view", "edit", etc.).
      * @param comment the comment to use when saving preferences document.
@@ -1056,7 +1056,7 @@ public final class RightsManager
 
     /**
      * Browse a group and groups it contains to find provided member (user or group).
-     * 
+     *
      * @param groupName the group name where to search for member.
      * @param memberName the name of the member to find.
      * @param groupCacheIn a map containing a set a group and its corresponding members already retrieved.
@@ -1099,7 +1099,7 @@ public final class RightsManager
 
     /**
      * Resolve passed user or group into users references list.
-     * 
+     *
      * @param userOrGroup the user or group
      * @param context the XWikiContext the XWiki context
      * @return the list of users references
@@ -1153,7 +1153,7 @@ public final class RightsManager
 
     /**
      * Resolve passed user or group into users references list.
-     * 
+     *
      * @param userOrGroup the user or group
      * @param context the XWikiContext the XWiki context
      * @return the list of users references
@@ -1166,7 +1166,7 @@ public final class RightsManager
 
     /**
      * Resolve passed users and groups into users references list.
-     * 
+     *
      * @param referenceList the list of users and groups
      * @param context the XWikiContext the XWiki context
      * @return the list of users references

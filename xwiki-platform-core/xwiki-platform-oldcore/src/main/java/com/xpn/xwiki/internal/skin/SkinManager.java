@@ -111,7 +111,7 @@ public class SkinManager implements Initializable
                 if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null
                     || document.getOriginalDocument().getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
                     // TODO: lower the granularity
-                    cache.removeAll();
+                    SkinManager.this.cache.removeAll();
                 }
 
             }

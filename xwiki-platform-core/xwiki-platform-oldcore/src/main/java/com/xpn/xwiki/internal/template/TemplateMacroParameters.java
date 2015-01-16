@@ -23,7 +23,7 @@ import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
  * Parameters for the {@link com.xpn.xwiki.internal.template.TemplateMacro} Macro.
- * 
+ *
  * @version $Id$
  * @since 6.1RC1
  */

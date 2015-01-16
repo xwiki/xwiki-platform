@@ -23,7 +23,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Exception raised by Content parsers when they fail to parse some content.
- * 
+ *
  * @version $Id$
  */
 public class ContentParserException extends XWikiException
@@ -32,7 +32,7 @@ public class ContentParserException extends XWikiException
      * @param code the exception code value, see {@link com.xpn.xwiki.XWikiException}
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
-     *        permitted, and indicates that the cause is nonexistent or unknown
+     *            permitted, and indicates that the cause is nonexistent or unknown
      * @param args the arguments used to format the passed message string using {@link java.text.MessageFormat}
      * @see XWikiException#XWikiException(int, int, String, Throwable, Object[])
      */
@@ -45,7 +45,7 @@ public class ContentParserException extends XWikiException
      * @param code the exception code value, see {@link com.xpn.xwiki.XWikiException}
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
      * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method). A null value is
-     *        permitted, and indicates that the cause is nonexistent or unknown
+     *            permitted, and indicates that the cause is nonexistent or unknown
      * @see XWikiException#XWikiException(int, int, String, Throwable)
      */
     public ContentParserException(int code, String message, Throwable cause)
@@ -64,7 +64,7 @@ public class ContentParserException extends XWikiException
     }
 
     /**
-     * @see XWikiException#XWikiException() 
+     * @see XWikiException#XWikiException()
      */
     public ContentParserException()
     {

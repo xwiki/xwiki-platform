@@ -27,7 +27,7 @@ import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 /**
  * Represents a date property.
- * 
+ *
  * @version $Id$
  */
 public class DateProperty extends BaseProperty implements Cloneable

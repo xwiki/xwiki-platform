@@ -26,7 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Specialized cache component related to documents.
- * 
+ *
  * @param <C> the class of the data stored in the cache.
  * @version $Id$
  * @since 2.4M1
@@ -40,7 +40,7 @@ public interface DocumentCache<C>
      * Initialize the cache.
      * <p>
      * This method should be called before anything else.
-     * 
+     *
      * @param cacheConfiguration the cache configuration
      * @throws CacheException failed to initialize the cache
      */
@@ -48,7 +48,7 @@ public interface DocumentCache<C>
 
     /**
      * Get the value associated with the provided key.
-     * 
+     *
      * @param documentReference the reference of the document
      * @param extensions the extensions to the document reference
      * @return the value
@@ -57,7 +57,7 @@ public interface DocumentCache<C>
 
     /**
      * Add a new value or overwrite the existing one associated with the provided key.
-     * 
+     *
      * @param data the data to store
      * @param documentReference the reference of the document
      * @param extensions the extensions to the document reference
@@ -66,7 +66,7 @@ public interface DocumentCache<C>
 
     /**
      * Remove from the cache the value associated to the provided key elements.
-     * 
+     *
      * @param data the data to store
      * @param documentReference the reference of the document
      * @param extensions the extensions to the document reference
@@ -80,7 +80,7 @@ public interface DocumentCache<C>
 
     /**
      * Remove all the entries the cache contains for specified document.
-     * 
+     *
      * @param documentReference document reference of cached document
      */
     void removeAll(DocumentReference documentReference);

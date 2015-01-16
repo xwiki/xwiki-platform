@@ -55,7 +55,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * <li><tt>{field:XWikiComment.content|edit|3}</tt> displays the {@code content} field of the third
  * {@code XWiki.XWikiComment} type in edit mode.</li>
  * </ul>
- * 
+ *
  * @deprecated It provides limited functionalities compared to the {@code doc.display} scripting API.
  * @version $Id$
  */
@@ -70,7 +70,7 @@ public class FieldMacro extends BaseLocaleMacro
 
     /**
      * Main macro execution method, replaces the macro instance with the generated output.
-     * 
+     *
      * @param writer the place where to write the output
      * @param params the parameters this macro is called with
      * @throws IllegalArgumentException if the mandatory argument ({@code text}) is missing

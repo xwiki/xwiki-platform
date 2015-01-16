@@ -22,11 +22,9 @@ package org.xwiki.mail.internal.iterator;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.mail.MimeMessageFactory;
 
@@ -46,40 +44,43 @@ public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, 
 
     protected Map<String, Object> parameters;
 
-    @Inject
-    private Logger logger;
-
     /**
      * @return the MimeMessage as the current element of Iterator.
      * @throws MessagingException  when an error occurs
      */
     protected abstract MimeMessage createMessage() throws MessagingException;
 
-    @Override public MimeMessage next()
+    protected abstract Logger getLogger();
+
+    @Override
+    public MimeMessage next()
     {
-        MimeMessage mimeMessage = null;
+        MimeMessage mimeMessage;
         try {
             mimeMessage = createMessage();
-        } catch (MessagingException e) {
-            this.logger.error("Failed to create mime message. "
-                + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
+        } catch (Exception e) {
             //TODO We need to save all the errors and display them in the status of all emails in the admin UI.
+            getLogger().error("Failed to create Mime Message.", e);
+            mimeMessage = null;
         }
-        position++;
+        this.position++;
         return mimeMessage;
     }
 
-    @Override public boolean hasNext()
+    @Override
+    public boolean hasNext()
     {
-        return this.iteratorSize != position;
+        return this.iteratorSize != this.position;
     }
 
-    @Override public void remove()
+    @Override
+    public void remove()
     {
         throw new UnsupportedOperationException();
     }
 
-    @Override public Iterator<MimeMessage> iterator()
+    @Override
+    public Iterator<MimeMessage> iterator()
     {
         return this;
     }

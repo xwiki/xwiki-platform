@@ -25,7 +25,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Abstract base plugin implementation.
- * 
+ *
  * @version $Id$
  * @deprecated the plugin technology is deprecated, consider rewriting as components
  */
@@ -34,14 +34,14 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 {
     /**
      * The plugin name.
-     * 
+     *
      * @see #getName()
      */
     private String name;
 
     /**
      * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
-     * 
+     *
      * @param name the plugin name, usually ignored, since plugins have a fixed name
      * @param className the name of this class, ignored
      * @param context the current request context
@@ -85,7 +85,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 
     /**
      * Older equivalent of the {@link #flushCache(XWikiContext)} method without a context provided.
-     * 
+     *
      * @deprecated use {@link #flushCache(XWikiContext)} instead
      */
     @Deprecated
@@ -162,7 +162,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 
     /**
      * Set the plugin name. Don't use outside the constructor.
-     * 
+     *
      * @param name the new name of the plugin
      * @deprecated most plugins hard code their names, so this doesn't really work
      */
@@ -175,7 +175,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 
     /**
      * Old method that doesn't really work. Don't use.
-     * 
+     *
      * @return the name of the plugin
      * @deprecated use {@link #getName()} instead
      */
@@ -187,7 +187,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
 
     /**
      * Old method that doesn't really work. Don't use.
-     * 
+     *
      * @param name the new name of the plugin
      * @deprecated most plugins hard code their names, so this doesn't really work, and changing the classname isn't
      *             really possible

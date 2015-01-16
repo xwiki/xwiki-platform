@@ -40,9 +40,10 @@ public class MigrationResourceAccessor extends ClassLoaderResourceAccessor
 
     /** The dynamic change log file. */
     private byte[] changeLog;
-    
+
     /**
      * Create a new accessor to support the dynamically created change log.
+     *
      * @param changeLog the dynamically created change log
      */
     public MigrationResourceAccessor(String changeLog)
@@ -59,7 +60,7 @@ public class MigrationResourceAccessor extends ClassLoaderResourceAccessor
     public InputStream getResourceAsStream(String file) throws IOException
     {
         if (CHANGELOG_NAME.equals(file)) {
-            return new ByteArrayInputStream(changeLog);
+            return new ByteArrayInputStream(this.changeLog);
         } else {
             return super.getResourceAsStream(file);
         }

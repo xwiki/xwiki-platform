@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ObjectAddAction extends XWikiAction
 {
-    private static final String[] EMPTY_PROPERTY = new String[] {""};
+    private static final String[] EMPTY_PROPERTY = new String[] { "" };
 
     /**
      * A pattern that matches the {@code xobjectNumber} request parameter which is used to pass the number of the added

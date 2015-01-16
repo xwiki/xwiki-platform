@@ -47,7 +47,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * <p>
  * You can get the content from an attachment using Velocity, as in:
  * </p>
- * 
+ *
  * <pre>
  * {svg}
  * $doc.getAttachment('image.svg').getContentAsString()
@@ -56,7 +56,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * <p>
  * The macro relies on the {@link SVGPlugin} to actually transform the SVG content into an image.
  * </p>
- * 
+ *
  * @deprecated The Radeox macros are deprecated in favor of the new wiki macros.
  * @version $Id$
  */
@@ -65,7 +65,7 @@ public class SVGMacro extends BaseLocaleMacro
 {
     /**
      * The name of the macro.
-     * 
+     *
      * @see org.radeox.macro.BaseLocaleMacro#getLocaleKey()
      */
     @Override
@@ -76,7 +76,7 @@ public class SVGMacro extends BaseLocaleMacro
 
     /**
      * Main macro execution method, replaces the macro instance with the generated output.
-     * 
+     *
      * @param writer the place where to write the output
      * @param params the parameters this macro is called with
      * @throws IllegalArgumentException if the mandatory argument ({@code text}) is missing

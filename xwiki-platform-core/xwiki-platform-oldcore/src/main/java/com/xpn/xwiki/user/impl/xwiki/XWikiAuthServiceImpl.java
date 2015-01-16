@@ -50,12 +50,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link com.xpn.xwiki.user.api.XWikiAuthService}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
@@ -274,7 +273,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * Method to authenticate and set the cookie from a username and password passed as parameters
-     * 
+     *
      * @return null if the user is not authenticated properly
      */
     @Override
@@ -463,7 +462,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
-            Object[][] whereParameters = new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
+            Object[][] whereParameters = new Object[][] { { "doc.space", "XWiki" }, { "doc.name", username } };
 
             List<String> list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
@@ -569,7 +568,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
      * The authentication library we are using (SecurityFilter) requires that its URLs do not contain the context path,
      * in order to be usable with <tt>RequestDispatcher.forward</tt>. Since our URL factory include the context path in
      * the generated URLs, we use this method to remove (if needed) the context path.
-     * 
+     *
      * @param url The URL to process.
      * @param context The ubiquitous XWiki request context.
      * @return A <code>String</code> representation of the contextpath-free URL.

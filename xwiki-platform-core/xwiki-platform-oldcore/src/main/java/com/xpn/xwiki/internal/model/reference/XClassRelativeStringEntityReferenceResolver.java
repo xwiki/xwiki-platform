@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReference;
  * The behavior is the one defined in {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver}
  * except that it uses a space with the "XWiki" value if no space is specified and that an optional parameter can be
  * passed to specify what page name to use if no page is specified in the passed string representation.
- * 
+ *
  * @version $Id$
  * @since 2.2.3
  * @deprecated this is only a backward compatibility resolver since the old behavior for class reference was to use the

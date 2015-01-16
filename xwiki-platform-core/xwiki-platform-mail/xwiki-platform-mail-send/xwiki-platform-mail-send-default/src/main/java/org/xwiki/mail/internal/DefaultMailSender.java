@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Iterator;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -36,8 +35,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
-import org.xwiki.mail.MailState;
-import org.xwiki.mail.MailStatus;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 
@@ -72,33 +69,6 @@ public class DefaultMailSender implements MailSender, Initializable
         this.mailSenderThread = new Thread(this.mailSenderRunnable);
         this.mailSenderThread.setName("Mail Sender Thread");
         this.mailSenderThread.start();
-    }
-
-    @Override
-    public MailResult send(Iterable<? extends MimeMessage> messages, Session session)
-        throws MessagingException
-    {
-        MailListener listener = getListener("memory");
-        MailResult result = sendAsynchronously(messages, session, listener);
-        result.waitTillSent(Long.MAX_VALUE);
-
-        // If some mails have failed to be sent, then raise an error
-        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.FAILED);
-        if (statuses.hasNext()) {
-            StringBuilder builder =
-                new StringBuilder("Some messages have failed to be sent for the following reasons: [");
-            while (statuses.hasNext()) {
-                MailStatus status = statuses.next();
-                builder.append('[');
-                builder.append('[').append(status.getErrorSummary()).append(']').append(',');
-                builder.append('[').append(status.getErrorDescription()).append(']');
-                builder.append(']');
-            }
-            builder.append(']');
-            throw new MessagingException(builder.toString());
-        }
-
-        return result;
     }
 
     @Override

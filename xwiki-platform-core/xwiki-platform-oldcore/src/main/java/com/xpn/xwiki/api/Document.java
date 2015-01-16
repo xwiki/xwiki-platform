@@ -88,7 +88,6 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  */
 /**
- * 
  * @version $Id$
  */
 public class Document extends Api
@@ -178,7 +177,7 @@ public class Document extends Api
 
     /**
      * Document constructor.
-     * 
+     *
      * @param doc The XWikiDocument object to wrap.
      * @param context The current request context.
      */
@@ -191,7 +190,7 @@ public class Document extends Api
     /**
      * Get the XWikiDocument wrapped by this API. This function is accessible only if you have the programming rights
      * give access to the priviledged API of the Document.
-     * 
+     *
      * @return The XWikiDocument wrapped by this API.
      */
     public XWikiDocument getDocument()
@@ -205,7 +204,7 @@ public class Document extends Api
 
     /**
      * Get a clone of the XWikiDocument wrapped by this API.
-     * 
+     *
      * @return A clone of the XWikiDocument wrapped by this API.
      */
     protected XWikiDocument getDoc()
@@ -220,7 +219,7 @@ public class Document extends Api
 
     /**
      * return the ID of the document. this ID is unique across the wiki.
-     * 
+     *
      * @return the id of the document.
      */
     public long getId()
@@ -242,7 +241,7 @@ public class Document extends Api
 
     /**
      * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
-     * 
+     *
      * @return the name of the document
      */
     public String getName()
@@ -253,7 +252,7 @@ public class Document extends Api
     /**
      * return the name of the space of the document for example if the fullName of a document is "MySpace.Mydoc", the
      * name is MySpace.
-     * 
+     *
      * @return the name of the space of the document
      */
     public String getSpace()
@@ -263,7 +262,7 @@ public class Document extends Api
 
     /**
      * Get the name wiki where the document is stored.
-     * 
+     *
      * @return The name of the wiki where this document is stored.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
@@ -275,7 +274,7 @@ public class Document extends Api
     /**
      * Get the fullName of the document. If a document is named "MyDoc" in space "MySpace", the fullname is
      * "MySpace.MyDoc". In a wiki, all the documents have a different fullName.
-     * 
+     *
      * @return fullName of the document.
      */
     public String getFullName()
@@ -287,7 +286,7 @@ public class Document extends Api
      * Get the complete fullName of the document. The real full name of the document containing the name of the wiki
      * where the document is stored. For a document stored in the wiki "xwiki", in space "MySpace", named "MyDoc", its
      * complete full name is "xwiki:MySpace.MyDoc".
-     * 
+     *
      * @return The complete fullName of the document.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
@@ -298,7 +297,7 @@ public class Document extends Api
 
     /**
      * Get a Version object representing the current version of the document.
-     * 
+     *
      * @return A Version object representing the current version of the document
      */
     public Version getRCSVersion()
@@ -308,7 +307,7 @@ public class Document extends Api
 
     /**
      * Get a string representing the current version of the document.
-     * 
+     *
      * @return A string representing the current version of the document.
      */
     public String getVersion()
@@ -318,7 +317,7 @@ public class Document extends Api
 
     /**
      * Get a string representing the previous version of the document.
-     * 
+     *
      * @return A string representing the previous version of the document. If this is the first version then it returns
      *         null.
      */
@@ -329,7 +328,7 @@ public class Document extends Api
 
     /**
      * Get the value of the title field of the document.
-     * 
+     *
      * @return The value of the title field of the document.
      */
     public String getTitle()
@@ -341,7 +340,7 @@ public class Document extends Api
      * Get document title. If a title has not been provided through the title field, it looks for a section title in the
      * document's content and if not found return the page name. The returned title is also interpreted which means it's
      * allowed to use Velocity, Groovy, etc syntax within a title.
-     * 
+     *
      * @return The document title as XHTML
      */
     public String getDisplayTitle()
@@ -394,7 +393,7 @@ public class Document extends Api
 
     /**
      * Get fullName of the profile document of the author of the current version of the document. Example: XWiki.Admin.
-     * 
+     *
      * @return The fullName of the profile document of the author of the current version of the document.
      */
     public String getAuthor()
@@ -421,7 +420,7 @@ public class Document extends Api
     /**
      * Get fullName of the profile document of the author of the content modification of this document version. Example:
      * XWiki.Admin.
-     * 
+     *
      * @return The fullName of the profile document of the author of the content modification in this document version.
      */
     public String getContentAuthor()
@@ -475,7 +474,7 @@ public class Document extends Api
 
     /**
      * Get the name of the parent of this document.
-     * 
+     *
      * @return The name of the parent of this document.
      */
     public String getParent()
@@ -485,7 +484,7 @@ public class Document extends Api
 
     /**
      * Get fullName of the profile document of the document creator.
-     * 
+     *
      * @return The fullName of the profile document of the document creator.
      */
     public String getCreator()
@@ -510,7 +509,7 @@ public class Document extends Api
 
     /**
      * Get raw content of the document, i.e. the content that is visible through the wiki editor.
-     * 
+     *
      * @return The raw content of the document.
      */
     public String getContent()
@@ -530,7 +529,7 @@ public class Document extends Api
     /**
      * Get the Syntax id representing the syntax used for the document. For example "xwiki/1.0" represents the first
      * version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
-     * 
+     *
      * @return The syntax id representing the syntax used for the document.
      * @deprecated since 2.3M1 use {@link #getSyntax()} instead
      */
@@ -543,7 +542,7 @@ public class Document extends Api
     /**
      * Get the language of the document. If the document is a translation it returns the language set for it, otherwise,
      * it returns the default language in the wiki where the document is stored.
-     * 
+     *
      * @return the language of the document.
      * @deprecated since 5.4M1 use {@link #getLocale()} instead
      * @todo Add a @Deprecated annotation too but be prepared to fix all the resulting Velocity warnings that will
@@ -699,7 +698,7 @@ public class Document extends Api
 
     /**
      * Render a text in a restricted mode, where script macros are completely disabled.
-     * 
+     *
      * @param text the text to render
      * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
      * @return the given text rendered in the context of this document using the passed Syntax
@@ -734,7 +733,7 @@ public class Document extends Api
 
     /**
      * Get the document's content XML-escaped.
-     * 
+     *
      * @return an XML-escaped version of the content of this document.
      */
     public String getEscapedContent() throws XWikiException
@@ -773,7 +772,7 @@ public class Document extends Api
 
     /**
      * Return the relative URL of download for the the given attachment name.
-     * 
+     *
      * @param filename the name of the attachment
      * @return A String with the URL
      */
@@ -784,7 +783,7 @@ public class Document extends Api
 
     /**
      * Get the relative URL of the given action for the the given attachment name.
-     * 
+     *
      * @param filename the name of the attachment.
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev".
      * @return a string representation of a URL to do the given opperation.
@@ -797,7 +796,7 @@ public class Document extends Api
     /**
      * Get the relative URL of an action on an attachment. the given action for the the given attachment name with
      * "queryString" parameters
-     * 
+     *
      * @param filename the name of the attachment.
      * @param action what to do to the file for example "delattachment", "download" or "downloadrev"
      * @param queryString parameters added to the URL, the "rev" parameter is used to specify a revision if using the
@@ -811,7 +810,7 @@ public class Document extends Api
 
     /**
      * Get an old revision of an attachment.
-     * 
+     *
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
      * @return the URL for accessing to the archive of the attachment "filename" at the version "version"
@@ -823,7 +822,7 @@ public class Document extends Api
 
     /**
      * Get an old revision of an attachment.
-     * 
+     *
      * @param filename the name of the attachment.
      * @param version a revision number such as "1.1" or "1.2".
      * @param queryString additional query parameters to pass in the request.
@@ -837,7 +836,7 @@ public class Document extends Api
 
     /**
      * Get the URL of this document.
-     * 
+     *
      * @return the URL to view this document, this will be a relitive URL for example: /xwiki/bin/view/Main/WebHome
      * @see #getExternalURL() for an absolute URL which can used outside of the site.
      */
@@ -848,7 +847,7 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     * 
+     *
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @return the URL of this document with the given action.
      * @see #getExternalURL(String) for an absolute URL which can used outside of the site.
@@ -860,7 +859,7 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     * 
+     *
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
      * @return the URL of this document with the given action and queryString as parameters.
@@ -873,7 +872,7 @@ public class Document extends Api
 
     /**
      * Get the external URL to do a given action on this document.
-     * 
+     *
      * @return the full URL of the document, sutable for use at external websites for example:
      *         http://www.xwiki.org/xwiki/bin/view/Main/WebHome
      * @see #getURL() for a reletive URL which can only be used inside of the site.
@@ -885,7 +884,7 @@ public class Document extends Api
 
     /**
      * Get the external URL to do a given action on this document.
-     * 
+     *
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @return the URL of this document with the given action.
      * @see #getURL() for a relative URL which can only be used inside of the site.
@@ -897,7 +896,7 @@ public class Document extends Api
 
     /**
      * Get the URL to do a given action on this document.
-     * 
+     *
      * @param action what to do to the document for example "view", "edit" or "inline".
      * @param queryString parameters to pass in the request eg: "paramA=value1&paramB=value2"
      * @return the URL of this document with the given action and queryString as parameters.
@@ -987,7 +986,7 @@ public class Document extends Api
 
     /**
      * Get the list of all objects available in this document organized in a Map by classname
-     * 
+     *
      * @return the map of objects
      */
     public Map<String, Vector<Object>> getxWikiObjects()
@@ -1019,7 +1018,7 @@ public class Document extends Api
 
     /**
      * Get the list of objects for a given classname classname
-     * 
+     *
      * @return the vector of objects
      */
     public Vector<Object> getObjects(String className)
@@ -1030,7 +1029,7 @@ public class Document extends Api
 
     /**
      * Get the first object that contains the given fieldname
-     * 
+     *
      * @param fieldname name of the field to find in the object
      * @return the XWiki Object
      */
@@ -1073,7 +1072,7 @@ public class Document extends Api
 
     /**
      * Select a subset of objects from a given class, filtered on a "key = value" criteria.
-     * 
+     *
      * @param classname The type of objects to return.
      * @param key The name of the property used for filtering.
      * @param value The required value.
@@ -1235,7 +1234,7 @@ public class Document extends Api
 
     /**
      * Get document versions matching criterias like author, minimum creation date, etc.
-     * 
+     *
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
@@ -1246,7 +1245,7 @@ public class Document extends Api
 
     /**
      * Get information about a document version : author, date, etc.
-     * 
+     *
      * @param version the version you want to get information about
      * @return a new RevisionInfo object
      */
@@ -1338,7 +1337,7 @@ public class Document extends Api
 
     /**
      * Displays the pretty name of the given field of the given object.
-     * 
+     *
      * @param fieldname fieldname to display the pretty name of
      * @param obj Object to find the class to display the pretty name of
      * @return the pretty name display of the field.
@@ -1440,7 +1439,7 @@ public class Document extends Api
 
     /**
      * Displays the tooltip of the given field of the given object.
-     * 
+     *
      * @param fieldname fieldname to display the tooltip of
      * @param object Object to find the class to display the tooltip of
      * @return the tooltip display of the field.
@@ -1670,7 +1669,7 @@ public class Document extends Api
 
             return this.doc.getContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
@@ -1699,7 +1698,7 @@ public class Document extends Api
 
             return this.doc.getXMLDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
@@ -1728,7 +1727,7 @@ public class Document extends Api
 
             return this.doc.getRenderedContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
@@ -1756,7 +1755,7 @@ public class Document extends Api
 
             return this.doc.getMetaDataDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
@@ -1784,7 +1783,7 @@ public class Document extends Api
 
             return this.doc.getObjectDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
@@ -1812,7 +1811,7 @@ public class Document extends Api
 
             return this.doc.getClassDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
-            java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
@@ -1841,8 +1840,8 @@ public class Document extends Api
             return this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
-                (newdoc != null) ? newdoc.getVersion() : null};
+                { (origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
+                (newdoc != null) ? newdoc.getVersion() : null };
             List list = new ArrayList();
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
@@ -1860,7 +1859,7 @@ public class Document extends Api
 
     /**
      * Get statistics about the number of request for the current page during the current month.
-     * 
+     *
      * @param action the type of request for which to retrieve statistics: view, edit...
      * @return the statistics object holding information for this document and the current month
      */
@@ -1879,7 +1878,7 @@ public class Document extends Api
 
     /**
      * Get statistics about the number of request for the current space during the current month.
-     * 
+     *
      * @param action the type of request for which to retrieve statistics: view, edit...
      * @return the statistics object holding information for the document's space and the current month
      */
@@ -1898,7 +1897,7 @@ public class Document extends Api
 
     /**
      * Get referer statistics for the current document during the current month.
-     * 
+     *
      * @return a list of referer statistics for the document's space
      */
     public List<RefererStats> getCurrentMonthRefStats()
@@ -2035,7 +2034,7 @@ public class Document extends Api
 
     /**
      * Returns data needed for a generation of Table of Content for this document.
-     * 
+     *
      * @param init an intial level where the TOC generation should start at
      * @param max maximum level TOC is generated for
      * @param numbered if should generate numbering for headings
@@ -2095,7 +2094,7 @@ public class Document extends Api
      * <p>
      * The section are filtered by xwiki.section.depth property on the maximum depth of the sections to return. This
      * method is usually used to get "editable" sections.
-     * 
+     *
      * @return the sections in the current document
      */
     public List<DocumentSection> getSections() throws XWikiException
@@ -2105,7 +2104,7 @@ public class Document extends Api
 
     /**
      * Get document children. Children are documents with the current document as parent.
-     * 
+     *
      * @return The list of children for the current document.
      * @since 1.8 Milestone 2
      */
@@ -2118,7 +2117,7 @@ public class Document extends Api
      * Get document children. Children are documents with the current document as parent. Where a document has a large
      * number of children, one may desire to return a certain number of children (nb) and skip some number (start) of
      * the first results.
-     * 
+     *
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
      * @return The list of children for the current document.
@@ -2260,7 +2259,7 @@ public class Document extends Api
         if (hasAccessLevel("edit")) {
             saveDocument(comment, minorEdit);
         } else {
-            java.lang.Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
+            java.lang.Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2281,7 +2280,7 @@ public class Document extends Api
         if (hasProgrammingRights()) {
             saveDocument(comment, minorEdit);
         } else {
-            java.lang.Object[] args = {this.getFullName()};
+            java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied with no programming rights document {0}", null, args);
         }
@@ -2290,7 +2289,7 @@ public class Document extends Api
     /**
      * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     * 
+     *
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
      */
@@ -2302,7 +2301,7 @@ public class Document extends Api
     /**
      * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     * 
+     *
      * @param comment The comment to display in document history (what did you change in the document)
      * @throws XWikiException if script author is not allowed to save the document or if save operation fails.
      * @since 2.3M2
@@ -2315,7 +2314,7 @@ public class Document extends Api
     /**
      * Save the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The author of this document is also set to the said content author.
-     * 
+     *
      * @param comment The comment to display in document history (what did you change in the document)
      * @param minorEdit Set true to advance the document version number by 0.1 or false to advance version to the next
      *            integer + 0.1 eg: 25.1
@@ -2334,7 +2333,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.getFullName()};
+            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot save document {2}", null, args);
         }
@@ -2432,7 +2431,7 @@ public class Document extends Api
 
     /**
      * Remove an XObject from the document. The changes are not persisted until the document is saved.
-     * 
+     *
      * @param object the object to remove
      * @return {@code true} if the object was successfully removed, {@code false} if the object was not found in the
      *         current document.
@@ -2446,7 +2445,7 @@ public class Document extends Api
      * Remove all the objects of a given type (XClass) from the document. The object counter is left unchanged, so that
      * future objects will have new (different) numbers. However, on some storage engines the counter will be reset if
      * the document is removed from the cache and reloaded from the persistent storage.
-     * 
+     *
      * @param className The class name of the objects to be removed.
      * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
      *         was in the current document.
@@ -2458,7 +2457,7 @@ public class Document extends Api
 
     /**
      * Remove document from the wiki. Reinit <code>cloned</code>.
-     * 
+     *
      * @throws XWikiException
      */
     protected void deleteDocument() throws XWikiException
@@ -2472,7 +2471,7 @@ public class Document extends Api
         if (hasAccessLevel("delete")) {
             deleteDocument();
         } else {
-            java.lang.Object[] args = {this.getFullName()};
+            java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2481,7 +2480,7 @@ public class Document extends Api
     /**
      * Delete the document if the {@link #getContentAuthor content author} of the script calling this method has
      * permission to do so. The deleter is also set to the said content author.
-     * 
+     *
      * @throws XWikiException if script author is not allowed to delete the document or if save operation fails.
      * @since 2.3M2
      */
@@ -2497,7 +2496,7 @@ public class Document extends Api
                 getXWikiContext().setUser(viewer);
             }
         } else {
-            java.lang.Object[] args = {author, getXWikiContext().getDoc(), this.getFullName()};
+            java.lang.Object[] args = { author, getXWikiContext().getDoc(), this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied; user {0}, acting through script in document {1} cannot delete document {2}", null, args);
         }
@@ -2508,7 +2507,7 @@ public class Document extends Api
         if (hasProgrammingRights()) {
             deleteDocument();
         } else {
-            java.lang.Object[] args = {this.getFullName()};
+            java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied with no programming rights document {0}", null, args);
         }
@@ -2527,7 +2526,7 @@ public class Document extends Api
     public int addAttachments(String fieldName) throws XWikiException
     {
         if (!hasAccessLevel("edit")) {
-            java.lang.Object[] args = {this.getFullName()};
+            java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in edit mode on document {0}", null, args);
         }
@@ -2614,7 +2613,7 @@ public class Document extends Api
     /**
      * Retrieves the validation script associated with this document, a Velocity script that is executed when validating
      * the document data.
-     * 
+     *
      * @return A <code>String</code> representation of the validation script, or an empty string if there is no such
      *         script.
      */
@@ -2626,7 +2625,7 @@ public class Document extends Api
     /**
      * Sets a new validation script for this document, a Velocity script that is executed when validating the document
      * data.
-     * 
+     *
      * @param validationScript The new validation script, which can be an empty string or <code>null</code> if the
      *            script should be removed.
      */
@@ -2639,7 +2638,7 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
-     * 
+     *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @throws XWikiException in case of an error
      */
@@ -2652,7 +2651,7 @@ public class Document extends Api
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
-     * 
+     *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
      * @since 2.3M2
@@ -2680,7 +2679,7 @@ public class Document extends Api
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
-     * 
+     *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
      *            new renamed document.
@@ -2698,7 +2697,7 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
-     * 
+     *
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
      *            new renamed document.
@@ -2725,7 +2724,7 @@ public class Document extends Api
     /**
      * Same as {@link #rename(String, List)} but the list of documents having the current document as their parent is
      * passed in parameter.
-     * 
+     *
      * @param newReference the reference to the new document
      * @param backlinkDocumentNames the list of reference to documents to parse and for which links will be modified to
      *            point to the new renamed document
@@ -2764,7 +2763,7 @@ public class Document extends Api
 
     /**
      * Allow to easily access any revision of a document
-     * 
+     *
      * @param revision the version to access
      * @return the document coresponding to the requested revision or {@code null} if the revision does not exist.
      */
@@ -2782,7 +2781,7 @@ public class Document extends Api
 
     /**
      * Allow to easily access the previous revision of a document
-     * 
+     *
      * @return Document
      * @throws XWikiException
      */
@@ -2807,7 +2806,7 @@ public class Document extends Api
 
     /**
      * Convert the current document content from its current syntax to the new syntax passed as parameter.
-     * 
+     *
      * @param targetSyntaxId the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
      * @throws XWikiException if an exception occurred during the conversion process
      */
@@ -2833,7 +2832,7 @@ public class Document extends Api
      */
     public boolean isHidden()
     {
-        return doc.isHidden();
+        return this.doc.isHidden();
     }
 
     /**
@@ -2844,7 +2843,7 @@ public class Document extends Api
      */
     public void setHidden(boolean hidden)
     {
-        doc.setHidden(hidden);
+        this.doc.setHidden(hidden);
     }
 
     /**

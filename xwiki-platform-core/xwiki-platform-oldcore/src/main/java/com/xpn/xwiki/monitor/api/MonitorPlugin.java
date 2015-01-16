@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,13 +40,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     private long nbrequests = 0;
 
-    private Map timerSummaries = new HashMap();
+    private Map<String, MonitorTimerSummary> timerSummaries = new HashMap<>();
 
-    private CircularFifoBuffer lastTimerDataList = new CircularFifoBuffer();
+    private CircularFifoQueue<MonitorData> lastTimerDataList = new CircularFifoQueue<>();
 
-    private CircularFifoBuffer lastUnfinishedTimerDataList = new CircularFifoBuffer();
+    private CircularFifoQueue<MonitorData> lastUnfinishedTimerDataList = new CircularFifoQueue<>();
 
-    private Map activeTimerDataList = new HashMap();
+    private Map<Thread, MonitorData> activeTimerDataList = new HashMap<>();
 
     public MonitorPlugin(String name, String className, XWikiContext context)
     {
@@ -64,13 +64,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void reset(XWikiContext context)
     {
-        timerSummaries = new HashMap();
-        activeTimerDataList = new HashMap();
-        duration = 0;
-        nbrequests = 0;
+        this.timerSummaries = new HashMap<>();
+        this.activeTimerDataList = new HashMap<>();
+        this.duration = 0;
+        this.nbrequests = 0;
         long size = context.getWiki().ParamAsLong("xwiki.monitor.lastlistsize", 20);
-        lastTimerDataList = new CircularFifoBuffer((int) size);
-        lastUnfinishedTimerDataList = new CircularFifoBuffer((int) size);
+        this.lastTimerDataList = new CircularFifoQueue<>((int) size);
+        this.lastUnfinishedTimerDataList = new CircularFifoQueue<>((int) size);
     }
 
     @Override
@@ -81,12 +81,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void startRequest(String page, String action, URL url)
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
             if (mdata != null) {
                 removeFromActiveTimerDataList(cthread);
                 addToLastUnfinishedTimerDataList(mdata);
@@ -97,7 +98,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin
                 mdata.endRequest(false);
             }
             mdata = new MonitorData(page, action, url, cthread.getName());
-            activeTimerDataList.put(cthread, mdata);
+            this.activeTimerDataList.put(cthread, mdata);
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("MONITOR: endRequest failed with exception " + e);
@@ -108,20 +109,18 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     private void addToLastUnfinishedTimerDataList(MonitorData mdata)
     {
-        // We should remove the oldest entry
-        if (lastUnfinishedTimerDataList.isFull())
-            lastUnfinishedTimerDataList.remove(lastUnfinishedTimerDataList.get());
-        lastUnfinishedTimerDataList.add(mdata);
+        this.lastUnfinishedTimerDataList.add(mdata);
     }
 
     public void endRequest()
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
             if (mdata == null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
@@ -143,40 +142,40 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     private void removeFromActiveTimerDataList(Thread cthread)
     {
-        if (activeTimerDataList.containsKey(cthread))
-            activeTimerDataList.remove(cthread);
+        if (this.activeTimerDataList.containsKey(cthread)) {
+            this.activeTimerDataList.remove(cthread);
+        }
     }
 
     private void addToTimerDataList(MonitorData mdata)
     {
-        // We should remove the oldest entry
-        if (lastTimerDataList.isFull())
-            lastTimerDataList.remove(lastTimerDataList.get());
-        lastTimerDataList.add(mdata);
+        this.lastTimerDataList.add(mdata);
     }
 
     public void setWikiPage(String page)
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
-            if (mdata != null)
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
+            if (mdata != null) {
                 mdata.setWikiPage(page);
+            }
         } catch (Throwable e) {
         }
     }
 
     private void addTimerDuration(MonitorData mdata)
     {
-        Map map = mdata.getTimerSummaries();
-        Map gmap = getTimerSummaries();
-        Iterator it = map.values().iterator();
+        Map<String, MonitorTimerSummary> map = mdata.getTimerSummaries();
+        Map<String, MonitorTimerSummary> gmap = getTimerSummaries();
+        Iterator<MonitorTimerSummary> it = map.values().iterator();
         while (it.hasNext()) {
-            MonitorTimerSummary stimer = (MonitorTimerSummary) it.next();
-            MonitorTimerSummary gtimer = (MonitorTimerSummary) gmap.get(stimer.getName());
+            MonitorTimerSummary stimer = it.next();
+            MonitorTimerSummary gtimer = gmap.get(stimer.getName());
             if (gtimer == null) {
                 gtimer = new MonitorTimerSummary(stimer.getName());
                 gmap.put(stimer.getName(), gtimer);
@@ -191,14 +190,14 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         this.nbrequests++;
     }
 
-    public CircularFifoBuffer getLastTimerData()
+    public CircularFifoQueue<MonitorData> getLastTimerData()
     {
-        return lastTimerDataList;
+        return this.lastTimerDataList;
     }
 
-    public CircularFifoBuffer getLastUnfinishedTimerData()
+    public CircularFifoQueue<MonitorData> getLastUnfinishedTimerData()
     {
-        return lastUnfinishedTimerDataList;
+        return this.lastUnfinishedTimerDataList;
     }
 
     public void startTimer(String timername)
@@ -208,12 +207,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void startTimer(String timername, String desc)
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
             if (mdata != null) {
                 mdata.startTimer(timername, desc);
             }
@@ -227,12 +227,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void setTimerDesc(String timername, String desc)
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
             if (mdata != null) {
                 mdata.setTimerDetails(timername, desc);
             }
@@ -246,12 +247,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin
 
     public void endTimer(String timername)
     {
-        if (isActive() == false)
+        if (isActive() == false) {
             return;
+        }
 
         try {
             Thread cthread = Thread.currentThread();
-            MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
+            MonitorData mdata = this.activeTimerDataList.get(cthread);
             if (mdata != null) {
                 mdata.endTimer(timername);
             }
@@ -263,56 +265,59 @@ public class MonitorPlugin extends XWikiDefaultPlugin
         }
     }
 
-    public Map getActiveTimerData()
+    public Map<Thread, MonitorData> getActiveTimerData()
     {
-        return activeTimerDataList;
+        return this.activeTimerDataList;
     }
 
-    public Map getTimerSummaries()
+    public Map<String, MonitorTimerSummary> getTimerSummaries()
     {
-        return timerSummaries;
+        return this.timerSummaries;
     }
 
     public long getDuration()
     {
-        return duration;
+        return this.duration;
     }
 
     public long getRequests()
     {
-        return nbrequests;
+        return this.nbrequests;
     }
 
     public long getDuration(String timer)
     {
-        MonitorTimerSummary tsummary = (MonitorTimerSummary) getTimerSummaries().get(timer);
-        if (tsummary == null)
+        MonitorTimerSummary tsummary = getTimerSummaries().get(timer);
+        if (tsummary == null) {
             return 0;
-        else
+        } else {
             return tsummary.getDuration();
+        }
     }
 
     public long getNbCalls(String timer)
     {
-        MonitorTimerSummary tsummary = (MonitorTimerSummary) getTimerSummaries().get(timer);
-        if (tsummary == null)
+        MonitorTimerSummary tsummary = getTimerSummaries().get(timer);
+        if (tsummary == null) {
             return 0;
-        else
+        } else {
             return tsummary.getNbCalls();
+        }
     }
 
     public long getRequests(String timer)
     {
-        MonitorTimerSummary tsummary = (MonitorTimerSummary) getTimerSummaries().get(timer);
-        if (tsummary == null)
+        MonitorTimerSummary tsummary = getTimerSummaries().get(timer);
+        if (tsummary == null) {
             return 0;
-        else
+        } else {
             return tsummary.getRequests();
+        }
     }
 
     public boolean isActive()
     {
-        return bActive;
+        return this.bActive;
     }
 
     public void setActive(boolean bActive)

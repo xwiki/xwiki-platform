@@ -182,31 +182,14 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>/*
-#set ($jsTreeVersion = '3.0.8')
-*/
-require.config({
-  paths: {
-    jsTree: [
-      '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/jstree.min',
-      "$!services.webjars.url('jstree', 'jstree.min.js')"
-    ],
-    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
-    tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
-  },
-  shim: {
-    jsTree: {
-      deps: ['jquery']
-    }
-  }
-});
-
-require(['tree'], function($) {
-  $('.xtree').xtree().one('ready.jstree', function(event, data) {
-    var tree = data.instance;
-    var openToNodeId = tree.element.attr('data-openTo');
-    // Open the tree to the specified node and select it.
-    openToNodeId &amp;&amp; data.instance.openTo(openToNodeId);
+      <code>require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+  require(['tree'], function($) {
+    $('.xtree').xtree().one('ready.jstree', function(event, data) {
+      var tree = data.instance;
+      var openToNodeId = tree.element.attr('data-openTo');
+      // Open the tree to the specified node and select it.
+      openToNodeId &amp;&amp; data.instance.openTo(openToNodeId);
+    });
   });
 });</code>
     </property>

@@ -194,7 +194,7 @@ public class ContextMacroTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void executeWhenBaseMetaDataInXDOM() throws Exception
+    public void executeWithRelativeDocumentReferenceParameter() throws Exception
     {
         final MacroBlock macroBlock = new MacroBlock("context", Collections.<String, String>emptyMap(), false);
         MetaData metaData = new MetaData(

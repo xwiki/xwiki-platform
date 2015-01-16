@@ -35,7 +35,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Common methods useful to all Authentication services implementations.
- * 
+ *
  * @version $Id$
  */
 public abstract class AbstractXWikiAuthService implements XWikiAuthService
@@ -65,7 +65,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
         // to retrieve only the page name
         DocumentReference documentReference =
-            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+            Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
                 username);
         return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
     }

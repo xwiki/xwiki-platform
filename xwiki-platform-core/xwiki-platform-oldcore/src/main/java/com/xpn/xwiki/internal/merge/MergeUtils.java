@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Provide some 3 ways merging related methods.
- * 
+ *
  * @version $Id$
  * @since 4.1M1
  */
@@ -57,7 +57,7 @@ public final class MergeUtils
 
     /**
      * Merge String at lines level.
-     * 
+     *
      * @param previousStr previous version of the string
      * @param newStr new version of the string
      * @param currentStr current version of the string
@@ -88,7 +88,7 @@ public final class MergeUtils
 
     /**
      * Merge an Object. Use Object#equals to find conflicts.
-     * 
+     *
      * @param previousObject previous version of the object
      * @param newObject new version of the object
      * @param currentObject current version of the object
@@ -115,7 +115,7 @@ public final class MergeUtils
 
     /**
      * Merge String at characters level.
-     * 
+     *
      * @param previousStr previous version of the string
      * @param newStr new version of the string
      * @param currentStr current version of the string
@@ -146,7 +146,7 @@ public final class MergeUtils
 
     /**
      * Merge a {@link List}.
-     * 
+     *
      * @param <T> the type of the lists elements
      * @param commonAncestor previous version of the collection
      * @param next new version of the collection
@@ -162,7 +162,7 @@ public final class MergeUtils
             mergeResult.getLog().addAll(result.getLog());
 
             List<T> merged = result.getMerged();
-            
+
             if (!ObjectUtils.equals(merged, current)) {
                 current.clear();
                 current.addAll(result.getMerged());

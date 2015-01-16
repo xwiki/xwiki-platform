@@ -19,60 +19,76 @@
  */
 package com.xpn.xwiki.plugin.svg;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import org.apache.batik.apps.rasterizer.SVGConverterException;
-
 import java.io.IOException;
 
-public class SVGPluginApi extends Api {
+import org.apache.batik.apps.rasterizer.SVGConverterException;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
+
+public class SVGPluginApi extends Api
+{
     private SVGPlugin plugin;
 
-    public SVGPluginApi(SVGPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
-        }
+    public SVGPluginApi(SVGPlugin plugin, XWikiContext context)
+    {
+        super(context);
+        setPlugin(plugin);
+    }
 
-    public SVGPlugin getPlugin() {
+    public SVGPlugin getPlugin()
+    {
         if (hasProgrammingRights()) {
-            return plugin;
+            return this.plugin;
         }
         return null;
     }
 
-    public void setPlugin(SVGPlugin plugin) {
+    public void setPlugin(SVGPlugin plugin)
+    {
         this.plugin = plugin;
     }
 
-    public byte[] getSVGImage(String content, int height, int width) throws IOException, SVGConverterException	 {
-        return plugin.getSVGImage(content, "png", height, width);
+    public byte[] getSVGImage(String content, int height, int width) throws IOException, SVGConverterException
+    {
+        return this.plugin.getSVGImage(content, "png", height, width);
     }
 
-    public byte[] getSVGImage(String content, String extension, int height, int width) throws IOException, SVGConverterException {
-        return plugin.getSVGImage(content, extension, height, width);
+    public byte[] getSVGImage(String content, String extension, int height, int width) throws IOException,
+        SVGConverterException
+    {
+        return this.plugin.getSVGImage(content, extension, height, width);
     }
 
-    public String getSVGImageURL(String content, int height, int width) throws IOException, SVGConverterException {
-        return plugin.getSVGImageURL(content, height, width, getXWikiContext());
+    public String getSVGImageURL(String content, int height, int width) throws IOException, SVGConverterException
+    {
+        return this.plugin.getSVGImageURL(content, height, width, getXWikiContext());
     }
 
-    public String writeSVGImage(String content, int height, int width) throws IOException, SVGConverterException {
-        return plugin.writeSVGImage(content, "png", height, width);
+    public String writeSVGImage(String content, int height, int width) throws IOException, SVGConverterException
+    {
+        return this.plugin.writeSVGImage(content, "png", height, width);
     }
 
-    public String writeSVGImage(String content, String extension, int height, int width) throws IOException, SVGConverterException {
-        return plugin.writeSVGImage(content, extension, height, width);
+    public String writeSVGImage(String content, String extension, int height, int width) throws IOException,
+        SVGConverterException
+    {
+        return this.plugin.writeSVGImage(content, extension, height, width);
     }
 
-    public void outputSVGImage(String content, int height, int width) throws IOException, SVGConverterException {
-        plugin.outputSVGImage(content, "gif", height, width, getXWikiContext());
+    public void outputSVGImage(String content, int height, int width) throws IOException, SVGConverterException
+    {
+        this.plugin.outputSVGImage(content, "gif", height, width, getXWikiContext());
     }
 
-    public void outputSVGImage(String content, String extension, int height, int width) throws IOException, SVGConverterException {
-        plugin.outputSVGImage(content, extension, height, width, getXWikiContext());
+    public void outputSVGImage(String content, String extension, int height, int width) throws IOException,
+        SVGConverterException
+    {
+        this.plugin.outputSVGImage(content, extension, height, width, getXWikiContext());
     }
 
-    public void flushCache() {
-        plugin.flushCache();
+    public void flushCache()
+    {
+        this.plugin.flushCache();
     }
 }

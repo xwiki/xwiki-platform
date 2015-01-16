@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  *   <li>if the passed reference doesn't have a page name specified (or if it's empty) the value used is the default
  *       page name (instead of the page name of the current document's reference).</li>
  * </ul>
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */

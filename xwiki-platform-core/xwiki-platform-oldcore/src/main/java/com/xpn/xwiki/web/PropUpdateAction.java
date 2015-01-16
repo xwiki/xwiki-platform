@@ -52,7 +52,7 @@ public class PropUpdateAction extends XWikiAction
         for (PropertyClass originalProperty : (Collection<PropertyClass>) bclass.getFieldList()) {
             PropertyClass newProperty = originalProperty.clone();
             String name = newProperty.getName();
-            Map<String, ? > map = ((EditForm) form).getObject(name);
+            Map<String, ?> map = ((EditForm) form).getObject(name);
             newProperty.getXClass(context).fromMap(map, newProperty);
             String newName = newProperty.getName();
 

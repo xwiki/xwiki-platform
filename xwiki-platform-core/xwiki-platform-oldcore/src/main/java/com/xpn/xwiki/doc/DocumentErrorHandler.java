@@ -43,7 +43,7 @@ public class DocumentErrorHandler implements ErrorHandler
      * <p>
      * Filters may use this method to report other, non-XML errors as well.
      * </p>
-     * 
+     *
      * @param exception The error information encapsulated in a SAX parse exception.
      * @throws org.xml.sax.SAXException Any SAX exception, possibly wrapping another exception.
      * @see org.xml.sax.SAXParseException
@@ -69,7 +69,7 @@ public class DocumentErrorHandler implements ErrorHandler
      * continue (if at all) only for the sake of collecting addition error messages: in fact, SAX parsers are free to
      * stop reporting any other events once this method has been invoked.
      * </p>
-     * 
+     *
      * @param exception The error information encapsulated in a SAX parse exception.
      * @throws org.xml.sax.SAXException Any SAX exception, possibly wrapping another exception.
      * @see org.xml.sax.SAXParseException
@@ -98,7 +98,7 @@ public class DocumentErrorHandler implements ErrorHandler
      * <p>
      * Filters may use this method to report other, non-XML warnings as well.
      * </p>
-     * 
+     *
      * @param exception The warning information encapsulated in a SAX parse exception.
      * @throws org.xml.sax.SAXException Any SAX exception, possibly wrapping another exception.
      * @see org.xml.sax.SAXParseException

@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Listener to user and groups events to apply related automatic task like cleaning groups and rights objects.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 2.2.3
  */
@@ -133,7 +133,7 @@ public final class RightsManagerListener implements EventListener
 
     /**
      * Remove reference to provided user or group in all groups and rights in current wiki.
-     * 
+     *
      * @param userOrGroupWiki the wiki name of the group or user.
      * @param userOrGroupSpace the space name of the group or user.
      * @param userOrGroupName the name of the group or user.
@@ -152,7 +152,7 @@ public final class RightsManagerListener implements EventListener
 
     /**
      * Remove reference to provided user or group in all groups and rights in all wikis.
-     * 
+     *
      * @param userOrGroupWiki the wiki name of the group or user.
      * @param userOrGroupSpace the space name of the group or user.
      * @param userOrGroupName the name of the group or user.

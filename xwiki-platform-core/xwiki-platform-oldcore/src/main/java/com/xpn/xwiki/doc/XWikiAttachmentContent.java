@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * The content of an attachment. Objects of this class hold the actual content which will be downloaded when a user
  * downloads an attachment.
- * 
+ *
  * @version $Id$
  */
 public class XWikiAttachmentContent implements Cloneable
@@ -60,7 +60,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Constructor which clones an existing XWikiAttachmentContent. Used by {@link #clone()}.
-     * 
+     *
      * @param original the XWikiAttachmentContent to clone.
      * @since 2.6M1
      */
@@ -74,7 +74,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Constructor with associated attachment specified.
-     * 
+     *
      * @param attachment the attachment which this is the content for.
      */
     public XWikiAttachmentContent(XWikiAttachment attachment)
@@ -131,7 +131,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * This is used so that Hibernate will associate this content with the right attachment (metadata).
-     * 
+     *
      * @return the id of the attachment (metadata) which this content is associated with.
      */
     public long getId()
@@ -141,7 +141,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * This function does nothing and exists only for Hibernate to be able to load a value which is not used.
-     * 
+     *
      * @param id is ignored.
      */
     public void setId(long id)
@@ -171,7 +171,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content from a byte array.
-     * 
+     *
      * @param content a byte array containing the binary data of the attachment
      * @deprecated use {@link #setContent(java.io.InputStream, int)} instead
      */
@@ -208,7 +208,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Is the content "dirty" meaning out of sync with the database.
-     * 
+     *
      * @return true if the content is out of sync with the database and in need of saving.
      */
     public boolean isContentDirty()
@@ -218,15 +218,15 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content as "dirty" meaning out of sync with the database.
-     * 
+     *
      * @param contentDirty if true then the content is regarded as out of sync with the database and in need of saving,
      *            otherwise it's considered saved.
      */
     public void setContentDirty(boolean contentDirty)
     {
         this.isContentDirty = contentDirty;
-        if (contentDirty && ownerDocument != null) {
-            ownerDocument.setContentDirty(contentDirty);
+        if (contentDirty && this.ownerDocument != null) {
+            this.ownerDocument.setContentDirty(contentDirty);
         }
     }
 
@@ -268,7 +268,8 @@ public class XWikiAttachmentContent implements Cloneable
             // so unless it is modified, this should not happen.
             throw new RuntimeException("Exception getting attachment OutputStream.", e);
         }
-        return (new ProxyOutputStream(fios) {
+        return (new ProxyOutputStream(fios)
+        {
             @Override
             public void close() throws IOException
             {
@@ -284,7 +285,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content of the attachment from a portion of an InputStream.
-     * 
+     *
      * @param is the input stream that will be read
      * @param len the number of bytes to read from the beginning of the stream
      * @throws IOException when an error occurs during streaming operation
@@ -299,7 +300,7 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the content of the attachment from an InputStream.
-     * 
+     *
      * @param is the input stream that will be read
      * @throws IOException when an error occurs during streaming operation
      * @since 2.6M1
@@ -325,12 +326,13 @@ public class XWikiAttachmentContent implements Cloneable
 
     /**
      * Set the owner document in order to propagate the content dirty flag.
-     * 
+     *
      * @param ownerDocument the owner document.
      */
-    public void setOwnerDocument(XWikiDocument ownerDocument) {
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
         this.ownerDocument = ownerDocument;
-        if (isContentDirty && ownerDocument != null) {
+        if (this.isContentDirty && ownerDocument != null) {
             ownerDocument.setContentDirty(true);
         }
     }

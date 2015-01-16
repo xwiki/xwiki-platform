@@ -66,7 +66,7 @@ import com.xpn.xwiki.internal.template.TemplateUpdatedEvent;
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
  * populate the Velocity Context with XWiki objects that are located in the Core (such as the XWiki object for example)
  * and since the Core needs to call the Velocity module this would cause a circular dependency.
- * 
+ *
  * @version $Id$
  * @since 1.5M1
  */
@@ -141,7 +141,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 if (event instanceof TemplateEvent) {
                     TemplateEvent templateEvent = (TemplateEvent) event;
 
-                    velocityFactory.removeVelocityEngine(templateEvent.getId());
+                    DefaultVelocityManager.this.velocityFactory.removeVelocityEngine(templateEvent.getId());
                 }
             }
 

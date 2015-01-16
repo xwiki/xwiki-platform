@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiConfig;
 
 /**
  * Delegate all {@link XWikiConfig} methods to xwiki.cfg {@link ConfigurationSource}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiConfigDelegate extends XWikiConfig

@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiException;
  * done before this action is invoked, the URL will trigger the authenticator automatically. If the authentication was
  * successful, then a proper user is set in the context, and the {@code login.vm} template will redirect to the view
  * mode.
- * 
+ *
  * @version $Id$
  */
 public class LoginSubmitAction extends XWikiAction

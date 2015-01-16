@@ -210,8 +210,8 @@ public abstract class ListClass extends PropertyClass
 
         String[] result = StringUtils.split(val, separators);
         String item = "";
-        for (int i = 0; i < result.length; i++) {
-            String element = StringUtils.replace(result[i], "%PIPE%", separators);
+        for (String element2 : result) {
+            String element = StringUtils.replace(element2, "%PIPE%", separators);
             if (withMap && (element.indexOf('=') != -1)) {
                 item = StringUtils.split(element, "=")[0];
             } else {
@@ -233,8 +233,8 @@ public abstract class ListClass extends PropertyClass
 
         String val = StringUtils.replace(value, "\\|", "%PIPE%");
         String[] result = StringUtils.split(val, "|");
-        for (int i = 0; i < result.length; i++) {
-            String element = StringUtils.replace(result[i], "%PIPE%", "|");
+        for (String element2 : result) {
+            String element = StringUtils.replace(element2, "%PIPE%", "|");
             if (element.indexOf('=') != -1) {
                 String[] data = StringUtils.split(element, "=");
                 map.put(data[0], new ListItem(data[0], data[1]));
@@ -296,8 +296,7 @@ public abstract class ListClass extends PropertyClass
         }
 
         // If Multiselect and multiple results
-        for (int i = 0; i < strings.length; i++) {
-            String item = strings[i];
+        for (String item : strings) {
             if (!item.trim().equals("")) {
                 list.add(item);
             }
@@ -346,7 +345,7 @@ public abstract class ListClass extends PropertyClass
      * <li>else, D can be specified in the values parameter of the property by using V=D</li>
      * <li>else return V</li>
      * </ol>
-     * 
+     *
      * @param value The internal value.
      * @param name The name of the ListProperty.
      * @param map The value=name mapping specified in the "values" parameter of the property.
@@ -384,7 +383,7 @@ public abstract class ListClass extends PropertyClass
     /**
      * Search for an internationalizable display text for the current value. The value can be either a simple string, or
      * a value=name pair selected from the database.
-     * 
+     *
      * @see #getDisplayValue(String, String, Map, XWikiContext)
      * @param rawvalue The internal value, or a value=name pair.
      * @param name The name of the ListProperty.
@@ -406,7 +405,7 @@ public abstract class ListClass extends PropertyClass
     /**
      * If the list is populated with value=name pairs selected from the database, then return only the value. Otherwise,
      * it is a simple value.
-     * 
+     *
      * @param rawvalue
      * @return The list value
      */
@@ -631,12 +630,12 @@ public abstract class ListClass extends PropertyClass
      * {@link List} whatever property is actually storing it.
      * <p>
      * There is no guarantees the returned {@link List} will be modifiable.
-     * 
+     *
      * @param property the property created by this class
      * @return the {@link List} representation of this property
      * @since 6.2M1
      */
-    public List<String> toList(BaseProperty< ? > property)
+    public List<String> toList(BaseProperty<?> property)
     {
         List<String> list;
 
@@ -653,12 +652,12 @@ public abstract class ListClass extends PropertyClass
 
     /**
      * Set the passed {@link List} into the passed property.
-     * 
+     *
      * @param property the property to modify
      * @param list the list to set
      * @since 6.2M1
      */
-    public void fromList(BaseProperty< ? > property, List<String> list)
+    public void fromList(BaseProperty<?> property, List<String> list)
     {
         if (property instanceof ListProperty) {
             ((ListProperty) property).setList(list);

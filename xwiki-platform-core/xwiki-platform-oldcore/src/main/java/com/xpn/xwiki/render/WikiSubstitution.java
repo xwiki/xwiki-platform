@@ -19,8 +19,14 @@
  */
 package com.xpn.xwiki.render;
 
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternMatcher;
+import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.oro.text.regex.Perl5Substitution;
+
 import com.xpn.xwiki.util.Util;
-import org.apache.oro.text.regex.*;
 
 public class WikiSubstitution extends Perl5Substitution
 {
@@ -76,12 +82,12 @@ public class WikiSubstitution extends Perl5Substitution
 
     public Perl5Matcher getMatcher()
     {
-        return util.getMatcher();
+        return this.util.getMatcher();
     }
 
     public Pattern getPattern()
     {
-        return pattern;
+        return this.pattern;
     }
 
     public void setPattern(Pattern pattern)
@@ -103,7 +109,7 @@ public class WikiSubstitution extends Perl5Substitution
 
     public com.xpn.xwiki.util.Util getUtil()
     {
-        return util;
+        return this.util;
     }
 
     public void setUtil(com.xpn.xwiki.util.Util util)

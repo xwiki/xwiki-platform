@@ -38,7 +38,7 @@ import com.xpn.xwiki.util.Programming;
  * {@link com.xpn.xwiki.objects.classes.NumberClass}, the list of possible values for a
  * {@link com.xpn.xwiki.objects.classes.StaticListClass}, etc.
  * </p>
- * 
+ *
  * @version $Id$
  */
 public class PropertyClass extends Collection implements Comparable<PropertyClass>
@@ -46,7 +46,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Default API constructor that creates a wrapper for a {@link com.xpn.xwiki.objects.classes.PropertyClass}, given a
      * {@link com.xpn.xwiki.XWikiContext context}.
-     * 
+     *
      * @param property the property definition to wrap
      * @param context the current request context
      */
@@ -57,7 +57,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
 
     /**
      * Internal access to the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}.
-     * 
+     *
      * @return the wrapped property definition
      */
     protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass()
@@ -73,7 +73,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * The {@code classType} can be used as a hint to lookup various components related to this specific XClass property
      * type or it can be used as a property name to retrieve the meta class of this property from
      * {@link com.xpn.xwiki.api.XWiki#getMetaclass()}.
-     * 
+     *
      * @return an identifier for the data type of the property value (e.g. 'String', 'Number', 'Date')
      */
     public String getClassType()
@@ -85,7 +85,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
      * Get the actual type of the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}. The returned value is
      * extracted from the class name of the runtime object representing this property definition, and denotes a
      * user-friendly data type name, for example {@code StringClass}, {@code NumberClass} or {@code StaticListClass}.
-     * 
+     *
      * @return the type of this property definition
      * @see #getClassType() {@code getClassType()} if you need the implementation hint of this property
      */
@@ -97,7 +97,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Get the name of the {@link com.xpn.xwiki.api.Class XClass} (Object Definition) this property definition belongs
      * to. For example, {@code XWiki.XWikiUsers} or {@code Blog.BlogPostClass}.
-     * 
+     *
      * @return the name of the owner XClass
      */
     public String getClassName()
@@ -108,7 +108,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Provides access to the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass} if Programming Rights are
      * present.
-     * 
+     *
      * @return the wrapped property definition
      */
     @Programming
@@ -123,7 +123,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * Get the untranslated user-friendly name of this property. For example, {@code User type} instead of the internal
      * {@code usertype}.
-     * 
+     *
      * @return the configured pretty name of this property definition
      * @see #getName() {@code getName()} returns the actual property name
      */
@@ -135,19 +135,19 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
 
     /**
      * Get the translated user-friendly name of this property.
-     * 
+     *
      * @return the configured pretty name of this property definition
      * @see #getName() {@code getName()} returns the actual property name
      */
     public String getTranslatedPrettyName()
     {
-        return getBasePropertyClass().getTranslatedPrettyName(context);
+        return getBasePropertyClass().getTranslatedPrettyName(this.context);
     }
 
     /**
      * Get the message that should be displayed when a value for an instance of this property definition fails the
      * validation. For example, {@code Please enter a valid IP address}.
-     * 
+     *
      * @return the configured validation message
      * @see #getValidationRegExp() {@code getValidationRegExp()} returns the regular expression used for validating the
      *      property value
@@ -159,7 +159,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
 
     /**
      * Get the regular expression used for validating a value for an instance of this property definition.
-     * 
+     *
      * @return a string representation of the validation regular expression
      * @see #getValidationMessage() {@code getValidationMessage()} returns the message that should be displayed in case
      *      the validation failed
@@ -171,7 +171,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
 
     /**
      * Get a tooltip string that should be displayed for input fields for instances of this property definition.
-     * 
+     *
      * @return A raw tooltip string. The value does not escape special HTML characters, so the caller should manually
      *         escape quotes if the tooltip should be used as a value for the HTML {@code title} attribute.
      */
@@ -183,7 +183,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * See if this property is disabled or not. A disabled property should not be editable, but existing object values
      * are still kept in the database.
-     * 
+     *
      * @return {@code true} if this property is disabled and should not be used, {@code false} otherwise
      * @since 2.4M2
      */
@@ -195,7 +195,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * If the property is a {@link ListClass}, returns the possible values. These are the internal values (keys), and
      * not the user-friendly or translated values that would be displayed to the user.
-     * 
+     *
      * @return the list of possible ({@code String}) values
      * @see #getMapValues() {@code getMapValues()} returns both the keys and their user-friendly displayed values
      **/
@@ -214,7 +214,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
     /**
      * If the property is a {@link ListClass}, returns the possible values as a map {@code internal key <-> displayed
      * value}.
-     * 
+     *
      * @return the map of possible ({@code String}) values and their associated ({@code ListItem}) displayed values
      * @see #getListValues() {@code getListValues()} returns only the list of possible internal keys
      **/
@@ -232,7 +232,7 @@ public class PropertyClass extends Collection implements Comparable<PropertyClas
 
     /**
      * Compares two property definitions based on their index number.
-     * 
+     *
      * @param other the other property definition to be compared with
      * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
      *         the specified object.

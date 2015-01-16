@@ -32,20 +32,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Register xwiki action.
- * 
+ *
  * @version $Id$
  */
 public class RegisterAction extends XWikiAction
 {
     /** Name of the corresponding template and URL parameter. */
     private static final String REGISTER = "register";
-    
+
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterAction.class);
-    
+
     /** Space where the registration config and class are stored. */
     private static final String WIKI_SPACE = "XWiki";
-    
+
     /** For verifying, if needed, the captcha answer submitted. */
     private static CaptchaVerifier verifier = Utils.getComponent(CaptchaVerifier.class, "image");
 
@@ -95,10 +95,10 @@ public class RegisterAction extends XWikiAction
     {
         return REGISTER;
     }
-    
+
     /**
      * Verifies the user captcha answer (if required).
-     * 
+     *
      * @param context Current context
      * @param xwiki Current wiki
      * @return true If the user submitted the correct answer or if no captcha is required
@@ -106,7 +106,7 @@ public class RegisterAction extends XWikiAction
      */
     private boolean verifyCaptcha(XWikiContext context, XWiki xwiki) throws XWikiException
     {
-        //No verification if the current user has programming rights.
+        // No verification if the current user has programming rights.
         if (xwiki.getRightService().hasProgrammingRights(context)) {
             return true;
         }
@@ -115,9 +115,9 @@ public class RegisterAction extends XWikiAction
         DocumentReference configRef = new DocumentReference(context.getWikiId(), WIKI_SPACE, "RegistrationConfig");
         DocumentReference classReference = new DocumentReference(context.getWikiId(), WIKI_SPACE, "Registration");
         XWikiDocument configDoc = xwiki.getDocument(configRef, context);
-        //Retrieve the captcha configuration. 
+        // Retrieve the captcha configuration.
         int captcha = configDoc.getIntValue(classReference, "requireCaptcha");
-        
+
         if (captcha == 1) {
             try {
                 if (!verifier.isAnswerCorrect(verifier.getUserId(request), request.get("captcha_answer"))) {
@@ -125,7 +125,7 @@ public class RegisterAction extends XWikiAction
                     return false;
                 }
             } catch (Exception e) {
-                LOGGER.warn("Cannot verify captcha answer: {}", e.getMessage()); 
+                LOGGER.warn("Cannot verify captcha answer: {}", e.getMessage());
                 return false;
             }
         }

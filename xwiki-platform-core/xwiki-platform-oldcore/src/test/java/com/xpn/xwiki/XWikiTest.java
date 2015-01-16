@@ -32,7 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -63,7 +63,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
@@ -416,7 +416,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Check that the user validation feature works when the validation key is stored both as plain text and as a hashed
      * field.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testValidationKeyStorage() throws Exception
@@ -465,7 +465,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     /**
      * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testGetPrefsClass() throws Exception
@@ -494,7 +494,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             });
         mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
 
-        xwiki.getPrefsClass(getContext());
-        xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
     }
 }

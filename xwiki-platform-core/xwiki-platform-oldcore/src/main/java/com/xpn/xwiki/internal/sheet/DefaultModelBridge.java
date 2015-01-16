@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Bridge between the sheet module and the old XWiki model.
- * 
+ *
  * @version $Id$
  * @since 4.1M1
  */
@@ -70,8 +70,8 @@ public class DefaultModelBridge implements ModelBridge
         try {
             return ((XWikiDocument) document).getDefaultEditMode(this.xcontextProvider.get());
         } catch (XWikiException e) {
-            logger.warn("Failed to get the default edit mode for [{}].",
-                defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            this.logger.warn("Failed to get the default edit mode for [{}].",
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
             return null;
         }
     }
@@ -86,8 +86,9 @@ public class DefaultModelBridge implements ModelBridge
                 XWikiContext xcontext = this.xcontextProvider.get();
                 return xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext);
             } catch (XWikiException e) {
-                String stringReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                logger.warn("Failed to load the default translation of [{}].", stringReference, e);
+                String stringReference =
+                    this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+                this.logger.warn("Failed to load the default translation of [{}].", stringReference, e);
             }
         }
         return document;

@@ -39,14 +39,10 @@
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

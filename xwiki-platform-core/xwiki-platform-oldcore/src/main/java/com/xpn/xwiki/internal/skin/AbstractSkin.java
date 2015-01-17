@@ -34,7 +34,7 @@ public abstract class AbstractSkin implements Skin
 
     protected String id;
 
-    protected ResourceRepository parent;
+    protected Skin parent;
 
     public AbstractSkin(String id, SkinManager skinManager, SkinConfiguration configuration)
     {
@@ -50,7 +50,7 @@ public abstract class AbstractSkin implements Skin
     }
 
     @Override
-    public ResourceRepository getParent()
+    public Skin getParent()
     {
         if (this.parent == null) {
             this.parent = createParent();

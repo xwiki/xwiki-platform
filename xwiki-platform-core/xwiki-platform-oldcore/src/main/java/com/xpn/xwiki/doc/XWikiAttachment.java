@@ -70,6 +70,14 @@ public class XWikiAttachment implements Cloneable
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
 
     /**
+     * {@link Tika} is thread safe and the configuration initialization is quite expensive so we keep it (and it's
+     * blocking all others detections when initializing despite the fact that they will still all redo the complete
+     * initialization).
+     */
+    // TODO: move that in a singleton component to be shared between everything that needs it
+    private static final Tika TIKA = new Tika();
+
+    /**
      * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
      * wiki).
      */
@@ -856,9 +864,7 @@ public class XWikiAttachment implements Cloneable
         // We try name-based detection and then fall back on content-based detection. We don't do this in a single step,
         // by passing both the content and the file name to Tika, because the default detector looks at the content
         // first which can be an issue for large attachments. Our approach is less accurate but has better performance.
-        Tika tika = new Tika();
-        // Name-based detection is quick but less accurate.
-        String mediaType = tika.detect(getFilename());
+        String mediaType = TIKA.detect(getFilename());
         if (MediaType.OCTET_STREAM.toString().equals(mediaType)) {
             try {
                 // Content-based detection is more accurate but it may require loading the attachment content in memory
@@ -871,7 +877,7 @@ public class XWikiAttachment implements Cloneable
                 // can happen for small files if AutoCloseInputStream is used, which supports the mark and reset methods
                 // so Tika uses it directly. In this case, the input stream is automatically closed after the first
                 // detector reads it so the next detector fails to read it.
-                mediaType = tika.detect(new BufferedInputStream(getContentInputStream(context)));
+                mediaType = TIKA.detect(new BufferedInputStream(getContentInputStream(context)));
             } catch (Exception e) {
                 LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type.", getReference());
             }

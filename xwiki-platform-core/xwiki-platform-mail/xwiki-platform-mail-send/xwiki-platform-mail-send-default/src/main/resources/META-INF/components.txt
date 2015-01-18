@@ -12,7 +12,6 @@ org.xwiki.mail.internal.thread.PrepareMailQueueManager
 org.xwiki.mail.internal.thread.SendMailQueueManager
 org.xwiki.mail.internal.thread.PrepareMailRunnable
 org.xwiki.mail.internal.thread.SendMailRunnable
-org.xwiki.mail.internal.SessionProvider
 org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.template.SecureTemplateMimeBodyPartFactory
 org.xwiki.mail.internal.template.TemplateMimeMessageFactory
@@ -28,3 +27,4 @@ org.xwiki.mail.internal.iterator.factory.DefaultUsersMimeMessageIteratorFactory
 org.xwiki.mail.internal.iterator.factory.DefaultGroupMimeMessageIteratorFactory
 org.xwiki.mail.internal.iterator.factory.DefaultSerializedFilesMimeMessageIteratorFactory
 org.xwiki.mail.internal.FileSystemMailContentStore
+org.xwiki.mail.internal.DefaultSessionFactory

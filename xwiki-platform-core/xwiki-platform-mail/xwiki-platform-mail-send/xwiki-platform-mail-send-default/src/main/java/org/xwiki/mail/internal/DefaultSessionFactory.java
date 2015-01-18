@@ -19,8 +19,10 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Map;
+import java.util.Properties;
+
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.mail.Session;
 
@@ -29,28 +31,35 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.XWikiAuthenticator;
 
 /**
- * Provide the JavaMail Session needed to create an instance of {@link javax.mail.internet.MimeMessage}.
+ * Create a Java Mail {@link javax.mail.Session} object, taking its properties from the XWiki Configuration but allowing
+ * to pass additional properties (for example to reuse an existing Batch Id).
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
  */
 @Component
 @Singleton
-public class SessionProvider implements Provider<Session>
+public class DefaultSessionFactory implements SessionFactory
 {
     @Inject
     private MailSenderConfiguration configuration;
 
     @Override
-    public Session get()
+    public Session create(Map<String, String> additionProperties)
     {
         Session session;
-        if (this.configuration.usesAuthentication()) {
-            session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
-        } else {
-            session = Session.getInstance(this.configuration.getAllProperties());
+
+        Properties properties = this.configuration.getAllProperties();
+        for (Map.Entry<String, String> entry : additionProperties.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
         }
+
+        if (this.configuration.usesAuthentication()) {
+            session = Session.getInstance(properties, new XWikiAuthenticator(this.configuration));
+        } else {
+            session = Session.getInstance(properties);
+        }
+
         return session;
     }
 }

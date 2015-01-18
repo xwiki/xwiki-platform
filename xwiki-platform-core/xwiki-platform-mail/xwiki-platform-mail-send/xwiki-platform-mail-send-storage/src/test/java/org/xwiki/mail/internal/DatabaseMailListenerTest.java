@@ -31,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 import org.slf4j.Logger;
 import org.xwiki.mail.MailContentStore;
@@ -41,9 +42,9 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.LogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link DatabaseMailListener}.
@@ -65,7 +66,7 @@ public class DatabaseMailListenerTest
 
     private MimeMessage message;
 
-    private UUID batchId = UUID.randomUUID();
+    private String batchId = UUID.randomUUID().toString();
 
     private UUID mailId = UUID.randomUUID();
 
@@ -75,7 +76,7 @@ public class DatabaseMailListenerTest
         Session session = Session.getInstance(new Properties());
         this.message = new MimeMessage(session);
         this.message.setHeader("X-MailID", this.mailId.toString());
-        this.message.setHeader("X-BatchID", this.batchId.toString());
+        this.message.setHeader("X-BatchID", this.batchId);
         this.message.setHeader("X-MailType", "type");
     }
 
@@ -91,42 +92,21 @@ public class DatabaseMailListenerTest
     }
 
     @Test
-    public void onPrepareWithPreviouslyFailedMessageAndWhenContentStoreFails() throws Exception
+    public void onPrepareWhenSaveFails() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.emptyMap();
-        MailStatus status = new MailStatus(this.message, MailState.FAILED);
-        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
-            this.mailId.toString()), 0, 0)).thenReturn(Arrays.asList(status));
+        doThrow(new MailStoreException("error")).when(mailStatusStore).save(any(MailStatus.class), anyMap());
 
-        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId.toString(),
-            this.mailId.toString());
+        Map < String, Object > parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
 
         this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
 
-        assertEquals("Failed to remove previously failing message [" + this.mailId + "] (batch id [" + this.batchId
-            + "]) from the file system. Reason [MailStoreException: error].", this.logRule.getMessage(0));
-    }
+        ArgumentCaptor<MailStatus> statusCapture = ArgumentCaptor.forClass(MailStatus.class);
+        verify(mailStatusStore).save(statusCapture.capture(), anyMap());
 
-    @Test
-    public void onPrepareWithPreviouslyFailedMessage() throws Exception
-    {
-        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        MailStatus status = new MailStatus(this.message, MailState.FAILED);
-        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
-            this.mailId.toString()), 0, 0)).thenReturn(Arrays.asList(status));
-
-        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
-
-        verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()), 0, 0);
-
-        verify(mailContentStore).delete(this.batchId.toString(), this.mailId.toString());
-
-        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.READY, "mywiki")), eq(parameters));
+        assertEquals("Failed to save mail status [messageId = [" + this.mailId.toString() + "], batchId = ["
+            + this.batchId + "], state = [ready], date = [" + statusCapture.getValue().getDate() + "], "
+            + "recipients = [<null>], type = [type], wiki = [mywiki]] to the database", this.logRule.getMessage(0));
     }
 
     @Test
@@ -143,6 +123,49 @@ public class DatabaseMailListenerTest
 
         verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()), 0, 0);
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT, "otherwiki")), eq(parameters));
+
+        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        verify(mailContentStore).delete(this.batchId, this.mailId.toString());
+    }
+
+    @Test
+    public void onSuccessWhenStatusLoadFails() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
+            this.mailId.toString()), 0, 0)).thenThrow(new MailStoreException("error"));
+
+        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
+
+        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
+
+        assertEquals("Failed to load mail status for message id [" + this.mailId + "] from the database",
+            this.logRule.getMessage(0));
+
+        // Verify that save didn't happen, nor the delete
+        verify(mailStatusStore, never()).save(any(MailStatus.class), anyMap());
+        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        verify(mailContentStore, never()).delete(anyString(), anyString());
+    }
+
+    @Test
+    public void onSuccessWhenMailContentDeletionFails() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
+        MailStatus status = new MailStatus(this.message, MailState.READY);
+        status.setWiki("otherwiki");
+        when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
+            this.mailId.toString()), 0, 0)).thenReturn(Arrays.asList(status));
+
+        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId, this.mailId.toString());
+
+        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
+
+        assertEquals("Failed to remove previously failing message [" + this.mailId.toString() + "] (batch id ["
+            + this.batchId + "]) from the file system. Reason [MailStoreException: error].",
+            this.logRule.getMessage(0));
     }
 
     @Test
@@ -155,14 +178,9 @@ public class DatabaseMailListenerTest
         when(mailStatusStore.load(Collections.<String, Object>singletonMap("id",
             this.mailId.toString()), 0, 0)).thenReturn(Arrays.asList(status));
 
-        MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-
         this.mocker.getComponentUnderTest().onError(this.message, new Exception("Error"), parameters);
 
         verify(mailStatusStore).load(Collections.<String, Object>singletonMap("id", this.mailId.toString()), 0, 0);
-
-            verify(mailContentStore).save(this.message);
-
         verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.FAILED, "otherwiki")), eq(parameters));
     }
 
@@ -185,7 +203,7 @@ public class DatabaseMailListenerTest
         public boolean matches(Object argument)
         {
             MailStatus statusArgument = (MailStatus) argument;
-            return statusArgument.getBatchId().equals(batchId.toString()) &&
+            return statusArgument.getBatchId().equals(batchId) &&
                 statusArgument.getMessageId().equals(mailId.toString()) &&
                 statusArgument.getType().equals("type") &&
                 statusArgument.getState().equals(state) &&

@@ -122,7 +122,7 @@ public class SendMailRunnable extends AbstractMailRunnable
             message = this.mailContentStore.load(item.getSession(), item.getBatchId().toString(), item.getMessageId());
         } catch (Exception e) {
             // Simply log an error since we cannot call the listener as the message is null.
-            this.logger.error("Failed to load the message [{}] from the content store", item);
+            this.logger.error("Failed to load the message [{}] from the content store", item, e);
             return;
         }
 

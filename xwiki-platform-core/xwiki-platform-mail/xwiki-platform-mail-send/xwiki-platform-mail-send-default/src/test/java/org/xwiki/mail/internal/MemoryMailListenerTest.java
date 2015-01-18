@@ -54,19 +54,19 @@ public class MemoryMailListenerTest
     {
         MemoryMailListener listener = this.mocker.getComponentUnderTest();
 
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
 
         UUID mailId1 = UUID.randomUUID();
         UUID mailId2 = UUID.randomUUID();
 
         MimeMessage message1 = mock(MimeMessage.class);
-        when(message1.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
+        when(message1.getHeader("X-BatchID", null)).thenReturn(batchId);
         when(message1.getHeader("X-MailID", null)).thenReturn(mailId1.toString());
         when(message1.getHeader("X-MailType", null)).thenReturn("mailtype1");
         listener.onError(message1, new Exception("error1"), Collections.<String, Object>emptyMap());
 
         MimeMessage message2 = mock(MimeMessage.class);
-        when(message2.getHeader("X-BatchID", null)).thenReturn(batchId.toString());
+        when(message2.getHeader("X-BatchID", null)).thenReturn(batchId);
         when(message2.getHeader("X-MailID", null)).thenReturn(mailId2.toString());
         when(message2.getHeader("X-MailType", null)).thenReturn("mailtype2");
         listener.onError(message2, new Exception("error2"), Collections.<String, Object>emptyMap());
@@ -77,14 +77,14 @@ public class MemoryMailListenerTest
         MailStatus status = results.next();
         assertEquals("Exception: error1", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error1"));
-        assertEquals(batchId.toString(), status.getBatchId());
+        assertEquals(batchId, status.getBatchId());
         assertEquals(mailId1.toString(), status.getMessageId());
         assertEquals("mailtype1", status.getType());
 
         status = results.next();
         assertEquals("Exception: error2", status.getErrorSummary());
         assertTrue(status.getErrorDescription().contains("error2"));
-        assertEquals(batchId.toString(), status.getBatchId());
+        assertEquals(batchId, status.getBatchId());
         assertEquals(mailId2.toString(), status.getMessageId());
         assertEquals("mailtype2", status.getType());
 

@@ -111,12 +111,12 @@ public class MailStorageScriptServiceTest
 
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        message.setHeader("X-BatchID", batchId.toString());
+        String batchId = UUID.randomUUID().toString();
+        message.setHeader("X-BatchID", batchId);
         message.setHeader("X-MailID", "messageId");
 
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(any(Session.class), eq(batchId.toString()), eq("messageId"))).thenReturn(message);
+        when(contentStore.load(any(Session.class), eq(batchId), eq("messageId"))).thenReturn(message);
 
         MailQueueManager<SendMailQueueItem> mailQueueManager = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
@@ -125,7 +125,7 @@ public class MailStorageScriptServiceTest
         when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(Session.class),
             same(memoryMailListener))).thenReturn(new DefaultMailResult(batchId, mailQueueManager));
 
-        ScriptMailResult result = this.mocker.getComponentUnderTest().resend(batchId.toString(), "messageId");
+        ScriptMailResult result = this.mocker.getComponentUnderTest().resend(batchId, "messageId");
 
         assertNotNull(result);
         assertEquals(batchId, result.getBatchId());

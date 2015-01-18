@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail;
 
-import java.util.UUID;
-
 /**
  * The result of the batch of emails being sent.
  *
@@ -46,5 +44,5 @@ public interface MailResult
     /**
      * @return the batch id for this session of mail sending
      */
-    UUID getBatchId();
+    String getBatchId();
 }

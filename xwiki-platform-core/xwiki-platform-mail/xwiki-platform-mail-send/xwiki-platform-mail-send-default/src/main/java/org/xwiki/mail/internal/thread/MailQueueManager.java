@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.UUID;
-
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -64,11 +62,11 @@ public interface MailQueueManager<T extends MailQueueItem>
      * @param batchId the batch id for the batch we're inspecting
      * @param timeout the maximum number of seconds to wait till we consider there's been an error
      */
-    void waitTillProcessed(UUID batchId, long timeout);
+    void waitTillProcessed(String batchId, long timeout);
 
     /**
      * @param batchId the batch id for the batch we're inspecting
      * @return true if all mails from the passed batch id have been processed or false otherwise
      */
-    boolean isProcessed(UUID batchId);
+    boolean isProcessed(String batchId);
 }

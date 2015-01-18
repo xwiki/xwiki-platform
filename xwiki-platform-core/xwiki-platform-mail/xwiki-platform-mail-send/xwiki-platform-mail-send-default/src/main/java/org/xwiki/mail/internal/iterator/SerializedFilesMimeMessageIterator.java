@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -64,7 +63,7 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
      * @param componentManager used to dynamically load components
      * @throws MessagingException when an error occurs when retrieving messages
      */
-    public SerializedFilesMimeMessageIterator(UUID batchId, Map<String, Object> parameters,
+    public SerializedFilesMimeMessageIterator(String batchId, Map<String, Object> parameters,
         ComponentManager componentManager) throws MessagingException
     {
         this.componentManager = componentManager;
@@ -74,13 +73,14 @@ public class SerializedFilesMimeMessageIterator extends AbstractMessageIterator
             throw new MessagingException("Failed to find default Environment", e);
         }
         this.batchDirectory =
-            new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchId.toString());
+            new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchId);
         this.files = this.batchDirectory.listFiles();
         this.iteratorSize = this.files.length;
         this.parameters = parameters;
     }
 
-    @Override protected MimeMessage createMessage() throws MessagingException
+    @Override
+    protected MimeMessage createMessage() throws MessagingException
     {
         File file = this.files[this.position];
         Session session = (Session) this.parameters.get("session");

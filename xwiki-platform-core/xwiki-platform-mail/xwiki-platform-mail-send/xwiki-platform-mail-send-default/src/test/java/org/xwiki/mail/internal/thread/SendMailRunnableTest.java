@@ -90,7 +90,7 @@ public class SendMailRunnableTest
         message2.setHeader("X-MailID", "id2");
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
 
         SendMailQueueItem item1 = new SendMailQueueItem("id1", session, listener, batchId, "wiki1");
         SendMailQueueItem item2 = new SendMailQueueItem("id2", session, listener, batchId, "wiki2");
@@ -100,8 +100,8 @@ public class SendMailRunnableTest
 
         // Simulate loading the message from the content store
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(session, batchId.toString(), "id1")).thenReturn(message1);
-        when(contentStore.load(session, batchId.toString(), "id2")).thenReturn(message2);
+        when(contentStore.load(session, batchId, "id1")).thenReturn(message1);
+        when(contentStore.load(session, batchId, "id2")).thenReturn(message2);
 
         // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.

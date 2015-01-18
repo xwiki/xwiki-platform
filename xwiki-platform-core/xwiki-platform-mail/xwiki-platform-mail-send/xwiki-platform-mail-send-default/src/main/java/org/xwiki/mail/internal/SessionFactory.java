@@ -17,46 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal.thread;
+package org.xwiki.mail.internal;
+
+import java.util.Map;
 
 import javax.mail.Session;
 
-import org.xwiki.mail.MailListener;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Represents a Mail Message placed on the queue for sending.
+ * Create a Java Mail {@link javax.mail.Session} object, taking its properties from some configuration location but
+ * allowing to pass additional properties (for example to reuse an existing Batch Id).
  *
  * @version $Id$
  * @since 6.4
  */
-public class SendMailQueueItem extends AbstractMailQueueItem
+@Role
+public interface SessionFactory
 {
-    private String messageId;
-
     /**
-     * @param messageId see {@link #getMessageId()}
-     * @param session see {@link #getSession()}
-     * @param listener see {@link #getListener()}
-     * @param batchId see {@link #getBatchId()}
-     * @param wikiId see {@link #getWikiId()}
+     * @param additionProperties some additional properties overriding the ones from the configuration
+     * @return the Session object to use when performing JavaMail operations
      */
-    public SendMailQueueItem(String messageId, Session session, MailListener listener, String batchId, String wikiId)
-    {
-        super(session, listener, batchId, wikiId);
-        this.messageId = messageId;
-    }
-
-    /**
-     * @return the unique id of the MimeMessage to send
-     */
-    public String getMessageId()
-    {
-        return this.messageId;
-    }
-
-    @Override
-    public String toString()
-    {
-        return prepareToString().append("messageId", getMessageId()).toString();
-    }
+    Session create(Map<String, String> additionProperties);
 }

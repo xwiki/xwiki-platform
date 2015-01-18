@@ -63,7 +63,7 @@ import static org.mockito.Mockito.when;
 public class GroupMimeMessageIteratorTest
 {
     @Test
-    public void testCreateMessage() throws Exception
+    public void createMessage() throws Exception
     {
         DocumentReference groupReference = new DocumentReference("xwiki", "XWiki", "Marketing");
 

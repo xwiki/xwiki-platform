@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.thread;
 
 import java.util.Iterator;
 import java.util.Queue;
@@ -25,21 +25,18 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
 
 /**
- * Handles all operations on the Mail Sending Queue.
+ * Handles all operations on the Mail Queues.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
+ * @param <T> the type of the Mail Queue Item managed by the Queue Manager
  */
-@Component
-@Singleton
-public class DefaultMailQueueManager implements MailQueueManager
+public abstract class AbstractMailQueueManager<T extends MailQueueItem> implements MailQueueManager<T>
 {
     @Inject
     private Logger logger;
@@ -48,42 +45,42 @@ public class DefaultMailQueueManager implements MailQueueManager
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
      */
-    private Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
+    private Queue<T> mailQueue = new ConcurrentLinkedQueue<>();
 
     /**
      * @return the mail queue containing all pending mails to be sent
      */
-    private Queue<MailSenderQueueItem> getMailQueue()
+    private Queue<T> getMailQueue()
     {
         return this.mailQueue;
     }
 
     @Override
-    public void addToQueue(MailSenderQueueItem mailSenderQueueItem)
+    public void addToQueue(T mailQueueItem)
     {
-        this.mailQueue.add(mailSenderQueueItem);
+        this.mailQueue.add(mailQueueItem);
     }
 
     @Override
-    public boolean hasMessageToSend()
+    public boolean hasMessage()
     {
         return !this.mailQueue.isEmpty();
     }
 
     @Override
-    public MailSenderQueueItem peekMessage()
+    public T peekMessage()
     {
         return this.mailQueue.peek();
     }
 
     @Override
-    public boolean removeMessageFromQueue(MailSenderQueueItem mailSenderQueueItem)
+    public boolean removeMessageFromQueue(T mailQueueItem)
     {
-        return this.mailQueue.remove(mailSenderQueueItem);
+        return this.mailQueue.remove(mailQueueItem);
     }
 
     @Override
-    public void waitTillSent(UUID batchId, long timeout)
+    public void waitTillProcessed(UUID batchId, long timeout)
     {
         long startTime = System.currentTimeMillis();
         while (!isProcessed(batchId) && System.currentTimeMillis() - startTime < timeout) {
@@ -101,9 +98,9 @@ public class DefaultMailQueueManager implements MailQueueManager
     @Override
     public boolean isProcessed(UUID batchId)
     {
-        Iterator<MailSenderQueueItem> iterator = getMailQueue().iterator();
+        Iterator<? extends MailQueueItem> iterator = getMailQueue().iterator();
         while (iterator.hasNext()) {
-            MailSenderQueueItem item = iterator.next();
+            MailQueueItem item = iterator.next();
             if (batchId == item.getBatchId()) {
                 return false;
             }

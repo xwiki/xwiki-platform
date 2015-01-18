@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.thread;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.UUID;
@@ -34,9 +33,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -47,20 +48,20 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultMailSenderRunnable}.
+ * Unit tests for {@link SendMailRunnable}.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.4
  */
 @ComponentList({
     MemoryMailListener.class,
-    DefaultMailQueueManager.class
+    SendMailQueueManager.class
 })
-public class DefaultMailSenderRunnableTest
+public class SendMailRunnableTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultMailSenderRunnable> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailSenderRunnable.class);
+    public MockitoComponentMockingRule<SendMailRunnable> mocker =
+        new MockitoComponentMockingRule<>(SendMailRunnable.class);
 
     @Before
     public void setUp() throws Exception
@@ -71,7 +72,7 @@ public class DefaultMailSenderRunnableTest
     }
 
     @Test
-    public void runInternalWhenMailSendingFails() throws Exception
+    public void sendMailWhenSendingFails() throws Exception
     {
         // Create a Session with an invalid host so that it generates an error
         Properties properties = new Properties();
@@ -81,33 +82,39 @@ public class DefaultMailSenderRunnableTest
         MimeMessage message1 = new MimeMessage(session);
         message1.setSubject("subject1");
         message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
+        message1.setHeader("X-MailID", "id1");
 
         MimeMessage message2 = new MimeMessage(session);
         message2.setSubject("subject2");
         message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
+        message2.setHeader("X-MailID", "id2");
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         UUID batchId = UUID.randomUUID();
 
-        MailSenderQueueItem item1 =
-            new MailSenderQueueItem(Arrays.asList(message1), session, listener, batchId, "wiki1");
-        MailSenderQueueItem item2 =
-            new MailSenderQueueItem(Arrays.asList(message2), session, listener, batchId, "wiki2");
+        SendMailQueueItem item1 = new SendMailQueueItem("id1", session, listener, batchId, "wiki1");
+        SendMailQueueItem item2 = new SendMailQueueItem("id2", session, listener, batchId, "wiki2");
 
-        MailQueueManager mailQueueManager = this.mocker.getInstance(MailQueueManager.class);
+        MailQueueManager mailQueueManager = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
+
+        // Simulate loading the message from the content store
+        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        when(contentStore.load(session, batchId.toString(), "id1")).thenReturn(message1);
+        when(contentStore.load(session, batchId.toString(), "id2")).thenReturn(message2);
 
         // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
         mailQueueManager.addToQueue(item1);
         mailQueueManager.addToQueue(item2);
 
-        MailSenderRunnable runnable = this.mocker.getComponentUnderTest();
+        MailRunnable runnable = this.mocker.getComponentUnderTest();
         Thread thread = new Thread(runnable);
         thread.start();
 
         // Wait for the mails to have been processed.
         try {
-            mailQueueManager.waitTillSent(batchId, 10000L);
+            mailQueueManager.waitTillProcessed(batchId, 10000L);
         } finally {
             runnable.stopProcessing();
             thread.interrupt();

@@ -42,12 +42,17 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
+import org.xwiki.environment.internal.EnvironmentConfiguration;
+import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
-import org.xwiki.mail.internal.DefaultMailQueueManager;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderRunnable;
+import org.xwiki.mail.internal.thread.PrepareMailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueManager;
+import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.internal.SessionProvider;
@@ -80,14 +85,18 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList({
     MailSenderScriptService.class,
+    StandardEnvironment.class,
     DefaultMailSender.class,
     DefaultExecution.class,
     ContextComponentManagerProvider.class,
     DefaultMimeBodyPartFactory.class,
     MemoryMailListener.class,
-    DefaultMailSenderRunnable.class,
-    DefaultMailQueueManager.class,
-    SessionProvider.class
+    SessionProvider.class,
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
 })
 public class ScriptingIntegrationTest
 {
@@ -119,6 +128,10 @@ public class ScriptingIntegrationTest
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
+
+        EnvironmentConfiguration environmentConfiguration =
+            this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
     }
 
     @Before
@@ -132,7 +145,7 @@ public class ScriptingIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.componentManager.getInstance(MailSender.class)).stopMailSenderThread();
+        ((DefaultMailSender) this.componentManager.getInstance(MailSender.class)).stopMailThreads();
     }
 
     @Test
@@ -142,18 +155,22 @@ public class ScriptingIntegrationTest
         Execution execution = this.componentManager.getInstance(Execution.class);
         execution.setContext(new ExecutionContext());
 
-        MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
-        message.addPart("text/plain", "some text here");
+        MimeMessageWrapper message1 = this.scriptService.createMessage("john@doe.com", "subject");
+        message1.addPart("text/plain", "some text here");
+        MimeMessageWrapper message2 = this.scriptService.createMessage("john@doe.com", "subject");
+        message2.addPart("text/plain", "some text here");
+        MimeMessageWrapper message3 = this.scriptService.createMessage("john@doe.com", "subject");
+        message3.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        List<MimeMessageWrapper> messagesList = Arrays.asList(message, message, message);
+        List<MimeMessageWrapper> messagesList = Arrays.asList(message1, message2, message3);
         ScriptMailResult result = this.scriptService.sendAsynchronously(messagesList, "memory");
 
         // Verify that there are no errors
         assertNull(this.scriptService.getLastError());
 
         // Wait for all mails to be sent
-        result.waitTillSent(10000L);
+        result.waitTillProcessed(10000L);
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",
@@ -221,7 +238,7 @@ public class ScriptingIntegrationTest
         assertNull(this.scriptService.getLastError());
 
         // Wait for all mails to be sent
-        result.waitTillSent(10000L);
+        result.waitTillProcessed(10000L);
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",

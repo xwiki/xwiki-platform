@@ -1,4 +1,3 @@
 org.xwiki.mail.MailStorageScriptService
 org.xwiki.mail.internal.DatabaseMailListener
 org.xwiki.mail.internal.DatabaseMailStatusStore
-org.xwiki.mail.internal.FileSystemMailContentStore

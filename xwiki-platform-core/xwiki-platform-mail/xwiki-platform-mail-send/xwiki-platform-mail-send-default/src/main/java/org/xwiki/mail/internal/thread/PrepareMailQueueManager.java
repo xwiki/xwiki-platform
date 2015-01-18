@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.thread;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 
 /**
- * Runnable to regularly check for mails on a Queue, and for each mail try to send it.
+ * Handles all operations on the Prepare Mail Queue.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
  */
-@Role
-public interface MailSenderRunnable extends Runnable
+@Component
+@Singleton
+public class PrepareMailQueueManager extends AbstractMailQueueManager<PrepareMailQueueItem>
+    implements MailQueueManager<PrepareMailQueueItem>
 {
-    /**
-     * Stop the processing to stop the thread.
-     */
-    void stopProcessing();
 }

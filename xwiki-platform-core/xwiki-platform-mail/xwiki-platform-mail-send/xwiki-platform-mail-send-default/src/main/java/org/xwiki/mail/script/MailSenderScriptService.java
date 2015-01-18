@@ -236,7 +236,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
         ScriptMailResult scriptMailResult = sendAsynchronously(messages, hint);
 
         // Wait for all messages from this batch to have been sent before returning
-        scriptMailResult.waitTillSent(Long.MAX_VALUE);
+        scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
 
         return scriptMailResult;
     }

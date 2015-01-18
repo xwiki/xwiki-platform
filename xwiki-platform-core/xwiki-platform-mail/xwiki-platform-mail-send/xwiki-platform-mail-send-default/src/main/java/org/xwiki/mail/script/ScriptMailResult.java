@@ -58,9 +58,9 @@ public class ScriptMailResult implements MailResult
     }
 
     @Override
-    public void waitTillSent(long timeout)
+    public void waitTillProcessed(long timeout)
     {
-        this.wrappedMailResult.waitTillSent(timeout);
+        this.wrappedMailResult.waitTillProcessed(timeout);
     }
 
     @Override

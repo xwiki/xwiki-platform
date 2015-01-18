@@ -17,35 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.thread;
 
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.UUID;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.MailSenderQueueItem}.
+ * Runnable to regularly check for mails on a Queue, and for each mail try to send it.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.4
  */
-public class MailSenderQueueItemTest
+@Role
+public interface MailRunnable extends Runnable
 {
-    @Test
-    public void verifyToString() throws Exception
-    {
-        Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
-        MailSenderQueueItem item = new MailSenderQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
-
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
-    }
+    /**
+     * Stop the processing to stop the thread.
+     */
+    void stopProcessing();
 }

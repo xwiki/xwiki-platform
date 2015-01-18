@@ -17,27 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.thread;
 
 import java.util.UUID;
 
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.mail.MailListener;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * Represents a Mail messages placed on the queue for sending.
+ * Represents a Mail messages placed on the queue for processing. Extending classes define how to reference the mail
+ * message itself.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.4
  */
-public class MailSenderQueueItem
+public abstract class AbstractMailQueueItem implements MailQueueItem
 {
-    private Iterable<? extends MimeMessage> messages;
-
     private Session session;
 
     private MailListener listener;
@@ -47,41 +45,26 @@ public class MailSenderQueueItem
     private String wikiId;
 
     /**
-     * @param messages see {@link #getMessages()}
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
      * @param wikiId see {@link #getWikiId()}
      */
-    public MailSenderQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
-        UUID batchId, String wikiId)
+    public AbstractMailQueueItem(Session session, MailListener listener, UUID batchId, String wikiId)
     {
-        this.messages = messages;
         this.session = session;
         this.listener = listener;
         this.batchId = batchId;
         this.wikiId = wikiId;
     }
 
-    /**
-     * @return the list of mail messages to be sent
-     */
-    public Iterable<? extends MimeMessage> getMessages()
-    {
-        return this.messages;
-    }
-
-    /**
-     * @return the JavaMail Session to be used when sending
-     */
+    @Override
     public Session getSession()
     {
         return this.session;
     }
 
-    /**
-     * @return an optional listener to call when the mail is sent successfully or when there's an error
-     */
+    @Override
     public MailListener getListener()
     {
         return this.listener;
@@ -90,23 +73,24 @@ public class MailSenderQueueItem
     @Override
     public String toString()
     {
-        ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("batchId", this.batchId);
-        builder.append("wikiId", getWikiId());
-        return builder.toString();
+        return prepareToString().toString();
     }
 
-    /**
-     * @return the UUID of the batch
-     */
+    protected ToStringBuilder prepareToString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("batchId", getBatchId());
+        builder.append("wikiId", getWikiId());
+        return builder;
+    }
+
+    @Override
     public UUID getBatchId()
     {
         return this.batchId;
     }
 
-    /**
-     * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message
-     */
+    @Override
     public String getWikiId()
     {
         return this.wikiId;

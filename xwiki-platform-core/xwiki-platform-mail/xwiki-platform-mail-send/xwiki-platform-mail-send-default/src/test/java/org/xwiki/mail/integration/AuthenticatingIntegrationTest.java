@@ -39,15 +39,19 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
-import org.xwiki.mail.internal.DefaultMailQueueManager;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderRunnable;
+import org.xwiki.mail.internal.thread.PrepareMailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueManager;
+import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
@@ -78,8 +82,11 @@ import static org.mockito.Mockito.when;
     StandardEnvironment.class,
     DefaultMailSender.class,
     MemoryMailListener.class,
-    DefaultMailSenderRunnable.class,
-    DefaultMailQueueManager.class
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
 })
 public class AuthenticatingIntegrationTest
 {
@@ -122,6 +129,10 @@ public class AuthenticatingIntegrationTest
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
+
+        EnvironmentConfiguration environmentConfiguration =
+            this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
     }
 
     @Before
@@ -140,7 +151,7 @@ public class AuthenticatingIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.sender).stopMailSenderThread();
+        ((DefaultMailSender) this.sender).stopMailThreads();
     }
 
     @Test

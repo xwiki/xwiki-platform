@@ -17,34 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal.thread;
 
-import java.util.UUID;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 
 /**
- * The result of the batch of emails being sent.
+ * Handles all operations on the Send Mail Queue.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
  */
-public interface MailResult
+@Component
+@Singleton
+public class SendMailQueueManager extends AbstractMailQueueManager<SendMailQueueItem>
+    implements MailQueueManager<SendMailQueueItem>
 {
-    /**
-     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     * @since 6.4
-     */
-    void waitTillProcessed(long timeout);
-
-    /**
-     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
-     * @since 6.4RC1
-     */
-    boolean isProcessed();
-
-    /**
-     * @return the batch id for this session of mail sending
-     */
-    UUID getBatchId();
 }

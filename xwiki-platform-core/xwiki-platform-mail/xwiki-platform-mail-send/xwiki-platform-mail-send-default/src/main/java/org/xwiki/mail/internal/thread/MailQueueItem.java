@@ -17,34 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal.thread;
 
 import java.util.UUID;
 
+import javax.mail.Session;
+
+import org.xwiki.mail.MailListener;
+
 /**
- * The result of the batch of emails being sent.
+ * Represents a Mail messages placed on the queue for processing.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
  */
-public interface MailResult
+public interface MailQueueItem
 {
     /**
-     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     * @since 6.4
+     * @return the JavaMail Session to be used when sending
      */
-    void waitTillProcessed(long timeout);
+    Session getSession();
 
     /**
-     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
-     * @since 6.4RC1
+     * @return an optional listener to call when the mail is sent successfully or when there's an error
      */
-    boolean isProcessed();
+    MailListener getListener();
 
     /**
-     * @return the batch id for this session of mail sending
+     * @return the UUID of the batch
      */
     UUID getBatchId();
+
+    /**
+     * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message
+     */
+    String getWikiId();
 }

@@ -17,34 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal.thread;
 
+import java.util.Arrays;
+import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
+import org.junit.Test;
+import org.xwiki.mail.internal.thread.SendMailQueueItem;
+
+import static org.junit.Assert.assertEquals;
+
 /**
- * The result of the batch of emails being sent.
+ * Unit tests for {@link org.xwiki.mail.internal.thread.SendMailQueueItem}.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 6.4
  */
-public interface MailResult
+public class SendMailQueueItemTest
 {
-    /**
-     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     * @since 6.4
-     */
-    void waitTillProcessed(long timeout);
+    @Test
+    public void verifyToString() throws Exception
+    {
+        Session session = Session.getDefaultInstance(new Properties());
+        UUID batchId = UUID.randomUUID();
+        SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId, "wiki");
 
-    /**
-     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
-     * @since 6.4RC1
-     */
-    boolean isProcessed();
-
-    /**
-     * @return the batch id for this session of mail sending
-     */
-    UUID getBatchId();
+        assertEquals("batchId = [" + batchId + "], wikiId = [wiki], messageId = [messageId]", item.toString());
+    }
 }

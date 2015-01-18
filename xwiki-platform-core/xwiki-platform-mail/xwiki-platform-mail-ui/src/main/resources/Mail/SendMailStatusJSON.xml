@@ -90,6 +90,12 @@
   #if("$!{filterStatus}" != '')
     #set ($discard = $filterMap.put('state', "%${filterStatus.trim()}%"))
   #end
+  #if ($xcontext.isMainWiki())
+    #set($filterWiki = "$!{request.get('wiki')}")
+    #if("$!{filterWiki}" != '')
+      #set ($discard = $filterMap.put('wiki', "%${filterWiki.trim()}%"))
+    #end
+  #end
   #set($filterError = "$!{request.get('error')}")
   #if("$!{filterError}" != '')
     #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
@@ -119,6 +125,8 @@
         'type' : "$!item.type",
         'recipients' : "$escapetool.javascript($recipients)",
         'state' : "$!item.state",
+        #if ($xcontext.isMainWiki())'wiki' : "$!item.wiki",
+        #{end}
         'error' : "$!item.errorSummary",
         #if("$!item.state" != 'sent')
           'actions' : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;

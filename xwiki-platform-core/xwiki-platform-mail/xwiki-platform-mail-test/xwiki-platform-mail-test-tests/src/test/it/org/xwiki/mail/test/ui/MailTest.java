@@ -167,6 +167,7 @@ public class MailTest extends AbstractTest
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
         assertTrue(liveTableElement.getRowCount() > 0);
         assertTrue(liveTableElement.hasRow("Error", ""));
     }

@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.UUID;
-
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.internal.thread.MailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailQueueItem;
@@ -33,7 +31,7 @@ import org.xwiki.mail.internal.thread.SendMailQueueItem;
  */
 public class DefaultMailResult implements MailResult
 {
-    private UUID batchId;
+    private String batchId;
 
     private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
 
@@ -42,7 +40,7 @@ public class DefaultMailResult implements MailResult
      *        sent
      * @param sendMailQueueManager the class we used to check when the emails have been sent
      */
-    public DefaultMailResult(UUID batchId, MailQueueManager<SendMailQueueItem> sendMailQueueManager)
+    public DefaultMailResult(String batchId, MailQueueManager<SendMailQueueItem> sendMailQueueManager)
     {
         this.batchId = batchId;
         this.sendMailQueueManager = sendMailQueueManager;
@@ -61,7 +59,7 @@ public class DefaultMailResult implements MailResult
     }
 
     @Override
-    public UUID getBatchId()
+    public String getBatchId()
     {
         return this.batchId;
     }

@@ -53,6 +53,8 @@ import org.xwiki.model.ModelContext;
 @Singleton
 public class DefaultMailSender implements MailSender, Initializable
 {
+    private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
+
     @Inject
     private ComponentManager componentManager;
 
@@ -95,7 +97,11 @@ public class DefaultMailSender implements MailSender, Initializable
     public MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session,
         MailListener listener)
     {
-        UUID batchId = UUID.randomUUID();
+        // If the session has specified a batch id, then use it! This can be used for example when resending email.
+        String batchId = session.getProperty(SESSION_BATCHID_KEY);
+        if (batchId == null) {
+            batchId = UUID.randomUUID().toString();
+        }
 
         // Pass the current wiki so that the mail message will be prepared and later sent in the context of that wiki.
         String wikiId = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();

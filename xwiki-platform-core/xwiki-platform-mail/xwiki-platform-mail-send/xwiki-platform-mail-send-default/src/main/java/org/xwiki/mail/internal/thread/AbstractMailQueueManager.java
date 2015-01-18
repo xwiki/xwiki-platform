@@ -21,7 +21,6 @@ package org.xwiki.mail.internal.thread;
 
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
@@ -80,7 +79,7 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     }
 
     @Override
-    public void waitTillProcessed(UUID batchId, long timeout)
+    public void waitTillProcessed(String batchId, long timeout)
     {
         long startTime = System.currentTimeMillis();
         while (!isProcessed(batchId) && System.currentTimeMillis() - startTime < timeout) {
@@ -96,7 +95,7 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     }
 
     @Override
-    public boolean isProcessed(UUID batchId)
+    public boolean isProcessed(String batchId)
     {
         Iterator<? extends MailQueueItem> iterator = getMailQueue().iterator();
         while (iterator.hasNext()) {

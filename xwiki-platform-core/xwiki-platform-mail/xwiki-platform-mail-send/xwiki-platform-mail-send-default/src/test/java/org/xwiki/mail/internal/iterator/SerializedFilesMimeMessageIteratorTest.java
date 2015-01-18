@@ -57,17 +57,17 @@ public class SerializedFilesMimeMessageIteratorTest
     private static final String TEMPORARY_DIRECTORY =
         System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
 
-    private UUID batchId;
+    private String batchId;
 
     private File batchDirectory;
 
     @Before
     public void setUp() throws Exception
     {
-        this.batchId = UUID.randomUUID();
+        this.batchId = UUID.randomUUID().toString();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
-        this.batchDirectory = new File(new File(tempDir, "mailstore"), this.batchId.toString());
+        this.batchDirectory = new File(new File(tempDir, "mailstore"), this.batchId);
         this.batchDirectory.mkdirs();
     }
 
@@ -76,7 +76,7 @@ public class SerializedFilesMimeMessageIteratorTest
     {
         // Delete created messages and directories
         FileUtils.deleteDirectory(
-            new File(TEMPORARY_DIRECTORY, this.batchId.toString()));
+            new File(TEMPORARY_DIRECTORY, this.batchId));
     }
 
     @Test
@@ -141,7 +141,7 @@ public class SerializedFilesMimeMessageIteratorTest
         fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
         fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
         fileWriter.append("X-MailID: " + mailID.toString() + newLine);
-        fileWriter.append("X-BatchID: " + this.batchId.toString() + newLine + newLine);
+        fileWriter.append("X-BatchID: " + this.batchId + newLine + newLine);
         fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         fileWriter.close();
     }

@@ -89,7 +89,7 @@ public class PrepareMailRunnableTest
         message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
 
         PrepareMailQueueItem item1 =
             new PrepareMailQueueItem(Arrays.asList(message1), session, listener, batchId, "wiki1");

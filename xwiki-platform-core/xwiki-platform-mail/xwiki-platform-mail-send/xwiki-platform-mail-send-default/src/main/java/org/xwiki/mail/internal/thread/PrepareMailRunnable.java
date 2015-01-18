@@ -160,7 +160,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         }
     }
 
-    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, UUID batchId, String wikiId)
+    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, String batchId, String wikiId)
         throws Exception
     {
         MimeMessage message;
@@ -200,7 +200,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         return message;
     }
 
-    private void setCustomHeaders(MimeMessage message, UUID batchId) throws MessagingException
+    private void setCustomHeaders(MimeMessage message, String batchId) throws MessagingException
     {
         // Set custom XWiki mail headers.
         // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
@@ -208,7 +208,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         // MimeMessage is loaded to be resent. This allows for example to remove the serialized messages after it's
         // resent.
         if (message.getHeader(HEADER_BATCH_ID, null) == null) {
-            message.setHeader(HEADER_BATCH_ID, batchId.toString());
+            message.setHeader(HEADER_BATCH_ID, batchId);
         }
 
         // If the message Id is already set, then don't generate an id. This is what happens for example when a

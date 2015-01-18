@@ -43,7 +43,7 @@ public class PrepareMailQueueItemTest
     {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
         PrepareMailQueueItem item = new PrepareMailQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
 
         assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());

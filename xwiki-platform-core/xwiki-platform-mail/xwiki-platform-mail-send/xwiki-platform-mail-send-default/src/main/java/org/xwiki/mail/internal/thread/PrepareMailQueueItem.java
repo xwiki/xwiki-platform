@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.UUID;
-
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
@@ -45,7 +43,7 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
      * @param wikiId see {@link #getWikiId()}
      */
     public PrepareMailQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
-        UUID batchId, String wikiId)
+        String batchId, String wikiId)
     {
         super(session, listener, batchId, wikiId);
         this.messages = messages;

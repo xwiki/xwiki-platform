@@ -19,15 +19,12 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.xwiki.mail.internal.thread.SendMailQueueItem;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,7 +40,7 @@ public class SendMailQueueItemTest
     public void verifyToString() throws Exception
     {
         Session session = Session.getDefaultInstance(new Properties());
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
         SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId, "wiki");
 
         assertEquals("batchId = [" + batchId + "], wikiId = [wiki], messageId = [messageId]", item.toString());

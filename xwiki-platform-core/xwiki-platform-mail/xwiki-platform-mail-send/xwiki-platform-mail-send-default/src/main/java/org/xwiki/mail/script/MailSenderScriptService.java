@@ -83,7 +83,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
         try {
             MimeMessageFactory factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
                 this.componentManagerProvider.get());
-            Session session = this.sessionProvider.get();
+            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -179,7 +179,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = this.sessionProvider.get();
+        Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
             this.componentManagerProvider.get());

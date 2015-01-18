@@ -22,7 +22,6 @@ package org.xwiki.mail.internal.script;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.mail.internet.MimeMessage;
 
@@ -72,7 +71,7 @@ public final class MimeMessageIteratorFactoryProvider
         } else if (hint.equals("files")) {
             SerializedFilesMimeMessageIteratorFactory iteratorFactory = componentManager.getInstance(
                 SerializedFilesMimeMessageIteratorFactory.class);
-            iterator = iteratorFactory.create((UUID) source, parameters);
+            iterator = iteratorFactory.create((String) source, parameters);
         } else {
             iterator = null;
         }

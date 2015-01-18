@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.UUID;
-
 import javax.mail.Session;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -40,7 +38,7 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
 
     private MailListener listener;
 
-    private UUID batchId;
+    private String batchId;
 
     private String wikiId;
 
@@ -50,7 +48,7 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
      * @param batchId see {@link #getBatchId()}
      * @param wikiId see {@link #getWikiId()}
      */
-    public AbstractMailQueueItem(Session session, MailListener listener, UUID batchId, String wikiId)
+    public AbstractMailQueueItem(Session session, MailListener listener, String batchId, String wikiId)
     {
         this.session = session;
         this.listener = listener;
@@ -85,7 +83,7 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
     }
 
     @Override
-    public UUID getBatchId()
+    public String getBatchId()
     {
         return this.batchId;
     }

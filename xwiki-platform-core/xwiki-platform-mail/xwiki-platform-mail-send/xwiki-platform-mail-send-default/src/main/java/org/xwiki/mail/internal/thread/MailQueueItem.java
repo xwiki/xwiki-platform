@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.UUID;
-
 import javax.mail.Session;
 
 import org.xwiki.mail.MailListener;
@@ -44,9 +42,9 @@ public interface MailQueueItem
     MailListener getListener();
 
     /**
-     * @return the UUID of the batch
+     * @return the unique id of the batch
      */
-    UUID getBatchId();
+    String getBatchId();
 
     /**
      * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message

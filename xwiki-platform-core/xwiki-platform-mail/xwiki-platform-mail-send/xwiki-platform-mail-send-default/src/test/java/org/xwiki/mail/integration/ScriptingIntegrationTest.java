@@ -47,6 +47,7 @@ import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
+import org.xwiki.mail.internal.DefaultSessionFactory;
 import org.xwiki.mail.internal.FileSystemMailContentStore;
 import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
@@ -55,7 +56,6 @@ import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
-import org.xwiki.mail.internal.SessionProvider;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptMailResult;
@@ -91,7 +91,7 @@ import static org.mockito.Mockito.when;
     ContextComponentManagerProvider.class,
     DefaultMimeBodyPartFactory.class,
     MemoryMailListener.class,
-    SessionProvider.class,
+    DefaultSessionFactory.class,
     SendMailRunnable.class,
     PrepareMailRunnable.class,
     PrepareMailQueueManager.class,

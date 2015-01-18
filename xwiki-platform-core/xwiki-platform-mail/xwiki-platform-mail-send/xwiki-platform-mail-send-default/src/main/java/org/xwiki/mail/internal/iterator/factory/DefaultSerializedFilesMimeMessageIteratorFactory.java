@@ -21,7 +21,6 @@ package org.xwiki.mail.internal.iterator.factory;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,7 +46,8 @@ public class DefaultSerializedFilesMimeMessageIteratorFactory implements Seriali
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
-    @Override public Iterator<MimeMessage> create(UUID batchId, Map<String, Object> parameters)
+    @Override
+    public Iterator<MimeMessage> create(String batchId, Map<String, Object> parameters)
         throws MessagingException
     {
         ComponentManager cm = componentManagerProvider.get();

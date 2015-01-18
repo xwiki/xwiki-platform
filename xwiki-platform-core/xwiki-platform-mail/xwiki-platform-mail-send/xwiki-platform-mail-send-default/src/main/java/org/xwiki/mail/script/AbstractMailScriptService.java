@@ -19,11 +19,12 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.manager.ComponentLookupException;
@@ -32,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.internal.SessionFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -54,7 +56,7 @@ public abstract class AbstractMailScriptService implements ScriptService
     protected Execution execution;
 
     @Inject
-    protected Provider<Session> sessionProvider;
+    protected SessionFactory sessionFactory;
 
     @Inject
     protected MailSenderConfiguration configuration;
@@ -84,8 +86,8 @@ public abstract class AbstractMailScriptService implements ScriptService
 
         // NOTE: we don't throw any error since the message is sent asynchronously. All errors can be found using
         // the passed listener.
-        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, this.sessionProvider.get(), listener),
-            listener.getMailStatusResult());
+        return new ScriptMailResult(this.mailSender.sendAsynchronously(messages, this.sessionFactory.create(
+            Collections.<String, String>emptyMap()), listener), listener.getMailStatusResult());
     }
 
     /**

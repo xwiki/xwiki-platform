@@ -117,7 +117,7 @@ public class MimeMessageIteratorFactoryProviderTest
     @Test
     public void createSerializedIterator() throws Exception
     {
-        UUID batchId = UUID.randomUUID();
+        String batchId = UUID.randomUUID().toString();
 
         SerializedFilesMimeMessageIteratorFactory filesFactory = mock(SerializedFilesMimeMessageIteratorFactory.class);
         when(this.componentManager.getInstance(eq(SerializedFilesMimeMessageIteratorFactory.class)))

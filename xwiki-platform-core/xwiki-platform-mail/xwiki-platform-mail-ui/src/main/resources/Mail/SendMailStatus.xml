@@ -88,7 +88,11 @@
     'error' : { 'type' : 'text' },
     'actions' : { 'type' : 'text', 'html' : 'true', 'filterable' : 'false', 'sortable' : 'false' }
 })
-#set($options = { 
+#if ($xcontext.isMainWiki())
+  #set($discard = $columns.add(5, 'wiki'))
+  #set($discard = $columnsProperties.put('wiki', { 'type' : 'text', 'size' : 6 }))
+#end
+#set($options = {
    'resultPage': 'Mail.SendMailStatusJSON',
    'translationPrefix' : 'Mail.SendMailStatus_livetable.',
    'tagCloud' : false

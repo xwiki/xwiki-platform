@@ -70,6 +70,7 @@ Mail.SendMailStatus_livetable.batchId=Batch ID
 Mail.SendMailStatus_livetable.type=Type
 Mail.SendMailStatus_livetable.recipients=Recipients
 Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
 Mail.SendMailStatus_livetable.error=Error
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Resend

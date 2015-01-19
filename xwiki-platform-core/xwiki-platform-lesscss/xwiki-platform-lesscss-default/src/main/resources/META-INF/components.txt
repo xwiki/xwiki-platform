@@ -27,3 +27,4 @@ org.xwiki.lesscss.internal.skin.DefaultSkinReferenceFactory
 org.xwiki.lesscss.internal.skin.DefaultSkinReferenceSerializer
 org.xwiki.lesscss.internal.skin.DocumentSkinReferenceSerializer
 org.xwiki.lesscss.internal.skin.FSSkinReferenceSerializer
+org.xwiki.lesscss.internal.LESSContext

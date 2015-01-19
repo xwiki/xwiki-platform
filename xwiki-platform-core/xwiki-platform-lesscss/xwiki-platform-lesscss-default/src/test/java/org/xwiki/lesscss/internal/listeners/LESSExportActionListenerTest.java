@@ -22,20 +22,17 @@ package org.xwiki.lesscss.internal.listeners;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
-import org.xwiki.lesscss.internal.listeners.LESSExportActionListener;
+import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link LESSExportActionListener}.
@@ -69,21 +66,12 @@ public class LESSExportActionListenerTest
         XWikiRequest request = mock(XWikiRequest.class);
         when(xcontext.getRequest()).thenReturn(request);
         when(request.get("format")).thenReturn("html");
-        when(xcontext.getWikiId()).thenReturn("wiki");
-        CurrentColorThemeGetter currentColorThemeGetter = this.mocker.getInstance(CurrentColorThemeGetter.class);
-        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("colorTheme");
-        ColorThemeReferenceFactory colorThemeReferenceFactory =
-                this.mocker.getInstance(ColorThemeReferenceFactory .class);
-        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
-                new NamedColorThemeReference("colorTheme"));
 
         this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
 
-        // The test is here: we verify that the clear API was called!
-        LESSResourcesCache cache = this.mocker.getInstance(LESSResourcesCache.class);
-        ColorThemeCache cache2 = this.mocker.getInstance(ColorThemeCache.class);
-        verify(cache).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
-        verify(cache2).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
+        // The test is here: we verify that the cache is disabled!
+        LESSContext lessContext = mocker.getInstance(LESSContext.class);
+        verify(lessContext).disableCache();
     }
 
     @Test
@@ -96,11 +84,9 @@ public class LESSExportActionListenerTest
 
         this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
 
-        // The test is here: we verify that the clear API was NOT called (since the export is not an HTML export).
-        // Actually that the cache object was not called at all...
-        LESSResourcesCache cache = this.mocker.getInstance(LESSResourcesCache.class);
-        verifyZeroInteractions(cache);
-        CurrentColorThemeGetter currentColorThemeGetter = this.mocker.getInstance(CurrentColorThemeGetter.class);
-        verifyZeroInteractions(currentColorThemeGetter);
+        // The test is here: we verify that the we do not disable the LESS cache (since the export is not an HTML
+        // export). Actually that the context object was not called at all...
+        LESSContext lessContext = mocker.getInstance(LESSContext.class);
+        verifyZeroInteractions(lessContext);
     }
 }

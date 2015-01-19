@@ -66,14 +66,15 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
     {
         // Example of URL:
-        // /xwiki/bin/webjars/resources/path?value=bootstrap/3.2.0/fonts/glyphicons-halflings-regular.eot
+        // /xwiki/bin/webjars/resources/path?value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
         // where:
         // - web = resources
         // - name = path
         // - action = webjars
-        // - querystring = value=bootstrap/3.2.0/fonts/glyphicons-halflings-regular.eot
+        // - querystring = value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
 
         // Copy the resources found in JARs on the filesystem
+        // The value in the query string must be decoded since we need a clean path to get the resource.
         String resourceName = URLDecoder.decode(StringUtils.substringAfter(querystring, "value="), "UTF-8");
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 

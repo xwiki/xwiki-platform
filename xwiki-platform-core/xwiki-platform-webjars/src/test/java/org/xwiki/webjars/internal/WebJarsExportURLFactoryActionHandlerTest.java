@@ -72,8 +72,8 @@ public class WebJarsExportURLFactoryActionHandlerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         ExportURLFactoryContext factoryContext = new ExportURLFactoryContext();
         factoryContext.setExportDir(BASEDIR);
-        URL result = this.mocker.getComponentUnderTest().createURL("resources", "path",
-            "value="+URLEncoder.encode("angular-paginate-anything/2.5.3/paginate-anything.js", "UTF-8"), null, "xwiki",
+        URL result = this.mocker.getComponentUnderTest().createURL("resources", "path", "value="
+            + URLEncoder.encode("angular-paginate-anything/2.5.3/paginate-anything.js", "UTF-8"), null, "xwiki",
                 xcontext, factoryContext);
 
         // Verify that the returned URL is ok

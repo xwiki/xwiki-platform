@@ -74,8 +74,12 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
         // - querystring = value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
 
         // Copy the resources found in JARs on the filesystem
-        // The value in the query string must be decoded since we need a clean path to get the resource.
+
+        // We need to decode the passed Query String because the query string passed to ExportURLFactory are always
+        // encoded. See XWikiURLFactory#createURL()'s javadoc for more details on why the query string is passed
+        // encoded.
         String resourceName = URLDecoder.decode(StringUtils.substringAfter(querystring, "value="), "UTF-8");
+
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 
         copyResourceFromJAR(resourcePath, WEBJAR_PATH, factoryContext);

@@ -182,6 +182,10 @@ public class WebJarsScriptService implements ScriptService
 
         XWikiContext xcontext = xcontextProvider.get();
         XWikiURLFactory urlFactory = xcontext.getURLFactory();
+        // Note: we have to encode the query string since URLFactory will not do that currently (Actually it cannot do
+        // this at the moment since it accepts a string representing the QueryString and it's thus not possible to
+        // encode it automatically - we would need to pass a Map to allow for query string encoding done by the
+        // URLFactory).
         URL url = urlFactory.createURL("resources", "path", "webjars", escapeTool.url(urlParams), null, xcontext);
         return urlFactory.getURL(url, xcontext);
     }

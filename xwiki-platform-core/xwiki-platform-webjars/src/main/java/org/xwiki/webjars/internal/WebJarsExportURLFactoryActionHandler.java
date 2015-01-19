@@ -27,6 +27,7 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -73,7 +74,7 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
         // - querystring = value=bootstrap/3.2.0/fonts/glyphicons-halflings-regular.eot
 
         // Copy the resources found in JARs on the filesystem
-        String resourceName = StringUtils.substringAfter(querystring, "value=");
+        String resourceName = URLDecoder.decode(StringUtils.substringAfter(querystring, "value="), "UTF-8");
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 
         copyResourceFromJAR(resourcePath, WEBJAR_PATH, factoryContext);

@@ -20,12 +20,11 @@
 package org.xwiki.lesscss.internal;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-
-import groovy.lang.Singleton;
 
 /**
  * Store and get LESS configuration variables from the execution context of the request.

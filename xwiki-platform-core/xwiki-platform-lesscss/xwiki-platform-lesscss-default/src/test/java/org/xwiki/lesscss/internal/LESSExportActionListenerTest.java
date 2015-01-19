@@ -65,9 +65,6 @@ public class LESSExportActionListenerTest
         XWikiRequest request = mock(XWikiRequest.class);
         when(xcontext.getRequest()).thenReturn(request);
         when(request.get("format")).thenReturn("html");
-        when(xcontext.getWikiId()).thenReturn("wiki");
-        CurrentColorThemeGetter currentColorThemeGetter = this.mocker.getInstance(CurrentColorThemeGetter.class);
-        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("colorTheme");
 
         this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
 

@@ -27,8 +27,6 @@ import javax.inject.Named;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.ColorThemeCache;
-import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -46,15 +44,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Named("lessexport")
 public class LESSExportActionListener implements EventListener
 {
-    @Inject
-    private LESSSkinFileCache lessSkinFileCache;
-
-    @Inject
-    private ColorThemeCache colorThemeCache;
-
-    @Inject
-    private CurrentColorThemeGetter currentColorThemeGetter;
-
     @Inject
     private LESSContext lessContext;
 

@@ -17,16 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package org.xwiki.template.event;
 
 import java.util.Objects;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all events related to templates.
  *
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
+@Unstable
 public abstract class AbstractTemplateEvent implements TemplateEvent
 {
     private String id;

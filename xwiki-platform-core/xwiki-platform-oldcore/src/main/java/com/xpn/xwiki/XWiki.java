@@ -138,7 +138,10 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
 import org.xwiki.stability.Unstable;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -167,11 +170,9 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.internal.skin.Resource;
-import com.xpn.xwiki.internal.skin.Skin;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.SkinConfiguration;
-import com.xpn.xwiki.internal.skin.SkinManager;
-import com.xpn.xwiki.internal.template.TemplateManager;
+import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -228,9 +229,9 @@ public class XWiki implements EventListener
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
 
-    public static final String CKEY_SKIN = SkinManager.CKEY_SKIN;
+    public static final String CKEY_SKIN = InternalSkinManager.CKEY_SKIN;
 
-    public static final String CKEY_BASESKIN = SkinManager.CKEY_PARENTSKIN;
+    public static final String CKEY_BASESKIN = InternalSkinManager.CKEY_PARENTSKIN;
 
     public static final String DEFAULT_SKIN = SkinConfiguration.DEFAULT_SKIN;
 
@@ -379,7 +380,7 @@ public class XWiki implements EventListener
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
 
-    private SkinManager skinManager;
+    private InternalSkinManager skinManager;
 
     private TemplateManager templateManager;
 
@@ -438,10 +439,10 @@ public class XWiki implements EventListener
         return this.userConfiguration;
     }
 
-    private SkinManager getSkinManager()
+    private InternalSkinManager getSkinManager()
     {
         if (this.skinManager == null) {
-            this.skinManager = Utils.getComponent(SkinManager.class);
+            this.skinManager = Utils.getComponent(InternalSkinManager.class);
         }
 
         return this.skinManager;

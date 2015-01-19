@@ -19,39 +19,17 @@
  */
 package org.xwiki.skin;
 
+import org.xwiki.stability.Unstable;
+
 /**
+ * Represent a skin.
+ * 
  * @version $Id$
  * @since 7.0M1
  */
+@Unstable
 public interface Skin extends ResourceRepository
 {
-    Skin VOID = new Skin()
-    {
-        @Override
-        public Resource<?> getResource(String resource)
-        {
-            return null;
-        }
-
-        @Override
-        public Resource<?> getLocalResource(String resource)
-        {
-            return null;
-        }
-
-        @Override
-        public Skin getParent()
-        {
-            return null;
-        }
-
-        @Override
-        public String getId()
-        {
-            return null;
-        }
-    };
-
     @Override
     Skin getParent();
 }

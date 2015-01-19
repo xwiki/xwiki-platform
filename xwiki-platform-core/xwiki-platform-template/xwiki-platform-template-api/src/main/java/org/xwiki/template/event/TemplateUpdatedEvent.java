@@ -17,14 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package org.xwiki.template.event;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Fired when a template is modified.
  *
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
+@Unstable
 public class TemplateUpdatedEvent extends AbstractTemplateEvent
 {
     /**

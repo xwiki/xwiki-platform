@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.skin;
 
 import org.xwiki.filter.input.InputSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.skin.Resource;
 
 /**
  * @version $Id$

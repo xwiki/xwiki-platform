@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package org.xwiki.template.internal.macro;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +31,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.template.macro.TemplateMacroParameters;
 
 /**
  * Insert a template.
@@ -46,7 +48,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "[INTERNAL] Insert a template.";
+    private static final String DESCRIPTION = "Insert a template.";
 
     @Inject
     private TemplateManager renderer;

@@ -17,16 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package org.xwiki.template.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.stability.Unstable;
 
 /**
- * Parameters for the {@link com.xpn.xwiki.internal.template.TemplateMacro} Macro.
+ * Parameters for the {@link org.xwiki.template.internal.macro.TemplateMacro} Macro.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 7.0M1
  */
+@Unstable
 public class TemplateMacroParameters
 {
     /**

@@ -19,21 +19,41 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import org.xwiki.filter.input.InputSource;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 
 /**
+ * Default implementation of {@link SkinManager}.
+ * 
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
-public interface Resource<I extends InputSource>
+@Component
+@Singleton
+public class DefaultSkinManager implements SkinManager
 {
-    ResourceRepository getRepository();
+    @Inject
+    private InternalSkinManager skinManager;
 
-    String getId();
+    @Override
+    public Skin getSkin(String id)
+    {
+        return this.skinManager.getSkin(id);
+    }
 
-    String getPath();
+    @Override
+    public Skin getCurrentSkin(boolean testRights)
+    {
+        return this.skinManager.getCurrentSkin(testRights);
+    }
 
-    I getInputSource() throws Exception;
-
-    String getURL(boolean forceSkinAction) throws Exception;
+    @Override
+    public Skin getDefaultSkin()
+    {
+        return this.skinManager.getDefaultSkin();
+    }
 }

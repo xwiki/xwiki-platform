@@ -39,6 +39,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
@@ -46,7 +47,6 @@ import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.template.TemplateManager;
 
 /**
  * Unit tests for {@link DefaultVelocityManager}.

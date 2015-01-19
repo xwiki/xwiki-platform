@@ -17,19 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.template;
+package org.xwiki.template.event;
+
+import org.xwiki.stability.Unstable;
 
 /**
- * A template.
+ * Fired when a template is deleted.
  *
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
-public interface Template
+@Unstable
+public class TemplateDeletedEvent extends AbstractTemplateEvent
 {
-    String getId();
+    /**
+     * Matches any {@link TemplateDeletedEvent}.
+     */
+    public TemplateDeletedEvent()
+    {
 
-    String getPath();
+    }
 
-    TemplateContent getContent() throws Exception;
+    /**
+     * @param id the id of the template
+     */
+    public TemplateDeletedEvent(String id)
+    {
+        super(id);
+    }
 }

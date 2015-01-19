@@ -45,6 +45,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.template.event.TemplateDeletedEvent;
+import org.xwiki.template.event.TemplateEvent;
+import org.xwiki.template.event.TemplateUpdatedEvent;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
@@ -56,11 +61,6 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.internal.template.SUExecutor;
-import com.xpn.xwiki.internal.template.Template;
-import com.xpn.xwiki.internal.template.TemplateDeletedEvent;
-import com.xpn.xwiki.internal.template.TemplateEvent;
-import com.xpn.xwiki.internal.template.TemplateManager;
-import com.xpn.xwiki.internal.template.TemplateUpdatedEvent;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to

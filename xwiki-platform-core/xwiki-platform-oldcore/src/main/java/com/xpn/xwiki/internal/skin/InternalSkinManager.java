@@ -43,17 +43,19 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.skin.ResourceRepository;
+import org.xwiki.skin.Skin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
-@Component(roles = SkinManager.class)
+@Component(roles = InternalSkinManager.class)
 @Singleton
-public class SkinManager implements Initializable
+public class InternalSkinManager implements Initializable
 {
     public static final String CKEY_SKIN = "skin";
 
@@ -111,7 +113,7 @@ public class SkinManager implements Initializable
                 if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null
                     || document.getOriginalDocument().getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
                     // TODO: lower the granularity
-                    SkinManager.this.cache.removeAll();
+                    InternalSkinManager.this.cache.removeAll();
                 }
 
             }
@@ -235,11 +237,9 @@ public class SkinManager implements Initializable
         if (baseSkin == null) {
             Skin skin = getCurrentSkin(testRights);
             if (skin != null) {
-                if (skin.getParent() instanceof Skin) {
-                    ResourceRepository parent = skin.getParent();
-                    if (parent != null) {
-                        baseSkin = parent.getId();
-                    }
+                ResourceRepository parent = skin.getParent();
+                if (parent != null) {
+                    baseSkin = parent.getId();
                 }
             }
         }

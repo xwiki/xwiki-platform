@@ -17,38 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.skin;
+package org.xwiki.template;
+
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
+ * The content of a template.
+ *
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
-public interface Skin extends ResourceRepository
+@Unstable
+public interface TemplateContent
 {
-    Skin VOID = new Skin()
-    {
-        @Override
-        public Resource<?> getResource(String resource)
-        {
-            return null;
-        }
+    String getContent();
 
-        @Override
-        public Resource<?> getLocalResource(String resource)
-        {
-            return null;
-        }
-
-        @Override
-        public ResourceRepository getParent()
-        {
-            return null;
-        }
-
-        @Override
-        public String getId()
-        {
-            return null;
-        }
-    };
+    DocumentReference getAuthorReference();
 }

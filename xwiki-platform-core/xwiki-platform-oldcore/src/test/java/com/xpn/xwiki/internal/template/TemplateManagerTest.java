@@ -43,6 +43,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -50,7 +51,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 /**
- * Validate {@link TemplateManager}.
+ * Validate {@link DefaultTemplateManager}.
  * 
  * @version $Id$
  */
@@ -59,7 +60,7 @@ public class TemplateManagerTest
 {
     @Rule
     public final MockitoComponentMockingRule<TemplateManager> mocker =
-        new MockitoComponentMockingRule<TemplateManager>(TemplateManager.class);
+        new MockitoComponentMockingRule<TemplateManager>(DefaultTemplateManager.class);
 
     private Environment environmentmMock;
 

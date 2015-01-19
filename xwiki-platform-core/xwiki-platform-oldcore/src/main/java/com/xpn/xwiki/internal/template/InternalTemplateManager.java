@@ -52,7 +52,6 @@ import org.xwiki.filter.input.ReaderInputSource;
 import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
@@ -72,29 +71,29 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
-import com.xpn.xwiki.internal.skin.Resource;
-import com.xpn.xwiki.internal.skin.Skin;
-import com.xpn.xwiki.internal.skin.SkinManager;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiResource;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Internal toolkit to experiment on wiki bases templates.
+ * Internal toolkit to experiment on templates.
  *
  * @version $Id$
- * @since 6.3M2
+ * @since 7.0M1
  */
-@Component(roles = TemplateManager.class)
+@Component(roles = InternalTemplateManager.class)
 @Singleton
-public class TemplateManager
+public class InternalTemplateManager
 {
-    static final LocalDocumentReference SKINCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiSkins");
-
     private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     /**
@@ -148,7 +147,7 @@ public class TemplateManager
     private SUExecutor suExecutor;
 
     @Inject
-    private SkinManager skins;
+    private InternalSkinManager skins;
 
     @Inject
     private Logger logger;
@@ -285,10 +284,10 @@ public class TemplateManager
             }
 
             try {
-                TemplateManager.this.beanManager.populate(this, properties);
+                InternalTemplateManager.this.beanManager.populate(this, properties);
             } catch (PropertyException e) {
                 // Should never happen
-                TemplateManager.this.logger.error("Failed to populate properties of template", e);
+                InternalTemplateManager.this.logger.error("Failed to populate properties of template", e);
             }
 
             // The default is xhtml to support old templates

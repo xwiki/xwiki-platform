@@ -59,13 +59,13 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;

@@ -17,19 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.skin;
+package org.xwiki.template;
+
+import org.xwiki.stability.Unstable;
 
 /**
+ * A template.
+ *
  * @version $Id$
- * @since 6.4M1
+ * @since 7.0M1
  */
-public interface ResourceRepository
+@Unstable
+public interface Template
 {
-    ResourceRepository getParent();
-
     String getId();
 
-    Resource<?> getResource(String resourceName);
+    String getPath();
 
-    Resource<?> getLocalResource(String resourceName);
+    TemplateContent getContent() throws Exception;
 }

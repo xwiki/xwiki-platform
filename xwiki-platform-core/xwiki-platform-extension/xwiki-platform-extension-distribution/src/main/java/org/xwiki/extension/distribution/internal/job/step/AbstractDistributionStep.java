@@ -25,9 +25,8 @@ import javax.inject.Provider;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.internal.template.TemplateManager;
 
 public abstract class AbstractDistributionStep implements DistributionStep
 {

@@ -133,7 +133,7 @@ if (Prototype.BrowserFeatures.ElementExtensions) {
           $(window).on(method + '.bs.' + plugin, handler); 
       });
     },
-    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip'];
+    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip', 'tab'];
     disablePrototypeJS('show', pluginsToDisable);
     disablePrototypeJS('hide', pluginsToDisable);
   });

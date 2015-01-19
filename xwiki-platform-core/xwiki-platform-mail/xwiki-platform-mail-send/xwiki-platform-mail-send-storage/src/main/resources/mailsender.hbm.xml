@@ -36,7 +36,7 @@
     <property name="recipients" type="string" column="mail_recipients" length="2000" index="MAIL_RECIPIENST" not-null="true"/>
     <property name="type" type="string" column="mail_type" length="255" index="MAIL_TYPE" />
     <property name="errorSummary" type="string" column="mail_errorSummary" length="2000" index="MAIL_ERRORSUMMARY"/>
-    <property name="errorDescription" type="string" column="mail_errorDescription" length="30000" />
+    <property name="errorDescription" type="text" column="mail_errorDescription" length="30000" />
     <property name="wiki" type="string" column="mail_wiki" length="255" index="MAIL_WIKI" />
   </class>
 

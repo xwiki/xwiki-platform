@@ -32,6 +32,7 @@ import org.junit.*;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.internal.server.DefaultDataManager;
 import org.xwiki.activeinstalls.server.DataManager;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
 import org.xwiki.properties.internal.converter.EnumConverter;
@@ -43,7 +44,6 @@ import com.google.gson.JsonObject;
 
 import io.searchbox.params.Parameters;
 import net.sf.json.JSONObject;
-
 import static com.github.tlrx.elasticsearch.test.EsSetup.deleteAll;
 import static com.github.tlrx.elasticsearch.test.EsSetup.index;
 import static org.junit.Assert.assertEquals;
@@ -60,8 +60,8 @@ import static org.mockito.Mockito.*;
     DefaultJestClientManager.class,
     DefaultConverterManager.class,
     ConvertUtilsConverter.class,
-    EnumConverter.class
-
+    EnumConverter.class,
+    ContextComponentManagerProvider.class
 })
 public class DefaultDataManagerTest
 {

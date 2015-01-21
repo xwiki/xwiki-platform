@@ -6159,7 +6159,7 @@ public class XWiki implements EventListener
             onWikiDeletedEvent((WikiDeletedEvent) event);
         } else if (event instanceof ComponentDescriptorAddedEvent) {
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) data);
+            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) source);
         } else {
             // Document modifications
 

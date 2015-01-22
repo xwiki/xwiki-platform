@@ -473,8 +473,13 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationsPanel li a {
   padding: 0.7em 0;
+}
+
+.panel-width-Small .applicationsPanel .application-label {
+  display: inline-block; /* Needed by IE for ellipsis */
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%; /* Needed by IE for ellipsis */
 }
 
 .panel-width-Small .applicationsPanel li img {

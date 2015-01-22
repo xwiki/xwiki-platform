@@ -214,6 +214,7 @@
 #set ($isFullWidthAvailable = $xcontext.macro.params.compact != 'true')
 #set ($links = $xcontext.macro.params.links == 'true')
 #set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
+#set ($finder = $xcontext.macro.params.finder == 'true')
 ## We use directly FontAwesome for the tree node icons for two reasons:
 ## * the XWiki icon set (available through the icon themes) is limited
 ## * jsTree expects an URL/path or a CSS class name as the value of the tree node icon configuration when JSON source is
@@ -228,7 +229,8 @@
 #set ($discard = $xwiki.jsx.use('IconThemes.FontAwesome'))
 {{tree reference="#escapeMacroParam($reference)" root="#escapeMacroParam($xcontext.macro.params.root)"
   dragAndDrop="$editable" contextMenu="$editable" icons="$isFullWidthAvailable" edges="$isFullWidthAvailable"
-  links="$links" checkboxes="$checkboxes" openTo="#escapeMacroParam($xcontext.macro.params.openTo)" /}}
+  links="$links" checkboxes="$checkboxes" openTo="#escapeMacroParam($xcontext.macro.params.openTo)"
+  finder="$finder" /}}
 {{/velocity}}</code>
     </property>
     <property>
@@ -1376,6 +1378,72 @@
     </property>
     <property>
       <name>filterByClass</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>17</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>81d944dc-8be2-45af-a7b6-b924b6608c66</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>finder</name>
     </property>
   </object>
 </xwikidoc>

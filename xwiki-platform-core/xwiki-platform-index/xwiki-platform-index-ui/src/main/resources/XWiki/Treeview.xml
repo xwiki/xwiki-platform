@@ -39,5 +39,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{documentTree showSpaces="true" /}}</content>
+  <content>{{documentTree showSpaces="true" finder="true" /}}</content>
 </xwikidoc>

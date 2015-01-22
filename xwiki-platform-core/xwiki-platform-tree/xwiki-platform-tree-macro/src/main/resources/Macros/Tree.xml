@@ -194,7 +194,7 @@
 });</code>
     </property>
     <property>
-      <name>Require Configuration</name>
+      <name>Initialization Code</name>
     </property>
     <property>
       <parse>1</parse>
@@ -357,6 +357,12 @@
 #set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
 #set ($discard = $attributes.add("data-checkboxes='$checkboxes'"))
 #set ($discard = $attributes.add("data-openTo='$!escapetool.xml($xcontext.macro.params.openTo)'"))
+#set ($finder = $xcontext.macro.params.finder == 'true')
+#if ($finder)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+#end
+#set ($discard = $attributes.add("data-finder='$finder'"))
 #set ($content = $xcontext.macro.content)
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit')
   #set ($content = "$services.icon.render('chart_organisation') This tree can't be displayed in edit mode.")
@@ -1049,6 +1055,72 @@
     </property>
     <property>
       <name>openTo</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>10</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d3269325-4da7-4916-a932-70aaaaf7f7de</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>finder</name>
     </property>
   </object>
 </xwikidoc>

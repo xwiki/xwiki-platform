@@ -61,6 +61,12 @@
       <artifactId>font-awesome</artifactId>
       <version>4.2.0</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>bootstrap</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- We use JavaScript to fix the way fonts are loaded on IE8. -->
     <dependency>

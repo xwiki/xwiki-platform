@@ -137,9 +137,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param title The resulting title.
  *###
 #macro(getBlogTitle $blogDoc $title)
-  #getBlogProperty($blogDoc 'title' $!blogDoc.displayTitle $result)
+  ## Titles can contain velocity code (most commonly translations), so we should evaluate them.
   #set ($title = $NULL)
-  #setVariable ("$title" $result)
+  #setVariable ("$title" $!blogDoc.displayTitle)
 #end
 ##
 ##

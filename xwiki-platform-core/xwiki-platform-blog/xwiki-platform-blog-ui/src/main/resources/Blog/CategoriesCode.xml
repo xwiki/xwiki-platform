@@ -36,7 +36,7 @@
   <title>Macros for the Blog Categories</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="Blog.BlogCode"/}}
 
@@ -350,7 +350,7 @@
 #macro(displaySimpleCategory $name $level)
   #getEntriesForCategory($name $discard $totalEntries)
   #set($nameUrl = $escapetool.url($name))
-  #foreach($i in [1..$level])*#end &lt;span class="blog-category-level"&gt;&lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl")" title="RSS"&gt;#toolImage('bullet_feed', '[RSS]')&lt;/a&gt; &lt;a href="$xwiki.getURL($name)"&gt;#getCategoryName($xwiki.getDocument($name))&lt;/a&gt; &lt;span class="itemCount"&gt; ($totalEntries)&lt;/span&gt;&lt;/span&gt;
+  #foreach($i in [1..$level])*#end (% class="blog-category-level" %)((( [[#toolImage('bullet_feed', '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$nameUrl" title="RSS"]] [[#getCategoryName($xwiki.getDocument($name))&gt;&gt;$name]] (% class="itemCount" %)($totalEntries)(%%))))
 #end
 ##
 ##
@@ -472,7 +472,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #set($categoryDoc = $xwiki.getDocument($category))
   #set($categoryParent = "$!categoryDoc.parent")
   #if($categoryParent == '')
-    #set($categoryParent = "{$defaultCategoryParent}"))
+    #set($categoryParent = "{$defaultCategoryParent}")
   #end
   #set($parameterValues = ["$!{category}"])
   #set($query = ', BaseObject obj where ')

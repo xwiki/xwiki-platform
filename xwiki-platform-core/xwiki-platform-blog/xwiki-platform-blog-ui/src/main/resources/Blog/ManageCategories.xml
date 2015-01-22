@@ -36,7 +36,7 @@
   <title>$services.localization.render('xe.blog.manageCategories.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="Blog.CategoriesCode"/}}
 
@@ -757,6 +757,7 @@ document.observe('xwiki:dom:loaded', function() {
   border: 1px solid $theme.borderColor;
   vertical-align: top !important;
 }
+
 * html .category-add-form, * html .category-rename-form {
   width: 17em;
 }

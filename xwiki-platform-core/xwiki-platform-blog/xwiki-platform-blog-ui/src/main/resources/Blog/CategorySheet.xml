@@ -41,12 +41,12 @@
   <content>{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
-{{html wiki=true}}
 #set ($discard = $xwiki.ssx.use("Blog.ManageCategories"))
 #set ($discard = $xwiki.jsx.use("Blog.ManageCategories"))
 #if ($doc.getObject($blogCategoryClassname))
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
   = Category: #getCategoryName($doc) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
+  {{html wiki=true}}
   ## Keep testing the inline action for backward compatibility with older categories.
   #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
     {{include reference="Blog.CreatePost"/}}
@@ -75,12 +75,12 @@
       #displayNavigationLinks($doc)
     #end
   #end
+  {{/html}}
 #elseif ($doc.fullName == $blogCategorySheet)
   {{translation key="xe.blog.categories.sheetmessage"/}}
 #else
   {{warning}}{{translation key="xe.blog.categories.notcategory"/}}{{/warning}}
 #end
-{{/html}}
 {{/velocity}}</content>
   <object>
     <name>Blog.CategorySheet</name>

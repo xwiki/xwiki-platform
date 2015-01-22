@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-ratings-api</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - Ratings - API</name>
-  <description>API for the Ratings Module</description>
+  <description>API to rate wiki pages</description>
   <properties>
     <platform.version>${commons.version}</platform.version>
     <!-- Name to display by the Extension Manager -->

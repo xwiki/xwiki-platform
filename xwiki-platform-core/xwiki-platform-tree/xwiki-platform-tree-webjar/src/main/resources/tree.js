@@ -1,5 +1,6 @@
-define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
+define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) {
   'use strict';
+
   // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
   // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
   // order to add the following special characters: ?`.
@@ -288,6 +289,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }
   };
 
+  var extendQueryString = function(url, parameters) {
+    url += url.indexOf('?') < 0 ? '?': '&';
+    return url + $.param(parameters);
+  };
+
   var getDefaultParams = function(element) {
     var baseParams = {
       core: {
@@ -312,6 +318,9 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       if (element.attr('data-checkboxes') == 'true') {
         plugins.push('checkbox');
       }
+      if (element.attr('data-finder') == 'true') {
+        plugins.push('finder');
+      }
       return $.extend(true, baseParams, {
         core: {
           data: getChildren,
@@ -323,6 +332,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         },
         contextmenu: {
           items: getContextMenuItems
+        },
+        finder: {
+          url: extendQueryString(element.attr('data-url'), {
+            data: 'suggestions'
+          })
         }
       });
     } else {

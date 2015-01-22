@@ -92,9 +92,9 @@
         <version>1.7.0.1.1</version>
         <configuration>
           <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-          <includes>
-            <include>tree.less</include>
-          </includes>
+          <excludes>
+            <exclude>**/jstree/**</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>

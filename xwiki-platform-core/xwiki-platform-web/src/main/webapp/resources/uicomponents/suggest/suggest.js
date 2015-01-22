@@ -387,6 +387,12 @@ var XWiki = (function(XWiki){
     suggestions && this.createList(this.aSuggestions, source);
   },
 
+  _getNestedProperty: function(obj, path) {
+    var properties = path.split('.');
+    while (properties.length && (obj = obj[properties.shift()]));
+    return properties.length > 0 ? null : obj;
+  },
+
   /**
    * Builds the list of suggestions by parsing the given response.
    */
@@ -397,14 +403,19 @@ var XWiki = (function(XWiki){
       if (!jsondata) {
         return null;
       }
-      var results = jsondata[source.resultsParameter || this.options.resultsParameter];
+      if (Object.isArray(jsondata)) {
+        var results = jsondata;
+      } else {
+        var results = this._getNestedProperty(jsondata, source.resultsParameter || this.options.resultsParameter);
+      }
       for (var i = 0; i < results.length; i++) {
+        var result = results[i];
         suggestions.push({
-           'id': results[i][source.resultId || this.options.resultId],
-           'value': results[i][source.resultValue || this.options.resultValue],
-           'info': results[i][source.resultInfo || this.options.resultInfo],
-           'icon' : results[i][source.resultIcon || this.options.resultIcon],
-           'hint' : results[i][source.resultHint || this.options.resultHint]
+           'id': this._getNestedProperty(result, source.resultId || this.options.resultId),
+           'value': this._getNestedProperty(result, source.resultValue || this.options.resultValue),
+           'info': this._getNestedProperty(result, source.resultInfo || this.options.resultInfo),
+           'icon' : this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
+           'hint' : this._getNestedProperty(result, source.resultHint || this.options.resultHint)
         });
       }
     } else {
@@ -496,7 +507,7 @@ var XWiki = (function(XWiki){
       for (var i=0;i<this.sources.length;i++) {
 
         var source = this.sources[i];
-        source.id = i
+        source.id = source.id || i;
 
         if(this.resultContainer.down('.results' + source.id)) {
           // If the sub-container for this source is already present, we just re-initialize it :
@@ -715,8 +726,14 @@ var XWiki = (function(XWiki){
     }
     // If the search result contains an icon information, we insert this icon in the result entry.
     if (data.icon) {
-      var iconImage = new Element("img", {'src' : data.icon, 'class' : 'icon' });
-      displayNode.insert({top: iconImage});
+      if (data.icon.indexOf('.') >= 0 || data.icon.indexOf('/') >= 0) {
+        // The icon is specified as a file path.
+        var iconElement = new Element('img', {'src': data.icon, 'class': 'icon'});
+      } else {
+        // The icon is specified as a CSS class name.
+        var iconElement = new Element('i', {'class': 'icon ' + data.icon});
+      }
+      displayNode.insert({top: iconElement});
     }
     return displayNode;
   },

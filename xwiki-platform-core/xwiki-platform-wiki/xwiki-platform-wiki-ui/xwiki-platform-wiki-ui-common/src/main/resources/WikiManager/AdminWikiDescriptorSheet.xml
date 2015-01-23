@@ -41,7 +41,7 @@
   <content>{{velocity}}
 #if ($hasGlobalAdmin)
   #set ($descriptor = $services.wiki.currentWikiDescriptor)
-  #set ($sheetDocName = 'AdminWikiSheet')
+  #set ($sheetDocName = 'AdminWikiDescriptorSheet')
   #set ($sheetDocFullName = "WikiManager.${sheetDocName}")
   ##
   #if ($request.ajax == 'true' &amp;&amp; $xcontext.action == 'get')

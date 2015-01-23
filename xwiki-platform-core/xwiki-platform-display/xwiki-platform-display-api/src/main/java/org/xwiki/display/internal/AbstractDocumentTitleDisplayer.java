@@ -246,7 +246,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM
+     * @deprecated since 7.0M1
      */
+    @Deprecated
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
 

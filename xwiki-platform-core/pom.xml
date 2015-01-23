@@ -424,6 +424,19 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/MimeMessageFactory</className>
+              <method>javax.mail.internet.MimeMessage createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
+              <to>java.lang.Object</to>
+              <justification>Young API. Made the API more generic.</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/script/MailSenderScriptService</className>
+              <method>java.util.Iterator createMessages(java.lang.String, java.lang.Object, java.lang.String, java.util.Map)</method>
+              <justification>Young API. Made the API more generic.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

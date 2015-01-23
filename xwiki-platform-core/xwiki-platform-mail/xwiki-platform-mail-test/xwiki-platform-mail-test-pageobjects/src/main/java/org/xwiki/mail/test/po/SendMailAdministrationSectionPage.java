@@ -37,6 +37,9 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     @FindBy(id = "Mail.SendMailConfigClass_0_port")
     private WebElement port;
 
+    @FindBy(id = "Mail.SendMailConfigClass_0_sendWaitTime")
+    private WebElement sendWaitTime;
+
     public SendMailAdministrationSectionPage()
     {
         super("Mail Sending");
@@ -62,5 +65,16 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     {
         this.port.clear();
         this.port.sendKeys(port);
+    }
+
+    public String getSendWaitTime()
+    {
+        return this.sendWaitTime.getAttribute("value");
+    }
+
+    public void setSendWaitTime(String sendWaitTime)
+    {
+        this.sendWaitTime.clear();
+        this.sendWaitTime.sendKeys(sendWaitTime);
     }
 }

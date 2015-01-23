@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.slf4j.Logger;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -53,11 +54,15 @@ public abstract class AbstractMailRunnable implements MailRunnable
     private Provider<XWikiContext> xwikiContextProvider;
 
     @Inject
+    private Execution execution;
+
+    @Inject
     private ExecutionContextManager executionContextManager;
 
     protected void prepareContext(String wikiId) throws ExecutionContextException
     {
         // Isolate the context when sending a mail by creating a new context
+        // Note: We need to remove any existing context since the initialize() will actually perform
         ExecutionContext executionContext = new ExecutionContext();
         this.executionContextManager.initialize(executionContext);
 
@@ -66,6 +71,11 @@ public abstract class AbstractMailRunnable implements MailRunnable
 
         // Set the wiki in which to execute
         xwikiContext.setWikiId(wikiId);
+    }
+
+    protected void removeContext()
+    {
+        this.execution.removeContext();
     }
 
     @Override

@@ -117,18 +117,22 @@ public class PrepareMailRunnable extends AbstractMailRunnable
      */
     protected void prepareMail(PrepareMailQueueItem item) throws ExecutionContextException
     {
-        prepareContext(item.getWikiId());
-
         Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
 
         while (messages.hasNext()) {
-            MimeMessage mimeMessage = messages.next();
-            // Skip message is message has failed to be created.
-            if (mimeMessage != null) {
-                prepareSingleMail(mimeMessage, item);
-            } else {
-                // We can't call a listener here because the message is null. Thus we simply log an error.
-                this.logger.error("Failed to prepare message for [{}]", item);
+            // We prepare a new Execution Context for each mail so that one mail doesn't interfere with another
+            prepareContext(item.getWikiId());
+            try {
+                MimeMessage mimeMessage = messages.next();
+                // Skip message is message has failed to be created.
+                if (mimeMessage != null) {
+                    prepareSingleMail(mimeMessage, item);
+                } else {
+                    // We can't call a listener here because the message is null. Thus we simply log an error.
+                    this.logger.error("Failed to prepare message for [{}]", item);
+                }
+            } finally {
+                removeContext();
             }
         }
     }

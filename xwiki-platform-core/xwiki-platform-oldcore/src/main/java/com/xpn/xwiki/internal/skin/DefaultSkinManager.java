@@ -56,4 +56,10 @@ public class DefaultSkinManager implements SkinManager
     {
         return this.skinManager.getDefaultSkin();
     }
+
+    @Override
+    public Skin getDefaultParentSkin()
+    {
+        return this.skinManager.getDefaultParentSkin();
+    }
 }

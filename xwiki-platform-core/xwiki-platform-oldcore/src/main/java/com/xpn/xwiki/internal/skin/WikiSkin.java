@@ -30,7 +30,7 @@ public class WikiSkin extends AbstractSkin
 {
     private WikiSkinUtils utils;
 
-    public WikiSkin(String id, InternalSkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration, WikiSkinUtils utils)
     {
         super(id, skinManager, configuration);
         this.utils = utils;

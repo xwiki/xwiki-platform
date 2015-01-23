@@ -140,6 +140,7 @@ import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -171,7 +172,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
-import com.xpn.xwiki.internal.skin.SkinConfiguration;
+import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.template.InternalTemplateManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -233,7 +234,7 @@ public class XWiki implements EventListener
 
     public static final String CKEY_BASESKIN = InternalSkinManager.CKEY_PARENTSKIN;
 
-    public static final String DEFAULT_SKIN = SkinConfiguration.DEFAULT_SKIN;
+    public static final String DEFAULT_SKIN = InternalSkinConfiguration.DEFAULT_SKIN;
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
@@ -1878,6 +1879,9 @@ public class XWiki implements EventListener
         return null;
     }
 
+    /**
+     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} instead
+     */
     public String getSkin(XWikiContext context)
     {
         String skin;
@@ -1927,16 +1931,28 @@ public class XWiki implements EventListener
         return default_value;
     }
 
+    /**
+     * @deprecated since 7.0M1, use {@link SkinManager#getDefaultParentSkin()} instead
+     */
+    @Deprecated
     public String getDefaultBaseSkin(XWikiContext context)
     {
         return getSkinManager().getDefaultParentSkinId();
     }
 
+    /**
+     * @deprecated since 7.0M1
+     */
+    @Deprecated
     public String getBaseSkin(XWikiContext context)
     {
         return getBaseSkin(context, false);
     }
 
+    /**
+     * @deprecated since 7.0M1
+     */
+    @Deprecated
     public String getBaseSkin(XWikiContext context, boolean fromRenderSkin)
     {
         String baseskin = "";

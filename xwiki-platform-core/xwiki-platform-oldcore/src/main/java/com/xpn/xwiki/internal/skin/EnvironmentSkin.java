@@ -51,7 +51,7 @@ public class EnvironmentSkin extends AbstractSkin
 
     private Provider<XWikiContext> xcontextProvider;
 
-    public EnvironmentSkin(String id, InternalSkinManager skinManager, SkinConfiguration configuration,
+    public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Environment environment, Provider<XWikiContext> xcontextProvider)
     {
         super(id, skinManager, configuration);

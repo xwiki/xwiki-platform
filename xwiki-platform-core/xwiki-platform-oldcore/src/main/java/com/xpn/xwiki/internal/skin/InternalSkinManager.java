@@ -62,7 +62,7 @@ public class InternalSkinManager implements Initializable
     public static final String CKEY_PARENTSKIN = "baseskin";
 
     @Inject
-    private SkinConfiguration skinConfiguration;
+    private InternalSkinConfiguration skinConfiguration;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;

@@ -31,9 +31,9 @@ import org.xwiki.configuration.ConfigurationSource;
  * @version $Id$
  * @since 6.4M1
  */
-@Component(roles = SkinConfiguration.class)
+@Component(roles = InternalSkinConfiguration.class)
 @Singleton
-public class SkinConfiguration
+public class InternalSkinConfiguration
 {
     public static final String DEFAULT_SKIN = "flamingo";
 

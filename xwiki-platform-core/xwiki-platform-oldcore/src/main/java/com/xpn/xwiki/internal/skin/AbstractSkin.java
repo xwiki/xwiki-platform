@@ -61,13 +61,13 @@ public abstract class AbstractSkin implements Skin
 
     protected InternalSkinManager skinManager;
 
-    protected SkinConfiguration configuration;
+    protected InternalSkinConfiguration configuration;
 
     protected String id;
 
     protected Skin parent;
 
-    public AbstractSkin(String id, InternalSkinManager skinManager, SkinConfiguration configuration)
+    public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration)
     {
         this.id = id;
         this.skinManager = skinManager;

@@ -35,4 +35,6 @@ public interface SkinManager
     Skin getCurrentSkin(boolean testRights);
 
     Skin getDefaultSkin();
+
+    Skin getDefaultParentSkin();
 }

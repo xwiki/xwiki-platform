@@ -24,8 +24,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -187,7 +185,6 @@ public class Api
      * @return The public api Attachment object
      * @since 5.0M2
      */
-    @Unstable
     protected Attachment convert(XWikiAttachment xattach)
     {
         return xattach == null ? null : new Attachment(convert(xattach.getDoc()), xattach, this.context);
@@ -200,7 +197,6 @@ public class Api
      * @return A List of Attachment objects
      * @since 5.0M2
      */
-    @Unstable
     protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)
     {
         List<Attachment> outList = new ArrayList<Attachment>(xattaches.size());

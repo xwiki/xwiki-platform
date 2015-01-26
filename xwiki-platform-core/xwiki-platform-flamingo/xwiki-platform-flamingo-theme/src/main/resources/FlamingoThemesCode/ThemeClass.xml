@@ -499,6 +499,15 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </font-size-base>
+    <headings-color>
+      <disabled>0</disabled>
+      <name>headings-color</name>
+      <number>59</number>
+      <prettyName>headings-color</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </headings-color>
     <input-bg>
       <customDisplay/>
       <disabled>0</disabled>

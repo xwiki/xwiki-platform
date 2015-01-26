@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -87,11 +88,13 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
         solrDocument.setField(FieldUtils.ATTACHMENT_VERSION, attachment.getVersion());
 
         // Index the full author reference for exact matching (faceting).
-        String authorStringReference = entityReferenceSerializer.serialize(attachment.getAuthorReference());
+        DocumentReference authorReference =
+            documentReferenceResolver.resolve(attachment.getAuthor(), attachment.getReference());
+        String authorStringReference = entityReferenceSerializer.serialize(authorReference);
         solrDocument.setField(FieldUtils.ATTACHMENT_AUTHOR, authorStringReference);
         try {
             // Index the author display name for free text search and results sorting.
-            String authorDisplayName = xcontext.getWiki().getPlainUserName(attachment.getAuthorReference(), xcontext);
+            String authorDisplayName = xcontext.getWiki().getPlainUserName(authorReference, xcontext);
             solrDocument.setField(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY, authorDisplayName);
             solrDocument.setField(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY_SORT, authorDisplayName);
         } catch (Exception e) {

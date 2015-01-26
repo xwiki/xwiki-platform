@@ -68,6 +68,7 @@
     "brand-info": "color",
     "brand-warning": "color",
     "brand-danger": "color",
+    "headings-color": "color",
     "component-active-color" : "color",
     "component-active-bg" : "color"
   },
@@ -182,7 +183,7 @@
                 &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
                 #foreach($attachment in $doc.getAttachmentList())
                   #if($attachment.isImage())
-                    &lt;option value="$escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+                    &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
                   #end
                 #end
               &lt;/select&gt;
@@ -192,11 +193,11 @@
                 &lt;div class="alert alert-warning"&gt;$services.localization.render("platform.flamingo.themes.lessCode.warning")&lt;/div&gt;
               #end
               &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $escapetool.xml($!doc.getValue($varName, $obj))
+                $!escapetool.xml($!doc.getValue($varName, $obj))
               &lt;/textarea&gt;
             #else
               &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
               &lt;/div&gt;
             #end
           &lt;/div&gt;

@@ -123,6 +123,7 @@
       "brand-info": "color",
       "brand-warning": "color",
       "brand-danger": "color",
+      "headings-color": "color",
       "component-active-color" : "color",
       "component-active-bg" : "color",
       "font-family-base": "text",

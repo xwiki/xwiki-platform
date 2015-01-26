@@ -19,8 +19,6 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Means that an error occurred while trying to construct an {@link ResourceReference} object.
  *

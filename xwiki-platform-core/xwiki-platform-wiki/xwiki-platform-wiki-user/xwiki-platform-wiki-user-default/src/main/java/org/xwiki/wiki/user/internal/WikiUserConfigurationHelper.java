@@ -20,7 +20,6 @@
 package org.xwiki.wiki.user.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.user.WikiUserConfiguration;
 import org.xwiki.wiki.user.WikiUserManagerException;
 
@@ -30,7 +29,6 @@ import org.xwiki.wiki.user.WikiUserManagerException;
  * @version $Id$
  * @since 5.3M2
  */
-@Unstable
 @Role
 public interface WikiUserConfigurationHelper
 {

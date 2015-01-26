@@ -305,11 +305,13 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         solrDocument.addField(FieldUtils.getFieldName(FieldUtils.ATTACHMENT_CONTENT, locale), attachmentTextContent);
 
         // Index the full author reference for exact matching (faceting).
-        String authorStringReference = entityReferenceSerializer.serialize(attachment.getAuthorReference());
+        DocumentReference authorReference =
+            documentReferenceResolver.resolve(attachment.getAuthor(), attachment.getReference());
+        String authorStringReference = entityReferenceSerializer.serialize(authorReference);
         solrDocument.addField(FieldUtils.ATTACHMENT_AUTHOR, authorStringReference);
         try {
             // Index the author display name for free text search.
-            String authorDisplayName = xcontext.getWiki().getPlainUserName(attachment.getAuthorReference(), xcontext);
+            String authorDisplayName = xcontext.getWiki().getPlainUserName(authorReference, xcontext);
             solrDocument.addField(FieldUtils.ATTACHMENT_AUTHOR_DISPLAY, authorDisplayName);
         } catch (Exception e) {
             this.logger.error("Failed to get author display name for attachment [{}]", attachment.getReference(), e);

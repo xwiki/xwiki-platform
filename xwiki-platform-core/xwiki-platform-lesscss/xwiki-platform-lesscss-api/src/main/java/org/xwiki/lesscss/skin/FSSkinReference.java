@@ -25,6 +25,7 @@ import org.xwiki.stability.Unstable;
  * A specialized implementation of {@link SkinReference} for any skin stored in the filesystem.
  *
  * @version $Id$
+ * @since 6.4M2
  */
 @Unstable
 public class FSSkinReference implements SkinReference

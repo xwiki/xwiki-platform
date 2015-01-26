@@ -499,8 +499,8 @@ public class DocumentSolrMetadataExtractorTest
         when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content.getBytes()));
 
         String authorFullName = "XWiki." + authorAlias;
+        when(attachment.getAuthor()).thenReturn(authorFullName);
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
-        when(attachment.getAuthorReference()).thenReturn(authorReference);
 
         DocumentReferenceResolver<String> resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
         when(resolver.resolve(authorFullName, attachment.getReference())).thenReturn(authorReference);

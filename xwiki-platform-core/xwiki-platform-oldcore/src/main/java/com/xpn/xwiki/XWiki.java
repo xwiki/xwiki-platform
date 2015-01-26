@@ -5619,6 +5619,11 @@ public class XWiki implements EventListener
         return getConfiguration().getProperty("xwiki.section.depth", 2L);
     }
 
+    public boolean hasCaptcha(XWikiContext context)
+    {
+        return (getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
+    }
+
     public String getWysiwygToolbars(XWikiContext context)
     {
         return getConfiguration().getProperty("xwiki.wysiwyg.toolbars", "");

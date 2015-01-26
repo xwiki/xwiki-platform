@@ -10,7 +10,6 @@
 ##
 ##############################################
 #set($doNotLoadColorThemeFromCSS = true)
-#set($themeObj = '')
 #template('colorThemeInit.vm')
 ## Reset $doNotLoadColorThemeFromCSS for future calls (in SSX for examples)
 #set($doNotLoadColorThemeFromCSS = false)

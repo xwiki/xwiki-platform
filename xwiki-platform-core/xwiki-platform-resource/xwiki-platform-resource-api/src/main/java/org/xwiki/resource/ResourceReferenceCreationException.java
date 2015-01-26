@@ -27,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.3M1
  */
-@Unstable
 public class ResourceReferenceCreationException extends Exception
 {
     /**

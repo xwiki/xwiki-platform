@@ -98,6 +98,7 @@ solr.facets.moreValues={0} restants
 solr.facets.resetAll=Tout réinitialiser
 solr.facets.title=Redéfinir votre recherche
 solr.field.attauthor=Enregistré par
+solr.field.attauthor_display=Ajouté par
 solr.field.attcontent=Contenu du fichier joint
 solr.field.attdate=Date d'enregistrement
 solr.field.attsize=Taille de fichier

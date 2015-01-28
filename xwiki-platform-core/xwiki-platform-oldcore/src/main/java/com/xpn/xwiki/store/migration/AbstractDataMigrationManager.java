@@ -292,7 +292,9 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * @return XWikiConfig to read configuration from xwiki.cfg
+     * @deprecated
      */
+    @Deprecated
     protected XWikiConfig getXWikiConfig()
     {
         return getXWikiContext().getWiki().getConfig();

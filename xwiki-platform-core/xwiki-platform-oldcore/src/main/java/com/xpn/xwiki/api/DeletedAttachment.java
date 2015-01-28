@@ -177,11 +177,10 @@ public class DeletedAttachment extends Api
                 return false;
             }
             String waitdays;
-            XWikiConfig config = getXWikiContext().getWiki().getConfig();
             if (hasAdminRights()) {
-                waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.adminWaitDays", "0");
             } else {
-                waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.waitDays", "7");
             }
             int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
             Calendar cal = Calendar.getInstance();

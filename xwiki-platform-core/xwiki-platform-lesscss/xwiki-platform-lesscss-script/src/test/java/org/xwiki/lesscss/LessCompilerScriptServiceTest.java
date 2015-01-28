@@ -62,7 +62,7 @@ public class LessCompilerScriptServiceTest
 {
     @Rule
     public MockitoComponentMockingRule<LessCompilerScriptService> mocker =
-            new MockitoComponentMockingRule(LessCompilerScriptService.class);
+            new MockitoComponentMockingRule<>(LessCompilerScriptService.class);
 
     private LESSSkinFileCompiler lessCompiler;
 
@@ -92,7 +92,7 @@ public class LessCompilerScriptServiceTest
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
         colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
     }

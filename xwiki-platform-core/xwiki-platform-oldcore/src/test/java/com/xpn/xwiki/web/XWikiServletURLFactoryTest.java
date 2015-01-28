@@ -44,8 +44,6 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
 
-    private XWikiConfig config;
-
     private XWikiServletURLFactory urlFactory = new XWikiServletURLFactory();
 
     private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
@@ -131,7 +129,6 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
                 return defaultValue;
             }
         };
-        xwiki.setConfig((this.config = new XWikiConfig()));
         xwiki.setDatabase(getContext().getWikiId());
 
         Mock mockXWikiRequest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
@@ -197,7 +194,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnSubWikiInVirtualMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
@@ -205,7 +202,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnMainWikiInPathMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -213,7 +210,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnSubWikiInPathMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
@@ -221,8 +218,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnSubWikiInVirtualModeInPathMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual", "1");
-        this.config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         secure = true;
         // Change the context URL to include a port number and to use HTTPS.
@@ -237,7 +234,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnMainWikiInDomainMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -245,7 +242,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnSubWikiInDomainMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -253,8 +250,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     public void testCreateURLOnSubWikiInVirtualModeInDomainMode() throws MalformedURLException
     {
-        this.config.setProperty("xwiki.virtual", "1");
-        this.config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -272,7 +269,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("https://www.xwiki.org/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -285,7 +282,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -301,8 +298,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual", "1");
-        config.setProperty("xwiki.virtual.usepath", "0");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "0");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("https://wiki1server/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -317,7 +314,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
@@ -331,7 +328,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new security level and HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("https://www.xwiki.org/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
@@ -344,8 +341,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new HTTP headers.
         urlFactory.init(getContext());
 
-        config.setProperty("xwiki.virtual", "1");
-        config.setProperty("xwiki.virtual.usepath", "1");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1", getContext());
         assertEquals(new URL("http://www.xwiki.org:8080/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor"), url);
@@ -395,8 +392,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // The test sets it to "xwiki" which is wrong for this test.
         getContext().setOriginalWikiId("subwiki");
 
-        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        config.setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
         urlFactory.init(getContext());
         assertEquals("http://mainwiki.mywiki.tld/", urlFactory.getServerURL("xwiki", getContext()).toString());
     }
@@ -413,8 +410,8 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // The test sets it to "xwiki" which is wrong for this test.
         getContext().setOriginalWikiId("subwiki");
 
-        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        config.setProperty("xwiki.virtual", "1");
+        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        getConfigurationSource().setProperty("xwiki.virtual", "1");
 
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(getContext());
@@ -439,7 +436,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     public void testGetServerURLNonVirtualModeWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         getContext().setURL(new URL("http://127.0.0.1:8080/xwiki/view/InitialSpace/InitialPage"));
-        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         urlFactory.init(getContext());
         // TODO: Fix getServerURL() so that is is consistent about returning a trailing / or not.
         assertEquals("http://mainwiki.mywiki.tld", urlFactory.getServerURL("xwiki", getContext()).toString());
@@ -454,7 +451,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Some proxies will modify the host field without adding a x-forwarded-host field,
         // Using xwiki.home we should be able to make it work anyway.
         getContext().setURL(new URL("http://localhost:8080/xwiki/view/InitialSpace/InitialPage"));
-        config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
+        getConfigurationSource().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(getContext());
 

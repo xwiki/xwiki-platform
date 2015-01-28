@@ -674,7 +674,7 @@ public class Utils
         try {
             contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context/root");
         } catch (ComponentLookupException e) {
-            // This means the Context CM doesn't exist, use the Root CM.
+            // This means the Context Root CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
 
             LOGGER.warn("Failed to find context/root component manager, return root component manager");

@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 4.3M2
  */
 @Role
-@Unstable
 public interface TranslationMessageParser
 {
     /**

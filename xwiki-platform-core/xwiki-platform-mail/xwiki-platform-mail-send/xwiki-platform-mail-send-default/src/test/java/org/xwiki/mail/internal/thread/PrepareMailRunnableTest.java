@@ -69,7 +69,7 @@ public class PrepareMailRunnableTest
     @Before
     public void setUp() throws Exception
     {
-        Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
     }
 

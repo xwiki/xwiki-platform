@@ -76,7 +76,7 @@ public class DefaultMailTemplateManagerTest
     public void setUp() throws Exception
     {
         XWikiContext xwikiContext = mock(XWikiContext.class);
-        Provider<XWikiContext> contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> contextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(contextProvider.get()).thenReturn(xwikiContext);
 
         this.xwiki = mock(XWiki.class);

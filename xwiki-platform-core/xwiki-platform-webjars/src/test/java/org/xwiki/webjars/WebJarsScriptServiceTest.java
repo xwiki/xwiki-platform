@@ -60,7 +60,7 @@ public class WebJarsScriptServiceTest
     @Before
     public void configure() throws Exception
     {
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
         when(this.xcontext.getURLFactory()).thenReturn(this.urlFactory);
     }

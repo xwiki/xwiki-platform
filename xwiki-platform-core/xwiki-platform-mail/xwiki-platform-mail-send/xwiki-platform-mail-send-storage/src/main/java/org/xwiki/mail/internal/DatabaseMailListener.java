@@ -41,6 +41,7 @@ import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
+import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
 
 /**
@@ -62,6 +63,9 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Inject
     @Named("database")
     private MailStatusStore mailStatusStore;
+
+    @Inject
+    private MailStorageConfiguration configuration;
 
     private DatabaseMailStatusResult mailStatusResult;
 
@@ -88,9 +92,14 @@ public class DatabaseMailListener implements MailListener, Initializable
         MailStatus status = loadMailStatus(messageId, parameters);
         if (status != null) {
             status.setState(MailState.SENT);
-            saveStatus(status, parameters);
             // Since the mail was sent successfully we don't need to keep its serialized content
             deleteMailContent(status);
+            // And if the user doesn't want to keep it for tracability we also remove the mail status
+            if (this.configuration.discardSuccessStatuses()) {
+                deleteStatus(status, parameters);
+            } else {
+                saveStatus(status, parameters);
+            }
         }
     }
 
@@ -143,6 +152,16 @@ public class DatabaseMailListener implements MailListener, Initializable
         } catch (MailStoreException e) {
             // Failed to save the status in the DB, we continue but log an error
             this.logger.error("Failed to save mail status [{}] to the database", status, e);
+        }
+    }
+
+    private void deleteStatus(MailStatus status, Map<String, Object> parameters)
+    {
+        try {
+            this.mailStatusStore.delete(status.getMessageId(), parameters);
+        } catch (MailStoreException e) {
+            // Failed to delete the status in the DB, we continue but log an error
+            this.logger.error("Failed to delete mail status [{}] from the database", status, e);
         }
     }
 

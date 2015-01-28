@@ -52,11 +52,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 @Singleton
 public class DatabaseMailStatusStore implements MailStatusStore
 {
-    private static final String BATCHID_PARAMETER_NAME = "batchid";
-
     private static final String ID_PARAMETER_NAME = "id";
-
-    private static final String WIKI_PARAMETER_NAME = "wiki";
 
     @Inject
     private Provider<XWikiContext> contextProvider;

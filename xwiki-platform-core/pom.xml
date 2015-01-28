@@ -437,6 +437,12 @@
               <method>java.util.Iterator createMessages(java.lang.String, java.lang.Object, java.lang.String, java.util.Map)</method>
               <justification>Young API. Made the API more generic.</justification>
             </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>org/xwiki/mail/script/AbstractMailScriptService</className>
+              <field>configuration</field>
+              <justification>Young API. Internal refactoring</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

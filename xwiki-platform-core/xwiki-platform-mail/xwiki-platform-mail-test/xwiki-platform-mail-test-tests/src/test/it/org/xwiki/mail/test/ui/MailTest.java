@@ -93,7 +93,11 @@ public class MailTest extends AbstractTest
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("localhost");
         sendMailPage.setPort("3025");
+        // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
+        // we wait to receive the mails)
         sendMailPage.setSendWaitTime("0");
+        // Keep all mail statuses including successful ones (so that we verify this works fine)
+        sendMailPage.setDiscardSuccessStatuses(false);
         sendMailPage.clickSave();
 
         // Step 3: Verify that there are no admin email sections when administering a space

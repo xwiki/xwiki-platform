@@ -124,7 +124,7 @@ public class ScriptingIntegrationTest
         Mockito.when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
         Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);

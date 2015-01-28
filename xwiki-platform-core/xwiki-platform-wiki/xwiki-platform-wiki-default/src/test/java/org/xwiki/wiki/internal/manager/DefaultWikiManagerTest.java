@@ -87,7 +87,7 @@ public class DefaultWikiManagerTest
     {
         // Injection
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         observationManager = mocker.getInstance(ObservationManager.class);
         wikiCopier = mocker.getInstance(WikiCopier.class);
         wikiDeleter = mocker.getInstance(WikiDeleter.class);

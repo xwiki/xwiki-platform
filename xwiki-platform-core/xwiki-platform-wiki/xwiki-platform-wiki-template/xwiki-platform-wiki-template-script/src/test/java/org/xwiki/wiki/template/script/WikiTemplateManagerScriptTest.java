@@ -94,7 +94,7 @@ public class WikiTemplateManagerScriptTest
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
                 EntityReferenceSerializer.class, String.class));
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         execution = mocker.getInstance(Execution.class);

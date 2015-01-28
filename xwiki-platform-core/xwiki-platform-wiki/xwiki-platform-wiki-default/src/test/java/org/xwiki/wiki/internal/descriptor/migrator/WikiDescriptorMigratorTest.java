@@ -75,7 +75,7 @@ public class WikiDescriptorMigratorTest
     @Before
     public void setUp() throws Exception
     {
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         context = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(context);
         xwiki = mock(XWiki.class);

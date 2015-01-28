@@ -69,7 +69,7 @@ public class LESSSkinFileContentReaderTest
     public void setUp() throws Exception
     {
         skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);

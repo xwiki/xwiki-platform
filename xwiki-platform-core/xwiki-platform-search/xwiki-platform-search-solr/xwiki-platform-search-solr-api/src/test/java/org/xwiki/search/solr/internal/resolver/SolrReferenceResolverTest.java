@@ -213,7 +213,7 @@ public class SolrReferenceResolverTest
 
         // XWikiContext Provider
 
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
 
         // XWikiContext trough Execution

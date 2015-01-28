@@ -65,7 +65,7 @@ public class DefaultWikiDeleterTest
     {
         // Injection
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
         // Frequent uses

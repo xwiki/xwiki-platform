@@ -86,7 +86,7 @@ public class DefaultSignatureStoreTest
         this.mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
-            this.mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         this.xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
         this.xwiki = mock(com.xpn.xwiki.XWiki.class);

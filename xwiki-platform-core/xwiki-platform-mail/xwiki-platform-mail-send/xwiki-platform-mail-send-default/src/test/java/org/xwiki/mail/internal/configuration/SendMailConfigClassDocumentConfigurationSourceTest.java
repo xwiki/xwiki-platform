@@ -86,7 +86,7 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         when(xcontext.getWiki()).thenReturn(xwiki);
 
         Provider<XWikiContext> xcontextProvider =
-            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xcontext);
 
         assertEquals("value", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));
@@ -115,7 +115,7 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         when(xcontext.getWiki()).thenReturn(xwiki);
 
         Provider<XWikiContext> xcontextProvider =
-            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xcontext);
 
         assertEquals("defaultValue", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));

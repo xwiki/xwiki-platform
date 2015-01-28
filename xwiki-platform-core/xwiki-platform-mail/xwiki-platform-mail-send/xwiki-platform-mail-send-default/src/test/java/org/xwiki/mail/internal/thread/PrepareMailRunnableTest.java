@@ -70,7 +70,7 @@ public class PrepareMailRunnableTest
     public void setUp() throws Exception
     {
         Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
     }
 

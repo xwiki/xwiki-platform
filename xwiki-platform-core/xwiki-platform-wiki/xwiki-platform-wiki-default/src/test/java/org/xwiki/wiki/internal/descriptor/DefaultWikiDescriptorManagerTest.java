@@ -82,7 +82,7 @@ public class DefaultWikiDescriptorManagerTest
     public void setUp() throws Exception
     {
         // Injection
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);

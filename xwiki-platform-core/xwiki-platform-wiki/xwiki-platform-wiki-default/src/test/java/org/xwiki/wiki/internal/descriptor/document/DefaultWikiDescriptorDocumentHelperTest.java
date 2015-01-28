@@ -72,7 +72,7 @@ public class DefaultWikiDescriptorDocumentHelperTest
     {
         wikiDescriptorManagerProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
                 WikiDescriptorManager.class));
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         queryManager = mocker.getInstance(QueryManager.class);
         documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
         context = mock(XWikiContext.class);

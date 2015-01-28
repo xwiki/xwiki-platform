@@ -19,9 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.files;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Provider;
@@ -32,8 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.mail.internal.factory.group.GroupMimeMessageFactory;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -57,7 +52,7 @@ public class SerializedFilesMimeMessageFactoryTest
     {
         Session session = Session.getInstance(new Properties());
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.getInstance(
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 

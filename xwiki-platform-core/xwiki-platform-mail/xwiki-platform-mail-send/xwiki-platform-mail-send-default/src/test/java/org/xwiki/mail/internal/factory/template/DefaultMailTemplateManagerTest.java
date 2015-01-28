@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -77,8 +76,7 @@ public class DefaultMailTemplateManagerTest
     public void setUp() throws Exception
     {
         XWikiContext xwikiContext = mock(XWikiContext.class);
-        Provider<XWikiContext> contextProvider = this.mocker.getInstance(
-            XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> contextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(contextProvider.get()).thenReturn(xwikiContext);
 
         this.xwiki = mock(XWiki.class);

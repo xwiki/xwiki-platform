@@ -103,7 +103,7 @@ public class GroupMimeMessageFactoryTest
         parameters.put("hint", "factoryHint");
         parameters.put("source", "factoryHint");
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.getInstance(
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 

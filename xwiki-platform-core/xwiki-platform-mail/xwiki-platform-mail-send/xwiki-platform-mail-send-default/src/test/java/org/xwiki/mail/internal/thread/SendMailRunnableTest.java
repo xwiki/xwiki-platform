@@ -66,8 +66,7 @@ public class SendMailRunnableTest
     @Before
     public void setUp() throws Exception
     {
-        Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(
-            XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
     }
 

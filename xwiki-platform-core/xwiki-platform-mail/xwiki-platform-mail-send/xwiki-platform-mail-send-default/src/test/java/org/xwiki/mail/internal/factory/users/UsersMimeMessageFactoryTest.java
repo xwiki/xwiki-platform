@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal.factory.users;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,7 +105,7 @@ public class UsersMimeMessageFactoryTest
         parameters.put("hint", "factoryHint");
         parameters.put("source", "factoryHint");
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.getInstance(
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 

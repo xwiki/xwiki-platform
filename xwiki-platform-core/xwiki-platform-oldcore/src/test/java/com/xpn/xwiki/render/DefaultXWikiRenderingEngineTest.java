@@ -187,7 +187,8 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
         assertEquals(groovyFirst, engine.renderText(text, document, getContext()));
 
-        xwiki.getConfig().put("xwiki.render.renderingorder", "macromapping, velocity, groovy, plugin, wiki, wikiwiki");
+        getConfigurationSource().setProperty("xwiki.render.renderingorder",
+            new String[] {"macromapping", "velocity", "groovy", "plugin", "wiki", "wikiwiki"});
 
         DefaultXWikiRenderingEngine myEngine = new DefaultXWikiRenderingEngine(xwiki, getContext());
 

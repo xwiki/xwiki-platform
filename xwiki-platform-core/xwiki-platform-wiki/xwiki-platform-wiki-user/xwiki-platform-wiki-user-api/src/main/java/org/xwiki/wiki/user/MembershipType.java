@@ -19,15 +19,12 @@
  */
 package org.xwiki.wiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Used to specify how user can become member of a wiki.
  *
  * @since 5.3M2
  * @version $Id$
  */
-@Unstable
 public enum MembershipType
 {
     /**

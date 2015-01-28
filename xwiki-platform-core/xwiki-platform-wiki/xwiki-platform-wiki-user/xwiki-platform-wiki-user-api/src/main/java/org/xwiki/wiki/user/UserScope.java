@@ -19,15 +19,12 @@
  */
 package org.xwiki.wiki.user;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Used to specify what kind of users are enabled on a wiki.
  *
  * @since 5.3M2
  * @version $Id$
  */
-@Unstable
 public enum UserScope
 {
     /**

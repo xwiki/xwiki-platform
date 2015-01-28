@@ -43,8 +43,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.multi.DelegateComponentManager;
+import org.xwiki.component.manager.ComponentEventManager;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -664,7 +669,16 @@ public class Utils
     @Deprecated
     public static ComponentManager getComponentManager()
     {
-        return getContextComponentManager();
+        ComponentManager contextComponentManager;
+
+        try {
+            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context/root");
+        } catch (ComponentLookupException e) {
+            // This means the Context CM doesn't exist, use the Root CM.
+            contextComponentManager = rootComponentManager;
+        }
+
+        return contextComponentManager;
     }
 
     /**

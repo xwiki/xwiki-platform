@@ -21,12 +21,15 @@ package org.xwiki.component.script;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,6 +39,7 @@ import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.annotation.ComponentList;
@@ -71,13 +75,33 @@ public class ComponentScriptServiceTest
      */
     private ComponentManager contextComponentManager;
 
+    private ComponentManager contextrootComponentManager;
+
+    private ComponentManager rootComponentManager;
+
+    private ComponentManagerManager componentManagerManager;
+
     private Execution execution;
 
     @Before
     public void configure() throws Exception
     {
         this.dab = this.mocker.getInstance(DocumentAccessBridge.class);
+
         this.contextComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "context");
+        Provider<ComponentManager> contextComponentManagerProvider = this.mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(contextComponentManagerProvider.get()).thenReturn(this.contextComponentManager);
+
+        this.contextrootComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "context/root");
+        Provider<ComponentManager> contextrootComponentManagerProvider = this.mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context/root");
+        when(contextrootComponentManagerProvider.get()).thenReturn(this.contextrootComponentManager);
+
+        this.rootComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "root");
+
+        this.componentManagerManager = this.mocker.getInstance(ComponentManagerManager.class);
+
+        when(this.componentManagerManager.getComponentManager(null, false)).thenReturn(this.rootComponentManager);
+
         this.execution = this.mocker.getInstance(Execution.class);
     }
 
@@ -90,11 +114,43 @@ public class ComponentScriptServiceTest
     }
 
     @Test
+    public void getRootComponentManagerWhenNoProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getRootComponentManager());
+    }
+
+    @Test
+    public void getContextComponentManagerWhenNoProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getContextComponentManager());
+    }
+
+    @Test
     public void getComponentManagerWhenProgrammingRights() throws Exception
     {
         when(this.dab.hasProgrammingRights()).thenReturn(true);
 
-        assertEquals(this.contextComponentManager, this.mocker.getComponentUnderTest().getComponentManager());
+        assertSame(this.contextrootComponentManager, this.mocker.getComponentUnderTest().getComponentManager());
+    }
+
+    @Test
+    public void getRootComponentManagerWhenProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+
+        assertSame(this.rootComponentManager, this.mocker.getComponentUnderTest().getRootComponentManager());
+    }
+
+    @Test
+    public void getContextComponentManagerWhenProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+
+        assertSame(this.contextComponentManager, this.mocker.getComponentUnderTest().getContextComponentManager());
     }
 
     @Test
@@ -113,11 +169,10 @@ public class ComponentScriptServiceTest
     {
         when(this.dab.hasProgrammingRights()).thenReturn(true);
 
-        ComponentManagerManager componentManagerManager = this.mocker.getInstance(ComponentManagerManager.class);
         ComponentManager wikiComponentManager = mock(ComponentManager.class);
-        when(componentManagerManager.getComponentManager("wiki:chess", false)).thenReturn(wikiComponentManager);
+        when(this.componentManagerManager.getComponentManager("wiki:chess", false)).thenReturn(wikiComponentManager);
 
-        assertEquals(wikiComponentManager, this.mocker.getComponentUnderTest().getComponentManager("wiki:chess"));
+        assertSame(wikiComponentManager, this.mocker.getComponentUnderTest().getComponentManager("wiki:chess"));
     }
 
     @Test
@@ -138,7 +193,7 @@ public class ComponentScriptServiceTest
         SomeRole instance = mock(SomeRole.class);
         when(this.contextComponentManager.getInstance(SomeRole.class)).thenReturn(instance);
 
-        assertEquals(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class));
+        assertSame(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class));
     }
 
     @Test
@@ -159,7 +214,7 @@ public class ComponentScriptServiceTest
         SomeRole instance = mock(SomeRole.class);
         when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenReturn(instance);
 
-        assertEquals(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
+        assertSame(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
     }
 
     @Test

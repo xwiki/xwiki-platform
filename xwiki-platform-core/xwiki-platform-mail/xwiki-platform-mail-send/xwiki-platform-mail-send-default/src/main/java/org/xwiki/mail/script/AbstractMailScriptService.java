@@ -59,7 +59,7 @@ public abstract class AbstractMailScriptService implements ScriptService
     protected SessionFactory sessionFactory;
 
     @Inject
-    protected MailSenderConfiguration configuration;
+    protected MailSenderConfiguration senderConfiguration;
 
     /**
      * Send the mail asynchronously.
@@ -99,7 +99,7 @@ public abstract class AbstractMailScriptService implements ScriptService
     {
         // Load the configured permission checker
         ScriptServicePermissionChecker checker;
-        String hint = this.configuration.getScriptServicePermissionCheckerHint();
+        String hint = this.senderConfiguration.getScriptServicePermissionCheckerHint();
         try {
             checker = this.componentManagerProvider.get().getInstance(ScriptServicePermissionChecker.class, hint);
         } catch (ComponentLookupException e) {

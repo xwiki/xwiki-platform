@@ -75,6 +75,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
     @Inject
     private ContextualAuthorizationManager authorizationManager;
 
+    @Inject
+    private MailStorageConfiguration storageConfiguration;
+
     /**
      * Resend the serialized MimeMessage synchronously.
      *
@@ -204,6 +207,14 @@ public class MailStorageScriptService extends AbstractMailScriptService
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
         }
+    }
+
+    /**
+     * @return the configuration for the Mail Storage
+     */
+    public MailStorageConfiguration getConfiguration()
+    {
+        return this.storageConfiguration;
     }
 
     private Map<String, Object> normalizeFilterMap(Map<String, Object> filterMap)

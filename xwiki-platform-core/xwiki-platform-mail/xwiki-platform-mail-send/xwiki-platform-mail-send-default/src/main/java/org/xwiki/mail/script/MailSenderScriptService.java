@@ -184,7 +184,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MimeMessageWrapper createMessage(String to, String subject)
     {
-        return createMessage(this.configuration.getFromAddress(), to, subject);
+        return createMessage(this.senderConfiguration.getFromAddress(), to, subject);
     }
 
     /**
@@ -300,7 +300,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MailSenderConfiguration getConfiguration()
     {
-        return this.configuration;
+        return this.senderConfiguration;
     }
 
     @Override

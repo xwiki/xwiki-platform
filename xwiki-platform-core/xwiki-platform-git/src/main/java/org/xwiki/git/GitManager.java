@@ -36,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface GitManager
 {
     /**

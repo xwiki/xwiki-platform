@@ -31,7 +31,6 @@ import io.searchbox.client.JestClient;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface JestClientManager
 {
     /**

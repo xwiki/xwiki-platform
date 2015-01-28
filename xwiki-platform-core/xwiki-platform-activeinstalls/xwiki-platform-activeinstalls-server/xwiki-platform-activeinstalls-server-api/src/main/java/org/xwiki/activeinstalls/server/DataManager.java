@@ -33,7 +33,6 @@ import com.google.gson.JsonObject;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface DataManager
 {
     /**

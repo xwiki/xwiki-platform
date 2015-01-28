@@ -43,7 +43,6 @@ import com.google.gson.JsonObject;
 @Component
 @Named("activeinstalls")
 @Singleton
-@Unstable
 public class ActiveInstallsScriptService implements ScriptService
 {
     /**

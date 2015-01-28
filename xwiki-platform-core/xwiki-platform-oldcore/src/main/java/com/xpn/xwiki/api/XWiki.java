@@ -720,7 +720,6 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      * @since 5.0M2
      */
-    @Unstable
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
@@ -739,7 +738,6 @@ public class XWiki extends Api
      * @see #searchAttachments(String, int, int, List)
      * @since 5.0M2
      */
-    @Unstable
     public int countAttachments(String parametrizedSqlClause, List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);

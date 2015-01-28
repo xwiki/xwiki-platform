@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface ActiveInstallsConfiguration
 {
     /**

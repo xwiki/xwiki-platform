@@ -676,6 +676,8 @@ public class Utils
         } catch (ComponentLookupException e) {
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
+
+            LOGGER.warn("Failed to find context/root component manager, return root component manager");
         }
 
         return contextComponentManager;
@@ -693,14 +695,13 @@ public class Utils
     {
         ComponentManager contextComponentManager;
 
-        // Look for the Context Component Manager so that Macros can be registered for a specific user, for a
-        // specific wiki, etc. If it's not found use the Root Component Manager. This allows the Rendering module
-        // to work outside of XWiki when there's no notion of Execution Context and Wiki Model for example.
         try {
             contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context");
         } catch (ComponentLookupException e) {
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
+
+            LOGGER.warn("Failed to find context component manager, return root component manager");
         }
 
         return contextComponentManager;

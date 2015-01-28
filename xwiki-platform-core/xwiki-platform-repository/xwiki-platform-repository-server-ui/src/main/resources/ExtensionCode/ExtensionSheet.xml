@@ -1,28 +1,48 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<xwikidoc version="1.1">
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>0</translation>
-  <creator>XWiki.Admin</creator>
-  <creationDate>1312816151000</creationDate>
   <parent>ExtensionCode.ExtensionClass</parent>
-  <author>xwiki:XWiki.ThomasMortagne</author>
-  <contentAuthor>xwiki:XWiki.ThomasMortagne</contentAuthor>
-  <date>1422436084000</date>
-  <contentUpdateDate>1422436084000</contentUpdateDate>
-  <version>95.2</version>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1312816151000</creationDate>
+  <date>1384856926000</date>
+  <contentUpdateDate>1384856926000</contentUpdateDate>
+  <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
-  <minorEdit>true</minorEdit>
+  <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <object>
-    <name>ExtensionCode.ExtensionSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>a11d8ef9-3862-4e83-81de-38c743abf3fe</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -94,50 +114,59 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a11d8ef9-3862-4e83-81de-38c743abf3fe</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
-      <code>#template('colorThemeInit.vm')&#xd;
-&#xd;
-.box, div.floatinginfobox {&#xd;
-  background-color: #fafafa;&#xd;
-}&#xd;
-&#xd;
-.box.floatinginfobox {&#xd;
-  margin-top: 0;&#xd;
-  max-width: 50%;&#xd;
-}&#xd;
-&#xd;
-.extensionSummary {&#xd;
-  background-color: $theme.backgroundSecondaryColor;&#xd;
-  border: 1px dotted $theme.borderColor;&#xd;
-  padding: 5px;&#xd;
-  display: block;&#xd;
-}&#xd;
-&#xd;
-.errormessage, .warningmessage, .infomessage, .plainmessage {&#xd;
-  background-color: $theme.backgroundSecondaryColor;&#xd;
-}&#xd;
-&#xd;
-.main .extensionInfo {&#xd;
-  margin: 0;&#xd;
-}&#xd;
-&#xd;
-.label {&#xd;
-  font-size: 0.85em;&#xd;
-  font-weight: bold;&#xd;
-  text-transform: uppercase;&#xd;
-}&#xd;
-&#xd;
-.toc .label {&#xd;
-  display: block;&#xd;
-  margin-top: 1.1em;&#xd;
-  padding: 0 1em;&#xd;
-}&#xd;
-&#xd;
-.toc ul {&#xd;
-  margin-top: 0;&#xd;
+      <code>#template('colorThemeInit.vm')
+
+.box, div.floatinginfobox {
+  background-color: #fafafa;
+}
+
+.box.floatinginfobox {
+  margin-top: 0;
+  max-width: 50%;
+}
+
+.extensionSummary {
+  background-color: $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  padding: 5px;
+  display: block;
+}
+
+.errormessage, .warningmessage, .infomessage, .plainmessage {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.main .extensionInfo {
+  margin: 0;
+}
+
+.label {
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.toc .label {
+  display: block;
+  margin-top: 1.1em;
+  padding: 0 1em;
+}
+
+.toc ul {
+  margin-top: 0;
+}
+
+.extensionInfo .rating-wrapper,
+.extensionInfo .rating-wrapper .rating-message {
+  float: none;
 }</code>
     </property>
     <property>
@@ -151,10 +180,6 @@
     </property>
   </object>
   <object>
-    <name>ExtensionCode.ExtensionSheet</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>2e60500a-2494-4583-97e6-603e30162f4a</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -226,44 +251,43 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2e60500a-2494-4583-97e6-603e30162f4a</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
-      <code>.extensionSummary td, /* PROBLEM: General styling reset */&#xd;
-.extensionInfo td {&#xd;
-  border: 0;&#xd;
-  padding-top: 0;&#xd;
-  padding-bottom: 0;&#xd;
-}&#xd;
-&#xd;
-.box.floatinginfobox, .box.toc {&#xd;
-  max-width: 49%;&#xd;
-}&#xd;
-&#xd;
-.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */&#xd;
-  color: inherit;&#xd;
-  text-align: inherit;&#xd;
-  display: table-cell;&#xd;
-}&#xd;
-&#xd;
-.toc .label {&#xd;
-  margin: 0;&#xd;
-}&#xd;
-&#xd;
-/* Download and Source button alignment */&#xd;
-.box > p {&#xd;
-  margin-bottom: 0;&#xd;
-}&#xd;
-&#xd;
-/* Spacing for repository info message */&#xd;
-.box .extensionInfo {&#xd;
-  margin-top: 10px;&#xd;
-}&#xd;
-&#xd;
-/* XINFRA-134: Aligning table cell text */&#xd;
-.floatinginfobox td {&#xd;
-  vertical-align: baseline;&#xd;
+      <code>.extensionSummary td, /* PROBLEM: General styling reset */
+.extensionInfo td {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.box.floatinginfobox, .box.toc {
+  max-width: 49%;
+}
+
+.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */
+  color: inherit;
+  text-align: inherit;
+  display: table-cell;
+}
+
+.toc .label {
+  margin: 0;
+}
+
+/* Download and Source button alignment */
+.box &gt; p {
+  margin-bottom: 0;
+}
+
+/* Spacing for repository info message */
+.box .extensionInfo {
+  margin-top: 10px;
 }</code>
     </property>
     <property>
@@ -276,324 +300,314 @@
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{include reference="ExtensionCode.RepositoryCode"/}}&#xd;
-&#xd;
-{{velocity output="false"}}&#xd;
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')&#xd;
-  #set($isEditMode = true)&#xd;
-#else&#xd;
-  #set($isViewMode = true)&#xd;
-#end&#xd;
-&#xd;
-#set($extension = $doc.getObject("ExtensionCode.ExtensionClass"))&#xd;
-&#xd;
-#if ($extension)&#xd;
-  #set($id = $extension.getProperty('id').value)&#xd;
-  #set($type = $extension.getProperty('type').value)&#xd;
-&#xd;
-  #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())&#xd;
-  #if ($extensionTypeDocumentNames.size() > 0)&#xd;
-    #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))&#xd;
-    #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))&#xd;
-  #end&#xd;
-&#xd;
-  #set ($extensionSheetExtensionDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionSheetExtensionClass) as sheetExtension').execute())&#xd;
-  #set($sheetExtensions = [])&#xd;
-  #foreach($extensionSheetExtensionDocumentName in $extensionSheetExtensionDocumentNames)&#xd;
-    #set($sheetExtension = $xwiki.getDocument($extensionSheetExtensionDocumentName).getObject('ExtensionCode.ExtensionSheetExtensionClass'))&#xd;
-    #if ($sheetExtension.getProperty('type').value == '' || $sheetExtension.getProperty('type').value == $type)&#xd;
-      #set($void = $sheetExtensions.add($sheetExtension))&#xd;
-    #end&#xd;
-  #end&#xd;
-#end&#xd;
-&#xd;
-#set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))&#xd;
-{{/velocity}}&#xd;
-&#xd;
-{{velocity}}&#xd;
-#if ($extension)&#xd;
-  $doc.use("ExtensionCode.ExtensionClass")&#xd;
-  #if ($isViewMode)&#xd;
-    ##------- Icon &amp; Summary -----------------&#xd;
-    (% class="extensionSummary" %)&#xd;
-    #set($icon = $doc.getValue("icon"))&#xd;
-    #if ("$!{icon.trim()}" != "")&#xd;
-      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**&#xd;
-    #else&#xd;
-      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**&#xd;
-    #end&#xd;
-&#xd;
-    ## Viewing&#xd;
-    ##&#xd;
-    {{box cssClass="floatinginfobox"}}&#xd;
-      #if ($hasEdit)&#xd;
-        #if ($proxyExtensionObject)&#xd;
-          #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)&#xd;
-          #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)&#xd;
-          {{info}}Extension imported from repository [[$repositoryId>>$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh>>ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end&#xd;
-        #end&#xd;
-      #end&#xd;
-&#xd;
-      (% class="extensionInfo" %)&#xd;
-      ##------- Type --------------&#xd;
-      #set($typeDisplay = $extensionTypeObject.getProperty('name').value)&#xd;
-      #if ("$!typeDisplay" == '')&#xd;
-        #set($typeDisplay = $type)&#xd;
-      #end&#xd;
-      |(% class="label" width='30%' %)Type(%%)|$typeDisplay&#xd;
-      ##------- Developed By --------&#xd;
-      #set($authors = $doc.getValue("authors"))&#xd;
-      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())&#xd;
-          Unknown&#xd;
-        #else&#xd;
-          $doc.authors&#xd;
-        #end&#xd;
-      ##------- Website --------------&#xd;
-      #set($website = $extension.getProperty("website").value)&#xd;
-      #if ("$!website" != '')&#xd;
-        |(% class="label" %)Website(%%)|#if ($website.length() > 40)&#xd;
-                                          [[{{{$website.substring(0, 40)...}}}>>url:$website]]&#xd;
-                                        #else&#xd;
-                                          $website&#xd;
-                                        #end&#xd;
-      #end&#xd;
-      ##------- License --------&#xd;
-      #set($licenseName = $doc.getValue("licenseName"))&#xd;
-      #if ("$!licenseName" != "")&#xd;
-        |(% class="label" %)License(%%)|$licenseName&#xd;
-      #else&#xd;
-        |(% class="label" %)License(%%)|Unknown&#xd;
-      #end&#xd;
-      ##---------------------------------&#xd;
-      ##------- Sheet extensions --------&#xd;
-      #if (!$sheetExtensions.isEmpty())&#xd;
-&#xd;
-        #foreach($sheetExtension in $sheetExtensions)&#xd;
-          $doc.display('view_info', 'view', $sheetExtension)&#xd;
-        #end&#xd;
-      #end&#xd;
-      ##-------------------------------------------&#xd;
-      ##------- Extension Manager -----------------&#xd;
-      #if ($doc.getValue('validExtension') == 1)&#xd;
-&#xd;
-        {{success}}**Installable with the Extension Manager**{{/success}}&#xd;
-      #end&#xd;
-      ##------------------------&#xd;
-      ##------- Source --------&#xd;
-      #set($source = $doc.getValue("source"))&#xd;
-      #if ("$!source" != "")&#xd;
-&#xd;
-        [[View Source>>$source||class="extension-link small-extension-link source-extension"]]&#xd;
-      #end&#xd;
-      ##------- Download button ------&#xd;
-      #set($lastVersion = $doc.getValue("lastVersion"))&#xd;
-      #if ("$!lastVersion" != '')&#xd;
-        #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))&#xd;
-&#xd;
-        #set ($version = $lastVersionObject.getProperty('version').value)&#xd;
-        #set ($download = $lastVersionObject.getProperty("download").value)&#xd;
-        #if ("$!download" == '')&#xd;
-          #if ($doc.getAttachment("${id}-${version}.${type}"))&#xd;
-            [[Download v$version>>attach:${id}-${version}.${type}||class="extension-link small-extension-link download-extension"]]&#xd;
-          #end&#xd;
-        #else&#xd;
-          [[Download v$version>>$download||class="extension-link small-extension-link download-extension"]]&#xd;
-        #end&#xd;
-      #end&#xd;
-    {{/box}}&#xd;
-&#xd;
-    {{box cssClass="toc"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}&#xd;
-  #else&#xd;
-    ## Editing&#xd;
-    ##&#xd;
-    {{toc/}}&#xd;
-&#xd;
-    = Documentation Help =&#xd;
-&#xd;
-    Here are some rules to follow when contributing an extension:&#xd;
-    * Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.&#xd;
-    #if($proxyExtensionObject)&#xd;
-      * When en extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations&#xd;
-    #end&#xd;
-&#xd;
-    #foreach($sheetExtension in $sheetExtensions)&#xd;
-      $doc.display('documentation', 'view', $sheetExtension)&#xd;
-    #end&#xd;
-&#xd;
-    #if($proxyExtensionObject)&#xd;
-      ; Automatically synchronize the extension informations&#xd;
-      : $proxyExtensionObject.autoUpdate&#xd;
-    #end&#xd;
-&#xd;
-    = Summary =&#xd;
-    #if ($doc.isNew())&#xd;
-      #if ($request.name)&#xd;
-        $extension.set('id', "${defaultIdPrefix}${request.name.toLowerCase().replace(' ', '-')}")##&#xd;
-        $extension.set('name', $request.name)##&#xd;
-      #else&#xd;
-        $extension.set('id', "${defaultIdPrefix}${doc.name.toLowerCase().replace(' ', '-')}")##&#xd;
-        $extension.set('name', $doc.name)##&#xd;
-      #end&#xd;
-      $extension.set('authors', $xcontext.user)##&#xd;
-      {{html}}&lt;input value="${escapetool.xml($extension.getProperty('id').value)}" name="ExtensionCode.ExtensionClass_0_id" type="hidden">{{/html}}&#xd;
-    #end&#xd;
-&#xd;
-    (% class="extension" %)&#xd;
-    |Name|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end~&#xd;
-    |Type|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end~&#xd;
-    |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~&#xd;
-    ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display&#xd;
-    |Authors|#if($proxyExtensionObject)$doc.getValue('authors')#else$doc.display('authors')#end~&#xd;
-    |License|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end~&#xd;
-    |Source|$doc.display('source')&#xd;
-    |Display Icon Location&#xd;
-(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank">icon name&lt;/a>{{/html}}${comment})|$doc.display("icon")&#xd;
-&#xd;
-    #foreach($sheetExtension in $sheetExtensions)&#xd;
-      $doc.display('edit', 'view', $sheetExtension)&#xd;
-    #end&#xd;
-  #end&#xd;
-&#xd;
-    = Description =&#xd;
-    #if ($isViewMode)&#xd;
-      ## Make sure to resolve reference based on the right document&#xd;
-      $doc.getValue("description")&#xd;
-    #else&#xd;
-      $doc.display("description")&#xd;
-    #end&#xd;
-    ##&#xd;
-    ## Only display Compatibility section if there are ExtensionCompatibilityClass xobjects defined&#xd;
-    #set($extensionCompatibilities = $doc.getObjects('ExtensionCode.ExtensionCompatibilityClass'))&#xd;
-    #if ($extensionCompatibilities &amp;&amp; $extensionCompatibilities.size() > 0)&#xd;
-      = Compatibility =&#xd;
-&#xd;
-      This extension has been tested with the following configurations.&#xd;
-&#xd;
-      #set ($compatibilityMatrix = {})&#xd;
-      |=Extension Version|=XWiki Flavor|=Notes&#xd;
-      #foreach ($extensionCompatibility in $extensionCompatibilities)&#xd;
-        |$extensionCompatibility.getProperty('extensionVersion').getValue()|$extensionCompatibility.getProperty('xwikiFlavor').getValue() $extensionCompatibility.getProperty('xwikiFlavorVersion').getValue()|$extensionCompatibility.get('notes')&#xd;
-      #end&#xd;
-    #end&#xd;
-&#xd;
-    #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')&#xd;
-      #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")&#xd;
-    #else&#xd;
-      #set($standardInstallation = '')&#xd;
-    #end&#xd;
-    #set($extraInstallation = "$!{doc.getValue('installation')}")&#xd;
-&#xd;
-    #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')&#xd;
-      = Prerequisites &amp; Installation Instructions =&#xd;
-&#xd;
-      #if ($isEditMode)&#xd;
-        ; Custom installation only&#xd;
-        : $extension.customInstallationOnly&#xd;
-      #end&#xd;
-      ##&#xd;
-      ## Standard installation&#xd;
-      #if ($standardInstallation != '')&#xd;
-        #if ($isEditMode)&#xd;
-          == Standard installation instructions&#xd;
-&#xd;
-        #end&#xd;
-        $extensionTypeObject.display('installation', 'view')&#xd;
-      #end&#xd;
-      ##&#xd;
-      ## Extra installation&#xd;
-      #if ($isEditMode)&#xd;
-        == Custom installation instructions&#xd;
-&#xd;
-      #end&#xd;
-      #if ($isEditMode || $extraInstallation != '')&#xd;
-        $extension.installation&#xd;
-      #end&#xd;
-    #end&#xd;
-&#xd;
-    ## Only display release notes if there are downloads and release notes&#xd;
-    #if ($lastVersionObject)&#xd;
-      #set ($releaseNotes = [])&#xd;
-      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))&#xd;
-      #foreach ($versionObject in $versions)&#xd;
-        #set ($notes = $!{versionObject.getProperty('notes').value})&#xd;
-        #set ($version = $!{versionObject.getProperty('version').value})&#xd;
-        #if ("$!notes" != '' &amp;&amp; "$!version" != '')&#xd;
-          #set ($discard = $releaseNotes.add([$version, $notes]))&#xd;
-        #end&#xd;
-      #end&#xd;
-      ## Reverse the list to have latest versions first&#xd;
-      #set ($discard = $collectionstool.reverse($releaseNotes))&#xd;
-      #if (!$releaseNotes.isEmpty())&#xd;
-        = Release Notes =&#xd;
-        #foreach ($entry in $releaseNotes)&#xd;
-          == v$entry.get(0) ==&#xd;
-          $entry.get(1)&#xd;
-        #end&#xd;
-      #end&#xd;
-&#xd;
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.version))&#xd;
-      #if ($extensionDependencies.size() > 0)&#xd;
-        = Dependencies =&#xd;
-&#xd;
-         #foreach($extensionDependency in $extensionDependencies)&#xd;
-          #set($dependencyDocumentName = $null)&#xd;
-          #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())&#xd;
-          #if (!$dependencyDocumentNames.isEmpty())&#xd;
-            #set($dependencyDocumentName = $dependencyDocumentNames.get(0))&#xd;
-          #end&#xd;
-          #if ($dependencyDocumentName)&#xd;
-            * [[$extensionDependency.id>>$dependencyDocumentName]] $extensionDependency.constraint&#xd;
-          #else&#xd;
-            * $extensionDependency.id $extensionDependency.constraint&#xd;
-          #end&#xd;
-        #end&#xd;
-      #end&#xd;
-    #end&#xd;
-&#xd;
-    #if ($isEditMode &amp;&amp; !$proxyExtensionObject)&#xd;
-      #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))&#xd;
-      #if($extversions &amp;&amp; $extversions.size()>0)&#xd;
-      = Current Downloads =&#xd;
-         #foreach($versionobj in $extversions)&#xd;
-            #set($ok = $doc.use($versionobj))&#xd;
-            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}&#xd;
-         #end&#xd;
-      #end&#xd;
-&#xd;
-      = Add Downloads =&#xd;
-      #if ($doc.isNew())&#xd;
-        {{info}}In order to add Download information for this extension, save this page first and edit it again.{{/info}}&#xd;
-      #else&#xd;
-        {{warning}}If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.{{/warning}}&#xd;
-&#xd;
-        We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:&#xd;
-        * If you're providing a new download, [[attach the new version to this page>>path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]] and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).&#xd;
- &#xd;
-      #set($xredirect = $doc.getURL("edit"))&#xd;
-      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionVersionClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))&#xd;
-      * Add Download information for the new attachment by filing in a new [[Extension Version>>path:$addobjecturl]]. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {{{attach:ubercoolmacro-1.0.xar}}}.&#xd;
-&#xd;
-      #set($extdeps = $doc.getObjects("ExtensionCode.ExtensionDependencyClass"))&#xd;
-      #if($extdeps &amp;&amp; $extdeps.size()>0)&#xd;
-      = Current Dependencies =&#xd;
-         #foreach($depobj in $extdeps)&#xd;
-            #set($ok = $doc.use($depobj))&#xd;
-            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionDependencySheet") {{/html}}&#xd;
-         #end&#xd;
-      #end&#xd;
-&#xd;
-      = Add Dependencies =&#xd;
-&#xd;
-      #set($xredirect = $doc.getURL("edit"))&#xd;
-      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionDependencyClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))&#xd;
-        You can also associate dependencies to each version by filing in the following information in a new [[Dependency>>path:$addobjecturl]]:&#xd;
-        * ${escapetool.h}#Extension version${escapetool.h}# is the version on which this dependency is assigned&#xd;
-        * ${escapetool.h}#Dependency id${escapetool.h}# is the identifier of the dependency extension on the repository where it is localed&#xd;
-        * ${escapetool.h}#Dependency version constraint${escapetool.h}# is the version related information of the dependency. Can be a version (e.g. ${escapetool.h}#1.0${escapetool.h}#) or one or several ranges of versions based on Maven standard syntax, for example: {{code language="none"}}[1.0,){{/code}} which would mean "at least ${escapetool.h}#1.0${escapetool.h}#".&#xd;
-      #end&#xd;
-    #end&#xd;
-#else&#xd;
-  This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object&#xd;
-#end&#xd;
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
+
+{{include reference="XWiki.RatingsMacros"/}}
+
+{{velocity output="false"}}
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set($isEditMode = true)
+#else
+  #set($isViewMode = true)
+#end
+
+#set($extension = $doc.getObject("ExtensionCode.ExtensionClass"))
+
+#if ($extension)
+  #set($id = $extension.getProperty('id').value)
+  #set($type = $extension.getProperty('type').value)
+
+  #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())
+  #if ($extensionTypeDocumentNames.size() &gt; 0)
+    #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))
+    #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
+  #end
+
+  #set ($extensionSheetExtensionDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionSheetExtensionClass) as sheetExtension').execute())
+  #set($sheetExtensions = [])
+  #foreach($extensionSheetExtensionDocumentName in $extensionSheetExtensionDocumentNames)
+    #set($sheetExtension = $xwiki.getDocument($extensionSheetExtensionDocumentName).getObject('ExtensionCode.ExtensionSheetExtensionClass'))
+    #if ($sheetExtension.getProperty('type').value == '' || $sheetExtension.getProperty('type').value == $type)
+      #set($void = $sheetExtensions.add($sheetExtension))
+    #end
+  #end
+#end
+
+#set($proxyExtensionObject = $doc.getObject('ExtensionCode.ExtensionProxyClass'))
+{{/velocity}}
+
+{{velocity}}
+#if ($extension)
+  $doc.use("ExtensionCode.ExtensionClass")
+  #if ($isViewMode)
+    ##------- Icon &amp; Summary -----------------
+    (% class="extensionSummary" %)
+    #set($icon = $doc.getValue("icon"))
+    #if ("$!{icon.trim()}" != "")
+      |[[image:${doc.getValue('icon')}]]|**{{{$doc.getValue("summary")}}}**
+    #else
+      |[[image:icon:cog]]|**{{{$doc.getValue("summary")}}}**
+    #end
+
+    ## Viewing
+    ##
+    {{box cssClass="floatinginfobox"}}
+      #if ($hasEdit)
+        #if ($proxyExtensionObject)
+          #set($repositoryId = $proxyExtensionObject.getProperty('repositoryId').value)
+          #set($repositoryURI = $proxyExtensionObject.getProperty('repositoryURI').value)
+          {{info}}Extension imported from repository [[$repositoryId&gt;&gt;$repositoryURI]]{{/info}} #if ($hasEdit)[[image:icon:arrow_refresh&gt;&gt;ExtensionCode.ImportExtension||title="Update extension" queryString="importExtension=true&amp;extensionId=$escapetool.url($id)&amp;repositoryId=$escapetool.url($repositoryId)"]]#end
+        #end
+      #end
+
+      (% class="extensionInfo" %)
+      ##------- Type --------------
+      #set($typeDisplay = $extensionTypeObject.getProperty('name').value)
+      #if ("$!typeDisplay" == '')
+        #set($typeDisplay = $type)
+      #end
+      |(% class="label" width='30%' %)Type(%%)|$typeDisplay
+      ##------- Developed By --------
+      #set($authors = $doc.getValue("authors"))
+      |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
+          Unknown
+        #else
+          $doc.authors
+        #end
+      ##------- Rating --------
+      |(% class="label" %)Rating(%%)|#displayFullRating($doc "")
+      ##------- Website --------------
+      #set($website = $extension.getProperty("website").value)
+      #if ("$!website" != '')
+        |(% class="label" %)Website(%%)|#if ($website.length() &gt; 40)
+                                          [[{{{$website.substring(0, 40)...}}}&gt;&gt;url:$website]]
+                                        #else
+                                          $website
+                                        #end
+      #end
+      ##------- License --------
+      #set($licenseName = $doc.getValue("licenseName"))
+      #if ("$!licenseName" != "")
+        |(% class="label" %)License(%%)|$licenseName
+      #else
+        |(% class="label" %)License(%%)|Unknown
+      #end
+      ##---------------------------------
+      ##------- Sheet extensions --------
+      #if (!$sheetExtensions.isEmpty())
+
+        #foreach($sheetExtension in $sheetExtensions)
+          $doc.display('view_info', 'view', $sheetExtension)
+        #end
+      #end
+      ##-------------------------------------------
+      ##------- Extension Manager -----------------
+      #if ($doc.getValue('validExtension') == 1)
+
+        {{success}}**Installable with the Extension Manager**{{/success}}
+      #end
+      ##------------------------
+      ##------- Source --------
+      #set($source = $doc.getValue("source"))
+      #if ("$!source" != "")
+
+        [[View Source&gt;&gt;$source||class="extension-link small-extension-link source-extension"]]
+      #end
+      ##------- Download button ------
+      #set($lastVersion = $doc.getValue("lastVersion"))
+      #if ("$!lastVersion" != '')
+        #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))
+
+        #set ($version = $lastVersionObject.getProperty('version').value)
+        #set ($download = $lastVersionObject.getProperty("download").value)
+        #if ("$!download" == '')
+          #if ($doc.getAttachment("${id}-${version}.${type}"))
+            [[Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="extension-link small-extension-link download-extension"]]
+          #end
+        #else
+          [[Download v$version&gt;&gt;$download||class="extension-link small-extension-link download-extension"]]
+        #end
+      #end
+    {{/box}}
+
+    {{box cssClass="toc"}}(% class="label" %)Table of contents(%%)((({{toc/}}))){{/box}}
+  #else
+    ## Editing
+    ##
+    {{toc/}}
+
+    = Documentation Help =
+
+    Here are some rules to follow when contributing an extension:
+    * Use a short summary. It's going to be displayed in the Extension livetable and ideally shouldn't take more than 1 line in that table.
+    #if($proxyExtensionObject)
+      * When en extension is imported everything from the source has priority over what's in that page so make sure you properly set the pom.xml or any other format you are importing from or disable auto update so that you can choose when to update and modify imported informations
+    #end
+
+    #foreach($sheetExtension in $sheetExtensions)
+      $doc.display('documentation', 'view', $sheetExtension)
+    #end
+
+    #if($proxyExtensionObject)
+      ; Automatically synchronize the extension informations
+      : $proxyExtensionObject.autoUpdate
+    #end
+
+    = Summary =
+    #if ($doc.isNew())
+      #if ($request.name)
+        $extension.set('id', "${defaultIdPrefix}${request.name.toLowerCase().replace(' ', '-')}")##
+        $extension.set('name', $request.name)##
+      #else
+        $extension.set('id', "${defaultIdPrefix}${doc.name.toLowerCase().replace(' ', '-')}")##
+        $extension.set('name', $doc.name)##
+      #end
+      $extension.set('authors', $xcontext.user)##
+      {{html}}&lt;input value="${escapetool.xml($extension.getProperty('id').value)}" name="ExtensionCode.ExtensionClass_0_id" type="hidden"&gt;{{/html}}
+    #end
+
+    (% class="extension" %)
+    |Name|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end~
+    |Type|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end~
+    |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~
+    ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
+    |Authors|#if($proxyExtensionObject)$doc.getValue('authors')#else$doc.display('authors')#end~
+    |License|#if($proxyExtensionObject)$doc.display('licenseName', 'view')#else$doc.display('licenseName')#end~
+    |Source|$doc.display('source')
+    |Display Icon Location
+(Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
+
+    #foreach($sheetExtension in $sheetExtensions)
+      $doc.display('edit', 'view', $sheetExtension)
+    #end
+  #end
+
+    = Description =
+    #if ($isViewMode)
+      ## Make sure to resolve reference based on the right document
+      $doc.getValue("description")
+    #else
+      $doc.display("description")
+    #end
+
+    #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
+      #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
+    #else
+      #set($standardInstallation = '')
+    #end
+    #set($extraInstallation = "$!{doc.getValue('installation')}")
+
+    #if ($isEditMode || $standardInstallation != '' || $extraInstallation != '')
+      = Prerequisites &amp; Installation Instructions =
+
+      #if ($isEditMode)
+        ; Custom installation only
+        : $extension.customInstallationOnly
+      #end
+      ##
+      ## Standard installation
+      #if ($standardInstallation != '')
+        #if ($isEditMode)
+          == Standard installation instructions
+
+        #end
+        $extensionTypeObject.display('installation', 'view')
+      #end
+      ##
+      ## Extra installation
+      #if ($isEditMode)
+        == Custom installation instructions
+
+      #end
+      #if ($isEditMode || $extraInstallation != '')
+        $extension.installation
+      #end
+    #end
+
+    ## Only display release notes if there are downloads and release notes
+    #if ($lastVersionObject)
+      #set ($releaseNotes = [])
+      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+      #foreach ($versionObject in $versions)
+        #set ($notes = $!{versionObject.getProperty('notes').value})
+        #set ($version = $!{versionObject.getProperty('version').value})
+        #if ("$!notes" != '' &amp;&amp; "$!version" != '')
+          #set ($discard = $releaseNotes.add([$version, $notes]))
+        #end
+      #end
+      ## Reverse the list to have latest versions first
+      #set ($discard = $collectionstool.reverse($releaseNotes))
+      #if (!$releaseNotes.isEmpty())
+        = Release Notes =
+        #foreach ($entry in $releaseNotes)
+          == v$entry.get(0) ==
+          $entry.get(1)
+        #end
+      #end
+
+      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.version))
+      #if ($extensionDependencies.size() &gt; 0)
+        = Dependencies =
+
+         #foreach($extensionDependency in $extensionDependencies)
+          #set($dependencyDocumentName = $null)
+          #set($dependencyDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionClass) as extension where extension.id = :id').bindValue("id", $extensionDependency.id).execute())
+          #if (!$dependencyDocumentNames.isEmpty())
+            #set($dependencyDocumentName = $dependencyDocumentNames.get(0))
+          #end
+          #if ($dependencyDocumentName)
+            * [[$extensionDependency.id&gt;&gt;$dependencyDocumentName]] $extensionDependency.constraint
+          #else
+            * $extensionDependency.id $extensionDependency.constraint
+          #end
+        #end
+      #end
+    #end
+
+    #if ($isEditMode &amp;&amp; !$proxyExtensionObject)
+      #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+      #if($extversions &amp;&amp; $extversions.size()&gt;0)
+      = Current Downloads =
+         #foreach($versionobj in $extversions)
+            #set($ok = $doc.use($versionobj))
+            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}
+         #end
+      #end
+
+      = Add Downloads =
+      #if ($doc.isNew())
+        {{info}}In order to add Download information for this extension, save this page first and edit it again.{{/info}}
+      #else
+        {{warning}}If you've made changes to this form, make sure to save the page before clicking on the links below since you would loose the information you entered otherwise.{{/warning}}
+
+        We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
+        * If you're providing a new download, [[attach the new version to this page&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]] and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).
+ 
+      #set($xredirect = $doc.getURL("edit"))
+      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionVersionClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
+      * Add Download information for the new attachment by filing in a new [[Extension Version&gt;&gt;path:$addobjecturl]]. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {{{attach:ubercoolmacro-1.0.xar}}}.
+
+      #set($extdeps = $doc.getObjects("ExtensionCode.ExtensionDependencyClass"))
+      #if($extdeps &amp;&amp; $extdeps.size()&gt;0)
+      = Current Dependencies =
+         #foreach($depobj in $extdeps)
+            #set($ok = $doc.use($depobj))
+            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionDependencySheet") {{/html}}
+         #end
+      #end
+
+      = Add Dependencies =
+
+      #set($xredirect = $doc.getURL("edit"))
+      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionDependencyClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
+        You can also associate dependencies to each version by filing in the following information in a new [[Dependency&gt;&gt;path:$addobjecturl]]:
+        * ${escapetool.h}#Extension version${escapetool.h}# is the version on which this dependency is assigned
+        * ${escapetool.h}#Dependency id${escapetool.h}# is the identifier of the dependency extension on the repository where it is localed
+        * ${escapetool.h}#Dependency version constraint${escapetool.h}# is the version related information of the dependency. Can be a version (e.g. ${escapetool.h}#1.0${escapetool.h}#) or one or several ranges of versions based on Maven standard syntax (e.g. ${escapetool.h}#[1.0,)${escapetool.h}# which mean at least ${escapetool.h}#1.0${escapetool.h}#)
+      #end
+    #end
+#else
+  This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object
+#end
 {{/velocity}}</content>
 </xwikidoc>

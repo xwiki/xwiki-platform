@@ -130,7 +130,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        XWikiConfig config = new XWikiConfig();
         getContext().setWiki(new XWiki() {
             @Override
             public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
@@ -138,7 +137,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
                 return Arrays.asList("xwiki");
             }
         });
-        getContext().getWiki().setConfig(config);
 
         registerComponent(TestDataMigrationManager.class);
     }

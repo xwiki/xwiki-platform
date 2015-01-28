@@ -27,7 +27,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.crypto.AsymmetricKeyFactory;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.params.cipher.asymmetric.PrivateKeyParameters;

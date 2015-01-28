@@ -31,14 +31,11 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-
-import junit.framework.Assert;
 
 public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {

@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.ColorTheme;

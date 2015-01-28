@@ -30,8 +30,6 @@ import org.xwiki.activeinstalls.server.DataManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
-
 import com.google.gson.JsonObject;
 
 /**

@@ -24,7 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceSerializer;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
 import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.skin.FSSkinReference;

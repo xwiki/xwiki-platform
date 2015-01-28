@@ -26,7 +26,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReader;

@@ -30,7 +30,6 @@ import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;

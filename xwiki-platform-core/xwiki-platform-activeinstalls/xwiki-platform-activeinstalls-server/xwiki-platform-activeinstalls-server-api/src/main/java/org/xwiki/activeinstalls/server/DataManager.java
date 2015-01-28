@@ -22,8 +22,6 @@ package org.xwiki.activeinstalls.server;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
 import com.google.gson.JsonObject;
 
 /**

@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;

@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;

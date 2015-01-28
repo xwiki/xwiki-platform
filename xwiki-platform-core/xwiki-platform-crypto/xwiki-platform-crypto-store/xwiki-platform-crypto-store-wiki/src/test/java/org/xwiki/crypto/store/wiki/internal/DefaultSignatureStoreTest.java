@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.SignatureStore;
 import org.xwiki.model.EntityType;

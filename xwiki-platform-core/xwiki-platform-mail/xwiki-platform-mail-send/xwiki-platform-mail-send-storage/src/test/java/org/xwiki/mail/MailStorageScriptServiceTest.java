@@ -68,8 +68,8 @@ public class MailStorageScriptServiceTest
     @Before
     public void setUp() throws Exception
     {
-        Provider<ComponentManager> componentManagerProvider = this.mocker.getInstance(new DefaultParameterizedType(
-            null, Provider.class, ComponentManager.class), "context");
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         Execution execution = this.mocker.getInstance(Execution.class);

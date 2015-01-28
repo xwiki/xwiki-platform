@@ -490,7 +490,7 @@
       $doc.display("description")
     #end
 
-    #if ($extensionTypeObject &amp;&amp; $latestVersion &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
+    #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
       #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
     #else
       #set($standardInstallation = '')
@@ -525,8 +525,9 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($latestVersion)
+    #if ($lastVersionObject)
       #set ($releaseNotes = [])
+      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #foreach ($versionObject in $versions)
         #set ($notes = $!{versionObject.getProperty('notes').value})
         #set ($version = $!{versionObject.getProperty('version').value})
@@ -544,7 +545,7 @@
         #end
       #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $latestVersion.version))
+      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.version))
       #if ($extensionDependencies.size() &gt; 0)
         = Dependencies =
 

@@ -20,7 +20,6 @@
 package org.xwiki.localization.message;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Transform String into a {@link TranslationMessage}.

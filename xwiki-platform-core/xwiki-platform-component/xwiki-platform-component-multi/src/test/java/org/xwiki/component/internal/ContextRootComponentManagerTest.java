@@ -19,9 +19,6 @@
  */
 package org.xwiki.component.internal;
 
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Type;
@@ -35,10 +32,9 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
- * Unit tests for {@link org.xwiki.component.script.ComponentScriptService}.
+ * Unit tests for {@link org.xwiki.component.script.ContextRootComponentManager}.
  * 
  * @version $Id$
- * @since 4.1M2
  */
 @ComponentList(ContextComponentManagerProvider.class)
 public class ContextRootComponentManagerTest

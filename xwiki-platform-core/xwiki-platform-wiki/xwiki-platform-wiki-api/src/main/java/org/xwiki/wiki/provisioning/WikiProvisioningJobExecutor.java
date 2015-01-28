@@ -22,7 +22,6 @@ package org.xwiki.wiki.provisioning;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Executor that manage jobs that provision wikis.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface WikiProvisioningJobExecutor
 {
     /**

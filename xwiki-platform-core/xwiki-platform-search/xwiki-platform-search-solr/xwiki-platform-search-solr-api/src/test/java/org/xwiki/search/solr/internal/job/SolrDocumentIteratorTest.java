@@ -65,7 +65,7 @@ public class SolrDocumentIteratorTest
         solr = mock(SolrInstance.class);
 
         Provider<SolrInstance> solrInstanceProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
+            mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
         when(solrInstanceProvider.get()).thenReturn(solr);
     }
 

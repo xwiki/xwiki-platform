@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -672,7 +673,8 @@ public class Utils
             // This means the Context Root CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
 
-            LOGGER.warn("Failed to find context/root component manager, return root component manager");
+            LOGGER.warn("Failed to find context/root component manager ({}), return root component manager",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return contextComponentManager;
@@ -696,7 +698,8 @@ public class Utils
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
 
-            LOGGER.warn("Failed to find context component manager, return root component manager");
+            LOGGER.warn("Failed to find context component manager ({}), return root component manager",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return contextComponentManager;

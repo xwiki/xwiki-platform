@@ -58,7 +58,7 @@ public class UIExtensionScriptServiceTest implements WikiUIExtensionConstants
     public void setUp() throws Exception
     {
         contextComponentManager = mock(ComponentManager.class);
-        Provider<ComponentManager> componentManagerProvider = componentManager.getInstance(
+        Provider<ComponentManager> componentManagerProvider = componentManager.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(contextComponentManager);
 

@@ -25,6 +25,7 @@ import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.Block;
@@ -45,6 +46,7 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
@@ -116,8 +118,14 @@ public class DefaultHTMLConverterTest
         // Verify that the macro transformations have been executed.
         Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
         RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
-        verify((MutableRenderingContext)renderingContext).transformInContext(same(macroTransformation),
-            any(TransformationContext.class), same(xdom));
+
+        // It's very important to verify that a transformation context id is set as otherwise if the content being
+        // edited has different velocity macros executing, they'll be executed in isolation and thus what's defined in
+        // one won't be visible from the other ones (For example see http://jira.xwiki.org/browse/XWIKI-11695).
+        ArgumentCaptor<TransformationContext> txContextArgument = ArgumentCaptor.forClass(TransformationContext.class);
+        verify((MutableRenderingContext) renderingContext).transformInContext(same(macroTransformation),
+            txContextArgument.capture(), same(xdom));
+        assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
         BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
@@ -152,9 +160,14 @@ public class DefaultHTMLConverterTest
         // Verify that the macro transformations have been executed.
         Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
         RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
-        verify((MutableRenderingContext)renderingContext).transformInContext(same(macroTransformation),
-            any(TransformationContext.class), same(xdom));
 
+        // It's very important to verify that a transformation context id is set as otherwise if the content being
+        // edited has different velocity macros executing, they'll be executed in isolation and thus what's defined in
+        // one won't be visible from the other ones (For example see http://jira.xwiki.org/browse/XWIKI-11695).
+        ArgumentCaptor<TransformationContext> txContextArgument = ArgumentCaptor.forClass(TransformationContext.class);
+        verify((MutableRenderingContext) renderingContext).transformInContext(same(macroTransformation),
+            txContextArgument.capture(), same(xdom));
+        assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
         BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");

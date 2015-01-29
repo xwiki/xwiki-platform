@@ -20,6 +20,7 @@
 package com.xpn.xwiki.export.html;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -30,6 +31,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -333,7 +337,7 @@ public class HtmlPackager
         }
 
         // Copy generated files in the ZIP file.
-        addDirToZip(tempdir, zos, "", null);
+        addDirToZip(tempdir, TrueFileFilter.TRUE, zos, "", null);
 
         zos.setComment(this.description);
 
@@ -386,18 +390,24 @@ public class HtmlPackager
         XWikiContext context) throws IOException
     {
         File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
-        addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
+
+        // Don't include vm and LESS files by default
+        FileFilter filter = new NotFileFilter(new SuffixFileFilter(
+            new String[] { ".vm", ".less", "skin.properties" }));
+
+        addDirToZip(file, filter, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
     }
 
     /**
      * Add a directory and all its sub-directories to the package.
      *
      * @param directory the directory to add.
+     * @param filter the files to include or exclude from the copy
      * @param out the ZIP output stream where to put the skin.
      * @param basePath the path where to put the directory in the package.
      * @throws IOException error when adding the directory to package.
      */
-    private static void addDirToZip(File directory, ZipOutputStream out, String basePath,
+    private static void addDirToZip(File directory, FileFilter filter, ZipOutputStream out, String basePath,
         Collection<String> exportedSkinFiles) throws IOException
     {
         if (LOGGER.isDebugEnabled()) {
@@ -408,7 +418,7 @@ public class HtmlPackager
             return;
         }
 
-        File[] files = directory.listFiles();
+        File[] files = directory.listFiles(filter);
 
         if (files == null) {
             return;
@@ -416,7 +426,7 @@ public class HtmlPackager
 
         for (File file : files) {
             if (file.isDirectory()) {
-                addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
+                addDirToZip(file, filter, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
             } else {
                 String path = basePath + file.getName();
 

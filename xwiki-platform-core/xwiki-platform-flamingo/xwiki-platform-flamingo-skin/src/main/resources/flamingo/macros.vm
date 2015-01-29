@@ -278,7 +278,7 @@ $xwiki.getUserName("xwiki:${username}")
       ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($groupReference = $group.extractReference('DOCUMENT'))
       #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($user, 'group/current'))
+        #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
       #end
       #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
       #if ("$!groupTitle" == '')

@@ -25,11 +25,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.RepositorySystem;
 import org.hibernate.cfg.Environment;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -116,6 +122,14 @@ public class ImportMojo extends AbstractMojo
      */
     protected RepositorySystem repositorySystem;
 
+    /**
+     * The current Maven session being executed.
+     *
+     * @parameter default-value="${session}"
+     * @readonly
+     */
+    private MavenSession session;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -185,7 +199,7 @@ public class ImportMojo extends AbstractMojo
     }
 
     private void installExtension(Artifact artifact, XWikiContext xcontext) throws ComponentLookupException,
-        InstallException, LocalExtensionRepositoryException
+        InstallException, LocalExtensionRepositoryException, MojoExecutionException
     {
         ComponentManager componentManager = (ComponentManager) xcontext.get(ComponentManager.class.getName());
 
@@ -194,8 +208,10 @@ public class ImportMojo extends AbstractMojo
         InstalledExtensionRepository installedExtensionRepository =
             componentManager.getInstance(InstalledExtensionRepository.class);
 
+        MavenProject dependencyProject = getMavenProject(artifact);
+
         ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-        Extension mavenExtension = converter.convert(Extension.class, this.project.getModel());
+        Extension mavenExtension = converter.convert(Extension.class, dependencyProject.getModel());
 
         DefaultLocalExtension extension = new DefaultLocalExtension(null, mavenExtension);
 
@@ -203,5 +219,24 @@ public class ImportMojo extends AbstractMojo
 
         LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
         installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", true);
+    }
+
+    private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
+    {
+        try {
+            ProjectBuildingRequest request =
+                new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest())
+                    // We don't want to execute any plugin here
+                    .setProcessPlugins(false)
+                    // It's not this plugin job to validate this pom.xml
+                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                    // Use the repositories configured for the built project instead of the default Maven ones
+                    .setRemoteRepositories(this.session.getCurrentProject().getRemoteArtifactRepositories());
+            // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
+            ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
+            return result.getProject();
+        } catch (ProjectBuildingException e) {
+            throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
+        }
     }
 }

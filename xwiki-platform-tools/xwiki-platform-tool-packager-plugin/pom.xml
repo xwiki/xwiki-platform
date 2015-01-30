@@ -258,11 +258,6 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <!-- We need to pick a URL implementation @ runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

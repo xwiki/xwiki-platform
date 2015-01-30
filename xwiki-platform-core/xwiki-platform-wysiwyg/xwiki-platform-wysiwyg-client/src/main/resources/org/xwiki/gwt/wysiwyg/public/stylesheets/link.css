@@ -5,8 +5,7 @@
 /* IE needs this to correctly return the clientHeight of the tree wrapper, offsetHeight - border width, etc. 
    Otherwise, for the default overflow: visible, it returns 0 even if offsetHeight is correct */
 .xExplorer {
-  /* it could also be auto, since it always matches its content, but just to make sure we never get a scrollbar */
-  overflow: hidden; 
+  overflow: auto;
 }
 
 .xAttachmentsSelector .xListBox, .xPagesSelector .xListBox {

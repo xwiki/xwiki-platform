@@ -22,6 +22,7 @@ package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.wysiwyg.client.Strings;
@@ -44,14 +45,21 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     private final WikiServiceAsync wikiService;
 
     /**
+     * The configuration object.
+     */
+    private final Config config;
+
+    /**
      * Creates a new page selector, that aggregates different views for selecting a page: recently modified pages, all
      * pages or page search.
      * 
      * @param wikiService the service to be used for creating links to wiki pages
+     * @param config the configuration object
      */
-    public PageSelectorWizardStep(WikiServiceAsync wikiService)
+    public PageSelectorWizardStep(WikiServiceAsync wikiService, Config config)
     {
         this.wikiService = wikiService;
+        this.config = config;
         setStepTitle(Strings.INSTANCE.linkSelectWikipageTitle());
     }
 
@@ -77,7 +85,7 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
         if (name.equals(Strings.INSTANCE.selectorSelectFromRecentPages())) {
             return new RecentChangesSelectorWizardStep(wikiService);
         } else if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            return new WikiPageExplorerWizardStep();
+            return new WikiPageExplorerWizardStep(config);
         } else if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
             return new SearchSelectorWizardStep(wikiService);
         }

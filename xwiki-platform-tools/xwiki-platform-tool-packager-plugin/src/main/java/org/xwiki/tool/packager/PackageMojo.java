@@ -276,18 +276,7 @@ public class PackageMojo extends AbstractMojo
             unzip(flamingoArtifact.getFile(), skinsDirectory);
         }
 
-        // Step 8: Extract SmartClient library from smartGWT to be used by the XWiki Explorer Tree.
-        getLog().info("Extracting SmartClient ...");
-        String smartGWTVersion = getDependencyManagementVersion(getTopLevelPOMProject(), "com.smartgwt", "smartgwt");
-        Artifact smartGWTArtifact = resolveArtifact("com.smartgwt", "smartgwt", smartGWTVersion, "jar");
-        File smartGWTOutputDirectory = new File(this.project.getBuild().getDirectory(), "smartgwt");
-        unzip(smartGWTArtifact.getFile(), smartGWTOutputDirectory);
-        File smartClientDirectory = new File(xwikiWebappDirectory, "resources/js/smartclient");
-        copyDirectory(new File(smartGWTOutputDirectory, "com/smartclient/public/sc"), smartClientDirectory);
-        copyDirectory(new File(smartGWTOutputDirectory, "com/smartclient/theme/enterprise/public/sc/skins"), new File(
-            smartClientDirectory, "skins"));
-
-        // Step 9: Import specified XAR files into the database
+        // Step 8: Import specified XAR files into the database
         getLog().info(
             String.format("Import XAR dependencies %s...", this.importUser == null ? "as a backup pack"
                 : "using user [" + this.importUser + "]"));

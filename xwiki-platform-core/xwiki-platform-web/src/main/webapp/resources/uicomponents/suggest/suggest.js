@@ -411,11 +411,12 @@ var XWiki = (function(XWiki){
       for (var i = 0; i < results.length; i++) {
         var result = results[i];
         suggestions.push({
-           'id': this._getNestedProperty(result, source.resultId || this.options.resultId),
-           'value': this._getNestedProperty(result, source.resultValue || this.options.resultValue),
-           'info': this._getNestedProperty(result, source.resultInfo || this.options.resultInfo),
-           'icon' : this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
-           'hint' : this._getNestedProperty(result, source.resultHint || this.options.resultHint)
+          'id': this._getNestedProperty(result, source.resultId || this.options.resultId),
+          'value': this._getNestedProperty(result, source.resultValue || this.options.resultValue),
+          'info': this._getNestedProperty(result, source.resultInfo || this.options.resultInfo),
+          'icon' : this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
+          'hint' : this._getNestedProperty(result, source.resultHint || this.options.resultHint),
+          'type' : this._getNestedProperty(result, source.resultType || this.options.resultType)
         });
       }
     } else {
@@ -427,10 +428,11 @@ var XWiki = (function(XWiki){
         if (results[i].hasChildNodes()) {
           suggestions.push({
             'id': results[i].getAttribute('id'),
-            'value':results[i].childNodes[0].nodeValue,
-            'info':results[i].getAttribute('info'),
-            'icon':results[i].getAttribute('icon'),
-            'hint':results[i].getAttribute('hint')
+            'value': results[i].childNodes[0].nodeValue,
+            'info': results[i].getAttribute('info'),
+            'icon': results[i].getAttribute('icon'),
+            'hint': results[i].getAttribute('hint'),
+            'type': results[i].getAttribute('type')
           });
         }
       }
@@ -675,7 +677,7 @@ var XWiki = (function(XWiki){
             .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)));
 
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
-        containerClasses: 'suggestItem',
+        containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
         noHighlight: true // we do the highlighting ourselves
       });

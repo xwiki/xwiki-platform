@@ -41,6 +41,19 @@ var Wysiwyg =
         // Start loading the WYSIWYG GWT module.
         this.readyState = 1;
 
+        // Load dependencies.
+        require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+            require(['tree'], function($) {
+                this._load();
+            }.bind(this));
+        }.bind(this));
+    },
+
+    /**
+     * Loads the WYSIWYG code assuming that all the dependencies have been loaded.
+     */
+    _load : function()
+    {
         // Create the script tag to be used for importing the GWT script loader.
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -82,7 +95,7 @@ var Wysiwyg =
                             // In case of IE we have to copy only the specified attributes.
                             if (typeof attrNode.specified == 'undefined'
                                 || (typeof attrNode.specified == 'boolean' && attrNode.specified)) {
-                                child.setAttribute(attrNode.nodeName, attrNode.nodeValue);
+                                child.setAttribute(attrNode.nodeName, attrNode.value);
                             }
                         }
                         // Copy the script text.

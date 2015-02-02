@@ -296,24 +296,6 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             Session session = getSession(context);
 
-<<<<<<< HEAD
-            String db = context.getDatabase();
-            String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
-            try {
-                if (attachdb != null) {
-                    context.setDatabase(attachdb);
-                }
-
-                // Delete the three attachment entries
-                try {
-                    session.delete(new XWikiAttachmentContent(attachment));
-                } catch (Exception e) {
-                    LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
-                        attachment.getDoc().getDocumentReference());
-                }
-
-                context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
-=======
             // Delete the three attachment entries
             try {
                 session.delete(new XWikiAttachmentContent(attachment));
@@ -321,20 +303,14 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
                     attachment.getDoc().getDocumentReference());
             }
->>>>>>> 3e417f7... XWIKI-11694: XWikiHibernateAttachmentStore methods don't take into account attachment wiki as well as they think
 
             context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
 
-<<<<<<< HEAD
-            } finally {
-                context.setDatabase(db);
-=======
             try {
                 session.delete(attachment);
             } catch (Exception e) {
                 LOGGER.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
                     attachment.getDoc().getDocumentReference());
->>>>>>> 3e417f7... XWIKI-11694: XWikiHibernateAttachmentStore methods don't take into account attachment wiki as well as they think
             }
 
             try {

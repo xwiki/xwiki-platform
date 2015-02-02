@@ -43,8 +43,7 @@
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
-      com.xpn.xwiki.plugin.lucene.LucenePlugin
+      com.xpn.xwiki.plugin.scheduler.SchedulerPlugin
     </xwikiCfgPlugins>
     <!-- Override in order to activate the Link Checker transformation for the Broken Links Bot Listener and Broken
          Link Event Listener -->
@@ -65,7 +64,7 @@
     <!-- Needed for the Wiki Search Bot Listener -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-lucene-api</artifactId>
+      <artifactId>xwiki-platform-search-solr-query</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Add Panel dep which is optional in xwiki-platform-ircbot-ui in order to test registration in the App panel -->

@@ -203,7 +203,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        String currentWiki = context.getWikiId();
+        String currentWiki = context.getDatabase();
 
         try {
             // Switch context wiki to attachment wiki
@@ -211,7 +211,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
                     .getWikiReference().getName();
             if (attachmentWiki != null) {
-                context.setWikiId(attachmentWiki);
+                context.setDatabase(attachmentWiki);
             }
 
             if (bTransaction) {
@@ -220,31 +220,13 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-<<<<<<< HEAD
-            String db = context.getDatabase();
-            String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
-            try {
-                if (attachdb != null) {
-                    context.setDatabase(attachdb);
-                }
-                XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-                session.load(content, new Long(content.getId()));
-=======
             XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
             session.load(content, new Long(content.getId()));
->>>>>>> 3e417f7... XWIKI-11694: XWikiHibernateAttachmentStore methods don't take into account attachment wiki as well as they think
 
             // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
             content.setContentDirty(false);
 
-<<<<<<< HEAD
-                attachment.setAttachment_content(content);
-            } finally {
-                context.setDatabase(db);
-            }
-=======
             attachment.setAttachment_content(content);
->>>>>>> 3e417f7... XWIKI-11694: XWikiHibernateAttachmentStore methods don't take into account attachment wiki as well as they think
 
             if (bTransaction) {
                 endTransaction(context, false, false);
@@ -263,7 +245,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
 
             // Restore context wiki
-            context.setWikiId(currentWiki);
+            context.setDatabase(currentWiki);
         }
     }
 
@@ -278,7 +260,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
-        String currentWiki = context.getWikiId();
+        String currentWiki = context.getDatabase();
 
         try {
             // Switch context wiki to attachment wiki
@@ -286,7 +268,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
                     .getWikiReference().getName();
             if (attachmentWiki != null) {
-                context.setWikiId(attachmentWiki);
+                context.setDatabase(attachmentWiki);
             }
 
             if (bTransaction) {
@@ -347,7 +329,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
 
             // Restore context wiki
-            context.setWikiId(currentWiki);
+            context.setDatabase(currentWiki);
         }
     }
 }

@@ -75,19 +75,16 @@
       <groupId>org.restlet.jee</groupId>
       <artifactId>org.restlet.ext.servlet</artifactId>
     </dependency>
-
     <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <!-- Apache xalan used for Solr's internal XML operations. -->
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-
     <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -119,7 +116,6 @@
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -127,13 +123,11 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-
     <!-- Testing dependencies -->
-
     <!-- Since we're mocking a class (XWiki) we need those -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -156,7 +150,6 @@
           </excludes>
         </configuration>
       </plugin>
-
       <!-- Attach default configuration package -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

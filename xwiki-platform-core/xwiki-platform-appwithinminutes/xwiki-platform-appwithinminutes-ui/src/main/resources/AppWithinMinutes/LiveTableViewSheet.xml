@@ -65,10 +65,9 @@
         = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
         #if($hasCreateData)
           * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #set($templateName = $escapetool.url("${className}Template"))
             #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
             #set ($params = {
-              'template': $templateName,
+              'template': "${className}Template",
               'parent': 'WebHome'
             })
             #if ($xwiki.getDocument($classRef).xWikiClass.properties.size() &gt; 0)
@@ -300,6 +299,22 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>

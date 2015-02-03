@@ -64,7 +64,7 @@ import com.xpn.xwiki.web.Utils;
  * <li>an XObject definition (composed of XObject properties)</li>
  * <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
- * 
+ *
  * @version $Id$
  */
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
@@ -166,7 +166,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Get the absolute reference of the XClass.
-     * 
+     *
      * @since 2.2M2
      */
     public DocumentReference getXClassReference()
@@ -182,7 +182,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Get the actual reference to the XClass as stored in this instance.
-     * 
+     *
      * @since 4.0M2
      */
     public EntityReference getRelativeXClassReference()
@@ -192,7 +192,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
      */
     @Deprecated
@@ -212,7 +212,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * <p>
      * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
      * of the reference will be systematically removed.
-     * 
+     *
      * @param xClassReference the reference to the XClass of this XObject.
      * @since 2.2.3
      */
@@ -234,7 +234,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
-     * 
+     *
      * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
      */
     @Deprecated
@@ -895,10 +895,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Set the owner document of this base object.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 5.3M1
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);

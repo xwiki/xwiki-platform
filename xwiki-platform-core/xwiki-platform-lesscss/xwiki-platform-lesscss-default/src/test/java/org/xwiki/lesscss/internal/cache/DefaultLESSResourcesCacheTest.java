@@ -27,8 +27,6 @@ import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.skin.FSSkinReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;

@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail;
 
+import java.util.Map;
+
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
@@ -38,23 +40,29 @@ public interface MailListener
      * Called when the mail is ready to be sent but before it is actually sent.
      *
      * @param message the message to be sent
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      */
-    void onPrepare(MimeMessage message);
+    void onPrepare(MimeMessage message, Map<String, Object> parameters);
 
     /**
      * Called when the mail has been sent successfully.
      *
      * @param message the message sent
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      */
-    void onSuccess(MimeMessage message);
+    void onSuccess(MimeMessage message, Map<String, Object> parameters);
 
     /**
      * Called when the mail has failed to be sent.
      *
      * @param message the message that was tried to be sent
      * @param e the exception explaining why the message couldn't be sent
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      */
-    void onError(MimeMessage message, Exception e);
+    void onError(MimeMessage message, Exception e, Map<String, Object> parameters);
 
     /**
      * @return the status of all the mails from the batch (whether they were sent successfully, failed to be sent,

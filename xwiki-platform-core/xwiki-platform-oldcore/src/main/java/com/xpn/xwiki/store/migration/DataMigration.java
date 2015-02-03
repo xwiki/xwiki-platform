@@ -22,8 +22,9 @@ package com.xpn.xwiki.store.migration;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Interface for data migration.
- * New data migration should be named like "R"+vernum+issuenumber+"DataMigration" to prevent collisions.
+ * Interface for data migration. New data migration should be named like "R"+vernum+issuenumber+"DataMigration" to
+ * prevent collisions.
+ *
  * @version $Id$
  * @since 3.4M1
  */
@@ -41,22 +42,22 @@ public interface DataMigration
     String getDescription();
 
     /**
-     * @return data version which need migration. 
-     * before you commit stuff which needs migration,
-     *  you need write data migration with version = current release number (i.e 32000 for release 3.2).
+     * @return data version which need migration. before you commit stuff which needs migration, you need write data
+     *         migration with version = current release number (i.e 32000 for release 3.2).
      */
     XWikiDBVersion getVersion();
 
     /**
      * Run migration.
+     *
      * @throws DataMigrationException if any error
      */
     void migrate() throws DataMigrationException;
 
     /**
-     * @param startupVersion the database version when the migration process starts (before any
-     *        dataMigration is applied). This is useful for data migration which need to run only when the
-     *        database is in a certain version.
+     * @param startupVersion the database version when the migration process starts (before any dataMigration is
+     *            applied). This is useful for data migration which need to run only when the database is in a certain
+     *            version.
      * @return true if the migration should be executed or false otherwise
      */
     boolean shouldExecute(XWikiDBVersion startupVersion);

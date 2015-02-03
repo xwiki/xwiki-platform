@@ -27,15 +27,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * A node in a {@link EntityReferenceTree}.
  * 
  * @version $Id$
  * @since 5.4RC1
  */
-@Unstable
 public class EntityReferenceTreeNode
 {
     /**

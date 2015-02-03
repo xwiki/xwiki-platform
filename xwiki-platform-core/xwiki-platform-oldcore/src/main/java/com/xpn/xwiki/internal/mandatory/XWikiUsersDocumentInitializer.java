@@ -38,7 +38,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Update XWiki.XWikiUsers document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
@@ -86,7 +86,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryDocumentInit
             needsUpdate = true;
         }
 
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         needsUpdate |= bclass.addTextField("first_name", "First Name", 30);
         needsUpdate |= bclass.addTextField("last_name", "Last Name", 30);

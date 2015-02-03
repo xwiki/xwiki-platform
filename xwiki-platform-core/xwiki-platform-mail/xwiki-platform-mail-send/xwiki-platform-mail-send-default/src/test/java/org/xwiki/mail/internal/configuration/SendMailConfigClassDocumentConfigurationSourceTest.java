@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.properties.ConverterManager;
@@ -85,8 +84,7 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
 
-        Provider<XWikiContext> xcontextProvider =
-            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xcontext);
 
         assertEquals("value", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));
@@ -114,8 +112,7 @@ public class SendMailConfigClassDocumentConfigurationSourceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
 
-        Provider<XWikiContext> xcontextProvider =
-            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xcontext);
 
         assertEquals("defaultValue", this.mocker.getComponentUnderTest().getProperty("key", "defaultValue"));

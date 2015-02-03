@@ -37,6 +37,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Template for data migration of hibernate store.
+ *
  * @see com.xpn.xwiki.store.migration.DataMigration
  * @version $Id$
  * @since 3.4M1
@@ -60,7 +61,7 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
      */
     protected XWikiContext getXWikiContext()
     {
-        ExecutionContext context = execution.getContext();
+        ExecutionContext context = this.execution.getContext();
         return (XWikiContext) context.getProperty("xwikicontext");
     }
 
@@ -71,7 +72,7 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     protected XWikiHibernateBaseStore getStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
+            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(String.format("Unable to reach the store for database %s",
                 getXWikiContext().getWikiId()), e);
@@ -79,7 +80,8 @@ public abstract class AbstractHibernateDataMigration implements HibernateDataMig
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         String hint = null;
         Named named = this.getClass().getAnnotation(Named.class);
         if (named != null) {

@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Interface giving access to users and groups management.
- * 
+ *
  * @version $Id$
  */
 public interface XWikiGroupService
@@ -56,7 +56,7 @@ public interface XWikiGroupService
 
     /**
      * Remove user or group name from all groups.
-     * 
+     *
      * @param userOrGroupWiki the name of the wiki of the member.
      * @param userOrGroupSpace the name of the space of the member.
      * @param userOrGroupName the name of the member.
@@ -81,7 +81,7 @@ public interface XWikiGroupService
 
     /**
      * Search for all users with provided constraints and in a provided order.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -103,12 +103,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting users.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+    List<?> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 
     /**
      * Search for all groups with provided constraints and in a provided order.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -131,12 +131,12 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+    List<?> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
         XWikiContext context) throws XWikiException;
 
     /**
      * Return number of users with provided constraints.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -153,7 +153,7 @@ public interface XWikiGroupService
 
     /**
      * Return number of groups with provided constraints.
-     * 
+     *
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -170,7 +170,7 @@ public interface XWikiGroupService
 
     /**
      * Get all groups containing provided member in the provided member wiki.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
      * @param start the index of the first found member to return.
@@ -184,7 +184,7 @@ public interface XWikiGroupService
 
     /**
      * Get all groups containing provided member in the current wiki.
-     * 
+     *
      * @param memberReference the member. Can be either user or group.
      * @param limit the maximum number of result to return.
      * @param offset the index of the first found member to return.
@@ -198,7 +198,7 @@ public interface XWikiGroupService
 
     /**
      * Get all members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -212,7 +212,7 @@ public interface XWikiGroupService
 
     /**
      * Get members of provided group.
-     * 
+     *
      * @param group the group.
      * @param matchField a string to search in result to filter.
      * @param nb the maximum number of result to return.
@@ -228,7 +228,7 @@ public interface XWikiGroupService
 
     /**
      * Return the number of groups containing provided member.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @param context the XWiki context.
      * @return the number of groups.
@@ -239,7 +239,7 @@ public interface XWikiGroupService
 
     /**
      * Return the number of members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param context the XWiki context.
      * @return the number of members.

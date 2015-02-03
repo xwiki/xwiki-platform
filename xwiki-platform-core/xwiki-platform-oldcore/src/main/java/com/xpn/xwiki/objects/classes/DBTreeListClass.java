@@ -72,7 +72,7 @@ public class DBTreeListClass extends DBListClass
 
     /**
      * Get the ordered list of tree nodes that is currently cached, if any.
-     * 
+     *
      * @param context the current request context
      * @return the cached list, or {@code null} if not already cached
      */
@@ -91,7 +91,7 @@ public class DBTreeListClass extends DBListClass
 
     /**
      * Store the ordered list of tree nodes in a cache.
-     * 
+     *
      * @param cachedDBTreeList the list to cache
      * @param context the current request context
      */
@@ -132,7 +132,7 @@ public class DBTreeListClass extends DBListClass
     /**
      * Gets an ordered list of items in the tree. This is necessary to make sure children are coming right after their
      * parents.
-     * 
+     *
      * @param treemap the unordered list of tree nodes
      * @param map the mapping between a node name and its corresponding tree node
      * @param context the current request context
@@ -373,7 +373,7 @@ public class DBTreeListClass extends DBListClass
      * The generated query always selects 3 columns, the first one is used as the stored value, the second one as the
      * displayed value, and the third one defines the "parent" of the current value.
      * </p>
-     * 
+     *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */

@@ -66,6 +66,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -116,6 +117,10 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> currentResolver;
+
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<String> currentStringResolver;
 
     /**
      * Used to validate download reference.
@@ -852,20 +857,16 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             List<String> documentNames = query.execute();
 
             if (!documentNames.isEmpty()) {
-                String currentWiki = xcontext.getWikiId();
-                try {
-                    for (String documentName : documentNames) {
+                WikiReference wikiReference = new WikiReference(wiki);
+                for (String documentName : documentNames) {
+                    DocumentReference documentReference =
+                        this.currentStringResolver.resolve(documentName, wikiReference);
 
-                        xcontext.setWikiId(wiki);
+                    String userDisplayName = xcontext.getWiki().getPlainUserName(documentReference, xcontext);
 
-                        String userName = xcontext.getWiki().getUserName(documentName, null, false, xcontext);
-
-                        if (userName.equals(authorName)) {
-                            return documentName;
-                        }
+                    if (userDisplayName.equals(authorName)) {
+                        return documentName;
                     }
-                } finally {
-                    xcontext.setWikiId(currentWiki);
                 }
             }
         } catch (QueryException e) {

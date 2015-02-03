@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Provides accessors to find all elements that have been replaced successfully when parsing and replacing content. Also
  * returns the modified content after the replacements have been done.
- * 
+ *
  * @version $Id$
  */
 public class ReplacementResultCollection extends ParsingResultCollection

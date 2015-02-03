@@ -237,3 +237,8 @@
 .xSelectorAggregatorStep .xImagesExplorer {
   height: 315px;
 }
+
+.xSelectorAggregatorStep .xExplorerPanel {
+  /* Prevent double scroll bars as we also limit the height of the tree. */
+  overflow: visible;
+}

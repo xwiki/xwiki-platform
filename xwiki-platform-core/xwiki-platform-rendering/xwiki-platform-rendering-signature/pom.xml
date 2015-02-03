@@ -23,7 +23,7 @@
   <parent>
     <artifactId>xwiki-platform-rendering</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.4-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-signature</artifactId>
   <name>XWiki Platform - Rendering - Signature</name>
@@ -67,7 +67,7 @@
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

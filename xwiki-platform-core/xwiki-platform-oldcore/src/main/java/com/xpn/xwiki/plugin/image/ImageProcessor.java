@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Component used to process images.
- * 
+ *
  * @version $Id$
  * @since 2.5M2
  */
@@ -38,7 +38,7 @@ public interface ImageProcessor
 {
     /**
      * Reads an image from an input stream.
-     * 
+     *
      * @param inputStream the input stream to read the image from
      * @return the read image
      * @throws IOException if reading the image fails
@@ -48,7 +48,7 @@ public interface ImageProcessor
     /**
      * Encodes the given image to match the specified mime type, if possible, and writes it to the output stream, using
      * the specified compression quality if appropriate.
-     * 
+     *
      * @param image the image to be written to the output stream
      * @param mimeType the image mime type (e.g. (e.g. "image/jpeg" or "image/png")
      * @param quality the compression quality; use this parameter to reduce the size, i.e. the number of bytes, of the
@@ -60,7 +60,7 @@ public interface ImageProcessor
 
     /**
      * Scales the given image to the specified dimensions.
-     * 
+     *
      * @param image the image to be scaled
      * @param width the new image width
      * @param height the new image height

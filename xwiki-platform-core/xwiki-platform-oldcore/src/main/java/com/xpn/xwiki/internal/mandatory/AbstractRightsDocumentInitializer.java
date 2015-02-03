@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * XWiki.XWikiPreferences class.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */

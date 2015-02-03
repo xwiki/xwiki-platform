@@ -169,8 +169,8 @@ ul.showCircles li {
 ** This is the URL of the which the user will be redirected to after pushing the login button if the xredirect parameter is not specified.  Velocity code may be used.
 
 {{id name=requireCaptcha/}}
-* **Require captcha to register** (Default: No)
-** Set this true to require the user to solve a captcha in order to register. **NOTE:** captcha.enable must be set true in the xwiki.properties configuration file in xwiki/WEB-INF/
+* **Require CAPTCHA to register** (Default: No)
+** Set this true to require the user to solve a CAPTCHA in order to register.
 
 {{id name=registrationSuccessMessage/}}
 * **Registration Successful Message**

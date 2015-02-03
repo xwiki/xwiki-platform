@@ -29,6 +29,7 @@ import org.xwiki.lesscss.cache.LESSCache;
 import org.xwiki.lesscss.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.skin.SkinReference;
@@ -65,6 +66,9 @@ public abstract class AbstractCachedCompiler<T>
     @Inject
     private CacheKeyFactory cacheKeyFactory;
 
+    @Inject
+    private LESSContext lessContext;
+
     private Map<String, String> mutexList = new HashMap<>();
 
     /**
@@ -99,6 +103,11 @@ public abstract class AbstractCachedCompiler<T>
     public T getResult(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
         String skin, boolean force) throws LESSCompilerException
     {
+        // If the cache is disabled, we just compile
+        if (lessContext.isCacheDisabled()) {
+            return compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, skin);
+        }
+
         T result = null;
 
         SkinReference skinReference = skinReferenceFactory.createReference(skin);

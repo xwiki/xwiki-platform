@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.internal.objects;
 
+import java.util.ArrayList;
+
 import org.hibernate.collection.PersistentList;
 import org.hibernate.engine.SessionImplementor;
 
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.ListProperty.NotifyList;
-
-import java.util.ArrayList;
 
 /**
  * Implementation of a persistent list holder for list property values.
@@ -59,16 +59,16 @@ public class ListPropertyPersistentList extends PersistentList
     @SuppressWarnings("unchecked")
     public void setOwner(ListProperty owner)
     {
-        if (list == null) {
-            list = new NotifyList(new ArrayList<String>());
+        if (this.list == null) {
+            this.list = new NotifyList(new ArrayList<String>());
         }
-        ((NotifyList) list).setOwner(owner);
+        ((NotifyList) this.list).setOwner(owner);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public boolean isWrapper(Object collection)
     {
-        return collection == list || ((NotifyList) list).isWrapper(collection);
+        return collection == this.list || ((NotifyList) this.list).isWrapper(collection);
     }
 }

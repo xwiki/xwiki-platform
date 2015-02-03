@@ -1,4 +1,5 @@
 org.xwiki.component.internal.ContextComponentManager
+org.xwiki.component.internal.ContextRootComponentManager
 org.xwiki.component.internal.DocumentComponentManager
 org.xwiki.component.internal.DocumentComponentManagerFactory
 org.xwiki.component.internal.DocumentDeletedListener

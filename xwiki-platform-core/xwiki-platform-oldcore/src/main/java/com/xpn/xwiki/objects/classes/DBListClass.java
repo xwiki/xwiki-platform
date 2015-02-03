@@ -185,7 +185,7 @@ public class DBListClass extends ListClass
      * If there are two columns selected, use the first one as the stored value and the second one as the displayed
      * value.
      * </p>
-     * 
+     *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */

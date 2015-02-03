@@ -26,7 +26,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReader;
@@ -78,7 +77,7 @@ public class CachedIntegratedLESSCompilerTest
         lessCompiler = mocker.getInstance(LESSCompiler.class);
         skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
         lessResourceReader = mocker.getInstance(LESSResourceReader.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);

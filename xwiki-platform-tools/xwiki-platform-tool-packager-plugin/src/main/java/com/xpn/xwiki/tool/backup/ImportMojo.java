@@ -20,20 +20,12 @@
 package com.xpn.xwiki.tool.backup;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Developer;
-import org.apache.maven.model.License;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -45,23 +37,18 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.RepositorySystem;
+import org.hibernate.cfg.Environment;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.extension.DefaultExtensionAuthor;
-import org.xwiki.extension.DefaultExtensionDependency;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.ExtensionLicense;
-import org.xwiki.extension.ExtensionLicenseManager;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
-import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.tool.utils.LogUtils;
-import org.hibernate.cfg.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -221,69 +208,17 @@ public class ImportMojo extends AbstractMojo
         InstalledExtensionRepository installedExtensionRepository =
             componentManager.getInstance(InstalledExtensionRepository.class);
 
-        DefaultLocalExtension extension =
-            new DefaultLocalExtension(null, new ExtensionId(artifact.getGroupId() + ':' + artifact.getArtifactId(),
-                artifact.getBaseVersion()), artifact.getType());
+        MavenProject dependencyProject = getMavenProject(artifact);
+
+        ConverterManager converter = componentManager.getInstance(ConverterManager.class);
+        Extension mavenExtension = converter.convert(Extension.class, dependencyProject.getModel());
+
+        DefaultLocalExtension extension = new DefaultLocalExtension(null, mavenExtension);
 
         extension.setFile(artifact.getFile());
 
-        MavenProject project = getMavenProject(artifact);
-
-        toExtension(extension, project.getModel(), componentManager);
-
         LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
         installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", true);
-    }
-
-    // Maven -> Extension
-    // TODO: put all this, what's on core extension scanner and maven repository handler in a commons module
-
-    private void toExtension(DefaultLocalExtension extension, Model model, ComponentManager componentManager)
-        throws ComponentLookupException
-    {
-        extension.setName(getPropertyString(model, MPNAME_NAME, model.getName()));
-        extension.setSummary(getPropertyString(model, MPNAME_SUMMARY, model.getDescription()));
-        extension.setWebsite(getPropertyString(model, MPNAME_WEBSITE, model.getUrl()));
-
-        // authors
-        for (Developer developer : model.getDevelopers()) {
-            URL authorURL = null;
-            if (developer.getUrl() != null) {
-                try {
-                    authorURL = new URL(developer.getUrl());
-                } catch (MalformedURLException e) {
-                    // TODO: log ?
-                }
-            }
-
-            extension.addAuthor(new DefaultExtensionAuthor(StringUtils.defaultIfBlank(developer.getName(),
-                developer.getId()), authorURL));
-        }
-
-        // licenses
-        if (!model.getLicenses().isEmpty()) {
-            ExtensionLicenseManager licenseManager = componentManager.getInstance(ExtensionLicenseManager.class);
-            for (License license : model.getLicenses()) {
-                extension.addLicense(getExtensionLicense(license, licenseManager));
-            }
-        }
-
-        // features
-        String featuresString = getProperty(model, MPNAME_FEATURES);
-        if (StringUtils.isNotBlank(featuresString)) {
-            featuresString = featuresString.replaceAll("[\r\n]", "");
-            ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-            extension.setFeatures(converter.<Collection<String>>convert(List.class, featuresString));
-        }
-
-        // dependencies
-        for (Dependency mavenDependency : model.getDependencies()) {
-            if (!mavenDependency.isOptional()
-                && (mavenDependency.getScope().equals("compile") || mavenDependency.getScope().equals("runtime"))) {
-                extension.addDependency(new DefaultExtensionDependency(mavenDependency.getGroupId() + ':'
-                    + mavenDependency.getArtifactId(), new DefaultVersionConstraint(mavenDependency.getVersion())));
-            }
-        }
     }
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException
@@ -303,32 +238,5 @@ public class ImportMojo extends AbstractMojo
         } catch (ProjectBuildingException e) {
             throw new MojoExecutionException(String.format("Failed to build project for [%s]", artifact), e);
         }
-    }
-
-    private String getProperty(Model model, String propertyName)
-    {
-        return model.getProperties().getProperty(MPKEYPREFIX + propertyName);
-    }
-
-    private String getPropertyString(Model model, String propertyName, String def)
-    {
-        return StringUtils.defaultString(getProperty(model, propertyName), def);
-    }
-
-    // TODO: download custom licenses content
-    private ExtensionLicense getExtensionLicense(License license, ExtensionLicenseManager licenseManager)
-    {
-        if (license.getName() == null) {
-            return new ExtensionLicense("noname", null);
-        }
-
-        return createLicenseByName(license.getName(), licenseManager);
-    }
-
-    private ExtensionLicense createLicenseByName(String name, ExtensionLicenseManager licenseManager)
-    {
-        ExtensionLicense extensionLicense = licenseManager.getLicense(name);
-
-        return extensionLicense != null ? extensionLicense : new ExtensionLicense(name, null);
     }
 }

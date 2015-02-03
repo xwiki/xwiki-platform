@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-platform-icon</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.4-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-fontawesome</artifactId>
   <packaging>xar</packaging>
@@ -61,6 +61,12 @@
       <artifactId>font-awesome</artifactId>
       <version>4.2.0</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>bootstrap</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- We use JavaScript to fix the way fonts are loaded on IE8. -->
     <dependency>

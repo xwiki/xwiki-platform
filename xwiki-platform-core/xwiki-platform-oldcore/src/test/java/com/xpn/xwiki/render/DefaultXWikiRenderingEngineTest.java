@@ -57,8 +57,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
     {
         super.setUp();
 
-        XWikiConfig config = new XWikiConfig();
-
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
         
@@ -75,7 +73,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         getContext().setURL(new URL("http://host"));
         getContext().setRequest(new XWikiServletRequestStub());
 
-        xwiki = new XWiki(config, getContext(), engineContext, false)
+        xwiki = new XWiki(new XWikiConfig(), getContext(), engineContext, false)
         {
             @Override
             public String getSkin(XWikiContext context)
@@ -113,7 +111,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
-        xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+        getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
         this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
 
@@ -189,7 +187,8 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
         assertEquals(groovyFirst, engine.renderText(text, document, getContext()));
 
-        xwiki.getConfig().put("xwiki.render.renderingorder", "macromapping, velocity, groovy, plugin, wiki, wikiwiki");
+        getConfigurationSource().setProperty("xwiki.render.renderingorder",
+            new String[] {"macromapping", "velocity", "groovy", "plugin", "wiki", "wikiwiki"});
 
         DefaultXWikiRenderingEngine myEngine = new DefaultXWikiRenderingEngine(xwiki, getContext());
 

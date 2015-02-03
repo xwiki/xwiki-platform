@@ -22,7 +22,6 @@
 <module rename-to="xwe">
   <inherits name='org.xwiki.gwt.user.User' />
   <inherits name='org.xwiki.gwt.wysiwyg.Plugin' />
-  <inherits name="com.smartgwt.SmartGwtNoScript" />
 
   <stylesheet src="stylesheets/Wysiwyg.css" />
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />

@@ -25,11 +25,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Generic list implementation with method to call when updating the list.
+ * Generic list implementation with method to call when updating the list. This is used for the attachment list in
+ * XWikiDocument.
  *
- * This is used for the attachment list in XWikiDocument.
- *
- * @version $Id$ 
+ * @version $Id$
  * @since 4.3M2
  * @param <E> type parameter.
  */
@@ -47,13 +46,13 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         this.list = list;
     }
 
-    /** Called when the list is updated.  The method will be called at least once, but may be called several times. */
+    /** Called when the list is updated. The method will be called at least once, but may be called several times. */
     protected abstract void onUpdate();
 
     @Override
     public boolean add(E e)
     {
-        boolean ret = list.add(e);
+        boolean ret = this.list.add(e);
         if (ret) {
             onUpdate();
         }
@@ -63,14 +62,14 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public void add(int index, E element)
     {
-        list.add(index, element);
+        this.list.add(index, element);
         onUpdate();
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c)
     {
-        boolean ret = list.addAll(c);
+        boolean ret = this.list.addAll(c);
         if (ret) {
             onUpdate();
         }
@@ -80,7 +79,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public boolean addAll(int index, Collection<? extends E> c)
     {
-        boolean ret = list.addAll(index, c);
+        boolean ret = this.list.addAll(index, c);
         if (ret) {
             onUpdate();
         }
@@ -90,80 +89,80 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public void clear()
     {
-        list.clear();
+        this.list.clear();
         onUpdate();
     }
 
     @Override
     public boolean contains(Object o)
     {
-        return list.contains(o);
+        return this.list.contains(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c)
     {
-        return list.containsAll(c);
+        return this.list.containsAll(c);
     }
 
     @Override
     public boolean equals(Object o)
     {
-        return list.equals(o);
+        return this.list.equals(o);
     }
 
     @Override
     public E get(int index)
     {
-        return list.get(index);
+        return this.list.get(index);
     }
 
     @Override
     public int hashCode()
     {
-        return list.hashCode();
+        return this.list.hashCode();
     }
 
     @Override
     public int indexOf(Object o)
     {
-        return list.indexOf(o);
+        return this.list.indexOf(o);
     }
 
     @Override
     public boolean isEmpty()
     {
-        return list.isEmpty();
+        return this.list.isEmpty();
     }
 
     @Override
     public Iterator<E> iterator()
     {
-        return new Itr(list.iterator());
+        return new Itr(this.list.iterator());
     }
 
     @Override
     public int lastIndexOf(Object o)
     {
-        return list.lastIndexOf(o);
+        return this.list.lastIndexOf(o);
     }
 
     @Override
     public ListIterator<E> listIterator()
     {
-        return new ListItr(list.listIterator());
+        return new ListItr(this.list.listIterator());
     }
 
     @Override
     public ListIterator<E> listIterator(int index)
     {
-        return new ListItr(list.listIterator(index));
+        return new ListItr(this.list.listIterator(index));
     }
 
     @Override
     public E remove(int index)
     {
-        E ret = list.remove(index);
+        E ret = this.list.remove(index);
         onUpdate();
         return ret;
     }
@@ -171,7 +170,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public boolean remove(Object o)
     {
-        boolean ret = list.remove(o);
+        boolean ret = this.list.remove(o);
         if (ret) {
             onUpdate();
         }
@@ -181,7 +180,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public boolean removeAll(Collection<?> c)
     {
-        boolean ret = list.removeAll(c);
+        boolean ret = this.list.removeAll(c);
         if (ret) {
             onUpdate();
         }
@@ -191,7 +190,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public boolean retainAll(Collection<?> c)
     {
-        boolean ret = list.retainAll(c);
+        boolean ret = this.list.retainAll(c);
         if (ret) {
             onUpdate();
         }
@@ -201,7 +200,7 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public E set(int index, E element)
     {
-        E ret = list.set(index, element);
+        E ret = this.list.set(index, element);
         onUpdate();
         return ret;
     }
@@ -209,13 +208,13 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public int size()
     {
-        return list.size();
+        return this.list.size();
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex)
     {
-        return new AbstractNotifyOnUpdateList<E>(list.subList(fromIndex, toIndex))
+        return new AbstractNotifyOnUpdateList<E>(this.list.subList(fromIndex, toIndex))
         {
             @Override
             public void onUpdate()
@@ -228,13 +227,13 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
     @Override
     public Object[] toArray()
     {
-        return list.toArray();
+        return this.list.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a)
     {
-        return list.toArray(a);
+        return this.list.toArray(a);
     }
 
     /**
@@ -243,14 +242,14 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
      * NOTE: We override the default {@link Object#toString()} implementation in order to preserve backwards
      * compatibility with code that was using {@link List#toString()} before we introduced
      * {@link AbstractNotifyOnUpdateList}.
-     * 
+     *
      * @see <a href="http://jira.xwiki.org/browse/XWIKI-9013">XWIKI-9013: Multiple Select List values are not correctly
      *      indexed by Lucene</a>
      */
     @Override
     public String toString()
     {
-        return list.toString();
+        return this.list.toString();
     }
 
     /**
@@ -273,19 +272,19 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         @Override
         public boolean hasNext()
         {
-            return iterator.hasNext();
+            return this.iterator.hasNext();
         }
 
         @Override
         public E next()
         {
-            return iterator.next();
+            return this.iterator.next();
         }
 
         @Override
         public void remove()
         {
-            iterator.remove();
+            this.iterator.remove();
             onUpdate();
         }
 
@@ -303,7 +302,8 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         /**
          * @param iterator wrapped iterator.
          */
-        public ListItr(ListIterator<E> iterator) {
+        public ListItr(ListIterator<E> iterator)
+        {
             super(iterator);
             this.iterator = iterator;
         }
@@ -311,38 +311,38 @@ public abstract class AbstractNotifyOnUpdateList<E> implements List<E>
         @Override
         public void add(E e)
         {
-            iterator.add(e);
+            this.iterator.add(e);
             onUpdate();
         }
 
         @Override
         public int nextIndex()
         {
-            return iterator.nextIndex();
+            return this.iterator.nextIndex();
         }
 
         @Override
         public boolean hasPrevious()
         {
-            return iterator.hasPrevious();
+            return this.iterator.hasPrevious();
         }
 
         @Override
         public E previous()
         {
-            return iterator.previous();
+            return this.iterator.previous();
         }
 
         @Override
         public int previousIndex()
         {
-            return iterator.previousIndex();
+            return this.iterator.previousIndex();
         }
 
         @Override
         public void set(E e)
         {
-            iterator.set(e);
+            this.iterator.set(e);
             onUpdate();
         }
     }

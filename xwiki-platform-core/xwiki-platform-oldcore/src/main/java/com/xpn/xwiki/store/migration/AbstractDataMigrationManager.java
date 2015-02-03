@@ -41,7 +41,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.job.JobManager;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -96,6 +95,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         /**
          * Build a new XWikiMigration.
+         *
          * @param dataMigration the data migration
          * @param isForced true when this migration is forced
          */
@@ -150,6 +150,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         /**
          * Try to acquire the lock.
+         *
          * @return true if the lock has been acquired
          */
         public boolean tryLock()
@@ -190,49 +191,51 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         /**
          * Build a simple status with no migration attempted, just storing the current database version.
+         *
          * @param version the current database version
          */
         public MigrationStatus(XWikiDBVersion version)
         {
             this.version = version;
-            migrationAttempted = false;
+            this.migrationAttempted = false;
         }
 
         /**
-         * Build a status following a migration storing the current database version and the exception resulting
-         * from the migration. A null value for the exception means a successful migration.
+         * Build a status following a migration storing the current database version and the exception resulting from
+         * the migration. A null value for the exception means a successful migration.
+         *
          * @param version the current database version
          * @param migrationException the exception resulting from the migration.
          */
         public MigrationStatus(XWikiDBVersion version, Exception migrationException)
         {
             this.version = version;
-            migrationAttempted = true;
+            this.migrationAttempted = true;
             this.migrationException = migrationException;
         }
 
         @Override
         public XWikiDBVersion getDBVersion()
         {
-            return version;
+            return this.version;
         }
 
         @Override
         public boolean hasDataMigrationBeenAttempted()
         {
-            return migrationAttempted;
+            return this.migrationAttempted;
         }
 
         @Override
         public boolean hasBeenSuccessfullyMigrated()
         {
-            return migrationAttempted && migrationException == null;
+            return this.migrationAttempted && this.migrationException == null;
         }
 
         @Override
         public Exception getLastMigrationException()
         {
-            return migrationException;
+            return this.migrationException;
         }
     }
 
@@ -242,8 +245,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     private final Map<String, MigrationStatus> statusCache = new HashMap<String, MigrationStatus>();
 
     /**
-     * The final database version when the migration process finishes.
-     * This is use to compute the DBVersion of an empty store and quickly check the outdated status of existing DB
+     * The final database version when the migration process finishes. This is use to compute the DBVersion of an empty
+     * store and quickly check the outdated status of existing DB.
      */
     private XWikiDBVersion targetVersion;
 
@@ -267,7 +270,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         @Override
         public void onEvent(Event event, Object source, Object data)
         {
-            statusCache.remove(((WikiDeletedEvent) event).getWikiId());
+            AbstractDataMigrationManager.this.statusCache.remove(((WikiDeletedEvent) event).getWikiId());
         }
     }
 
@@ -283,13 +286,15 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     protected XWikiContext getXWikiContext()
     {
-        ExecutionContext context = execution.getContext();
+        ExecutionContext context = this.execution.getContext();
         return (XWikiContext) context.getProperty("xwikicontext");
     }
 
     /**
      * @return XWikiConfig to read configuration from xwiki.cfg
+     * @deprecated
      */
+    @Deprecated
     protected XWikiConfig getXWikiConfig()
     {
         return getXWikiContext().getWiki().getConfig();
@@ -299,6 +304,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @return true if running in virtual mode
      */
+    @Deprecated
     protected boolean isVirtualMode()
     {
         return true;
@@ -330,8 +336,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     public void initialize() throws InitializationException
     {
         try {
-            SortedMap<XWikiDBVersion, XWikiMigration> availableMigrations
-                = new TreeMap<XWikiDBVersion, XWikiMigration>();
+            SortedMap<XWikiDBVersion, XWikiMigration> availableMigrations = new TreeMap<>();
 
             Map<XWikiDBVersion, XWikiMigration> forcedMigrations = getForcedMigrations();
             if (!forcedMigrations.isEmpty()) {
@@ -351,13 +356,13 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             }
 
             this.targetVersion = (availableMigrations.size() > 0) ? availableMigrations.lastKey()
-                                                                  : new XWikiDBVersion(0);
-            this.migrations =  availableMigrations.values();
+                : new XWikiDBVersion(0);
+            this.migrations = availableMigrations.values();
         } catch (Exception e) {
             throw new InitializationException("Migration Manager initialization failed", e);
         }
 
-        observationManager.addListener(new WikiDeletedEventListener());
+        this.observationManager.addListener(new WikiDeletedEventListener());
     }
 
     /**
@@ -373,6 +378,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Read data version from database.
+     *
      * @return data version or null if this is a new database
      * @throws DataMigrationException in case of an unexpected error
      */
@@ -384,7 +390,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     @Override
     public final XWikiDBVersion getDBVersion() throws DataMigrationException
     {
-        lock.lock();
+        this.lock.lock();
         try {
             String wikiName = getXWikiContext().getWikiId();
             MigrationStatus dbStatus = this.statusCache.get(wikiName);
@@ -399,14 +405,14 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             }
             return dbStatus.getDBVersion();
         } finally {
-            lock.unlock();
+            this.lock.unlock();
         }
     }
 
     @Override
     public DataMigrationStatus getDataMigrationStatus() throws DataMigrationException
     {
-        lock.lock();
+        this.lock.lock();
         try {
             String wikiName = getXWikiContext().getWikiId();
             MigrationStatus dbStatus = this.statusCache.get(wikiName);
@@ -421,7 +427,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             }
             return dbStatus;
         } finally {
-            lock.unlock();
+            this.lock.unlock();
         }
     }
 
@@ -434,11 +440,11 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     @Override
     public synchronized void initNewDB() throws DataMigrationException
     {
-        lock.lock();
+        this.lock.lock();
         try {
             initializeEmptyDB();
         } finally {
-            lock.unlock();
+            this.lock.unlock();
         }
     }
 
@@ -455,6 +461,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update database version and status cache (not after a migration, use updateMigrationStatus).
+     *
      * @param version database version to be stored
      * @throws DataMigrationException if any error
      */
@@ -465,6 +472,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update database version and status cache after a successful migration.
+     *
      * @param version new database version
      * @throws DataMigrationException if any error
      */
@@ -475,6 +483,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update status cache based on last migration failure.
+     *
      * @param version current database version (last valid version)
      * @param e exception thrown by the migration
      * @throws DataMigrationException if any error
@@ -486,6 +495,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update database version and status cache based on the new migration status.
+     *
      * @param version current or new database version
      * @param migrationAttempted true if this update is the result of a migration process
      * @param e exception thrown by the last migration or null if the migration was successful
@@ -506,6 +516,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
     /**
      * Update database schema to the latest structure.
+     *
      * @param migrations the migration that will be executed (since 4.0M1)
      * @throws DataMigrationException if any error
      */
@@ -514,7 +525,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     @Override
     public void checkDatabase() throws MigrationRequiredException, DataMigrationException
     {
-        if (!lock.tryLock()) {
+        if (!this.lock.tryLock()) {
             return;
         }
         try {
@@ -529,7 +540,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
             preventAccessToOutdatedDb();
         } finally {
-            lock.unlock();
+            this.lock.unlock();
         }
     }
 
@@ -541,7 +552,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             String message = String.format(
                 "The empty database %s seems to be not writable, please check your configuration!",
                 getXWikiContext().getWikiId());
-            logger.error(message, e);
+            this.logger.error(message, e);
             throw new DataMigrationException(message, e);
         }
     }
@@ -555,7 +566,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             String message = String.format(
                 "Database %s seems to be inaccessible, please check your configuration!",
                 getXWikiContext().getWikiId());
-            logger.error(message, e);
+            this.logger.error(message, e);
             throw new DataMigrationException(message, e);
         }
         return status;
@@ -605,13 +616,13 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
             && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
             // Run migrations
-            logger.info("Storage schema updates and data migrations are enabled");
+            this.logger.info("Storage schema updates and data migrations are enabled");
 
             startMigrationsOnlyOnce();
 
             // TODO: Improve or remove this which is inappropriate in a container environment
             if ("1".equals(config.getProperty("xwiki.store.migration.exitAfterEnd", "0"))) {
-                logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
+                this.logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
                 System.exit(0);
             }
         }
@@ -637,8 +648,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
-     * Start the migration process.
-     * This one is not thread safe and should be synchronized. The migrations field should not be null.
+     * Start the migration process. This one is not thread safe and should be synchronized. The migrations field should
+     * not be null.
      *
      * @throws DataMigrationException in case of any error
      */
@@ -652,7 +663,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
             if (!migrateDatabase(getMainXWiki())) {
                 String message = "Main wiki database migration failed, it is not safe to continue!";
-                logger.error(message);
+                this.logger.error(message);
                 throw new DataMigrationException(message);
             }
 
@@ -665,7 +676,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
             if (errorCount > 0) {
                 String message = String.format("%s wiki database migration(s) failed.", errorCount);
-                logger.error(message);
+                this.logger.error(message);
                 throw new DataMigrationException(message);
             }
         } finally {
@@ -674,11 +685,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
-     * Returns the names of the databases that should be migrated. The main wiki database should have been migrated
-     * and is never returned.
-     * This is controlled through the "xwiki.store.migration.databases" configuration property in xwiki.cfg.
-     * A value of "all" or no value at all will add all databases. Note that the main database is automatically added
-     * even if not specified.
+     * Returns the names of the databases that should be migrated. The main wiki database should have been migrated and
+     * is never returned. This is controlled through the "xwiki.store.migration.databases" configuration property in
+     * xwiki.cfg. A value of "all" or no value at all will add all databases. Note that the main database is
+     * automatically added even if not specified.
      *
      * @return The names of all databases to migrate.
      * @throws DataMigrationException if the list of wikis cannot be obtained.
@@ -734,7 +744,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 // Should not happen and could be safely ignored.
             }
             String message = String.format("Failed to migrate database [%s]...", database);
-            logger.error(message, e);
+            this.logger.error(message, e);
             return false;
         } finally {
             context.setWikiId(currentDatabase);
@@ -744,8 +754,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
-     * @return collection of {@link DataMigration} in ascending order, which need be
-     *         executed.
+     * @return collection of {@link DataMigration} in ascending order, which need be executed.
      * @throws DataMigrationException if any error
      */
     protected Collection<XWikiMigration> getNeededMigrations() throws DataMigrationException
@@ -755,13 +764,13 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         for (XWikiMigration migration : this.migrations) {
             if (migration.isForced || (migration.dataMigration.getVersion().compareTo(curversion) > 0
-                                        && migration.dataMigration.shouldExecute(curversion)))
+                && migration.dataMigration.shouldExecute(curversion)))
             {
                 neededMigrations.add(migration);
             }
         }
 
-        if (logger.isInfoEnabled()) {
+        if (this.logger.isInfoEnabled()) {
             logNeededMigrationReport(curversion, neededMigrations);
         }
 
@@ -773,19 +782,19 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     {
         String database = getXWikiContext().getWikiId();
         if (!neededMigrations.isEmpty()) {
-            logger.info(
+            this.logger.info(
                 "The following data migration(s) will be applied for wiki [{}] currently in version [{}]:",
                 database, curversion);
             for (XWikiMigration migration : neededMigrations) {
-                logger.info("  {} - {}{}", migration.dataMigration.getName(),
+                this.logger.info("  {} - {}{}", migration.dataMigration.getName(),
                     migration.dataMigration.getDescription(), (migration.isForced ? " (forced)" : ""));
             }
         } else {
             if (curversion != null) {
-                logger.info("No data migration to apply for wiki [{}] currently in version [{}]",
+                this.logger.info("No data migration to apply for wiki [{}] currently in version [{}]",
                     database, curversion);
             } else {
-                logger.info("No data migration to apply for empty wiki [{}]",
+                this.logger.info("No data migration to apply for empty wiki [{}]",
                     database);
             }
         }
@@ -800,7 +809,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         SortedMap<XWikiDBVersion, XWikiMigration> forcedMigrations = new TreeMap<XWikiDBVersion, XWikiMigration>();
         for (String hint : getXWikiConfig().getPropertyAsList("xwiki.store.migration.force")) {
             try {
-                DataMigration dataMigration = componentManager.getInstance(DataMigration.class, hint);
+                DataMigration dataMigration = this.componentManager.getInstance(DataMigration.class, hint);
                 forcedMigrations.put(dataMigration.getVersion(), new XWikiMigration(dataMigration, true));
             } catch (ComponentLookupException e) {
                 throw new DataMigrationException("Forced dataMigration " + hint + " component could not be found", e);
@@ -817,7 +826,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     {
         XWikiDBVersion curversion = getDBVersion();
         String database = null;
-        if (logger.isInfoEnabled()) {
+        if (this.logger.isInfoEnabled()) {
             database = getXWikiContext().getWikiId();
         }
 
@@ -825,8 +834,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         try {
             for (XWikiMigration migration : migrations) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Starting data migration [{}] with version [{}] on database [{}]",
+                if (this.logger.isInfoEnabled()) {
+                    this.logger.info("Starting data migration [{}] with version [{}] on database [{}]",
                         migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
                 }
 
@@ -835,12 +844,13 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                 if (migration.dataMigration.getVersion().compareTo(curversion) > 0) {
                     curversion = migration.dataMigration.getVersion();
                     updateMigrationStatus(curversion);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Data migration [{}] applied successfully, database [{}] upgraded to version [{}]",
+                    if (this.logger.isInfoEnabled()) {
+                        this.logger.info(
+                            "Data migration [{}] applied successfully, database [{}] upgraded to version [{}]",
                             migration.dataMigration.getName(), database, getDBVersion());
                     }
-                } else if (logger.isInfoEnabled()) {
-                    logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
+                } else if (this.logger.isInfoEnabled()) {
+                    this.logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
                         migration.dataMigration.getName(), database, getDBVersion());
                 }
 
@@ -855,10 +865,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     }
 
     /**
-     * Set the database to the latest version when migration has all been processed.
-     *
-     * If migration is launch on an empty DB or latest migration was unneeded, this method ensure that the database
-     * is properly set the latest DB version.
+     * Set the database to the latest version when migration has all been processed. If migration is launch on an empty
+     * DB or latest migration was unneeded, this method ensure that the database is properly set the latest DB version.
      *
      * @param currentVersion the current database version
      * @throws DataMigrationException if the version update fails
@@ -869,9 +877,9 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             setDBVersion(getLatestVersion());
         } else if (getLatestVersion().compareTo(currentVersion) > 0) {
             updateMigrationStatus(getLatestVersion());
-            if (logger.isInfoEnabled()) {
-                logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
-                    getXWikiContext().getWikiId(), getDBVersion(), (migrations.size() > 0) ? " further" : "");
+            if (this.logger.isInfoEnabled()) {
+                this.logger.info("Database [{}] upgraded to latest version [{}] without needing{} data migration",
+                    getXWikiContext().getWikiId(), getDBVersion(), (this.migrations.size() > 0) ? " further" : "");
             }
         }
     }

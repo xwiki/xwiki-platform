@@ -77,10 +77,10 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public void flushCache()
     {
         try {
-            File[] filelist = tempDir.listFiles();
-            for (int i = 0; i < filelist.length; i++) {
+            File[] filelist = this.tempDir.listFiles();
+            for (File element : filelist) {
                 try {
-                    filelist[i].delete();
+                    element.delete();
                 } catch (Exception e) {
                 }
             }
@@ -94,9 +94,9 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         super.init(context);
 
         File dir = this.environment.getTemporaryDirectory();
-        tempDir = new File(dir, "svg");
+        this.tempDir = new File(dir, "svg");
         try {
-            tempDir.mkdirs();
+            this.tempDir.mkdirs();
         } catch (Exception ex) {
             LOGGER.warn("Cannot create temporary files", ex);
         }
@@ -134,7 +134,7 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         conv.setDst(ofile);
         conv.setHeight(height);
         conv.setWidth(width);
-        String[] sources = {dfile.getAbsolutePath()};
+        String[] sources = { dfile.getAbsolutePath() };
         conv.setSources(sources);
         conv.execute();
 
@@ -158,8 +158,8 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             File f = new File(v);
             if (f.exists() && f.isDirectory()) {
                 File[] fl = f.listFiles(new SVGConverter.SVGFileFilter());
-                for (int i = 0; i < fl.length; i++) {
-                    expandedSources.addElement(fl[i].getPath());
+                for (File element : fl) {
+                    expandedSources.addElement(element.getPath());
                 }
             } else {
                 expandedSources.addElement(v);
@@ -223,7 +223,7 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
     public File getTempFile(String filename)
     {
-        return new File(tempDir, filename);
+        return new File(this.tempDir, filename);
     }
 
     public File getTempFile(int hashcode, String extension)

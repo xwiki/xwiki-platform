@@ -22,7 +22,6 @@ package org.xwiki.wiki.descriptor;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
@@ -32,7 +31,6 @@ import org.xwiki.wiki.manager.WikiManagerException;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface WikiDescriptorManager
 {
     /**

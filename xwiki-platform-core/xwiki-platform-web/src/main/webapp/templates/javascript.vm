@@ -84,7 +84,7 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ## Note that velocity takes argument references by name (see: https://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#velocimacros).
 ## So we set the value of the $expr in the $url variable to not execute $expr multiple times.
 #set ($url = $expr)
-#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js'))#else$url#{end}
+#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js')#else$url#{end}
 #end
 ##
 ## Start the requirejs config.
@@ -92,7 +92,8 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 require.config({
   paths: {
     'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
-    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')',
+    'xwiki-events-bridge': "$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js')"
   },
   ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   map: {

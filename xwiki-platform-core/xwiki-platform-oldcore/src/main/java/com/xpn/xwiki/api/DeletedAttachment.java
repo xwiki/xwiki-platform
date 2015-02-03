@@ -25,7 +25,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -38,7 +37,7 @@ import com.xpn.xwiki.util.Programming;
  * <p>
  * This object is immutable, since entries in the trash can not be modified.
  * </p>
- * 
+ *
  * @version $Id$
  * @since 2.2M1
  */
@@ -53,7 +52,7 @@ public class DeletedAttachment extends Api
     /**
      * Simple constructor, initializes a new API object with the current {@link com.xpn.xwiki.XWikiContext context} and
      * the specified protected {@link com.xpn.xwiki.doc.DeletedAttachment deleted attachment} object.
-     * 
+     *
      * @param deletedAttachment the internal object wrapped by this API
      * @param context the current request context
      */
@@ -67,7 +66,7 @@ public class DeletedAttachment extends Api
      * Retrieve the internal entry index, used to uniquely identify this entity in the trash. This is needed because a
      * file can be attached and deleted multiple times, so the document name and filename are not enough to uniquely
      * identify a deleted attachment.
-     * 
+     *
      * @return internal identifier of the corresponding trash entry
      */
     public long getId()
@@ -77,7 +76,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Retrieve the original name of this attachment.
-     * 
+     *
      * @return the original filename, for example {@code MyPhoto.png}
      */
     public String getFilename()
@@ -87,7 +86,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Retrieve the name of the document this attachment belonged to.
-     * 
+     *
      * @return the name of the owner document, in the {@code Space.Document} format
      */
     public String getDocName()
@@ -97,7 +96,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Retrieve the name of the user who deleted this attachment.
-     * 
+     *
      * @return the user who deleted the attachment, as its document name (e.g. {@code XWiki.Admin})
      */
     public String getDeleter()
@@ -107,7 +106,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Retrieve the date and time this attachment has been deleted.
-     * 
+     *
      * @return the date of the deletion
      */
     public Date getDate()
@@ -117,7 +116,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Access to the real attachment object.
-     * 
+     *
      * @return the attachment as it was before being deleted, and as it currently is in the recycle bin
      */
     public Attachment getAttachment()
@@ -133,7 +132,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Privileged access to the internal object wrapped by this API.
-     * 
+     *
      * @return original deleted attachment if the current user has programming rights, else {@code null}.
      */
     @Programming
@@ -148,7 +147,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Check if the current user has the right to restore the attachment.
-     * 
+     *
      * @return {@code true} if the current user can restore this document, {@code false} otherwise
      */
     public boolean canRestore()
@@ -160,7 +159,7 @@ public class DeletedAttachment extends Api
 
     /**
      * Check if the current user has the right to permanently delete the attachment from the trash.
-     * 
+     *
      * @return {@code true} if the current user can purge this document, {@code false} otherwise
      * @xwikicfg xwiki.store.recyclebin.adminWaitDays How many days should an administrator wait before being able to
      *           permanently delete this document from the recycle bin. 0 by default.
@@ -177,11 +176,10 @@ public class DeletedAttachment extends Api
                 return false;
             }
             String waitdays;
-            XWikiConfig config = getXWikiContext().getWiki().getConfig();
             if (hasAdminRights()) {
-                waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.adminWaitDays", "0");
             } else {
-                waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.waitDays", "7");
             }
             int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
             Calendar cal = Calendar.getInstance();
@@ -199,7 +197,7 @@ public class DeletedAttachment extends Api
      * Permanently delete this attachment from the trash. Throws an access denied exception if the user does not have
      * the right to perform this action, which will trigger the generic Access Denied message. Any other failures will
      * be silently ignored.
-     * 
+     *
      * @throws XWikiException if the user does not have the right to perform this action
      */
     public void delete() throws XWikiException
@@ -211,7 +209,7 @@ public class DeletedAttachment extends Api
                 LOGGER.warn("Failed to purge deleted attachment", ex);
             }
         } else {
-            java.lang.Object[] args = {this.getFilename(), this.getDocName()};
+            java.lang.Object[] args = { this.getFilename(), this.getDocName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Cannot permanently delete attachment {0}@{1} from the trash", null, args);
         }

@@ -205,7 +205,7 @@ public class BaseAttachmentsResource extends XWikiResource
                     attachment.setMimeType(mimeType);
                     attachment.setAuthor(xwikiAttachment.getAuthor());
                     if (withPrettyNames) {
-                        attachment.setAuthorName(Utils.getAuthorName(xwikiAttachment.getAuthor(), componentManager));
+                        attachment.setAuthorName(Utils.getAuthorName(xwikiAttachment.getAuthorReference(), componentManager));
                     }
 
                     Calendar calendar = Calendar.getInstance();

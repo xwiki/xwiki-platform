@@ -41,25 +41,25 @@ public final class MimeMessageFactoryProvider
     }
 
     /**
-     * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
-     * @param type the type of the source from which to prefill the Mime Message
+     * @param hint the component hint of the {@link org.xwiki.mail.MimeMessageFactory} component to find
+     * @param sourceType the type of the source from which to prefill the Mime Message
+     * @param returnType the type returned by the {@link org.xwiki.mail.MimeMessageFactory} to find
      * @param componentManager used to dynamically load all MimeMessageIterator
      * @return MimeMessage Factory
      * @throws ComponentLookupException when an error occurs
      */
-    public static MimeMessageFactory get(String hint, Type type, ComponentManager componentManager)
-        throws ComponentLookupException
+    public static MimeMessageFactory get(String hint, Type sourceType, Type returnType,
+        ComponentManager componentManager) throws ComponentLookupException
     {
         MimeMessageFactory factory;
         // Step 1: Look for a secure version first
         try {
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type),
-                String.format("%s/secure", hint));
+            factory = componentManager.getInstance(new DefaultParameterizedType(null, MimeMessageFactory.class,
+                sourceType, returnType), String.format("%s/secure", hint));
         } catch (ComponentLookupException e) {
             // Step 2: Look for a non secure version if a secure one doesn't exist...
-            factory = componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null), hint);
+            factory = componentManager.getInstance(new DefaultParameterizedType(null, MimeMessageFactory.class,
+                sourceType, returnType), hint);
         }
 
         return factory;

@@ -80,7 +80,7 @@ public class DefaultSkinReferenceFactory implements SkinReferenceFactory
                 }
 
             } catch (XWikiException e) {
-                throw new LESSCompilerException(String.format("Unable to read document [%s]", skinDocRef));
+                throw new LESSCompilerException(String.format("Unable to read document [%s]", skinDocRef), e);
             }
         }
 

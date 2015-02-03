@@ -35,7 +35,6 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
@@ -79,7 +78,7 @@ public class DefaultVelocityManagerTest
         executionContext.newProperty("velocityContext").initial(velocityContext).inherited().cloneValue().declare();
 
         XWikiContext mockContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(mockContext);
 
         this.mocker.getComponentUnderTest().getVelocityContext();
@@ -95,7 +94,7 @@ public class DefaultVelocityManagerTest
         when(execution.getContext()).thenReturn(executionContext);
 
         XWikiContext xwikiContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xwikiContext);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(xwiki);
@@ -110,10 +109,7 @@ public class DefaultVelocityManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityFactory.createVelocityEngine(eq("default"), any(Properties.class))).thenReturn(velocityEngine);
 
-        TemplateManager templates = mock(TemplateManager.class);
-        Provider<TemplateManager> templatesProvider = this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
-            TemplateManager.class));
-        when(templatesProvider.get()).thenReturn(templates);
+        this.mocker.registerMockComponent(TemplateManager.class);
 
         Assert.assertSame(velocityEngine, this.mocker.getComponentUnderTest().getVelocityEngine());
     }

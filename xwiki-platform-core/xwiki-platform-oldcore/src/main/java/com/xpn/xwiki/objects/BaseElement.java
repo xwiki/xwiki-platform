@@ -36,14 +36,14 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.
- * 
+ *
  * @version $Id$
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
     /**
      * Full reference of this element.
-     * 
+     *
      * @since 3.2M1
      */
     protected R referenceCache;
@@ -51,14 +51,14 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Reference to the document in which this element is defined (for elements where this make sense, for example for
      * an XClass or a XObject).
-     * 
+     *
      * @since 5.3M1
      */
     protected DocumentReference documentReference;
 
     /**
      * The owner document, if this element was obtained from a document.
-     * 
+     *
      * @since 5.3M1
      */
     protected transient XWikiDocument ownerDocument;
@@ -113,7 +113,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Note that this method is used by Hibernate for saving an element. {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#getName()
      */
     @Override
@@ -138,7 +138,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Note that this method is used by Hibernate for loading an element. {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
      */
     @Override
@@ -202,7 +202,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Return an truncated MD5 hash of the local key computed in {@link #getLocalKey()}.
-     * 
+     *
      * @return the identifier used by hibernate for storage.
      * @since 4.0M1
      */
@@ -221,7 +221,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Dummy function, do hibernate is always happy.
-     * 
+     *
      * @param id the identifier assigned by hibernate.
      * @since 4.0M1
      */
@@ -328,7 +328,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Set the owner document of this element.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 5.3M1
      */

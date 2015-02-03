@@ -20,7 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -177,7 +176,7 @@ public class LevelsClass extends ListClass
     }
 
     @Override
-    public List<String> toList(BaseProperty< ? > property)
+    public List<String> toList(BaseProperty<?> property)
     {
         List<String> selectlist;
 
@@ -191,7 +190,7 @@ public class LevelsClass extends ListClass
     }
 
     @Override
-    public void fromList(BaseProperty< ? > property, List<String> list)
+    public void fromList(BaseProperty<?> property, List<String> list)
     {
         property.setValue(list != null ? StringUtils.join(list, ',') : null);
     }

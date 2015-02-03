@@ -53,6 +53,6 @@ public class UrlFilter extends LocaleRegexTokenFilter implements CacheFilter
         XWikiContext xcontext = (XWikiContext) context.getRenderContext().get("xcontext");
         String url = result.group(0);
         url = Utils.createPlaceholder(url, xcontext);
-        buffer.append(this.formatter.format(new Object[] {url}));
+        buffer.append(this.formatter.format(new Object[] { url }));
     }
 }

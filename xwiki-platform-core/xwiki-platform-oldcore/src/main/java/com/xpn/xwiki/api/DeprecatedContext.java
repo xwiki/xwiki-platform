@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiContext;
  * Deprecated instance of {@link Context}.
  * <p>
  * Used to associate the deprecated "context" velocity script binding to a deprecated object class.
- * 
+ *
  * @version $Id$
  * @deprecated use {@link Context} instead
  */
@@ -34,7 +34,7 @@ public class DeprecatedContext extends Context
 {
     /**
      * The Constructor.
-     * 
+     *
      * @param context The {@link XWikiContext} to wrap.
      */
     public DeprecatedContext(XWikiContext context)

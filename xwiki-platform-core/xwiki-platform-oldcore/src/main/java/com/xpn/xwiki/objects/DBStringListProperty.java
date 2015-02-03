@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.objects;
 
-
-
 // There is no difference..
 // This is just to get a different storage
 // mecanism from Hibernate
-public class DBStringListProperty extends ListProperty {
+public class DBStringListProperty extends ListProperty
+{
 }

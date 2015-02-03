@@ -30,7 +30,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Defines the meta properties of a number XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

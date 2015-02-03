@@ -45,7 +45,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  * Special URL Factory used during exports, which stores referenced attachments and resources on the filesystem, in a
  * temporary folder, so that they can be included in the export result. The returned URLs point to these resources as
  * {@code file://} links, and not as {@code http://} links.
- * 
+ *
  * @version $Id$
  * @since 5.0RC1
  */

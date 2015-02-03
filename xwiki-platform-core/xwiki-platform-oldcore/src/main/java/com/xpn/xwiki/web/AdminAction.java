@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Administration xwiki action.
- * 
+ *
  * @version $Id$
  */
 public class AdminAction extends XWikiAction

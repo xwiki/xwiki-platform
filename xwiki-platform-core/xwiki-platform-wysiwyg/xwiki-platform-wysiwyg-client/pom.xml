@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>6.4-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-client</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Client Side</name>
@@ -56,14 +56,14 @@
       <!-- Only needed at build time -->
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <!-- SmartGWT is used only for its tree widget. -->
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <!-- Only needed at build time -->
-      <scope>provided</scope>
-    </dependency>
     <!-- XWiki dependencies -->
+    <dependency>
+      <!-- The tree used by the Link Creation Wizard to select a document or an attachment. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <!--
         This dependency is required only for its annotations. GWT-RPC services are implemented as components in XWiki

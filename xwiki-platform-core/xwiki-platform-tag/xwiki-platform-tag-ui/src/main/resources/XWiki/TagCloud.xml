@@ -20,30 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>TagCloud</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.Tags</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1394179530000</creationDate>
+  <parent>Main.Tags</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1252454400000</creationDate>
-  <date>1297363518000</date>
-  <contentUpdateDate>1297363518000</contentUpdateDate>
+  <date>1420639422000</date>
+  <contentUpdateDate>1420639325000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("xe.tag.tagcloud")</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+##
+## Tag cloud.
+## 
+## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
+##
+#if($tagCloudSpace &amp;&amp; "$!tagCloudSpace" != "")
+  {{tagcloud space="$tagCloudSpace"/}}
+#else
+  {{tagcloud/}}
+#end
+{{/velocity}}</content>
   <object>
+    <name>XWiki.TagCloud</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>2955d6dd-fdcd-4e42-8771-5174d63c8e41</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -74,15 +86,15 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
-    <name>XWiki.TagCloud</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>2955d6dd-fdcd-4e42-8771-5174d63c8e41</guid>
     <property>
       <level>edit</level>
     </property>
   </object>
   <object>
+    <name>XWiki.TagCloud</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a8888c10-036f-4a37-9964-ac7691874ef6</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -154,10 +166,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.TagCloud</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>a8888c10-036f-4a37-9964-ac7691874ef6</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -213,6 +221,10 @@ ol.tagCloud .ultraPopular {
     </property>
   </object>
   <object>
+    <name>XWiki.TagCloud</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>a98525e7-1607-418b-b763-aa062d9ff71d</guid>
     <class>
       <name>XWiki.WikiMacroClass</name>
       <customClass/>
@@ -322,15 +334,12 @@ ol.tagCloud .ultraPopular {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>XWiki.TagCloud</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>a98525e7-1607-418b-b763-aa062d9ff71d</guid>
     <property>
       <code>{{velocity}}
 ##
 ## tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 #set ($tagCloudSpace = $xcontext.macro.params.get('space'))
+#set ($tagCloudSpaces = $xcontext.macro.params.get('spaces'))
 ##
 ## Configurable popularity levels. You must enter an even number of levels. Default: 6.
 #set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
@@ -338,8 +347,22 @@ ol.tagCloud .ultraPopular {
 ##
 $xwiki.ssx.use('XWiki.TagCloud')##
 ##
-## Get tag count map. Key: tag, value: number of occurrences.
-#set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
+#if( $tagCloudSpace &amp;&amp; $tagCloudSpaces )
+  {{error}}
+  ##Do not use space and spaces parameter in the same time.
+  {{translation key="xe.tag.paramerror" /}}
+  {{/error}}
+  #break
+#end
+
+##If multiple spaces with "spaces" parameter
+#if( $tagCloudSpaces )
+  #set ($tagCount = $xwiki.tag.getTagCountForQuery("","doc.space IN($tagCloudSpaces)"))
+#else
+  ##If only one space
+  ## Get tag count map. Key: tag, value: number of occurrences.
+  #set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
+#end
 ##
 ## Only build popularity map if at least one tag exists
 #if ($tagCount.size() &gt; 0)
@@ -434,6 +457,10 @@ $xwiki.ssx.use('XWiki.TagCloud')##
     </property>
   </object>
   <object>
+    <name>XWiki.TagCloud</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d2a74ee7-18c3-48f9-ab7f-26ee989227d6</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -482,10 +509,6 @@ $xwiki.ssx.use('XWiki.TagCloud')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.TagCloud</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>d2a74ee7-18c3-48f9-ab7f-26ee989227d6</guid>
     <property>
       <defaultValue/>
     </property>
@@ -499,16 +522,71 @@ $xwiki.ssx.use('XWiki.TagCloud')##
       <name>space</name>
     </property>
   </object>
-  <content>{{velocity}}
-##
-## Tag cloud.
-## 
-## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
-##
-#if($tagCloudSpace &amp;&amp; "$!tagCloudSpace" != "")
-  {{tagcloud space="$tagCloudSpace"/}}
-#else
-  {{tagcloud/}}
-#end
-{{/velocity}}</content>
+  <object>
+    <name>XWiki.TagCloud</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>600f2ba6-26ff-4926-b06f-791d4ff8ec3b</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Spaces to display the tag cloud for. Spaces name must be separate by "," character and "'".
+(i.e. spaces="'My Space','Space2'")</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>spaces</name>
+    </property>
+  </object>
 </xwikidoc>

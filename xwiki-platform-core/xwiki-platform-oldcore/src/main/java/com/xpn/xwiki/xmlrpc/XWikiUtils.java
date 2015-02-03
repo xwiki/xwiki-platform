@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import org.xwiki.xmlrpc.model.XWikiExtendedId;
 
@@ -36,7 +36,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 /**
  * This is an helper class containing some utility method for handling and setting up the XWiki and XMLRPC data objects
  * needed to serve XMLRPC requests.
- * 
+ *
  * @version $Id$
  */
 public class XWikiUtils
@@ -57,7 +57,7 @@ public class XWikiUtils
         XWikiXmlRpcUser user = null;
         String ip = context.getRequest().getRemoteAddr();
 
-        /* Check if we must grant guest access when no token is provided. Default is true. */        
+        /* Check if we must grant guest access when no token is provided. Default is true. */
         boolean allowGuest = context.getWiki().ParamAsLong("xwiki.xmlrpc.allowGuest", 1) != 0;
 
         if (token != null) {
@@ -97,7 +97,7 @@ public class XWikiUtils
      * <li><code>Main.WebHome?language=fr&version=2</code>: retrieves the version 2.1 of the french translation</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param xwikiApi The api object for accessing XWiki functionalities.
      * @param extendedPageId The extended page id
      * @param failIfDoesntExist True is an exception has to be raised if the page doesn't exist.
@@ -179,8 +179,8 @@ public class XWikiUtils
         if (object.getClass().isArray()) {
             Object[] objects = (Object[]) object;
             List result = new ArrayList();
-            for (int i = 0; i < objects.length; i++) {
-                result.add(xmlRpcConvert(objects[i]));
+            for (Object object2 : objects) {
+                result.add(xmlRpcConvert(object2));
             }
 
             return result;

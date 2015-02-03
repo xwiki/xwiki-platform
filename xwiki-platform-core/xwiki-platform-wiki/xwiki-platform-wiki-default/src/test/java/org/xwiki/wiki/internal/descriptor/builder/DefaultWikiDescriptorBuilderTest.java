@@ -35,7 +35,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -63,7 +62,7 @@ public class DefaultWikiDescriptorBuilderTest
 {
     @Rule
     public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorBuilder> mocker =
-        new MockitoComponentMockingRule(DefaultWikiDescriptorBuilder.class);
+        new MockitoComponentMockingRule<>(DefaultWikiDescriptorBuilder.class);
 
     private Provider<XWikiContext> xcontextProvider;
 
@@ -86,7 +85,7 @@ public class DefaultWikiDescriptorBuilderTest
     @Before
     public void setUp() throws Exception
     {
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         context = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(context);
         xwiki = mock(XWiki.class);
@@ -96,17 +95,10 @@ public class DefaultWikiDescriptorBuilderTest
         referenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
         userReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "user");
 
-        wikiDescriptorManager = mock(WikiDescriptorManager.class);
-        wikiPropertyGroupManager = mock(WikiPropertyGroupManager.class);
         wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
-        Provider<WikiDescriptorManager> wikiDescriptorManagerProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, WikiDescriptorManager.class));
-        Provider<WikiPropertyGroupManager> wikiPropertyGroupManagerProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, WikiPropertyGroupManager.class));
-
-        when(wikiDescriptorManagerProvider.get()).thenReturn(wikiDescriptorManager);
-        when(wikiPropertyGroupManagerProvider.get()).thenReturn(wikiPropertyGroupManager);
+        wikiDescriptorManager = mocker.registerMockComponent(WikiDescriptorManager.class);
+        wikiPropertyGroupManager = mocker.registerMockComponent(WikiPropertyGroupManager.class);
     }
 
     @Test

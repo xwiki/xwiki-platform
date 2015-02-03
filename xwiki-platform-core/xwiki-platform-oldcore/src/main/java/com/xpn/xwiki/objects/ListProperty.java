@@ -76,7 +76,7 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     /**
      * This method is called by Hibernate to get the raw value to store in the database. Check the xwiki.hbm.xml file.
-     * 
+     *
      * @return the string value that is saved in the database
      */
     public String getTextValue()
@@ -177,7 +177,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * Starting from 4.3M2, this method will copy the list passed as parameter. Due to XWIKI-8398 we must be able to
      * detect when the values in the list changes, so we cannot store the values in any type of list.
-     * 
+     *
      * @param list The list to copy.
      */
     public void setList(List<String> list)
@@ -241,7 +241,7 @@ public class ListProperty extends BaseProperty implements Cloneable
      * {@inheritDoc}
      * <p>
      * This is important.. Otherwise we can get a stackoverflow calling toXML()
-     * 
+     *
      * @see com.xpn.xwiki.objects.BaseProperty#toString()
      */
     @Override

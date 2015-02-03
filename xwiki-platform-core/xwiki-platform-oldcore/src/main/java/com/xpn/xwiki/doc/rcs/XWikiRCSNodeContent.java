@@ -24,22 +24,27 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
- * Contains differences between document versions.
- * Mutable.
+ * Contains differences between document versions. Mutable.
+ *
  * @version $Id$
  * @since 1.2M1
  */
-public class XWikiRCSNodeContent extends AbstractSimpleClass 
+public class XWikiRCSNodeContent extends AbstractSimpleClass
     implements Comparable<XWikiRCSNodeContent>
 {
     /** composite primary id of class. Not null. */
-    private XWikiRCSNodeId  id;
-    /** Diff or full version of revision. Not null.  */
-    private XWikiPatch      patch;
+    private XWikiRCSNodeId id;
+
+    /** Diff or full version of revision. Not null. */
+    private XWikiPatch patch;
+
     /**
      * default constructor used in Hibernate to load this class.
      */
-    public XWikiRCSNodeContent() { }
+    public XWikiRCSNodeContent()
+    {
+    }
+
     /**
      * @param id - primary key
      */
@@ -47,13 +52,15 @@ public class XWikiRCSNodeContent extends AbstractSimpleClass
     {
         setId((XWikiRCSNodeId) id.clone());
     }
+
     /**
      * @return primary key
      */
     public XWikiRCSNodeId getId()
     {
-        return id;
+        return this.id;
     }
+
     /**
      * @param id = primary key
      */
@@ -62,14 +69,16 @@ public class XWikiRCSNodeContent extends AbstractSimpleClass
         // mutable, so clone is needed
         this.id = (XWikiRCSNodeId) id.clone();
     }
+
     /**
      * @return patch for this revision
      * @see XWikiPatch
      */
     public XWikiPatch getPatch()
     {
-        return patch;
+        return this.patch;
     }
+
     /**
      * @param patch - patch for this revision
      * @see XWikiPatch
@@ -78,6 +87,7 @@ public class XWikiRCSNodeContent extends AbstractSimpleClass
     {
         this.patch = patch;
     }
+
     @Override
     public String toString()
     {
@@ -85,6 +95,7 @@ public class XWikiRCSNodeContent extends AbstractSimpleClass
             .append("id", getId())
             .toString();
     }
+
     @Override
     public int compareTo(XWikiRCSNodeContent o)
     {

@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Action for restoring documents from the recycle bin.
- * 
+ *
  * @version $Id$
  * @since 1.2M1
  */

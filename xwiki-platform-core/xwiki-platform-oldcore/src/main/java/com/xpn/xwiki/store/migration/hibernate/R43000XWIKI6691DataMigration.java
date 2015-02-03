@@ -31,7 +31,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI-6691: Reduce the size of the ASE_REQUESTID column to 48-chars.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */

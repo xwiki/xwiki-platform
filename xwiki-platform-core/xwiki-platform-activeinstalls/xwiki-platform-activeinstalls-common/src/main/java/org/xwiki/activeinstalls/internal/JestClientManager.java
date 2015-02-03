@@ -20,8 +20,6 @@
 package org.xwiki.activeinstalls.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
 import io.searchbox.client.JestClient;
 
 /**
@@ -31,7 +29,6 @@ import io.searchbox.client.JestClient;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface JestClientManager
 {
     /**

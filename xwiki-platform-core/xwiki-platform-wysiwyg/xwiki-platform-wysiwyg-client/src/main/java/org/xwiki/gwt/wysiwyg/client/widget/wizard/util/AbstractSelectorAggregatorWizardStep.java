@@ -187,7 +187,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         stepPanel.getWidget(0).setVisible(true);
         tabPanel.removeStyleName(STYLE_LOADING);
         if (step instanceof AbstractSelectorWizardStep) {
-            ((AbstractSelectorWizardStep< ? >) step).setActive();
+            ((AbstractSelectorWizardStep<?>) step).setActive();
         }
     }
 
@@ -271,7 +271,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     /**
      * {@inheritDoc}
      */
-    public void init(Object data, final AsyncCallback< ? > cb)
+    public void init(Object data, final AsyncCallback<?> cb)
     {
         // Maybe initialize the tab bar.
         if (tabPanel.getTabBar().getTabCount() == 0) {
@@ -306,7 +306,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      * 
      * @param cb the initialization callback
      */
-    private void dispatchInit(final AsyncCallback< ? > cb)
+    private void dispatchInit(final AsyncCallback<?> cb)
     {
         // pick the right tab to select
         String stepName = getRequiredStep();
@@ -329,7 +329,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      * @param step the step to initialize
      * @param cb the call back to handle asynchronous load of the step
      */
-    private void lazyInitializeStep(final WizardStep step, final AsyncCallback< ? > cb)
+    private void lazyInitializeStep(final WizardStep step, final AsyncCallback<?> cb)
     {
         if (!initialized.get(step)) {
             step.init(getData(), new AsyncCallback<Object>()

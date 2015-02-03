@@ -38,7 +38,7 @@ public class CodeFilter extends RegexTokenFilter
     private static Logger LOGGER = LoggerFactory.getLogger(CodeFilter.class);
 
     private Macro codeMacro = new XWikiCodeMacro();
-    
+
     public CodeFilter()
     {
         super("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code}", MULTILINE);
@@ -53,7 +53,7 @@ public class CodeFilter extends RegexTokenFilter
     @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
-    	// Call the XWikiCodeMacro macro...
+        // Call the XWikiCodeMacro macro...
         Writer writer = new StringBufferWriter(buffer);
 
         MacroParameter mParams = context.getMacroParameter();
@@ -61,7 +61,7 @@ public class CodeFilter extends RegexTokenFilter
         mParams.setContent(result.group(3));
 
         try {
-        	this.codeMacro.execute(writer, mParams);
+            this.codeMacro.execute(writer, mParams);
         } catch (Throwable e) {
             LOGGER.warn("CodeFilter: unable to format macro: " + result.group(1), e);
             buffer.append("<div class=\"error\">" + result.group(1) + ": " + e.getMessage() + "</div>");

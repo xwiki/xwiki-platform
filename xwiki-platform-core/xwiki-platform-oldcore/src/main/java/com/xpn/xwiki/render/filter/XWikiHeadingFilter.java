@@ -70,9 +70,9 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
     public void setInitialContext(InitialRenderContext context)
     {
         super.setInitialContext(context);
-        String outputTemplate = outputMessages.getString(getLocaleKey() + ".print");
-        formatter = new MessageFormat("");
-        formatter.applyPattern(outputTemplate);
+        String outputTemplate = this.outputMessages.getString(getLocaleKey() + ".print");
+        this.formatter = new MessageFormat("");
+        this.formatter.applyPattern(outputTemplate);
     }
 
     public String handleMatch(MatchResult result, FilterContext context)
@@ -103,23 +103,23 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
         // add numbering if the flag is set
 
-        if (xcontext.containsKey(TOC_NUMBERED) && ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue()) {
+        if (xcontext.containsKey(this.TOC_NUMBERED) && ((Boolean) xcontext.get(this.TOC_NUMBERED)).booleanValue()) {
             // This is the old place where the data was placed, but this requires programming
             // rights. Instead, we now use vcontext.
-            if (xcontext.containsKey(TOC_DATA)) {
-                Map tocEntry = (Map) ((Map) xcontext.get(TOC_DATA)).get(id);
+            if (xcontext.containsKey(this.TOC_DATA)) {
+                Map tocEntry = (Map) ((Map) xcontext.get(this.TOC_DATA)).get(id);
                 if (tocEntry != null) {
                     numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
                 }
-            } else if (vcontext != null && vcontext.containsKey(TOC_DATA)) {
-                Map tocEntry = (Map) ((Map) vcontext.get(TOC_DATA)).get(id);
+            } else if (vcontext != null && vcontext.containsKey(this.TOC_DATA)) {
+                Map tocEntry = (Map) ((Map) vcontext.get(this.TOC_DATA)).get(id);
                 if (tocEntry != null) {
                     numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
                 }
             }
         }
 
-        String heading = formatter.format(new Object[] {id, numbering, text, hlevel});
+        String heading = this.formatter.format(new Object[] { id, numbering, text, hlevel });
 
         // Only show the section edit button for view action and when the user has edit rights on
         // the current document
@@ -148,7 +148,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             if (beforeAction != null) {
                 if (!beforeAction.toString().equals("HeadingFilter")) {
                     xcontext.put("action", "HeadingFilter");
-                    sectionNumber = 0;
+                    this.sectionNumber = 0;
                 }
             }
 
@@ -161,12 +161,12 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                 if (doc != null && doc.getContent().indexOf(title.trim()) != -1) {
                     // TODO: This is unstable, meaning that it works in the current skin, but it might
                     // fail if there are other headings processed before the document content.
-                    sectionNumber++;
+                    this.sectionNumber++;
                     StringBuffer editparams = new StringBuffer();
                     if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
-                        editparams.append("xpage=wysiwyg&amp;section=").append(sectionNumber);
+                        editparams.append("xpage=wysiwyg&amp;section=").append(this.sectionNumber);
                     } else {
-                        editparams.append("section=").append(sectionNumber);
+                        editparams.append("section=").append(this.sectionNumber);
                     }
                     try {
                         if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null)) {

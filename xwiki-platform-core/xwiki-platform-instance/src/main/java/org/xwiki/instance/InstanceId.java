@@ -21,8 +21,6 @@ package org.xwiki.instance;
 
 import java.util.UUID;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents an XWiki instance using a unique id.
  *
@@ -31,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.2M2
  */
-@Unstable
 public class InstanceId
 {
     /**
@@ -82,7 +79,8 @@ public class InstanceId
         return this.uuid.hashCode();
     }
 
-    @Override public boolean equals(Object o)
+    @Override
+    public boolean equals(Object o)
     {
         return this.uuid.equals(o);
     }

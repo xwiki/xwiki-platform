@@ -19,27 +19,20 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.inject.Provider;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.activeinstalls.internal.JestClientManager;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.google.gson.Gson;
-
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Index;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Index;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.activeinstalls.internal.JestClientManager;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.google.gson.Gson;
 
 /**
  * Unit tests for {@link DefaultPingSender}.
@@ -64,13 +57,7 @@ public class DefaultPingSenderTest
         JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        Provider<List<PingDataProvider>> provider =
-            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
-                new DefaultParameterizedType(null, List.class, PingDataProvider.class)));
-
-        PingDataProvider pingDataProvider = mock(PingDataProvider.class);
-        when(provider.get()).thenReturn(Collections.singletonList(pingDataProvider));
-        //when(pingDataProvider.provideMapping()).thenReturn(Collections.EMPTY_MAP);
+        PingDataProvider pingDataProvider = this.mocker.registerMockComponent(PingDataProvider.class, "test");
 
         this.mocker.getComponentUnderTest().sendPing();
 

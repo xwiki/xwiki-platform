@@ -21,14 +21,14 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
-
-import org.apache.commons.io.IOUtils;
 
 public class DownloadRevAction extends XWikiAction
 {
@@ -56,7 +56,7 @@ public class DownloadRevAction extends XWikiAction
             attachment = doc.getAttachment(filename);
         }
         if (attachment == null) {
-            Object[] args = {filename};
+            Object[] args = { filename };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
         }

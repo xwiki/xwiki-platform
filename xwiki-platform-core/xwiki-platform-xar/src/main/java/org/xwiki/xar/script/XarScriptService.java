@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.XarPackage;
 
 /**
@@ -42,7 +41,6 @@ import org.xwiki.xar.XarPackage;
 @Component
 @Named("xar")
 @Singleton
-@Unstable
 public class XarScriptService implements ScriptService
 {
     /**

@@ -30,7 +30,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 import org.jfree.util.Log;
@@ -65,7 +65,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 {
     /**
      * Type instance for Provider<XWikiContext>.
-     * 
+     *
      * @since 5.0M1
      */
     public static final ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class,
@@ -324,7 +324,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * {@inheritDoc}
      * <p>
      * Make sure to keep {@link #wikiId} fields and map synchronized.
-     * 
+     *
      * @see java.util.Hashtable#put(java.lang.Object, java.lang.Object)
      */
     @Override
@@ -350,7 +350,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * {@inheritDoc}
      * <p>
      * Make sure to keep {@link #wikiId} field and map synchronized.
-     * 
+     *
      * @see java.util.Hashtable#remove(java.lang.Object)
      */
     @Override
@@ -371,7 +371,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * Get the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
-     * 
+     *
      * @return the wiki id originally requested by the user.
      * @deprecated since 6.1M1, use {@link #getOriginalWikiId()} instead
      */
@@ -384,7 +384,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * Get the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
-     * 
+     *
      * @return the wiki id originally requested by the user.
      * @since 6.1M1
      */
@@ -405,7 +405,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * Set the "original" wiki id. This will be the wiki id for the wiki which the user requested. If the wiki is
      * switched to load some piece of data, this will remember what it should be switched back to.
-     * 
+     *
      * @return the wiki id originally requested by the user.
      * @since 6.1M1
      */
@@ -856,7 +856,7 @@ public class XWikiContext extends Hashtable<Object, Object>
      * <p>
      * If you are interested in a more flexable sandboxing method which sandboxed code only for the remainder of the
      * rendering cycle, consider using {@link com.xpn.xwiki.api.Document#dropPermissions()}.
-     * 
+     *
      * @since 3.0M3
      */
     public void dropPermissions()
@@ -894,7 +894,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
         // Make sure to have unique instances of the various caches
         context.displayedFields = Collections.synchronizedList(new ArrayList<String>(this.displayedFields));
-        context.classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+        context.classCache = Collections.synchronizedMap(new LRUMap<DocumentReference, BaseClass>(this.classCacheSize));
 
         return context;
     }
@@ -902,7 +902,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * There are several places where the XWiki context needs to be declared in the execution, so we add a common method
      * here.
-     * 
+     *
      * @param executionContext The execution context.
      */
     public void declareInExecutionContext(ExecutionContext executionContext)

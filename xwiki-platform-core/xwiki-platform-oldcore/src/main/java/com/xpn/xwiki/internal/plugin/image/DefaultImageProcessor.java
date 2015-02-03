@@ -44,7 +44,7 @@ import com.xpn.xwiki.plugin.image.ImageProcessor;
 
 /**
  * Default {@link ImageProcessor} implementation.
- * 
+ *
  * @version $Id$
  * @since 2.5M2
  */

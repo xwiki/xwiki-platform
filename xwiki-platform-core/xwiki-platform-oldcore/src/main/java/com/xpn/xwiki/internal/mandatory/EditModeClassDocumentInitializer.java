@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Update XWiki.EditModeClass document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */

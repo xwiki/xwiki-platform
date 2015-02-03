@@ -29,7 +29,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Specialized version of the {@link AppServerTrustedAuthServiceImpl} that extract usernames out of Kerberos principals.
- * 
+ *
  * @version $Id$
  * @since 2.6.2
  */
@@ -89,7 +89,7 @@ public class AppServerTrustedKerberosAuthServiceImpl extends XWikiAuthServiceImp
 
     /**
      * Helper method to extract the username part out of a Kerberos principal.
-     * 
+     *
      * @param principal the principal to extract the username from
      * @return the extracted username
      */

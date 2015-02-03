@@ -23,13 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWikiConfig;
 
 /**
  * Delegate all {@link XWikiConfig} methods to xwiki.cfg {@link ConfigurationSource}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiConfigDelegate extends XWikiConfig
@@ -46,6 +47,18 @@ public class XWikiConfigDelegate extends XWikiConfig
         if (this.source instanceof XWikiCfgConfigurationSource) {
             this.defaults = ((XWikiCfgConfigurationSource) this.source).getProperties();
         }
+    }
+
+    @Override
+    public String getProperty(String key)
+    {
+        return StringUtils.trim(this.source.getProperty(key, String.class));
+    }
+
+    @Override
+    public String getProperty(String key, String defaultValue)
+    {
+        return StringUtils.trim(this.source.getProperty(key, defaultValue));
     }
 
     @Override

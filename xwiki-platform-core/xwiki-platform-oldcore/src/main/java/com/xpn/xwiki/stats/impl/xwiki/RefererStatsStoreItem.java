@@ -33,7 +33,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Store referer statistics into the database.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -51,7 +51,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
 
     /**
      * Create new instance of {@link RefererStatsStoreItem}.
-     * 
+     *
      * @param name the full name of the document.
      * @param periodDate the period date.
      * @param periodType the period type.
@@ -77,7 +77,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
     {
         RefererStatsStoreItem lastItem = (RefererStatsStoreItem) stats.get(stats.size() - 1);
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
+        XWikiHibernateStore store = this.context.getWiki().getHibernateStore();
         if (store == null) {
             return;
         }
@@ -88,7 +88,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
         // Load old statistics object from database
         try {
             // TODO Fix use of deprecated call.
-            store.loadXWikiCollection(refererStat, context, true);
+            store.loadXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Failed to load referer statictics object [" + getId() + "]");
@@ -101,7 +101,7 @@ public class RefererStatsStoreItem extends AbstractStatsStoreItem
         // Re-save statistics object
         try {
             // TODO Fix use of deprecated call.
-            store.saveXWikiCollection(refererStat, context, true);
+            store.saveXWikiCollection(refererStat, this.context, true);
         } catch (XWikiException e) {
             LOGGER.error("Failed to save referer statictics object [" + getId() + "]");
         }

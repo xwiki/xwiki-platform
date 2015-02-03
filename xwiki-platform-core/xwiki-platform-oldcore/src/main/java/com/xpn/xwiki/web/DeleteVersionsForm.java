@@ -25,7 +25,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Struts form for {@link DeleteVersionsAction}.
- * 
+ *
  * @version $Id$
  */
 public class DeleteVersionsForm extends XWikiForm
@@ -49,11 +49,11 @@ public class DeleteVersionsForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        rev1 = getVersion(request.getParameter("rev1"));
-        rev2 = getVersion(request.getParameter("rev2"));
-        rev = getVersion(request.getParameter("rev"));
-        language = Util.normalizeLanguage(request.getParameter("language"));
-        confirm = request.getParameter("confirm") != null;
+        this.rev1 = getVersion(request.getParameter("rev1"));
+        this.rev2 = getVersion(request.getParameter("rev2"));
+        this.rev = getVersion(request.getParameter("rev"));
+        this.language = Util.normalizeLanguage(request.getParameter("language"));
+        this.confirm = request.getParameter("confirm") != null;
     }
 
     /**
@@ -74,7 +74,7 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public Version getRev1()
     {
-        return rev1;
+        return this.rev1;
     }
 
     /**
@@ -82,7 +82,7 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public Version getRev2()
     {
-        return rev2;
+        return this.rev2;
     }
 
     /**
@@ -90,7 +90,7 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public Version getRev()
     {
-        return rev;
+        return this.rev;
     }
 
     /**
@@ -98,7 +98,7 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     /**
@@ -106,6 +106,6 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public boolean isConfirmed()
     {
-        return confirm;
+        return this.confirm;
     }
 }

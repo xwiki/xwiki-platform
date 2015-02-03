@@ -23,7 +23,7 @@ import org.xwiki.observation.event.Event;
 
 /**
  * An event related to a template.
- * 
+ *
  * @version $Id$
  * @since 6.4M1
  */

@@ -31,10 +31,10 @@ public class XWikiDebugGWTURLFactory extends XWikiServletURLFactory
     {
         URL url = context.getURL();
 
-        contextPath = "xwiki/";
+        this.contextPath = "xwiki/";
 
         try {
-            serverURL = new URL(url.getProtocol(), url.getHost(), 1025, "/");
+            this.serverURL = new URL(url.getProtocol(), url.getHost(), 1025, "/");
         } catch (MalformedURLException e) {
             // This can't happen
         }

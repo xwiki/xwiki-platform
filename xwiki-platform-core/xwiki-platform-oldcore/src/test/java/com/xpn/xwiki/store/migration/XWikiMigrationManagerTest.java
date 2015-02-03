@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -130,7 +129,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        XWikiConfig config = new XWikiConfig();
         getContext().setWiki(new XWiki() {
             @Override
             public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
@@ -138,7 +136,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
                 return Arrays.asList("xwiki");
             }
         });
-        getContext().getWiki().setConfig(config);
 
         registerComponent(TestDataMigrationManager.class);
     }
@@ -159,9 +156,8 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
      */
     public void testMigrationOrderAndIgnore() throws Exception
     {
-        XWikiConfig config = getContext().getWiki().getConfig();
-        config.setProperty("xwiki.store.migration.version", "123");
-        config.setProperty("xwiki.store.migration.ignored", "345");
+        getConfigurationSource().setProperty("xwiki.store.migration.version", "123");
+        getConfigurationSource().setProperty("xwiki.store.migration.ignored", "345");
         TestDataMigrationManager mm = getComponentManager().getInstance(
             DataMigrationManager.class,"TestDataMigration");
         Collection neededMigration = mm.getNeededMigrations();
@@ -210,9 +206,8 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     /** test "xwiki.store.migration.force" parameter */
     public void testMigrationForce() throws Exception
     {
-        XWikiConfig config = getContext().getWiki().getConfig();
-        config.setProperty("xwiki.store.migration.version", "234");
-        config.setProperty("xwiki.store.migration.force", "TestForcedMigration");
+        getConfigurationSource().setProperty("xwiki.store.migration.version", "234");
+        getConfigurationSource().setProperty("xwiki.store.migration.force", "TestForcedMigration");
         registerComponent(TestForceMigration.class);
 
         TestDataMigrationManager mm = getComponentManager().getInstance(

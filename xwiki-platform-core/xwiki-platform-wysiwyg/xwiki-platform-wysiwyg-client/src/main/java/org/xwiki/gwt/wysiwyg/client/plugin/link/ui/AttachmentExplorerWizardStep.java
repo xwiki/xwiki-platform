@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
+import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardStep;
@@ -35,13 +36,15 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
      * Creates a new attachment selection wizard step that allows the user to select an attachment from a tree.
+     *
+     * @param config the configuration object
      */
-    public AttachmentExplorerWizardStep()
+    public AttachmentExplorerWizardStep(Config config)
     {
         // Reduce the size to fit the toggling bar of the attachment selector step which aggregates this step.
         // FIXME: This wizard step should be usable w/o the aggregating step. Also having size information added in more
         // than one single place is bad.
-        super(false, true, true, 455, 280);
+        super(config.getParameter("attachmentTreeURL"), 455, 280);
 
         setStepTitle(Strings.INSTANCE.linkSelectAttachmentTitle());
         setHelpLabelText(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
@@ -74,7 +77,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         if (getExplorer().isNewAttachment()) {
             getData().getDestination().setEntityReference(attachmentReference.getEntityReference());
             // Invalidate the explorer cache so that the new attachment shows up in the tree when the tree is reloaded.
-            invalidateExplorerData();
+            getExplorer().invalidateCache();
             async.onSuccess(true);
         } else if (StringUtils.isEmpty(attachmentReference.getFileName())) {
             displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());

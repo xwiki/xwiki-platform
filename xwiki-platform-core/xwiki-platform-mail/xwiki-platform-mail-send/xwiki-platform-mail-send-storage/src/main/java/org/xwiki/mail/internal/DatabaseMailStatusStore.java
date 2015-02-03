@@ -19,7 +19,9 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,7 +32,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
@@ -51,14 +52,6 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 @Singleton
 public class DatabaseMailStatusStore implements MailStatusStore
 {
-    private static final String FROM_QUERY = "from " + MailStatus.class.getName();
-
-    private static final String BATCHID_PARAMETER_NAME = "batchid";
-
-    private static final String WHERE_QUERY_BATCH_ID = " where mail_batchid=:batchid";
-
-    private static final String WHERE_QUERY_MAIL_ID = " where mail_id=:id";
-
     private static final String ID_PARAMETER_NAME = "id";
 
     @Inject
@@ -69,120 +62,166 @@ public class DatabaseMailStatusStore implements MailStatusStore
     private XWikiStoreInterface hibernateStore;
 
     @Override
-    public void save(final MailStatus status) throws MailStoreException
+    public void save(final MailStatus status, final Map<String, Object> parameters) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        XWikiContext xwikiContext = this.contextProvider.get();
+        // Save in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
         try {
-            store.executeWrite(this.contextProvider.get(), new XWikiHibernateBaseStore.HibernateCallback<Object>()
+            // Delete any previous state of the message
+            delete(status.getMessageId(), parameters);
+
+            store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
             {
-                @Override public Object doInHibernate(Session session) throws HibernateException, XWikiException
+                @Override
+                public Object doInHibernate(Session session) throws HibernateException, XWikiException
                 {
-                    //Delete previous state of the message
-                    session.createQuery("delete " + FROM_QUERY + WHERE_QUERY_MAIL_ID)
-                        .setParameter(ID_PARAMETER_NAME, status.getMessageId()).executeUpdate();
                     session.save(status);
                     return null;
                 }
             });
         } catch (Exception e) {
             throw new MailStoreException(String.format("Failed to save mail status [%s] to the database.", status), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
     @Override
-    public MailStatus loadFromMessageId(final String messageId) throws MailStoreException
+    public List<MailStatus> load(final Map<String, Object> filterMap, final int offset, final int count)
+        throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Load from the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Compute the Query string based on the passed filter map
+        final String queryString = computeSelectQueryString(filterMap);
+
         try {
-            return store.executeRead(this.contextProvider.get(),
-                new XWikiHibernateBaseStore.HibernateCallback<MailStatus>()
+            return store.executeRead(xwikiContext,
+                new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
                 {
-                    @Override public MailStatus doInHibernate(Session session) throws HibernateException, XWikiException
+                    @Override
+                    public List<MailStatus> doInHibernate(Session session)
+                        throws HibernateException, XWikiException
                     {
-                        Query query = session.createQuery(FROM_QUERY + WHERE_QUERY_MAIL_ID);
-                        query.setParameter(ID_PARAMETER_NAME, messageId);
-                        List<MailStatus> queryResult = (List<MailStatus>) query.list();
-                        if (!queryResult.isEmpty()) {
-                            return queryResult.get(0);
+                        Query query = session.createQuery(queryString);
+                        if (offset > 0) {
+                            query.setFirstResult(offset);
                         }
-                        return null;
-                    }
-                });
-        } catch (Exception e) {
-            throw new MailStoreException(String.format("Failed to load mail status for message [%s] from the database.",
-                messageId), e);
-        }
-    }
-
-    @Override
-    public List<MailStatus> loadFromBatchId(final String batchId, final MailState state) throws MailStoreException
-    {
-        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
-        try {
-            return store.executeRead(this.contextProvider.get(),
-                new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
-                {
-                    @Override public List<MailStatus> doInHibernate(Session session)
-                        throws HibernateException, XWikiException
-                    {
-                        Query query =
-                            session.createQuery(FROM_QUERY + " where mail_batchid=:batchid and mail_status=:state");
-                        query.setParameter(BATCHID_PARAMETER_NAME, batchId).setParameter("state", state);
+                        if (count > 0) {
+                            query.setMaxResults(count);
+                        }
+                        query.setProperties(filterMap);
                         List<MailStatus> queryResult = (List<MailStatus>) query.list();
                         return queryResult;
                     }
                 });
         } catch (Exception e) {
-            throw new MailStoreException(String.format("Failed to load mail statuses "
-                + "(for batch id [%s] and state [%s]) from the database.", batchId, state), e);
+            throw new MailStoreException(String.format(
+                "Failed to load mail statuses matching the filter [%s] from the database.", filterMap), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
     }
 
     @Override
-    public List<MailStatus> loadFromBatchId(final String batchId) throws MailStoreException
+    public long count(final Map<String, Object> filterMap) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
-        try {
-            return store.executeRead(this.contextProvider.get(),
-                new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
-                {
-                    @Override public List<MailStatus> doInHibernate(Session session)
-                        throws HibernateException, XWikiException
-                    {
-                        Query query =
-                            session.createQuery(FROM_QUERY + WHERE_QUERY_BATCH_ID);
-                        query.setParameter(BATCHID_PARAMETER_NAME, batchId);
-                        List<MailStatus> queryResult = (List<MailStatus>) query.list();
-                        return queryResult;
-                    }
-                });
-        } catch (Exception e) {
-            throw new MailStoreException(String.format("Failed to load mail statuses from the database "
-                + "for batch id [%s].", batchId), e);
-        }
-    }
 
-    @Override
-    public long count(final String batchId) throws MailStoreException
-    {
-        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+        final XWikiContext xwikiContext = this.contextProvider.get();
+        // Count in the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        // Compute the Query string based on the passed filter map
+        final String queryString = computeCountQueryString(filterMap);
+
         try {
-            Long count = store.executeRead(this.contextProvider.get(),
+            Long count = store.executeRead(xwikiContext,
                 new XWikiHibernateBaseStore.HibernateCallback<Long>()
                 {
-                    @Override public Long doInHibernate(Session session)
+                    @Override
+                    public Long doInHibernate(Session session)
                         throws HibernateException, XWikiException
                     {
-                        Query query =
-                            session.createQuery("select count(*) " + FROM_QUERY + WHERE_QUERY_BATCH_ID);
-                        query.setParameter(BATCHID_PARAMETER_NAME, batchId);
+                        Query query = session.createQuery(queryString);
+                        query.setProperties(filterMap);
                         return (Long) query.uniqueResult();
                     }
                 });
             return count;
         } catch (Exception e) {
-            throw new MailStoreException(String.format("Failed to get count of mail statuses with batch id "
-                + "[%s] from the database .", batchId), e);
+            throw new MailStoreException(String.format(
+                "Failed to count mail statuses matching the filter [%s] from the database.", filterMap), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
         }
+    }
+
+    @Override
+    public void delete(final String messageId, Map<String, Object> parameters) throws MailStoreException
+    {
+        XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
+
+        XWikiContext xwikiContext = this.contextProvider.get();
+        // Delete from the main wiki
+        String currentWiki = xwikiContext.getWikiId();
+        xwikiContext.setWikiId(xwikiContext.getMainXWiki());
+
+        try {
+            store.executeWrite(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Object>()
+            {
+                @Override
+                public Object doInHibernate(Session session) throws HibernateException, XWikiException
+                {
+                    // Delete the message
+                    String queryString = String.format("delete from %s where mail_id=:id", MailStatus.class.getName());
+                    session.createQuery(queryString).setParameter(ID_PARAMETER_NAME, messageId).executeUpdate();
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            throw new MailStoreException(String.format("Failed to delete mail status (message id [%s]) "
+                + "from the database.", messageId), e);
+        } finally {
+            xwikiContext.setWikiId(currentWiki);
+        }
+    }
+
+    protected String computeQueryString(String prefix, Map<String, Object> filterMap)
+    {
+        StringBuilder queryBuilder = new StringBuilder(prefix);
+        if (!filterMap.isEmpty()) {
+            queryBuilder.append(" where");
+            Iterator<String> iterator = filterMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                String filterKey = iterator.next();
+                queryBuilder.append(" mail_").append(filterKey).append(" like ").append(':').append(filterKey);
+                if (iterator.hasNext()) {
+                    queryBuilder.append(" and");
+                }
+            }
+        }
+        return queryBuilder.toString();
+    }
+
+    protected String computeCountQueryString(Map<String, Object> filterMap)
+    {
+        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()), filterMap);
+    }
+
+    protected String computeSelectQueryString(Map<String, Object> filterMap)
+    {
+        return computeQueryString(String.format("from %s", MailStatus.class.getName()), filterMap);
     }
 }

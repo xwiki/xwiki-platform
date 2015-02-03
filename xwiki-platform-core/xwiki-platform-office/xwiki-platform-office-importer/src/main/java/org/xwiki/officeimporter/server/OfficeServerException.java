@@ -19,15 +19,12 @@
  */
 package org.xwiki.officeimporter.server;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents an exception that can be thrown communicating with an office server.
  * 
  * @version $Id$
  * @since 5.0M2
  */
-@Unstable
 public class OfficeServerException extends Exception
 {
     /**

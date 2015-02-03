@@ -32,7 +32,6 @@ import org.jmock.Mock;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jvnet.mock_javamail.Mailbox;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.mail.MailSenderConfiguration;
 
 import com.xpn.xwiki.XWiki;

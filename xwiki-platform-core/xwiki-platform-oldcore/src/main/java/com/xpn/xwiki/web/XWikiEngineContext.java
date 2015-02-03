@@ -25,10 +25,14 @@ import java.net.URL;
 
 import org.xwiki.environment.Environment;
 
-public interface XWikiEngineContext {
+public interface XWikiEngineContext
+{
     public Object getAttribute(String name);
+
     public void setAttribute(String name, Object value);
+
     public String getRealPath(String path);
+
     public String getMimeType(String filename);
 
     /**

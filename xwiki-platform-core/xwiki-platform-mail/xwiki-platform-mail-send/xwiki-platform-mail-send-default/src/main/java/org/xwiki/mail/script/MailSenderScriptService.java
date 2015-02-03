@@ -34,12 +34,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
-import org.xwiki.mail.internal.script.MimeMessageIteratorFactoryProvider;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -79,11 +79,11 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MimeMessageWrapper createMessage(String hint, Object source, Map<String, Object> parameters)
     {
-        MimeMessageWrapper messageWrapper;
+        MimeMessageWrapper result;
         try {
-            MimeMessageFactory factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
-                this.componentManagerProvider.get());
-            Session session = this.sessionProvider.get();
+            MimeMessageFactory<Object, MimeMessage> factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
+                MimeMessage.class, this.componentManagerProvider.get());
+            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
             // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
@@ -95,8 +95,8 @@ public class MailSenderScriptService extends AbstractMailScriptService
                 extendedMimeMessage = new ExtendedMimeMessage(message);
             }
 
-            messageWrapper = new MimeMessageWrapper(extendedMimeMessage, session, this.execution,
-                componentManagerProvider.get());
+            result = new MimeMessageWrapper(extendedMimeMessage, session, this.execution,
+                this.componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -104,28 +104,48 @@ public class MailSenderScriptService extends AbstractMailScriptService
             return null;
         }
 
-        return messageWrapper;
+        return result;
     }
 
     /**
-     * @param hint the hint of Iterator factories
-     * @param source the source from which to prefill the Mime Message iterator (depends on the implementation)
-     * @param factoryHint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
-     * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
-     * @return the ist of the pre-filled Mime Message wrapped
+     * Construct an iterator of Mime Messages by running the Component implementation of {@link
+     * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     *
+     * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
+     * @param source the source from which to prefill the Mime Messages (depends on the implementation)
+     * @return the pre-filled Mime Message iterator
      */
-    public Iterator<? extends MimeMessage> createMessages(String hint, Object source, String factoryHint,
-        Map<String, Object> parameters)
+    public Iterator<MimeMessage> createMessages(String hint, Object source)
     {
+        return createMessages(hint, source, Collections.<String, Object>emptyMap());
+    }
+
+    /**
+     * Construct an iterator of Mime Messages by running the Component implementation of {@link
+     * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     *
+     * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
+     * @param source the source from which to prefill the Mime Messages (depends on the implementation)
+     * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
+     * @return the pre-filled Mime Message iterator
+     */
+    public Iterator<MimeMessage> createMessages(String hint, Object source, Map<String, Object> parameters)
+    {
+        Iterator<MimeMessage> result;
         try {
-            MimeMessageFactory factory = MimeMessageFactoryProvider
-                .get(factoryHint, parameters.get("source").getClass(), this.componentManagerProvider.get());
-            return MimeMessageIteratorFactoryProvider.get(hint, source, factory, parameters,
+            MimeMessageFactory<Object, Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
+                source.getClass(), new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
                 this.componentManagerProvider.get());
+            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
+            result = factory.createMessage(session, source, parameters);
         } catch (Exception e) {
+            // No factory found, set an error
+            // An error occurred, save it and return null
             setError(e);
             return null;
         }
+
+        return result;
     }
 
     /**
@@ -164,7 +184,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MimeMessageWrapper createMessage(String to, String subject)
     {
-        return createMessage(this.configuration.getFromAddress(), to, subject);
+        return createMessage(this.senderConfiguration.getFromAddress(), to, subject);
     }
 
     /**
@@ -179,7 +199,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session = this.sessionProvider.get();
+        Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
         ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
             this.componentManagerProvider.get());
@@ -236,7 +256,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
         ScriptMailResult scriptMailResult = sendAsynchronously(messages, hint);
 
         // Wait for all messages from this batch to have been sent before returning
-        scriptMailResult.waitTillSent(Long.MAX_VALUE);
+        scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
 
         return scriptMailResult;
     }
@@ -280,7 +300,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public MailSenderConfiguration getConfiguration()
     {
-        return this.configuration;
+        return this.senderConfiguration;
     }
 
     @Override

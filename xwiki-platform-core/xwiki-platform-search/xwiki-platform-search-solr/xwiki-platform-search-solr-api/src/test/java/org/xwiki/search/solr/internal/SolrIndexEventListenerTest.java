@@ -19,17 +19,16 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Locale;
-
-import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
@@ -48,14 +47,12 @@ public class SolrIndexEventListenerTest
     public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
         SolrIndexEventListener.class);
 
-    private SolrIndexer indexer = mock(SolrIndexer.class);
+    private SolrIndexer indexer;
 
     @Before
     public void setUp() throws Exception
     {
-        Provider<SolrIndexer> indexerProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, SolrIndexer.class));
-        when(indexerProvider.get()).thenReturn(indexer);
+        indexer = mocker.registerMockComponent(SolrIndexer.class);
     }
 
     @Test

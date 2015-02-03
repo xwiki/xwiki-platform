@@ -22,13 +22,12 @@ package com.xpn.xwiki.doc;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 
-
 /**
  * Provide a document that should be initialized at startup and when creating new wiki.
  * <p>
  * The role hint should be the local (or absolute if it's supposed to be used only for a specific wiki) reference of the
  * document so that I can easily be found.
- * 
+ *
  * @version $Id$
  */
 @Role
@@ -42,7 +41,7 @@ public interface MandatoryDocumentInitializer
 
     /**
      * Update the provided document according to the need.
-     * 
+     *
      * @param document the existing document to update
      * @return true if the document has been modified, false otherwise
      */

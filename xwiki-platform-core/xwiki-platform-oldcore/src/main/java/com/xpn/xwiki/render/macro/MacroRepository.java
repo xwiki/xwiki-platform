@@ -77,7 +77,7 @@ public class MacroRepository extends org.radeox.macro.PluginRepository
 
     protected void initialize(InitialRenderContext context)
     {
-        Iterator iterator = list.iterator();
+        Iterator iterator = this.list.iterator();
         while (iterator.hasNext()) {
             Macro macro = (Macro) iterator.next();
             macro.setInitialContext(context);
@@ -95,12 +95,12 @@ public class MacroRepository extends org.radeox.macro.PluginRepository
     {
         Map newPlugins = new HashMap();
 
-        Iterator iterator = list.iterator();
+        Iterator iterator = this.list.iterator();
         while (iterator.hasNext()) {
             Macro macro = (Macro) iterator.next();
             newPlugins.put(macro.getName(), macro);
         }
-        plugins = newPlugins;
+        this.plugins = newPlugins;
     }
 
     /**
@@ -108,7 +108,7 @@ public class MacroRepository extends org.radeox.macro.PluginRepository
      */
     protected void load()
     {
-        Iterator iterator = loaders.iterator();
+        Iterator iterator = this.loaders.iterator();
         while (iterator.hasNext()) {
             MacroLoader loader = (MacroLoader) iterator.next();
             loader.setRepository(this);
@@ -119,8 +119,8 @@ public class MacroRepository extends org.radeox.macro.PluginRepository
 
     protected MacroRepository()
     {
-        loaders = new ArrayList();
-        loaders.add(new MacroLoader());
+        this.loaders = new ArrayList();
+        this.loaders.add(new MacroLoader());
         load();
     }
 }

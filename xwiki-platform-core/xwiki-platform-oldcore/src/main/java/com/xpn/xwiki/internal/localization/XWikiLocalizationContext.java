@@ -34,7 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation of {@link LocalizationContext}.
- * 
+ *
  * @version $Id$
  * @since 4.3M2
  */

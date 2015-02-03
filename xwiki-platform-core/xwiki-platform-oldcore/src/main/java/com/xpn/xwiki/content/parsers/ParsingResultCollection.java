@@ -27,7 +27,7 @@ import java.util.List;
  * parsing and we don't want to stop the parsing when these happen. Instead we want to let the caller code be handle
  * those errors as it sees fit. This is why we're returning both the valid parsed elements in addition to the parsing
  * errors.
- * 
+ *
  * @version $Id$
  */
 public class ParsingResultCollection

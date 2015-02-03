@@ -278,7 +278,7 @@ $xwiki.getUserName("xwiki:${username}")
       ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($groupReference = $group.extractReference('DOCUMENT'))
       #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($user, 'group/current'))
+        #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
       #end
       #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
       #if ("$!groupTitle" == '')
@@ -2081,19 +2081,23 @@ function (row, i, table) {
   * @param $lazy {@code true} to download the WYSIWYG code only when it is needed, {@code false} to download it when the page is loaded
   *#
 #macro(wysiwyg_import $lazy)
-## SmartClient (used by the XWikiExplorer)
-## NOTE: We can't defer the SmartClient loading because it uses document.write() to load stylesheets in IE.
-$xwiki.jsfx.use("js/smartclient/initsc.js", {'forceSkinAction': true, 'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js", {'defer': false})
-## XWikiExplorer (used by the link plug-in)
-$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
-## WYSIWYG
+## Load the CSS of the tree used by the Create Link Wizard (the JavaScript code is loaded with Require.js).
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'})
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'finder.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'})
+## We use directly FontAwesome for the tree node icons for two reasons:
+## * the XWiki icon set (available through the icon themes) is limited
+## * jsTree expects an URL/path or a CSS class name as the value of the tree node icon configuration when JSON source is
+##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
+##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
+##   configuration becomes complex.
+## We don't load the FontAwesome CSS directly from its WebJar because it contains some relative paths that currently are
+## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
+## SSX instead.
+$xwiki.ssx.use('IconThemes.FontAwesome')
+## Include also the fix for the FontAwesome loading issue on IE8.
+$xwiki.jsx.use('IconThemes.FontAwesome')
 $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {'forceSkinAction': true, 'lazy': $lazy})
 #end
 
@@ -2226,6 +2230,19 @@ var $jsVarName = {
 #if("$!request.debug" != '')
   #set($ok = $parameters.put('debug', $request.debug))
 #end
+#set($ok = $parameters.put('documentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+  'outputSyntax': 'plain',
+  'showSpaces': true,
+  'showAddDocument': true,
+  'showTranslations': false,
+  'showAttachments': false
+}))))
+#set($ok = $parameters.put('attachmentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+  'outputSyntax': 'plain',
+  'showSpaces': true,
+  'showTranslations': false,
+  'showAddAttachment': true
+}))))
 #end
 
 #**
@@ -2392,7 +2409,7 @@ var $jsVarName = {
   $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
     #set ($children = [])
-    #sortCollectionOfMapsByField($item.children, 'order', 9999, 'asc', $children)
+    #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
     #foreach ($child in $children)
       #verticalNavigationItem($child $level.concat('*') $options)
     #end

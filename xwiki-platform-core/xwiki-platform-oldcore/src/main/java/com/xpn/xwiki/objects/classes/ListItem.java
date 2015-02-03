@@ -21,23 +21,22 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Comparator;
 
-import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections4.ComparatorUtils;
 
 /**
  * An entry in a List or in a Tree.
- * 
+ *
  * @version $Id$
  */
 public class ListItem
 {
     /** Comparator that orders two strings in their natural order, keeping nulls at the end. */
-    @SuppressWarnings("unchecked")
     private static final Comparator<String> BASE_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<String>()
         {
             /**
              * Case insensitive comparison of two Strings.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -51,14 +50,13 @@ public class ListItem
         });
 
     /** Comparator that orders list items on their identifiers, keeping null items at the end. */
-    @SuppressWarnings("unchecked")
     protected static final Comparator<ListItem> ID_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<ListItem>()
         {
             /**
              * Sorts the items on their ID: the option with the lower ID (case insensitive String comparison) will be
              * placed before the other one.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -72,14 +70,13 @@ public class ListItem
         });
 
     /** Comparator that orders list items on their values, keeping null items at the end. */
-    @SuppressWarnings("unchecked")
     protected static final Comparator<ListItem> VALUE_COMPARATOR = ComparatorUtils
         .nullHighComparator(new Comparator<ListItem>()
         {
             /**
              * Sorts the items on their value: the option with the lower value (case insensitive String comparison) will
              * be placed before the other one.
-             * 
+             *
              * @param o1 the first item to be compared.
              * @param o2 the second item to be compared.
              * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
@@ -104,7 +101,7 @@ public class ListItem
     /**
      * Constructor that initializes both the {@link #id internal ID} and the {@link #value displayed value} with the
      * same value, leaving the {@link #parent} field empty.
-     * 
+     *
      * @param id the value to use for the id and the displayed value
      */
     public ListItem(String id)
@@ -116,7 +113,7 @@ public class ListItem
     /**
      * Constructor that initializes the {@link #id internal ID} and the {@link #value displayed value}, leaving the
      * {@link #parent} field empty.
-     * 
+     *
      * @param id the value to use for the internal id
      * @param value the value to use for the displayed value
      */
@@ -129,7 +126,7 @@ public class ListItem
     /**
      * Constructor that initializes all of the {@link #id internal ID}, the {@link #value displayed value}, and the
      * {@link #parent} fields.
-     * 
+     *
      * @param id the value to use for the internal id
      * @param value the value to use for the displayed value
      * @param parent the value to use for the item's parent

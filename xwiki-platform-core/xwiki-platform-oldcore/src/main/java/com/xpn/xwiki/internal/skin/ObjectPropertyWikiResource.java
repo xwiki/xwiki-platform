@@ -50,7 +50,7 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     @Override
     protected StringInputSource getInputSourceInternal(XWikiDocument document)
     {
-        return new StringInputSource(content);
+        return new StringInputSource(this.content);
     }
 
     @Override

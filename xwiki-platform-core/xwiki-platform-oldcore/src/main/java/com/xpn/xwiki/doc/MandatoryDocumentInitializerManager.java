@@ -24,7 +24,7 @@ import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Provide utility method to access various mandatory document initializers.
- * 
+ *
  * @version $Id$
  * @since 5.2M2
  */

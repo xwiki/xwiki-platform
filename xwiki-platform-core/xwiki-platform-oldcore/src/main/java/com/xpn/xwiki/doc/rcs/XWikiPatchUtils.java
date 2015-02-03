@@ -34,16 +34,20 @@ import org.suigeneris.jrcs.util.ToString;
 
 /**
  * diff & patch utility.
+ *
  * @version $Id$
  * @since 1.2M1
  */
 public class XWikiPatchUtils
 {
     /** prevent to create utility class. */
-    private XWikiPatchUtils() { }    
+    private XWikiPatchUtils()
+    {
+    }
+
     /**
      * @param orig - original text
-     * @param rev  - new text
+     * @param rev - new text
      * @return diff in JRCS format
      * @throws DifferentiationFailedException if error when creating diff
      */
@@ -51,32 +55,36 @@ public class XWikiPatchUtils
     {
         return Diff.diff(orig, rev).toRCSString();
     }
+
     /**
      * @param orig - original text
-     * @param rev  - new text
+     * @param rev - new text
      * @return diff in JRCS format
      * @throws DifferentiationFailedException if error when creating diff
      */
-    public static String getDiff(String orig, String rev) throws DifferentiationFailedException {
+    public static String getDiff(String orig, String rev) throws DifferentiationFailedException
+    {
         return getDiff(ToString.stringToArray(orig), ToString.stringToArray(rev));
     }
-    
+
     /**
      * From {@link Node#patch(List, boolean)}.
-     * @param orig - text to patch, List&lt;String&gt; of lines. 
+     *
+     * @param orig - text to patch, List&lt;String&gt; of lines.
      * @param diff - diff to patch, {@link Diff} format
-     * @throws InvalidFileFormatException if diff is incorrect 
+     * @throws InvalidFileFormatException if diff is incorrect
      * @throws PatchFailedException if error in patching
      */
-    public static void patch(List<String> orig, String diff) 
-        throws InvalidFileFormatException, PatchFailedException 
+    public static void patch(List<String> orig, String diff)
+        throws InvalidFileFormatException, PatchFailedException
     {
         Revision revision = new Revision();
         Object[] lines = ToString.stringToArray(diff);
         for (int it = 0; it < lines.length; it++) {
             String cmd = lines[it].toString();
-            if (cmd.length()==0)
+            if (cmd.length() == 0) {
                 break;
+            }
 
             java.util.StringTokenizer t = new StringTokenizer(cmd, "ad ", true);
             char action;
@@ -91,14 +99,14 @@ public class XWikiPatchUtils
                 count = Integer.parseInt(t.nextToken());
             } catch (Exception e) {
                 throw new InvalidFileFormatException("line:" + ":" + e.getClass().getName(),
-                        e);
+                    e);
             }
 
             if (action == 'd') {
                 revision.addDelta(new DeleteDelta(new Chunk(n - 1, count)));
             } else if (action == 'a') {
                 revision.addDelta(new AddDelta(n, new Chunk(getTextLines(lines,
-                        it + 1, it + 1 + count), 0, count, n - 1)));
+                    it + 1, it + 1 + count), 0, count, n - 1)));
                 it += count;
             } else {
                 throw new InvalidFileFormatException();
@@ -106,17 +114,19 @@ public class XWikiPatchUtils
         }
         revision.applyTo(orig);
     }
+
     /**
      * @param lines - some text
-     * @param from  - from that line
-     * @param to    - to that line
+     * @param from - from that line
+     * @param to - to that line
      * @return selected lines of text
      */
     private static Object[] getTextLines(Object[] lines, int from, int to)
     {
-        Object[] ret = new Object[to-from+1];
-        for (int i=from; i<to; i++)
-            ret[i-from] = lines[i];
+        Object[] ret = new Object[to - from + 1];
+        for (int i = from; i < to; i++) {
+            ret[i - from] = lines[i];
+        }
         return ret;
     }
 }

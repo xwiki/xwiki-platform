@@ -82,7 +82,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     /**
      * Render an input with text markup and return a String with e.g. HTML
-     * 
+     *
      * @param content String with the input to render
      * @param context Special context for the filter engine, e.g. with configuration information
      * @return result Output with rendered content
@@ -150,7 +150,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     /**
      * Appends for example the &lt;a href&gt; HTML code for linking to a wiki page with the given name to the passed
      * buffer.
-     * 
+     *
      * @param buffer the string to append to
      * @param name the name of the wiki page pointed to by the link
      * @param view the text that will be shown to the user for the link
@@ -315,7 +315,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     /**
      * Get a link to an image. This can be used by filters or macros to get images for e.g. external links or icons
      * Should be refactored to get other images as well
-     * 
+     *
      * @return result String with an HTML link to an image
      */
     @Override

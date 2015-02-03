@@ -229,7 +229,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
 
     /**
      * Clean the text so that it won't be interpreted by radeox simple syntax
-     * 
+     *
      * @param text
      * @return
      */
@@ -241,7 +241,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
     /**
      * Returns the view of the wiki name that is shown to the user. Overwrite to support other views for example
      * transform "WikiLinking" to "Wiki Linking". Does nothing by default.
-     * 
+     *
      * @return view The view of the wiki name
      */
     protected String getWikiView(String name)

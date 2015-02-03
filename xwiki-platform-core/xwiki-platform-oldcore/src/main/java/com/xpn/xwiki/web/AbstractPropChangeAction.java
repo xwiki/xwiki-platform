@@ -29,7 +29,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * Base class for manipulating property definitions: disable, enable, delete. The property to alter is specified in the
  * {@code propname} request parameter, and the class is the one defined in the requested document.
- * 
+ *
  * @version $Id$
  * @since 2.4M2
  */
@@ -38,7 +38,7 @@ public abstract class AbstractPropChangeAction extends XWikiAction
     /**
      * Tries to change the specified property, and redirect back to the class editor (or the specified {@code xredirect}
      * location). If the property does not exist, forward to the exception page.
-     * 
+     *
      * @param context the current request context
      * @return {@code false} if the operation succeeded and the response is finished, {@code true} if the response must
      *         be rendered by {@link #render(XWikiContext)}
@@ -86,7 +86,7 @@ public abstract class AbstractPropChangeAction extends XWikiAction
 
     /**
      * The method which does the actual modification of the property definition.
-     * 
+     *
      * @param xclass the affected class
      * @param propertyName the property to change
      * @param context the current request context

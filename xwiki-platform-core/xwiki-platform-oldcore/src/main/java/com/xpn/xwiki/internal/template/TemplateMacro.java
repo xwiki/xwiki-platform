@@ -34,7 +34,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Insert a template.
- * 
+ *
  * @version $Id$
  * @since 6.1RC1
  */

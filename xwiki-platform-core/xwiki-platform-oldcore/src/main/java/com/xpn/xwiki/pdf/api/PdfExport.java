@@ -27,7 +27,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * PDF Exporter, converts a wiki {@link XWikiDocument Document} into PDF.
- * 
+ *
  * @version $Id$
  */
 public interface PdfExport
@@ -49,7 +49,7 @@ public interface PdfExport
 
         /**
          * Constructor, specifying the target MIME type and file extension.
-         * 
+         *
          * @param mimeType the standard MIME type for this export type
          * @param extension the filename extension for this export type
          */
@@ -80,7 +80,7 @@ public interface PdfExport
      * Export a wiki Document into PDF. See
      * {@link PdfExport#export(XWikiDocument, OutputStream, ExportType, XWikiContext)} for more details about the
      * conversion process.
-     * 
+     *
      * @param doc the document to export
      * @param out where to write the resulting document
      * @param context the current request context
@@ -93,7 +93,7 @@ public interface PdfExport
      * Export a wiki Document into PDF or RTF. The content of the document is rendered into HTML using the
      * {@code pdf.vm} template, the resulting HTML is cleaned up into valid XHTML, and custom CSS is applied to it. The
      * XHTML document is transformed into an XSL-FO document, which is finally processed using Apache FOP.
-     * 
+     *
      * @param doc the document to export
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
@@ -104,7 +104,7 @@ public interface PdfExport
 
     /**
      * Convert an HTML document to PDF. The HTML is cleaned up, and CSS style is applied to it.
-     * 
+     *
      * @param html the source document to transform
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF

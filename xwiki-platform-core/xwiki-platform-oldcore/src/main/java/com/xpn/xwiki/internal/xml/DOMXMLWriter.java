@@ -85,7 +85,7 @@ import org.xml.sax.SAXException;
  * <p>
  * <b>WARNING</b> - This implementation in INCOMPLETE and a minimal support. It should be improve as needed over time
  * </p>
- * 
+ *
  * @version $Id$
  */
 public class DOMXMLWriter extends XMLWriter
@@ -103,7 +103,7 @@ public class DOMXMLWriter extends XMLWriter
     /**
      * Create a new <code>{@link DOMXMLWriter}</code> that will build into the provided document using the default
      * encoding.
-     * 
+     *
      * @param doc <code>{@link Document}</code> that will be build by this writer
      */
     public DOMXMLWriter(Document doc)
@@ -115,7 +115,7 @@ public class DOMXMLWriter extends XMLWriter
     /**
      * Create a new <code>{@link DOMXMLWriter}</code> that will build into the provided document using the encoding
      * provided in the <code>{@link OutputFormat}</code>.
-     * 
+     *
      * @param doc <code>{@link Document}</code> that will be build by this writer
      * @param format <code>{@link OutputFormat}</code> used to retrieve the proper encoding
      */
@@ -131,7 +131,7 @@ public class DOMXMLWriter extends XMLWriter
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements, putting the whole stream content as text in the content of the <code>{@link Element}</code>. The
      * stream is converted to a String encoded in the current encoding.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#write(org.dom4j.Element, java.io.InputStream)
      */
     @Override
@@ -146,7 +146,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of of
      * the <code>{@link Element}</code>.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#write(org.dom4j.Element, java.io.Reader)
      */
     @Override
@@ -162,7 +162,7 @@ public class DOMXMLWriter extends XMLWriter
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements, putting the whole stream content as Base64 text in the content of the
      * <code>{@link Element}</code>.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeBase64(org.dom4j.Element, java.io.InputStream)
      */
     @Override
@@ -180,7 +180,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Cleanup the stack of opened elements.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeDocumentEnd(org.dom4j.Document)
      */
     @Override
@@ -195,7 +195,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Does nothing, avoid default action.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeDocumentStart(org.dom4j.Document)
      */
     @Override
@@ -208,7 +208,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements.
-     * 
+     *
      * @see org.dom4j.io.XMLWriter#write(org.dom4j.Element)
      */
     @Override
@@ -225,7 +225,7 @@ public class DOMXMLWriter extends XMLWriter
      * {@inheritDoc}
      * <p>
      * Cleanup the stack of opened elements up to the given element.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeClose(org.dom4j.Element)
      */
     @Override
@@ -246,7 +246,7 @@ public class DOMXMLWriter extends XMLWriter
      * <p>
      * Add the element into the <code>{@link Document}</code> as a children of the element at the top of the stack of
      * opened elements. Add this element at the top of the stack of opened elements.
-     * 
+     *
      * @see com.xpn.xwiki.internal.xml.XMLWriter#writeOpen(org.dom4j.Element)
      */
     @Override

@@ -45,7 +45,6 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides Model-specific Scripting APIs.
@@ -173,7 +172,6 @@ public class ModelScriptService implements ScriptService
      * @return the reference to the wiki
      * @since 5.0M1
      */
-    @Unstable
     public WikiReference createWikiReference(String wikiName)
     {
         return new WikiReference(wikiName);
@@ -187,7 +185,6 @@ public class ModelScriptService implements ScriptService
      * @return the reference to the space
      * @since 5.0M1
      */
-    @Unstable
     public SpaceReference createSpaceReference(String spaceName, WikiReference parent)
     {
         return new SpaceReference(spaceName, parent);
@@ -201,7 +198,6 @@ public class ModelScriptService implements ScriptService
      * @return the created reference
      * @since 5.0M1
      */
-    @Unstable
     public EntityReference createEntityReference(String name, EntityType type)
     {
         return new EntityReference(name, type);
@@ -216,7 +212,6 @@ public class ModelScriptService implements ScriptService
      * @return the created reference
      * @since 5.0M1
      */
-    @Unstable
     public EntityReference createEntityReference(String name, EntityType type, EntityReference parent)
     {
         return new EntityReference(name, type, parent);
@@ -230,7 +225,6 @@ public class ModelScriptService implements ScriptService
      * @return the typed Space Reference object (resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 5.0M1
      */
-    @Unstable
     public SpaceReference resolveSpace(String stringRepresentation, Object... parameters)
     {
         return resolveSpace(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
@@ -246,7 +240,6 @@ public class ModelScriptService implements ScriptService
      * @return the typed Space Reference object or null if no Resolver with the passed hint could be found
      * @since 5.0M1
      */
-    @Unstable
     public SpaceReference resolveSpace(String stringRepresentation, String hint, Object... parameters)
     {
         try {
@@ -512,7 +505,6 @@ public class ModelScriptService implements ScriptService
      * @return the references as a tree
      * @since 5.4RC1
      */
-    @Unstable
     public EntityReferenceTree toTree(Iterable< ? extends EntityReference> references)
     {
         return new EntityReferenceTree(references);
@@ -525,7 +517,6 @@ public class ModelScriptService implements ScriptService
      * @return the references as a tree
      * @since 5.4RC1
      */
-    @Unstable
     public EntityReferenceTree toTree(EntityReference... references)
     {
         return new EntityReferenceTree(references);

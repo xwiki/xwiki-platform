@@ -131,7 +131,7 @@
       'xhtml/1.0'))
   #end
   &lt;li&gt;
-    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")"&gt;
+    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")" title="$escapetool.xml($params.label)"&gt;
       &lt;span class="application-img"&gt;$icon&lt;/span&gt;
       &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
     &lt;/a&gt;
@@ -171,7 +171,7 @@
 &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
   &lt;li&gt;
     &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
-        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;
+        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton" title="$services.localization.render('panels.applications.more')"&gt;
       &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
       &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
     &lt;/a&gt;
@@ -473,8 +473,13 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationsPanel li a {
   padding: 0.7em 0;
+}
+
+.panel-width-Small .applicationsPanel .application-label {
+  display: inline-block; /* Needed by IE for ellipsis */
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%; /* Needed by IE for ellipsis */
 }
 
 .panel-width-Small .applicationsPanel li img {

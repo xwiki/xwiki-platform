@@ -59,6 +59,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer, Initializable
     /**
      * @deprecated since 6.1M2, use component with role {@link XWikiRenderer} and hint <code>wikiwiki</code> instead
      */
+    @Deprecated
     public XWikiWikiBaseRenderer(boolean renderWiki, boolean removePre)
     {
         this.setRemovePre(removePre);

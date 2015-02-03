@@ -53,7 +53,7 @@ import liquibase.exception.LiquibaseException;
 
 /**
  * Migration manager for hibernate store.
- * 
+ *
  * @version $Id$
  * @since 3.4M1
  */
@@ -75,7 +75,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     public XWikiHibernateBaseStore getStore() throws DataMigrationException
     {
         try {
-            return (XWikiHibernateBaseStore) componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
+            return (XWikiHibernateBaseStore) this.componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(String.format("Unable to reach the store for database %s",
                 getXWikiContext().getWikiId()), e);
@@ -128,7 +128,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     }
 
     @Override
-    protected void initializeEmptyDB() throws DataMigrationException {
+    protected void initializeEmptyDB() throws DataMigrationException
+    {
         final XWikiContext context = getXWikiContext();
         final XWikiHibernateBaseStore store = getStore();
 
@@ -170,9 +171,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         }
     }
 
-
     @Override
-    protected void updateSchema(Collection<XWikiMigration> migrations) throws DataMigrationException {
+    protected void updateSchema(Collection<XWikiMigration> migrations) throws DataMigrationException
+    {
         try {
             liquibaseUpdate(migrations, true);
             hibernateShemaUpdate();
@@ -185,12 +186,13 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
     /**
      * Run hibernate schema updates
+     *
      * @throws DataMigrationException if the store is not accessible
      */
     private void hibernateShemaUpdate() throws DataMigrationException
     {
-        if (logger.isInfoEnabled()) {
-            logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
+        if (this.logger.isInfoEnabled()) {
+            this.logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
                 getXWikiContext().getWikiId());
         }
         getStore().updateSchema(getXWikiContext(), true);
@@ -198,8 +200,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
     /**
      * Get agregated liquibase change logs from a set of migration.
-     * @param migrations    the set of migration to visit
-     * @param preHibernate  if true, get pre-hibernate schema update changelogs.
+     *
+     * @param migrations the set of migration to visit
+     * @param preHibernate if true, get pre-hibernate schema update changelogs.
      * @return retrieved change logs
      * @throws DataMigrationException if an issue occurs in a migrator during retrieval of a change log
      * @since 4.3
@@ -214,9 +217,9 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                     String changeLog;
                     if (preHibernate) {
                         changeLog =
-                            ((HibernateDataMigration)migration.dataMigration).getPreHibernateLiquibaseChangeLog();
+                            ((HibernateDataMigration) migration.dataMigration).getPreHibernateLiquibaseChangeLog();
                     } else {
-                        changeLog = ((HibernateDataMigration)migration.dataMigration).getLiquibaseChangeLog();
+                        changeLog = ((HibernateDataMigration) migration.dataMigration).getLiquibaseChangeLog();
                     }
                     if (changeLog != null) {
                         changeLogs.append(changeLog);
@@ -241,13 +244,15 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
     /**
      * Run liquibase for a given set of change logs
-     * @param migrations    the set of migration to visit
-     * @param preHibernate  if true, use pre-hibernate schema update changelogs.
+     *
+     * @param migrations the set of migration to visit
+     * @param preHibernate if true, use pre-hibernate schema update changelogs.
      * @throws XWikiException
      * @throws DataMigrationException
      * @since 4.3
      */
-    private void liquibaseUpdate(Collection<XWikiMigration> migrations, boolean preHibernate) throws XWikiException, DataMigrationException
+    private void liquibaseUpdate(Collection<XWikiMigration> migrations, boolean preHibernate) throws XWikiException,
+        DataMigrationException
     {
         String liquibaseChangeLogs = getLiquibaseChangeLogs(migrations, preHibernate);
         if (liquibaseChangeLogs == null || liquibaseChangeLogs.length() == 0) {
@@ -256,11 +261,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
 
         final String database = getXWikiContext().getWikiId();
 
-        if (logger.isInfoEnabled()) {
-            if( preHibernate ) {
-                logger.info("Running early schema updates (using liquibase) for database [{}]", database);
+        if (this.logger.isInfoEnabled()) {
+            if (preHibernate) {
+                this.logger.info("Running early schema updates (using liquibase) for database [{}]", database);
             } else {
-                logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
+                this.logger.info("Running additional schema updates (using liquibase) for database [{}]", database);
             }
         }
 
@@ -336,7 +341,8 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     }
 
     @Override
-    protected void startMigrations() throws DataMigrationException {
+    protected void startMigrations() throws DataMigrationException
+    {
         XWikiContext context = getXWikiContext();
         XWikiHibernateBaseStore store = getStore();
 
@@ -357,7 +363,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected List<? extends DataMigration> getAllMigrations() throws DataMigrationException
     {
         try {
-            return componentManager.getInstanceList(HibernateDataMigration.class);
+            return this.componentManager.getInstanceList(HibernateDataMigration.class);
         } catch (ComponentLookupException e) {
             throw new DataMigrationException("Unable to retrieve the list of hibernate data migrations", e);
         }

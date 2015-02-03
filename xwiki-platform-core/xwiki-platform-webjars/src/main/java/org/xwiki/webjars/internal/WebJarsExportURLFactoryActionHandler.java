@@ -27,6 +27,7 @@ import java.net.JarURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -65,15 +66,20 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
     {
         // Example of URL:
-        // /xwiki/bin/webjars/resources/path?value=bootstrap/3.2.0/fonts/glyphicons-halflings-regular.eot
+        // /xwiki/bin/webjars/resources/path?value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
         // where:
         // - web = resources
         // - name = path
         // - action = webjars
-        // - querystring = value=bootstrap/3.2.0/fonts/glyphicons-halflings-regular.eot
+        // - querystring = value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
 
         // Copy the resources found in JARs on the filesystem
-        String resourceName = StringUtils.substringAfter(querystring, "value=");
+
+        // We need to decode the passed Query String because the query string passed to ExportURLFactory are always
+        // encoded. See XWikiURLFactory#createURL()'s javadoc for more details on why the query string is passed
+        // encoded.
+        String resourceName = URLDecoder.decode(StringUtils.substringAfter(querystring, "value="), "UTF-8");
+
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 
         copyResourceFromJAR(resourcePath, WEBJAR_PATH, factoryContext);

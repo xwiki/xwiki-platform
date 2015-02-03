@@ -37,10 +37,9 @@ import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Scriptable API for easy handling of users. For the moment this API is very limited, containing
- * only one method. In the future it should be extended to provide useful methods for working with
- * users.
- * 
+ * Scriptable API for easy handling of users. For the moment this API is very limited, containing only one method. In
+ * the future it should be extended to provide useful methods for working with users.
+ *
  * @version $Id$
  * @since Platform-1.0
  */
@@ -48,21 +47,21 @@ public class User extends Api
 {
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(User.class);
-    
+
     /** User class reference. */
     private static final EntityReference USERCLASS_REFERENCE = new EntityReference("XWikiUsers", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
-    
+        new EntityReference("XWiki", EntityType.SPACE));
+
     /** Reference resolver. */
     private static final DocumentReferenceResolver<String> REFERENCE_RESOLVER = Utils.getComponent(
-            DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /** The wrapped XWikiUser object. */
     private XWikiUser user;
 
     /**
      * Constructs a wrapper for the given protected XWikiUser object.
-     * 
+     *
      * @param user The XWikiUser object that should be wrapper.
      * @param context The current {@link XWikiContext context}.
      */
@@ -74,26 +73,24 @@ public class User extends Api
 
     /**
      * Expose the wrapped XWikiUser object. Requires programming rights.
-     * 
-     * @return The wrapped XWikiUser object, or <tt>null</tt> if the user does not have
-     *         programming rights.
+     *
+     * @return The wrapped XWikiUser object, or <tt>null</tt> if the user does not have programming rights.
      */
     @Programming
     public XWikiUser getUser()
     {
         if (hasProgrammingRights()) {
-            return user;
+            return this.user;
         }
         return null;
     }
 
     /**
-     * Check if the user belongs to a group or not.
-     * This method only check direct membership (no recursive checking) in the current wiki.
-     * 
+     * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
+     * the current wiki.
+     *
      * @param groupName The group to check.
-     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if
-     *         an exception occurs.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
      */
     public boolean isUserInGroup(String groupName)
     {
@@ -106,7 +103,7 @@ public class User extends Api
             }
         } catch (Exception ex) {
             LOGGER.warn(new MessageFormat("Unhandled exception while checking if user {0}"
-                + " belongs to group {1}").format(new java.lang.Object[] {user, groupName}), ex);
+                + " belongs to group {1}").format(new java.lang.Object[] { this.user, groupName }), ex);
         }
         return result;
     }
@@ -118,21 +115,19 @@ public class User extends Api
      * <p>
      * This method is not public, as the underlying implementation is not fully functional
      * </p>
-     * 
+     *
      * @return <tt>true</tt> if the user is global, false otherwise or if an exception occurs.
      */
     protected boolean isMain()
     {
-        return user.isMain();
+        return this.user.isMain();
     }
 
     /**
-     * API to retrieve the e-mail address of this user. This e-mail address is taken from the user
-     * profile. If the user hasn't changed his profile, then this is the e-mail address he filled in
-     * the registration form.
-     * 
-     * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error
-     *         retrieving the email.
+     * API to retrieve the e-mail address of this user. This e-mail address is taken from the user profile. If the user
+     * hasn't changed his profile, then this is the e-mail address he filled in the registration form.
+     *
+     * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error retrieving the email.
      * @since 1.1.3
      * @since 1.2.2
      * @since 1.3M2
@@ -141,7 +136,7 @@ public class User extends Api
     {
         XWikiDocument userDoc;
         try {
-            userDoc = getXWikiContext().getWiki().getDocument(user.getUser(), getXWikiContext());
+            userDoc = getXWikiContext().getWiki().getDocument(this.user.getUser(), getXWikiContext());
             BaseObject obj = userDoc.getObject("XWiki.XWikiUsers");
             return obj.getStringValue("email");
         } catch (Exception e) {
@@ -151,24 +146,24 @@ public class User extends Api
             return null;
         }
     }
-    
+
     /**
-     * Check if the password passed as argument is the user password. This method is used when a user
-     * wants to change its password. To make sure that it wouldn't be used to perform brute force attacks,
-     * we ensure that this is only used to check the current user password on its profile page.
-     * 
+     * Check if the password passed as argument is the user password. This method is used when a user wants to change
+     * its password. To make sure that it wouldn't be used to perform brute force attacks, we ensure that this is only
+     * used to check the current user password on its profile page.
+     *
      * @param password Password submitted.
      * @return true if password is really the user password.
      * @throws XWikiException error if authorization denied.
      */
     public boolean checkPassword(String password) throws XWikiException
     {
-        EntityReference userReference = REFERENCE_RESOLVER.resolve(user.getUser());
+        EntityReference userReference = REFERENCE_RESOLVER.resolve(this.user.getUser());
         EntityReference docReference = getXWikiContext().getDoc().getDocumentReference();
         if (userReference.equals(getXWikiContext().getUserReference()) && userReference.equals(docReference)) {
             try {
                 boolean result = false;
-                
+
                 XWikiDocument userDoc = getXWikiContext().getWiki().getDocument(userReference, getXWikiContext());
                 BaseObject obj = userDoc.getXObject(USERCLASS_REFERENCE);
                 // We only allow empty password from users having a XWikiUsers object.

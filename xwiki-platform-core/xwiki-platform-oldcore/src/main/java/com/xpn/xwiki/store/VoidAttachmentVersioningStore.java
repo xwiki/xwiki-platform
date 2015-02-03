@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * Void store for attachment versioning when it is disabled. ("xwiki.store.attachment.versioning=0" parameter is set in
  * xwiki.cfg) It says what there is only one version of attachment - latest. It doesn't store anything. It is safe to
  * use with any stores.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -48,7 +48,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**
      * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
-     * 
+     *
      * @param context The current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.class) instead.
      */
@@ -105,7 +105,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 
         /**
          * Helper constructor.
-         * 
+         *
          * @param attachment attachment of this archive
          */
         public VoidAttachmentArchive(XWikiAttachment attachment)
@@ -156,7 +156,7 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
         @Override
         public Version[] getVersions()
         {
-            return new Version[] {getAttachment().getRCSVersion()};
+            return new Version[] { getAttachment().getRCSVersion() };
         }
 
         /**

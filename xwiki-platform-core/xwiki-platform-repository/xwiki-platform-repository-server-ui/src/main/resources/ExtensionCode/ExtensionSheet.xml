@@ -414,23 +414,18 @@
         [[View Source&gt;&gt;$source||class="extension-link small-extension-link source-extension"]]
       #end
       ##------- Download button ------
-      ## Get the last ExtensionVersion object and consider it corresponds to the last version
-      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
-      #if (!$versions.isEmpty())
-        #set ($latestVersion = $versions.lastElement())
+      #set($lastVersion = $doc.getValue("lastVersion"))
+      #if ("$!lastVersion" != '')
+        #set ($lastVersionObject = $doc.getObject("ExtensionCode.ExtensionVersionClass", 'version', $lastVersion))
 
-        #set ($version = $!{latestVersion.getProperty('version').value})
-        #if ("$!version" == '')
-          [[Download&gt;&gt;$latestVersion.getProperty("download").getValue()||class="extension-link small-extension-link download-extension"]]
-        #else
-          #set($download = $latestVersion.getProperty("download").getValue())
-          #if ("$!download" == '')
-            #if ($doc.getAttachment("${id}-${version}.${type}"))
-              [[Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="extension-link small-extension-link download-extension"]]
-            #end
-          #else
-            [[Download v$version&gt;&gt;$latestVersion.getProperty("download").getValue()||class="extension-link small-extension-link download-extension"]]
+        #set ($version = $lastVersionObject.getProperty('version').value)
+        #set ($download = $lastVersionObject.getProperty("download").value)
+        #if ("$!download" == '')
+          #if ($doc.getAttachment("${id}-${version}.${type}"))
+            [[Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="extension-link small-extension-link download-extension"]]
           #end
+        #else
+          [[Download v$version&gt;&gt;$download||class="extension-link small-extension-link download-extension"]]
         #end
       #end
     {{/box}}
@@ -495,7 +490,7 @@
       $doc.display("description")
     #end
 
-    #if ($extensionTypeObject &amp;&amp; $latestVersion &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
+    #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')
       #set($standardInstallation = "$!{extensionTypeObject.getProperty('installation').value}")
     #else
       #set($standardInstallation = '')
@@ -530,8 +525,9 @@
     #end
 
     ## Only display release notes if there are downloads and release notes
-    #if ($latestVersion)
+    #if ($lastVersionObject)
       #set ($releaseNotes = [])
+      #set ($versions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
       #foreach ($versionObject in $versions)
         #set ($notes = $!{versionObject.getProperty('notes').value})
         #set ($version = $!{versionObject.getProperty('version').value})
@@ -549,7 +545,7 @@
         #end
       #end
 
-      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $latestVersion.version))
+      #set($extensionDependencies = $doc.getObjects('ExtensionCode.ExtensionDependencyClass', 'extensionVersion', $lastVersionObject.version))
       #if ($extensionDependencies.size() &gt; 0)
         = Dependencies =
 

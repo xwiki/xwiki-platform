@@ -20,7 +20,6 @@
 package org.xwiki.activeinstalls;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration properties for the Active Installs module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface ActiveInstallsConfiguration
 {
     /**

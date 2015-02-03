@@ -20,6 +20,7 @@
 package org.xwiki.mail;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -38,42 +39,39 @@ public interface MailStatusStore
      * Saves mail status in the store.
      *
      * @param status the mail status to be saved
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
      * @throws MailStoreException when an error occurs saving the data
      */
-    void save(MailStatus status) throws MailStoreException;
+    void save(MailStatus status, Map<String, Object> parameters) throws MailStoreException;
 
     /**
-     * Load a message status from the store.
+     * Loads all message statuses matching the passed filters.
      *
-     * @param messageId the id of the message to load
-     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
+     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @param offset the number of rows to skip (0 means don't skip any row)
+     * @param count the number of rows to return. If 0 then all rows are returned
+     * @return the loaded {@link org.xwiki.mail.MailStatus} instances
      * @throws MailStoreException when an error occurs when loading the data
      */
-    MailStatus loadFromMessageId(String messageId) throws MailStoreException;
+    List<MailStatus> load(Map<String, Object> filterMap, int offset, int count) throws MailStoreException;
 
     /**
-     * @param batchId the batch id of the message statuses to load
-     * @return the number of emails matching the passed batch id from the store.
-     * @throws MailStoreException when an error occurs when loading the data
-     */
-    long count(String batchId) throws MailStoreException;
-
-    /**
-     * Loads all message statuses matching the passed state and batch id from the store.
+     * Count the number of message statuses matching the passed filters.
      *
-     * @param batchId the batch id of the message statuses to load
-     * @param state the state to match (only statuses having that state will be loaded)
-     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
+     * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
+     * @return the number of emails matching the passed filters
      * @throws MailStoreException when an error occurs when loading the data
      */
-    List<MailStatus> loadFromBatchId(String batchId, MailState state) throws MailStoreException;
+    long count(Map<String, Object> filterMap) throws MailStoreException;
 
     /**
-     * Loads all message statuses matching the passed batch id from the store.
+     * Delete a message.
      *
-     * @param batchId the batch id of the message statuses to load
-     * @return the loaded {@link org.xwiki.mail.MailStatus} instance
-     * @throws MailStoreException when an error occurs when loading the data
+     * @param messageId the id of the message to delete
+     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
+     *        the {@code wiki} key)
+     * @throws MailStoreException when an error occurs deleting the message
      */
-    List<MailStatus> loadFromBatchId(String batchId) throws MailStoreException;
+    void delete(String messageId, Map<String, Object> parameters) throws MailStoreException;
 }

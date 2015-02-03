@@ -41,7 +41,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Fix any existing mistake with document translation field. It should be synchronized with the language.
  * <p>
  * This kind of mistake should not be possible anymore with the fix for XWIKI-11110.
- * 
+ *
  * @version $Id$
  * @since 5.4.6
  */

@@ -33,7 +33,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 /**
  * Provide current {@link XWikiContext} or create one from {@link XWikiStubContextProvider} if there is no current one
  * yet.
- * 
+ *
  * @version $Id$
  */
 @Component

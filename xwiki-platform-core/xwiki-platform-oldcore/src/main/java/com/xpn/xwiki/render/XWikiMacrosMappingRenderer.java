@@ -180,8 +180,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
             String[] macrolanguages =
                 StringUtils.split(xcontext.getWiki()
                     .getXWikiPreference("macros_languages", "velocity,groovy", xcontext), ", ");
-            for (int i = 0; i < macrolanguages.length; i++) {
-                String language = macrolanguages[i];
+            for (String language : macrolanguages) {
                 this.macros_libraries
                     .put(
                         language,
@@ -192,9 +191,9 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
 
             String macrosmapping = xcontext.getWiki().getMacroList(xcontext);
             String[] mappings = StringUtils.split(macrosmapping, "\r\n");
-            for (int i = 0; i < mappings.length; i++) {
+            for (String mapping : mappings) {
                 try {
-                    XWikiVirtualMacro macro = new XWikiVirtualMacro(mappings[i]);
+                    XWikiVirtualMacro macro = new XWikiVirtualMacro(mapping);
                     if (!macro.getName().equals("")) {
                         if (!macro.getFunctionName().equals("")) {
                             this.macros_mappings.put(macro.getName(), macro);
@@ -203,7 +202,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error reading macro mapping " + mappings[i], e);
+                    LOGGER.error("Error reading macro mapping " + mapping, e);
                 }
             }
         }

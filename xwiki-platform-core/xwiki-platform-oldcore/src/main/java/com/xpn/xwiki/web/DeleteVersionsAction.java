@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * Struts action for deleting document versions.
- * 
+ *
  * @version $Id$
  */
 public class DeleteVersionsAction extends XWikiAction
@@ -94,7 +94,7 @@ public class DeleteVersionsAction extends XWikiAction
 
     /**
      * redirect back to view history.
-     * 
+     *
      * @param context used in redirecting
      * @throws XWikiException if any error
      */

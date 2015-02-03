@@ -66,8 +66,8 @@ public class ExportURLFactoryContext
     private Set<String> exportedSkinFiles = new HashSet<>();
 
     /**
-     * Adds "../" prefixes to the passed path for adjusting the path so that it's relative to where the CSS file
-     * it's contained in.
+     * Adds "../" prefixes to the passed path for adjusting the path so that it's relative to where the CSS file it's
+     * contained in.
      *
      * @param builder the path to adjust
      */

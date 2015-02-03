@@ -33,7 +33,7 @@ import org.xwiki.observation.event.EndEvent;
  * plugin)</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
- * 
+ *
  * @version $Id$
  */
 public class XARImportedEvent extends AbstractFilterableEvent implements EndEvent

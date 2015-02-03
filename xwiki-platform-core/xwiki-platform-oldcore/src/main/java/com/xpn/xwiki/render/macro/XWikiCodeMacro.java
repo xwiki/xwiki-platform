@@ -43,12 +43,12 @@
  */
 package com.xpn.xwiki.render.macro;
 
-import org.radeox.macro.CodeMacro;
-import org.radeox.macro.parameter.MacroParameter;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.Writer;
+
+import org.apache.commons.lang3.StringUtils;
+import org.radeox.macro.CodeMacro;
+import org.radeox.macro.parameter.MacroParameter;
 
 /**
  * The Code Macro renders its content as is but pretty printed according to the language passed as parameter. Supporting

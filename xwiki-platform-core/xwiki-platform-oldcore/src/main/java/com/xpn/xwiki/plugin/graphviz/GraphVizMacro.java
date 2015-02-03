@@ -76,7 +76,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  * itself, there's no need for an extra map tag.</li>
  * </ol>
  * </p>
- * 
+ *
  * @version $Id$
  */
 public class GraphVizMacro extends BaseLocaleMacro
@@ -121,9 +121,9 @@ public class GraphVizMacro extends BaseLocaleMacro
         String dottext = params.getContent();
 
         // please KEEP THE ARRAYS SORTED
-        final String[] embedTagFormats = new String[] {"svg", "svgz"};
+        final String[] embedTagFormats = new String[] { "svg", "svgz" };
         final String[] plainTextFormats =
-            new String[] {"canon", "cmapx", "cmapx_np", "dot", "imap", "imap_np", "plain", "plain-ext", "xdot"};
+            new String[] { "canon", "cmapx", "cmapx_np", "dot", "imap", "imap_np", "plain", "plain-ext", "xdot" };
 
         if (Arrays.binarySearch(plainTextFormats, format) >= 0) {
             // Producing plain text output
@@ -141,7 +141,7 @@ public class GraphVizMacro extends BaseLocaleMacro
 
     /**
      * Write the markup needed for an embedded output.
-     * 
+     *
      * @param writer where to write
      * @param height the image height
      * @param width the image width
@@ -172,7 +172,7 @@ public class GraphVizMacro extends BaseLocaleMacro
 
     /**
      * Write the markup needed for image output.
-     * 
+     *
      * @param writer where to write
      * @param dottext the dot source
      * @param dot which engine to execute: {@code dot} if {@code true}, {@code neato} if {@code false}
@@ -222,7 +222,7 @@ public class GraphVizMacro extends BaseLocaleMacro
 
     /**
      * Write the attributes needed for an image output.
-     * 
+     *
      * @param writer where to write
      * @param resultURL the URL from where the image can be retrieved
      * @param title the title (tooltip) to show over the image
@@ -248,7 +248,7 @@ public class GraphVizMacro extends BaseLocaleMacro
     /**
      * Write some attributes into the output. {@code null} or the special value {@code "none"} represents that a
      * specific attribute should not be written.
-     * 
+     *
      * @param writer where to write
      * @param title the optional title attribute value
      * @param height the optional height attribute value
@@ -276,7 +276,7 @@ public class GraphVizMacro extends BaseLocaleMacro
 
     /**
      * Checks if a parameter came with a '=' sign and return null in the case. Else, returns the parameter itself.
-     * 
+     *
      * @param radeoxParam the raw value of the macro parameter
      * @return String
      */

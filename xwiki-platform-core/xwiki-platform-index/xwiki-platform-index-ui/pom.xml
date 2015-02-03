@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-index</artifactId>
-    <version>6.4-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-index-ui</artifactId>
   <name>XWiki Platform - Index - UI</name>
@@ -85,6 +85,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-script</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- The document tree macro uses FontAwesome for the node icons. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-fontawesome</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

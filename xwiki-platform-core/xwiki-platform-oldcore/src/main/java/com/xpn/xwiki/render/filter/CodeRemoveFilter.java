@@ -19,20 +19,20 @@
  */
 package com.xpn.xwiki.render.filter;
 
+import java.util.LinkedList;
+
 import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.RegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
-import java.util.LinkedList;
-
 /**
- * Escape everything inside the {code} macro so that its content isn't rendered. This filter needs to 
- * configured to run first in the Radeox com.xpn.xwiki.render.filter.XWikiFilter configuration file.
+ * Escape everything inside the {code} macro so that its content isn't rendered. This filter needs to configured to run
+ * first in the Radeox com.xpn.xwiki.render.filter.XWikiFilter configuration file.
  */
 public class CodeRemoveFilter extends RegexTokenFilter
 {
-	public static final String CODE_MACRO_CONTENT = "codeMacroContent";
-	
+    public static final String CODE_MACRO_CONTENT = "codeMacroContent";
+
     public CodeRemoveFilter()
     {
         super("(\\{(code)(?::([^\\}]*))?\\})(.*?)\\{code}", MULTILINE);
@@ -41,8 +41,8 @@ public class CodeRemoveFilter extends RegexTokenFilter
     @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
-    	// Remove the content inside the code macro. It'll be put back in CodeRestoreFilter
-    	// We save the content in the Filter context so that it can restored later on.
+        // Remove the content inside the code macro. It'll be put back in CodeRestoreFilter
+        // We save the content in the Filter context so that it can restored later on.
 
         // Important: This filter is called for all code macros on the page before the restore
         // filter is called. Thus we need to save the removed content for ALL code macros and this
@@ -54,7 +54,7 @@ public class CodeRemoveFilter extends RegexTokenFilter
         }
 
         contentList.add(result.group(4));
-    	buffer.append(result.group(1));
-    	buffer.append("{code}");
+        buffer.append(result.group(1));
+        buffer.append("{code}");
     }
 }

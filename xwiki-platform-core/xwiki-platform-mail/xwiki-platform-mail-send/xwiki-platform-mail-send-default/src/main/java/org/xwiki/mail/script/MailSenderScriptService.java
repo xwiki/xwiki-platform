@@ -161,7 +161,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
         // Find the Type of the MimeMessageFactory to look up. If the type is passed as parameters then use it,
         // otherwise try to guess it.
         Type sourceType;
-        Object sourceTypeAsObject = parameters.get("type");
+        Object sourceTypeAsObject = parameters.get("sourceType");
         if (sourceTypeAsObject == null) {
             // No "type" defined by the user, try to guess it!
             // If the passed source extends List then consider that the type is List.

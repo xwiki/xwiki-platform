@@ -130,7 +130,7 @@ public class MailSenderScriptServiceTest
         when(cm.getInstance(type, "users/secure")).thenReturn(factory);
 
         String typeAsString = String.format("%s<%s>", List.class.getName(), DocumentReference.class.getName());
-        Map<String, Object> parameters = Collections.<String, Object>singletonMap("type", typeAsString);
+        Map<String, Object> parameters = Collections.<String, Object>singletonMap("sourceType", typeAsString);
 
         ConverterManager converterManager = this.mocker.getInstance(ConverterManager.class);
         when(converterManager.convert(Type.class, typeAsString)).thenReturn(
@@ -139,5 +139,6 @@ public class MailSenderScriptServiceTest
         this.mocker.getComponentUnderTest().createMessages("users", users, parameters);
 
         verify(cm).getInstance(type, "users/secure");
+        verify(converterManager).convert(Type.class, typeAsString);
     }
 }

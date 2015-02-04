@@ -20,11 +20,13 @@
 package org.xwiki.skin;
 
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 7.0M1
  */
+@Unstable
 public interface Resource<I extends InputSource>
 {
     ResourceRepository getRepository();

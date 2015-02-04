@@ -587,12 +587,24 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         // Since the passed URL has been potentially modified by HttpServletResponse.encodeURL() we also need to call
         // encodeURL on urlPrefix to have a matching result.
+        // Note that this allows rewrite filters to customize the URL as they wish (adding jsessionid,
+        // query string, etc). If the webapp is installed as root this means that they can add a leading slash,
+        // transforming for example "http://server" into "http://server/?jsessionid=xxx".
         String encodedUrlPrefix = context.getResponse().encodeURL(urlPrefix);
+
         // Remove a potential jsessionid in the URL
         encodedUrlPrefix = encodedUrlPrefix.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+
         // Also remove any query string that might have been added by an outbound URL rewrite rule
         encodedUrlPrefix = StringUtils.substringBeforeLast(encodedUrlPrefix, "?");
 
-        return StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
+        // Since the encodeURL can potentially add a trailing slash, make sure that the relative URL we return always
+        // start with a leadig slash.
+        String strippedURL = StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
+        if (!strippedURL.startsWith("/")) {
+            strippedURL = "/" + strippedURL;
+        }
+
+        return strippedURL;
     }
 }

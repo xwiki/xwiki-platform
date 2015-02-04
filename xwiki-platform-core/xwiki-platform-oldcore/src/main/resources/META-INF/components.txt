@@ -48,8 +48,8 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.skin.DefaultSkinManager
+com.xpn.xwiki.internal.skin.InternalSkinConfiguration
 com.xpn.xwiki.internal.skin.InternalSkinManager
-com.xpn.xwiki.internal.skin.SkinConfiguration
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.internal.template.DefaultTemplateManager

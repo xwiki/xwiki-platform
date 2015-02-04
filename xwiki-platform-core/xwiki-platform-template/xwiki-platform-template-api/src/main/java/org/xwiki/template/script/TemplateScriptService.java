@@ -60,6 +60,7 @@ public class TemplateScriptService implements ScriptService
      * The current transformation id is used.
      *
      * @param template the template name
+     * @throws Exception when failing to execute the template
      */
     public void execute(String template) throws Exception
     {

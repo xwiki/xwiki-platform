@@ -132,9 +132,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceReferenceResolver;
@@ -172,9 +174,8 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
-import com.xpn.xwiki.internal.template.InternalTemplateManager;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -383,9 +384,11 @@ public class XWiki implements EventListener
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
 
-    private InternalSkinManager skinManager;
+    private InternalSkinManager internalSkinManager;
 
     private TemplateManager templateManager;
+
+    private RenderingContext renderingContext;
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -442,13 +445,13 @@ public class XWiki implements EventListener
         return this.userConfiguration;
     }
 
-    private InternalSkinManager getSkinManager()
+    private InternalSkinManager getInternalSkinManager()
     {
-        if (this.skinManager == null) {
-            this.skinManager = Utils.getComponent(InternalSkinManager.class);
+        if (this.internalSkinManager == null) {
+            this.internalSkinManager = Utils.getComponent(InternalSkinManager.class);
         }
 
-        return this.skinManager;
+        return this.internalSkinManager;
     }
 
     private TemplateManager getTemplateManager()
@@ -458,6 +461,25 @@ public class XWiki implements EventListener
         }
 
         return this.templateManager;
+    }
+
+    private RenderingContext getRenderingContext()
+    {
+        if (this.renderingContext == null) {
+            this.renderingContext = Utils.getComponent(RenderingContext.class);
+        }
+
+        return this.renderingContext;
+    }
+
+    private MutableRenderingContext getMutableRenderingContext()
+    {
+        if (this.renderingContext == null) {
+            this.renderingContext = Utils.getComponent(RenderingContext.class);
+        }
+
+        return this.renderingContext instanceof MutableRenderingContext
+            ? (MutableRenderingContext) this.renderingContext : null;
     }
 
     private ObservationManager getObservationManager()
@@ -1074,8 +1096,8 @@ public class XWiki implements EventListener
     {
         String storeclass = getConfiguration().getProperty(param, defClass);
         try {
-            Class<?>[] classes = new Class<?>[] { XWikiContext.class };
-            Object[] args = new Object[] { context };
+            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
+            Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
         } catch (Exception e) {
@@ -1083,7 +1105,7 @@ public class XWiki implements EventListener
             if (e instanceof InvocationTargetException) {
                 ecause = ((InvocationTargetException) e).getTargetException();
             }
-            Object[] args = { param, storeclass };
+            Object[] args = {param, storeclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR, "Cannot load class {1} from param {0}", ecause,
                 args);
@@ -1709,38 +1731,61 @@ public class XWiki implements EventListener
      * @return the return of the velocity script
      * @throws IOException failed to get the template content
      * @since 2.2.2
+     * @deprecated since 7.0M1, use {@link TemplateManager#render(String)} instead
      */
+    @Deprecated
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
+        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
+
+        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
         try {
+            // Force rendering with XHTML 1.0 syntax for retro-compatibility
+            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+
             return getTemplateManager().render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
-            Object[] args = { template };
+            Object[] args = {template};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
                     "Error while evaluating velocity template {0}", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
+        } finally {
+            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
-    public String parseTemplate(String template, String skin, XWikiContext context)
+    /**
+     * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin(String, Skin)} instead
+     */
+    @Deprecated
+    public String parseTemplate(String template, String skinId, XWikiContext context)
     {
+        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
+
+        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
         try {
+            // Force rendering with XHTML 1.0 syntax for retro-compatibility
+            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+
+            Skin skin = getInternalSkinManager().getSkin(skinId);
             return getTemplateManager().renderFromSkin(template, skin);
         } catch (Exception e) {
-            LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
+            LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skinId, e);
 
-            Object[] args = { template, skin };
+            Object[] args = {template, skinId};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
                     "Error while evaluating velocity template [{0}] from skin [{1}]", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
+        } finally {
+            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
@@ -1811,7 +1856,7 @@ public class XWiki implements EventListener
 
         try {
             // Try in the specified skin
-            Skin skin = getSkinManager().getCurrentSkin(true);
+            Skin skin = getInternalSkinManager().getCurrentSkin(true);
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
@@ -1819,7 +1864,7 @@ public class XWiki implements EventListener
                 }
             } else {
                 // Try in the current parent skin
-                Skin parentSkin = getSkinManager().getCurrentParentSkin(true);
+                Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
@@ -1857,7 +1902,7 @@ public class XWiki implements EventListener
     public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
     {
         try {
-            Skin skin = getSkinManager().getSkin(skinId);
+            Skin skin = getInternalSkinManager().getSkin(skinId);
 
             Resource<?> resource = skin.getLocalResource(filename);
 
@@ -1884,12 +1929,13 @@ public class XWiki implements EventListener
     /**
      * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} instead
      */
+    @Deprecated
     public String getSkin(XWikiContext context)
     {
         String skin;
 
         try {
-            skin = getSkinManager().getCurrentSkinId(true);
+            skin = getInternalSkinManager().getCurrentSkinId(true);
         } catch (Exception e) {
             LOGGER.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
@@ -1939,7 +1985,7 @@ public class XWiki implements EventListener
     @Deprecated
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        return getSkinManager().getDefaultParentSkinId();
+        return getInternalSkinManager().getDefaultParentSkinId();
     }
 
     /**
@@ -1959,7 +2005,7 @@ public class XWiki implements EventListener
     {
         String baseskin = "";
         try {
-            return getSkinManager().getCurrentParentSkinId(false);
+            return getInternalSkinManager().getCurrentParentSkinId(false);
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
 
@@ -1975,10 +2021,12 @@ public class XWiki implements EventListener
      * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2
      * @since 2.1M1
+     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} and {@link Skin#getParent()} instead
      */
+    @Deprecated
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        String baseSkin = getSkinManager().getParentSkin(skin);
+        String baseSkin = getInternalSkinManager().getParentSkin(skin);
 
         return baseSkin != null ? baseSkin : "";
     }
@@ -2923,13 +2971,13 @@ public class XWiki implements EventListener
             }
 
             if (withValidation) {
-                map.put("active", new String[] { "0" });
+                map.put("active", new String[] {"0"});
                 validkey = generateValidationKey(16);
-                map.put("validkey", new String[] { validkey });
+                map.put("validkey", new String[] {validkey});
 
             } else {
                 // Mark user active
-                map.put("active", new String[] { "1" });
+                map.put("active", new String[] {"1"});
             }
 
             int result =
@@ -3194,7 +3242,7 @@ public class XWiki implements EventListener
 
             return 1;
         } catch (Exception e) {
-            Object[] args = { "XWiki." + userName };
+            Object[] args = {"XWiki." + userName};
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_CREATE,
                 "Cannot create user {0}", e, args);
         }
@@ -4316,7 +4364,7 @@ public class XWiki implements EventListener
             // We need to check rights before we look for translations
             // Otherwise we don't have the user language
             if (checkAccess(context.getAction(), doc, context) == false) {
-                Object[] args = { doc.getFullName(), context.getUser() };
+                Object[] args = {doc.getFullName(), context.getUser()};
                 setPhonyDocument(reference, context, vcontext);
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                     "Access to document {0} has been denied to user {1}", null, args);
@@ -4347,7 +4395,7 @@ public class XWiki implements EventListener
                     }
                 }
                 if (!allow) {
-                    Object[] args = { context.getUser() };
+                    Object[] args = {context.getUser()};
                     setPhonyDocument(reference, context, vcontext);
                     throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                         XWikiException.ERROR_XWIKI_USER_INACTIVE, "User {0} account is inactive", null, args);
@@ -4599,7 +4647,7 @@ public class XWiki implements EventListener
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+                                    .getConstructor(new Class<?>[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -6426,7 +6474,7 @@ public class XWiki implements EventListener
         try {
             initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
         } catch (FileNotFoundException e) {
-            Object[] args = { xwikicfgpath };
+            Object[] args = {xwikicfgpath};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
         }

@@ -23,19 +23,42 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.stability.Unstable;
 
 /**
+ * @param <I> the type of the {@link InputSource}
  * @version $Id$
  * @since 7.0M1
  */
 @Unstable
 public interface Resource<I extends InputSource>
 {
+    /**
+     * @return the repository containing the resource
+     */
     ResourceRepository getRepository();
 
+    /**
+     * @return the unique identifier of the resource
+     */
     String getId();
 
+    /**
+     * @return the path of the resource
+     */
     String getPath();
 
+    /**
+     * Provide an {@link InputSource} to read the resource.
+     * 
+     * @return an {@link InputSource} to read the resource
+     * @throws Exception when failing to create a {@link InputSource} for the resource
+     */
     I getInputSource() throws Exception;
 
+    /**
+     * Create a URL for the resource.
+     * 
+     * @param forceSkinAction true if a dynamic skin URL should be forced
+     * @return a URL to the resource
+     * @throws Exception when failing to create a URL for the resource
+     */
     String getURL(boolean forceSkinAction) throws Exception;
 }

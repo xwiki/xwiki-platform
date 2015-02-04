@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.template;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +54,7 @@ import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyId;
@@ -72,6 +74,7 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.skin.Resource;
+import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
@@ -142,6 +145,9 @@ public class InternalTemplateManager
 
     @Inject
     private BeanManager beanManager;
+
+    @Inject
+    private ConverterManager converter;
 
     @Inject
     private SUExecutor suExecutor;
@@ -252,7 +258,7 @@ public class InternalTemplateManager
         @PropertyId("raw.syntax")
         public Syntax rawSyntax;
 
-        public Map<String, Object> properties = new HashMap<String, Object>();
+        protected Map<String, Object> properties = new HashMap<String, Object>();
 
         public DefaultTemplateContent(String content)
         {
@@ -266,6 +272,38 @@ public class InternalTemplateManager
             this(content);
 
             setAuthorReference(authorReference);
+        }
+
+        @Override
+        public Syntax getSourceSyntax()
+        {
+            return this.sourceSyntax;
+        }
+
+        @Override
+        public Syntax getRawSyntax()
+        {
+            return this.rawSyntax;
+        }
+
+        @Override
+        public <T> T getProperty(String name, T def)
+        {
+            if (!this.properties.containsKey(name)) {
+                return def;
+            }
+
+            if (def != null) {
+                return getProperty(name, def.getClass());
+            }
+
+            return (T) this.properties.get(name);
+        }
+
+        @Override
+        public <T> T getProperty(String name, Type type)
+        {
+            return converter.convert(type, this.properties.get(name));
         }
 
         protected void init()
@@ -532,9 +570,11 @@ public class InternalTemplateManager
         renderFromSkin(template, null, writer);
     }
 
-    public void renderFromSkin(final String templateName, Skin skin, final Writer writer) throws Exception
+    public void renderFromSkin(final String templateName, ResourceRepository reposirory, final Writer writer)
+        throws Exception
     {
-        final Template template = skin != null ? getTemplate(templateName, skin) : getTemplate(templateName);
+        final Template template =
+            reposirory != null ? getTemplate(templateName, reposirory) : getTemplate(templateName);
 
         if (template != null) {
             final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
@@ -709,9 +749,9 @@ public class InternalTemplateManager
         return template;
     }
 
-    public Template getSkinTemplate(String templateName, Skin skin)
+    public Template getResourceTemplate(String templateName, ResourceRepository repository)
     {
-        Resource<?> resource = skin.getLocalResource(templateName);
+        Resource<?> resource = repository.getLocalResource(templateName);
         if (resource != null) {
             return createTemplate(resource);
         }
@@ -719,9 +759,9 @@ public class InternalTemplateManager
         return null;
     }
 
-    public Template getTemplate(String templateName, Skin skin)
+    public Template getTemplate(String templateName, ResourceRepository repository)
     {
-        Resource<?> resource = skin.getResource(templateName);
+        Resource<?> resource = repository.getResource(templateName);
         if (resource != null) {
             return createTemplate(resource);
         }

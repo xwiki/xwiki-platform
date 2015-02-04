@@ -28,11 +28,30 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface ResourceRepository
 {
+    /**
+     * @return the parent of the resource repository used to fallback
+     */
     ResourceRepository getParent();
 
+    /**
+     * @return the identifier of the repository
+     */
     String getId();
 
+    /**
+     * Get the resource associated to the provided name. If none is found in the resource repository fallback on parent
+     * repository.
+     * 
+     * @param resourceName the name of the resource to search
+     * @return the found resource, null if none could be found
+     */
     Resource<?> getResource(String resourceName);
 
+    /**
+     * Get the resource associated to the provided name. Does not fallback on parent repository.
+     * 
+     * @param resourceName the name of the resource to search
+     * @return the found resource, null if none could be found
+     */
     Resource<?> getLocalResource(String resourceName);
 }

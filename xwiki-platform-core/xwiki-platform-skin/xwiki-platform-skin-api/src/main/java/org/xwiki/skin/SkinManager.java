@@ -30,11 +30,31 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface SkinManager
 {
+    /**
+     * @param id the id of the skin
+     * @return the skin with the provided id
+     */
     Skin getSkin(String id);
 
+    /**
+     * Return the current skin.
+     * 
+     * @param testRights true if it should make sure to return a skin accessible to current user
+     * @return the skin
+     */
     Skin getCurrentSkin(boolean testRights);
 
+    /**
+     * Return the default skin.
+     * 
+     * @return the default skin
+     */
     Skin getDefaultSkin();
 
+    /**
+     * Return the default skin to use as parent for other skins.
+     * 
+     * @return the default parent skin
+     */
     Skin getDefaultParentSkin();
 }

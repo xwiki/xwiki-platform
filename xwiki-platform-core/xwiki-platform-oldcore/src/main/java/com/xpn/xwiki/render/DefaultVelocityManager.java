@@ -45,6 +45,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.template.event.TemplateDeletedEvent;
@@ -122,6 +124,9 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
     private Provider<TemplateManager> templates;
 
     @Inject
+    private SkinManager skinManager;
+
+    @Inject
     private ObservationManager observation;
 
     @Inject
@@ -194,12 +199,12 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
      * @return the key used to cache the Velocity Engines. We have one Velocity Engine per skin which has a macros.vm
      *         file on the filesystem. Right now we don't support macros.vm defined in custom skins in wiki pages.
      */
-    private Template getVelocityEngineMacrosTemplate(XWikiContext xcontext)
+    private Template getVelocityEngineMacrosTemplate()
     {
         Template template = null;
         Map<String, Template> templateCache = null;
 
-        String currentSkin = xcontext.getWiki().getSkin(xcontext);
+        Skin currentSkin = this.skinManager.getCurrentSkin(true);
 
         // Generating this key is very expensive so we cache it in the context
         ExecutionContext econtext = this.execution.getContext();
@@ -209,7 +214,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
                 templateCache = new HashMap<>();
                 econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, templateCache);
             } else {
-                template = templateCache.get(currentSkin);
+                template = templateCache.get(currentSkin.getId());
             }
         }
 
@@ -217,7 +222,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
             template = this.templates.get().getTemplate("macros.vm");
 
             if (templateCache != null) {
-                templateCache.put(currentSkin, template);
+                templateCache.put(currentSkin.getId(), template);
             }
         }
 
@@ -246,7 +251,7 @@ public class DefaultVelocityManager implements VelocityManager, Initializable
 
         final Template template;
         if (xcontext != null && xcontext.getWiki() != null) {
-            template = getVelocityEngineMacrosTemplate(xcontext);
+            template = getVelocityEngineMacrosTemplate();
         } else {
             template = null;
         }

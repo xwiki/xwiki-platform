@@ -38,6 +38,8 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityConfiguration;
@@ -93,12 +95,16 @@ public class DefaultVelocityManagerTest
         ExecutionContext executionContext = new ExecutionContext();
         when(execution.getContext()).thenReturn(executionContext);
 
+        SkinManager skinManager = this.mocker.registerMockComponent(SkinManager.class);
+        Skin skin = mock(Skin.class);
+        when(skin.getId()).thenReturn("testskin");
+        when(skinManager.getCurrentSkin(true)).thenReturn(skin);
+
         XWikiContext xwikiContext = mock(XWikiContext.class);
         Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xwikiContext);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getSkin(any(XWikiContext.class))).thenReturn("testskin");
 
         VelocityFactory velocityFactory = this.mocker.getInstance(VelocityFactory.class);
         when(velocityFactory.hasVelocityEngine("default")).thenReturn(false);

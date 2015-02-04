@@ -30,9 +30,21 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface Template
 {
+    /**
+     * @return the identifier of the template
+     */
     String getId();
 
+    /**
+     * @return the path of the template
+     */
     String getPath();
 
+    /**
+     * Parse and return the template content.
+     * 
+     * @return the content of the template
+     * @throws Exception when failing to parse the template
+     */
     TemplateContent getContent() throws Exception;
 }

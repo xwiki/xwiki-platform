@@ -66,12 +66,6 @@ public class DefaultTemplateManager implements TemplateManager
     }
 
     @Override
-    public String renderFromSkin(String template, String skinId) throws Exception
-    {
-        return this.templateManager.renderFromSkin(template, skinId);
-    }
-
-    @Override
     public String renderFromSkin(String template, Skin skin) throws Exception
     {
         return this.templateManager.renderFromSkin(template, skin);
@@ -116,7 +110,7 @@ public class DefaultTemplateManager implements TemplateManager
     @Override
     public Template getSkinTemplate(String templateName, Skin skin)
     {
-        return this.templateManager.getSkinTemplate(templateName, skin);
+        return this.templateManager.getResourceTemplate(templateName, skin);
     }
 
     @Override

@@ -78,4 +78,16 @@ public interface LESSCache<T>
      * @param lessResourceReference reference of a LESS resource
      */
     void clearFromLESSResource(LESSResourceReference lessResourceReference);
+
+    /** 
+     * Create a Mutex for a cache entry, to be used by someone who need a Thread-Safe access to the cache.
+     *  
+     * @param lessResourceReference a reference to a LESS resource
+     * @param skin a reference to a Skin
+     * @param colorTheme a reference to a color theme 
+     * @return the mutex related to the 3 parameters
+     * 
+     * @since 6.4.1
+     */
+    Object getMutex(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme);
 }

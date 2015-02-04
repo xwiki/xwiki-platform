@@ -86,7 +86,7 @@ public class ComponentScriptService implements ScriptService
      * 
      * @return the Component Manager if the document has Programming Rights or null otherwise
      * @deprecated since 6.4.1, 6.2.6, use {@link #getContextComponentManager()} or
-     *             {@link #getRootContextComponentManager()} instead
+     *             {@link #getContextComponentManager()} instead
      */
     @Deprecated
     public ComponentManager getComponentManager()

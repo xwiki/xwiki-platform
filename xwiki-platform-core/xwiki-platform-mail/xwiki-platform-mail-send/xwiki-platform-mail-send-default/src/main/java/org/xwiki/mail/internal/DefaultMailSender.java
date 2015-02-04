@@ -22,6 +22,7 @@ package org.xwiki.mail.internal;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -35,11 +36,15 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
+import org.xwiki.mail.internal.thread.MailQueueManager;
+import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
+import org.xwiki.mail.internal.thread.MailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueItem;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 
 /**
- * Default implementation using the {@link DefaultMailSenderRunnable} to send emails asynchronously.
+ * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails asynchronously.
  *
  * @version $Id$
  * @since 6.1M2
@@ -48,6 +53,8 @@ import org.xwiki.model.ModelContext;
 @Singleton
 public class DefaultMailSender implements MailSender, Initializable
 {
+    private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
+
     @Inject
     private ComponentManager componentManager;
 
@@ -55,48 +62,77 @@ public class DefaultMailSender implements MailSender, Initializable
     private ModelContext modelContext;
 
     @Inject
-    private MailSenderRunnable mailSenderRunnable;
+    @Named("prepare")
+    private MailRunnable prepareMailRunnable;
 
     @Inject
-    private MailQueueManager mailQueueManager;
+    @Named("send")
+    private MailRunnable sendMailRunnable;
 
-    private Thread mailSenderThread;
+    @Inject
+    private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
+
+    @Inject
+    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
+
+    private Thread prepareMailThread;
+
+    private Thread sendMailThread;
 
     @Override
     public void initialize() throws InitializationException
     {
-        // Start the Mail Sending Thread
-        this.mailSenderThread = new Thread(this.mailSenderRunnable);
-        this.mailSenderThread.setName("Mail Sender Thread");
-        this.mailSenderThread.start();
+        // Step 1: Start the Mail Prepare Thread
+        this.prepareMailThread = new Thread(this.prepareMailRunnable);
+        this.prepareMailThread.setName("Mail Prepare Thread");
+        this.prepareMailThread.start();
+
+        // Step 2: Start the Mail Sender Thread
+        this.sendMailThread = new Thread(this.sendMailRunnable);
+        this.sendMailThread.setName("Mail Sender Thread");
+        this.sendMailThread.start();
     }
 
     @Override
     public MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session,
         MailListener listener)
     {
-        UUID batchId = UUID.randomUUID();
+        // If the session has specified a batch id, then use it! This can be used for example when resending email.
+        String batchId = session.getProperty(SESSION_BATCHID_KEY);
+        if (batchId == null) {
+            batchId = UUID.randomUUID().toString();
+        }
 
-        // Pass the current wiki so that the mail message will be prepared and sent in the context of that wiki.
+        // Pass the current wiki so that the mail message will be prepared and later sent in the context of that wiki.
         String wikiId = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
 
-        this.mailQueueManager.addToQueue(new MailSenderQueueItem(messages, session, listener, batchId, wikiId));
+        this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId, wikiId));
 
-        return new DefaultMailResult(batchId, this.mailQueueManager);
+        return new DefaultMailResult(batchId, this.sendMailQueueManager);
     }
 
     /**
-     * Stops the sending thread. Should be called when the application is stopped for a clean shutdown.
+     * Stops the Mail Prepare and Sender threads. Should be called when the application is stopped for a clean shutdown.
      *
-     * @throws InterruptedException if the thread failed to be stopped
+     * @throws InterruptedException if a thread fails to be stopped
      */
-    public void stopMailSenderThread() throws InterruptedException
+    public void stopMailThreads() throws InterruptedException
     {
-        this.mailSenderRunnable.stopProcessing();
+        // Step 1: Stop the Mail Sender Thread
+
+        this.sendMailRunnable.stopProcessing();
         // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
-        this.mailSenderThread.interrupt();
+        this.sendMailThread.interrupt();
         // Wait till the thread goes away
-        this.mailSenderThread.join();
+        this.sendMailThread.join();
+
+        // Step 2: Stop the Mail Prepare Thread
+
+        this.prepareMailRunnable.stopProcessing();
+        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
+        this.prepareMailThread.interrupt();
+        // Wait till the thread goes away
+        this.prepareMailThread.join();
     }
 
     private MailListener getListener(String hint) throws MessagingException

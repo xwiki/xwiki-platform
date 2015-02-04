@@ -21,6 +21,7 @@ package org.xwiki.webjars.internal;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -71,8 +72,9 @@ public class WebJarsExportURLFactoryActionHandlerTest
         XWikiContext xcontext = mock(XWikiContext.class);
         ExportURLFactoryContext factoryContext = new ExportURLFactoryContext();
         factoryContext.setExportDir(BASEDIR);
-        URL result = this.mocker.getComponentUnderTest().createURL("resources", "path",
-            "value=angular-paginate-anything/2.5.3/paginate-anything.js", null, "xwiki", xcontext, factoryContext);
+        URL result = this.mocker.getComponentUnderTest().createURL("resources", "path", "value="
+            + URLEncoder.encode("angular-paginate-anything/2.5.3/paginate-anything.js", "UTF-8"), null, "xwiki",
+                xcontext, factoryContext);
 
         // Verify that the returned URL is ok
         assertEquals("file://webjars/META-INF/resources/webjars/angular-paginate-anything/2.5.3/paginate-anything.js",

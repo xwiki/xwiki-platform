@@ -26,7 +26,6 @@ import org.openqa.selenium.WebDriver;
  *
  * @version $Id$
  * @since 5.1M1
- * @todo decide if we want this way of authenticating to replace {@link AbstractAdminAuthenticatedTest}
  */
 public class AdminAuthenticationRule extends AuthenticationRule
 {

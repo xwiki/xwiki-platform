@@ -37,6 +37,12 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     @FindBy(id = "Mail.SendMailConfigClass_0_port")
     private WebElement port;
 
+    @FindBy(id = "Mail.SendMailConfigClass_0_sendWaitTime")
+    private WebElement sendWaitTime;
+
+    @FindBy(id = "Mail.SendMailConfigClass_0_discardSuccessStatuses")
+    private WebElement discardSuccessStatuses;
+
     public SendMailAdministrationSectionPage()
     {
         super("Mail Sending");
@@ -62,5 +68,34 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
     {
         this.port.clear();
         this.port.sendKeys(port);
+    }
+
+    public String getSendWaitTime()
+    {
+        return this.sendWaitTime.getAttribute("value");
+    }
+
+    public void setSendWaitTime(String sendWaitTime)
+    {
+        this.sendWaitTime.clear();
+        this.sendWaitTime.sendKeys(sendWaitTime);
+    }
+
+    /**
+     * @since 6.4.1
+     */
+    public void setDiscardSuccessStatuses(boolean discardSuccessStatuses)
+    {
+        if (getDiscardSuccessStatuses() != discardSuccessStatuses) {
+            this.discardSuccessStatuses.click();
+        }
+    }
+
+    /**
+     * @since 6.4.1
+     */
+    public boolean getDiscardSuccessStatuses()
+    {
+        return this.discardSuccessStatuses.isSelected();
     }
 }

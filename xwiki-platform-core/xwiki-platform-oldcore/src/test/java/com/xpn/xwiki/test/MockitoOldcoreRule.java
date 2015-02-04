@@ -238,7 +238,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
-            Provider<XWikiContext> xcontextProvider = mock(Provider.class);
+            Provider<XWikiContext> xcontextProvider = this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
             when(xcontextProvider.get()).thenReturn(this.context);
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);

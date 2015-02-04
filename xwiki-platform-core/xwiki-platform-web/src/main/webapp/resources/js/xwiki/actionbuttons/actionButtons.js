@@ -85,6 +85,9 @@ actionButtons.EditActions = Class.create({
     // Notify others we are going to cancel
     this.notify(event, "cancel");
 
+    // Optimisation: Do not send the entire form's data when all we want is to cancel editing.
+
+    // Determine the form's action and clean it by removing any anchors.
     var location = event.element().form.action;
     if (typeof location != "string") {
        location = event.element().form.attributes.getNamedItem("action");
@@ -100,9 +103,20 @@ actionButtons.EditActions = Class.create({
     if (location.indexOf('?') == -1) {
       location += '?';
     }
-    // Prevent a redundant request to remove the edit lock when the page unloads.
+
+    // Make sure that we call the CancelAction using XWiki's ActionFilter, no matter what XWiki action was set in the form's action.
+    var cancelActionParameter = '&action_cancel=true';
+
+    // Include the xredirect element, if it exists.
+    var xredirectElement = event.element().form.elements['xredirect'];
+    var xredirectParameter = xredirectElement ? '&xredirect=' + escape(xredirectElement.value) : '';
+
+    // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both the cancel action
+    // and the page unload event would unlock the document, so no point in doing both.
     XWiki.EditLock && XWiki.EditLock.setLocked(false);
-    window.location = location + '&action_cancel=true' + fragmentId;
+
+    // Call the cancel URL directly instead of submitting the form. (optimisation)
+    window.location = location + cancelActionParameter + xredirectParameter + fragmentId;
   },
   onPreview : function(event) {
     if (!this.validateForm(event.element().form)) {

@@ -327,16 +327,6 @@ public class TestUtils
         }
     }
 
-    /**
-     * @deprecated starting with 5.0M2 use {@link #createUserAndLogin(String, String, Object...)} instead
-     */
-    @Deprecated
-    public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
-    {
-        createUserAndLogin(username, password);
-        getDriver().get(pageURL);
-    }
-
     public ViewPage gotoPage(String space, String page)
     {
         gotoPage(space, page, "view");

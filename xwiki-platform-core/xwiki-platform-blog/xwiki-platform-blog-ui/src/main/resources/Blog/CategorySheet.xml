@@ -20,69 +20,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>CategorySheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.CategoryClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.CategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1364935598000</creationDate>
   <date>1364974947000</date>
   <contentUpdateDate>1364974938000</contentUpdateDate>
   <version>1.1</version>
   <title>#if ($doc.fullName == $blogCategorySheet)$services.localization.render('xe.blog.categories.sheet')#else$doc.name#end</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.SheetDescriptorClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <action>
-        <customDisplay/>
-        <disabled>0</disabled>
-        <name>action</name>
-        <number>1</number>
-        <picker>0</picker>
-        <prettyName>Action</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </action>
-    </class>
-    <name>Blog.CategorySheet</name>
-    <number>0</number>
-    <className>XWiki.SheetDescriptorClass</className>
-    <guid>e04cbd1d-a504-4e3e-9ddd-4d2bdcdac1b0</guid>
-    <property>
-      <action>view</action>
-    </property>
-  </object>
   <content>{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
-{{html wiki=true}}
 #set ($discard = $xwiki.ssx.use("Blog.ManageCategories"))
 #set ($discard = $xwiki.jsx.use("Blog.ManageCategories"))
 #if ($doc.getObject($blogCategoryClassname))
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
   = Category: #getCategoryName($doc) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
+  {{html wiki=true}}
   ## Keep testing the inline action for backward compatibility with older categories.
   #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
     {{include reference="Blog.CreatePost"/}}
@@ -111,11 +76,43 @@
       #displayNavigationLinks($doc)
     #end
   #end
+  {{/html}}
 #elseif ($doc.fullName == $blogCategorySheet)
   {{translation key="xe.blog.categories.sheetmessage"/}}
 #else
   {{warning}}{{translation key="xe.blog.categories.notcategory"/}}{{/warning}}
 #end
-{{/html}}
 {{/velocity}}</content>
+  <object>
+    <name>Blog.CategorySheet</name>
+    <number>0</number>
+    <className>XWiki.SheetDescriptorClass</className>
+    <guid>e04cbd1d-a504-4e3e-9ddd-4d2bdcdac1b0</guid>
+    <class>
+      <name>XWiki.SheetDescriptorClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <action>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>action</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Action</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </action>
+    </class>
+    <property>
+      <action>view</action>
+    </property>
+  </object>
 </xwikidoc>

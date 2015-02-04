@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
@@ -65,7 +64,7 @@ public class DefaultWikiDeleterTest
     {
         // Injection
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
         // Frequent uses

@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroService;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
@@ -115,7 +114,7 @@ public class XWikiMacroServiceTest
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getWikiId()).thenReturn("xwiki");
 
-        Provider<XWikiContext> contextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> contextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(contextProvider.get()).thenReturn(xcontext);
 
         Assert.assertSame(translatedDescriptor, mocker.getComponentUnderTest().getMacroDescriptor(macroId, syntaxId));

@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -82,7 +81,7 @@ public class DefaultWikiDescriptorManagerTest
     public void setUp() throws Exception
     {
         // Injection
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);

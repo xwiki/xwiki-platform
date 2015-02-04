@@ -1,1 +1,0 @@
-com.xpn.xwiki.plugin.lucene.internal.rest.LuceneSearchSource

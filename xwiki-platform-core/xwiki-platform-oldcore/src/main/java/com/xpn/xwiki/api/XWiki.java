@@ -39,8 +39,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -720,7 +718,6 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      * @since 5.0M2
      */
-    @Unstable
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
@@ -739,7 +736,6 @@ public class XWiki extends Api
      * @see #searchAttachments(String, int, int, List)
      * @since 5.0M2
      */
-    @Unstable
     public int countAttachments(String parametrizedSqlClause, List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);

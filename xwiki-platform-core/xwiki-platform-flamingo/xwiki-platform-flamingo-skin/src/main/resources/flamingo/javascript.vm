@@ -100,7 +100,8 @@ require.config({
   paths: {
     'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
     'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap", "js/bootstrap${jsExtension}"))',
-    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')',
+    'xwiki-events-bridge': "$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js')"
   },
   shim: {
     'bootstrap' : ['jquery']
@@ -132,7 +133,7 @@ if (Prototype.BrowserFeatures.ElementExtensions) {
           $(window).on(method + '.bs.' + plugin, handler); 
       });
     },
-    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip'];
+    pluginsToDisable = ['collapse', 'dropdown', 'modal', 'tooltip', 'tab', 'popover'];
     disablePrototypeJS('show', pluginsToDisable);
     disablePrototypeJS('hide', pluginsToDisable);
   });

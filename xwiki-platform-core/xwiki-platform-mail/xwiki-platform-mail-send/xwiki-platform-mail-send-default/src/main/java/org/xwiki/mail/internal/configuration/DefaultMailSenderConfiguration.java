@@ -150,10 +150,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
                 port = DEFAULT_PORT;
             }
         } else {
-            Long portAsLong = this.mailConfigSource.getProperty(PORT_PROPERTY, Long.class);
-            if (portAsLong != null) {
-                port = portAsLong.intValue();
-            }
+            port = this.mailConfigSource.getProperty(PORT_PROPERTY, Integer.class);
         }
 
         // If not found, look in the xwiki properties source

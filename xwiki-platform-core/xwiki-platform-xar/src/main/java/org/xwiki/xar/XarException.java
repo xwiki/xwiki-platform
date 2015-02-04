@@ -19,13 +19,10 @@
  */
 package org.xwiki.xar;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * @version $Id$
  * @since 5.4RC1
  */
-@Unstable
 public class XarException extends Exception
 {
     /**

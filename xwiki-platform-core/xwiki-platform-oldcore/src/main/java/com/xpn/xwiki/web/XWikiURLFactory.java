@@ -34,14 +34,46 @@ public interface XWikiURLFactory
 
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context);
 
@@ -53,15 +85,47 @@ public interface XWikiURLFactory
 
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         String xwikidb, XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         String querystring, XWikiContext context);
 
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         String querystring, String xwikidb, XWikiContext context);
 

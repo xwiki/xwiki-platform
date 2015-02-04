@@ -108,7 +108,7 @@ public class WikiManagerScriptServiceTest
             mocker.getInstance(new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
         standardURLConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         execution = mocker.getInstance(Execution.class);

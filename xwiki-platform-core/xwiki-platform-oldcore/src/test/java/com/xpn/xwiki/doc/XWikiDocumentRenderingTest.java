@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import com.xpn.xwiki.api.Document;
+
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
@@ -31,6 +32,7 @@ import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.internal.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -42,6 +44,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
@@ -87,6 +90,9 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     protected void setUp() throws Exception
     {
         super.setUp();
+
+        // Mock xwiki.cfg
+        getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), getConfigurationSource());
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
         this.document.setSyntax(Syntax.XWIKI_1_0);
@@ -221,6 +227,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
 
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
         assertEquals("header 1", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
         this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
@@ -252,8 +260,15 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     }
 
     public void testGetRenderedTitleWithoutTitlePLAIN()
-    {
+    {   
         this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
         this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");

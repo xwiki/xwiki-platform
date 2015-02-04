@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
@@ -69,7 +68,7 @@ public class LESSSkinFileContentReaderTest
     public void setUp() throws Exception
     {
         skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);

@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.script;
 
-import java.util.UUID;
-
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailStatusResult;
 
@@ -58,9 +56,9 @@ public class ScriptMailResult implements MailResult
     }
 
     @Override
-    public void waitTillSent(long timeout)
+    public void waitTillProcessed(long timeout)
     {
-        this.wrappedMailResult.waitTillSent(timeout);
+        this.wrappedMailResult.waitTillProcessed(timeout);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class ScriptMailResult implements MailResult
     }
 
     @Override
-    public UUID getBatchId()
+    public String getBatchId()
     {
         return this.wrappedMailResult.getBatchId();
     }

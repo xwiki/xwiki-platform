@@ -433,8 +433,7 @@ ul.searchSuggestSources {
 #foreach ($source in $doc.getObjects($searchSuggestSourceClassName))
   #set ($engine = $source.getProperty('engine').value)
   #if ("$!engine" == '')
-    ## For backward compatibility we consider the search engine to be Lucene when it's not specified.
-    #set ($engine = 'lucene')
+    #set ($engine = 'solr')
   #end
   #set ($sourcesForEngine = $sources.get($engine))
   #if (!$sourcesForEngine)

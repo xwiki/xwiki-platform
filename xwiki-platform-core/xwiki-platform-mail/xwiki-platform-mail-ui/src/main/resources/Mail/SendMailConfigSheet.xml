@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,8 +30,8 @@
   <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1418743275000</date>
-  <contentUpdateDate>1418743275000</contentUpdateDate>
+  <date>1422375802000</date>
+  <contentUpdateDate>1422375802000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -107,7 +106,7 @@
 ## Step 1: Display form
 ## =======================================================
 #set ($params = {
-  'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties', 'sendWaitTime']
+  'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties', 'sendWaitTime', 'discardSuccessStatuses']
 })
 #set ($paramDoc = $configDoc)
 #set ($paramClass = $configClassName)

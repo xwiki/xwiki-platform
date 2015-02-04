@@ -28,21 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.jmock.Expectations;
-import org.jmock.api.Action;
-import org.jmock.api.Invocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.xwiki.annotation.Annotation;
 import org.xwiki.annotation.AnnotationsMockSetup;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**

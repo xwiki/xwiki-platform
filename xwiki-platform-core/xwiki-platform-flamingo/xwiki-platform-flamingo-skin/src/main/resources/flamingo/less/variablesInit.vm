@@ -124,6 +124,7 @@
       "brand-info": "color",
       "brand-warning": "color",
       "brand-danger": "color",
+      "headings-color": "color",
       "component-active-color" : "color",
       "component-active-bg" : "color",
       "font-family-base": "text",
@@ -231,3 +232,4 @@
 @xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
 @xwiki-icon-edit-section:             "$xwiki.getSkinFile('icons/xwiki/edit-section.png')";
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
+@xwiki-icon-link-external:            "$xwiki.getSkinFile('icons/xwiki/external-link.png')";

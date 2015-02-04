@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
@@ -74,7 +73,7 @@ public class WikiTemplatePropertyGroupProviderTest
     {
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         wikiDescriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(com.xpn.xwiki.XWiki.class);

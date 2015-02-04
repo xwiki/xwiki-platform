@@ -38,18 +38,23 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.XWikiAuthenticator;
-import org.xwiki.mail.internal.AttachmentMimeBodyPartFactory;
-import org.xwiki.mail.internal.DefaultMailQueueManager;
+import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.mail.internal.DefaultMailSenderRunnable;
+import org.xwiki.mail.internal.thread.PrepareMailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueManager;
+import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
-import org.xwiki.mail.internal.DefaultMimeBodyPartFactory;
+import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
@@ -73,13 +78,16 @@ import static org.mockito.Mockito.when;
  * @since 6.4M1
  */
 @ComponentList({
-    DefaultMimeBodyPartFactory.class,
+    TextMimeBodyPartFactory.class,
     AttachmentMimeBodyPartFactory.class,
     StandardEnvironment.class,
     DefaultMailSender.class,
     MemoryMailListener.class,
-    DefaultMailSenderRunnable.class,
-    DefaultMailQueueManager.class
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
 })
 public class AuthenticatingIntegrationTest
 {
@@ -118,10 +126,15 @@ public class AuthenticatingIntegrationTest
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
         Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
+        this.componentManager.registerMockComponent(Execution.class);
+
+        EnvironmentConfiguration environmentConfiguration =
+            this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
     }
 
     @Before
@@ -140,7 +153,7 @@ public class AuthenticatingIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.sender).stopMailSenderThread();
+        ((DefaultMailSender) this.sender).stopMailThreads();
     }
 
     @Test

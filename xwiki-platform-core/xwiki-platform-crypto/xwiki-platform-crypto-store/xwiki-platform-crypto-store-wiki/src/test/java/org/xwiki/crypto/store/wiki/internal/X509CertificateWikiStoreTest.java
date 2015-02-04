@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.pkix.CertificateFactory;
@@ -147,7 +146,7 @@ public class X509CertificateWikiStoreTest
         mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+            mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(com.xpn.xwiki.XWiki.class);

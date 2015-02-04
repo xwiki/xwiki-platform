@@ -30,7 +30,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;

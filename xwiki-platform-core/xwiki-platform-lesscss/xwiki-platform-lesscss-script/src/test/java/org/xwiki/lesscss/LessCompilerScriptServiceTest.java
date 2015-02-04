@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.ColorTheme;
@@ -62,7 +61,7 @@ public class LessCompilerScriptServiceTest
 {
     @Rule
     public MockitoComponentMockingRule<LessCompilerScriptService> mocker =
-            new MockitoComponentMockingRule(LessCompilerScriptService.class);
+            new MockitoComponentMockingRule<>(LessCompilerScriptService.class);
 
     private LESSSkinFileCompiler lessCompiler;
 
@@ -92,7 +91,7 @@ public class LessCompilerScriptServiceTest
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
         colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
     }

@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -78,7 +77,7 @@ public class DefaultLESSSkinFileCompilerTest
         currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
         referenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
                 String.class));
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);

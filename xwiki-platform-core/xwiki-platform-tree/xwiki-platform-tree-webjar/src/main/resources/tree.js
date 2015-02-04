@@ -1,5 +1,6 @@
-define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
+define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) {
   'use strict';
+
   // Fix the regular expression used by jsTree to escape special characters in CSS selectors. It is mainly used to be
   // able to find a tree node by its id using Element#querySelector. We overwrite the default value used by jsTree in
   // order to add the following special characters: ?`.
@@ -11,7 +12,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var getNodeTypes = function(nodes) {
     var typesMap = {};
     $.each(nodes, function() {
-      if (this.data && typeof this.data.type == 'string') {
+      if (this.data && typeof this.data.type === 'string') {
         typesMap[this.data.type] = true;
       }
     });
@@ -25,7 +26,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
     callback = $.proxy(callback, this);
-    if (node.id == '#' && !node.data) {
+    if (node.id === '#' && !node.data) {
       // If the root node doesn't have any data then infer it from its children.
       var nestedCallback = callback;
       callback = function(children) {
@@ -42,7 +43,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       childrenURL = this.element.attr('data-url');
       // Use the specified id for the root node.
       var root = this.element.attr('data-root');
-      var actualNodeId = (node.id == '#' && root) ? root : node.id;
+      var actualNodeId = (node.id === '#' && root) ? root : node.id;
       parameters = $.extend({
         data: 'children',
         id: actualNodeId
@@ -81,11 +82,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var validateOperation = function (operation, node, parent, position, more) {
     // The operation can be 'create_node', 'rename_node', 'delete_node', 'move_node' or 'copy_node'.
     // In case the operation is 'rename_node' the position is filled with the new node name.
-    return (operation == 'create_node' && canAcceptChild(parent, node))
-      || (operation == 'rename_node' && node.data && node.data.canRename)
-      || (operation == 'delete_node' && node.data && node.data.canDelete)
-      || (operation == 'move_node' && node.data && node.data.canMove && canAcceptChild(parent, node))
-      || (operation == 'copy_node' && node.data && node.data.canCopy && canAcceptChild(parent, node));
+    return (operation === 'create_node' && canAcceptChild(parent, node))
+      || (operation === 'rename_node' && node.data && node.data.canRename)
+      || (operation === 'delete_node' && node.data && node.data.canDelete)
+      || (operation === 'move_node' && node.data && node.data.canMove && canAcceptChild(parent, node))
+      || (operation === 'copy_node' && node.data && node.data.canCopy && canAcceptChild(parent, node));
   };
 
   var areDraggable = function(nodes) {
@@ -109,7 +110,9 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var position = paginationElement.parent().children().index(paginationElement[0]);
       tree.delete_node(paginationNode);
       $.each(children, function(index) {
-        tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
+        // Create the node only if it doesn't exist (the node may have been loaded by a call to openTo).
+        // Note that deleting or moving the existing node may not be allowed by #validateOperation().
+        !tree.get_node(this) && tree.create_node(parent, this, position + index, index === 0 && function(firstChild) {
           tree.select_node(firstChild);
         });
       });
@@ -276,16 +279,32 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }
   };
 
-  var openPath = function(path, callback) {
+  var openPath = function(parent, path, callback) {
     // 'this' is the tree instance.
-    if (path && path.length > 0 && this.get_node(path[0])) {
-      // The first node is present in the tree so we can open it.
-      this.open_node(path[0], function() {
-        openPath.call(this, path.slice(1), callback);
-      });
-    } else {
-      callback && callback();
+    if (path && path.length > 0) {
+      var child = this.get_node(path[0]);
+      var children = this.get_children_dom(parent);
+      if (!child && canAcceptChild(parent, path[0]) && children.length > 0
+          && this.get_node(children.last()).data.type === 'pagination') {
+        // The child node is probably not displayed because of the pagination. It's expensive to retrieve all the rest
+        // of the children (i.e. all the next pages) until we find the node from the path so we simply add the child to
+        // the parent. Don't worry, the node won't be duplicated when the pagination is triggered.
+        child = this.get_node(this.create_node(parent, path[0], children.length - 1));
+      }
+      if (child) {
+        // The node is present in the tree. Open it.
+        return this.open_node(child, function() {
+          openPath.call(this, child, path.slice(1), callback);
+        });
+      }
     }
+    // If we get here then it means we cannot advance any more.
+    callback && callback(parent);
+  };
+
+  var extendQueryString = function(url, parameters) {
+    url += url.indexOf('?') < 0 ? '?': '&';
+    return url + $.param(parameters);
   };
 
   var getDefaultParams = function(element) {
@@ -293,24 +312,29 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       core: {
         // The node label is plain text by default. Otherwise we have to do HTML escaping in lots of places.
         force_text: true,
+        // Turn off animations by default.
+        animation: false,
         themes: {
           name: 'xwiki',
-          responsive: element.attr('data-responsive') == 'true',
-          icons: element.attr('data-icons') == 'true',
-          dots: element.attr('data-edges') == 'true'
+          responsive: element.attr('data-responsive') !== 'false',
+          icons: element.attr('data-icons') !== 'false',
+          dots: element.attr('data-edges') !== 'false'
         }
       }
     };
     if (element.attr('data-url')) {
       var plugins = [];
-      if (element.attr('data-dragAndDrop') == 'true') {
+      if (element.attr('data-dragAndDrop') === 'true') {
         plugins.push('dnd');
       }
-      if (element.attr('data-contextMenu') == 'true') {
+      if (element.attr('data-contextMenu') === 'true') {
         plugins.push('contextmenu');
       }
-      if (element.attr('data-checkboxes') == 'true') {
+      if (element.attr('data-checkboxes') === 'true') {
         plugins.push('checkbox');
+      }
+      if (element.attr('data-finder') === 'true') {
+        plugins.push('finder');
       }
       return $.extend(true, baseParams, {
         core: {
@@ -323,6 +347,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         },
         contextmenu: {
           items: getContextMenuItems
+        },
+        finder: {
+          url: extendQueryString(element.attr('data-url'), {
+            data: 'suggestions'
+          })
         }
       });
     } else {
@@ -334,10 +363,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var customTreeAPI = {
     openTo: function(nodeId, callback) {
       // Select the node if no callback is provided.
-      callback = callback || $.proxy(this, 'select_node', nodeId);
+      callback = callback || $.proxy(this, 'select_node');
       // We need to open all the ancestors of the specified node.
       getPath.call(this, nodeId, function(path) {
-        openPath.call(this, path, callback);
+        var root = this.get_node('#');
+        openPath.call(this, root, path, callback);
       });
     },
     refreshNode: function(node) {
@@ -367,7 +397,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     return this.on('select_node.jstree', function(event, data) {
       var tree = data.instance;
       var selectedNode = data.node;
-      if (selectedNode.data && selectedNode.data.type == 'pagination') {
+      if (selectedNode.data && selectedNode.data.type === 'pagination') {
         addMoreChildren(tree, selectedNode);
       } else if (data.event && !$(this).hasClass('jstree-no-links')) {
         // The node selection was triggered by an user event and links are enabled.
@@ -422,7 +452,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }).on('move_node.jstree', function(event, data) {
       var entityId = data.node.data && data.node.data.id;
       // Don't trigger the server-side move unless the tree node has an entity associated.
-      if (!entityId || data.parent == data.old_parent) {
+      if (!entityId || data.parent === data.old_parent) {
         return;
       }
       disableNodeBeforeLoading(data.instance, data.node);

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -97,6 +98,10 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
+
     /**
      * Used to emulate an in-line parsing.
      */
@@ -140,13 +145,16 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         }
 
         // 2. Try to extract the title from the document content.
-        try {
-            XDOM title = extractTitleFromContent(document, parameters);
-            if (title != null) {
-                return title;
+        if ("1".equals(this.xwikicfg.getProperty("xwiki.title.compatibility", "0"))) {
+            try {
+                XDOM title = extractTitleFromContent(document, parameters);
+                if (title != null) {
+                    return title;
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(),
+                    e);
             }
-        } catch (Exception e) {
-            logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(), e);
         }
 
         // 3. The title was not specified or its evaluation failed. Use the document name as a fall-back.
@@ -238,7 +246,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM
+     * @deprecated since 7.0M1
      */
+    @Deprecated
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
 

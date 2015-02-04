@@ -58,7 +58,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
@@ -1063,10 +1062,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         this.dialect = this.configuration.buildSettings().getDialect();
 
         // Check configuration for safe mode
-        XWikiConfig config = getXWikiContext().getWiki().getConfig();
         /* True if migration should use safe but slower non-bulk native updates. */
         boolean useSafeUpdates =
-            "1".equals(config.getProperty("xwiki.store.migration." + this.getName() + ".safemode", "0"));
+            "1".equals(getXWikiContext().getWiki().Param("xwiki.store.migration." + this.getName() + ".safemode", "0"));
 
         // Use safe mode if the database has no temporary table supported by hibernate
         useSafeUpdates = useSafeUpdates || !this.configuration.buildSettings().getDialect().supportsTemporaryTables();

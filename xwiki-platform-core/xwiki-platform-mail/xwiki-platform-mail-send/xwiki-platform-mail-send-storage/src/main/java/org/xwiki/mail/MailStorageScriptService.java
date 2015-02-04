@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
@@ -56,7 +57,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
     /**
      * The key under which the last encountered error is stored in the current execution context.
      */
-    static final String ERROR_KEY = "scriptservice.mailstorage.error";
+    private static final String ERROR_KEY = "scriptservice.mailstorage.error";
+
+    private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
 
     @Inject
     @Named("filesystem")
@@ -71,6 +74,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
 
     @Inject
     private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private MailStorageConfiguration storageConfiguration;
 
     /**
      * Resend the serialized MimeMessage synchronously.
@@ -97,10 +103,14 @@ public class MailStorageScriptService extends AbstractMailScriptService
         MimeMessage message;
         try {
             message = loadMessage(batchId, messageId);
-            ScriptMailResult scriptMailResult = sendAsynchronously(Arrays.asList(message), listener, false);
+
+            // Set the batch id so that no new batch id is generated when re-sending the mail
+            Session session = this.sessionFactory.create(Collections.singletonMap(SESSION_BATCHID_KEY, batchId));
+            ScriptMailResult scriptMailResult = new ScriptMailResult(this.mailSender.sendAsynchronously(
+                Arrays.asList(message), session, listener), listener.getMailStatusResult());
 
             // Wait for all messages from this batch to have been sent before returning
-            scriptMailResult.waitTillSent(Long.MAX_VALUE);
+            scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
 
             return scriptMailResult;
         } catch (MailStoreException e) {
@@ -199,6 +209,14 @@ public class MailStorageScriptService extends AbstractMailScriptService
         }
     }
 
+    /**
+     * @return the configuration for the Mail Storage
+     */
+    public MailStorageConfiguration getConfiguration()
+    {
+        return this.storageConfiguration;
+    }
+
     private Map<String, Object> normalizeFilterMap(Map<String, Object> filterMap)
     {
         // Force the wiki to be the current wiki to prevent any subwiki to see the list of mail statuses from other
@@ -213,7 +231,8 @@ public class MailStorageScriptService extends AbstractMailScriptService
 
     private MimeMessage loadMessage(String batchId, String mailId) throws MailStoreException
     {
-        MimeMessage message = this.mailContentStore.load(this.sessionProvider.get(), batchId, mailId);
+        MimeMessage message = this.mailContentStore.load(this.sessionFactory.create(
+            Collections.<String, String>emptyMap()), batchId, mailId);
         return message;
     }
 

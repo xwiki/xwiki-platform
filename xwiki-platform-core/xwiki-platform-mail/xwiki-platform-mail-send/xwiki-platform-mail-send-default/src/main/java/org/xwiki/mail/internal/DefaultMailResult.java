@@ -19,9 +19,9 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.UUID;
-
 import org.xwiki.mail.MailResult;
+import org.xwiki.mail.internal.thread.MailQueueManager;
+import org.xwiki.mail.internal.thread.SendMailQueueItem;
 
 /**
  * Default implementation used when using the Mail Sender Java API.
@@ -31,35 +31,35 @@ import org.xwiki.mail.MailResult;
  */
 public class DefaultMailResult implements MailResult
 {
-    private UUID batchId;
+    private String batchId;
 
-    private MailQueueManager mailQueueManager;
+    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
 
     /**
      * @param batchId the unique id for the batch of emails being sent together, used to verify when they've all been
      *        sent
-     * @param mailQueueManager the class we used to check when the emails have been sent
+     * @param sendMailQueueManager the class we used to check when the emails have been sent
      */
-    public DefaultMailResult(UUID batchId, MailQueueManager mailQueueManager)
+    public DefaultMailResult(String batchId, MailQueueManager<SendMailQueueItem> sendMailQueueManager)
     {
         this.batchId = batchId;
-        this.mailQueueManager = mailQueueManager;
+        this.sendMailQueueManager = sendMailQueueManager;
     }
 
     @Override
-    public void waitTillSent(long timeout)
+    public void waitTillProcessed(long timeout)
     {
-        this.mailQueueManager.waitTillSent(getBatchId(), timeout);
+        this.sendMailQueueManager.waitTillProcessed(getBatchId(), timeout);
     }
 
     @Override
     public boolean isProcessed()
     {
-        return this.mailQueueManager.isProcessed(getBatchId());
+        return this.sendMailQueueManager.isProcessed(getBatchId());
     }
 
     @Override
-    public UUID getBatchId()
+    public String getBatchId()
     {
         return this.batchId;
     }

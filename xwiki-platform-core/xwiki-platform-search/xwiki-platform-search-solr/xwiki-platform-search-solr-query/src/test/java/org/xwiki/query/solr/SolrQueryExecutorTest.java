@@ -113,7 +113,7 @@ public class SolrQueryExecutorTest
         });
 
         ParameterizedType solrProviderType = new DefaultParameterizedType(null, Provider.class, SolrInstance.class);
-        Provider<SolrInstance> provider = componentManager.getInstance(solrProviderType);
+        Provider<SolrInstance> provider = componentManager.registerMockComponent(solrProviderType);
         when(provider.get()).thenReturn(solr);
 
         DefaultQuery query = new DefaultQuery("TestQuery", null);

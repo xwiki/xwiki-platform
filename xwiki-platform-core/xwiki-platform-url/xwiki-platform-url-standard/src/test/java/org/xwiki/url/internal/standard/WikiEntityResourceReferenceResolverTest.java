@@ -31,7 +31,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.standard.entity.WikiEntityResourceReferenceResolver;

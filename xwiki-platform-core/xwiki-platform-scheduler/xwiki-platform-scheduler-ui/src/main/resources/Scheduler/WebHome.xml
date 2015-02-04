@@ -174,7 +174,7 @@ $services.localization.render('xe.scheduler.welcome')
     #set ($ok = $!actions.put('unschedule', $doc.getExternalURL('view', "do=unschedule&amp;which=${jobHolder.fullName}")))
   #end
   #set ($ok = $!actions.put('delete', $doc.getExternalURL('view', "do=delete&amp;which=${jobHolder.fullName}")))
-|$job.get('jobName')|$status|$firetime|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel('programming')) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions.entrySet()) [[$services.localization.render("xe.scheduler.jobs.actions.${action.key}")&gt;&gt;${action.value}]]#end
+|$job.get('jobName')|$status|$firetime|**$services.localization.render('xe.scheduler.jobs.actions.access')** [[$services.localization.render('xe.scheduler.jobs.actions.view')&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel('programming')) [[$services.localization.render('xe.scheduler.jobs.actions.edit')&gt;&gt;${jobHolder.getExternalURL('edit')}]]#end **$services.localization.render('xe.scheduler.jobs.actions.manage')**#foreach($action in $actions.entrySet()) [[$services.localization.render("xe.scheduler.jobs.actions.${action.key}")&gt;&gt;${action.value}]]#end
 
 #end
 #if ($doc.hasAccessLevel('programming'))

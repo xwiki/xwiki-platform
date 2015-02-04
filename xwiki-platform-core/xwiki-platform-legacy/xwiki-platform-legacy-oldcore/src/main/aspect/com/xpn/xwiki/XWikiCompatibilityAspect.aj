@@ -1282,4 +1282,14 @@ public privileged aspect XWikiCompatibilityAspect
         String[] recip = recipient.split(",");
         sendMessage(sender, recip, message, context);
     }
+
+    /**
+     * @deprecated since 7.0M1. This method should have actually been deprecated since 2.3M1, but it was left forgotten
+     *             and unused.
+     */
+    @Deprecated
+    public boolean XWiki.hasCaptcha(XWikiContext context)
+    {
+        return (this.getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
+    }
 }

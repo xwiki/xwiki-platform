@@ -21,9 +21,6 @@ package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -34,9 +31,6 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.codec.binary.Base64;
 import org.jmock.Mock;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.event.CacheEntryListener;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.image.ImagePlugin} class.

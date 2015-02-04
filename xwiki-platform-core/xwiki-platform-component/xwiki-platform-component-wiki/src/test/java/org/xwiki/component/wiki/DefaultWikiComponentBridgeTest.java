@@ -104,7 +104,7 @@ public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTest
         final Execution execution = registerMockComponent(Execution.class);
         final ExecutionContext context = new ExecutionContext();
 
-        final Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(XWikiContext.TYPE_PROVIDER);
+        final Provider<XWikiContext> xcontextProvider = registerMockComponent(XWikiContext.TYPE_PROVIDER);
 
         this.xwiki = getMockery().mock(XWiki.class);
 

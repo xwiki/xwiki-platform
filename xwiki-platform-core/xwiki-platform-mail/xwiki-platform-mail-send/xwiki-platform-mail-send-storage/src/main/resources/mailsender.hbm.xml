@@ -33,10 +33,16 @@
     <property name="batchId" type="string" column="mail_batchId" length="255" index="MAIL_BATCH_ID" not-null="true"/>
     <property name="state" type="string" column="mail_state" length="255" index="MAIL_STATE" not-null="true"/>
     <property name="date" type="timestamp" column="mail_date" index="MAIL_DATE" not-null="true"/>
-    <property name="recipients" type="string" column="mail_recipients" length="2000" index="MAIL_RECIPIENST" not-null="true"/>
+    <!-- Note: We don't put an index on this by default since it's a large column (and on MySQL for example, string
+         indexes cannot exceed 767 bytes) -->
+    <property name="recipients" type="string" column="mail_recipients" length="2000" not-null="true"/>
     <property name="type" type="string" column="mail_type" length="255" index="MAIL_TYPE" />
-    <property name="errorSummary" type="string" column="mail_errorSummary" length="2000" index="MAIL_ERRORSUMMARY"/>
-    <property name="errorDescription" type="string" column="mail_errorDescription" length="30000" />
+    <!-- Note: We don't put an index on this by default since it's a large column (and on MySQL for example, string
+         indexes cannot exceed 767 bytes) -->
+    <property name="errorSummary" type="string" column="mail_errorSummary" length="2000"/>
+    <!-- Note: We don't put an index on this by default since it's a large column (and on MySQL for example, string
+         indexes cannot exceed 767 bytes) -->
+    <property name="errorDescription" type="text" column="mail_errorDescription" length="30000" />
     <property name="wiki" type="string" column="mail_wiki" length="255" index="MAIL_WIKI" />
   </class>
 

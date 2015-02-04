@@ -59,6 +59,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <!-- Used in the Require.js configuration. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -92,9 +99,9 @@
         <version>1.7.0.1.1</version>
         <configuration>
           <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-          <includes>
-            <include>tree.less</include>
-          </includes>
+          <excludes>
+            <exclude>**/jstree/**</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>

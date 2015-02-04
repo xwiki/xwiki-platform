@@ -20,30 +20,102 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>ManageCategories</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.Categories</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.Categories</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1220503150000</creationDate>
   <date>1304081827000</date>
   <contentUpdateDate>1304081827000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.blog.manageCategories.title')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="Blog.CategoriesCode"/}}
+
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#set($space = "$!request.space")
+##
+##
+######################################################
+## Execute actions
+######################################################
+#if ("$!request.xaction" == 'delete')
+  #foreach($item in $request.getParameterValues('category'))
+    #deleteCategory($item)
+  #end
+#elseif("$!request.xaction" == 'rename')
+  #set ($newFullName = "$!{request.newCategoryName}")
+  #if($newFullName.trim().equals(''))
+    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
+  #elseif(!$xwiki.exists($request.category))
+    #blog__actionResponseError(404, 'thispagedoesnotexist', [])
+  #elseif($xwiki.exists($newFullName))
+    #blog__actionResponseError(409, 'core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
+    #blog__actionResponseError(403, 'core.rename.targetNotWritable', [$newFullName])
+  #else
+    #renameCategory($request.category, $newFullName)
+  #end
+#elseif("$!request.xaction" == 'create')
+  #set($title = "$!{request.newCategoryName}")
+  #set($name = "${doc.space}.${title}")
+  #if ($title.trim().equals(''))
+    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
+  #elseif (!$xwiki.getDocument($name).isNew())
+    #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
+  #else
+    #set($title = $escapetool.url($title))
+    #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
+    #if($request.ajax)
+      #if("$!{request.mode}" == 'select')
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+      #else
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+      #end      
+    #else ## request.ajax
+      #set($xredirect = $doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
+    #end
+    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
+  #end ## empty title
+#end
+#####################################################
+## Action execution done
+#####################################################
+#if ("$!request.display" == 'list')
+  #set($displayType = "$!{request.listType}")
+  #if($displayType == '')
+    #set($displayType = 'editable')
+  #end
+  #displayCategoryManagementTree('' $displayType)
+#elseif ("$!request.display" == 'addForm')
+  #getCategoriesHierarchy('' $tree)
+  #addCategoryForm()
+#elseif ("$!request.display" == 'renameForm')
+  #renameCategoryForm()
+#elseif (!$request.ajax)
+##
+$xwiki.ssx.use('Blog.ManageCategories')##
+$xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##
+##
+#displayCategoryManagementTree('' 'editable')
+#end
+{{/html}}
+{{/velocity}}</content>
   <object>
+    <name>Blog.ManageCategories</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>c013b1cc-0ac3-44b5-b309-ccebd5cf86ba</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -111,14 +183,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Blog.ManageCategories</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>c013b1cc-0ac3-44b5-b309-ccebd5cf86ba</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -539,6 +607,10 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
+    <name>Blog.ManageCategories</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>fd160bce-cab7-4830-a18e-2632cd47fc00</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -574,6 +646,22 @@ document.observe('xwiki:dom:loaded', function() {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -606,14 +694,10 @@ document.observe('xwiki:dom:loaded', function() {
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Blog.ManageCategories</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>fd160bce-cab7-4830-a18e-2632cd47fc00</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -674,6 +758,7 @@ document.observe('xwiki:dom:loaded', function() {
   border: 1px solid $theme.borderColor;
   vertical-align: top !important;
 }
+
 * html .category-add-form, * html .category-rename-form {
   width: 17em;
 }
@@ -700,6 +785,9 @@ input.category-name-input {
 }</code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>Category management style</name>
     </property>
     <property>
@@ -709,76 +797,4 @@ input.category-name-input {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include reference="Blog.CategoriesCode"/}}
-
-{{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
-#set($space = "$!request.space")
-##
-##
-######################################################
-## Execute actions
-######################################################
-#if ("$!request.xaction" == 'delete')
-  #foreach($item in $request.getParameterValues('category'))
-    #deleteCategory($item)
-  #end
-#elseif("$!request.xaction" == 'rename')
-  #set ($newFullName = "$!{request.newCategoryName}")
-  #if($newFullName.trim().equals(''))
-    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
-  #elseif(!$xwiki.exists($request.category))
-    #blog__actionResponseError(404, 'thispagedoesnotexist', [])
-  #elseif($xwiki.exists($newFullName))
-    #blog__actionResponseError(409, 'core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])
-  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newFullName))
-    #blog__actionResponseError(403, 'core.rename.targetNotWritable', [$newFullName])
-  #else
-    #renameCategory($request.category, $newFullName)
-  #end
-#elseif("$!request.xaction" == 'create')
-  #set($title = "$!{request.newCategoryName}")
-  #set($name = "${doc.space}.${title}")
-  #if ($title.trim().equals(''))
-    #blog__actionResponseError(400, 'xe.blog.manageCategories.create.error.emptyName', [])
-  #elseif (!$xwiki.getDocument($name).isNew())
-    #blog__actionResponseError(409, 'xe.blog.manageCategories.create.error.alreadyExists', [])
-  #else
-    #set($title = $escapetool.url($title))
-    #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
-    #if($request.ajax)
-      #if("$!{request.mode}" == 'select')
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
-      #else
-        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
-      #end      
-    #else ## request.ajax
-      #set($xredirect = $doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
-    #end
-    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
-  #end ## empty title
-#end
-#####################################################
-## Action execution done
-#####################################################
-#if ("$!request.display" == 'list')
-  #set($displayType = "$!{request.listType}")
-  #if($displayType == '')
-    #set($displayType = 'editable')
-  #end
-  #displayCategoryManagementTree('' $displayType)
-#elseif ("$!request.display" == 'addForm')
-  #getCategoriesHierarchy('' $tree)
-  #addCategoryForm()
-#elseif ("$!request.display" == 'renameForm')
-  #renameCategoryForm()
-#elseif (!$request.ajax)
-##
-$xwiki.ssx.use('Blog.ManageCategories')##
-$xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##
-##
-#displayCategoryManagementTree('' 'editable')
-#end
-{{/html}}
-{{/velocity}}</content>
 </xwikidoc>

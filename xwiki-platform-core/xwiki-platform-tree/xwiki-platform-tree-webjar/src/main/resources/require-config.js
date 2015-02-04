@@ -11,6 +11,7 @@ require.config({
       "$!services.webjars.url('jstree', 'jstree.min.js')"
     ],
     JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner${minified}.js")',
+    'tree-finder': '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "finder${minified}.js")',
     tree: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "tree${minified}.js")'
   },
   shim: {

@@ -107,6 +107,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
+import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
@@ -216,6 +217,7 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
+@Serializable(false)
 public class XWiki implements EventListener
 {
     /** Name of the default wiki. */
@@ -3037,7 +3039,7 @@ public class XWiki implements EventListener
             MailSender mailSender = Utils.getComponent(MailSender.class);
             MailListener mailListener = Utils.getComponent(MailListener.class, "database");
             MailResult mailResult = mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
-            mailResult.waitTillSent(Long.MAX_VALUE);
+            mailResult.waitTillProcessed(Long.MAX_VALUE);
             String errorMessage = MailStatusResultSerializer.serializeErrors(mailListener.getMailStatusResult());
             if (errorMessage != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
@@ -5634,11 +5636,6 @@ public class XWiki implements EventListener
         return getConfiguration().getProperty("xwiki.section.depth", 2L);
     }
 
-    public boolean hasCaptcha(XWikiContext context)
-    {
-        return (getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
-    }
-
     public String getWysiwygToolbars(XWikiContext context)
     {
         return getConfiguration().getProperty("xwiki.wysiwyg.toolbars", "");
@@ -6176,7 +6173,7 @@ public class XWiki implements EventListener
             onWikiDeletedEvent((WikiDeletedEvent) event);
         } else if (event instanceof ComponentDescriptorAddedEvent) {
             // A new mandatory document initializer has been installed
-            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) data);
+            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) source);
         } else {
             // Document modifications
 

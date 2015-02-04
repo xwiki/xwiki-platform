@@ -93,6 +93,11 @@ public class MailTest extends AbstractTest
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
         sendMailPage.setHost("localhost");
         sendMailPage.setPort("3025");
+        // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
+        // we wait to receive the mails)
+        sendMailPage.setSendWaitTime("0");
+        // Keep all mail statuses including successful ones (so that we verify this works fine)
+        sendMailPage.setDiscardSuccessStatuses(false);
         sendMailPage.clickSave();
 
         // Step 3: Verify that there are no admin email sections when administering a space
@@ -110,7 +115,7 @@ public class MailTest extends AbstractTest
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "General"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "Mail Sending"));
 
-        // Step 4: Try sending an email
+        // Step 4: Try sending a template email (with an attachment) to a single user
 
         // Remove existing pages (for pages that we create below)
         getUtil().deletePage(getTestClassName(), "MailTemplate");
@@ -158,15 +163,61 @@ public class MailTest extends AbstractTest
         assertEquals("Status for John on " + getTestClassName() + ".SendMail",
             this.mail.getReceivedMessages()[0].getSubject());
 
-        // Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for the sent
-        // mail
+        // Step 5: Try sending a template email to all the users in the XWikiAllGroup Group (we'll create 2 users).
+
+        // Remove existing pages (for pages that we create below)
+        getUtil().deletePage(getTestClassName(), "SendMailGroup");
+
+        // Create 2 users
+        getUtil().createUser("user1", "password1", getUtil().getURLToNonExistentPage(), "email", "user1@doe.com");
+        getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
+
+        // Create another page with the Velocity script to send the template email
+        velocity = "{{velocity}}\n"
+            + "#set ($templateParameters = {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
+                + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
+            + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
+            + "', 'MailTemplate'))\n"
+            + "#set ($groupParameters = {'hint' : 'template', 'source' : $templateReference, "
+                + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
+            + "#set ($groupReference = $services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup'))\n"
+            + "#set ($messages = $services.mailsender.createMessages('group', $groupReference, $groupParameters))\n"
+            + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
+            + "#if ($services.mailsender.lastError)\n"
+            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#end\n"
+            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
+            + "  {{error}}\n"
+            + "    $status.messageId - $status.errorSummary\n"
+            + "    $status.errorDescription\n"
+            + "  {{/error}}\n"
+            + "#end\n"
+            + "{{/velocity}}";
+        // This will create the page and execute its content and thus send the mail
+        vp = getUtil().createPage(getTestClassName(), "SendMailGroup", velocity, "");
+
+        // Verify that the page doesn't display any content (unless there's an error!)
+        assertEquals("", vp.getContent());
+
+        // Verify that the mail has been received (first mail above + the 2 mails sent to the group)
+        this.mail.waitForIncomingEmail(10000L, 3);
+        assertEquals(3, this.mail.getReceivedMessages().length);
+        assertEquals("Status for John on " + getTestClassName() + ".SendMailGroup",
+            this.mail.getReceivedMessages()[1].getSubject());
+        assertEquals("Status for John on " + getTestClassName() + ".SendMailGroup",
+            this.mail.getReceivedMessages()[2].getSubject());
+
+        // Step 6: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
+        // the sent mails
         administrationPage = AdministrationPage.gotoPage();
         administrationPage.clickSection("Email", "Mail Sending Status");
         MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
         LiveTableElement liveTableElement = statusPage.getLiveTable();
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
+        assertTrue(liveTableElement.getRowCount() > 2);
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);
         assertTrue(liveTableElement.hasRow("Error", ""));
     }

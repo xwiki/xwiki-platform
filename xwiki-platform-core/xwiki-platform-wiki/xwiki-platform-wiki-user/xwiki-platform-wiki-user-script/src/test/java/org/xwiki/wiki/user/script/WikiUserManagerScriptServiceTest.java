@@ -99,7 +99,7 @@ public class WikiUserManagerScriptServiceTest
         wikiUserManager = mocker.getInstance(WikiUserManager.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
                 EntityReferenceSerializer.class, String.class));
         execution = mocker.getInstance(Execution.class);

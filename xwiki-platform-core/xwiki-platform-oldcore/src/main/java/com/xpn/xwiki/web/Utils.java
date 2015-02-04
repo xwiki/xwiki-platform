@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -551,7 +552,7 @@ public class Utils
         String[] newValues = null;
         String[] oldValues = map.get(name);
         if (oldValues == null) {
-            newValues = new String[] { value };
+            newValues = new String[] {value};
         } else {
             newValues = new String[oldValues.length + 1];
             System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
@@ -664,7 +665,19 @@ public class Utils
     @Deprecated
     public static ComponentManager getComponentManager()
     {
-        return getContextComponentManager();
+        ComponentManager contextComponentManager;
+
+        try {
+            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context/root");
+        } catch (ComponentLookupException e) {
+            // This means the Context Root CM doesn't exist, use the Root CM.
+            contextComponentManager = rootComponentManager;
+
+            LOGGER.warn("Failed to find context/root component manager ({}), return root component manager",
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        return contextComponentManager;
     }
 
     /**
@@ -679,14 +692,14 @@ public class Utils
     {
         ComponentManager contextComponentManager;
 
-        // Look for the Context Component Manager so that Macros can be registered for a specific user, for a
-        // specific wiki, etc. If it's not found use the Root Component Manager. This allows the Rendering module
-        // to work outside of XWiki when there's no notion of Execution Context and Wiki Model for example.
         try {
             contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context");
         } catch (ComponentLookupException e) {
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
+
+            LOGGER.warn("Failed to find context component manager ({}), return root component manager",
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return contextComponentManager;

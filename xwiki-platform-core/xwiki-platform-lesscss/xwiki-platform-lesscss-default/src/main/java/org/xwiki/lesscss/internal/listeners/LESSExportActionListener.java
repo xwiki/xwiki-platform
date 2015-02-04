@@ -26,15 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
-import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
+import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -54,19 +48,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class LESSExportActionListener implements EventListener
 {
     @Inject
-    private LESSResourcesCache lessResourcesCache;
-
-    @Inject
-    private ColorThemeCache colorThemeCache;
-
-    @Inject
-    private CurrentColorThemeGetter currentColorThemeGetter;
-
-    @Inject
-    private ColorThemeReferenceFactory colorThemeReferenceFactory;
-
-    @Inject
-    private Logger logger;
+    private LESSContext lessContext;
 
     @Override
     public String getName()
@@ -83,20 +65,13 @@ public class LESSExportActionListener implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        // Flush the LESS cache if we're doing an HTML export because we need that URLs located in less file be
+        // Do not use the the LESS cache if we're doing an HTML export because we need that URLs located in less file be
         // recomputed (see ExportURLFactory).
         XWikiContext xcontext = (XWikiContext) data;
         XWikiRequest request = xcontext.getRequest();
         String format = request.get("format");
         if ("html".equals(format)) {
-            try {
-                ColorThemeReference  colorTheme = colorThemeReferenceFactory.createReference(
-                        currentColorThemeGetter.getCurrentColorTheme("default"));
-                this.lessResourcesCache.clearFromColorTheme(colorTheme);
-                this.colorThemeCache.clearFromColorTheme(colorTheme);
-            } catch (LESSCompilerException e) {
-                logger.warn("Failed to flush the less cache.", e);
-            }
+            lessContext.disableCache();
         }
     }
 }

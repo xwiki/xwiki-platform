@@ -21,8 +21,6 @@ package org.xwiki.model.reference;
 
 import java.util.Comparator;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Expose a set of references as a tree. The sort order is configurable using a {@link Comparator}. By default the
  * references will be sorted in default {@link String} order.
@@ -38,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.4RC1
  */
-@Unstable
 public class EntityReferenceTree extends EntityReferenceTreeNode
 {
     /**

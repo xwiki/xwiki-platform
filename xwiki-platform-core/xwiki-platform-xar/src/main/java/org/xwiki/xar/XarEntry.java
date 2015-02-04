@@ -21,36 +21,48 @@ package org.xwiki.xar;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.model.XarModel;
 
 /**
+ * An entry (wiki page) in a XAR package.
+ * 
  * @version $Id$
  * @since 5.4RC1
  */
-@Unstable
 public class XarEntry extends LocalDocumentReference
 {
     /**
-     * The name of the entry in the ZIP stream.
+     * @see #getEntryName()
      */
     private String entryName;
 
     /**
-     * The default action to set in package.xml.
+     * @see #getDefaultAction()
      */
     private int defaultAction;
 
+    /**
+     * @param reference the reference of the document
+     */
     public XarEntry(LocalDocumentReference reference)
     {
         this(reference, null);
     }
 
+    /**
+     * @param reference the reference of the document
+     * @param name the name of the entry (ZIP style)
+     */
     public XarEntry(LocalDocumentReference reference, String name)
     {
         this(reference, name, XarModel.ACTION_OVERWRITE);
     }
 
+    /**
+     * @param reference the reference of the document
+     * @param name the name of the entry (ZIP style)
+     * @param defaultAction the default action associated to a XAR entry
+     */
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction)
     {
         super(reference);
@@ -58,21 +70,33 @@ public class XarEntry extends LocalDocumentReference
         this.entryName = name;
     }
 
+    /**
+     * @return the name of the entry in the ZIP (XAR) package
+     */
     public String getEntryName()
     {
         return this.entryName;
     }
 
+    /**
+     * @return the default action associated to the entry
+     */
     public int getDefaultAction()
     {
         return this.defaultAction;
     }
 
+    /**
+     * @return the space of the document
+     */
     public String getSpaceName()
     {
         return extractReference(EntityType.SPACE).getName();
     }
 
+    /**
+     * @return the name of the document
+     */
     public String getDocumentName()
     {
         return getName();

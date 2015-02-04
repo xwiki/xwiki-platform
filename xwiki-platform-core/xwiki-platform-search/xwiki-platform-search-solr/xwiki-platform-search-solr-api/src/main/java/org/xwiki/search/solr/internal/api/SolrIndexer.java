@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.job.IndexerJob;
 import org.xwiki.search.solr.internal.job.IndexerRequest;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component that accepts XWiki {@link EntityReference}s to be indexed or deleted from the index if they exist. The
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.1M2
  */
-@Unstable
 @Role
 public interface SolrIndexer
 {

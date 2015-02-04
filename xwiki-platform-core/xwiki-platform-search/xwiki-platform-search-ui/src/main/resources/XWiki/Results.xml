@@ -49,24 +49,11 @@
 &lt;div id="searchResults"&gt;
   #foreach ($item in $list)
     #set($itemClass = "$item.class")
-    #if($itemClass.contains('lucene'))
-      #set($isLuceneResult = true)
-    #else
-      #set($isLuceneResult = false)
-    #end
-    #if($isLuceneResult)
-      #set($itemfullname = $services.model.serialize($item.getDocumentReference()))
-    #else
-      #set($itemfullname = "${xcontext.database}:${item}")
-    #end
+    #set($itemfullname = "${xcontext.database}:${item}")
     #if ($xwiki.hasAccessLevel('view', $xcontext.user, $itemfullname))
       &lt;div class="resultItem"&gt;
       &lt;div class="resultContainer"&gt;
-      #if($isLuceneResult)
-        #set($itemDoc = $item)
-      #else
-        #set($itemDoc = $xwiki.getDocument($item))
-      #end
+      #set($itemDoc = $xwiki.getDocument($item))
       #set($author = $xwiki.getUserName($itemDoc.author))
       ##*********************************************************##
       ## Description                                             ##
@@ -76,15 +63,7 @@
         ## Title                                                   ##
         ##*********************************************************##
         &lt;h2 class="itemTitle"&gt;
-          #if($isLuceneResult)
-            #if($item.type == 'attachment')
-              &lt;a href="$xwiki.getDocument($item.getDocumentReference()).getAttachmentURL($item.filename)"&gt;$escapetool.xml($item.filename)&lt;/a&gt;
-            #else
-              &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($xwiki.getDocument($itemfullname).plainTitle)&lt;/a&gt;
-            #end
-          #else
-            &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($itemDoc.plainTitle)&lt;/a&gt;
-          #end
+          &lt;a href="$xwiki.getURL($itemfullname)"&gt;$escapetool.xml($itemDoc.plainTitle)&lt;/a&gt;
         &lt;/h2&gt;
         ##*********************************************************##
         ## Location                                                ##

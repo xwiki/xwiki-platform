@@ -21,7 +21,6 @@ package org.xwiki.panels.test.ui;
 
 import org.junit.*;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 

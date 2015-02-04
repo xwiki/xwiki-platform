@@ -20,7 +20,6 @@
 package org.xwiki.instance;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Initialize and retrieve the Instance Id.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Role
-@Unstable
 public interface InstanceIdManager
 {
     /**

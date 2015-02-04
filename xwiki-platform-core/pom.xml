@@ -53,7 +53,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -66,7 +66,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.7-b3-xwiki-1</version>
+        <version>2.7-b3-xwiki-3</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
@@ -425,84 +425,31 @@
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
-              <method>org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String)</method>
-              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
-              <method>java.util.List getMacroDescriptors(java.lang.String, java.lang.String)</method>
-              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
-              <method>void getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
-              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
-              <method>void getMacroDescriptors(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
-              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
-              <method>boolean clearCacheFromFileSystemSkin(java.lang.String)</method>
-              <justification>LESS refactoring.</justification>
-            </difference>
-            <difference>
               <differenceType>7006</differenceType>
-              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
-              <method>org.xwiki.lesscss.ColorTheme getColorThemeFromSkinFile(java.lang.String)</method>
-              <to>org.xwiki.lesscss.colortheme.ColorTheme</to>
-              <justification>LESS refactoring.</justification>
+              <className>org/xwiki/mail/MimeMessageFactory</className>
+              <method>javax.mail.internet.MimeMessage createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
+              <to>java.lang.Object</to>
+              <justification>Young API. Made the API more generic.</justification>
             </difference>
             <difference>
-              <differenceType>7006</differenceType>
-              <className>org/xwiki/lesscss/LessCompilerScriptService</className>
-              <method>org.xwiki.lesscss.ColorTheme getColorThemeFromSkinFile(java.lang.String, java.lang.String)</method>
-              <to>org.xwiki.lesscss.colortheme.ColorTheme</to>
-              <justification>LESS refactoring.</justification>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/script/MailSenderScriptService</className>
+              <method>java.util.Iterator createMessages(java.lang.String, java.lang.Object, java.lang.String, java.util.Map)</method>
+              <justification>Young API. Made the API more generic.</justification>
             </difference>
             <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/wiki/descriptor/WikiDescriptorManager</className>
-              <method>org.xwiki.wiki.descriptor.WikiDescriptor getCurrentWikiDescriptor()</method>
-              <justification>Young API, this method needs to be available for consistency with the getMainWikiDescriptor/Id pair of methods</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
-              <className>com/xpn/xwiki/monitor/api/MonitorPlugin</className>
-              <method>org.apache.commons.collections.buffer.CircularFifoBuffer getLastTimerData()</method>
-              <to>org.apache.commons.collections4.queue.CircularFifoQueue</to>
-              <justification>Switched to the generics-aware commons-collections4.</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
-              <className>com/xpn/xwiki/monitor/api/MonitorPlugin</className>
-              <method>org.apache.commons.collections.buffer.CircularFifoBuffer getLastUnfinishedTimerData()</method>
-              <to>org.apache.commons.collections4.queue.CircularFifoQueue</to>
-              <justification>Switched to the generics-aware commons-collections4.</justification>
+              <differenceType>6001</differenceType>
+              <className>org/xwiki/mail/script/AbstractMailScriptService</className>
+              <field>configuration</field>
+              <justification>Young API. Internal refactoring</justification>
             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Add new methods to the Icon Set Module -->
-            <exclude>**/IconSetManager**</exclude>
-            <exclude>**/IconManager**</exclude>
-            <!-- Refactor on the LESS module.
-             The clirr configuration of that module is actually done in xwiki-platfrom-lesscss-api/pom.xml because of
-             a bug in the clirr plugin.
-             Do not forget to also change that file for the final release!-->
-            <exclude>**/xwiki-platform-lesscss/**</exclude>
-            <!-- Lots of refactoring on the new Mail module, which is a young API -->
-            <exclude>**/org/xwiki/mail/**</exclude>
+            <!-- We refactored the client code of the WYSIWYG editor to use the new tree. -->
+            <exclude>org/xwiki/gwt/wysiwyg/client/**</exclude>
           </excludes>
         </configuration>
       </plugin>

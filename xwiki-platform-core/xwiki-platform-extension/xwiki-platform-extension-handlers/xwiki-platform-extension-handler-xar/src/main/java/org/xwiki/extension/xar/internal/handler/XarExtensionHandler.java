@@ -59,7 +59,6 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
-import org.xwiki.xar.XarPackage;
 
 /**
  * @version $Id$

@@ -64,7 +64,15 @@ public class FlamingoThemeTest extends AbstractTest
         presentationAdministrationSectionPage.clickOnCustomize();
         EditThemePage editThemePage = new EditThemePage();
 
+        // Wait for the preview to be fully loaded
+        assertTrue(editThemePage.isPreviewBoxLoading());
+        editThemePage.waitUntilPreviewIsLoaded();
+        // First, disable auto refresh because it slows down the test
+        // (and can even make it fails if the computer is slow)
+        editThemePage.setAutoRefresh(false);
+
         verifyAllVariablesCategoriesArePresent(editThemePage);
+        verifyVariablesCategoriesDoesNotDisappear(editThemePage);
         verifyThatPreviewWorks(editThemePage);
 
         // We do not have a way top clear the browser's cache with selenium
@@ -88,17 +96,24 @@ public class FlamingoThemeTest extends AbstractTest
         assertTrue(categories.contains("Advanced"));
     }
 
+    private void verifyVariablesCategoriesDoesNotDisappear(EditThemePage editThemePage) throws Exception
+    {
+        // Because of an incompatibility between PrototypeJS and Bootstrap, the variables categories can disappear
+        // (see: http://jira.xwiki.org/browse/XWIKI-11670).
+        // This test verifies that the bug is still fixed.
+        assertEquals(10, editThemePage.getVariableCategories().size());
+        // We click on different categories
+        editThemePage.selectVariableCategory("Base colors");
+        editThemePage.selectVariableCategory("Typography");
+        // We verify that they are still there
+        assertEquals(10, editThemePage.getVariableCategories().size());
+    }
+
     /**
      * @since 6.3M2
      */
     private void verifyThatPreviewWorks(EditThemePage editThemePage) throws Exception
     {
-        // Wait for the preview to be fully loaded
-        assertTrue(editThemePage.isPreviewBoxLoading());
-        editThemePage.waitUntilPreviewIsLoaded();
-        // First, disable auto refresh because it slows down the test
-        // (and can even make it fails if the computer is slow)
-        editThemePage.setAutoRefresh(false);
         // Verify that the preview is working with the current values
         PreviewBox previewBox = editThemePage.getPreviewBox();
         assertFalse(previewBox.hasError());

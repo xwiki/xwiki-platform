@@ -48,13 +48,11 @@
       <artifactId>resin-quercus</artifactId>
       <version>3.2.1</version>
     </dependency>
-
     <!-- Quercus needs the servlet API to properly initialize -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -70,4 +68,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <properties combine.self="override"/>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

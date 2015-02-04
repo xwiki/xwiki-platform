@@ -1,6 +1,7 @@
 org.xwiki.lesscss.internal.cache.CacheKeyFactory
 org.xwiki.lesscss.internal.cache.DefaultColorThemeCache
 org.xwiki.lesscss.internal.cache.DefaultLESSResourcesCache
+org.xwiki.lesscss.internal.cache.XWikiContextCacheKeyFactory
 org.xwiki.lesscss.internal.colortheme.CachedLESSColorThemeConverter
 org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter
 org.xwiki.lesscss.internal.colortheme.DefaultColorThemeReferenceFactory
@@ -20,7 +21,6 @@ org.xwiki.lesscss.internal.resources.LESSObjectPropertyResourceReferenceSerializ
 org.xwiki.lesscss.internal.resources.LESSSkinFileReader
 org.xwiki.lesscss.internal.resources.LESSSkinFileResourceReferenceSerializer
 org.xwiki.lesscss.internal.listeners.ColorThemeListener
-org.xwiki.lesscss.internal.listeners.LESSExportActionListener
 org.xwiki.lesscss.internal.listeners.SkinListener
 org.xwiki.lesscss.internal.listeners.SSXListener
 org.xwiki.lesscss.internal.skin.DefaultSkinReferenceFactory

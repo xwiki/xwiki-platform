@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-api</artifactId>
-  <name>XWiki Platform - User Interface Extension - API</name>
+  <name>XWiki Platform - UI Extension Extension - API</name>
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
   <properties>
@@ -92,4 +92,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <properties combine.self="override"/>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

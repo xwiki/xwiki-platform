@@ -50,9 +50,15 @@ public class DefaultColorThemeCache extends AbstractCache<ColorTheme> implements
     public void initialize() throws InitializationException
     {
         try {
+            // Create the cache
             CacheConfiguration configuration = new CacheConfiguration(LESS_COLOR_THEMES_CACHE_ID);
             CacheFactory cacheFactory = cacheManager.getCacheFactory();
-            this.cache = cacheFactory.newCache(configuration);
+            super.cache = cacheFactory.newCache(configuration);
+            
+            // The Color Theme only depends on colors which do not depend on the XWikiContext. So we don't handle the
+            // XWikiContext in this cache.
+            super.isContextHandled = false;
+            
         } catch (ComponentLookupException | CacheException e) {
             throw new InitializationException(
                     String.format("Failed to initialize LESS color themes cache [%s].", LESS_COLOR_THEMES_CACHE_ID), e);

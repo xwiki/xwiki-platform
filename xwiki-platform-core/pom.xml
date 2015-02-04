@@ -311,7 +311,21 @@
                 <value>${basedir}/target/screenshots</value>
               </property>
             </systemProperties>
+            <!-- Verify that unit tests don't output anything to stdout/stderr -->
+            <properties>
+              <property>
+                <name>listener</name>
+                <value>org.xwiki.test.CaptureConsoleRunListener</value>
+              </property>
+            </properties>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
@@ -442,6 +456,12 @@
               <className>org/xwiki/mail/script/AbstractMailScriptService</className>
               <field>configuration</field>
               <justification>Young API. Internal refactoring</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/lesscss/cache/LESSCache</className>
+              <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
+              <justification>Young API. Fix a bad designed API.</justification>
             </difference>
           </ignored>
           <excludes>

@@ -178,6 +178,8 @@
           <classpathDependencyExcludes>
             <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
           </classpathDependencyExcludes>
+          <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+          <properties combine.self="override"/>
         </configuration>
       </plugin>
     </plugins>

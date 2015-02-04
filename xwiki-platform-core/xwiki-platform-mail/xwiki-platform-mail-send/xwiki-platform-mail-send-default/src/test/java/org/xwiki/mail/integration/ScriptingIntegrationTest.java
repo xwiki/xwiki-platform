@@ -61,6 +61,7 @@ import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -131,6 +132,8 @@ public class ScriptingIntegrationTest
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
         when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
+
+        this.componentManager.registerMockComponent(ConverterManager.class);
     }
 
     @Before

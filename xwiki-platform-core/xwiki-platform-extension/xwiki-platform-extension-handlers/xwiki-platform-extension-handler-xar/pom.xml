@@ -77,7 +77,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -98,7 +97,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -135,6 +133,14 @@
               **/WikiEventListener.java,
               **/XarExtensionPlan.java
           </excludes>
+        </configuration>
+      </plugin>
+      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <properties combine.self="override"/>
         </configuration>
       </plugin>
     </plugins>

@@ -19,11 +19,14 @@
  */
 package org.xwiki.mail.script;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.Message;
@@ -40,6 +43,7 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -67,6 +71,9 @@ public class MailSenderScriptService extends AbstractMailScriptService
      * The key under which the last encountered error is stored in the current execution context.
      */
     static final String ERROR_KEY = "scriptservice.mailsender.error";
+
+    @Inject
+    private ConverterManager converterManager;
 
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
@@ -134,7 +141,8 @@ public class MailSenderScriptService extends AbstractMailScriptService
         Iterator<MimeMessage> result;
         try {
             MimeMessageFactory<Object, Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
-                source.getClass(), new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
+                computeSourceType(source, parameters),
+                new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
                 this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
             result = factory.createMessage(session, source, parameters);
@@ -146,6 +154,33 @@ public class MailSenderScriptService extends AbstractMailScriptService
         }
 
         return result;
+    }
+
+    private Type computeSourceType(Object source, Map<String, Object> parameters)
+    {
+        // Find the Type of the MimeMessageFactory to look up. If the type is passed as parameters then use it,
+        // otherwise try to guess it.
+        Type sourceType;
+        Object sourceTypeAsObject = parameters.get("type");
+        if (sourceTypeAsObject == null) {
+            // No "type" defined by the user, try to guess it!
+            // If the passed source extends List then consider that the type is List.
+            // Then use the class of the first element to construct a generic type
+            if (source instanceof List) {
+                List sourceList = (List) source;
+                if (!sourceList.isEmpty()) {
+                    sourceType = new DefaultParameterizedType(null, List.class, sourceList.get(0).getClass());
+                } else {
+                    sourceType = List.class;
+                }
+            } else {
+                sourceType = source.getClass();
+            }
+        } else {
+            sourceType = this.converterManager.convert(Type.class, sourceTypeAsObject);
+        }
+
+        return sourceType;
     }
 
     /**

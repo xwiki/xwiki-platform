@@ -2923,7 +2923,7 @@ public class XWiki implements EventListener
             String content;
             Syntax syntax;
             if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-                content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
+                content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
                 syntax = Syntax.XWIKI_2_0;
             } else {
                 content = "#includeForm(\"XWiki.XWikiUserSheet\")";
@@ -3148,7 +3148,7 @@ public class XWiki implements EventListener
         String content;
         Syntax syntax;
         if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-            content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
+            content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
             syntax = Syntax.XWIKI_2_0;
         } else {
             content = "#includeForm(\"XWiki.XWikiUserSheet\")";

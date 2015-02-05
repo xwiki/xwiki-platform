@@ -79,4 +79,15 @@ public class LESSContextTest
         mocker.getComponentUnderTest().stopDisablingCache();
         assertFalse(mocker.getComponentUnderTest().isCacheDisabled());
     }
+
+    @Test
+    public void setHTMLExport() throws Exception
+    {
+        assertFalse(mocker.getComponentUnderTest().isHtmlExport());
+        mocker.getComponentUnderTest().setHtmlExport(true);
+        assertTrue(mocker.getComponentUnderTest().isHtmlExport());
+        mocker.getComponentUnderTest().setHtmlExport(false);
+        assertFalse(mocker.getComponentUnderTest().isHtmlExport());
+    }
+
 }

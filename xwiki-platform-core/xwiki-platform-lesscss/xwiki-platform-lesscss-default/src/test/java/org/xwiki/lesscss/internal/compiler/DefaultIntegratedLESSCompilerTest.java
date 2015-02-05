@@ -171,4 +171,25 @@ public class DefaultIntegratedLESSCompilerTest
         verifyZeroInteractions(cache);
     }
 
+    @Test
+    public void compileWhenInCacheAndHTMLExport() throws Exception
+    {
+        // Mocks
+        when(cache.get(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
+                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cached output");
+        
+        when(lessContext.isHtmlExport()).thenReturn(true);
+
+        // Test
+        assertEquals("cached output",
+                mocker.getComponentUnderTest().compile(new LESSSkinFileResourceReference("file"), false, true, false));
+        
+        // Verify that the velocity is executed
+        verify(cachedIntegratedLESSCompiler).compute(eq(new LESSSkinFileResourceReference("file")), eq(false), eq(true),
+                eq(false), eq("skin"));
+        // Verify we don't put anything in the cache
+        verify(cache, never()).set(any(LESSResourceReference.class), any(SkinReference.class),
+                any(ColorThemeReference.class), anyString());
+    }
+
 }

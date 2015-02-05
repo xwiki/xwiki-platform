@@ -46,8 +46,6 @@ public class CacheKeyFactoryTest
     private SkinReferenceSerializer skinReferenceSerializer;
 
     private ColorThemeReferenceSerializer colorThemeReferenceSerializer;
-    
-    private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
 
     @Before
     public void setUp() throws Exception
@@ -55,28 +53,10 @@ public class CacheKeyFactoryTest
         lessResourceReferenceSerializer = mocker.getInstance(LESSResourceReferenceSerializer.class);
         skinReferenceSerializer = mocker.getInstance(SkinReferenceSerializer.class);
         colorThemeReferenceSerializer = mocker.getInstance(ColorThemeReferenceSerializer.class);
-        xcontextCacheKeyFactory = mocker.getInstance(XWikiContextCacheKeyFactory.class);
     }
 
     @Test
-    public void getCacheKeyWithContext() throws Exception
-    {
-        // Mocks
-        when(lessResourceReferenceSerializer.serialize(eq(new LESSSkinFileResourceReference("file")))).
-                thenReturn("file");
-        when(skinReferenceSerializer.serialize(eq(new FSSkinReference("skin")))).thenReturn("skin");
-        when(colorThemeReferenceSerializer.serialize(new NamedColorThemeReference("colorTheme"))).thenReturn("colorTheme");
-        when(xcontextCacheKeyFactory.getCacheKey()).thenReturn("XWikiContext[Mock]");
-
-        // Test
-        assertEquals("4_file_4_skin_10_colorTheme_18_XWikiContext[Mock]",
-                mocker.getComponentUnderTest().getCacheKey(
-                        new LESSSkinFileResourceReference("file"), new FSSkinReference("skin"),
-                        new NamedColorThemeReference("colorTheme"), true));
-    }
-
-    @Test
-    public void getCacheKeyWithoutContext() throws Exception
+    public void getCacheKey() throws Exception
     {
         // Mocks
         when(lessResourceReferenceSerializer.serialize(eq(new LESSSkinFileResourceReference("file")))).
@@ -85,10 +65,9 @@ public class CacheKeyFactoryTest
         when(colorThemeReferenceSerializer.serialize(new NamedColorThemeReference("colorTheme"))).thenReturn("colorTheme");
 
         // Test
-        assertEquals("4_file_4_skin_10_colorTheme",
-                mocker.getComponentUnderTest().getCacheKey(
-                        new LESSSkinFileResourceReference("file"), new FSSkinReference("skin"),
-                        new NamedColorThemeReference("colorTheme"), false));
+        assertEquals("4_file_4_skin_10_colorTheme", mocker.getComponentUnderTest().getCacheKey(
+                new LESSSkinFileResourceReference("file"), new FSSkinReference("skin"),
+                new NamedColorThemeReference("colorTheme")));
     }
 
 

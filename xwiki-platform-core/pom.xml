@@ -443,12 +443,6 @@
               <field>configuration</field>
               <justification>Young API. Internal refactoring</justification>
             </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/lesscss/cache/LESSCache</className>
-              <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
-              <justification>Young API. Fix a bad designed API.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

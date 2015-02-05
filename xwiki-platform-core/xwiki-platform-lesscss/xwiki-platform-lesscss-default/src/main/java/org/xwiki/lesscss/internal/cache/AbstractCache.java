@@ -31,6 +31,7 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.cache.LESSCache;
 import org.xwiki.lesscss.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
 import org.xwiki.lesscss.skin.SkinReference;
 
 /**
@@ -45,11 +46,6 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 {
     @Inject
     protected CacheManager cacheManager;
-
-    /**
-     * Whether or not the cache should handle the current XWikiContext object (true by default).
-     */
-    protected boolean isContextHandled = true;
 
     /**
      * The cache that will store the content.
@@ -77,12 +73,13 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     @Inject
     private CacheKeyFactory cacheKeyFactory;
 
-    private Map<String, String> mutexList = new HashMap<>();
+    @Inject
+    private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
 
     @Override
     public T get(LESSResourceReference lessResourceReference, SkinReference skin, ColorThemeReference colorTheme)
     {
-        return cache.get(cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme, isContextHandled));
+        return cache.get(cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme));
     }
 
     @Override
@@ -90,7 +87,7 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         ColorThemeReference colorTheme, T content)
     {
         // Store the content in the cache
-        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme, isContextHandled);
+        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme);
         cache.set(cacheKey, content);
 
         // Add the new key to maps
@@ -160,20 +157,5 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     public void clearFromLESSResource(LESSResourceReference lessResourceReference)
     {
         clearFromCriteria(cachedFilesKeysMapPerLESSResource, lessResourceReference);
-    }
-    
-    @Override
-    public synchronized Object getMutex(LESSResourceReference lessResourceReference, SkinReference skin, 
-        ColorThemeReference colorTheme)
-    {
-        // The mutex is a string (actually the cache key) to help debugging.
-        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skin, colorTheme, isContextHandled);
-        String mutex = mutexList.get(cacheKey);
-        if (mutex == null) {
-            // the mutex is the key, so no extra memory is needed
-            mutex = cacheKey;
-            mutexList.put(cacheKey, mutex);
-        }
-        return mutex;
     }
 }

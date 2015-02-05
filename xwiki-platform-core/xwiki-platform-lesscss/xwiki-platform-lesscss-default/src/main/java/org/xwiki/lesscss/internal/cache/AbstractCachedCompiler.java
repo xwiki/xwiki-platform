@@ -19,6 +19,9 @@
  */
 package org.xwiki.lesscss.internal.cache;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
@@ -27,8 +30,8 @@ import org.xwiki.lesscss.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
-import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
 import org.xwiki.lesscss.skin.SkinReference;
 import org.xwiki.lesscss.skin.SkinReferenceFactory;
 
@@ -52,16 +55,21 @@ public abstract class AbstractCachedCompiler<T>
     protected Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    protected CurrentColorThemeGetter currentColorThemeGetter;
+    private CurrentColorThemeGetter currentColorThemeGetter;
 
     @Inject
-    protected SkinReferenceFactory skinReferenceFactory;
+    private SkinReferenceFactory skinReferenceFactory;
 
     @Inject
-    protected ColorThemeReferenceFactory colorThemeReferenceFactory;
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
     @Inject
-    protected LESSContext lessContext;
+    private CacheKeyFactory cacheKeyFactory;
+
+    @Inject
+    private LESSContext lessContext;
+
+    private Map<String, String> mutexList = new HashMap<>();
 
     /**
      * Get the result of the compilation.
@@ -108,7 +116,8 @@ public abstract class AbstractCachedCompiler<T>
 
         // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
         // use the last result stored in the cache.
-        Object mutex = cache.getMutex(lessResourceReference, skinReference, colorThemeReference);
+        // The mutex is a string (actually the cache key) to help debugging.
+        String mutex = getMutex(lessResourceReference, skinReference, colorThemeReference);
         synchronized (mutex) {
 
             // Check if the result is in the cache
@@ -143,4 +152,17 @@ public abstract class AbstractCachedCompiler<T>
      * @since 6.4M3
      */
     protected abstract T cloneResult(T toClone);
+
+    private synchronized String getMutex(LESSResourceReference lessResourceReference, SkinReference skinReference,
+        ColorThemeReference colorThemeReference)
+    {
+        String cacheKey = cacheKeyFactory.getCacheKey(lessResourceReference, skinReference, colorThemeReference);
+        String mutex = mutexList.get(cacheKey);
+        if (mutex == null) {
+            // the mutex is the key, so no extra memory is needed
+            mutex = cacheKey;
+            mutexList.put(cacheKey, mutex);
+        }
+        return mutex;
+    }
 }

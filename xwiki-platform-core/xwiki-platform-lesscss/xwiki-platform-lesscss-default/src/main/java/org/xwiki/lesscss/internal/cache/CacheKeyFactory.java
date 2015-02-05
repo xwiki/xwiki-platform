@@ -50,6 +50,9 @@ public class CacheKeyFactory
 
     @Inject
     private ColorThemeReferenceSerializer colorThemeReferenceSerializer;
+    
+    @Inject
+    private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
 
     /**
      * Get the cache key corresponding to the given LESS resource and context.
@@ -57,18 +60,26 @@ public class CacheKeyFactory
      * @param lessResourceReference the reference to the LESS resource that have been compiled
      * @param skinReference skin for which the resource have been compiled
      * @param colorThemeReference color theme for which the resource have been compiled.
+     * @param withContext whether or not the current XWikiContext must be handled by the cache.
      *
      * @return the corresponding cache key.
      */
     public String getCacheKey(LESSResourceReference lessResourceReference, SkinReference skinReference,
-            ColorThemeReference colorThemeReference)
+            ColorThemeReference colorThemeReference, boolean withContext)
     {
-        String lessResource = lessResourceReferenceSerializer.serialize(lessResourceReference);
-        String skin = skinReferenceSerializer.serialize(skinReference);
-        String colorTheme = colorThemeReferenceSerializer.serialize(colorThemeReference);
+        String lessResource  = lessResourceReferenceSerializer.serialize(lessResourceReference);
+        String skin          = skinReferenceSerializer.serialize(skinReference);
+        String colorTheme    = colorThemeReferenceSerializer.serialize(colorThemeReference);
+        
+        String result = lessResource.length()  + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
+                     +  skin.length()          + CACHE_KEY_SEPARATOR + skin         + CACHE_KEY_SEPARATOR
+                     +  colorTheme.length()    + CACHE_KEY_SEPARATOR + colorTheme;
+        
+        if (withContext) {
+            String xcontext = xcontextCacheKeyFactory.getCacheKey();
+            result += CACHE_KEY_SEPARATOR + xcontext.length() + CACHE_KEY_SEPARATOR + xcontext; 
+        }
 
-        return lessResource.length() + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
-            + skin.length() + CACHE_KEY_SEPARATOR + skin + CACHE_KEY_SEPARATOR
-            + colorTheme.length() + CACHE_KEY_SEPARATOR + colorTheme;
+        return result;
     }
 }

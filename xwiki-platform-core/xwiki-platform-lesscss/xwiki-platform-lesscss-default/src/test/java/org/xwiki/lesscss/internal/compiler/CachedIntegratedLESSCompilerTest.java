@@ -46,6 +46,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -125,6 +126,26 @@ public class CachedIntegratedLESSCompilerTest
 
         // Verify
         verify(xcontext, never()).put(eq("skin"), anyString());
+    }
+
+    @Test
+    public void computeSkinFileWithoutLESS() throws Exception
+    {
+        // Mocks
+        LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
+
+        Path path = mock(Path.class);
+        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
+        when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
+                thenReturn("Some Velocity-rendered LESS content");
+        
+        // Tests
+        assertEquals("Some Velocity-rendered LESS content", mocker.getComponentUnderTest().compute(resource, false, 
+            true, false, "skin2"));
+        
+        // Verify that the LESS compiler is never called
+        verifyZeroInteractions(lessCompiler);
     }
 
     @Test

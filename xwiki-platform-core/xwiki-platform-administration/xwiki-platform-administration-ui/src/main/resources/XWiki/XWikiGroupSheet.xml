@@ -50,7 +50,6 @@
   #setVariable("$hasGroupRight" $result)
 #end
 #hasGroupRight('edit' $hasEditGroupRight)
-#hasGroupRight('delete' $hasDeleteGroupRight)
 {{/velocity}}
 
 {{velocity}}
@@ -97,7 +96,7 @@
    }
 })
 ## Keep testing the inline action for backward compatibility with existing groups.
-#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasDeleteGroupRight)
+#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
   #set($columns = ['_avatar', 'member', '_actions'])
 #else
   #set($columns = ['_avatar', 'member'])

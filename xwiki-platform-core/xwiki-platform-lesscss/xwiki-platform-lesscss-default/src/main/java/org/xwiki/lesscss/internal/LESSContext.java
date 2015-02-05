@@ -38,6 +38,8 @@ public class LESSContext
 {
     private static final String CACHE_PROPERTY = "less.cache.disable";
 
+    private static final String HTML_EXPORT = "less.htmlexport";
+
     @Inject
     private Execution execution;
 
@@ -63,6 +65,22 @@ public class LESSContext
     public boolean isCacheDisabled()
     {
         return Boolean.TRUE.equals(getContext().getProperty(CACHE_PROPERTY));
+    }
+
+    /**
+     * @param htmlExport whether or not XWiki is performing an HTML export.  
+     */
+    public void setHtmlExport(boolean htmlExport)
+    {
+        getContext().newProperty(HTML_EXPORT).inherited().initial(htmlExport).declare();
+    }
+
+    /**
+     * @return whether or not XWiki is performing an HTML export.
+     */
+    public boolean isHtmlExport()
+    {
+        return Boolean.TRUE.equals(getContext().getProperty(HTML_EXPORT));
     }
 
     private ExecutionContext getContext()

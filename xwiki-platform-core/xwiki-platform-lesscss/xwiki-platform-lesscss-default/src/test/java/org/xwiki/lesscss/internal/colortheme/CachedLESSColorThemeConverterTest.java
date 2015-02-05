@@ -65,7 +65,7 @@ public class CachedLESSColorThemeConverterTest
             thenReturn(string.toString());
 
         Map<String, String> results = mocker.getComponentUnderTest().compute(
-            new LESSSkinFileResourceReference("file"), false, false, "skin");
+            new LESSSkinFileResourceReference("file"), false, false, true, "skin");
         assertEquals("#e8e8e8", results.get("borderColor"));
     }
 }

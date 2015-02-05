@@ -28,6 +28,7 @@ import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
+import org.xwiki.lesscss.internal.compiler.DefaultIntegratedLESSCompiler;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.skin.SkinReference;
 import org.xwiki.lesscss.skin.SkinReferenceFactory;
@@ -97,7 +98,7 @@ public abstract class AbstractCachedCompiler<T>
     {
         // If the cache is disabled, we just compile
         if (lessContext.isCacheDisabled()) {
-            return compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, skin);
+            return compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, true, skin);
         }
 
         T result = null;
@@ -115,13 +116,22 @@ public abstract class AbstractCachedCompiler<T>
             if (!force) {
                 result = cache.get(lessResourceReference, skinReference, colorThemeReference);
                 if (result != null) {
+                    // The LESS file contains Velocity code that call resources (ie: $xwiki.getSkinFile), and the HTML
+                    // exporter listens these calls to know which resources must be exported.
+                    // If we only use the cache, we would have a correct CSS file but some resources will be missing.
+                    // So we need to execute the velocity again, even if the LESS file is cached.
+                    // To perform this quickly, we do not recompile the LESS code (which would be useless anyway), but
+                    // we only do the Velocity Execution step.
+                    if (lessContext.isHtmlExport() && useVelocity && this instanceof DefaultIntegratedLESSCompiler) {
+                        compiler.compute(lessResourceReference, includeSkinStyle, true, false, skin);
+                    }
                     return cloneResult(result);
                 }
             }
 
             // Either the result was in the cache or the force flag is set to true, we need to compile
             try {
-                result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, skin);
+                result = compiler.compute(lessResourceReference, includeSkinStyle, useVelocity, true, skin);
             } finally {
                 // We must cache the result, even if the compilation have failed, to prevent re-compiling again and
                 // again (the compilation will still fail until the LESS resource is updated so it useless to retry).

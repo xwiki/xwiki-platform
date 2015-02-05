@@ -29,7 +29,6 @@ import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.template.event.TemplateDeletedEvent;
-import org.xwiki.template.event.TemplateEvent;
 import org.xwiki.template.event.TemplateUpdatedEvent;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -43,7 +42,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 
 /**
- * Listener to modification to wiki based template and generate related {@link TemplateEvent}s.
+ * Listener to modification to wiki based template and generate related {@link org.xwiki.template.event.TemplateEvent}s.
  *
  * @version $Id$
  */

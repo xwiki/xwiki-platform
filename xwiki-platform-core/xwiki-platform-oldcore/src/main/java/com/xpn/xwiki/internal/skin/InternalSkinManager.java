@@ -84,7 +84,7 @@ public class InternalSkinManager implements Initializable
     private CacheManager cacheManager;
 
     @Inject
-    private ContextualAuthorizationManager authorization;
+    private Provider<ContextualAuthorizationManager> authorization;
 
     @Inject
     private Logger logger;
@@ -194,7 +194,7 @@ public class InternalSkinManager implements Initializable
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(skin);
                 if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    if (!this.authorization.get().hasAccess(Right.VIEW, document.getDocumentReference())) {
                         this.logger.debug(
                             "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
                             skin);
@@ -257,7 +257,7 @@ public class InternalSkinManager implements Initializable
             if (testRights) {
                 XWikiDocument document = this.wikiSkinUtils.getSkinDocument(baseSkin);
                 if (document != null) {
-                    if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
+                    if (!this.authorization.get().hasAccess(Right.VIEW, document.getDocumentReference())) {
                         this.logger.debug(
                             "Cannot access configured wiki skin [{}] due to access rights, using the default skin.",
                             baseSkin);

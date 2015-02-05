@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * <p>
@@ -69,6 +71,11 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /** The name of the context key for the additional parameters for pulled extensions. */
     protected final String parametersContextKey = this.getClass().getCanonicalName() + "_parameters";
+
+    /**
+     * @see #getDefaultEntityReferenceSerializer()
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
      * XWiki plugin constructor.
@@ -227,7 +234,13 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
         // Add On-Page extensions
         if (hasPageExtensions(context)) {
-            extensions.add(context.getDoc().getFullName());
+            // Make sure to use a prefixed document full name for the current document as well, or else the "extensions"
+            // set will not detect if it was added before and it will be added twice.
+            EntityReferenceSerializer<String> serializer = getDefaultEntityReferenceSerializer();
+            String serializedCurrentDocumentName = serializer.serialize(context.getDoc().getDocumentReference());
+
+            // Add it to the list.
+            extensions.add(serializedCurrentDocumentName);
         }
 
         for (String documentName : extensions) {
@@ -347,5 +360,17 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
                    UsedExtension extension) {
         getPulledResources(context).addAll(extension.resources);
         getParametersMap(context).putAll(extension.parameters);
+    }
+
+    /**
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
+    {
+        if (this.defaultEntityReferenceSerializer == null) {
+            this.defaultEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        }
+
+        return this.defaultEntityReferenceSerializer;
     }
 }

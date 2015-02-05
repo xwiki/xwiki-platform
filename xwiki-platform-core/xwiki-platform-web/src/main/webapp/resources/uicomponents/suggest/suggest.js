@@ -49,6 +49,9 @@ var XWiki = (function(XWiki){
     resultIcon: "icon",
     // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
     resultHint: "hint",
+    // The name of the JSON field or XML attribute holding the result type. The value of the specified field/attribute is
+    // used as a CSS class name. This is useful if you need to style suggestions differently based on some property.
+    resultType: "type",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input

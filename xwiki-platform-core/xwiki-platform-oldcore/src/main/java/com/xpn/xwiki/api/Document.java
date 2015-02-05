@@ -378,6 +378,16 @@ public class Document extends Api
     }
 
     /**
+     * @return the document author reference
+     * @since 6.4RC1
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return this.doc.getAuthorReference();
+    }
+
+
+    /**
      * Get fullName of the profile document of the author of the content modification of this document version.
      * Example: XWiki.Admin.
      * 

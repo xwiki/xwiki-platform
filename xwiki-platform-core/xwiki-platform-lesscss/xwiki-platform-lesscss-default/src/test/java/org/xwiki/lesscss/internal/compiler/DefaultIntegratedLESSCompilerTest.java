@@ -124,7 +124,7 @@ public class DefaultIntegratedLESSCompilerTest
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
         // Mocks
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq("skin"))).
+        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq(true), eq("skin"))).
                 thenReturn("compiled output");
 
         // Test
@@ -142,7 +142,7 @@ public class DefaultIntegratedLESSCompilerTest
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
         // Mocks
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq("skin"))).
+        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq(true), eq("skin"))).
                 thenReturn("compiled output");
 
         // Test
@@ -162,7 +162,7 @@ public class DefaultIntegratedLESSCompilerTest
         // Mock
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
         when(lessContext.isCacheDisabled()).thenReturn(true);
-        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false), eq("skin"))).
+        when(cachedIntegratedLESSCompiler.compute(eq(resource), eq(false), eq(false),eq(true), eq("skin"))).
                 thenReturn("compiled output");
 
         // Test

@@ -102,7 +102,7 @@ public class CachedIntegratedLESSCompilerTest
         when(lessCompiler.compile(eq("Some Velocity-rendered LESS content"), any(Path[].class))).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, true, "skin2"));
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, true, true, "skin2"));
 
         // Verify
         verify(xcontext, times(1)).put("skin", "skin2");
@@ -121,7 +121,7 @@ public class CachedIntegratedLESSCompilerTest
         when(lessCompiler.compile(eq("Some LESS content"), any(Path[].class))).thenReturn("output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, "skin2"));
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, true, "skin2"));
 
         // Verify
         verify(xcontext, never()).put(eq("skin"), anyString());
@@ -153,7 +153,7 @@ public class CachedIntegratedLESSCompilerTest
                 .thenReturn(".realStartOfXWikiSSX{color:#000}output");
 
         // Tests
-        assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, "skin"));
+        assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, true, "skin"));
 
     }
 
@@ -175,7 +175,7 @@ public class CachedIntegratedLESSCompilerTest
         // Tests
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().compute(resource, false, true, "skin2");
+            mocker.getComponentUnderTest().compute(resource, false, true, true, "skin2");
         } catch(LESSCompilerException e) {
             caughtException = e;
         }

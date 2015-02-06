@@ -448,6 +448,7 @@ Value must be:
 $services.localization.render('platform.index.spaceIndexDescription', [$space])
 
 {{documents space="$space.replaceAll('["~]', '~$0')" id="spaceindex"/}}
+#set($docextras=[])
 {{/velocity}}
 </content>
 </xwikidoc>

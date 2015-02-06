@@ -55,7 +55,7 @@ public class XWikiRenderingContext extends DefaultRenderingContext
             try {
                 this.velocityManager = this.componentManager.getInstance(VelocityManager.class);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Failed to initialize VelocityManager, velocity cache won't be cleaned", e);
+                this.logger.debug("Failed to initialize VelocityManager, velocity cache won't be cleaned", e);
             }
         }
 

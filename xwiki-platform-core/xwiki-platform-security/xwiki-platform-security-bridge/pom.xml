@@ -32,6 +32,8 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -108,14 +110,6 @@
             <!-- Fan-out complexity issue without any information of the exceeded value. -->
             **/authorization/internal/DefaultSecurityEntryReader.java
           </excludes>
-        </configuration>
-      </plugin>
-      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <properties combine.self="override"/>
         </configuration>
       </plugin>
     </plugins>

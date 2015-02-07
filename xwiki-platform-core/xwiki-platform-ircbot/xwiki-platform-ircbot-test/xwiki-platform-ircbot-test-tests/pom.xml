@@ -48,6 +48,8 @@
     <!-- Override in order to activate the Link Checker transformation for the Broken Links Bot Listener and Broken
          Link Event Listener -->
     <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

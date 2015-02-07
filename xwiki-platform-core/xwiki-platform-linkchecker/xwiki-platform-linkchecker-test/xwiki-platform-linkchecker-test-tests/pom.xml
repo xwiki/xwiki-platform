@@ -36,6 +36,8 @@
   <properties>
     <!-- Overridden configuration data for xwiki.properties to activate the Link Checker transformation -->
     <xwikiRenderingTransformations>macro, icon, linkchecker</xwikiRenderingTransformations>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

@@ -26,14 +26,15 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
 import org.suigeneris.jrcs.util.ToString;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
 /**
  * Implementation of an archive for XWikiAttachment based on a simple list of XWikiAttachments.
@@ -50,8 +51,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         "Exception while manipulating the archive for attachment {0}";
 
     /**
-     * Message to place in exceptions which are thrown because functions
-     * are not available in this implementation.
+     * Message to place in exceptions which are thrown because functions are not available in this implementation.
      */
     private static final String NOT_IMPLEMENTED_MESSAGE =
         "This function is not available in this implementation.";
@@ -62,8 +62,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     private XWikiAttachment attachment;
 
     /**
-     * A list of all the revisions of the attachment in this archive
-     * ordered by version number ascending.
+     * A list of all the revisions of the attachment in this archive ordered by version number ascending.
      */
     private final List<XWikiAttachment> revisions = new ArrayList<XWikiAttachment>();
 
@@ -78,11 +77,10 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * Constructor from List.
-     * Create a new instance of ListAttachmentArchive from a list of attachments.
+     * Constructor from List. Create a new instance of ListAttachmentArchive from a list of attachments.
      *
-     * @param revisions a List of XWikiAttachment revisions to put in this archive.
-     * All revisions are the same attachment and thus must have the same ID.
+     * @param revisions a List of XWikiAttachment revisions to put in this archive. All revisions are the same
+     * attachment and thus must have the same ID.
      */
     public ListAttachmentArchive(final List<XWikiAttachment> revisions)
     {
@@ -126,10 +124,9 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * Clone an attachment but not it's archive.
-     * {@link ListAttachmentArchive#clone()} calls {@link XWikiAttachment#clone()}
-     * and if the attachment is associated with an archive it call clone the archive.
-     * This function prevents an infinite loop.
+     * Clone an attachment but not it's archive.{@link ListAttachmentArchive#clone()} calls {@link
+     * XWikiAttachment#clone()} and if the attachment is associated with an archive it call clone the archive. This
+     * function prevents an infinite loop.
      *
      * @param original an attachment to clone.
      * @return a clone of original which has no XWikiAttachmentArchive attached.
@@ -164,8 +161,8 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      *
      * @param context the XWikiContext for the request.
      * @return this archive in JRCS format.
-     * @throws Exception if something goes wrong while serializing the attachment to XML or inserting it
-     * into the RCS archive.
+     * @throws Exception if something goes wrong while serializing the attachment to XML or inserting it into the RCS
+     * archive.
      */
     private Archive toRCS(final XWikiContext context) throws Exception
     {
@@ -186,8 +183,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
 
     /**
      * @param rcsArchive the RCS archive to import.
-     * @throws Exception if getting a revision from the RCS archive
-     * or deserializing an attachment from XML fails
+     * @throws Exception if getting a revision from the RCS archive or deserializing an attachment from XML fails
      */
     private void fromRCS(final Archive rcsArchive) throws Exception
     {
@@ -219,8 +215,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * {@inheritDoc}
-     * Not implemented, always returns an empty array.
+     * {@inheritDoc} Not implemented, always returns an empty array.
      *
      * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getArchive()
      */
@@ -238,7 +233,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }
-            Object[] args = {getAttachment().getFilename()};
+            Object[] args = { getAttachment().getFilename() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
                 GENERIC_EXCEPTION_MESSAGE, e, args);
@@ -259,7 +254,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
                 if (e instanceof XWikiException) {
                     throw (XWikiException) e;
                 }
-                Object[] args = {getAttachment().getFilename()};
+                Object[] args = { getAttachment().getFilename() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
                     GENERIC_EXCEPTION_MESSAGE, e, args);
@@ -274,8 +269,8 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     /**
-     * Update the archive, increment the attachment version, set the date on the attachment and
-     * add the attachment to the list.
+     * Update the archive, increment the attachment version, set the date on the attachment and add the attachment to
+     * the list.
      */
     private void update()
     {

@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
 /**
  * Filesystem based Archive of deleted attachment, stored in
  * {@link org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore}.
- * 
+ *
  * @version $Id$
  * @since 3.0M3
  */
@@ -51,7 +51,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
 
     /**
      * A constructor with all the information about the deleted attachment.
-     * 
+     *
      * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
@@ -77,7 +77,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
      * {@inheritDoc}
      * <p>
      * The XWiki context is unused and may safely be null.
-     * 
+     *
      * @see com.xpn.xwiki.doc.DeletedAttachment#setAttachment(XWikiAttachment, XWikiContext)
      */
     @Override
@@ -99,9 +99,9 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * Get the attachment. This does not clone the attachment. To get a clone, use
-     * {@link #restoreAttachment(XWikiAttachment, XWikiContext)}
-     * 
+     * Get the attachment. This does not clone the attachment. To get a clone, use {@link
+     * #restoreAttachment(XWikiAttachment, XWikiContext)}
+     *
      * @return the attachment which was deleted.
      */
     public XWikiAttachment getAttachment()
@@ -136,11 +136,11 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * Generate an ID which will be as collision resistant as possible. Because
-     * {@link con.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long, this ID is guaranteed to be
-     * unique unless the same attachment is deleted twice in the same second or again in a second which will come around
-     * in another 136 years.
-     * 
+     * Generate an ID which will be as collision resistant as possible. Because {@link
+     * com.xpn.xwiki.doc.XWikiAttachment#getId()} returns an int cast to a long, this ID is guaranteed to be unique
+     * unless the same attachment is deleted twice in the same second or again in a second which will come around in
+     * another 136 years.
+     *
      * @param attachment the attachment to get an ID number for.
      * @param deleteDate the Date the attachment was deleted.
      * @return an ID number for this deleted attachment.

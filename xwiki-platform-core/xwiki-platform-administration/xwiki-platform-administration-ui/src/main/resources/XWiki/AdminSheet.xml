@@ -334,7 +334,7 @@
     #end
   #end
   $xwiki.ssx.use('XWiki.AdminSheet', $parameterMap)##
-  #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0)
+  #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0 &amp;&amp; $xwiki.exists($crtSectionId))
     #set ($sectionName = $xwiki.getDocument($crtSectionId).getDisplayTitle())
   #elseif ($crtSectionId != '' &amp;&amp; $services.localization.get("admin.${crtSectionId.toLowerCase()}"))
     #set ($sectionName = $services.localization.render("admin.${crtSectionId.toLowerCase()}"))

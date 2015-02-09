@@ -737,6 +737,9 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         // Summary
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, getSummary(extension));
 
+        // Category
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY, extension.getCategory());
+
         // Website
         /*
          * Don't import website since most of the time we want the new page to be the extension entry point needSave |=

@@ -316,6 +316,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setSummary((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
         extension.setDescription((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
         extension.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME));
+        extension.setCategory((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY));
         extension.setWebsite(StringUtils.defaultIfEmpty(
             (String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE),
             extensionDocument.getExternalURL("view", getXWikiContext())));

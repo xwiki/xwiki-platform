@@ -52,7 +52,11 @@ public class DefaultColorThemeCache extends AbstractCache<ColorTheme> implements
         try {
             CacheConfiguration configuration = new CacheConfiguration(LESS_COLOR_THEMES_CACHE_ID);
             CacheFactory cacheFactory = cacheManager.getCacheFactory();
-            this.cache = cacheFactory.newCache(configuration);
+            super.cache = cacheFactory.newCache(configuration);
+            
+            // We don't need to handle the context in the cache, since the context has no effect on the colors
+            super.isContextHandled = false;
+            
         } catch (ComponentLookupException | CacheException e) {
             throw new InitializationException(
                     String.format("Failed to initialize LESS color themes cache [%s].", LESS_COLOR_THEMES_CACHE_ID), e);

@@ -55,6 +55,8 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
     public void initialize() throws InitializationException
     {
         super.cache = cache;
+        // We don't need to handle the context in the cache, since the context has no effect on the colors
+        super.isContextHandled = false;
     }
 
     @Override

@@ -65,6 +65,8 @@ public class DefaultLESSSkinFileCacheTest
 
     private WikiDescriptorManager wikiDescriptorManager;
 
+    private XWikiContextCacheKeyFactory xwikiContextCacheKeyFactory;
+    
     @Before
     public void setUp() throws Exception
     {
@@ -79,17 +81,19 @@ public class DefaultLESSSkinFileCacheTest
         entityReferenceSerializer = mocker.getInstance(
                 new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        xwikiContextCacheKeyFactory = mocker.getInstance(XWikiContextCacheKeyFactory.class);
         DocumentReference colorThemeRef = new DocumentReference("currentWiki", "ColorTheme", "CT");
         when(documentReferenceResolver.resolve(eq("colorTheme"), any(WikiReference.class))).thenReturn(colorThemeRef);
         when(entityReferenceSerializer.serialize(colorThemeRef)).thenReturn("currentWiki:ColorTheme.CT");
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWiki");
+        when(xwikiContextCacheKeyFactory.getCacheKey()).thenReturn("XWikiContext[mock]");
     }
 
     @Test
     public void get() throws Exception
     {
         // Mock
-        when(cache.get("4skin_25currentWiki:ColorTheme.CT_4file")).thenReturn("Expected output");
+        when(cache.get("4skin_25currentWiki:ColorTheme.CT_4file_18XWikiContext[mock]")).thenReturn("Expected output");
 
         // Test
         String result = mocker.getComponentUnderTest().get("file", "skin", "colorTheme");
@@ -105,7 +109,7 @@ public class DefaultLESSSkinFileCacheTest
         mocker.getComponentUnderTest().set("file", "skin", "colorTheme", "css");
 
         // Verify
-        verify(cache).set(eq("4skin_25currentWiki:ColorTheme.CT_4file"), eq("css"));
+        verify(cache).set(eq("4skin_25currentWiki:ColorTheme.CT_4file_18XWikiContext[mock]"), eq("css"));
     }
 
     @Test
@@ -135,9 +139,9 @@ public class DefaultLESSSkinFileCacheTest
         mocker.getComponentUnderTest().clearFromFileSystemSkin("skin1");
 
         // Verify
-        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache).remove("5skin1_25currentWiki:ColorTheme.CT_5file2");
-        verify(cache, never()).remove("5skin2_25currentWiki:ColorTheme.CT_5file1");
+        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1_18XWikiContext[mock]");
+        verify(cache).remove("5skin1_25currentWiki:ColorTheme.CT_5file2_18XWikiContext[mock]");
+        verify(cache, never()).remove("5skin2_25currentWiki:ColorTheme.CT_5file1_18XWikiContext[mock]");
     }
 
     @Test
@@ -160,9 +164,9 @@ public class DefaultLESSSkinFileCacheTest
         mocker.getComponentUnderTest().clearFromColorTheme("colorTheme");
 
         // Verify
-        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache).remove("5skin2_25currentWiki:ColorTheme.CT_5file1");
-        verify(cache, never()).remove("5skin2_26currentWiki:ColorTheme.CT2_5file1");
+        verify(cache, times(1)).remove("5skin1_25currentWiki:ColorTheme.CT_5file1_18XWikiContext[mock]");
+        verify(cache).remove("5skin2_25currentWiki:ColorTheme.CT_5file1_18XWikiContext[mock]");
+        verify(cache, never()).remove("5skin2_26currentWiki:ColorTheme.CT2_5file1_18XWikiContext[mock]");
     }
 
 }

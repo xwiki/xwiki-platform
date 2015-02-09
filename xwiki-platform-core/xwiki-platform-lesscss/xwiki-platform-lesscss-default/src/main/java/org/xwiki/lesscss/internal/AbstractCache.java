@@ -26,9 +26,11 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.LESSCache;
+import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -51,9 +53,18 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     protected CacheManager cacheManager;
 
     /**
+     * Whether or not the cache should handle the current XWikiContext object (true by default).
+     * @since 6.2.6
+     */
+    protected boolean isContextHandled = true;
+
+    /**
      * The cache that will store the content.
      */
     protected Cache<T> cache;
+
+    @Inject
+    protected Logger logger;
 
     /**
      * This map stores the list of the cached files keys corresponding to a skin, in order to clear the corresponding
@@ -75,6 +86,9 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private XWikiContextCacheKeyFactory xwikiContextCacheKeyFactory;
 
     @Override
     public T get(String fileName, String fileSystemSkin, String colorTheme)
@@ -165,7 +179,16 @@ public abstract class AbstractCache<T> implements LESSCache<T>
 
     private String getCacheKey(String fileName, String skin, String colorThemeFullName)
     {
-        return skin.length() + skin + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
+        String result = skin.length() + skin + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
                 + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
+        if (isContextHandled) {
+            try {
+                String xcontext = xwikiContextCacheKeyFactory.getCacheKey();
+                result += CACHE_KEY_SEPARATOR + xcontext.length() + xcontext;
+            } catch (LESSCompilerException e) {
+                logger.warn("Failed to generate a cache key handling the XWikiContext", e);
+            }
+        }
+        return result;
     }
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
 import org.xwiki.lesscss.LESSCache;
 import org.xwiki.lesscss.LESSCompilerException;
 
@@ -42,14 +43,26 @@ public abstract class AbstractCachedCompiler<T>
 {
     protected LESSCache<T> cache;
 
+    /**
+     * Whether or not the cache should handle the current XWikiContext object (true by default).
+     * @since 6.2.6
+     */
+    protected boolean isContextHandled = true;
+
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private CurrentColorThemeGetter currentColorThemeGetter;
+    protected CurrentColorThemeGetter currentColorThemeGetter;
 
     @Inject
-    private LESSContext lessContext;
+    protected LESSContext lessContext;
+    
+    @Inject
+    protected XWikiContextCacheKeyFactory xwikiContextCacheKeyFactory;
+    
+    @Inject
+    protected Logger logger;
 
     private Map<String, Object> mutexList = new HashMap<>();
 
@@ -94,6 +107,18 @@ public abstract class AbstractCachedCompiler<T>
             if (!force) {
                 result = cache.get(fileName, skin, colorTheme);
                 if (result != null) {
+
+                    // The LESS file contains Velocity code that call resources (ie: $xwiki.getSkinFile), and the HTML
+                    // exporter listens these calls to know which resources must be exported.
+                    // If we only use the cache, we would have a correct CSS file but some resources will be missing.
+                    // So we need to execute the velocity again, even if the LESS file is cached.
+                    // To perform this quickly, we do not recompile the LESS code (which would be useless anyway), but
+                    // we only do the Velocity Execution step.
+                    // (quick backport of http://jira.xwiki.org/browse/XWIKI-11731)
+                    if (lessContext.isHtmlExport() && this instanceof DefaultLESSSkinFileCompiler) {
+                        compile(fileName, skin, force);
+                    }
+                    
                     return result;
                 }
             }
@@ -111,7 +136,18 @@ public abstract class AbstractCachedCompiler<T>
 
     private synchronized Object getMutex(String colorThemeFullName)
     {
-        Object mutex = mutexList.get(colorThemeFullName);
+        String cacheKey = colorThemeFullName;
+        
+        if (this.isContextHandled) {
+            try {
+                String xcontext = xwikiContextCacheKeyFactory.getCacheKey();
+                cacheKey += "_" + xcontext;
+            } catch (LESSCompilerException e) {
+                logger.warn("Failed to generate a cache key handling the XWikiContext", e);
+            }
+        }
+        
+        Object mutex = mutexList.get(cacheKey);
         if (mutex == null) {
             mutex = new Object();
             mutexList.put(colorThemeFullName, mutex);

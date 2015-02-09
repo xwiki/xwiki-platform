@@ -70,7 +70,7 @@ public class LESSExportActionListenerTest
 
         // The test is here: we verify that the cache is disabled!
         LESSContext lessContext = mocker.getInstance(LESSContext.class);
-        verify(lessContext).disableCache();
+        verify(lessContext).setHtmlExport(true);
     }
 
     @Test

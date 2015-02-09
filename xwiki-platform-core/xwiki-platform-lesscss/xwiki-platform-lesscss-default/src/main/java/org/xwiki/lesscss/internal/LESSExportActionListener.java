@@ -68,7 +68,7 @@ public class LESSExportActionListener implements EventListener
         XWikiRequest request = xcontext.getRequest();
         String format = request.get("format");
         if ("html".equals(format)) {
-            lessContext.disableCache();
+            lessContext.setHtmlExport(true);
         }
     }
 }

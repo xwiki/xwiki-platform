@@ -38,6 +38,8 @@ public class LESSContext
 {
     private static final String CACHE_PROPERTY = "less.cache.disable";
 
+    private static final String HTML_EXPORT = "less.htmlexport";
+
     @Inject
     private Execution execution;
 
@@ -46,7 +48,7 @@ public class LESSContext
      */
     public void disableCache()
     {
-        getContext().newProperty(CACHE_PROPERTY).inherited().initial(true).declare();
+        setProperty(CACHE_PROPERTY, true);
     }
 
     /**
@@ -54,7 +56,7 @@ public class LESSContext
      */
     public void stopDisablingCache()
     {
-        getContext().setProperty(CACHE_PROPERTY, false);
+        setProperty(CACHE_PROPERTY, false);
     }
 
     /**
@@ -65,8 +67,34 @@ public class LESSContext
         return Boolean.TRUE.equals(getContext().getProperty(CACHE_PROPERTY));
     }
 
+    /**
+     * @param htmlExport whether or not XWiki is performing an HTML export.  
+     */
+    public void setHtmlExport(boolean htmlExport)
+    {
+        setProperty(HTML_EXPORT, htmlExport);
+    }
+
+    /**
+     * @return whether or not XWiki is performing an HTML export.
+     */
+    public boolean isHtmlExport()
+    {
+        return Boolean.TRUE.equals(getContext().getProperty(HTML_EXPORT));
+    }
+
     private ExecutionContext getContext()
     {
         return execution.getContext();
+    }
+
+    private void setProperty(String propertyName, Object value)
+    {
+        Object property = getContext().getProperty(propertyName);
+        if (property != null) {
+            getContext().setProperty(propertyName, value);
+        } else {
+            getContext().newProperty(propertyName).inherited().initial(value).declare();
+        }
     }
 }

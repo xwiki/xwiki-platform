@@ -7,3 +7,5 @@ org.xwiki.lesscss.internal.DefaultLESSSkinFileCache
 org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler
 org.xwiki.lesscss.internal.LESSContext
 org.xwiki.lesscss.internal.LESSExportActionListener
+org.xwiki.lesscss.internal.SkinDirectoryGetter
+org.xwiki.lesscss.internal.XWikiContextCacheKeyFactory

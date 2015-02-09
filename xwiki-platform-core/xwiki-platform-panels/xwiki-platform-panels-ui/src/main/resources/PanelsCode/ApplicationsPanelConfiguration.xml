@@ -175,7 +175,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayInSection>Applications Panel</displayInSection>
+      <displayInSection>panels.applications</displayInSection>
     </property>
     <property>
       <heading/>

@@ -86,5 +86,6 @@ platform.panels.applications.ajax.success=The configuration has been saved.
 platform.panels.applications.ajax.csrf=CSRF validation failed. Try to reload the page.
 platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
 platform.panels.applications.ajax.error=Failed to save your change.
+admin.panels.applications=Applications Panel
 </content>
 </xwikidoc>

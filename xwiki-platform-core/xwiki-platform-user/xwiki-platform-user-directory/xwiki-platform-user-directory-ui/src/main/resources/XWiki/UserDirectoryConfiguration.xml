@@ -172,7 +172,7 @@
       <configureGlobally>1</configureGlobally>
     </property>
     <property>
-      <displayInSection>User Directory</displayInSection>
+      <displayInSection>userdirectory</displayInSection>
     </property>
     <property>
       <heading/>

@@ -54,22 +54,22 @@ public class UserIterator implements Iterator<DocumentReference>
 
     private XWikiContext xwikiContext;
 
-    private List<DocumentReference> userOrGroupReferences;
+    private List<DocumentReference> userAndGroupReferences;
 
-    private Stack<Iterator<DocumentReference>> membersIteratorStack = new Stack<>();
+    private Stack<Iterator<DocumentReference>> userAndGroupIteratorStack = new Stack<>();
 
     private DocumentReference lookaheadReference;
 
     /**
-     * @param userOrGroupReferences the list of references (users or groups) to iterate over
+     * @param userAndGroupReferences the list of references (users or groups) to iterate over
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param execution the component used to access the {@link XWikiContext} we use to call oldcore APIs
      */
-    public UserIterator(List<DocumentReference> userOrGroupReferences,
+    public UserIterator(List<DocumentReference> userAndGroupReferences,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
     {
-        initialize(userOrGroupReferences, explicitDocumentReferenceResolver);
+        initialize(userAndGroupReferences, explicitDocumentReferenceResolver);
         this.xwikiContext = getXWikiContext(execution);
     }
 
@@ -87,15 +87,15 @@ public class UserIterator implements Iterator<DocumentReference>
     }
 
     /**
-     * @param userOrGroupReferences the list of references (users or groups) to iterate over
+     * @param userAndGroupReferences the list of references (users or groups) to iterate over
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param xwikiContext the {@link XWikiContext} we use to call oldcore APIs
      */
-    public UserIterator(List<DocumentReference> userOrGroupReferences,
+    public UserIterator(List<DocumentReference> userAndGroupReferences,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
-        initialize(userOrGroupReferences, explicitDocumentReferenceResolver);
+        initialize(userAndGroupReferences, explicitDocumentReferenceResolver);
         this.xwikiContext = xwikiContext;
     }
 
@@ -120,13 +120,13 @@ public class UserIterator implements Iterator<DocumentReference>
         initialize(references, explicitDocumentReferenceResolver);
     }
 
-    private void initialize(List<DocumentReference> userOrGroupReferences,
+    private void initialize(List<DocumentReference> userAndGroupReferences,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver)
     {
-        this.userOrGroupReferences = userOrGroupReferences;
+        this.userAndGroupReferences = userAndGroupReferences;
         this.explicitDocumentReferenceResolver = explicitDocumentReferenceResolver;
-        if (userOrGroupReferences != null && !userOrGroupReferences.isEmpty()) {
-            this.membersIteratorStack.push(userOrGroupReferences.iterator());
+        if (userAndGroupReferences != null && !userAndGroupReferences.isEmpty()) {
+            this.userAndGroupIteratorStack.push(userAndGroupReferences.iterator());
         }
     }
 
@@ -134,7 +134,7 @@ public class UserIterator implements Iterator<DocumentReference>
     public boolean hasNext()
     {
         boolean hasNext = false;
-        if (!this.membersIteratorStack.isEmpty()) {
+        if (!this.userAndGroupIteratorStack.isEmpty()) {
             if (this.lookaheadReference == null) {
                 DocumentReference currentReference = getNext();
                 if (currentReference != null) {
@@ -156,16 +156,16 @@ public class UserIterator implements Iterator<DocumentReference>
             currentReference = getNext();
             if (currentReference == null) {
                 throw new NoSuchElementException(String.format(
-                    "No more users to extract from the passed references [%s]", serializeUserOrGroupReferences()));
+                    "No more users to extract from the passed references [%s]", serializeUserAndGroupReferences()));
             }
         }
         return currentReference;
     }
 
-    private String serializeUserOrGroupReferences()
+    private String serializeUserAndGroupReferences()
     {
         StringBuffer buffer = new StringBuffer();
-        Iterator<DocumentReference> iterator = this.userOrGroupReferences.iterator();
+        Iterator<DocumentReference> iterator = this.userAndGroupReferences.iterator();
         while (iterator.hasNext()) {
             DocumentReference reference = iterator.next();
             buffer.append('[').append(reference).append(']');
@@ -187,10 +187,10 @@ public class UserIterator implements Iterator<DocumentReference>
         DocumentReference currentReference;
 
         // If there are no more references in the stack then we've already returned everything!
-        if (this.membersIteratorStack.isEmpty()) {
+        if (this.userAndGroupIteratorStack.isEmpty()) {
             return null;
         }
-        Iterator<DocumentReference> currentIterator = this.membersIteratorStack.peek();
+        Iterator<DocumentReference> currentIterator = this.userAndGroupIteratorStack.peek();
 
         currentReference = currentIterator.next();
 
@@ -243,7 +243,7 @@ public class UserIterator implements Iterator<DocumentReference>
         // If we have neither a group reference nor a user reference, skip it and get the next reference
         if (isGroupReference) {
             // Extract the references and push them on the stack as an iterator
-            this.membersIteratorStack.push(convertToDocumentReferences(members, reference).iterator());
+            this.userAndGroupIteratorStack.push(convertToDocumentReferences(members, reference).iterator());
             if (!isUserReference) {
                 reference = getNext();
             }
@@ -258,8 +258,8 @@ public class UserIterator implements Iterator<DocumentReference>
     private void cleanStackIfNeeded(Iterator<DocumentReference> currentIterator)
     {
         // If there is no more reference to handle in the current iterator, pop the stack!
-        while (!this.membersIteratorStack.isEmpty() && !this.membersIteratorStack.peek().hasNext()) {
-            this.membersIteratorStack.pop();
+        while (!this.userAndGroupIteratorStack.isEmpty() && !this.userAndGroupIteratorStack.peek().hasNext()) {
+            this.userAndGroupIteratorStack.pop();
         }
     }
 
@@ -269,7 +269,7 @@ public class UserIterator implements Iterator<DocumentReference>
             return this.xwikiContext.getWiki().getDocument(reference, this.xwikiContext);
         } catch (XWikiException e) {
             throw new RuntimeException(String.format("Failed to get document for User or Group [%s] when extracting "
-                + "all users for the references [%s]", reference, serializeUserOrGroupReferences()));
+                + "all users for the references [%s]", reference, serializeUserAndGroupReferences()));
         }
     }
 
@@ -294,7 +294,7 @@ public class UserIterator implements Iterator<DocumentReference>
         }
         if (executionContext == null || context == null) {
             throw new RuntimeException(String.format("Aborting member extraction from passed references [%s] since "
-                + "no XWiki Context was found", serializeUserOrGroupReferences()));
+                + "no XWiki Context was found", serializeUserAndGroupReferences()));
         }
         return context;
     }

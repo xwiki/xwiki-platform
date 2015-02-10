@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -429,7 +430,13 @@ public class PackageMojo extends AbstractMojo
                 throw new MojoExecutionException("Failed to create context to import XAR files", e);
             }
 
-            for (Artifact xarArtifact : xarArtifacts) {
+            // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an
+            // ordered LinkedHashSet behind the scene)
+            List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(xarArtifacts);
+            Collections.reverse(dependenciesFirstArtifacts);
+            
+            // Import the xars
+            for (Artifact xarArtifact : dependenciesFirstArtifacts) {
                 getLog().info("  ... Importing XAR file: " + xarArtifact.getFile());
 
                 try {
@@ -467,7 +474,7 @@ public class PackageMojo extends AbstractMojo
 
     private Set<Artifact> resolveXARs() throws MojoExecutionException
     {
-        Set<Artifact> xarArtifacts = new HashSet<Artifact>();
+        Set<Artifact> xarArtifacts = new LinkedHashSet<>();
 
         Set<Artifact> artifacts = this.project.getArtifacts();
         if (artifacts != null) {

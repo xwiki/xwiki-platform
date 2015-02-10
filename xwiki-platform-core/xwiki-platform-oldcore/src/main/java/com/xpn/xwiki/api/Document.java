@@ -408,7 +408,7 @@ public class Document extends Api
 
     /**
      * @return the document content author reference
-     * @since 6.4RC1, 6.2.6
+     * @since 6.4RC1, 6.2.5
      */
     public DocumentReference getContentAuthorReference()
     {
@@ -470,7 +470,7 @@ public class Document extends Api
 
     /**
      * @return the document creator reference
-     * @since 6.4RC1, 6.2.6
+     * @since 6.4RC1, 6.2.5
      */
     public DocumentReference getCreatorReference()
     {

@@ -4954,7 +4954,7 @@ public class XWiki implements EventListener
      * @param escapeXML true if the returned name should be escaped (forced true if <code>link</link> is true)
      * @param context the XWiki context
      * @return the display user name or a html snippet with the link to the passed user
-     * @since 6.4RC1
+     * @since 6.4RC1, 6.2.5
      */
     public String getUserName(DocumentReference userReference, String format, boolean link, boolean escapeXML, XWikiContext context)
     {
@@ -5019,7 +5019,7 @@ public class XWiki implements EventListener
      * @param userReference the user reference
      * @param context the XWiki context
      * @return the unescaped display user name
-     * @since 6.4RC1
+     * @since 6.4RC1, 6.2.5
      */
     public String getPlainUserName(DocumentReference userReference, XWikiContext context)
     {

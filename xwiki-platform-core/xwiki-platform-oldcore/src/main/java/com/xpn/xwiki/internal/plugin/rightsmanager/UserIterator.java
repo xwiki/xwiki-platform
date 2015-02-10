@@ -42,58 +42,91 @@ import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Iterates over all the users and groups found in the passed reference (which can be a reference to a group or to
- * a user). Handles nested groups.
+ * Iterates over all the users found in the passed references (which can be references to groups or to users).
+ * Handles nested groups.
  *
  * @version $Id$
  * @since 6.4.2, 7.0M2
  */
-public class GroupMemberIterator implements Iterator<DocumentReference>
+public class UserIterator implements Iterator<DocumentReference>
 {
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
-    private XWikiContext xwikicontext;
+    private XWikiContext xwikiContext;
 
-    private DocumentReference userOrGroupReference;
+    private List<DocumentReference> userOrGroupReferences;
 
     private Stack<Iterator<DocumentReference>> membersIteratorStack = new Stack<>();
 
     private DocumentReference lookaheadReference;
 
     /**
-     * @param userOrGroupReference the reference to iterate over
+     * @param userOrGroupReferences the list of references (users or groups) to iterate over
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param execution the component used to access the {@link XWikiContext} we use to call oldcore APIs
      */
-    public GroupMemberIterator(DocumentReference userOrGroupReference,
+    public UserIterator(List<DocumentReference> userOrGroupReferences,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
     {
-        this.userOrGroupReference = userOrGroupReference;
-        initialize(explicitDocumentReferenceResolver, getXWikiContext(execution));
+        initialize(userOrGroupReferences, explicitDocumentReferenceResolver);
+        this.xwikiContext = getXWikiContext(execution);
     }
 
     /**
-     * @param userOrGroupReference the reference to iterate over
+     * @param userOrGroupReference the reference (user or group) to iterate over
+     * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
+     *        {@link DocumentReference}
+     * @param execution the component used to access the {@link XWikiContext} we use to call oldcore APIs
+     */
+    public UserIterator(DocumentReference userOrGroupReference,
+        DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
+    {
+        initialize(userOrGroupReference, explicitDocumentReferenceResolver);
+        this.xwikiContext = getXWikiContext(execution);
+    }
+
+    /**
+     * @param userOrGroupReferences the list of references (users or groups) to iterate over
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param xwikiContext the {@link XWikiContext} we use to call oldcore APIs
      */
-    public GroupMemberIterator(DocumentReference userOrGroupReference,
+    public UserIterator(List<DocumentReference> userOrGroupReferences,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
-        this.userOrGroupReference = userOrGroupReference;
-        initialize(explicitDocumentReferenceResolver, xwikiContext);
+        initialize(userOrGroupReferences, explicitDocumentReferenceResolver);
+        this.xwikiContext = xwikiContext;
     }
 
-    private void initialize(DocumentReferenceResolver<String> explicitDocumentReferenceResolver,
-        XWikiContext xwikiContext)
+    /**
+     * @param userOrGroupReference the reference (user or group) to iterate over
+     * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
+     *        {@link DocumentReference}
+     * @param xwikiContext the {@link XWikiContext} we use to call oldcore APIs
+     */
+    public UserIterator(DocumentReference userOrGroupReference,
+        DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
-        this.explicitDocumentReferenceResolver = explicitDocumentReferenceResolver;
-        this.xwikicontext = xwikiContext;
+        initialize(userOrGroupReference, explicitDocumentReferenceResolver);
+        this.xwikiContext = xwikiContext;
+    }
 
-        if (userOrGroupReference != null) {
-            this.membersIteratorStack.push(Collections.singletonList(userOrGroupReference).iterator());
+    private void initialize(DocumentReference userOrGroupReference,
+        DocumentReferenceResolver<String> explicitDocumentReferenceResolver)
+    {
+        List<DocumentReference> references = userOrGroupReference == null
+            ? Collections.<DocumentReference>emptyList() : Collections.singletonList(userOrGroupReference);
+        initialize(references, explicitDocumentReferenceResolver);
+    }
+
+    private void initialize(List<DocumentReference> userOrGroupReferences,
+        DocumentReferenceResolver<String> explicitDocumentReferenceResolver)
+    {
+        this.userOrGroupReferences = userOrGroupReferences;
+        this.explicitDocumentReferenceResolver = explicitDocumentReferenceResolver;
+        if (userOrGroupReferences != null && !userOrGroupReferences.isEmpty()) {
+            this.membersIteratorStack.push(userOrGroupReferences.iterator());
         }
     }
 
@@ -123,10 +156,24 @@ public class GroupMemberIterator implements Iterator<DocumentReference>
             currentReference = getNext();
             if (currentReference == null) {
                 throw new NoSuchElementException(String.format(
-                    "No more users to extract from the passed [%s] reference", this.userOrGroupReference));
+                    "No more users to extract from the passed references [%s]", serializeUserOrGroupReferences()));
             }
         }
         return currentReference;
+    }
+
+    private String serializeUserOrGroupReferences()
+    {
+        StringBuffer buffer = new StringBuffer();
+        Iterator<DocumentReference> iterator = this.userOrGroupReferences.iterator();
+        while (iterator.hasNext()) {
+            DocumentReference reference = iterator.next();
+            buffer.append('[').append(reference).append(']');
+            if (iterator.hasNext()) {
+                buffer.append(',').append(' ');
+            }
+        }
+        return buffer.toString();
     }
 
     @Override
@@ -219,10 +266,10 @@ public class GroupMemberIterator implements Iterator<DocumentReference>
     private XWikiDocument getFailsafeDocument(DocumentReference reference)
     {
         try {
-            return this.xwikicontext.getWiki().getDocument(reference, this.xwikicontext);
+            return this.xwikiContext.getWiki().getDocument(reference, this.xwikiContext);
         } catch (XWikiException e) {
             throw new RuntimeException(String.format("Failed to get document for User or Group [%s] when extracting "
-                + "all users for reference [%s]", reference, this.userOrGroupReference));
+                + "all users for the references [%s]", reference, serializeUserOrGroupReferences()));
         }
     }
 
@@ -240,15 +287,15 @@ public class GroupMemberIterator implements Iterator<DocumentReference>
 
     private XWikiContext getXWikiContext(Execution execution)
     {
-        XWikiContext xwikiContext = null;
+        XWikiContext context = null;
         ExecutionContext executionContext = execution.getContext();
         if (executionContext != null) {
-            xwikiContext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            context = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         }
-        if (executionContext == null || xwikiContext == null) {
-            throw new RuntimeException(String.format("Aborting member extraction from [%s] since no XWiki Context "
-                + "was found", this.userOrGroupReference));
+        if (executionContext == null || context == null) {
+            throw new RuntimeException(String.format("Aborting member extraction from passed references [%s] since "
+                + "no XWiki Context was found", serializeUserOrGroupReferences()));
         }
-        return xwikiContext;
+        return context;
     }
 }

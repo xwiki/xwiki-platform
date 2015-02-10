@@ -1832,7 +1832,7 @@ public class XWiki extends Api
      * @param userReference the user reference
      * @param context the XWiki context
      * @return the unescaped display user name
-     * @since 6.4RC1
+     * @since 6.4RC1, 6.2.5
      */
     public String getPlainUserName(DocumentReference userReference)
     {

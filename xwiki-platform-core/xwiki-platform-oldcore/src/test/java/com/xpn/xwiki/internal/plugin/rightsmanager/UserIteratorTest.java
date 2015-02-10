@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.plugin.rightsmanager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -42,12 +43,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link GroupMemberIterator}.
+ * Unit tests for {@link UserIterator}.
  *
  * @version $Id$
  * @since 6.4.2, 7.0M2
  */
-public class GroupMemberIteratorTest
+public class UserIteratorTest
 {
     @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
@@ -66,10 +67,10 @@ public class GroupMemberIteratorTest
         Execution execution = this.componentManager.registerMockComponent(Execution.class);
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
-            new GroupMemberIterator(userReference, null, execution).next();
+            new UserIterator(userReference, null, execution).next();
         } catch (RuntimeException expected) {
-            assertEquals("Aborting member extraction from [userwiki:XWiki.userpage] since no XWiki Context was found",
-                expected.getMessage());
+            assertEquals("Aborting member extraction from passed references [[userwiki:XWiki.userpage]] since no "
+                + "XWiki Context was found", expected.getMessage());
         }
     }
 
@@ -80,10 +81,10 @@ public class GroupMemberIteratorTest
         when(execution.getContext()).thenReturn(new ExecutionContext());
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         try {
-            new GroupMemberIterator(userReference, null, execution).next();
+            new UserIterator(userReference, null, execution).next();
         } catch (RuntimeException expected) {
-            assertEquals("Aborting member extraction from [userwiki:XWiki.userpage] since no XWiki Context was found",
-                expected.getMessage());
+            assertEquals("Aborting member extraction from passed references [[userwiki:XWiki.userpage]] since no "
+                + "XWiki Context was found", expected.getMessage());
         }
     }
 
@@ -92,7 +93,7 @@ public class GroupMemberIteratorTest
     {
         setUpBaseMocks();
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(null, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator((DocumentReference) null, null, this.execution);
 
         assertFalse(iterator.hasNext());
     }
@@ -103,7 +104,7 @@ public class GroupMemberIteratorTest
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "superadmin");
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(userReference, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(userReference, null, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference, iterator.next());
@@ -116,7 +117,7 @@ public class GroupMemberIteratorTest
         setUpBaseMocks();
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "XWikiGuest");
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(userReference, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(userReference, null, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference, iterator.next());
@@ -151,7 +152,7 @@ public class GroupMemberIteratorTest
         try {
             iterator.next();
         } catch (NoSuchElementException expected) {
-            assertEquals("No more users to extract from the passed [userwiki:XWiki.userpage] reference",
+            assertEquals("No more users to extract from the passed references [[userwiki:XWiki.userpage]]",
                 expected.getMessage());
         }
     }
@@ -162,7 +163,7 @@ public class GroupMemberIteratorTest
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         setUpUserPageMocks(userReference);
 
-        return new GroupMemberIterator(userReference, null, this.execution);
+        return new UserIterator(userReference, null, this.execution);
     }
 
     @Test
@@ -174,7 +175,7 @@ public class GroupMemberIteratorTest
         when(document.isNew()).thenReturn(true);
         when(this.xwiki.getDocument(userReference, this.xwikiContext)).thenReturn(document);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(userReference, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(userReference, null, this.execution);
 
         assertFalse(iterator.hasNext());
     }
@@ -205,7 +206,7 @@ public class GroupMemberIteratorTest
         when(this.resolver.resolve("XWiki.user", reference)).thenReturn(userReference);
         setUpUserPageMocks(userReference);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(reference, this.resolver, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(reference, this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(new DocumentReference("wiki", "XWiki", "page"), iterator.next());
@@ -221,13 +222,13 @@ public class GroupMemberIteratorTest
         DocumentReference userReference = new DocumentReference("userwiki", "XWiki", "userpage");
         when(xwiki.getDocument(userReference, this.xwikiContext)).thenThrow(new XWikiException());
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(userReference, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(userReference, null, this.execution);
 
         try {
             iterator.next();
         } catch (RuntimeException expected) {
             assertEquals("Failed to get document for User or Group [userwiki:XWiki.userpage] when extracting all "
-                + "users for reference [userwiki:XWiki.userpage]", expected.getMessage());
+                + "users for the references [[userwiki:XWiki.userpage]]", expected.getMessage());
         }
     }
 
@@ -240,7 +241,26 @@ public class GroupMemberIteratorTest
         DocumentReference userReference2 = new DocumentReference("userwiki", "XWiki", "user2");
         setUpGroupPageMocks(groupReference, userReference1, userReference2);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(groupReference, resolver, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(groupReference, this.resolver, this.execution);
+
+        assertTrue(iterator.hasNext());
+        assertEquals(userReference1, iterator.next());
+        assertTrue(iterator.hasNext());
+        assertEquals(userReference2, iterator.next());
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void getMembersWhenTwoUsers() throws Exception
+    {
+        setUpBaseMocks();
+        DocumentReference userReference1 = new DocumentReference("userwiki", "XWiki", "user1");
+        setUpUserPageMocks(userReference1);
+        DocumentReference userReference2 = new DocumentReference("userwiki", "XWiki", "user2");
+        setUpUserPageMocks(userReference2);
+
+        Iterator<DocumentReference> iterator = new UserIterator(Arrays.asList(userReference1, userReference2),
+            this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference1, iterator.next());
@@ -257,7 +277,7 @@ public class GroupMemberIteratorTest
         DocumentReference userReference1 = new DocumentReference("userwiki", "XWiki", "user1");
         setUpGroupPageMocks(groupReference, userReference1);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(groupReference, resolver, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(groupReference, this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference1, iterator.next());
@@ -275,7 +295,7 @@ public class GroupMemberIteratorTest
         when(document.getXObject(new DocumentReference("somewiki", "XWiki", "XWikiUsers"))).thenReturn(null);
         when(this.xwiki.getDocument(reference, this.xwikiContext)).thenReturn(document);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(reference, null, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(reference, null, this.execution);
 
         assertFalse(iterator.hasNext());
     }
@@ -293,7 +313,7 @@ public class GroupMemberIteratorTest
         setUpGroupPageMocks(groupReference1, userReference1, userReference2, groupReference2);
         setUpGroupPageMocks(groupReference2, userReference3, userReference4);
 
-        Iterator<DocumentReference> iterator = new GroupMemberIterator(groupReference1, this.resolver, this.execution);
+        Iterator<DocumentReference> iterator = new UserIterator(groupReference1, this.resolver, this.execution);
 
         assertTrue(iterator.hasNext());
         assertEquals(userReference1, iterator.next());

@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.plugin.rightsmanager.GroupMemberIterator;
+import com.xpn.xwiki.internal.plugin.rightsmanager.UserIterator;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -1111,7 +1111,7 @@ public final class RightsManager
     {
         Collection<DocumentReference> userReferences = new LinkedHashSet<>();
         Iterator<DocumentReference> iterator =
-            new GroupMemberIterator(userOrGroup, this.explicitDocumentReferenceResolver, context);
+            new UserIterator(userOrGroup, this.explicitDocumentReferenceResolver, context);
         while (iterator.hasNext()) {
             userReferences.add(iterator.next());
         }
@@ -1142,7 +1142,7 @@ public final class RightsManager
     public Collection<DocumentReference> resolveUsers(List<String> referenceList, XWikiContext context)
         throws XWikiException
     {
-        Collection<DocumentReference> users = new LinkedHashSet<DocumentReference>();
+        Collection<DocumentReference> users = new LinkedHashSet<>();
 
         for (String reference : referenceList) {
             users.addAll(resolveUsers(reference, context));

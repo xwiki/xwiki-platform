@@ -716,4 +716,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is 8 seconds:
 # mail.sender.sendWaitTime = 8000
 
+#-# [Since 6.4.1, 7.0M1]
+#-# When using the Database Mail Listener, whether mail statuses for mails that have been sent successfully must be
+#-# discarded or not. They could be kept for tracability purpose for example.
+#-# The default is:
+# mail.sender.database.discardSuccessStatuses = true
+
 $!xwikiPropertiesAdditionalProperties

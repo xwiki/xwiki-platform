@@ -36,6 +36,8 @@
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

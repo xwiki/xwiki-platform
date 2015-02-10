@@ -38,6 +38,8 @@
       com.xpn.xwiki.platform:xwiki-core
     </xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <!-- Legacy oldcore needs some legacy classes from legacy URL -->
@@ -178,8 +180,6 @@
           <classpathDependencyExcludes>
             <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-oldcore:jar</classpathDependencyExcludes>
           </classpathDependencyExcludes>
-          <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-          <properties combine.self="override"/>
         </configuration>
       </plugin>
     </plugins>

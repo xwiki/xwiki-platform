@@ -34,6 +34,8 @@
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>xwiki-platform-messagestream</xwiki.extension.features>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -65,16 +67,4 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <properties combine.self="override"/>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

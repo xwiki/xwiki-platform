@@ -43,6 +43,7 @@
 
 {{velocity}}
 #displayUserDirectory(true)
+#set($docextras=[])
 {{/velocity}}</content>
   <object>
     <name>Main.UserDirectory</name>

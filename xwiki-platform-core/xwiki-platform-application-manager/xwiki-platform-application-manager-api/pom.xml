@@ -33,10 +33,11 @@
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>com.xpn.xwiki.platform.plugins:xwiki-plugin-application-manager</xwiki.extension.features>
-
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Application Manager API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -69,14 +70,6 @@
               **/ApplicationManagerListener.java,
               **/ApplicationManagerScriptService.java
           </excludes>
-        </configuration>
-      </plugin>
-      <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <properties combine.self="override"/>
         </configuration>
       </plugin>
     </plugins>

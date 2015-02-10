@@ -24,19 +24,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.xwiki.store.UnexpectedException;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
+
 /**
- * The content of an attachment. This implementation is based on a file on the filesystem.
- * This implementation is mutable but the underlying file is left alone.
+ * The content of an attachment. This implementation is based on a file on the filesystem. This implementation is
+ * mutable but the underlying file is left alone.
  *
  * @version $Id$
  * @since 3.0M2
- * @see {@link com.xpn.xwiki.store.FilesystemAttachmentStore}.
  */
 public class FilesystemAttachmentContent extends XWikiAttachmentContent
 {
@@ -80,7 +80,9 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Deprecated
     public byte[] getContent()
     {
-        if (this.getFileItem() != null) { return super.getContent(); }
+        if (this.getFileItem() != null) {
+            return super.getContent();
+        }
 
         final InputStream is = this.getContentInputStream();
         try {
@@ -95,7 +97,9 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public InputStream getContentInputStream()
     {
-        if (this.getFileItem() != null) { return super.getContentInputStream(); }
+        if (this.getFileItem() != null) {
+            return super.getContentInputStream();
+        }
 
         try {
             return new AutoCloseInputStream(new FileInputStream(this.storageFile));
@@ -107,7 +111,9 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public int getSize()
     {
-        if (this.getFileItem() != null) { return super.getSize(); }
+        if (this.getFileItem() != null) {
+            return super.getSize();
+        }
 
         long size = this.storageFile.length();
         // The most important thing is that it doesn't roll over into the negative space.

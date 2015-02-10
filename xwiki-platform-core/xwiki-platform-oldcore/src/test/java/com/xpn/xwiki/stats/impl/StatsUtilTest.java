@@ -22,6 +22,7 @@ package com.xpn.xwiki.stats.impl;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.jmock.Mock;
@@ -83,15 +84,14 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
             .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))));
 
         assertEquals(
-            new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))),
+            new HashSet<>(Collections.singletonList(new DocumentReference("xwiki", "XWiki", "XWikiGuest"))),
             StatsUtil.getRequestFilteredUsers(getContext()));
 
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.supeRadmin"));
         this.mockXWiki.stubs().method("getDocument")
             .will(returnValue(new XWikiDocument(new DocumentReference("xwiki", "XWiki", "supeRadmin"))));
 
-        assertEquals(
-            new HashSet<DocumentReference>(Arrays.asList(new DocumentReference("xwiki", "XWiki", "supeRadmin"))),
+        assertEquals(new HashSet<>(Collections.singletonList(new DocumentReference("xwiki", "XWiki", "supeRadmin"))),
             StatsUtil.getRequestFilteredUsers(getContext()));
 
         this.mockXWiki.stubs().method("Param").will(returnValue("invalid"));
@@ -108,7 +108,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user"));
         this.mockXWiki.stubs().method("getDocument").with(eq(userReference), ANYTHING).will(returnValue(userDoc));
 
-        assertEquals(new HashSet<DocumentReference>(Arrays.asList(userReference)),
+        assertEquals(new HashSet<>(Collections.singletonList(userReference)),
             StatsUtil.getRequestFilteredUsers(getContext()));
 
         DocumentReference user2Reference = new DocumentReference("xwiki", "XWiki", "user2");
@@ -119,7 +119,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("Param").will(returnValue("XWiki.user,XWiki.user2"));
         this.mockXWiki.stubs().method("getDocument").with(eq(user2Reference), ANYTHING).will(returnValue(user2Doc));
 
-        assertEquals(new HashSet<DocumentReference>(Arrays.asList(userReference, user2Reference)),
+        assertEquals(new HashSet<>(Arrays.asList(userReference, user2Reference)),
             StatsUtil.getRequestFilteredUsers(getContext()));
 
         DocumentReference user3Reference = new DocumentReference("otherwiki", "XWiki", "user3");
@@ -138,7 +138,7 @@ public class StatsUtilTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getDocument").with(eq(groupReference), ANYTHING).will(returnValue(groupDoc));
         this.mockXWiki.stubs().method("getDocument").with(eq(user3Reference), ANYTHING).will(returnValue(user3Doc));
 
-        assertEquals(new HashSet<DocumentReference>(Arrays.asList(userReference, user2Reference, user3Reference)),
+        assertEquals(new HashSet<>(Arrays.asList(userReference, user2Reference, user3Reference)),
             StatsUtil.getRequestFilteredUsers(getContext()));
     }
 }

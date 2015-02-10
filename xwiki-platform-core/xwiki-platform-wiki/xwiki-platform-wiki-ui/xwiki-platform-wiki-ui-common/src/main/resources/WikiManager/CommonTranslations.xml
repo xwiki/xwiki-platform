@@ -24,7 +24,7 @@
   <web>WikiManager</web>
   <name>CommonTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1418662042000</creationDate>

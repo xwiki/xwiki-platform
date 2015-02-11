@@ -42,13 +42,15 @@ import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Iterates over all the users found in the passed references (which can be references to groups or to users).
- * Handles nested groups.
+ * Iterates over all the users found in the passed references (which can be references to groups or to users) and
+ * return extracted data from the USer for each found user (the extracted data is controlled by the passed
+ * {@link UserDataExtractor}. Handles nested groups.
  *
+ * @param <T> the type of data returned by the iterator when {@link #next()} is called
  * @version $Id$
  * @since 6.4.2, 7.0M2
  */
-public class UserIterator implements Iterator<DocumentReference>
+public class UserIterator<T> implements Iterator<T>
 {
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
@@ -56,75 +58,103 @@ public class UserIterator implements Iterator<DocumentReference>
 
     private List<DocumentReference> userAndGroupReferences;
 
+    private List<DocumentReference> excludedUserAndGroupReferences;
+
     private Stack<Iterator<DocumentReference>> userAndGroupIteratorStack = new Stack<>();
 
-    private DocumentReference lookaheadReference;
+    private T lookaheadValue;
+
+    private UserDataExtractor<T> userDataExtractor;
 
     /**
+     * Recommended if this iterator is called from code using components.
+     *
      * @param userAndGroupReferences the list of references (users or groups) to iterate over
+     * @param excludedUserAndGroupReferences the list of references (users or groups) to exclude. Can be null.
+     * @param userDataExtractor the extractor to use the return the value extracted from the user profile
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param execution the component used to access the {@link XWikiContext} we use to call oldcore APIs
      */
     public UserIterator(List<DocumentReference> userAndGroupReferences,
+        List<DocumentReference> excludedUserAndGroupReferences, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
     {
-        initialize(userAndGroupReferences, explicitDocumentReferenceResolver);
+        initialize(userAndGroupReferences, excludedUserAndGroupReferences, userDataExtractor,
+            explicitDocumentReferenceResolver);
         this.xwikiContext = getXWikiContext(execution);
     }
 
     /**
+     * Recommended if this iterator is called from code using components.
+     *
      * @param userOrGroupReference the reference (user or group) to iterate over
+     * @param userDataExtractor the extractor to use the return the value extracted from the user profile
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param execution the component used to access the {@link XWikiContext} we use to call oldcore APIs
      */
-    public UserIterator(DocumentReference userOrGroupReference,
+    public UserIterator(DocumentReference userOrGroupReference, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, Execution execution)
     {
-        initialize(userOrGroupReference, explicitDocumentReferenceResolver);
+        initialize(userOrGroupReference, userDataExtractor, explicitDocumentReferenceResolver);
         this.xwikiContext = getXWikiContext(execution);
     }
 
     /**
+     * Recommended if this iterator is called from old code not using components.
+     *
      * @param userAndGroupReferences the list of references (users or groups) to iterate over
+     * @param excludedUserAndGroupReferences the list of references (users or groups) to exclude. Can be null.
+     * @param userDataExtractor the extractor to use the return the value extracted from the user profile
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param xwikiContext the {@link XWikiContext} we use to call oldcore APIs
      */
     public UserIterator(List<DocumentReference> userAndGroupReferences,
+        List<DocumentReference> excludedUserAndGroupReferences, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
-        initialize(userAndGroupReferences, explicitDocumentReferenceResolver);
+        initialize(userAndGroupReferences, excludedUserAndGroupReferences, userDataExtractor,
+            explicitDocumentReferenceResolver);
         this.xwikiContext = xwikiContext;
     }
 
     /**
+     * Recommended if this iterator is called from old code not using components.
+     *
      * @param userOrGroupReference the reference (user or group) to iterate over
+     * @param userDataExtractor the extractor to use the return the value extracted from the user profile
      * @param explicitDocumentReferenceResolver the resolver to use for transforming group member strings into
      *        {@link DocumentReference}
      * @param xwikiContext the {@link XWikiContext} we use to call oldcore APIs
      */
-    public UserIterator(DocumentReference userOrGroupReference,
+    public UserIterator(DocumentReference userOrGroupReference, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver, XWikiContext xwikiContext)
     {
-        initialize(userOrGroupReference, explicitDocumentReferenceResolver);
+        initialize(userOrGroupReference, userDataExtractor, explicitDocumentReferenceResolver);
         this.xwikiContext = xwikiContext;
     }
 
-    private void initialize(DocumentReference userOrGroupReference,
+    private void initialize(DocumentReference userOrGroupReference, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver)
     {
         List<DocumentReference> references = userOrGroupReference == null
             ? Collections.<DocumentReference>emptyList() : Collections.singletonList(userOrGroupReference);
-        initialize(references, explicitDocumentReferenceResolver);
+        initialize(references, null, userDataExtractor, explicitDocumentReferenceResolver);
     }
 
     private void initialize(List<DocumentReference> userAndGroupReferences,
+        List<DocumentReference> excludedUserAndGroupReferences, UserDataExtractor<T> userDataExtractor,
         DocumentReferenceResolver<String> explicitDocumentReferenceResolver)
     {
         this.userAndGroupReferences = userAndGroupReferences;
+        this.excludedUserAndGroupReferences = excludedUserAndGroupReferences;
+        if (excludedUserAndGroupReferences == null) {
+            this.excludedUserAndGroupReferences = Collections.emptyList();
+        }
         this.explicitDocumentReferenceResolver = explicitDocumentReferenceResolver;
+        this.userDataExtractor = userDataExtractor;
         if (userAndGroupReferences != null && !userAndGroupReferences.isEmpty()) {
             this.userAndGroupIteratorStack.push(userAndGroupReferences.iterator());
         }
@@ -135,10 +165,10 @@ public class UserIterator implements Iterator<DocumentReference>
     {
         boolean hasNext = false;
         if (!this.userAndGroupIteratorStack.isEmpty()) {
-            if (this.lookaheadReference == null) {
-                DocumentReference currentReference = getNext();
-                if (currentReference != null) {
-                    this.lookaheadReference = currentReference;
+            if (this.lookaheadValue == null) {
+                T currentValue = getNext();
+                if (currentValue != null) {
+                    this.lookaheadValue = currentValue;
                     hasNext = true;
                 }
             }
@@ -147,24 +177,24 @@ public class UserIterator implements Iterator<DocumentReference>
     }
 
     @Override
-    public DocumentReference next()
+    public T next()
     {
-        DocumentReference currentReference = this.lookaheadReference;
-        if (currentReference != null) {
-            this.lookaheadReference = null;
+        T currentValue = this.lookaheadValue;
+        if (currentValue != null) {
+            this.lookaheadValue = null;
         } else {
-            currentReference = getNext();
-            if (currentReference == null) {
+            currentValue = getNext();
+            if (currentValue == null) {
                 throw new NoSuchElementException(String.format(
                     "No more users to extract from the passed references [%s]", serializeUserAndGroupReferences()));
             }
         }
-        return currentReference;
+        return currentValue;
     }
 
     private String serializeUserAndGroupReferences()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         Iterator<DocumentReference> iterator = this.userAndGroupReferences.iterator();
         while (iterator.hasNext()) {
             DocumentReference reference = iterator.next();
@@ -182,52 +212,73 @@ public class UserIterator implements Iterator<DocumentReference>
         throw new UnsupportedOperationException("remove");
     }
 
-    private DocumentReference getNext()
+    private T getNext()
     {
+        T currentValue;
         DocumentReference currentReference;
 
         // If there are no more references in the stack then we've already returned everything!
         if (this.userAndGroupIteratorStack.isEmpty()) {
             return null;
         }
+
         Iterator<DocumentReference> currentIterator = this.userAndGroupIteratorStack.peek();
 
         currentReference = currentIterator.next();
 
+        // If the reference is in the excluded list, skip it!
+        if (this.excludedUserAndGroupReferences.contains(currentReference)) {
+            cleanStackIfNeeded(currentIterator);
+            return getNext();
+        }
+
         // If it's not a virtual user (guest or superadmin user), then load the document
-        if (!currentReference.getLastSpaceReference().getName().equals(RightsManager.DEFAULT_USERORGROUP_SPACE)
-            || (!currentReference.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER)
-            && !currentReference.getName().equals(XWikiRightService.GUEST_USER)))
-        {
+        if (isSuperAdmin(currentReference)) {
+            currentValue = this.userDataExtractor.extractFromSuperadmin(currentReference);
+        } else if (isGuest(currentReference)) {
+            currentValue = this.userDataExtractor.extractFromGuest(currentReference);
+        } else {
             XWikiDocument document = getFailsafeDocument(currentReference);
             if (!document.isNew()) {
-                Pair<DocumentReference, Iterator<DocumentReference>> result = handleUserOrGroupReference(
+                Pair<T, Iterator<DocumentReference>> result = handleUserOrGroupReference(
                     currentReference, currentIterator, document);
-                currentReference = result.getLeft();
+                currentValue = result.getLeft();
                 currentIterator = result.getRight();
             } else {
                 // The document doesn't exist and thus it cannot point to a real user or group, skip it!
                 cleanStackIfNeeded(currentIterator);
-                currentReference = getNext();
+                currentValue = getNext();
             }
         }
 
         cleanStackIfNeeded(currentIterator);
 
-        return currentReference;
+        return currentValue;
     }
 
-    private Pair<DocumentReference, Iterator<DocumentReference>> handleUserOrGroupReference(
+    private boolean isSuperAdmin(DocumentReference reference)
+    {
+        return reference.getLastSpaceReference().getName().equals(RightsManager.DEFAULT_USERORGROUP_SPACE)
+            && reference.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER);
+    }
+
+    private boolean isGuest(DocumentReference reference)
+    {
+        return reference.getLastSpaceReference().getName().equals(RightsManager.DEFAULT_USERORGROUP_SPACE)
+            && reference.getName().equals(XWikiRightService.GUEST_USER);
+    }
+
+    private Pair<T, Iterator<DocumentReference>> handleUserOrGroupReference(
         DocumentReference currentReference, Iterator<DocumentReference> currentIterator, XWikiDocument document)
     {
-        DocumentReference reference = currentReference;
-        Iterator<DocumentReference> iterator = currentIterator;
+        T value;
 
         // Is the reference pointing to a user?
         DocumentReference userClassReference = new DocumentReference(
             document.getDocumentReference().getWikiReference().getName(),
             RightsManager.DEFAULT_USERORGROUP_SPACE, "XWikiUsers");
-        boolean isUserReference = document.getXObject(userClassReference) != null;
+        BaseObject userObject = document.getXObject(userClassReference);
+        boolean isUserReference = userObject != null;
 
         // Is the reference pointing to a group?
         // Note that a reference can point to a user reference and to a group reference at the same time!
@@ -243,16 +294,31 @@ public class UserIterator implements Iterator<DocumentReference>
         // If we have neither a group reference nor a user reference, skip it and get the next reference
         if (isGroupReference) {
             // Extract the references and push them on the stack as an iterator
-            this.userAndGroupIteratorStack.push(convertToDocumentReferences(members, reference).iterator());
+            this.userAndGroupIteratorStack.push(convertToDocumentReferences(members, currentReference).iterator());
             if (!isUserReference) {
-                reference = getNext();
+                value = getNext();
+            } else {
+                value = getValue(currentIterator, currentReference, document, userObject);
             }
         } else if (!isUserReference) {
-            cleanStackIfNeeded(iterator);
-            reference = getNext();
+            cleanStackIfNeeded(currentIterator);
+            value = getNext();
+        } else {
+            value = getValue(currentIterator, currentReference, document, userObject);
         }
 
-        return new ImmutablePair<>(reference, iterator);
+        return new ImmutablePair<>(value, currentIterator);
+    }
+
+    private T getValue(Iterator<DocumentReference> iterator, DocumentReference reference, XWikiDocument document,
+        BaseObject userObject)
+    {
+        T value = this.userDataExtractor.extract(reference, document, userObject);
+        if (value == null) {
+            cleanStackIfNeeded(iterator);
+            value = getNext();
+        }
+        return value;
     }
 
     private void cleanStackIfNeeded(Iterator<DocumentReference> currentIterator)
@@ -266,7 +332,7 @@ public class UserIterator implements Iterator<DocumentReference>
     private XWikiDocument getFailsafeDocument(DocumentReference reference)
     {
         try {
-            return this.xwikiContext.getWiki().getDocument(reference, this.xwikiContext);
+            return getXwikiContext().getWiki().getDocument(reference, getXwikiContext());
         } catch (XWikiException e) {
             throw new RuntimeException(String.format("Failed to get document for User or Group [%s] when extracting "
                 + "all users for the references [%s]", reference, serializeUserAndGroupReferences()));
@@ -283,6 +349,11 @@ public class UserIterator implements Iterator<DocumentReference>
             members.add(this.explicitDocumentReferenceResolver.resolve(member, currentReference));
         }
         return members;
+    }
+
+    protected XWikiContext getXwikiContext()
+    {
+        return this.xwikiContext;
     }
 
     private XWikiContext getXWikiContext(Execution execution)

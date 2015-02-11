@@ -36,7 +36,7 @@ import org.xwiki.mail.MimeMessageFactory;
  */
 public abstract class AbstractMessageIterator implements Iterator<MimeMessage>, Iterable<MimeMessage>
 {
-    protected MimeMessageFactory<Object, MimeMessage> factory;
+    protected MimeMessageFactory<MimeMessage> factory;
 
     protected int position;
 

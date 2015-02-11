@@ -130,16 +130,14 @@ public class MailTest extends AbstractTest
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
-        // Step 5: Send a template email (with an attachment) to a single user
-        sendTemplateMailToSingleUser();
+        // Step 5: Send a template email (with an attachment) to a single email address
+        sendTemplateMailToEmail();
 
-        // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users).
-        sendTemplateMailToGroup();
+        // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
+        // two other users (however since they're part of the group they'll receive only one mail each).
+        sendTemplateMailToUsersAndGroup();
 
-        // Step 7: Send a template email to 2 users (they have been created in step 5 above)
-        sendTemplateMailToSeveralUsers();
-
-        // Step 8: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
+        // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
         administrationPage = AdministrationPage.gotoPage();
         administrationPage.clickSection("Email", "Mail Sending Status");
@@ -154,7 +152,7 @@ public class MailTest extends AbstractTest
         assertTrue(liveTableElement.hasRow("Error", ""));
     }
 
-    private void sendTemplateMailToSingleUser() throws Exception
+    private void sendTemplateMailToEmail() throws Exception
     {
         // Remove existing pages (for pages that we create below)
         getUtil().deletePage(getTestClassName(), "SendMail");
@@ -192,10 +190,10 @@ public class MailTest extends AbstractTest
             "Status for John on " + getTestClassName() + ".SendMail"));
     }
 
-    private void sendTemplateMailToGroup() throws Exception
+    private void sendTemplateMailToUsersAndGroup() throws Exception
     {
         // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMailGroup");
+        getUtil().deletePage(getTestClassName(), "SendMailGroupAndUsers");
 
         // Create 2 users
         getUtil().createUser("user1", "password1", getUtil().getURLToNonExistentPage(), "email", "user1@doe.com");
@@ -207,10 +205,13 @@ public class MailTest extends AbstractTest
             + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
-            + "#set ($groupParameters = {'hint' : 'template', 'source' : $templateReference, "
+            + "#set ($parameters = {'hint' : 'template', 'source' : $templateReference, "
             + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
             + "#set ($groupReference = $services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup'))\n"
-            + "#set ($messages = $services.mailsender.createMessages('group', $groupReference, $groupParameters))\n"
+            + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
+            + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
+            + "#set ($source = {'groups' : [$groupReference], 'users' : [$user1Reference, $user2Reference]})\n"
+            + "#set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))\n"
             + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
@@ -223,7 +224,7 @@ public class MailTest extends AbstractTest
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMailGroup", velocity, "");
+        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMailGroupAndUsers", velocity, "");
 
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", vp.getContent());
@@ -232,48 +233,7 @@ public class MailTest extends AbstractTest
         this.mail.waitForIncomingEmail(10000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
         assertEquals(2, getNumberOfReceivedMessagesWithSubject(
-            "Status for John on " + getTestClassName() + ".SendMailGroup"));
-    }
-
-    private void sendTemplateMailToSeveralUsers() throws Exception
-    {
-        // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMailUsers");
-
-        // Create another page with the Velocity script to send the template email
-        String velocity = "{{velocity}}\n"
-            + "#set ($templateParameters = {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
-            + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
-            + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
-            + "', 'MailTemplate'))\n"
-            + "#set ($usersParameters = {'hint' : 'template', 'source' : $templateReference, "
-            + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
-            + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
-            + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
-            + "#set ($messages = $services.mailsender.createMessages('users', [$user1Reference, $user2Reference], "
-            + "$usersParameters))\n"
-            + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
-            + "#end\n"
-            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
-            + "  {{error}}\n"
-            + "    $status.messageId - $status.errorSummary\n"
-            + "    $status.errorDescription\n"
-            + "  {{/error}}\n"
-            + "#end\n"
-            + "{{/velocity}}";
-        // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMailUsers", velocity, "");
-
-        // Verify that the page doesn't display any content (unless there's an error!)
-        assertEquals("", vp.getContent());
-
-        // Verify that the mails has been received (3 mails above + the 2 mails sent to the 2 users)
-        this.mail.waitForIncomingEmail(10000L, 5);
-        assertEquals(5, this.mail.getReceivedMessages().length);
-        assertEquals(2, getNumberOfReceivedMessagesWithSubject(
-            "Status for John on " + getTestClassName() + ".SendMailUsers"));
+            "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers"));
     }
 
     private int getNumberOfReceivedMessagesWithSubject(String subject) throws Exception

@@ -41,12 +41,13 @@ import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 @Component
 @Named("files")
 @Singleton
-public class SerializedFilesMimeMessageFactory extends AbstractIteratorMimeMessageFactory<String>
+public class SerializedFilesMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     @Override
-    public Iterator<MimeMessage> createMessage(Session session, String batchId, Map<String, Object> parameters)
+    public Iterator<MimeMessage> createMessage(Session session, Object batchIdObject, Map<String, Object> parameters)
         throws MessagingException
     {
+        String batchId = getTypedSource(batchIdObject, String.class);
         SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(batchId, parameters,
             this.componentManagerProvider.get());
         return iterator;

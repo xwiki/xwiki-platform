@@ -19,11 +19,9 @@
  */
 package org.xwiki.mail.script;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -88,8 +86,8 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         MimeMessageWrapper result;
         try {
-            MimeMessageFactory<Object, MimeMessage> factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
-                MimeMessage.class, this.componentManagerProvider.get());
+            MimeMessageFactory<MimeMessage> factory = MimeMessageFactoryProvider.get(hint, MimeMessage.class,
+                this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
@@ -140,8 +138,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         Iterator<MimeMessage> result;
         try {
-            MimeMessageFactory<Object, Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
-                computeSourceType(source, parameters),
+            MimeMessageFactory<Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
                 new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
                 this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
@@ -154,33 +151,6 @@ public class MailSenderScriptService extends AbstractMailScriptService
         }
 
         return result;
-    }
-
-    private Type computeSourceType(Object source, Map<String, Object> parameters)
-    {
-        // Find the Type of the MimeMessageFactory to look up. If the type is passed as parameters then use it,
-        // otherwise try to guess it.
-        Type sourceType;
-        Object sourceTypeAsObject = parameters.get("sourceType");
-        if (sourceTypeAsObject == null) {
-            // No "type" defined by the user, try to guess it!
-            // If the passed source extends List then consider that the type is List.
-            // Then use the class of the first element to construct a generic type
-            if (source instanceof List) {
-                List sourceList = (List) source;
-                if (!sourceList.isEmpty()) {
-                    sourceType = new DefaultParameterizedType(null, List.class, sourceList.get(0).getClass());
-                } else {
-                    sourceType = List.class;
-                }
-            } else {
-                sourceType = source.getClass();
-            }
-        } else {
-            sourceType = this.converterManager.convert(Type.class, sourceTypeAsObject);
-        }
-
-        return sourceType;
     }
 
     /**

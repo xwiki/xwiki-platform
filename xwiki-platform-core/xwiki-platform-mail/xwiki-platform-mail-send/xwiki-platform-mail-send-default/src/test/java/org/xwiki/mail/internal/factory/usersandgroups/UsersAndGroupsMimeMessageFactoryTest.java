@@ -17,49 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal.factory.users;
+package org.xwiki.mail.internal.factory.usersandgroups;
 
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.factory.users.UsersMimeMessageFactory}.
+ * Unit tests for {@link UsersAndGroupsMimeMessageFactory}.
  *
  * @version $Id$
- * @since 6.4.1
+ * @since 6.4.2, 7.0M2
  */
-public class UsersMimeMessageFactoryTest
+public class UsersAndGroupsMimeMessageFactoryTest
 {
     @Rule
-    public MockitoComponentMockingRule<UsersMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(UsersMimeMessageFactory.class);
+    public MockitoComponentMockingRule<UsersAndGroupsMimeMessageFactory> mocker =
+        new MockitoComponentMockingRule<>(UsersAndGroupsMimeMessageFactory.class);
 
     @Test
     public void createMessageWhenNullParametersPassed() throws Exception
     {
         Session session = Session.getInstance(new Properties());
-        DocumentReference userReference = new DocumentReference("wiki", "space", "page");
-
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference), null);
+            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(), null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("You must pass parameters for this Mime Message Factory to work!", expected.getMessage());
@@ -70,11 +73,9 @@ public class UsersMimeMessageFactoryTest
     public void createMessageWhenNoHintParameterPassed() throws Exception
     {
         Session session = Session.getInstance(new Properties());
-        DocumentReference userReference = new DocumentReference("wiki", "space", "page");
-
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference),
-                Collections.<String, Object>emptyMap());
+            this.mocker.getComponentUnderTest().createMessage(session,
+                Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap());
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("The parameter [hint] is mandatory.", expected.getMessage());
@@ -85,10 +86,8 @@ public class UsersMimeMessageFactoryTest
     public void createMessageWhenNoSourceParameterPassed() throws Exception
     {
         Session session = Session.getInstance(new Properties());
-        DocumentReference userReference = new DocumentReference("wiki", "space", "page");
-
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference),
+            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(),
                 Collections.<String, Object>singletonMap("hint", "factoryHint"));
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -100,21 +99,49 @@ public class UsersMimeMessageFactoryTest
     public void createMessageWhenNotExistingMimeMessageFactory() throws Exception
     {
         Session session = Session.getInstance(new Properties());
-        DocumentReference userReference = new DocumentReference("wiki", "space", "page");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("hint", "factoryHint");
         parameters.put("source", "factoryHint");
 
-        Provider<ComponentManager> componentManagerProvider = this.mocker.getInstance(
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference), parameters);
+            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(),
+                parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("Failed to find a [MimeMessageFactory<String, MimeMessage>] for hint [factoryHint]",
                 expected.getMessage());
         }
+    }
+
+    @Test
+    public void createMessage() throws Exception
+    {
+        Session session = Session.getInstance(new Properties());
+        DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        Map<String, Object> source = Collections.<String, Object>singletonMap("users",
+            Collections.singletonList(userReference));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("hint", "template");
+        parameters.put("source", new DocumentReference("templatewiki", "templatespace", "templatepage"));
+
+        Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
+            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
+        when(componentManagerProvider.get()).thenReturn(this.mocker);
+        this.mocker.registerMockComponent(new DefaultParameterizedType(null, MimeMessageFactory.class,
+            MimeMessage.class), "template");
+
+        // Setup XWikiContext since this is required internally by the iterator constructor
+        Execution execution = this.mocker.registerMockComponent(Execution.class);
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
+        when(execution.getContext()).thenReturn(executionContext);
+
+        Iterator<MimeMessage> iterator = this.mocker.getComponentUnderTest().createMessage(session, source, parameters);
+        assertNotNull(iterator);
     }
 }

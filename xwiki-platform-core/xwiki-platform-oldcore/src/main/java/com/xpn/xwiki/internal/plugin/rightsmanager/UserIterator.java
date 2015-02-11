@@ -335,7 +335,7 @@ public class UserIterator<T> implements Iterator<T>
             return getXwikiContext().getWiki().getDocument(reference, getXwikiContext());
         } catch (XWikiException e) {
             throw new RuntimeException(String.format("Failed to get document for User or Group [%s] when extracting "
-                + "all users for the references [%s]", reference, serializeUserAndGroupReferences()));
+                + "all users for the references [%s]", reference, serializeUserAndGroupReferences()), e);
         }
     }
 

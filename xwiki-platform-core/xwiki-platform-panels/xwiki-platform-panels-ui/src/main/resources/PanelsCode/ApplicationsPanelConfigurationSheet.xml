@@ -381,7 +381,6 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
 ##########################
 #set($discard = $xwiki.jsx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
 #set($discard = $xwiki.ssx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
-#set($discard = $services.localization.use('document', 'PanelsCode.Translations'))
 ##########################
 ## First, we split the applications in 2 categories (white listed/black listed)
 ##########################

@@ -129,7 +129,7 @@
   "breadcrumb": {
     "breadcrumb-bg": "color",
     "breadcrumb-color": "color",
-    "breadcrumb-separator": "text"
+    "breadcrumb-separator": "escapedText"
   },
   "advanced": {
     "lessCode": "textarea"
@@ -197,7 +197,7 @@
               &lt;/textarea&gt;
             #else
               &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end type-${varType}" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
               &lt;/div&gt;
             #end
           &lt;/div&gt;
@@ -236,7 +236,7 @@
     #foreach($var in $catVar.keySet())
       #set($varName = $var)
       #set($varType = $catVar.get($varName))
-      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" /&gt;
+      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" class="type-${varType}"/&gt;
     #end
   #end
   &lt;/div&gt;
@@ -430,7 +430,12 @@ require(['jquery'], function($) {
         // file. We currently have not a solution for this case.
         if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
-          varMap[name] = variableInput.value;
+          var value = variableInput.value
+          // Some values need to be placed inside a string
+          if ($(variableInput).hasClass('type-escapedText')) {
+            value = '"' + value.replace('"', '\\"') + '"';
+          }
+          varMap[name] = value;
         }
       }
       
@@ -713,6 +718,22 @@ require(['jquery', 'colpick'], function($, Colpick) {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -768,6 +789,9 @@ require(['jquery', 'colpick'], function($, Colpick) {
 }</code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>CSS</name>
     </property>
     <property>
@@ -817,6 +841,22 @@ require(['jquery', 'colpick'], function($, Colpick) {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -873,6 +913,9 @@ require(['jquery', 'colpick'], function($, Colpick) {
   padding: 0;
   border: 0;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Color picker</name>

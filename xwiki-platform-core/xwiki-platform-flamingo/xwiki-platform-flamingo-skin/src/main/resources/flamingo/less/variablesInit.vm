@@ -169,15 +169,15 @@
       "panel-default-text" : "color",
       "breadcrumb-bg": "color",
       "breadcrumb-color": "color",
-      "breadcrumb-separator": "text"
+      "breadcrumb-separator": "escapedText"
       })
     #set($themeClass = $xwiki.getClass('FlamingoThemesCode.ThemeClass'))
     #foreach($property in $variables.keySet())
       #set($value = $themeDoc.getValue($property, $themeObj))
       #if("$!value" != '')
         #set($propertyType = $variables.get($property))
-        #if($propertyType == "text")
-          @$property: "$value";
+        #if($propertyType == 'escapedText')
+          @$property: "$escapetool.javascript($value)";
         #else
           @$property: $value;
         #end

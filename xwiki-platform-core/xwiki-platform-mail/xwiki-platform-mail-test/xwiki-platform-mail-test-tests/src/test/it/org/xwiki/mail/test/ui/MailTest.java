@@ -122,9 +122,12 @@ public class MailTest extends AbstractTest
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
-        // Note: we use the $doc binding in the content to verify that standard variables are correctly bound.
+        // Note: we use the $xwiki binding in the content to verify that standard variables are correctly bound.
+        // Note: we use the $doc binding to show that the user can add new bindings ($doc is not bound by default).
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
-            "subject", "Status for $name on $doc.fullName", "language", "en", "html", "<strong>Hello $name</strong>",
+            "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
+            "language", "en",
+            "html", "<strong>Hello $name</strong>",
             "text", "Hello $name");
         ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
@@ -186,8 +189,7 @@ public class MailTest extends AbstractTest
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
-        assertEquals(1, getNumberOfReceivedMessagesWithSubject(
-            "Status for John on " + getTestClassName() + ".SendMail"));
+        assertNumberOfReceivedMessagesWithSubject(1, "Status for John on " + getTestClassName() + ".SendMail");
     }
 
     private void sendTemplateMailToUsersAndGroup() throws Exception
@@ -232,18 +234,21 @@ public class MailTest extends AbstractTest
         // Verify that the mails have been received (first mail above + the 2 mails sent to the group)
         this.mail.waitForIncomingEmail(10000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
-        assertEquals(2, getNumberOfReceivedMessagesWithSubject(
-            "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers"));
+        assertNumberOfReceivedMessagesWithSubject(2,
+            "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers");
     }
 
-    private int getNumberOfReceivedMessagesWithSubject(String subject) throws Exception
+    private void assertNumberOfReceivedMessagesWithSubject(int nb, String subject) throws Exception
     {
+        StringBuilder builder = new StringBuilder();
         int count = 0;
         for (MimeMessage message : this.mail.getReceivedMessages()) {
+            builder.append('[').append(message.getSubject()).append(']').append('\n');
             if (message.getSubject().equals(subject)) {
                 count++;
             }
         }
-        return count;
+        assertEquals("We got the following subjects instead of the required " + nb + " for [" + subject + "]:\n"
+            + builder.toString(), nb, count);
     }
 }

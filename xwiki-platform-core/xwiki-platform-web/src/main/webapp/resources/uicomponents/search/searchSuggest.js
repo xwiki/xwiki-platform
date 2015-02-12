@@ -19,8 +19,6 @@ var XWiki = (function (XWiki) {
         return;
       }
 
-      this.searchInput.observe("keyup", this.onKeyUp.bindAsEventListener(this));
-
       document.observe("xwiki:suggest:clearSuggestions", this.onClearSuggestions.bindAsEventListener(this));
       document.observe("xwiki:suggest:containerCreated", this.onSuggestContainerCreated.bindAsEventListener(this));
       document.observe("xwiki:suggest:containerPrepared", this.onSuggestContainerPrepared.bindAsEventListener(this));
@@ -81,6 +79,10 @@ var XWiki = (function (XWiki) {
     onSuggestionSelected: function(event) {
       if (event.memo.suggest == this.suggest) {
         event.stop();
+        // Also stop the browser event that triggered the custom "xwiki:suggest:selected" event.
+        if (event.memo.originalEvent) {
+          Event.stop(event.memo.originalEvent);
+        }
         if (!event.memo.id) {
           // Submit form
           this.searchInput.up('form').submit();
@@ -145,23 +147,10 @@ var XWiki = (function (XWiki) {
         width: 500,
         unifiedLoader: true,
         loaderNode: allResults.down("li"),
-        shownoresults: false
+        shownoresults: false,
+        propagateEventKeyCodes : [ Event.KEY_RETURN ]
       });
-    },
-
-   /**
-    * Callback triggered when a key has been typed on the virtual input.
-    */
-   onKeyUp: function(event) {
-     var key = event.keyCode;
-     switch(key) {
-       case Event.KEY_RETURN:
-         if (!this.suggest.hasActiveSelection()) {
-           event.stop();
-           this.searchInput.up('form').submit();
-         }
-     }
-   }
+    }
 
   });
 

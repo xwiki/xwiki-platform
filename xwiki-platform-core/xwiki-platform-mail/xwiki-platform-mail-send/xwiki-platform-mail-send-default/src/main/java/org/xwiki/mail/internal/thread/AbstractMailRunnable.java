@@ -62,7 +62,6 @@ public abstract class AbstractMailRunnable implements MailRunnable
     protected void prepareContext(String wikiId) throws ExecutionContextException
     {
         // Isolate the context when sending a mail by creating a new context
-        // Note: We need to remove any existing context since the initialize() will actually perform
         ExecutionContext executionContext = new ExecutionContext();
         this.executionContextManager.initialize(executionContext);
 

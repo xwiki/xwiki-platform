@@ -162,12 +162,12 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
     private VelocityContext createVelocityContext(Map<String, String> data)
     {
-        // Inherit from the existing Velocity Context so that all the default variables (such as $xwiki)
-        // can be used in templates.
-        // Even though the inner context is read only (ie not put call can be called on the inner context) and even
-        // though we perform a clone(), if a variable from the inner context is modified it'll still be modified...
-        XWikiContext context = this.xwikiContextProvider.get();
-        VelocityContext existingVelocityContext = (VelocityContext) context.get("vcontext");
+        // Note: We create an inner Velocity Context to make it read only and try to prevent the script to modify
+        // its bindings. We also clone its values to try try to protect them. It's not guaranteed though since the
+        // clone() method of VelocityContext only performs shallow cloning.
+        // However, this whole code is executed in a thread and we recreate the context for each email so it should be
+        // pretty safe!
+        VelocityContext existingVelocityContext = this.velocityManager.getVelocityContext();
         VelocityContext velocityContext;
         if (existingVelocityContext != null) {
             velocityContext = new VelocityContext((VelocityContext) existingVelocityContext.clone());

@@ -198,7 +198,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         // This seems to cause a problem in virtual wikis
         user = context.getXWikiUser();
         if (user == null) {
-            needsAuth = needsAuth(right, context);
+            needsAuth = needsAuth(right, doc.getDocumentReference().getWikiReference().getName(), context);
             try {
                 if (context.getMode() != XWikiContext.MODE_XMLRPC) {
                     user = context.getWiki().checkAuth(context);
@@ -276,32 +276,38 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
     }
 
-    private boolean needsAuth(String right, XWikiContext context)
+    private boolean needsAuth(String right, String wikiId, XWikiContext context)
     {
+        final String origWikiId = context.getWikiId();
         boolean needsAuth = false;
-
+        
         try {
-            needsAuth =
-                context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
-        } catch (Exception e) {
-        }
+            context.setWikiId(wikiId);
+            try {
+                needsAuth =
+                        context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+            } catch (Exception e) {
+            }
 
-        try {
-            needsAuth |= (context.getWiki().getXWikiPreferenceAsInt("authenticate_" + right, 0, context) == 1);
-        } catch (Exception e) {
-        }
+            try {
+                needsAuth |= (context.getWiki().getXWikiPreferenceAsInt("authenticate_" + right, 0, context) == 1);
+            } catch (Exception e) {
+            }
 
-        try {
-            needsAuth |=
-                context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
-        } catch (Exception e) {
-        }
+            try {
+                needsAuth |=
+                        context.getWiki().getSpacePreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+            } catch (Exception e) {
+            }
 
-        try {
-            needsAuth |= (context.getWiki().getSpacePreferenceAsInt("authenticate_" + right, 0, context) == 1);
-        } catch (Exception e) {
+            try {
+                needsAuth |= (context.getWiki().getSpacePreferenceAsInt("authenticate_" + right, 0, context) == 1);
+            } catch (Exception e) {
+            }
+        } finally {
+            context.setWikiId(origWikiId);
         }
-
+        
         return needsAuth;
     }
 
@@ -532,6 +538,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean deny_found = false;
         boolean isReadOnly = context.getWiki().isReadOnly();
         String database = context.getWikiId();
+        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(entityReference);
         XWikiDocument currentdoc = null;
 
         if (isReadOnly) {
@@ -544,7 +551,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         if (userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER)) {
-            if (needsAuth(accessLevel, context)) {
+            if (needsAuth(accessLevel, this.entityReferenceSerializer.serialize(documentReference.getWikiReference()), context)) {
                 return false;
             }
         }

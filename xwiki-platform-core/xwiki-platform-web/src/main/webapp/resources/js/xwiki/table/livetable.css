@@ -68,28 +68,28 @@
   overflow: hidden;
   border: none;
 }
-.controlPagination a.prevPagination , .controlPagination span.noPrevPagination, .controlPagination a.nextPagination, .controlPagination span.noNextPagination {
+.controlPagination .prevPagination , .controlPagination .noPrevPagination, .controlPagination .nextPagination, .controlPagination .noNextPagination {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
   width: 21px;
   height: 22px;
 }
-.controlPagination a.prevPagination:hover, .controlPagination a.nextPagination:hover {
+.controlPagination .prevPagination:hover, .controlPagination .nextPagination:hover {
   cursor: pointer;
 }
-.controlPagination a.noPrevPagination:hover, .controlPagination a.noNextPagination:hover {
+.controlPagination .noPrevPagination:hover, .controlPagination .noNextPagination:hover {
   cursor: default;
 }
-.controlPagination a.prevPagination {
+.controlPagination .prevPagination {
   background-position: left top;
 }
-.controlPagination span.noPrevPagination {
+.controlPagination .noPrevPagination {
   background-position: left bottom;
 }
-.controlPagination a.nextPagination {
+.controlPagination .nextPagination {
   background-position: right top;
   left: 21px;
 }
-.controlPagination span.noNextPagination {
+.controlPagination .noNextPagination {
   background-position: right bottom;
   left: 21px;
 }

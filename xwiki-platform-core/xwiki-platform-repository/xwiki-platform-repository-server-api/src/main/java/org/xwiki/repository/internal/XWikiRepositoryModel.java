@@ -79,6 +79,8 @@ public interface XWikiRepositoryModel
 
     String PROP_EXTENSION_CATEGORY = "category";
 
+    String PROP_EXTENSION_PROPERTIES = "properties";
+
     String PROP_VERSION_ID = "id";
 
     String PROP_VERSION_VERSION = "version";

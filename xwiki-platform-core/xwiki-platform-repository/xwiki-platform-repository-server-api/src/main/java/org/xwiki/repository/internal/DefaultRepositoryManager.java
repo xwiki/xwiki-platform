@@ -770,6 +770,10 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
                 new ArrayList<String>(extension.getFeatures()));
 
+        // Features
+        needSave |=
+            updateProperties(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES, extension.getProperties());
+
         return needSave;
     }
 
@@ -965,6 +969,17 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
 
         return needSave;
+    }
+
+    protected boolean updateProperties(BaseObject object, String fieldName, Map map)
+    {
+        if (ObjectUtils.notEqual(value, getValue(object, fieldName))) {
+            object.set(fieldName, value, this.xcontextProvider.get());
+
+            return true;
+        }
+
+        return false;
     }
 
     protected <T> T getValue(BaseObject object, String field)

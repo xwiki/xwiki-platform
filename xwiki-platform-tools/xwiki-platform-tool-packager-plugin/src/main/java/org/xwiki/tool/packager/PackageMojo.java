@@ -671,7 +671,7 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
-            "bootstrap", "3.2.0", null, "jar"));
+            "bootstrap", "3.3.2", null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
             "requirejs", "2.1.15", null, "jar"));
 

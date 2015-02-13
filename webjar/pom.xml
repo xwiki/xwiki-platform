@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.contrib</groupId>
+    <artifactId>application-ckeditor-pom</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <packaging>jar</packaging>
+  <artifactId>application-ckeditor-webjar</artifactId>
+  <name>CKEditor Integration WebJar</name>
+  <description>Packages CKEditor and our custom plugins in a single WebJar.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
+    <!-- No Java code here -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- The path to the folder where you cloned the CKEditor sources. -->
+    <ckeditor.path>${basedir}/../../../ckeditor-dev</ckeditor.path>
+    <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
+    <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
+    <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
+    <webjars.unpack.directory>${project.build.directory}/webjars</webjars.unpack.directory>
+    <webjars.unpack.contentDirectory>
+      ${webjars.unpack.directory}/META-INF/resources/webjars/application-ckeditor-plugins/${project.version}
+    </webjars.unpack.contentDirectory>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-plugins-webjar</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.contrib</groupId>
+                  <artifactId>application-ckeditor-plugins</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <outputDirectory>${webjars.unpack.directory}</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Copy the build configuration to the CKEditor sources. -->
+            <id>copy-build-config</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${ckeditor.builder.path}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/config</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the custom plugins to the CKEditor sources. -->
+            <id>copy-custom-plugins</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${ckeditor.plugins.path}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${webjars.unpack.contentDirectory}</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the output of the CKEditor builder to the expected WebJar location. -->
+            <id>copy-ckeditor-resources</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${ckeditor.builder.path}/release/ckeditor</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Build the CKEditor. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-ckeditor</id>
+            <!-- Use a phase after compile because the Clirr Maven Plugin executes all the phases up to compile twice. -->
+            <phase>process-classes</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>${ckeditor.builder.path}/build.sh</executable>
+              <arguments>
+                <argument>-s</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

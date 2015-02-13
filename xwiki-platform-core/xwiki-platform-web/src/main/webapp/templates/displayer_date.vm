@@ -1,13 +1,15 @@
 #set ($format = $field.getProperty('dateFormat').value)
-#set ($formattedValue = $escapetool.xml($datetool.format($format, $value)))
+#set ($formattedValue = $escapetool.xml($datetool.format($format, $value, $services.localization.getCurrentLocale())))
 #if ($type == 'edit' || $type == 'search')
   #set ($picker = $field.getProperty('picker').value == 1)
   #if ($picker)
     ## A simple date picker widget.
     #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js',
+      {'forceSkinAction': true, 'language': $xcontext.language}))
     ## Used to parse and serialize the selected date using the date format specified in the XClass.
-    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js',
+      {'forceSkinAction': true, 'language': $xcontext.language}))
     ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
     #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
     #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))

@@ -25,14 +25,17 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Defines an XClass property type whose value is a Date.
@@ -63,6 +66,11 @@ public class DateClass extends PropertyClass
      * The meta property that specifies the date format.
      */
     private static final String META_PROPERTY_DATE_FORMAT = "dateFormat";
+
+    /**
+     * Used to get the current locale.
+     */
+    private LocalizationContext localizationContext;
 
     /**
      * Creates a new Date property that is described by the given meta class.
@@ -172,7 +180,7 @@ public class DateClass extends PropertyClass
         }
 
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
+            SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat(), getCurrentLocale());
             property.setValue(sdf.parse(value));
             return property;
         } catch (ParseException e) {
@@ -194,7 +202,8 @@ public class DateClass extends PropertyClass
      */
     public String toFormString(BaseProperty property)
     {
-        return property.getValue() == null ? "" : new SimpleDateFormat(getDateFormat()).format(property.getValue());
+        return property.getValue() == null ? "" : new SimpleDateFormat(getDateFormat(), getCurrentLocale())
+            .format(property.getValue());
     }
 
     /**
@@ -233,5 +242,25 @@ public class DateClass extends PropertyClass
             }
         }
         return property;
+    }
+
+    private LocalizationContext getLocalizationContext()
+    {
+        if (this.localizationContext == null) {
+            this.localizationContext = Utils.getComponent(LocalizationContext.class);
+        }
+        return this.localizationContext;
+    }
+
+    private Locale getCurrentLocale()
+    {
+        try {
+            return getLocalizationContext().getCurrentLocale();
+        } catch (Exception e) {
+            Locale defaultLocale = Locale.getDefault();
+            LOGGER.warn("Failed to get the context locale: [{}]. Continue using the default JVM locale [{}].",
+                ExceptionUtils.getRootCauseMessage(e), defaultLocale);
+            return defaultLocale;
+        }
     }
 }

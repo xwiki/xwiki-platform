@@ -33,7 +33,7 @@
   <artifactId>application-ckeditor-pom</artifactId>
   <packaging>pom</packaging>
   <name>CKEditor Integration Parent POM</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <description>Adds support for editing wiki pages using CKEditor.</description>
   <developers>
     <developer>
@@ -49,7 +49,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-ckeditor.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-ckeditor.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-ckeditor</url>
-    <tag>application-ckeditor-1.0</tag>
+    <tag>HEAD</tag>
   </scm>
   <distributionManagement>
     <repository>

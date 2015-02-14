@@ -233,22 +233,9 @@ public class DashboardMacro extends AbstractMacro<DashboardMacroParameters> impl
             // include the effects.js and dragdrop.js that are needed by the dashboard js
             this.jsfx.use("js/scriptaculous/effects.js");
             this.jsfx.use("js/scriptaculous/dragdrop.js");
-            Map<String, Object> fxParamsNonDeferred = new HashMap<String, Object>();
-            fxParamsNonDeferred.put("defer", false);
             Map<String, Object> fxParamsNonDeferredForceSkinAction = new HashMap<String, Object>();
+            fxParamsNonDeferredForceSkinAction.put("defer", false);
             fxParamsNonDeferredForceSkinAction.putAll(fxParamsForceSkinAction);
-            fxParamsNonDeferredForceSkinAction.putAll(fxParamsNonDeferred);
-            // include the smart client as well since it injects stuff in the GWT and then onModuleLoad cannot be ran
-            // without. See XWIKI-6620 for details
-            this.jsfx.use("js/smartclient/initsc.js", fxParamsNonDeferredForceSkinAction);
-            this.jsfx.use("js/smartclient/modules/ISC_Core.js", fxParamsNonDeferred);
-            this.jsfx.use("js/smartclient/modules/ISC_Foundation.js", fxParamsNonDeferred);
-            this.jsfx.use("js/smartclient/modules/ISC_Containers.js", fxParamsNonDeferred);
-            // this is the only file that seems to be not really needed. I am including it though since I'm including
-            // all others anyway and maybe there's a case I didn't see
-            this.jsfx.use("js/smartclient/modules/ISC_Grids.js", fxParamsNonDeferred);
-            this.jsfx.use("js/smartclient/modules/ISC_Forms.js", fxParamsNonDeferred);
-            this.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", fxParamsNonDeferred);
             this.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", fxParamsNonDeferredForceSkinAction);
             this.jsfx.use("uicomponents/dashboard/dashboard.js", fxParamsForceSkinAction);
         }

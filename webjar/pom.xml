@@ -36,8 +36,9 @@
     <xwiki.extension.name>CKEditor WebJar</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- The path to the folder where you cloned the CKEditor sources. -->
-    <ckeditor.path>${basedir}/../../../ckeditor-dev</ckeditor.path>
+    <ckeditor.version>4.4.7</ckeditor.version>
+    <!-- The path to the folder where we clone the CKEditor sources. -->
+    <ckeditor.path>${project.build.directory}/ckeditor-dev</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
     <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
     <!-- Where to unpack the WebJars with the custom CKEditor plugins. -->
@@ -48,8 +49,29 @@
   </properties>
   <build>
     <plugins>
+      <!-- Checkout the CKEditor sources for the version (tag) we want to use. -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>1.9.2</version>
+        <executions>
+          <execution>
+            <id>checkout-ckeditor-sources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>checkout</goal>
+            </goals>
+            <configuration>
+              <checkoutDirectory>${ckeditor.path}</checkoutDirectory>
+              <connectionUrl>scm:git:git://github.com/ckeditor/ckeditor-dev.git</connectionUrl>
+              <scmVersion>${ckeditor.version}</scmVersion>
+              <scmVersionType>tag</scmVersionType>
+              <skipCheckoutIfExists>true</skipCheckoutIfExists>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Unpack the WebJar with the custom CKEditor plugins that we want to include in the build. -->
+      <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
@@ -92,7 +114,7 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the custom plugins to the CKEditor sources. -->
+            <!-- Copy the custom plugins to the CKEditor sources so that they are included in the build. -->
             <id>copy-custom-plugins</id>
             <phase>process-resources</phase>
             <goals>
@@ -124,6 +146,9 @@
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <overwrite>true</overwrite>
+        </configuration>
       </plugin>
       <!-- Build the CKEditor. -->
       <plugin>

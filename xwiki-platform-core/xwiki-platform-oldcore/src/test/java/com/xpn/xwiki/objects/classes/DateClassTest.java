@@ -29,6 +29,9 @@ import org.junit.Test;
 import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.objects.BaseProperty;
@@ -58,6 +61,10 @@ public class DateClassTest
         mocker.registerComponent(ComponentManager.class, "context", contextCM);
 
         Utils.setComponentManager(mocker);
+
+        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
         localizationContext = mocker.registerMockComponent(LocalizationContext.class);
     }

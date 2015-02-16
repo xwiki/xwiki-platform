@@ -95,6 +95,17 @@ public class GadgetWizardApi implements WizardListener
     /**
      * Creates a new gadget wizard.
      *
+     * @deprecated: Since 7.0M2. Use {@link #GadgetWizardApi(JavaScriptObject)} instead
+     */
+    @Deprecated
+    public GadgetWizardApi()
+    {
+        this(JavaScriptObject.fromJson("{syntax:'xwiki/2.0'}"));
+    }
+
+    /**
+     * Creates a new gadget wizard.
+     *
      * @param jsConfig the {@link JavaScriptObject} used to configure the newly created gadget
      */
     public GadgetWizardApi(JavaScriptObject jsConfig)

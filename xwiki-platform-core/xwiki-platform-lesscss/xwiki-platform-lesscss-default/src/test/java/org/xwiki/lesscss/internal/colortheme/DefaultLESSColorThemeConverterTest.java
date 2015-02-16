@@ -83,7 +83,7 @@ public class DefaultLESSColorThemeConverterTest
         xwiki = mock(XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
-        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("colorTheme");
+        when(currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("colorTheme");
         when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
         when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
                 new NamedColorThemeReference("colorTheme"));

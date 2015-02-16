@@ -88,7 +88,7 @@ public class DefaultLESSSkinFileCompilerTest
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
 
-        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("wikiId:ColorTheme.MyColorTheme");
+        when(currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("wikiId:ColorTheme.MyColorTheme");
 
     }
     /*

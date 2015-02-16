@@ -29,6 +29,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -58,12 +60,26 @@ public class CurrentColorThemeGetter
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     /**
      * @param fallbackValue value to return if the current color theme is invalid
      * @return the full name of the current color theme or fallbackValue if the current color theme is invalid
      */
     public String getCurrentColorTheme(String fallbackValue)
+    {
+        return getCurrentColorTheme(true, fallbackValue);
+    }
+
+    /**
+     * @param checkRights check if the user has the right to see the color theme
+     * @param fallbackValue value to return if the current color theme is invalid
+     * @return the full name of the current color theme or fallbackValue if the current color theme is invalid
+     * @since 7.0-M2
+     */
+    public String getCurrentColorTheme(boolean checkRights, String fallbackValue) 
     {
         // Get information about the context
         String wikiId = wikiDescriptorManager.getCurrentWikiId();
@@ -85,10 +101,12 @@ public class CurrentColorThemeGetter
 
         // Check that the color theme exists, to avoid a DOS if some user tries to getResult a skin file
         // with random colorTheme names
-        if (!xwiki.exists(colorThemeReference, context)) {
+        // Also check that the user has the right to see the color theme
+        if (!xwiki.exists(colorThemeReference, context) || (checkRights && !authorizationManager.hasAccess(Right.VIEW,
+            context.getUserReference(), colorThemeReference))) {
             colorTheme = fallbackValue;
         }
-
+        
         return colorTheme;
     }
 

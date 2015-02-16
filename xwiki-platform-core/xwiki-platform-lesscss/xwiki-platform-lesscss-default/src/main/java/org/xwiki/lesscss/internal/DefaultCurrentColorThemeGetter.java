@@ -83,7 +83,7 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
                 documentReferenceResolver.resolve(colorTheme, new WikiReference(wikiId));
         colorTheme = entityReferenceSerializer.serialize(colorThemeReference);
 
-        // Check that the color theme exists, to avoid a DOS if some user tries to getResult a skin file
+        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
         // with random colorTheme names
         // Also check that the user has the right to see the color theme
         if (!xwiki.exists(colorThemeReference, context) || !authorizationManager.hasAccess(Right.VIEW,

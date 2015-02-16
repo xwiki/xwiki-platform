@@ -28,6 +28,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -57,6 +59,9 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private AuthorizationManager authorizationManager;
+
     @Override
     public String getCurrentColorTheme(String fallbackValue)
     {
@@ -78,9 +83,11 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
                 documentReferenceResolver.resolve(colorTheme, new WikiReference(wikiId));
         colorTheme = entityReferenceSerializer.serialize(colorThemeReference);
 
-        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
+        // Check that the color theme exists, to avoid a DOS if some user tries to getResult a skin file
         // with random colorTheme names
-        if (!xwiki.exists(colorThemeReference, context)) {
+        // Also check that the user has the right to see the color theme
+        if (!xwiki.exists(colorThemeReference, context) || !authorizationManager.hasAccess(Right.VIEW,
+                context.getUserReference(), colorThemeReference)) {
             colorTheme = fallbackValue;
         }
 

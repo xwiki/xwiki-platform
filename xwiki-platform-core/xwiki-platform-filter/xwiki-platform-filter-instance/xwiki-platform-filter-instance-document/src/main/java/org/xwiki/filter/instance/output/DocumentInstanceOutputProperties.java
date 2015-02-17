@@ -61,6 +61,11 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     private boolean authorPreserved = true;
 
     /**
+     * @see #isStoppedWhenSaveFail()
+     */
+    private boolean stoppedWhenSaveFail = true;
+
+    /**
      * @return The base reference to use to resolve reference from events
      */
     @PropertyName("Default reference")
@@ -167,5 +172,23 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     public void setAuthorPreserved(boolean authorPreserved)
     {
         this.authorPreserved = authorPreserved;
+    }
+
+    /**
+     * @return Indicate if an exception should be thrown if a document save fail.
+     */
+    @PropertyName("Stop when document save fail")
+    @PropertyDescription("Indicate if an exception should be thrown if a document save fail")
+    public boolean isStoppedWhenSaveFail()
+    {
+        return stoppedWhenSaveFail;
+    }
+
+    /**
+     * @param stoppedWhenSaveFail Indicate if an exception should be thrown if a document save fail.
+     */
+    public void setStoppedWhenSaveFail(boolean stoppedWhenSaveFail)
+    {
+        this.stoppedWhenSaveFail = stoppedWhenSaveFail;
     }
 }

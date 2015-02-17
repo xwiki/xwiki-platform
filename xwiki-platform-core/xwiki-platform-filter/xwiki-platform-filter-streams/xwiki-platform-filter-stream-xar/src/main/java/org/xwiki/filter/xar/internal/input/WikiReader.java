@@ -138,7 +138,7 @@ public class WikiReader
                 } catch (Exception e) {
                     if (this.properties.isVerbose()) {
                         this.logger.warn(LOG_DOCUMENT_FAILREAD, "Failed to read XAR XML document from entry [{}]: {}",
-                            entry.getName(), ExceptionUtils.getRootCauseMessage(e));
+                            entry.getName(), ExceptionUtils.getRootCauseMessage(e), e);
                     }
                 }
             }

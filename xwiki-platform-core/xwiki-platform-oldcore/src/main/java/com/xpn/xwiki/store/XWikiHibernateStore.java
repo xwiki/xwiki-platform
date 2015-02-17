@@ -25,6 +25,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -645,28 +646,23 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     + " where o.className=? and p.id=o.id and p.name=?");
                                 q.setString(0, bclass.getName()).setString(1, lc.getName());
                                 for (Iterator it = q.list().iterator(); it.hasNext();) {
-                                    BaseProperty lp = (BaseProperty) it.next();
-                                    BaseProperty lp1 = lc.newProperty();
-                                    lp1.setId(lp.getId());
-                                    lp1.setName(lp.getName());
-                                    if (lc.isMultiSelect()) {
-                                        List tmp;
-                                        if (lp.getValue() instanceof List) {
-                                            tmp = (List) lp.getValue();
-                                        } else {
-                                            tmp = new ArrayList<String>(1);
-                                            tmp.add(lp.getValue());
-                                        }
-                                        lp1.setValue(tmp);
-                                    } else {
-                                        Object tmp = lp.getValue();
-                                        if (tmp instanceof List && ((List) tmp).size() > 0) {
-                                            tmp = ((List) tmp).get(0);
-                                        }
-                                        lp1.setValue(tmp);
+                                    BaseProperty oldListProperty = (BaseProperty) it.next();
+                                    Object value = oldListProperty.getValue();
+                                    if (lc.isMultiSelect() && !(value instanceof List) && value != null) {
+                                        value = Arrays.asList(value);
+                                    } else if (!lc.isMultiSelect() && value instanceof List) {
+                                        List<String> values = (List<String>) value;
+                                        value = values.isEmpty() ? null : values.get(0);
                                     }
-                                    session.delete(lp);
-                                    session.save(lp1);
+                                    session.delete(oldListProperty);
+                                    // Don't save the new value if it's null (it means the property is not set).
+                                    if (value != null) {
+                                        BaseProperty newListProperty = lc.newProperty();
+                                        newListProperty.setId(oldListProperty.getId());
+                                        newListProperty.setName(oldListProperty.getName());
+                                        newListProperty.setValue(value);
+                                        session.save(newListProperty);
+                                    }
                                 }
                             }
                         }

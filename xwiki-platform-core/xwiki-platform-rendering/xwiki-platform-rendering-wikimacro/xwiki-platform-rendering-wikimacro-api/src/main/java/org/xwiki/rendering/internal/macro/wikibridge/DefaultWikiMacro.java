@@ -223,12 +223,17 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
                 new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
                     wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
 
-            // make sure to use provided metadatas
+            // Make sure to use provided metadatas
             MetaDataBlock metaDataBlock =
                 new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
 
             // Make sure the context XDOM contains the wiki macro content
             wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
+
+            // "Emulate" the fact that wiki macro block is still part of the XDOM
+            wikiMacroBlock.setParent(metaDataBlock.getParent());
+            wikiMacroBlock.setNextSiblingBlock(metaDataBlock.getNextSibling());
+            wikiMacroBlock.setPreviousSiblingBlock(metaDataBlock.getPreviousSibling());
 
             try {
                 if (observation != null) {

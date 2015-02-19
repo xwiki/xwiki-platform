@@ -239,12 +239,12 @@ $xwiki.getUserName("xwiki:${username}")
       #set ($userName = ${userReference.name})
       #getUserAvatarURL($userReference $avatarURL 30)
       <li class="user">
-       <div class="user-avatar-wrapper">
-         ## The string returned by XWiki#getUserName() is XML encoded.
-         <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-           alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
-      </div>
-      <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
+        <div class="user-avatar-wrapper">
+          ## The string returned by XWiki#getUserName() is XML encoded.
+          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
+            alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
+        </div>
+        <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
         <div>
           <span class="user-alias">${escapetool.xml($userReference.name)}</span>
           ## Display the wiki only for local users.
@@ -293,15 +293,15 @@ $xwiki.getUserName("xwiki:${username}")
         <div class="user-name">
           <a href="${escapetool.xml($xwiki.getURL($groupReference))}">${escapetool.xml($groupTitle)}</a>
         </div>
-    <div>
-    <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
-      ## Display the wiki only for local groups.
-      #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
-        <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
-      #end
-    </div>
-  </li>
-  #end
+        <div>
+          <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
+          ## Display the wiki only for local groups.
+          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
+            <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
+          #end
+        </div>
+      </li>
+    #end
   </ul>
 #end
 

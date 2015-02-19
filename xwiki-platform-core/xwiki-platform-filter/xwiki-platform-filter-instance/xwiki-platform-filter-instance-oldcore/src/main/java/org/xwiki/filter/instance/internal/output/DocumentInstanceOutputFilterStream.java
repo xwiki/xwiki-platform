@@ -62,6 +62,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     private static final TranslationMarker LOG_DOCUMENT_UPDATED = new TranslationMarker(
         "filter.instance.log.document.updated", WikiDocumentFilter.LOG_DOCUMENT_UPDATED);
 
+    private static final TranslationMarker LOG_DOCUMENT_FAILSAVE = new TranslationMarker(
+        "filter.instance.log.document.failsave", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
+
     @Inject
     private FilterDescriptorManager filterManager;
 
@@ -171,6 +174,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                     this.documentDeleted = true;
                     document = inputDocument;
                 } else {
+                    // Safer to clone for thread safety and in case the save fail
+                    document = document.clone();
+
                     document.loadAttachmentsContent(xcontext);
                     document.apply(inputDocument);
                 }
@@ -235,7 +241,12 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 }
             }
         } catch (Exception e) {
-            throw new FilterException("Failed to save document", e);
+            this.logger.error(LOG_DOCUMENT_FAILSAVE, "Failed to save document [{}]",
+                inputDocument.getDocumentReferenceWithLocale(), e);
+
+            if (this.properties.isStoppedWhenSaveFail()) {
+                throw new FilterException("Failed to save document", e);
+            }
         }
     }
 }

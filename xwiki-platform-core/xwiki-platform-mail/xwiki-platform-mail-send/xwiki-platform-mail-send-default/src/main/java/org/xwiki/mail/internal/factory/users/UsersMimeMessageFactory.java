@@ -40,20 +40,23 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @version $Id$
  * @since 6.4.1
+ * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
  */
 @Component
 @Named("users")
 @Singleton
-public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory<List<DocumentReference>>
+@Deprecated
+public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     private static final String HINT = "hint";
 
     private static final String SOURCE = "source";
 
     @Override
-    public Iterator<MimeMessage> createMessage(Session session, List<DocumentReference> userReferences,
+    public Iterator<MimeMessage> createMessage(Session session, Object userReferencesObject,
         Map<String, Object> parameters) throws MessagingException
     {
+        List<DocumentReference> userReferences = getTypedSource(userReferencesObject, List.class);
         validateParameters(parameters, HINT, SOURCE);
 
         // Extract from the passed parameters the MimeMessageFactory to use to create a single mail

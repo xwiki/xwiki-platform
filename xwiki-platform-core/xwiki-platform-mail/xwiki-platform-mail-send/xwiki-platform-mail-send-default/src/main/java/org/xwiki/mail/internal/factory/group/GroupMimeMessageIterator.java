@@ -46,7 +46,9 @@ import com.xpn.xwiki.XWikiException;
  *
  * @version $Id$
  * @since 6.4M3
+ * @deprecated starting with 6.4.2 this is replaced by the {@code usersandroups} Mime Message Factory
  */
+@Deprecated
 public class GroupMimeMessageIterator extends AbstractMessageIterator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupMimeMessageIterator.class);
@@ -72,7 +74,7 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
      * @throws MessagingException when an error occurs when retrieving the number of users
      */
     public GroupMimeMessageIterator(DocumentReference groupReference,
-        MimeMessageFactory<Object, MimeMessage> factory, Map<String, Object> parameters,
+        MimeMessageFactory<MimeMessage> factory, Map<String, Object> parameters,
         ComponentManager componentManager) throws MessagingException
     {
         this.factory = factory;

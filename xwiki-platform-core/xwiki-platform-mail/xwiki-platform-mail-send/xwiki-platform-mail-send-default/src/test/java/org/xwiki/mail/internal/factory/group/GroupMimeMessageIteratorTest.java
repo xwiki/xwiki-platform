@@ -73,7 +73,7 @@ public class GroupMimeMessageIteratorTest
 
         Session session = Session.getInstance(new Properties());
 
-        MimeMessageFactory<Object, MimeMessage> factory = new MimeMessageFactory<Object, MimeMessage>()
+        MimeMessageFactory<MimeMessage> factory = new MimeMessageFactory<MimeMessage>()
         {
             @Override
             public MimeMessage createMessage(Session session, Object source, Map parameters) throws MessagingException

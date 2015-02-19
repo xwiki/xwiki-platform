@@ -105,7 +105,7 @@ public abstract class AbstractCachedCompiler<T>
 
         SkinReference skinReference = skinReferenceFactory.createReference(skin);
         ColorThemeReference colorThemeReference = colorThemeReferenceFactory.createReference(
-                currentColorThemeGetter.getCurrentColorTheme("default"));
+                currentColorThemeGetter.getCurrentColorTheme(true, "default"));
 
         // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
         // use the last result stored in the cache.

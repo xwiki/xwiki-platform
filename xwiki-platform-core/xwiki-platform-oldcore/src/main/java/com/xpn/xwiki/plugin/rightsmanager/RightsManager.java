@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import org.xwiki.model.reference.EntityReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.plugin.rightsmanager.ReferenceUserIterator;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -43,7 +45,6 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.AllowDeny;
 import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.Utils;
 
@@ -1108,47 +1109,13 @@ public final class RightsManager
     public Collection<DocumentReference> resolveUsers(DocumentReference userOrGroup, XWikiContext context)
         throws XWikiException
     {
-        Collection<DocumentReference> users = new LinkedHashSet<DocumentReference>();
-
-        // Try it as virtual user (guest, superadmin)
-
-        if (userOrGroup.getLastSpaceReference().getName().equals(DEFAULT_USERORGROUP_SPACE)
-            && (userOrGroup.getName().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER) || userOrGroup.getName()
-                .equals(XWikiRightService.GUEST_USER))) {
-            users.add(userOrGroup);
+        Collection<DocumentReference> userReferences = new LinkedHashSet<>();
+        Iterator<DocumentReference> iterator =
+            new ReferenceUserIterator(userOrGroup, this.explicitDocumentReferenceResolver, context);
+        while (iterator.hasNext()) {
+            userReferences.add(iterator.next());
         }
-
-        // resolve
-
-        XWikiDocument document = context.getWiki().getDocument(userOrGroup, context);
-
-        if (!document.isNew()) {
-            // Try it as user
-
-            DocumentReference userClassReference =
-                new DocumentReference(document.getDatabase(), DEFAULT_USERORGROUP_SPACE, "XWikiUsers");
-
-            if (document.getXObject(userClassReference) != null) {
-                users.add(userOrGroup);
-            }
-
-            // Try it as group
-
-            DocumentReference groupClassReference =
-                new DocumentReference(document.getDatabase(), DEFAULT_USERORGROUP_SPACE, "XWikiGroups");
-
-            List<BaseObject> members = document.getXObjects(groupClassReference);
-            if (members != null) {
-                for (BaseObject memberObj : members) {
-                    String member = memberObj.getStringValue("member");
-
-                    users.addAll(resolveUsers(this.explicitDocumentReferenceResolver.resolve(member, userOrGroup),
-                        context));
-                }
-            }
-        }
-
-        return users;
+        return userReferences;
     }
 
     /**
@@ -1175,7 +1142,7 @@ public final class RightsManager
     public Collection<DocumentReference> resolveUsers(List<String> referenceList, XWikiContext context)
         throws XWikiException
     {
-        Collection<DocumentReference> users = new LinkedHashSet<DocumentReference>();
+        Collection<DocumentReference> users = new LinkedHashSet<>();
 
         for (String reference : referenceList) {
             users.addAll(resolveUsers(reference, context));

@@ -19,10 +19,6 @@
  */
 package com.xpn.xwiki.store;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -30,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.fop.fo.properties.StringProperty;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -55,10 +50,17 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DoubleProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -376,5 +378,94 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         verify(query).setString("fullName", fullName);
         verify(query).setString("language", Locale.ENGLISH.toString());
+    }
+
+    @Test
+    public void saveClassAfterChangingMultipleSelectToSingleSelectOnDBListProperty() throws Exception
+    {
+        // The Database List property that was changed from multiple select to single select.
+        StringProperty stringProperty = mock(StringProperty.class);
+        DBListClass dbListField = mock(DBListClass.class);
+        when(dbListField.isMultiSelect()).thenReturn(false);
+        when(dbListField.newProperty()).thenReturn(stringProperty);
+
+        // The XClass that has only the Database List property.
+        List<DBListClass> fieldList = Collections.singletonList(dbListField);
+        BaseClass xclass = mock(BaseClass.class);
+        when(xclass.getFieldList()).thenReturn(fieldList);
+
+        // The class that is being saved.
+        XWikiDocument classDoc = mock(XWikiDocument.class, "Some.Class");
+        when(classDoc.getXClass()).thenReturn(xclass);
+
+        // Assume there are two objects of the XClass previously defined: one that has no value set for the Database
+        // List property and one that has multiple values.
+        StringListProperty emptyProperty = mock(StringListProperty.class, "empty");
+        // The code checks if the value is an instance of List so we cannot use Collections.emptyList().
+        when(emptyProperty.getValue()).thenReturn(Arrays.asList());
+        StringListProperty multipleValueProperty = mock(StringListProperty.class, "multipleValue");
+        when(multipleValueProperty.getValue()).thenReturn(Arrays.asList("one", "two"));
+        List<StringListProperty> properties = Arrays.asList(multipleValueProperty, emptyProperty);
+
+        Query query = mock(Query.class);
+        when(session.createQuery(anyString())).thenReturn(query);
+        when(query.setString(anyInt(), anyString())).thenReturn(query);
+        when(query.list()).thenReturn(properties);
+
+        store.saveXWikiDoc(classDoc, context);
+
+        verify(session, times(3)).delete(multipleValueProperty);
+        verify(session, times(3)).delete(emptyProperty);
+
+        verify(stringProperty, never()).setValue(Arrays.asList("one", "two"));
+        verify(stringProperty, never()).setValue(Arrays.asList());
+        verify(stringProperty, never()).setValue(null);
+        verify(stringProperty, never()).setValue("");
+        verify(stringProperty, times(3)).setValue("one");
+        verify(session, times(3)).save(stringProperty);
+    }
+
+    @Test
+    public void saveClassAfterChangingSingleSelectToMultipleSelectOnDBListProperty() throws Exception
+    {
+        // The Database List property that was changed from single select to multiple select.
+        StringListProperty stringListProperty = mock(StringListProperty.class);
+        DBListClass dbListField = mock(DBListClass.class);
+        when(dbListField.isMultiSelect()).thenReturn(true);
+        when(dbListField.newProperty()).thenReturn(stringListProperty);
+
+        // The XClass that has only the Database List property.
+        List<DBListClass> fieldList = Collections.singletonList(dbListField);
+        BaseClass xclass = mock(BaseClass.class);
+        when(xclass.getFieldList()).thenReturn(fieldList);
+
+        // The class that is being saved.
+        XWikiDocument classDoc = mock(XWikiDocument.class, "Some.Class");
+        when(classDoc.getXClass()).thenReturn(xclass);
+
+        // Assume there are two objects of the XClass previously defined: one that has no value set for the Database
+        // List property and one that has one value.
+        StringProperty unsetProperty = mock(StringProperty.class, "unset");
+        when(unsetProperty.getValue()).thenReturn(null);
+        StringProperty singleValueProperty = mock(StringProperty.class, "singleValue");
+        when(singleValueProperty.getValue()).thenReturn("one");
+        List<StringProperty> properties = Arrays.asList(singleValueProperty, unsetProperty);
+
+        Query query = mock(Query.class);
+        when(session.createQuery(anyString())).thenReturn(query);
+        when(query.setString(anyInt(), anyString())).thenReturn(query);
+        when(query.list()).thenReturn(properties);
+
+        store.saveXWikiDoc(classDoc, context);
+
+        verify(session, times(3)).delete(singleValueProperty);
+        verify(session, times(3)).delete(unsetProperty);
+
+        verify(stringListProperty, never()).setValue("one");
+        verify(stringListProperty, never()).setValue(Arrays.asList());
+        verify(stringListProperty, never()).setValue(null);
+        verify(stringListProperty, never()).setValue("");
+        verify(stringListProperty, times(3)).setValue(Arrays.asList("one"));
+        verify(session, times(3)).save(stringListProperty);
     }
 }

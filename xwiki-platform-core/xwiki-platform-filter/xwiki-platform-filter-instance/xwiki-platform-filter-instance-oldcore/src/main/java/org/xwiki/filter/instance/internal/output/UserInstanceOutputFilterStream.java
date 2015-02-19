@@ -186,6 +186,9 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         XWikiDocument userDocument;
         try {
             userDocument = getUserDocument(name);
+
+            // Safer to clone for thread safety and in case the save fail
+            userDocument = userDocument.clone();
         } catch (XWikiException e) {
             throw new FilterException("Failed to get an XWikiDocument for user name [" + name + "]", e);
         }

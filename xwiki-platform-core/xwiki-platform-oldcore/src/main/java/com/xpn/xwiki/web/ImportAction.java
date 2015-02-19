@@ -310,6 +310,7 @@ public class ImportAction extends XWikiAction
         // Setup log
         xarProperties.setVerbose(true);
         instanceProperties.setVerbose(true);
+        instanceProperties.setStoppedWhenSaveFail(false);
         LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
         LogQueue logger = new LogQueue();
         if (loggerManager != null) {

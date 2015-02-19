@@ -39,6 +39,8 @@
     <xwiki.minification.skip>false</xwiki.minification.skip>
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <!-- The bootstrap version is used is several places -->
+    <bootstrap.version>3.3.2</bootstrap.version>
   </properties>
   <dependencies>
     <!-- Adds an Annotation Processor to automatically verify Component declarations.
@@ -239,6 +241,12 @@
         <groupId>org.webjars</groupId>
         <artifactId>jquery</artifactId>
         <version>1.11.1</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>${bootstrap.version}</version>
         <scope>runtime</scope>
       </dependency>
     </dependencies>

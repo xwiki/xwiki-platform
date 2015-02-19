@@ -757,7 +757,7 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
-## If all dependancies are OK, we call the controller
+## If all dependencies are OK, we call the controller
 #if ($services.wiki)
   #controller()
 #else
@@ -1138,17 +1138,24 @@ return XWiki;
     #if("$!wikialias" == '')
       #set($wikialias = $request.wikiname)
     #end
+    #set($ownerId = $request.ownerId)
+    #if("$!ownerId" == '')
+      ## If the ownerId is null, then set the current user
+      #set($ownerId = $services.model.serialize($xcontext.userReference, 'default'))
+    #else 
+      #set($ownerId = $services.model.serialize($services.model.resolveDocument($ownerId), 'default'))
+    #end
     #set($fromTemplate = false)
     #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
       ## check if the wiki is already in creation
       #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
       #if(!$services.wiki.exists($request.wikiname))
-        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $request.ownerId, true))
+        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $ownerId, true))
       #end
       #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
       #set($fromTemplate = true)
     #else
-      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $wikialias, $request.ownerId, true))
+      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $wikialias, $ownerId, true))
     #end
     #if (!$wikiDescriptor)
 
@@ -1198,10 +1205,7 @@ return XWiki;
       #set ($globalMembers = [])
       ## Enforce global users
       #foreach ($member in $members)
-        #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
-          #set ($member = "${services.wiki.mainWikiId}:${member}")
-        #end
-        #set ($discard = $globalMembers.add("${member}"))
+        #set($discard = $globalMembers.add($services.model.serialize($services.model.resolveDocument($member), 'default')))
       #end
       ## Add the members
       #set ($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))

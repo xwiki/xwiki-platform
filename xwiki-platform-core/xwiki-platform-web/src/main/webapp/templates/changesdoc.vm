@@ -26,7 +26,7 @@ ${line.type.symbol}##
 #if ($line.chunks)##
 #inlineDiffLine($line.chunks)##
 #else##
-$escapetool.html($line.value)##
+$escapetool.xml($line.value)##
 #end
 #end
 
@@ -37,7 +37,7 @@ $escapetool.html($line.value)##
 
 #macro (inlineDiffLine $chunks)
 #foreach ($chunk in $chunks)
-#set ($escapedChunk = $escapetool.html($chunk))
+#set ($escapedChunk = $escapetool.xml($chunk))
 #if ($chunk.added)##
 <ins>$escapedChunk</ins>##
 #elseif ($chunk.deleted)##

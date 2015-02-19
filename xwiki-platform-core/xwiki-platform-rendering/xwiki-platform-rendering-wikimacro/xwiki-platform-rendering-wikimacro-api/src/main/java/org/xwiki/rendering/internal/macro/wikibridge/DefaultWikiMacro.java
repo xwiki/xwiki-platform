@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -219,24 +219,17 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 
             MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
 
-            MacroMarkerBlock wikiMacroMarker =
-                new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
-                    wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
-
             // Make sure to use provided metadatas
             MetaDataBlock metaDataBlock =
-                new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
+                new MetaDataBlock(xdom.getChildren(), xdom.getMetaData());
 
             // Make sure the context XDOM contains the wiki macro content
-            wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
+            // Adding the content of the macro as macro child.
+            // FIXME: a MacroBlock is not supposed to have children but context current macro block cannot be set to a
+            // MacroMarkerBlock
+            wikiMacroBlock.addChild(metaDataBlock);
 
-            // "Emulate" the fact that wiki macro block is still part of the XDOM (what is in the XDOM is a
-            // MacroMarkerBlock and MacroTransformationContext current macro block only support MacroBlock so we can't
-            // switch it without breaking some APIs)
-            wikiMacroBlock.setParent(metaDataBlock.getParent());
-            wikiMacroBlock.setNextSiblingBlock(metaDataBlock.getNextSibling());
-            wikiMacroBlock.setPreviousSiblingBlock(metaDataBlock.getPreviousSibling());
-
+            List<Block> result;
             try {
                 if (observation != null) {
                     observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
@@ -248,13 +241,15 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
 
                 RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
                 ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
-                    wikiMacroMarker);
+                    metaDataBlock);
+
+                result = new ArrayList<>(wikiMacroBlock.getChildren());
             } finally {
                 // Restore context XDOM to its previous state
-                metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
+                wikiMacroBlock.setChildren(Collections.<Block>emptyList());
             }
 
-            return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
+            return extractResult(result, macroBinding, context);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {
@@ -288,7 +283,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             result = blocks;
             // If in inline mode remove any top level paragraph.
             if (context.isInline()) {
-                removeTopLevelParagraph(result);
+                removeTopLevelParagraph(null, result);
             }
         }
 
@@ -301,13 +296,22 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
      * 
      * @param blocks the blocks to check and convert
      */
-    private void removeTopLevelParagraph(List<Block> blocks)
+    private void removeTopLevelParagraph(Block parentBlock, List<Block> blocks)
     {
         // Remove any top level paragraph so that the result of a macro can be used inline for example.
         // We only remove the paragraph if there's only one top level element and if it's a paragraph.
-        if ((blocks.size() == 1) && blocks.get(0) instanceof ParagraphBlock) {
-            Block paragraphBlock = blocks.remove(0);
-            blocks.addAll(0, paragraphBlock.getChildren());
+        if (blocks.size() == 1) {
+            Block block = blocks.get(0);
+            if (block instanceof ParagraphBlock) {
+                if (parentBlock != null) {
+                    parentBlock.setChildren(block.getChildren());
+                } else {
+                    blocks.remove(0);
+                    blocks.addAll(0, block.getChildren());
+                }
+            } else if (block instanceof MetaDataBlock) {
+                removeTopLevelParagraph(block, block.getChildren());
+            }
         }
     }
 

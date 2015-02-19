@@ -478,9 +478,11 @@ public class DBListClass extends ListClass
             boolean setInpVal = true;
 
             BaseProperty prop = (BaseProperty) object.safeget(name);
-            String val = "";
+            String value = "";
+            String databaseValue = "";
             if (prop != null) {
-                val = prop.toText();
+                value = this.toFormString(prop);
+                databaseValue = prop.toText();
             }
 
             if (isPicker()) {
@@ -505,12 +507,12 @@ public class DBListClass extends ListClass
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
                         hidden.setDisabled(isDisabled());
-                        if (val != null && !val.equals("")) {
-                            hidden.setValue(val);
+                        if (StringUtils.isNotEmpty(value)) {
+                            hidden.setValue(value);
                         }
                         buffer.append(hidden.toString());
 
-                        input.setValue(getValue(val, hibquery, context));
+                        input.setValue(getValue(databaseValue, hibquery, context));
                         setInpVal = false;
                     }
                 }
@@ -536,7 +538,7 @@ public class DBListClass extends ListClass
                 input.setID(prefix + name);
             }
             if (setInpVal == true) {
-                input.setValue(val);
+                input.setValue(value);
             }
 
             input.setDisabled(isDisabled());

@@ -230,7 +230,9 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             // Make sure the context XDOM contains the html macro content
             wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
-            // "Emulate" the fact that wiki macro block is still part of the XDOM
+            // "Emulate" the fact that wiki macro block is still part of the XDOM (what is in the XDOM is a
+            // MacroMarkerBlock and MacroTransformationContext current macro block only support MacroBlock so we can't
+            // switch it without breaking some APIs)
             wikiMacroBlock.setParent(metaDataBlock.getParent());
             wikiMacroBlock.setNextSiblingBlock(metaDataBlock.getNextSibling());
             wikiMacroBlock.setPreviousSiblingBlock(metaDataBlock.getPreviousSibling());

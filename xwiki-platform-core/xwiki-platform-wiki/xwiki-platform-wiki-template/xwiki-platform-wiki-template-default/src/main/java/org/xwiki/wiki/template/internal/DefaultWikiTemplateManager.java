@@ -29,12 +29,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
@@ -73,13 +71,6 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
     @Inject
     private QueryManager queryManager;
-
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Inject
     private WikiProvisioningJobExecutor wikiProvisionerExecutor;

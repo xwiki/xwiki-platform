@@ -213,11 +213,6 @@ platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Step 2 — Choose members
 platform.wiki.create.wizard.step.users.shortname=Users
 platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
-platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete the wiki
 platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
 platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
@@ -232,6 +227,12 @@ platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the w
 platform.wiki.create.wizard.step.previous=Previous Step
 platform.wiki.create.wizard.step.next=Go to next step
 platform.wiki.create.wizard.step.create=Create
+
+platform.wiki.create.wizard.step.creation=Wiki creation
+platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
+platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
+platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some documents have not been installed. In consequence, the wiki might behave erroneously and you should probably delete it.
+platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
 admin.wikis.description=Wikis management.
@@ -281,6 +282,15 @@ platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager
 #######################################
 admin.wikis=Wikis
 admin.wikis.template=Wiki Template
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

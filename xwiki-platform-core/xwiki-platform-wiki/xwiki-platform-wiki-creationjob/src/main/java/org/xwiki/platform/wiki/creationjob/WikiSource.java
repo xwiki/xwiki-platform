@@ -17,41 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.test.po;
+package org.xwiki.platform.wiki.creationjob;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.stability.Unstable;
 
-public class CreateWikiPageStepUser extends ExtendedViewPage
+/**
+ * The source of provisioning for a wiki.
+ *
+ * @version $Id$
+ * @since 7.0M2
+ */
+@Unstable
+public enum WikiSource
 {
-    @FindBy(id = "owner")
-    private WebElement ownerInput;
-
-    @FindBy(id = "wizard-create")
-    private WebElement createButton;
-
-    public boolean isCreateButtonEnabled()
-    {
-        return createButton.isEnabled();
-    }
+    /**
+     * the wiki is filled by a template wiki.
+     */ 
+    TEMPLATE,
     
-    public WikiCreationPage create()
-    {
-        createButton.click();
-        return new WikiCreationPage();
-        
-    }
-
-    public UserPicker getOwnerPicker()
-    {
-        return new UserPicker(this.ownerInput);
-    }
-
-    @Override
-    public CreateWikiPageStepUser waitUntilPageIsLoaded()
-    {
-        getOwnerPicker().waitToLoad();
-        return this;
-    }
+    /** 
+     * the wiki is filled by an extension.
+     */
+    EXTENSION 
 }

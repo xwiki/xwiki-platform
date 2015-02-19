@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
-import org.xwiki.wiki.internal.manager.WikiCopier;
+import org.xwiki.wiki.provisioning.WikiCopier;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;

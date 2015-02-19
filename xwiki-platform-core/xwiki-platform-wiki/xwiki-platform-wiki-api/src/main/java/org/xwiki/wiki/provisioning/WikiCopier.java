@@ -17,14 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.internal.manager;
+package org.xwiki.wiki.provisioning;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
- * Helper to perform the copy of a wiki..
- * @since 5.3M2
+ * Copy all the documents from a wiki to an other.
+ * @since 7.0M2
  * @version $Id :$
  */
 @Role

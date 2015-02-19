@@ -33,12 +33,13 @@
   <description>XWiki Platform - Wiki - Parent POM</description>
   <modules>
     <module>xwiki-platform-wiki-api</module>
+    <module>xwiki-platform-wiki-creationjob</module>
     <module>xwiki-platform-wiki-default</module>
+    <module>xwiki-platform-wiki-rest</module>
     <module>xwiki-platform-wiki-script</module>
     <module>xwiki-platform-wiki-template</module>
     <module>xwiki-platform-wiki-user</module>
     <module>xwiki-platform-wiki-ui</module>
-    <module>xwiki-platform-wiki-rest</module>
     <module>xwiki-platform-wiki-workspaces-migrator</module>
   </modules>
   <profiles>

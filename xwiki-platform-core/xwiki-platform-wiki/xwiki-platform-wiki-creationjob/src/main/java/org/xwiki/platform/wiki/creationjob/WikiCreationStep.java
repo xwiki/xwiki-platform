@@ -17,41 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.test.po;
+package org.xwiki.platform.wiki.creationjob;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.editor.UserPicker;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
-public class CreateWikiPageStepUser extends ExtendedViewPage
+/**
+ * Step to be executed during the wiki crcreatorjobion job.
+ *
+ * @version $Id$
+ * @since 7.0M2
+ */
+@Role
+@Unstable
+public interface WikiCreationStep
 {
-    @FindBy(id = "owner")
-    private WebElement ownerInput;
+    /**
+     * Execute the steps.
+     * @param request wiki creation request with all information about the wiki to create
+     * @throws WikiCreationException if problem occurs
+     */
+    void execute(WikiCreationRequest request) throws WikiCreationException;
 
-    @FindBy(id = "wizard-create")
-    private WebElement createButton;
-
-    public boolean isCreateButtonEnabled()
-    {
-        return createButton.isEnabled();
-    }
-    
-    public WikiCreationPage create()
-    {
-        createButton.click();
-        return new WikiCreationPage();
-        
-    }
-
-    public UserPicker getOwnerPicker()
-    {
-        return new UserPicker(this.ownerInput);
-    }
-
-    @Override
-    public CreateWikiPageStepUser waitUntilPageIsLoaded()
-    {
-        getOwnerPicker().waitToLoad();
-        return this;
-    }
+    /**
+     * The creation steps are sorted by order before being executed so this method returns the one of the current steps.
+     * @return the order of the steps
+     */
+    int getOrder();
 }

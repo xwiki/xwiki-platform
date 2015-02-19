@@ -88,8 +88,16 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     container.insert(avatarWrapper);
     var userName = source.highlight ? this.emphasizeMatches(this.sInput, data.info) : data.info;
     container.insert(new Element('div', {'class': 'user-name'}).update(userName));
+    var referenceWrapper = new Element('div');
     var userAlias = source.highlight ? this.emphasizeMatches(this.sInput, data.id) : data.id;
-    container.insert(new Element('div', {'class': 'user-alias'}).update(userAlias));
+    referenceWrapper.insert(new Element('span', {'class': 'user-alias'}).update(userAlias));
+    var userReference = XWiki.Model.resolve(data.value, XWiki.EntityType.DOCUMENT);
+    var wiki = userReference.extractReferenceValue(XWiki.EntityType.WIKI) || XWiki.currentWiki;
+    // Display the wiki only for local users (in order to be consistent with the display in view mode).
+    if (wiki !== '$xcontext.mainWikiName') {
+      referenceWrapper.insert(new Element('span', {'class': 'user-wiki'}).update(wiki));
+    }
+    container.insert(referenceWrapper);
     return container;
   },
 

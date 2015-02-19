@@ -78,7 +78,8 @@ public class DefaultWikiManager implements WikiManager
     {
         // Check that the wiki Id is available
         if (failOnExist && !idAvailable(wikiId)) {
-            throw new WikiManagerException("wiki id is not valid");
+            throw new WikiManagerException(String.format("wiki id [%s] is already used and is thus not available",
+                wikiId));
         }
 
         XWikiContext context = xcontextProvider.get();

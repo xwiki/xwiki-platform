@@ -195,7 +195,7 @@
          Uncomment if you want to use Oracle and comment out other database configurations.
          Notes:
            - the 2 properties named "connection.SetBigStringTryClob" and
-             "jdbc.batch_size". They are required to tell Oracle to allow CLOBs larger than 32K.
+             "jdbc.batch_size" are required to tell Oracle to allow CLOBs larger than 32K.
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
 

@@ -46,7 +46,8 @@ public class WikiTemplateTest extends AbstractTest
     public SuperAdminAuthenticationRule superAdminAuthenticationRule =
             new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
-    private String TEMPLATE_CONTENT = "Content of the template";
+    private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
+    private static final String TEMPLATE_CONTENT = "Content of the template";
 
     public void createTemplateWiki() throws Exception
     {
@@ -54,7 +55,7 @@ public class WikiTemplateTest extends AbstractTest
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
         createWikiPage.setPrettyName("My new template");
         String wikiName = createWikiPage.getComputedName();
-        assertEquals("mynewtemplate", wikiName);
+        assertEquals(TEMPLATE_WIKI_ID, wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
 
@@ -72,7 +73,7 @@ public class WikiTemplateTest extends AbstractTest
 
         // Verify the template is in the list of templates in the wizard
         CreateWikiPage createWikiPage2 = wikiHomePage.createWiki();
-        assertTrue(createWikiPage2.getTemplateList().contains("mynewtemplate"));
+        assertTrue(createWikiPage2.getTemplateList().contains(TEMPLATE_WIKI_ID));
 
         // Verify the wiki is in the wiki index page.
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
@@ -94,7 +95,7 @@ public class WikiTemplateTest extends AbstractTest
         }
         WikiHomePage wikiHomePage = templateWikiLink.click();
         // Delete the wiki
-        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki().confirm();
+        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki().confirm(TEMPLATE_WIKI_ID);
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
@@ -111,7 +112,7 @@ public class WikiTemplateTest extends AbstractTest
         createWikiPage.setPrettyName("My new wiki");
         String wikiName = createWikiPage.getComputedName();
         assertEquals("mynewwiki", wikiName);
-        createWikiPage.setTemplate("mynewtemplate");
+        createWikiPage.setTemplate(TEMPLATE_WIKI_ID);
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
@@ -128,7 +129,15 @@ public class WikiTemplateTest extends AbstractTest
         // Delete the wiki
         wikiEditPage.clickCancel();
         DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki();
-        deleteWikiPage = deleteWikiPage.confirm();
+        deleteWikiPage = deleteWikiPage.confirm("");
+        assertTrue(deleteWikiPage.hasUserErrorMessage());
+        assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput(""));
+
+        deleteWikiPage = deleteWikiPage.confirm("My new wiki");
+        assertTrue(deleteWikiPage.hasUserErrorMessage());
+        assertTrue(deleteWikiPage.hasWikiDeleteConfirmationInput("My new wiki"));
+
+        deleteWikiPage = deleteWikiPage.confirm("mynewwiki");
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
         // Verify the wiki has been deleted

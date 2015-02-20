@@ -153,9 +153,11 @@ platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
 platform.wiki.users.profile.activity.show=show activity
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}?
-platform.wiki.delete.confirmation.yes=Yes
-platform.wiki.delete.confirmation.no=No
+platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This can not be reverted!
+platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
+platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
+platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
 ## Wiki macro

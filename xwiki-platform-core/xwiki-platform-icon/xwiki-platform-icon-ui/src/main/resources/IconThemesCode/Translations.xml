@@ -39,7 +39,16 @@
   <hidden>true</hidden>
   <parent>IconThemes.WebHome</parent>
   <content>platform.icon.picker.preview=Preview with: 
-platform.icon.picker.loading=Loading</content>
+platform.icon.picker.loading=Loading
+
+rendering.macro.iconPicker.name=Icon Picker
+rendering.macro.iconPicker.description=Select an icon within the XWiki icon set.
+rendering.macro.iconPicker.parameter.id.name=Id
+rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply
+rendering.macro.iconPicker.parameter.class.name=Class
+rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply
+rendering.macro.iconPicker.parameter.prefix.name=Prefix
+rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")</content>
   <object>
     <name>IconThemesCode.Translations</name>
     <number>0</number>

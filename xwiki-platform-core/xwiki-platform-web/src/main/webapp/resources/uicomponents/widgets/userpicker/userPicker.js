@@ -86,9 +86,9 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     var avatarWrapper = new Element('div', {'class': 'user-avatar-wrapper'});
     avatarWrapper.insert(new Element('img', {src: data.icon, alt: data.info, 'class': 'icon'}));
     container.insert(avatarWrapper);
-    var userName = source.highlight ? this.emphasizeMatches(this.sInput, data.info) : data.info;
+    var userName = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.info.escapeHTML()) : data.info.escapeHTML();
     container.insert(new Element('div', {'class': 'user-name'}).update(userName));
-    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput, data.id) : data.id;
+    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.id.escapeHTML()) : data.id.escapeHTML();
     container.insert(new Element('div', {'class': 'user-alias'}).update(userAlias));
     return container;
   },

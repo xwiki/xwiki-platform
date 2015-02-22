@@ -27,7 +27,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroLookupException;
@@ -73,7 +76,12 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
                 try {
                     Macro< ? > macro = this.macroManager.getMacro(new MacroId(parentId));
                     if (macro instanceof ScriptMacro) {
-                        event.cancel("Nested scripts are not allowed");
+                        // Find the
+                        event.cancel(String.format("Nested scripts are not allowed. Current Script Macro [%s] "
+                            + "(source [%s]) is executed inside Script Macro [%s] (source [%s])",
+                            context.getCurrentMacroBlock().getId(),
+                            extractSourceContentReference(context.getCurrentMacroBlock()), parentId,
+                            extractSourceContentReference(parent)));
                     } else if (macro instanceof NestedScriptMacroEnabled) {
                         // This macro has the right to produce script macro whatever the parent.
                         return;
@@ -89,5 +97,20 @@ public class NestedScriptMacroValidatorListener extends AbstractScriptCheckerLis
                 parent = parent.getFirstBlock(new ClassBlockMatcher(MacroMarkerBlock.class), Block.Axes.ANCESTOR);
             }
         }
+    }
+
+    /**
+     * @param source the blocks from where to try to extract the source content
+     * @return the source content reference or null if none is found
+     */
+    private String extractSourceContentReference(Block source)
+    {
+        String contentSource = null;
+        MetaDataBlock metaDataBlock =
+            source.getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE), Block.Axes.ANCESTOR);
+        if (metaDataBlock != null) {
+            contentSource = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
+        }
+        return contentSource;
     }
 }

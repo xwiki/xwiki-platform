@@ -62,7 +62,7 @@ public class CreateWikiPage extends ExtendedViewPage
      */
     public String getComputedName()
     {
-        waitUntilElementHasNonEmptyAttributeValue(By.name("wikiname"), "value");
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.name("wikiname"), "value");
         return getName();
     }
 

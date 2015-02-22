@@ -92,8 +92,8 @@ public class MergeConflictPane extends BaseElement
     {
         diffButton.click();
         // Wait as long as the button remains disabled.
-        waitUntilElementIsVisible(By
-            .xpath("//button[@name = 'extensionAction' and @value = 'diff' and not(@disabled)]"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//button[@name = 'extensionAction' and @value = 'diff' and not(@disabled)]"));
         return new MergeConflictPane();
     }
 

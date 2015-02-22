@@ -44,8 +44,7 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
     private WatchlistUserProfilePage watchlistPage;
 
     @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-            new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
     
     @Before
     public void setUp() throws Exception

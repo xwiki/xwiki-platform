@@ -42,7 +42,7 @@ import org.xwiki.test.ui.po.editor.RightsEditPage;
 public class PanelTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
     public void verifyApplicationsPanelEntry()

@@ -26,6 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.BaseElement;
 
 /**
@@ -57,13 +58,13 @@ public class ExtensionDependenciesPane extends BaseElement
     public List<DependencyPane> getDirectDependencies()
     {
         // Wait until all remote dependencies are resolved asynchronously.
-        getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
+        getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(WebDriver driver)
             {
-                return getUtil().findElementsWithoutWaiting(driver, container, By.className("extension-item-loading"))
-                    .size() > 0 ? null : container;
+                return ((XWikiWebDriver) driver).findElementsWithoutWaiting(container,
+                    By.className("extension-item-loading")).size() > 0 ? null : container;
             }
         });
         return getDependenciesAfter("This extension depends on:");
@@ -87,7 +88,7 @@ public class ExtensionDependenciesPane extends BaseElement
             By.xpath(".//*[contains(@class, 'dependency-item') and ancestor::ul[preceding-sibling::p[starts-with(., '"
                 + label + "')]]]");
         List<DependencyPane> dependencies = new ArrayList<DependencyPane>();
-        for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(), container, xpath)) {
+        for (WebElement element : getDriver().findElementsWithoutWaiting(container, xpath)) {
             dependencies.add(new DependencyPane(element));
         }
         return dependencies;

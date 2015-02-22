@@ -174,7 +174,7 @@ public class TreeNodeElement extends BaseElement
      */
     public TreeNodeElement waitForIt()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)

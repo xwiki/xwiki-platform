@@ -33,7 +33,7 @@ import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 public class PanelWizardTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
     public void verifyPanelWizardPresentInAdministration()

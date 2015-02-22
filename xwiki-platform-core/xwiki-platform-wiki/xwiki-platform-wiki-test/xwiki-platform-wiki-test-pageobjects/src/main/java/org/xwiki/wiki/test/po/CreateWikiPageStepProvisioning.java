@@ -44,7 +44,7 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
     public WikiHomePage finalizeCreation()
     {
         // The finalize button is not visible until the provisioning is done, so we wait for it
-        waitUntilElementIsVisible(By.id("finalize"), 30);
+        getDriver().waitUntilElementIsVisible(By.id("finalize"), 30);
         // Now we can click
         finalizeButton.click();
         // And wait for the page to be loaded

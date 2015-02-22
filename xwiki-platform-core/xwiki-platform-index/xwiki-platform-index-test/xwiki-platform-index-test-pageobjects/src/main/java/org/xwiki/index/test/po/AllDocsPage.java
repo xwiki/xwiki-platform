@@ -90,13 +90,12 @@ public class AllDocsPage extends ViewPage
 
     public boolean hasDeletedDocsTab()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.xpath("//li[@id='xwikideletedDocs']/a")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedDocs']/a")).size() > 0;
     }
 
     public boolean hasDeletedAttachmentsTab()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//li[@id='xwikideletedAttachments']/a")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.xpath("//li[@id='xwikideletedAttachments']/a")).size() > 0;
     }
 
     public LiveTableElement clickDeletedDocsTab()

@@ -93,9 +93,9 @@ public class ClassEditPage extends BasePage
         deleteLink.click();
 
         // Expect a confirmation box
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         getDriver().findElement(By.cssSelector(".xdialog-box-confirmation input[value='Yes']")).click();
-        waitUntilElementDisappears(propertyLocator);
+        getDriver().waitUntilElementDisappears(propertyLocator);
     }
 
     private FormElement getForm()

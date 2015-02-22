@@ -43,8 +43,7 @@ import org.xwiki.wiki.test.po.WikiLink;
 public class WikiTemplateTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-            new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
     private static final String TEMPLATE_CONTENT = "Content of the template";

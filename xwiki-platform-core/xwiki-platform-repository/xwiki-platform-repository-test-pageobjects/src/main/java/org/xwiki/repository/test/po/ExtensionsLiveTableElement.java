@@ -40,7 +40,7 @@ public class ExtensionsLiveTableElement extends LiveTableElement
 
     public ExtensionPage clickExtensionName(String name)
     {
-        getUtil().findElementWithoutWaiting(getDriver(), By.linkText(name)).click();
+        getDriver().findElementWithoutWaiting(By.linkText(name)).click();
 
         return new ExtensionPage();
     }

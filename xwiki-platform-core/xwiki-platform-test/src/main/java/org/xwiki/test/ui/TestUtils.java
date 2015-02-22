@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -57,8 +56,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -134,11 +131,6 @@ public class TestUtils
         }
     }
 
-    /**
-     * How long to wait before failing a test because an element cannot be found. Can be overridden with setTimeout.
-     */
-    private int timeout = 10;
-
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -157,7 +149,7 @@ public class TestUtils
         TestUtils.context = context;
     }
 
-    protected WebDriver getDriver()
+    protected XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -258,13 +250,11 @@ public class TestUtils
     /**
      * After successful completion of this function, you are guaranteed to be logged in as the given user and on the
      * page passed in pageURL.
-     *
-     * @param pageURL
      */
     public void assertOnPage(final String pageURL)
     {
         final String pageURI = pageURL.replaceAll("\\?.*", "");
-        waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -274,24 +264,10 @@ public class TestUtils
         });
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        getDriver().manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), getTimeout());
-        try {
-            wait.until(condition);
-        } finally {
-            // Reset timeout
-            setDriverImplicitWait(getDriver());
-        }
-    }
-
     public String getLoggedInUserName()
     {
         String loggedInUserName = null;
-        List<WebElement> elements = findElementsWithoutWaiting(getDriver(), By.xpath("(//.[@id='tmUser']//a)[1]"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.xpath("(//.[@id='tmUser']//a)[1]"));
         if (!elements.isEmpty()) {
             String href = elements.get(0).getAttribute("href");
             loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
@@ -682,28 +658,6 @@ public class TestUtils
         }
     }
 
-    public int getTimeout()
-    {
-        return this.timeout;
-    }
-
-    /**
-     * @param timeout the number of seconds after which we consider the action to have failed
-     */
-    public void setTimeout(int timeout)
-    {
-        this.timeout = timeout;
-    }
-
-    /**
-     * Forces the passed driver to wait for a {@link #getTimeout()} number of seconds when looking up page elements
-     * before declaring that it cannot find them.
-     */
-    public void setDriverImplicitWait(WebDriver driver)
-    {
-        driver.manage().timeouts().implicitlyWait(getTimeout(), TimeUnit.SECONDS);
-    }
-
     public boolean isInWYSIWYGEditMode()
     {
         return getDriver()
@@ -920,86 +874,6 @@ public class TestUtils
             keyBuilder.append(key);
 
             return keyBuilder.toString();
-        }
-    }
-
-    public WebElement findElementWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public WebElement findElementWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(By by)
-    {
-        try {
-            getDriver().findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    public boolean hasElementWithoutWaiting(By by)
-    {
-        try {
-            findElementWithoutWaiting(getDriver(), by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(WebElement element, By by)
-    {
-        try {
-            element.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
         }
     }
 

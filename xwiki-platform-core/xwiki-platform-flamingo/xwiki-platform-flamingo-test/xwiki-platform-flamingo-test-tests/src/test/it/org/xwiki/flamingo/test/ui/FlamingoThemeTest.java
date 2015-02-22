@@ -46,8 +46,7 @@ import static org.junit.Assert.assertTrue;
 public class FlamingoThemeTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-            new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
     @Test
     public void editFlamingoTheme() throws Exception
     {

@@ -59,7 +59,7 @@ public class ManageCategoriesPage extends BasePage
     public void clickAddCategory()
     {
         this.addCategoryLink.click();
-        waitUntilElementIsVisible(By.className("category-add-form"));
+        getDriver().waitUntilElementIsVisible(By.className("category-add-form"));
     }
 
     /**
@@ -80,7 +80,7 @@ public class ManageCategoriesPage extends BasePage
         this.nameInput.sendKeys(name);
         this.addButton.submit();
 
-        waitUntilElementIsVisible(categoryLocator(name));
+        getDriver().waitUntilElementIsVisible(categoryLocator(name));
     }
 
     /**
@@ -94,14 +94,14 @@ public class ManageCategoriesPage extends BasePage
         By deletePath =
             By.xpath("//a[@class='tool delete' and contains(@href, '" + getUtil().escapeURL(name) + "')]/img");
         hoverCategoryItem(name);
-        waitUntilElementIsVisible(deletePath);
+        getDriver().waitUntilElementIsVisible(deletePath);
         getDriver().findElement(deletePath).click();
 
         // answer yes in confirmation dialog
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         getDriver().findElement(By.xpath("//div[contains(@class, 'xdialog-box-confirmation')]//input[@value='Yes']"))
             .click();
-        waitUntilElementDisappears(categoryLocator(name));
+        getDriver().waitUntilElementDisappears(categoryLocator(name));
     }
 
     /**
@@ -116,14 +116,14 @@ public class ManageCategoriesPage extends BasePage
         By renamePath =
             By.xpath("//a[@class='tool rename' and contains(@href, '" + getUtil().escapeURL(fromName) + "')]/img");
         hoverCategoryItem(fromName);
-        waitUntilElementIsVisible(renamePath);
+        getDriver().waitUntilElementIsVisible(renamePath);
         getDriver().findElement(renamePath).click();
-        waitUntilElementIsVisible(By.className("category-rename-form"));
+        getDriver().waitUntilElementIsVisible(By.className("category-rename-form"));
 
         // rename and wait for result
         this.nameInput.sendKeys(toName);
         this.renameButton.submit();
-        waitUntilElementIsVisible(categoryLocator(toName));
+        getDriver().waitUntilElementIsVisible(categoryLocator(toName));
     }
 
     /**
@@ -133,7 +133,7 @@ public class ManageCategoriesPage extends BasePage
      */
     public boolean isCategoryPresent(String name)
     {
-        return !getUtil().findElementsWithoutWaiting(getDriver(), categoryLocator(name)).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(categoryLocator(name)).isEmpty();
     }
 
     /**
@@ -147,7 +147,7 @@ public class ManageCategoriesPage extends BasePage
         By locator =
             By.xpath("//a[@class='tool delete' and contains(@href, '" + getUtil().escapeURL(name)
                 + "')]/ancestor::span[@class='blog-category-tools']");
-        makeElementVisible(locator);
+        getDriver().makeElementVisible(locator);
     }
 
     /**

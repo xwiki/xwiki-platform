@@ -41,6 +41,6 @@ public class ViewThemePage extends ViewPage
 
     public void waitUntilPreviewIsLoaded()
     {
-        waitUntilElementDisappears(By.id("preview-curtain"));
+        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
     }
 }

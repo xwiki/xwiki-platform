@@ -151,7 +151,7 @@ public class AdministrationPage extends ViewPage
      */
     public boolean hasSection(String categoryName, String sectionName)
     {
-        return getUtil().hasElement(By.xpath(
+        return getDriver().hasElement(By.xpath(
             "//div[contains(@class, 'admin-menu')]"
             + "/ul/li/span/a[text() = '" + categoryName + "']"
             + "/../../ul/li/span/a[text() = '" + sectionName + "']"));
@@ -159,7 +159,7 @@ public class AdministrationPage extends ViewPage
 
     public boolean hasSection(String sectionName)
     {
-        return getUtil().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
+        return getDriver().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
             + sectionName + "')]"));
     }
 
@@ -168,7 +168,7 @@ public class AdministrationPage extends ViewPage
      */
     public boolean hasNotSection(String categoryName, String sectionName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.xpath(
+        return getDriver().findElementsWithoutWaiting(By.xpath(
             "//div[contains(@class, 'admin-menu')]"
             + "/ul/li/span/a[text() = '" + categoryName + "']"
             + "/../../ul/li/span/a[text() = '" + sectionName + "']")).size() == 0;
@@ -176,7 +176,7 @@ public class AdministrationPage extends ViewPage
 
     public boolean hasNotSection(String sectionName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
                 + sectionName + "')]")).size() == 0;
     }

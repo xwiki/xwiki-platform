@@ -48,7 +48,7 @@ public class AnnotationsPane extends BaseElement
             By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
         // Verify that the annotationssettings panel is open
-        waitUntilElementIsVisible(By.className("annotationsettings"));
+        getDriver().waitUntilElementIsVisible(By.className("annotationsettings"));
     }
 
     /**
@@ -64,7 +64,7 @@ public class AnnotationsPane extends BaseElement
                 By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
         // Verify that the annotationssettings panel is close
-        waitUntilElementDisappears(By.className("annotationsettings"));
+        getDriver().waitUntilElementDisappears(By.className("annotationsettings"));
     }
 
     /**
@@ -94,7 +94,7 @@ public class AnnotationsPane extends BaseElement
      */
     public boolean checkIfShowAnnotationsCheckboxExists()
     {
-        if (getUtil().findElementsWithoutWaiting(getDriver(), By.id("annotationsdisplay")).size() > 0) {
+        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
             return true;
         } else {
             return false;

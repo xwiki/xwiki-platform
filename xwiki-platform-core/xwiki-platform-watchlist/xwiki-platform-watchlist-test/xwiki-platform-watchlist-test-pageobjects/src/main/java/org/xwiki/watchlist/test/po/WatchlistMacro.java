@@ -55,7 +55,7 @@ public class WatchlistMacro extends BaseElement
         // Make sure the livetable is loaded
         getWatchList();
         
-        return !getUtil().findElementsWithoutWaiting(getDriver(), removeLink(space, page)).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(removeLink(space, page)).isEmpty();
     }
 
     public boolean isWatched(String space) {
@@ -113,7 +113,7 @@ public class WatchlistMacro extends BaseElement
         // this would be easier if we get any feedback about removing items from the watchlist
         // waitForNotificationSuccessMessage(message);
         // instead we wait for the remove link to vanish
-        getUtil().waitUntilCondition(new ExpectNoRemoveLinks(space, page));
+        getDriver().waitUntilCondition(new ExpectNoRemoveLinks(space, page));
 
         return true;
     }

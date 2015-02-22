@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 public class UserDirectoryTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
     public void verifyUserIsListed()

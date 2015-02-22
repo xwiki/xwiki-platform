@@ -62,10 +62,9 @@ public class ClassPropertyEditPane extends BaseElement
     {
         By containerLocator = By.id("xproperty_" + propertyName);
         By titleLocator = By.id("xproperty_" + propertyName + "_title");
-        waitUntilElementIsVisible(containerLocator);
-        if (getUtil().findElementWithoutWaiting(getDriver(), containerLocator).getAttribute("class")
-            .contains("collapsed")) {
-            getUtil().findElementWithoutWaiting(getDriver(), titleLocator).click();
+        getDriver().waitUntilElementIsVisible(containerLocator);
+        if (getDriver().findElementWithoutWaiting(containerLocator).getAttribute("class").contains("collapsed")) {
+            getDriver().findElementWithoutWaiting(titleLocator).click();
         }
         return this;
     }

@@ -43,7 +43,7 @@ public class UnusedPagesPane extends BaseElement
      */
     public UnusedPagesPane(WebElement question)
     {
-        this.documentTree = getUtil().findElementWithoutWaiting(getDriver(), question, By.className("document-tree"));
+        this.documentTree = getDriver().findElementWithoutWaiting(question, By.className("document-tree"));
     }
 
     /**
@@ -55,6 +55,6 @@ public class UnusedPagesPane extends BaseElement
     {
         String reference = String.format("xwiki:%s.%s", space, page);
         String xpath = "//input[@type = 'checkbox' and @name = '" + reference + "' and @value = '']";
-        return getUtil().findElementsWithoutWaiting(getDriver(), this.documentTree, By.xpath(xpath)).size() > 0;
+        return getDriver().findElementsWithoutWaiting(this.documentTree, By.xpath(xpath)).size() > 0;
     }
 }

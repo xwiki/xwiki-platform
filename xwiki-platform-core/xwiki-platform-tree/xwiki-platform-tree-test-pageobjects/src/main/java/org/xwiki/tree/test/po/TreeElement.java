@@ -64,7 +64,7 @@ public class TreeElement extends BaseElement
      */
     public boolean hasNode(String nodeId)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), this.element, By.id(nodeId)).size() > 0;
+        return getDriver().findElementsWithoutWaiting(this.element, By.id(nodeId)).size() > 0;
     }
 
     /**
@@ -79,7 +79,7 @@ public class TreeElement extends BaseElement
             ((JavascriptExecutor) getDriver()).executeScript(
                 "jQuery.jstree.reference(jQuery(arguments[0])).openTo(arguments[1])", this.element, nodeId);
         }
-        waitUntilElementIsVisible(By.id(nodeId));
+        getDriver().waitUntilElementIsVisible(By.id(nodeId));
         return this;
     }
 
@@ -90,7 +90,7 @@ public class TreeElement extends BaseElement
      */
     public TreeElement waitForIt()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)

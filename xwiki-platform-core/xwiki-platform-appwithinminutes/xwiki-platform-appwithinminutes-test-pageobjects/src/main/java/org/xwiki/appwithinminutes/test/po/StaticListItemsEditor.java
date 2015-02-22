@@ -63,12 +63,12 @@ public class StaticListItemsEditor extends BaseElement
         this.container = container;
 
         By xpath = By.xpath(".//*[@class = 'xHint' and . = 'ID']/following-sibling::input[@type = 'text']");
-        valueInput = getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
+        valueInput = getDriver().findElementWithoutWaiting(container, xpath);
 
         xpath = By.xpath(".//*[@class = 'xHint' and . = 'Value']/following-sibling::input[@type = 'text']");
-        labelInput = getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
+        labelInput = getDriver().findElementWithoutWaiting(container, xpath);
 
-        addButton = getUtil().findElementWithoutWaiting(getDriver(), container, By.className("add"));
+        addButton = getDriver().findElementWithoutWaiting(container, By.className("add"));
     }
 
     /**
@@ -79,7 +79,7 @@ public class StaticListItemsEditor extends BaseElement
     public void remove(String value)
     {
         By xpath = By.xpath("ul/li/*[@title = '" + value + "']/following-sibling::*[@class = 'delete']");
-        getUtil().findElementWithoutWaiting(getDriver(), container, xpath).click();
+        getDriver().findElementWithoutWaiting(container, xpath).click();
     }
 
     /**
@@ -145,7 +145,7 @@ public class StaticListItemsEditor extends BaseElement
     public WebElement getItem(String valueOrLabel)
     {
         By xpath = By.xpath("ul/li/*[@title = '" + valueOrLabel + "' or . = '" + valueOrLabel + "']");
-        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
+        return getDriver().findElementWithoutWaiting(container, xpath);
     }
 
     /**
@@ -153,6 +153,6 @@ public class StaticListItemsEditor extends BaseElement
      */
     public int size()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), container, By.tagName("li")).size();
+        return getDriver().findElementsWithoutWaiting(container, By.tagName("li")).size();
     }
 }

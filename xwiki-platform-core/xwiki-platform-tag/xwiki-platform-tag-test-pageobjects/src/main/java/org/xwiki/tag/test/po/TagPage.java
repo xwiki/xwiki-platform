@@ -78,12 +78,12 @@ public class TagPage extends ViewPage
 
     public boolean hasTagHighlight(String tagName)
     {   
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//span[@class='highlight tag' and contains(text()[1], '" + tagName + "')]")).size() == 1;
     }
     public boolean hasConfirmationMessage(String tagName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//div[@class='box infomessage' and contains(. ,'has been successfully deleted')]"))
             .size() == 1;
     }

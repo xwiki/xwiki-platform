@@ -52,7 +52,7 @@ public class ResetPasswordPage extends ViewPage
 
     public String getUserName()
     {
-        return userNameInput.getText();
+        return userNameInput.getAttribute("value");
     }
 
     public void setUserName(String userName)
@@ -68,7 +68,7 @@ public class ResetPasswordPage extends ViewPage
 
     public boolean isResetPasswordSent()
     {
-        return getDriver().findElements(By.cssSelector("xcontent form")).isEmpty()
+        return getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty()
             && messageBox.getAttribute("class").contains("infomessage");
     }
 

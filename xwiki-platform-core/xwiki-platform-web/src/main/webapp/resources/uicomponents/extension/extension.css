@@ -124,7 +124,18 @@
   display: block;
 }
 
-dl.extension-metadata > dd > ul {
+dl.extension-body-section {
+  margin: 0;
+}
+dl.extension-body-section > dt {
+  color: $theme.textSecondaryColor;
+  font-weight: normal;
+}
+dl.extension-body-section > dd + dt {
+  margin-top: .7em;
+}
+
+dl.extension-body-description > dd > ul {
   list-style-position: inside;
   margin: 0;
   padding: 0;
@@ -135,7 +146,7 @@ ul.dependencies {
   list-style-type: none;
   margin: .5em 0 0;
   /* This should accommodate 10 items */
-  max-height: 230px;
+  max-height: 268px;
   overflow: auto;
   padding: 0;
 }
@@ -278,14 +289,12 @@ ul.dependencies li:hover {
   z-index: 200;
 }
 
-.innerMenu {
+ul.innerMenu {
   color: $theme.textSecondaryColor;
   font-size: 1em;
   font-size: 0.8em;
-  /*padding: 0 1.55em .1em 3.35em;*/
   padding: 0 0 .1em;
-  margin: 0 0 0 0 !important;
-  margin-top: -5px !important;
+  margin: -5px 0 1em 0 !important;
 }
 .innerMenu li {
   display: inline-block;

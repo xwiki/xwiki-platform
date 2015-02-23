@@ -522,7 +522,7 @@
     #set ($allInvitations = $services.wiki.user.getAllInvitations($wiki.id))
     #foreach ($name in $names)
       #foreach ($candidateMember in $allInvitations)
-        #if ("$!name"=="$!candidateMember.getUserId()" &amp;&amp; $candidateMember.status == 'PENDING')
+        #if ($name == $candidateMember.userId &amp;&amp; $candidateMember.status == 'PENDING')
           #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteUserAlreadyInvited')
           #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteRequestAlreadyExists')
 

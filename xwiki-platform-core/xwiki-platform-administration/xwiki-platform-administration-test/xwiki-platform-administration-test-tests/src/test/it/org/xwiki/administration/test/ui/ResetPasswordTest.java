@@ -57,7 +57,7 @@ import com.icegreen.greenmail.util.ServerSetupTest;
 public class ResetPasswordTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private GreenMail mail;
 

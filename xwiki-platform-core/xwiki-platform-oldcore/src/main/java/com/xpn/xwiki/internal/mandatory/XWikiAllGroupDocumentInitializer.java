@@ -23,9 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.slf4j.Logger;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -44,6 +44,8 @@ import com.xpn.xwiki.objects.BaseObject;
 public class XWikiAllGroupDocumentInitializer implements MandatoryDocumentInitializer
 {
     private static final String DOCUMENT_NAME = "XWikiAllGroup";
+
+    private static final String CLASS_NAME = "XWikiGroups";
     
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -57,24 +59,43 @@ public class XWikiAllGroupDocumentInitializer implements MandatoryDocumentInitia
     @Override
     public EntityReference getDocumentReference()
     {
-        return new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-                new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+        return new LocalDocumentReference(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
     }
 
     @Override
     public boolean updateDocument(XWikiDocument document)
     {
         boolean needsUpdate = false;
+
+        // Create the reference to the parent of the current document which is also the class of the object to create
+        LocalDocumentReference classReference = new LocalDocumentReference(XWiki.SYSTEM_SPACE, CLASS_NAME);
+
+        // Ensure the document has a creator
+        if (document.getCreatorReference() == null) {
+            document.setCreatorReference(new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                    XWiki.SYSTEM_SPACE, "superadmin"));
+            needsUpdate = true;
+        }
         
+        // Ensure the document has an author
+        if (document.getAuthorReference() == null) {
+            document.setAuthorReference(document.getCreatorReference());
+            needsUpdate = true;
+        }
+
+        // Ensure the document has a parent
+        if (document.getParentReference() == null) {
+            document.setParentReference(classReference);
+            needsUpdate = true;
+        }
+
         // Ensure the document is hidden, like every technical document
         if (!document.isHidden()) {
             document.setHidden(true);
             needsUpdate = true;
         }
         
-        // Ensure the document has a XWikiGroups object
-        DocumentReference classReference =
-                new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), XWiki.SYSTEM_SPACE, "XWikiGroups");
+        // Ensure the document has an XWikiGroups object
         if (document.getXObject(classReference) == null) {
             try {
                 BaseObject obj = document.newXObject(classReference, xcontextProvider.get());
@@ -83,7 +104,7 @@ public class XWikiAllGroupDocumentInitializer implements MandatoryDocumentInitia
             } catch (XWikiException e) {
                 logger.error(
                     String.format("Impossible to add an object to the document XWiki.XWikiAllGroups in the wiki [%s].",
-                        wikiDescriptorManager.getCurrentWikiId()), e);
+                        document.getDocumentReference().getWikiReference().getName()), e);
             }
         }
         

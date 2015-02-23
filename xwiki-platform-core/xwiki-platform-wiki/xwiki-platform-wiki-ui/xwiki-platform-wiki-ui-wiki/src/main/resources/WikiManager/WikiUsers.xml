@@ -521,9 +521,10 @@
       ##
       ## Remove users that have already been invited.
       #set ($alreadyInvited = [])
+      #set ($allInvitations = $services.wiki.user.getAllInvitations($wiki.id))
       #foreach ($name in $names)
-        #foreach ($candidateMember in $services.wiki.user.getAllInvitations($wiki.id))
-          #if ($candidateMember.status == 'PENDING')
+        #foreach ($candidateMember in $allInvitations)
+          #if ($name == $candidateMember.userId &amp;&amp; $candidateMember.status == 'PENDING')
             #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteUserAlreadyInvited')
             #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteRequestAlreadyExists')
 

@@ -36,10 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
-import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.LoginPage;
@@ -60,8 +58,6 @@ public class ResetPasswordTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private GreenMail mail;
-
-    private Map<String, String> currentEmailSettings;
 
     @Before
     public void startMail()
@@ -84,53 +80,17 @@ public class ResetPasswordTest extends AbstractTest
 
     private void configureEmail()
     {
-        // Open administration.
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-
-        // Sanity check.
-        Assert.assertTrue(administrationPage.hasSection("Email", "Mail Sending"));
-
-        // Open the Mail Sending section and configure it to use the local test mail server.
-        administrationPage.clickSection("Email", "Mail Sending");
-        SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
-
-        // First, store the current settings so we can set them back once the test is done
-        currentEmailSettings = new HashMap<String, String>();
-        currentEmailSettings.put("host", sendMailPage.getHost());
-        currentEmailSettings.put("port", sendMailPage.getPort());
-        currentEmailSettings.put("sendWaitTime", sendMailPage.getSendWaitTime());
-
-        // Set the new values
-        sendMailPage.setHost("localhost");
-        sendMailPage.setPort("3025");
-        // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
-        // we wait to receive the mails)
-        sendMailPage.setSendWaitTime("0");
-        sendMailPage.clickSave();
+        getUtil().updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
+            "3025", "sendWaitTime", "0");
     }
 
     private void restoreSettings()
     {
-        // It is possible that the setup was not executed, so no point in doing cleanup
-        if (currentEmailSettings == null) {
-            return;
-        }
-
         // Make sure we can restore the settings, so we log back with superadmin to finish the work
         getUtil().gotoPage(getUtil().getURLToLoginAsSuperAdmin());
 
-        // Open administration.
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-
-        // Open the Mail Sending section
-        administrationPage.clickSection("Email", "Mail Sending");
-        SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
-
-        // Set the new values
-        sendMailPage.setHost(currentEmailSettings.get("host"));
-        sendMailPage.setPort(currentEmailSettings.get("port"));
-        sendMailPage.setSendWaitTime(currentEmailSettings.get("sendWaitTime"));
-        sendMailPage.clickSave();
+        // Remove the previous version that the setup has created.
+        getUtil().deleteLatestVersion("Mail", "MailConfig");
     }
 
     @Test

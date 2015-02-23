@@ -23,6 +23,7 @@ com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
+com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer

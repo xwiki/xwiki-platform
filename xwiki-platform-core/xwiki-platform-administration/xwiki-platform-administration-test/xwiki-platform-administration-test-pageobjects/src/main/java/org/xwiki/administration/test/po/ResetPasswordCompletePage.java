@@ -56,7 +56,7 @@ public class ResetPasswordCompletePage extends ViewPage
     public boolean isResetLinkValid()
     {
         // If we see the form, the the link is valid.
-        return !getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty();
+        return getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"));
     }
 
     public String getPassowrd()
@@ -88,7 +88,7 @@ public class ResetPasswordCompletePage extends ViewPage
     public boolean isPasswordSuccessfullyReset()
     {
         // success = no form and a message that is not error or warning.
-        return getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty()
+        return !getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"))
             && messageBox.getAttribute("class").contains("infomessage");
     }
 

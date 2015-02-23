@@ -68,7 +68,8 @@ public class ResetPasswordPage extends ViewPage
 
     public boolean isResetPasswordSent()
     {
-        return getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty()
+        // If there is no form and we see an info box, then the request was sent.
+        return !getDriver().hasElementWithoutWaiting(By.cssSelector(".xcontent form"))
             && messageBox.getAttribute("class").contains("infomessage");
     }
 

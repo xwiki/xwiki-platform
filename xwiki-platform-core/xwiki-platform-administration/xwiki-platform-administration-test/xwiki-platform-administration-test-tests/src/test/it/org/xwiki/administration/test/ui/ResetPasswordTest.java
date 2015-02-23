@@ -61,8 +61,6 @@ public class ResetPasswordTest extends AbstractTest
 
     private GreenMail mail;
 
-    private Map<String, String> currentEmailSettings;
-
     @Before
     public void startMail()
     {
@@ -78,8 +76,6 @@ public class ResetPasswordTest extends AbstractTest
         if (this.mail != null) {
             this.mail.stop();
         }
-
-        restoreSettings();
     }
 
     private void configureEmail()
@@ -93,43 +89,11 @@ public class ResetPasswordTest extends AbstractTest
         // Open the Mail Sending section and configure it to use the local test mail server.
         administrationPage.clickSection("Email", "Mail Sending");
         SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
-
-        // First, store the current settings so we can set them back once the test is done
-        currentEmailSettings = new HashMap<String, String>();
-        currentEmailSettings.put("host", sendMailPage.getHost());
-        currentEmailSettings.put("port", sendMailPage.getPort());
-        currentEmailSettings.put("sendWaitTime", sendMailPage.getSendWaitTime());
-
-        // Set the new values
         sendMailPage.setHost("localhost");
         sendMailPage.setPort("3025");
         // Make sure we don't wait between email sending in order to speed up the test (and not incur timeouts when
         // we wait to receive the mails)
         sendMailPage.setSendWaitTime("0");
-        sendMailPage.clickSave();
-    }
-
-    private void restoreSettings()
-    {
-        // It is possible that the setup was not executed, so no point in doing cleanup
-        if (currentEmailSettings == null) {
-            return;
-        }
-
-        // Make sure we can restore the settings, so we log back with superadmin to finish the work
-        getUtil().gotoPage(getUtil().getURLToLoginAsSuperAdmin());
-
-        // Open administration.
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
-
-        // Open the Mail Sending section
-        administrationPage.clickSection("Email", "Mail Sending");
-        SendMailAdministrationSectionPage sendMailPage = new SendMailAdministrationSectionPage();
-
-        // Set the new values
-        sendMailPage.setHost(currentEmailSettings.get("host"));
-        sendMailPage.setPort(currentEmailSettings.get("port"));
-        sendMailPage.setSendWaitTime(currentEmailSettings.get("sendWaitTime"));
         sendMailPage.clickSave();
     }
 
@@ -192,7 +156,7 @@ public class ResetPasswordTest extends AbstractTest
         // Check that the link was valid
         Assert.assertTrue(resetPasswordCompletePage.isResetLinkValid());
         resetPasswordCompletePage.setPassword(newPassword);
-        resetPasswordCompletePage.setPasswordConfirmation(newPassword);
+        resetPasswordCompletePage.setConfirmationPassword(newPassword);
         resetPasswordCompletePage = resetPasswordCompletePage.clickSave();
 
         // Check the result
@@ -200,7 +164,7 @@ public class ResetPasswordTest extends AbstractTest
         LoginPage loginPage = resetPasswordCompletePage.clickLogin();
 
         // Check the new password
-        loginPage.loginAs(userName, newPassword);
+        loginPage.loginAs(userName, password);
         Assert.assertEquals(userName, getUtil().getLoggedInUserName());
     }
 

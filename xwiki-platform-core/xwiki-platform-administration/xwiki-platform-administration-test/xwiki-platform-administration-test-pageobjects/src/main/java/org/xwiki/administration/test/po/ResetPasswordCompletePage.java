@@ -42,10 +42,10 @@ public class ResetPasswordCompletePage extends ViewPage
     @FindBy(id = "p2")
     private WebElement newPasswordConfirmationField;
 
-    @FindBy(css = ".xcontent form input[type='submit']")
+    @FindBy(css = "xcontent form input[type='submit']")
     private WebElement saveButton;
 
-    @FindBy(xpath = "//.[@class='xcontent']//a[contains(@href, 'login')]")
+    @FindBy(css = "a[contains(href, 'login')")
     private WebElement loginButton;
 
     /**
@@ -59,22 +59,12 @@ public class ResetPasswordCompletePage extends ViewPage
         return !getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty();
     }
 
-    public String getPassowrd()
-    {
-        return this.newPasswordField.getAttribute("value");
-    }
-
     public void setPassword(String newPassword)
     {
         this.newPasswordField.sendKeys(newPassword);
     }
 
-    public String getPasswordConfirmation()
-    {
-        return this.newPasswordConfirmationField.getAttribute("value");
-    }
-
-    public void setPasswordConfirmation(String newPasswordConfirmation)
+    public void setConfirmationPassword(String newPasswordConfirmation)
     {
         this.newPasswordConfirmationField.sendKeys(newPasswordConfirmation);
     }
@@ -88,7 +78,7 @@ public class ResetPasswordCompletePage extends ViewPage
     public boolean isPasswordSuccessfullyReset()
     {
         // success = no form and a message that is not error or warning.
-        return getDriver().findElements(By.cssSelector(".xcontent form")).isEmpty()
+        return getDriver().findElements(By.cssSelector("xcontent form")).isEmpty()
             && messageBox.getAttribute("class").contains("infomessage");
     }
 

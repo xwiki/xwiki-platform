@@ -1006,6 +1006,8 @@ $namespace##
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
         #set ($status = 'installed-invalid')
+      #elseif ($extension.isDependency($extensionNamespace))
+        #set ($status = 'installed-dependency')
       #else
         #set ($status = 'installed')
       #end
@@ -1019,9 +1021,7 @@ $namespace##
         #getInstalledExtension($extension $extensionNamespace $currentVersion)
       #end
       #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.descriptor.id)
-        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
-        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
+        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint)")
       #else
         #set ($status = 'remote')
       #end
@@ -1037,16 +1037,20 @@ $namespace##
   #setVariable ("$_extensionStatusMessage" $message)
 #end
 
-#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
-#set ($status = $options.get(0))
-#if ($alice.id.equals($bob.id))
-#set ($status = $options.get(1))
-#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
-#set ($status = $options.get(2))
-#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
-#set ($status = $options.get(3))
+#macro (determineVersionCompatibility $alice $bob $versionConstraint)
+#set ($prefix = '')
+#if (!$alice.id.equals($bob.id))
+#set ($prefix = 'remote-')
 #end
-$status##
+#set ($suffix = '')
+#if ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
+#set ($suffix = '-incompatible')
+#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
+#set ($suffix = '-invalid')
+#elseif ($bob.isDependency($extensionNamespace))
+#set ($suffix = '-dependency')
+#end
+${prefix}${bob.repository.descriptor.id}${suffix}##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)

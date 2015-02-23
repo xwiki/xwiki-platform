@@ -69,13 +69,23 @@
   font-size: .9em;
 }
 
-.extension-item-core .extension-status, .extension-item-installed .extension-status,
+.extension-item-core .extension-status,
+.extension-item-installed-dependency .extension-status,
 /* We have to duplicate the selectors to force the style to be applied to extension dependencies, which are nested inside extension display. */
-.extension-item .extension-item-core .extension-status, .extension-item .extension-item-installed .extension-status {
+.extension-item .extension-item-core .extension-status,
+.extension-item .extension-item-installed-dependency .extension-status {
+  color: $theme.textSecondaryColor;
+}
+.extension-item-installed .extension-status,
+.extension-item .extension-item-installed .extension-status {
   color: $theme.notificationSuccessColor;
 }
-.extension-item-remote-core .extension-status, .extension-item-remote-installed .extension-status,
-.extension-item .extension-item-remote-core .extension-status, .extension-item .extension-item-remote-installed .extension-status {
+.extension-item-remote-core .extension-status,
+.extension-item-remote-installed .extension-status,
+.extension-item-remote-installed-dependency .extension-status,
+.extension-item .extension-item-remote-core .extension-status,
+.extension-item .extension-item-remote-installed .extension-status,
+.extension-item .extension-item-remote-installed-dependency .extension-status {
   color: $theme.notificationWarningColor;
 }
 .extension-item-installed-invalid .extension-status, .extension-item-remote-installed-invalid .extension-status,
@@ -147,9 +157,11 @@ ul.dependencies li:hover {
   background-image: url("$xwiki.getSkinFile('icons/silk/cog.png')");
 }
 .extension-item-installed .extension-title, .extension-item-remote-installed .extension-title,
+.extension-item-installed-dependency .extension-title, .extension-item-remote-installed-dependency .extension-title,
 .extension-item-installed-invalid .extension-title, .extension-item-remote-installed-invalid .extension-title,
 .dependency-item.extension-item-installed, .dependency-item.extension-item-remote-installed,
 .dependency-item.extension-item-installed-invalid, .dependency-item.extension-item-remote-installed-invalid,
+.dependency-item.extension-item-installed-dependency, .dependency-item.extension-item-remote-installed-dependency,
 .dependency-item.extension-item-remote-installed-incompatible {
   background-image: url("$xwiki.getSkinFile('icons/silk/plugin.png')");
 }
@@ -167,10 +179,16 @@ ul.dependencies li:hover {
   right: 1.5em;
 }
 
-.extension-item-core, .extension-item-installed {
+.extension-item-core,
+.extension-item-installed-dependency {
+  border-right-color: $theme.textSecondaryColor;
+}
+.extension-item-installed {
   border-right-color: $theme.notificationSuccessColor;
 }
-.extension-item-remote-installed, .extension-item-remote-core {
+.extension-item-remote-installed,
+.extension-item-remote-installed-dependency,
+.extension-item-remote-core {
   border-right-color: $theme.notificationWarningColor;
 }
 .extension-item-installed-invalid, .extension-item-remote-installed-invalid,

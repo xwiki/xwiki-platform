@@ -490,7 +490,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(new String[] { space, page }, action, queryString);
+        return getURL(new String[] {space, page}, action, queryString);
     }
 
     private String getURL(String[] path, String action, String queryString)
@@ -541,7 +541,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(new String[] { space, page, attachment }, action, queryString);
+        return getURL(new String[] {space, page, attachment}, action, queryString);
     }
 
     /**
@@ -660,14 +660,13 @@ public class TestUtils
 
     public boolean isInWYSIWYGEditMode()
     {
-        return getDriver()
-            .findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]")).size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))
+            .size() > 0;
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
-            .size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).size() > 0;
     }
 
     public boolean isInViewMode()
@@ -1036,5 +1035,69 @@ public class TestUtils
         }
 
         return putMethod;
+    }
+
+    /**
+     * Delete the latest version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void deleteLatestVersion(String space, String page)
+    {
+        deleteVersion(space, page, "latest");
+    }
+
+    /**
+     * Delete a specific version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersion(String space, String page, String version)
+    {
+        deleteVersions(space, page, version, version);
+    }
+
+    /**
+     * Delete an interval of versions from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param v1 the starting version to delete
+     * @param v2 the ending version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersions(String space, String page, String v1, String v2)
+    {
+        gotoPage(space, page, "deleteversions", "rev1", v1, "rev2", v2, "confirm", "1");
+    }
+
+    /**
+     * Roll back a page to the previous version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void rollbackToPreviousVersion(String space, String page)
+    {
+        rollBackTo(space, page, "previous");
+    }
+
+    /**
+     * Roll back a page to the specified version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to rollback to
+     * @since 7.0M2
+     */
+    public void rollBackTo(String space, String page, String version)
+    {
+        gotoPage(space, page, "rollback", "rev", version, "confirm", "1");
     }
 }

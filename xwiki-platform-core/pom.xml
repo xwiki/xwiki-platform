@@ -471,6 +471,27 @@
               <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
               <justification>Young API. Fix a bad designed API.</justification>
             </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of jrcs Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev1()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev2()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

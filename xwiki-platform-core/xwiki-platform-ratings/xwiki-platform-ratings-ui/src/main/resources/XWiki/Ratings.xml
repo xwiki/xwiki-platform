@@ -438,7 +438,7 @@ icon=icon:star</parameters>
   #if("$!{request.vote}" != "")
     #set($requestDocRef = $services.model.resolveDocument($request.doc))
     #set($userDocRef = $xcontext.getUserReference())
-    #set($vote = $util.parseInt($request.vote))
+    #set($vote = $mathtool.toInteger($request.vote))
     #if($vote &gt; 0 &amp;&amp; $vote &lt;= 5)
       #set($ok = $services.ratings.setRating($requestDocRef, $userDocRef, $vote))
       #if($ok) 

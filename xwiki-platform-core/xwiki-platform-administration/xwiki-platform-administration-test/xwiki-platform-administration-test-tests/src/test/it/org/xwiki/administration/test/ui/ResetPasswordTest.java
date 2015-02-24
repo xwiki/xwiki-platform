@@ -88,6 +88,7 @@ public class ResetPasswordTest extends AbstractTest
     {
         // Make sure we can restore the settings, so we log back with superadmin to finish the work
         getUtil().gotoPage(getUtil().getURLToLoginAsSuperAdmin());
+        getUtil().recacheSecretToken();
 
         // Remove the previous version that the setup has created.
         getUtil().deleteLatestVersion("Mail", "MailConfig");

@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Step to be executed during the wiki crcreatorjobion job.
+ * Step to be executed during the wiki creation job.
  *
  * @version $Id$
  * @since 7.0M2
@@ -40,7 +40,8 @@ public interface WikiCreationStep
     void execute(WikiCreationRequest request) throws WikiCreationException;
 
     /**
-     * The creation steps are sorted by order before being executed so this method returns the one of the current steps.
+     * The creation steps are sorted in ascending order before being executed so this method returns the one of the
+     * current steps.
      * @return the order of the steps
      */
     int getOrder();

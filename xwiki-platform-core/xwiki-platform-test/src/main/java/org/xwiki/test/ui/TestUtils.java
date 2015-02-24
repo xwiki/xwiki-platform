@@ -175,6 +175,51 @@ public class TestUtils
         }
     }
 
+    public void loginAsSuperAdmin()
+    {
+        login(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsSuperAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void loginAsAdmin()
+    {
+        login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void login(String username, String password)
+    {
+        if (!username.equals(getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            // Also recache the CSRF token
+            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            recacheSecretTokenWhenOnRegisterPage();
+            getDriver().get(getURLToNonExistentPage());
+        }
+    }
+
+    public void loginAndGotoPage(String username, String password, String pageURL)
+    {
+        if (!username.equals(getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            // Also recache the CSRF token
+            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            recacheSecretTokenWhenOnRegisterPage();
+            // Go to the page asked
+            getDriver().get(pageURL);
+        }
+    }
+
     /**
      * Consider using setSession(null) because it will drop the cookies which is faster than invoking a logout action.
      */
@@ -582,6 +627,13 @@ public class TestUtils
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
         gotoPage("XWiki", "Register", "register");
+        recacheSecretTokenWhenOnRegisterPage();
+        // Return to the previous page.
+        getDriver().get(previousURL);
+    }
+
+    private void recacheSecretTokenWhenOnRegisterPage()
+    {
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
@@ -590,8 +642,6 @@ public class TestUtils
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
             exception.printStackTrace();
         }
-        // Return to the previous page.
-        getDriver().get(previousURL);
     }
 
     /**

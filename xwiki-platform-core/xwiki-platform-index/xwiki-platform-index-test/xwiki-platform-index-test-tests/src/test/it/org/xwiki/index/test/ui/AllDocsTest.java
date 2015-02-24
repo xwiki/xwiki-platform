@@ -73,10 +73,8 @@ public class AllDocsTest extends AbstractTest
     @Test
     public void recycleBinTab() throws Exception
     {
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
-        AllDocsPage page = AllDocsPage.gotoPage();
+        getUtil().loginAsSuperAdminAndGotoPage(AllDocsPage.getURL());
+        AllDocsPage page = new AllDocsPage();
         assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
         assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
 

@@ -57,7 +57,7 @@ public class AllDocsPage extends ViewPage
         return new AllDocsPage();
     }
 
-    public String getURL()
+    public static String getURL()
     {
         return getUtil().getURL("Main", "AllDocs");
     }

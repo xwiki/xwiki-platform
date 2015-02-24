@@ -87,8 +87,7 @@ public class ResetPasswordTest extends AbstractTest
     private void restoreSettings()
     {
         // Make sure we can restore the settings, so we log back with superadmin to finish the work
-        getUtil().gotoPage(getUtil().getURLToLoginAsSuperAdmin());
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdmin();
 
         // Remove the previous version that the setup has created.
         getUtil().deleteLatestVersion("Mail", "MailConfig");
@@ -124,8 +123,7 @@ public class ResetPasswordTest extends AbstractTest
         Assert.assertTrue(resetPasswordPage.getMessage().contains("email address not provided"));
 
         // Try again. This time, set the user's email address in the profile
-        getUtil().gotoPage(getUtil().getURLToLoginAsSuperAdmin());
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdmin();
         getUtil().updateObject("XWiki", userName, "XWiki.XWikiUsers", 0, "email", "foo@bar.com", "form_token",
             getUtil().getSecretToken());
         new ViewPage().logout();

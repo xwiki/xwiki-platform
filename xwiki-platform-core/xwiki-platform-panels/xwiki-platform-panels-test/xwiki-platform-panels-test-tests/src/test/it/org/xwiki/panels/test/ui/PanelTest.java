@@ -133,9 +133,7 @@ public class PanelTest extends AbstractTest
             rightsEditor.setRight(userName, Right.VIEW, State.ALLOW);
 
             // Check again the panel visibility for the test user and then for guest
-            getUtil().gotoPage(getUtil().getURLToLoginAndGotoPage(userName, "password",
-                getUtil().getURL(getTestClassName(), getTestMethodName())));
-            getUtil().recacheSecretToken();
+            getUtil().loginAndGotoPage(userName, "password", getUtil().getURL(getTestClassName(), getTestMethodName()));
             ViewPage page = new ViewPage();
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
             page.logout();

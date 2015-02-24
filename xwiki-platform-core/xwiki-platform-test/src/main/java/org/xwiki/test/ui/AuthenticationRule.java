@@ -60,12 +60,6 @@ public class AuthenticationRule implements MethodRule
 
     public void authenticate()
     {
-        if (!this.userName.equals(this.util.getLoggedInUserName())) {
-            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
-            // going to the home page for example.
-            this.util.getDriver().get(this.util.getURLToLoginAndGotoPage(this.userName, this.userPassword,
-                this.util.getURLToNonExistentPage()));
-            this.util.recacheSecretToken();
-        }
+        this.util.login(this.userName, this.userPassword);
     }
 }

@@ -113,8 +113,7 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
         // Switch to superadmin user and go to the scheduler home page
         SchedulerHomePage schedulerHomePage = new SchedulerHomePage();
-        getDriver().get(getUtil().getURLToLoginAsSuperAdminAndGotoPage(schedulerHomePage.getURL()));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(schedulerHomePage.getURL());
 
         // Trigger the notification for the Daily job
         schedulerHomePage.clickJobActionTrigger("WatchList daily notifier");

@@ -68,8 +68,23 @@ public class AdministrationPage extends ViewPage
 
     public static AdministrationPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin");
+        getUtil().gotoPage(getSpace(), getPage(), "admin");
         return new AdministrationPage();
+    }
+
+    public static String getURL()
+    {
+        return getUtil().getURL(getSpace(), getPage());
+    }
+
+    public static String getSpace()
+    {
+        return "XWiki";
+    }
+
+    public static String getPage()
+    {
+        return "XWikiPreferences";
     }
 
     public LocalizationAdministrationSectionPage clickLocalizationSection()

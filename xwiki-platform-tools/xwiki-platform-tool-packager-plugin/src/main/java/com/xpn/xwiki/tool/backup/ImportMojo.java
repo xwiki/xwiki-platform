@@ -22,7 +22,9 @@ package com.xpn.xwiki.tool.backup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -167,6 +169,12 @@ public class ImportMojo extends AbstractMojo
     {
         XWikiContext xcontext = importer.createXWikiContext(databaseName, hibernateConfig);
 
+        // We need to distinguish between extensions installed explicitly and their transitive dependencies.
+        // We have to create our own Set because Maven changes the fields from the dependency Artifacts (e.g. resolves
+        // their version) after they are added to the Set of dependencies and this causes the hash code to change. As a
+        // result the #contains(Artifact) method doesn't work as expected because it uses the new hash code.
+        Set<Artifact> directDependencies = new HashSet<Artifact>(this.project.getDependencyArtifacts());
+
         // Reverse artifact order to have dependencies first (despite the fact that it's a Set it's actually an ordered
         // LinkedHashSet behind the scene)
         List<Artifact> dependenciesFirstArtifacts = new ArrayList<Artifact>(this.project.getArtifacts());
@@ -183,7 +191,7 @@ public class ImportMojo extends AbstractMojo
                     getLog().info("  ..... Imported " + nb + " documents");
 
                     // Install extension
-                    installExtension(artifact, xcontext);
+                    installExtension(artifact, xcontext, directDependencies.contains(artifact));
                 }
             }
         }
@@ -198,8 +206,8 @@ public class ImportMojo extends AbstractMojo
         importer.disposeXWikiContext(xcontext);
     }
 
-    private void installExtension(Artifact artifact, XWikiContext xcontext) throws ComponentLookupException,
-        InstallException, LocalExtensionRepositoryException, MojoExecutionException
+    private void installExtension(Artifact artifact, XWikiContext xcontext, boolean directDependency)
+        throws ComponentLookupException, InstallException, LocalExtensionRepositoryException, MojoExecutionException
     {
         ComponentManager componentManager = (ComponentManager) xcontext.get(ComponentManager.class.getName());
 
@@ -218,7 +226,7 @@ public class ImportMojo extends AbstractMojo
         extension.setFile(artifact.getFile());
 
         LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
-        installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", true);
+        installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", !directDependency);
     }
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException

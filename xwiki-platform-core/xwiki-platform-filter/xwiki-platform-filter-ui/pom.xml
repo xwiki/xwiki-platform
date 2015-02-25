@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter</artifactId>
-    <version>6.2.7-SNAPSHOT</version>
+    <version>6.2.7</version>
   </parent>
   <artifactId>xwiki-platform-filter-ui</artifactId>
   <name>XWiki Platform - Filter - UI</name>

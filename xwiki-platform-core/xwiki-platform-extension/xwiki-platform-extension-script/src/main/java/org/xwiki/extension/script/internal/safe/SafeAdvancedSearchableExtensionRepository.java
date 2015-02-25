@@ -20,10 +20,13 @@
 package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.context.Execution;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
+import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.AdvancedSearchable;
 import org.xwiki.extension.repository.search.ExtensionQuery;
+import org.xwiki.extension.repository.search.SearchException;
 
 /**
  * Provide a public script access to a {@link AdvancedSearchable} extension repository.
@@ -50,12 +53,24 @@ public class SafeAdvancedSearchableExtensionRepository<T extends ExtensionReposi
     // AdvancedSearchable
 
     @Override
-    public ExtensionQuery createQuery(String query)
+    public boolean isFilterable()
+    {
+        return ((AdvancedSearchable) getWrapped()).isFilterable();
+    }
+
+    @Override
+    public boolean isSortable()
+    {
+        return ((AdvancedSearchable) getWrapped()).isSortable();
+    }
+
+    @Override
+    public IterableResult<Extension> search(ExtensionQuery query) throws SearchException
     {
         setError(null);
 
         try {
-            return safe(((AdvancedSearchable) getWrapped()).createQuery(query));
+            return safe(((AdvancedSearchable) getWrapped()).search(query));
         } catch (Exception e) {
             setError(e);
         }

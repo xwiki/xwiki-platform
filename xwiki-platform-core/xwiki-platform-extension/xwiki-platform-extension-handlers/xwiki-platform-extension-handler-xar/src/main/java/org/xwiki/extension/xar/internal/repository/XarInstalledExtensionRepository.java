@@ -49,8 +49,10 @@ import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.internal.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.internal.RepositoryUtils;
+import org.xwiki.extension.repository.internal.installed.DefaultInstalledExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.observation.EventListener;
@@ -70,7 +72,7 @@ import org.xwiki.xar.XarException;
 public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepository<XarInstalledExtension> implements
     InstalledExtensionRepository, Initializable
 {
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ExtensionInstalledEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
 
     @Inject
@@ -250,7 +252,7 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {
-        Pattern patternMatcher = createPatternMatcher(pattern);
+        Pattern patternMatcher = RepositoryUtils.createPatternMatcher(pattern);
 
         List<Extension> result = new ArrayList<Extension>();
 
@@ -267,18 +269,19 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     public IterableResult<Extension> searchInstalledExtensions(String pattern, String namespace, int offset, int nb)
         throws SearchException
     {
-        Pattern patternMatcher = createPatternMatcher(pattern);
+        ExtensionQuery query = new ExtensionQuery(pattern);
 
-        List<Extension> result = new ArrayList<Extension>();
+        query.setOffset(offset);
+        query.setLimit(nb);
 
-        for (XarInstalledExtension extension : this.extensions.values()) {
-            if (extension.isInstalled(namespace)) {
-                if (patternMatcher == null || RepositoryUtils.matches(patternMatcher, extension)) {
-                    result.add(extension);
-                }
-            }
-        }
+        return search(query);
+    }
 
-        return new CollectionIterableResult<Extension>(this.extensions.size(), offset, result);
+    @Override
+    public IterableResult<Extension> searchInstalledExtensions(String namespace, ExtensionQuery query)
+        throws SearchException
+    {
+        return DefaultInstalledExtensionRepository
+            .searchInstalledExtensions(namespace, query, this.extensions.values());
     }
 }

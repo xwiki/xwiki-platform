@@ -33,6 +33,7 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
 
 /**
@@ -43,7 +44,7 @@ import org.xwiki.extension.repository.search.SearchException;
  * @since 4.0M2
  */
 public class SafeInstalledExtensionRepository<T extends InstalledExtensionRepository> extends
-    SafeSearchableExtensionRepository<T> implements InstalledExtensionRepository
+    SafeAdvancedSearchableExtensionRepository<T> implements InstalledExtensionRepository
 {
     /**
      * @param repository wrapped repository
@@ -51,7 +52,7 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeInstalledExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);
@@ -172,5 +173,12 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
         throws SearchException
     {
         return safe(getWrapped().searchInstalledExtensions(pattern, namespace, offset, nb));
+    }
+
+    @Override
+    public IterableResult<Extension> searchInstalledExtensions(String namespace, ExtensionQuery query)
+        throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(namespace, query));
     }
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.context.Execution;
@@ -43,7 +44,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Iterates over all the users found in the passed references (which can be references to groups or to users) and
- * return extracted data from the USer for each found user (the extracted data is controlled by the passed
+ * return extracted data from the User for each found user (the extracted data is controlled by the passed
  * {@link UserDataExtractor}. Handles nested groups.
  *
  * @param <T> the type of data returned by the iterator when {@link #next()} is called
@@ -294,7 +295,13 @@ public class UserIterator<T> implements Iterator<T>
         // If we have neither a group reference nor a user reference, skip it and get the next reference
         if (isGroupReference) {
             // Extract the references and push them on the stack as an iterator
-            this.userAndGroupIteratorStack.push(convertToDocumentReferences(members, currentReference).iterator());
+            Collection<DocumentReference> groupMemberReferences =
+                convertToDocumentReferences(members, currentReference);
+            if (!groupMemberReferences.isEmpty()) {
+                this.userAndGroupIteratorStack.push(groupMemberReferences.iterator());
+            } else {
+                cleanStackIfNeeded(currentIterator);
+            }
             if (!isUserReference) {
                 value = getNext();
             } else {
@@ -346,7 +353,14 @@ public class UserIterator<T> implements Iterator<T>
         Collection<DocumentReference> members = new LinkedHashSet<>();
         for (BaseObject memberObject : memberObjects) {
             String member = memberObject.getStringValue("member");
-            members.add(this.explicitDocumentReferenceResolver.resolve(member, currentReference));
+            // If the member is empty, discard it!
+            if (!StringUtils.isBlank(member)) {
+                DocumentReference resolvedReference =
+                    this.explicitDocumentReferenceResolver.resolve(member, currentReference);
+                if (!resolvedReference.equals(currentReference)) {
+                    members.add(resolvedReference);
+                }
+            }
         }
         return members;
     }

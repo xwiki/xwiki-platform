@@ -41,7 +41,7 @@ public class ViewPage extends BasePage
     private WebElement content;
 
     @FindBy(id = "hierarchy")
-    private WebElement breadcrumbOl;
+    private WebElement breadcrumb;
 
     /**
      * Opens the comments tab.
@@ -51,24 +51,21 @@ public class ViewPage extends BasePage
     public CommentsTab openCommentsDocExtraPane()
     {
         getDriver().findElement(By.id("Commentslink")).click();
-        getDriver().waitUntilElementIsVisible(By.id("commentscontent"));
-
+        waitForDocExtraPaneActive("comments");
         return new CommentsTab();
     }
 
     public HistoryPane openHistoryDocExtraPane()
     {
         getDriver().findElement(By.id("Historylink")).click();
-        getDriver().waitUntilElementIsVisible(By.id("historycontent"));
-
+        waitForDocExtraPaneActive("history");
         return new HistoryPane();
     }
 
     public AttachmentsPane openAttachmentsDocExtraPane()
     {
         getDriver().findElement(By.id("Attachmentslink")).click();
-        getDriver().waitUntilElementIsVisible(By.id("attachmentscontent"));
-
+        waitForDocExtraPaneActive("attachments");
         return new AttachmentsPane();
     }
 
@@ -124,17 +121,17 @@ public class ViewPage extends BasePage
 
     public String getBreadcrumbContent()
     {
-        return this.breadcrumbOl.getText();
+        return this.breadcrumb.getText();
     }
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
     {
         List<WebElement> result;
         if (isCurrent) {
-            result = getDriver().findElementsWithoutWaiting(this.breadcrumbOl,
+            result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
                 By.xpath("li[@class = 'active' and text() ='" + breadcrumbItem + "']"));
         } else {
-            result = getDriver().findElementsWithoutWaiting(this.breadcrumbOl,
+            result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
                 By.xpath("//a[text() = '" + breadcrumbItem + "']"));
         }
         return result.size() > 0;
@@ -148,7 +145,7 @@ public class ViewPage extends BasePage
      */
     public ViewPage clickBreadcrumbLink(String linkText)
     {
-        this.breadcrumbOl.findElement(By.linkText(linkText)).click();
+        this.breadcrumb.findElement(By.linkText(linkText)).click();
         return new ViewPage();
     }
 

@@ -47,6 +47,7 @@
     <module>xwiki-platform-legacy-url</module>
     <module>xwiki-platform-legacy-web</module>
     <module>xwiki-platform-legacy-ldap</module>
+    <module>xwiki-platform-legacy-watchlist-api</module>
   </modules>
   <build>
     <pluginManagement>

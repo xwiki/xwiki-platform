@@ -23,7 +23,7 @@
 <xwikidoc>
   <web>Sandbox</web>
   <name>TestPage1</name>
-  <language>de</language>
+  <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Sandbox.WebHome</parent>
@@ -43,9 +43,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
-  <content>Klicken Sie auf **"Bearbeiten"**, um diese Seite zu editieren. Wenn Sie fertig mit dem Bearbeiten sind, klicken Sie **"Speichern &amp; Ansehen"**, um sich die Ergebnisse anzusehen!
+  <content>Cliquez sur **"Modifier"** puis altérez le contenu de la page enfin cliquez sur **"Enregistrer &amp; Fermer** pour visualiser le résultat de vos modifications dans la page !
 
-= Hier ist ein wenig Fülltext, damit Sie sich vorstellen können, wie eine Seite aussieht =
+= Voici un texte d'exemple =
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</content>
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </content>
 </xwikidoc>

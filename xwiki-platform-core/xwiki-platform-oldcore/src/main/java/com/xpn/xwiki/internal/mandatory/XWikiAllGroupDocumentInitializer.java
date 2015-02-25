@@ -20,9 +20,12 @@
 package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -41,6 +44,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 6.4.2 
  */
+@Component
+@Singleton
+@Named("XWiki.XWikiAllGroup")
 public class XWikiAllGroupDocumentInitializer implements MandatoryDocumentInitializer
 {
     private static final String DOCUMENT_NAME = "XWikiAllGroup";

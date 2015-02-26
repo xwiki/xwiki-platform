@@ -20,6 +20,7 @@
 package org.xwiki.extension.script.internal.safe;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.context.Execution;
@@ -80,6 +81,13 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
     {
+        return installExtension(extension, namespace, dependency, Collections.<String, Object>emptyMap());
+    }
+
+    @Override
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency,
+        Map<String, Object> properties)
+    {
         if (!this.hasProgrammingRight) {
             setError(new UnsupportedOperationException(FORBIDDEN));
 
@@ -89,7 +97,7 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
         setError(null);
 
         try {
-            return safe(getWrapped().installExtension(extension, namespace, dependency));
+            return safe(getWrapped().installExtension(extension, namespace, dependency, properties));
         } catch (InstallException e) {
             setError(e);
         }

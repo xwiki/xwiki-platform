@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -218,6 +219,13 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     @Override
     public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
         throws InstallException
+    {
+        return installExtension(extension, namespace, dependency, Collections.<String, Object>emptyMap());
+    }
+
+    @Override
+    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency,
+        Map<String, Object> properties) throws InstallException
     {
         throw new UnsupportedOperationException("Not implemented");
     }

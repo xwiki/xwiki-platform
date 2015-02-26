@@ -37,6 +37,7 @@ import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -49,6 +50,11 @@ import org.xwiki.job.JobExecutor;
 @Singleton
 public class XarExtensionScriptService extends AbstractExtensionScriptService
 {
+    /**
+     * The install request property that specifies which user triggered the XAR repair job.
+     */
+    private static final String PROPERTY_USER_REFERENCE = "user.reference";
+
     /**
      * Needed for checking programming rights.
      */
@@ -82,6 +88,14 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
+        if (currentUserReference != null) {
+            installRequest.setProperty(PROPERTY_USER_REFERENCE, currentUserReference);
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USER_REFERENCE, currentUserReference.toString());
+        }
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);

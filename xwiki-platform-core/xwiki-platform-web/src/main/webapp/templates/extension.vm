@@ -308,16 +308,52 @@
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #getInstallInfo($extension $NULL $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedGloballyBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #else
+      <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #end
   #elseif ($xcontext.isMainWiki())
     ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
     <dt>$services.localization.render('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
-        <li>#displayExtensionNamespace($namespace)</li>
+        #getInstallInfo($extension $namespace $install)
+        #if ($install.date)
+          <li>$services.localization.render('extensions.info.installedOnNamespaceBy', [
+            "#displayExtensionNamespace($namespace)",
+            $xwiki.getUserName($install.userReference),
+            $xwiki.formatDate($install.date)
+          ])</li>
+        #else
+          <li>#displayExtensionNamespace($namespace)</li>
+        #end
       #end
     </ul></dd>
+  #else
+    #getInstallInfo($extension $extensionNamespace $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #end
   #end
+#end
+
+#macro (getInstallInfo $installedExtension $namespace $return)
+  #set ($install = {'date': $installedExtension.getInstallDate($namespace)})
+  #if ($install.date)
+    #set ($install.userReference = $installedExtension.getUserReference($namespace))
+  #else
+    #set ($installJobStatus = $extensionManager.getExtensionJobStatus($installedExtension.id.id, $namespace))
+    #if ($installJobStatus && $installJobStatus.request.getProperty('job.type') == 'install')
+      #set ($install.date = $installJobStatus.startDate)
+      #set ($install.userReference = $installJobStatus.request.getProperty('user.reference'))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $install)
 #end
 
 #macro (displayExtensionNamespace $namespace)

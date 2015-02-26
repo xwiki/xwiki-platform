@@ -20,7 +20,6 @@
 package org.xwiki.filter.test.xarinstance;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 import org.junit.Test;
 import org.xwiki.filter.FilterException;
@@ -29,8 +28,6 @@ import org.xwiki.filter.instance.internal.input.AbstractInstanceInputFilterStrea
 import org.xwiki.filter.instance.internal.output.DocumentInstanceOutputFilterStream;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.test.annotation.AllComponents;
-
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Validate {@link DocumentInstanceOutputFilterStream}.
@@ -43,8 +40,7 @@ public class DocumentInstanceInputFilterStreamTest extends AbstractInstanceInput
     // Tests
 
     @Test
-    public void testImportDocumentsPreserveVersion() throws FilterException, XWikiException, ParseException,
-        IOException
+    public void testImportDocumentsPreserveVersion() throws FilterException, IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
         outputProperties.setVersionPreserved(true);

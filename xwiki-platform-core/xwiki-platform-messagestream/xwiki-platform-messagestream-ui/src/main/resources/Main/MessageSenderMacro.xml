@@ -543,6 +543,8 @@ return XWiki;
 ##
 ## Skin Extensions
 ##--------------------------------------------------------------
+#set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js'))
+#set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js'))
 #set ($discard = $xwiki.ssx.use('Main.Activity'))
 #set ($discard = $xwiki.ssx.use('Main.MessageSenderMacro'))
 #set ($discard = $xwiki.jsx.use('Main.MessageSenderMacro'))

@@ -47,24 +47,25 @@
     <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
     <property name="jdbc.use_scrollable_resultset">false</property>
 
-    <!-- DBCP Connection Pooling configuration
+    <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
+         at http://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
     <property name="dbcp.defaultAutoCommit">false</property>
-    <property name="dbcp.maxActive">50</property>
+    <property name="dbcp.maxTotal">50</property>
     <property name="dbcp.maxIdle">5</property>
-    <property name="dbcp.maxWait">30000</property>
-    <property name="dbcp.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.whenExhaustedAction">1</property>
-    <property name="dbcp.ps.maxWait">120000</property>
-    <property name="dbcp.ps.maxIdle">20</property>
+    <property name="dbcp.maxWaitMillis">30000</property>
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 
-    <!-- Setting dbcp.ps.maxActive configuration tells DBCP whether to cache Prepared Statement or not.
+    <!-- Setting "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" will tell DBCP to cache
+         Prepared Statements (it's off by default). Note that for backward compatibility the "dbcp.ps.maxActive" is also
+         supported and when set it'll set "dbcp.poolPreparedStatements" to true and "dbcp.maxOpenPreparedStatements" to
+         value of "dbcp.ps.maxActive".
 
          Note 1: When using HSQLDB for example, it's important to NOT cache prepared statements because HSQLDB
          Prepared Statements (PS) contain the schema on which they were initially created and thus when switching
          schema if the same PS is reused it'll execute on the wrong schema! Since HSQLDB does internally cache
-         prepared statement there's no performance loss. see http://jira.xwiki.org/browse/XWIKI-1740.
+         prepared statement there's no performance loss by not caching Prepared Statements at the DBCP level.
+         See http://jira.xwiki.org/browse/XWIKI-1740.
          Thus we recommend not turning on this configuration for HSQLDB unless you know what you're doing :)
 
          Note 2: The same applies to PostGreSQL.
@@ -131,7 +132,8 @@
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -207,7 +209,8 @@
     <property name="connection.SetBigStringTryClob">true</property>
     <property name="jdbc.batch_size">0</property>
     <property name="jdbc.use_streams_for_binary">false</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
@@ -226,7 +229,8 @@
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
-    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.poolPreparedStatements">true</property>
+    <property name="dbcp.maxOpenPreparedStatements">20</property>
     <mapping resource="xwiki.derby.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
 ## Note: This is starting the line in order not to put extra spaces when generated

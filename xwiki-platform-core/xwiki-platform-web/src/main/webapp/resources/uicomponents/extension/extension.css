@@ -131,7 +131,8 @@ dl.extension-body-section > dt {
   color: $theme.textSecondaryColor;
   font-weight: normal;
 }
-dl.extension-body-section > dd + dt {
+dl.extension-body-section > dd + dt,
+dl.extension-body-section > dt + dt {
   margin-top: .7em;
 }
 

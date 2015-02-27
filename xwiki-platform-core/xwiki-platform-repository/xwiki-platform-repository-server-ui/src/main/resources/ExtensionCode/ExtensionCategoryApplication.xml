@@ -22,17 +22,17 @@
 
 <xwikidoc version="1.1">
   <web>ExtensionCode</web>
-  <name>ExtensionCategoryOther</name>
+  <name>ExtensionCategoryApplication</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1423235662000</creationDate>
+  <creationDate>1425053071000</creationDate>
   <parent>ExtensionCode.ExtensionCategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1425052286000</date>
-  <contentUpdateDate>1423235662000</contentUpdateDate>
+  <date>1425053105000</date>
+  <contentUpdateDate>1425053071000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,10 +41,10 @@
   <hidden>false</hidden>
   <content/>
   <object>
-    <name>ExtensionCode.ExtensionCategoryOther</name>
+    <name>ExtensionCode.ExtensionCategoryApplication</name>
     <number>0</number>
     <className>ExtensionCode.ExtensionCategoryClass</className>
-    <guid>91967710-5d26-4d33-bfba-a1263c31548f</guid>
+    <guid>3b71f779-ff4b-4690-8fc8-376fe40696a2</guid>
     <class>
       <name>ExtensionCode.ExtensionCategoryClass</name>
       <customClass/>
@@ -97,13 +97,13 @@
       </name>
     </class>
     <property>
-      <description/>
+      <description>An application.</description>
     </property>
     <property>
-      <id>other</id>
+      <id>application</id>
     </property>
     <property>
-      <name>Other</name>
+      <name>Application</name>
     </property>
   </object>
 </xwikidoc>

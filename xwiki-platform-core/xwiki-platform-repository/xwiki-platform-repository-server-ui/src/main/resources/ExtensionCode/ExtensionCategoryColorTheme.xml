@@ -22,17 +22,17 @@
 
 <xwikidoc version="1.1">
   <web>ExtensionCode</web>
-  <name>ExtensionCategoryOther</name>
+  <name>ExtensionCategoryColorTheme</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1423235662000</creationDate>
+  <creationDate>1425053057000</creationDate>
   <parent>ExtensionCode.ExtensionCategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1425052286000</date>
-  <contentUpdateDate>1423235662000</contentUpdateDate>
+  <date>1425053123000</date>
+  <contentUpdateDate>1425053057000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -41,10 +41,10 @@
   <hidden>false</hidden>
   <content/>
   <object>
-    <name>ExtensionCode.ExtensionCategoryOther</name>
+    <name>ExtensionCode.ExtensionCategoryColorTheme</name>
     <number>0</number>
     <className>ExtensionCode.ExtensionCategoryClass</className>
-    <guid>91967710-5d26-4d33-bfba-a1263c31548f</guid>
+    <guid>8fb327cc-7052-4fd4-b9f4-f3a2db935f6e</guid>
     <class>
       <name>ExtensionCode.ExtensionCategoryClass</name>
       <customClass/>
@@ -97,13 +97,13 @@
       </name>
     </class>
     <property>
-      <description/>
+      <description>A color theme.</description>
     </property>
     <property>
-      <id>other</id>
+      <id>colortheme</id>
     </property>
     <property>
-      <name>Other</name>
+      <name>Color theme</name>
     </property>
   </object>
 </xwikidoc>

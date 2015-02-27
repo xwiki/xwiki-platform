@@ -23,6 +23,7 @@ com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
+com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer
@@ -63,6 +64,7 @@ com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultModelBridge
+com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer

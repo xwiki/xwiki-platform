@@ -29,6 +29,11 @@ public class StringListProperty extends ListProperty
         return getTextValue();
     }
 
+    /**
+     * This method is called by Hibernate to set the raw value read from the database. Check the xwiki.hbm.xml file.
+     *
+     * @param value the string value retrieved from the database
+     */
     public void setTextValue(String value)
     {
         setList(ListClass.getListFromString(value));

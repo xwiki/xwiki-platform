@@ -35,17 +35,12 @@ public class CreateWikiPageStepUser extends ExtendedViewPage
     {
         return createButton.isEnabled();
     }
-
-    public WikiHomePage createWithoutTemplate()
+    
+    public WikiCreationPage create()
     {
         createButton.click();
-        return new WikiHomePage();
-    }
-
-    public CreateWikiPageStepProvisioning createWithTemplate()
-    {
-        createButton.click();
-        return new CreateWikiPageStepProvisioning();
+        return new WikiCreationPage();
+        
     }
 
     public UserPicker getOwnerPicker()

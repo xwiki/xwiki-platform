@@ -52,13 +52,11 @@
       <artifactId>commons-exec</artifactId>
       <version>1.1</version>
     </dependency>
-
-    <!-- Manipulate xwiki.properrties -->
+    <!-- Manipulate xwiki.properties -->
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
     </dependency>
-
     <!-- Dependencies for the UI test framework -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -67,12 +65,12 @@
     <dependency>
       <groupId>org.jboss.arquillian.extension</groupId>
       <artifactId>arquillian-phantom-driver</artifactId>
-      <version>1.1.0.Final</version>
+      <version>1.1.3.Final</version>
       <!-- Exclude since we want to use our version of Selenium and not the one brought by arquillian-phantom-driver -->
       <exclusions>
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-server</artifactId>
+          <artifactId>selenium-java</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
@@ -80,7 +78,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <!-- Make it easy to debug flickering tests by repeating them.
          See http://tempus-fugit.googlecode.com/svn/site/documentation/annotations.html#aRepeating -->
     <dependency>
@@ -94,7 +91,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <!-- REST. TODO: Find way to not have any dependency on platform modules since this prevents using this test
          framework in those modules! -->
     <dependency>
@@ -116,7 +112,6 @@
       <artifactId>xwiki-commons-repository-model</artifactId>
       <version>${commons.version}</version>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>

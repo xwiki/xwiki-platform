@@ -20,10 +20,13 @@
 package org.xwiki.extension.script.internal.safe;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Provide a public script access to a installed extension.
@@ -36,12 +39,21 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     InstalledExtension
 {
     /**
+     * Used to resolve the reference of the user that installed the extension.
+     */
+    private final DocumentReferenceResolver<String> documentReferenceResolver;
+
+    /**
      * @param localExtension the wrapped local extension
      * @param safeProvider the provider of instances safe for public scripts
+     * @param documentReferenceResolver used to resolve the reference of the user that installed the extension
      */
-    public SafeInstalledExtension(T localExtension, ScriptSafeProvider<Object> safeProvider)
+    public SafeInstalledExtension(T localExtension, ScriptSafeProvider<Object> safeProvider,
+        DocumentReferenceResolver<String> documentReferenceResolver)
     {
         super(localExtension, safeProvider);
+
+        this.documentReferenceResolver = documentReferenceResolver;
     }
 
     // InstalledExtension
@@ -86,5 +98,35 @@ public class SafeInstalledExtension<T extends InstalledExtension> extends SafeLo
     public boolean isDependency(String namespace)
     {
         return getWrapped().isDependency(namespace);
+    }
+
+    @Override
+    public Date getInstallDate(String namespace)
+    {
+        return getWrapped().getInstallDate(namespace);
+    }
+
+    @Override
+    public Object getNamespaceProperty(String key, String namespace)
+    {
+        return safe(getWrapped().getNamespaceProperty(key, namespace));
+    }
+
+    /**
+     * @param namespace the namespace to look for
+     * @return the reference of the user that installed this extension on the given namespace
+     * @since 7.0M2
+     */
+    public DocumentReference getUserReference(String namespace)
+    {
+        DocumentReference userReference = null;
+        Object value = getNamespaceProperty("user.reference", namespace);
+        if (value instanceof DocumentReference) {
+            userReference = (DocumentReference) value;
+        } else if (value instanceof String) {
+            // The extension store doesn't know how to serialize a DocumentReference and so it saves the string value.
+            userReference = this.documentReferenceResolver.resolve((String) value);
+        }
+        return userReference;
     }
 }

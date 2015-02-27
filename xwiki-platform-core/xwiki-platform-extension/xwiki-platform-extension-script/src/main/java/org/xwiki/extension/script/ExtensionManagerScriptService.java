@@ -64,6 +64,7 @@ import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -346,6 +347,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
         installRequest.setInteractive(true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
+        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
+        if (currentUserReference != null) {
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USERREFERENCE, currentUserReference.toString());
+        }
 
         return installRequest;
     }

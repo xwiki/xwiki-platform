@@ -33,7 +33,7 @@ public class ImageConfigPane extends WizardStepElement
     public ImageConfigPane waitToLoad()
     {
         super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xImageConfig"));
+        getDriver().waitUntilElementIsVisible(By.className("xImageConfig"));
         return this;
     }
 }

@@ -154,7 +154,7 @@
       <name>platform.filter</name>
     </property>
     <property>
-      <parameters>label=Filter streams converter
+      <parameters>label=Filter Streams Converter
 target=Filter.WebHome
 icon=icon:plugin</parameters>
     </property>

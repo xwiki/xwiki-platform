@@ -48,7 +48,7 @@ public class AnnotationsWindow extends BaseElement
 
     public void enterAnnotationText(String annotationText)
     {
-        waitUntilElementIsVisible(By.className("annotation-box-create"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-box-create"));
         this.inputText.sendKeys(annotationText);
     }
 

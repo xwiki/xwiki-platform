@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.web;
 
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -31,13 +29,13 @@ import com.xpn.xwiki.util.Util;
 public class DeleteVersionsForm extends XWikiForm
 {
     /** from revision. */
-    private Version rev1;
+    private String rev1;
 
     /** to revision. */
-    private Version rev2;
+    private String rev2;
 
     /** single version. */
-    private Version rev;
+    private String rev;
 
     /** document language. */
     private String language;
@@ -49,30 +47,17 @@ public class DeleteVersionsForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        this.rev1 = getVersion(request.getParameter("rev1"));
-        this.rev2 = getVersion(request.getParameter("rev2"));
-        this.rev = getVersion(request.getParameter("rev"));
+        this.rev1 = request.getParameter("rev1");
+        this.rev2 = request.getParameter("rev2");
+        this.rev = request.getParameter("rev");
         this.language = Util.normalizeLanguage(request.getParameter("language"));
         this.confirm = request.getParameter("confirm") != null;
     }
 
     /**
-     * @return {@link Version}, or null if ver is incorrect
-     * @param ver string representation of {@link Version}
-     */
-    private Version getVersion(String ver)
-    {
-        try {
-            return new Version(ver);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
      * @return from revision
      */
-    public Version getRev1()
+    public String getRev1()
     {
         return this.rev1;
     }
@@ -80,7 +65,7 @@ public class DeleteVersionsForm extends XWikiForm
     /**
      * @return to revision
      */
-    public Version getRev2()
+    public String getRev2()
     {
         return this.rev2;
     }
@@ -88,7 +73,7 @@ public class DeleteVersionsForm extends XWikiForm
     /**
      * @return single revision
      */
-    public Version getRev()
+    public String getRev()
     {
         return this.rev;
     }

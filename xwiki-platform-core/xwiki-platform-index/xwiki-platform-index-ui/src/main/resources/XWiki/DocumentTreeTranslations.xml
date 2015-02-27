@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1424709160000</creationDate>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1424709200000</date>
+  <contentUpdateDate>1424709198000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=Document Tree
+rendering.macro.documentTree.description=Displays the tree of XWiki documents.
+rendering.macro.documentTree.parameter.readOnly.name=Read Only
+rendering.macro.documentTree.parameter.readOnly.description=Should the user be able to modify the tree structure, provided she has the necessary rights?
+rendering.macro.documentTree.parameter.showWikis.name=Show Wikis
+rendering.macro.documentTree.parameter.showWikis.description=Whether to show the wiki nodes or not. This can be used only on the main wiki and if the tree source has been saved with programming rights.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Show Wiki Pretty Name
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Show the wiki pretty name instead of the wiki id when displaying a wiki node.
+rendering.macro.documentTree.parameter.showSpaces.name=Show Spaces
+rendering.macro.documentTree.parameter.showSpaces.description=Whether to show the space nodes or not. The documents are grouped by space if the space nodes are displayed.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Show Document Title
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Whether to show the document title instead of the document name when displaying a document node.
+rendering.macro.documentTree.parameter.showTranslations.name=Show Translations
+rendering.macro.documentTree.parameter.showTranslations.description=Whether to show the document translations or not.
+rendering.macro.documentTree.parameter.showAttachments.name=Show Attachments
+rendering.macro.documentTree.parameter.showAttachments.description=Whether to show the document attachments or not.
+rendering.macro.documentTree.parameter.showObjects.name=Show Objects
+rendering.macro.documentTree.parameter.showObjects.description=Whether to show the document objects or not.
+rendering.macro.documentTree.parameter.showClassProperties.name=Show Class Properties
+rendering.macro.documentTree.parameter.showClassProperties.description=Whether to show the class properties for documents that define classes.
+rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
+rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
+rendering.macro.documentTree.parameter.root.name=Root
+rendering.macro.documentTree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.compact.name=Compact
+rendering.macro.documentTree.parameter.compact.description=If you have limited horizontal space available then you should probably set this to true. The effect is that the node icons and the edges that connect them will be hidden. Some special styles will also be applied to ensure the tree takes less horizontal space while keeping the node labels fully visible.
+rendering.macro.documentTree.parameter.links.name=Links
+rendering.macro.documentTree.parameter.links.description=Specifies whether the node labels should look and behave as links (anchors).
+rendering.macro.documentTree.parameter.checkboxes.name=Checkboxes
+rendering.macro.documentTree.parameter.checkboxes.description=Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.
+rendering.macro.documentTree.parameter.openTo.name=Open to
+rendering.macro.documentTree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also. The format of the node id is the one used for the root parameter.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Show only Viewable
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Show only the wiki, space and document nodes for which the current user has view right. If this is set to false then the wiki, space and document nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).
+rendering.macro.documentTree.parameter.filterByClass.name=Filter by Class
+rendering.macro.documentTree.parameter.filterByClass.description=Show only the documents that have an object of the specified type. The value of this parameter is the full name of an XWiki document that holds a class definition. For example, 'Blog.CategoryClass' can be used to show only the documents that represent blog categories. Leave this parameter empty if you don't want to restrict the type of documents shown in the tree.
+rendering.macro.documentTree.parameter.finder.name=Finder
+rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.</content>
+  <object>
+    <name>XWiki.DocumentTreeTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>7b0ef63b-7bc3-4950-a557-9d076eeafa54</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

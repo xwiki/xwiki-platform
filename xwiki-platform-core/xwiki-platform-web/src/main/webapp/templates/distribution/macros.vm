@@ -169,9 +169,9 @@
     ## automatically at startup when the database is empty and we don't want to take them into account).
     #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML is null or doc.xWikiClassXML not like '<%'"
       ).setWiki($wiki).addFilter('unique').addFilter('count').execute().get(0))
-    ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
-    ## notifiers) and we want to exclude them also.
-    #if ($installedExtensionCount > 0 || $documentCount > 3)
+    ## Unfortunately there are still 4 documents that are not XClasses and which are created automatically (Watchlist
+    ## notifiers and XWikiAllGroup) and we want to exclude them also.
+    #if ($installedExtensionCount > 0 || $documentCount > 4)
       ## There are documents in the database (past the default set that is automatically created), maybe from the
       ## previous version of the default distribution UI, but the UI is not marked as installed.
       #repairPreviousUI($wiki $recommendedUIExtension $documentCount)

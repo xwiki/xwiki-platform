@@ -79,8 +79,11 @@
   #set ($jsonItems = $result.getAsJsonObject('aggregations').getAsJsonObject('activeinstalls_over_time').getAsJsonArray('buckets'))
   $headingLine
   #foreach ($jsonItem in $jsonItems)
-    #set ($date = $datetool.toDate($jsonItem.getAsJsonPrimitive('key').getAsLong()))
-    |$datetool.format('yyyy-MM-dd', $date)|$jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
+    ## Don't output the last item since all the data for the day have not been gathered yet and the result is thus false for the day
+    #if ($foreach.hasNext)
+      #set ($date = $datetool.toDate($jsonItem.getAsJsonPrimitive('key').getAsLong()))
+      |$datetool.format('yyyy-MM-dd', $date)|$jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
+    #end
   #end
 #end
 {{/velocity}}</content>

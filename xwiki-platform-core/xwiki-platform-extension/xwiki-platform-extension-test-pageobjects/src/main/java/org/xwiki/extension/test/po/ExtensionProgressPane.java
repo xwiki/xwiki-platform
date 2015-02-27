@@ -63,7 +63,7 @@ public class ExtensionProgressPane extends BaseElement
     public WebElement getJobLogLabel()
     {
         String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/label";
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath));
+        return getDriver().findElementWithoutWaiting(container, By.xpath(xpath));
     }
 
     /**
@@ -72,8 +72,7 @@ public class ExtensionProgressPane extends BaseElement
     public List<LogItemPane> getJobLog()
     {
         List<LogItemPane> log = new ArrayList<LogItemPane>();
-        for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(), container,
-            By.className("log-item"))) {
+        for (WebElement element : getDriver().findElementsWithoutWaiting(container, By.className("log-item"))) {
             log.add(new LogItemPane(element));
         }
         return log;
@@ -84,7 +83,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public MergeConflictPane getMergeConflict()
     {
-        if (getUtil().findElementsWithoutWaiting(getDriver(), container, By.name("versionToKeep")).size() > 0) {
+        if (getDriver().findElementsWithoutWaiting(container, By.name("versionToKeep")).size() > 0) {
             return new MergeConflictPane();
         }
         return null;
@@ -95,7 +94,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public UnusedPagesPane getUnusedPages()
     {
-        return new UnusedPagesPane(getUtil().findElementWithoutWaiting(getDriver(), container,
+        return new UnusedPagesPane(getDriver().findElementWithoutWaiting(container,
             By.className("extension-question")));
     }
 }

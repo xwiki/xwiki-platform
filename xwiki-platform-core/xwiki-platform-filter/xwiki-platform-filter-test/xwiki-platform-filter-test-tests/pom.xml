@@ -47,7 +47,6 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
-      <type>jar</type>
     </dependency>
     
     <!-- Add Panel deps which is optional in xwiki-platform-filter-ui in order to test registration in the App panel -->
@@ -62,6 +61,7 @@
       <artifactId>xwiki-platform-icon-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -98,12 +98,6 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-filter-test</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-filter-stream-xml</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

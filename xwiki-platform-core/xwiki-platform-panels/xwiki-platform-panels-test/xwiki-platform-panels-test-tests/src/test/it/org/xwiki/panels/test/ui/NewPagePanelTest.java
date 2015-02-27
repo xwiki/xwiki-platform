@@ -38,8 +38,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 public class NewPagePanelTest extends AbstractTest
 {
     @Rule
-    public AuthenticationRule authenticationRule =
-        new AuthenticationRule("TestUser", "TestPassword", getUtil(), getDriver());
+    public AuthenticationRule authenticationRule = new AuthenticationRule("TestUser", "TestPassword", getUtil());
 
     /**
      * Tests if a new page can be created using the create page panel.

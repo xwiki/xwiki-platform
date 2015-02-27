@@ -423,7 +423,7 @@
 /**
  * Enhances the behaviour of an extension.
  */
-XWiki.ProvisioningBar = Class.create({
+XWiki.WikiCreationStatusBar = Class.create({
   initialize : function () {
     // We run the progress bar only if the &lt;div id="ui-progress"&gt; exists
     if ($('ui-progress')) {
@@ -432,7 +432,7 @@ XWiki.ProvisioningBar = Class.create({
   },
   _callRefresh : function () {
     // Document URL
-    var document = new XWiki.Document('WikiTemplateProvisioningService', 'WikiManager');
+    var document = new XWiki.Document('WikiCreationJobStatusService', 'WikiManager');
     var url = document.getURL('get', 'outputSyntax=plain');
     new Ajax.Request(url, {
       method: 'get',
@@ -463,16 +463,20 @@ XWiki.ProvisioningBar = Class.create({
           progress = 0;
         else if (progress &gt; 1)
           progress = 1;
-        $('template-progress-bar').setStyle({width: (progress*100)+'%'});
+        $('wikicreation-progress-bar').setStyle({width: (progress*100)+'%'});
       }
       this._callRefresh.bind(this).delay(1);
-   }
+    }
+    // Display logs
+    var creationLogContainer = $('creation-log');
+    creationLogContainer.innerHTML = status.logs;
+    creationLogContainer.firstDescendant().scrollTop=$$('.log-item-loading')[0].offsetTop;
   }
 });
 
 var init = function(event) {
-  if ($('wikiId')) {
-    new XWiki.ProvisioningBar();
+  if ($('progressBar')) {
+    new XWiki.WikiCreationStatusBar();
   }
   return true;
 };
@@ -757,8 +761,8 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
-## If all dependancies are OK, we call the controller
-#if ($services.wiki)
+## If all dependencies are OK, we call the controller
+#if ($services.wiki &amp;&amp; $services.wiki.creationjob)
   #controller()
 #else
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
@@ -772,11 +776,10 @@ return XWiki;
     #stepMembers()
   #elseif($request.step == 'create')
     #create()
-  #elseif($request.step == 'finalize')
-    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
-    #setMembers($wikiDescriptor)
   #elseif($request.step == 'cleanUp')
     #cleanUp()
+  #elseif($request.step == 'finalize')
+    #finalize()
   #else
     ## Default step
     #stepType()
@@ -829,7 +832,7 @@ return XWiki;
     #end
     #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="finalize" title="$services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize')" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize')&lt;/button&gt;
+        &lt;button value="finalize" title="$services.localization.render('platform.wiki.create.wizard.step.creation.go')" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.creation.go')&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!cleanUp" != '')
@@ -954,7 +957,7 @@ return XWiki;
             &lt;/dl&gt;
             &lt;p class="xformInline"&gt;
               #set ($isTemplate = '')
-              #if ($request.set_as_template == '1')
+              #if ("$!request.set_as_template" != '')
                 #set ($isTemplate = 'checked="checked"')
               #end
               &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
@@ -1102,11 +1105,6 @@ return XWiki;
       ### END OF WIZARD BODY
       &lt;/div&gt;
       &lt;div class="clearfloats"&gt;&lt;/div&gt;
-      #if ("$!request.template" == '' || $request.template == 'xwikinotemplate')
-        &lt;div class="box infomessage whatnext"&gt;
-          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.dw')&lt;/p&gt;
-        &lt;/div&gt;
-      #end
       #wizardFooter('type', '', 'create')
     &lt;/form&gt;
   {{/html}}
@@ -1133,63 +1131,62 @@ return XWiki;
 ## The final step that eventually create the wiki
 ##################################
 #macro(create)
-  #if ($services.csrf.isTokenValid($request.form_token))
-    #set($wikialias = $request.wikialias)
-    #if("$!wikialias" == '')
-      #set($wikialias = $request.wikiname)
-    #end
-    #set($fromTemplate = false)
-    #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
-      ## check if the wiki is already in creation
-      #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
-      #if(!$services.wiki.exists($request.wikiname))
-        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $request.ownerId, true))
-      #end
-      #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
-      #set($fromTemplate = true)
-    #else
-      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $wikialias, $request.ownerId, true))
-    #end
-    #if (!$wikiDescriptor)
-
-      {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
-
-    #else
-      ## Set the pretty name
-      #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
-      #set ($discard = $wikiDescriptor.setDescription($request.description))
-      #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
-      ## Set the template value
-      #if("$!request.set_as_template" != '')
-        #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
-      #end
-      #if($fromTemplate)
-        #templateProvisioning($wikiDescriptor)
-      #else
-        #setMembers($wikiDescriptor)
-      #end
-    #end
-  #else
+  ## CSRF checkFailed to execute the [velocity] macro. Click on this m
+  #if (!$services.csrf.isTokenValid($request.form_token))
 
     {{warning}}
       {{translation key="platform.wiki.csrf.error" /}}
     {{/warning}}
     
     #stepMembers()
+  #elseif("$!services.wiki.creationjob.getJobStatus($request.wikiname)" != '')
+    #creation()
+  #else
+    #createWiki()
   #end
 #end
 ##################################
-##        SET MEMBERS
+##         CREATE WIKI
 ##
-## This macro set the members of the wiki
+## The macro that finaly starts the wiki creation job
 ##################################
-#macro(setMembers $wikiDescriptor)
-  ## Set the membership type and the local users
-  #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
+#macro(createWiki)
+  #set($wikialias = $request.wikialias)
+  #if("$!wikialias" == '')
+    #set($wikialias = $request.wikiname)
+  #end
+  #set($wikiCreationRequest = $services.wiki.creationjob.newWikiCreationRequest())
+  #set($discard = $wikiCreationRequest.setWikiId($request.wikiname))
+  #set($discard = $wikiCreationRequest.setAlias($wikialias))
+  #set($discard = $wikiCreationRequest.setPrettyName($request.wikiprettyname))
+  #set($discard = $wikiCreationRequest.setDescription($request.description))
+  #if("$!request.set_as_template" != '')
+    #set($discard = $wikiCreationRequest.setTemplate(true))
+  #else
+    #set($discard = $wikiCreationRequest.setTemplate(false))
+  #end
+  #set($ownerId = $request.ownerId)
+  #if("$!ownerId" == '')
+    ## If the ownerId is null, then set the current user
+    #set($ownerId = $services.model.serialize($xcontext.userReference, 'default'))
+  #else 
+    #set($ownerId = $services.model.serialize($services.model.resolveDocument($ownerId), 'default'))
+  #end
+  #set($discard = $wikiCreationRequest.setOwnerId($ownerId))
+  #set($discard = $wikiCreationRequest.setUserScope($request.userScope))
+  #set($discard = $wikiCreationRequest.setMembershipType($request.membershipType))
+  #set($discard = $wikiCreationRequest.setFailOnExist(true))
+  #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+    ## Create a wiki from a template
+    #set($discard = $wikiCreationRequest.setWikiSource('template'))
+    #set($discard = $wikiCreationRequest.setTemplateId($request.template))
+  #else
+    ## Create a wiki from an extension
+    #set($discard = $wikiCreationRequest.setWikiSource('extension'))
+    #set($discard = $wikiCreationRequest.setExtensionId($services.wiki.creationjob.defaultWikiExtensionId))
+  #end
+  ## Members
   #if ($request.userScope != 'local_only')
-    #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
-    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")
-    ## Save the members
     #set ($members = [])
     #getRequestList($members 'members')
     ## Remove empty strings from the list of members (the user picker submits by default an empty string).
@@ -1198,17 +1195,21 @@ return XWiki;
       #set ($globalMembers = [])
       ## Enforce global users
       #foreach ($member in $members)
-        #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
-          #set ($member = "${services.wiki.mainWikiId}:${member}")
-        #end
-        #set ($discard = $globalMembers.add("${member}"))
+        #set($discard = $globalMembers.add($services.model.serialize($services.model.resolveDocument($member), 'default')))
       #end
       ## Add the members
-      #set ($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
+      #set ($discard = $wikiCreationRequest.setMembers($globalMembers))
     #end
   #end
-  ## Redirect to the new wiki's homepage.
-  #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference)))
+  ## Start the creation job
+  #set($job = $services.wiki.creationjob.createWiki($wikiCreationRequest))
+  #if (!$job)
+
+    {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.creationjob.lastError]){{/error}}
+    
+  #else
+    #creation()
+  #end
 #end
 ##################################
 ##  ADD MEMBERS AS HIDDEN INPUT
@@ -1225,52 +1226,59 @@ return XWiki;
   #end
 #end
 ##################################
-##     TEMPLATE PROVISIONING
+##          CREATION
 ##
 ## This step display a progess bar during
-## the wiki provisioning
+## the wiki creation
 ##################################
-#macro(templateProvisioning $wikiDescriptor)
+#macro(creation)
   #set ($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-  #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
-  #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
+  #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
   #set ($errors = $status.log.getLogs('ERROR'))
   #set ($hasError = ($errors.size() &gt; 0))
   
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-    #addMembersAsHiddenInput()
-    &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
-    &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
-    &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
+    &lt;input type="hidden" id="progressBar" value="true" /&gt;
+    &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
     &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-    #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.provisioning'))
+    #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.creation'))
     &lt;div class="wizard-body"&gt;
-      #if ($status.state == "RUNNING")
+      #if ($status.state == 'RUNNING')
       &lt;div class="ui-progress" id="ui-progress"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.provisioning.wait')
+        $services.localization.render('platform.wiki.create.wizard.step.creation.wait')
         &lt;div class="ui-progress-background"&gt;
-          #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
-          #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
           #set ($percent = $status.progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
           #if (!$percent)
             #set ($percent = 0)
           #end
           #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
-          &lt;div class="ui-progress-bar green" style="width:${percent}%" id="template-progress-bar"&gt;&lt;/div&gt;
+          &lt;div class="ui-progress-bar green" style="width:${percent}%" id="wikicreation-progress-bar"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
       #end
       &lt;p class="successmessage box #if($hasError || $status.state == 'RUNNING')hidden#end" id="successMessage"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
+        $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
       &lt;p class="errormessage box #if(!$hasError || $status.state == 'RUNNING')hidden#end" id="errorMessage"&gt;
-        #set($wikiURL = $xwiki.getURL($wikiDescriptor.mainPageReference))
-        $services.localization.render('platform.wiki.create.wizard.step.provisioning.error', ["&lt;a href='$wikiURL'&gt;$!escapetool.xml($wikiDescriptor.id)&lt;/a&gt;"])
+        $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;
-    #if($status.state == "FINISHED")
+    ## Log
+    #template('logging_macros.vm')
+    #template('extension.vm')
+    ## Hack to be able to use macros from extension.vm that are supposed to be used inside Extension Manager
+    #set($olddoc = $doc)
+    #set($doc = $xwiki.getDocument('XWiki.AddExtensions'))
+    #set($loading = $status.state != 'FINISHED')
+    &lt;div id="creation-log"&gt;
+      #printLogs($status.log, $loading)
+    &lt;/div&gt;
+    #set($doc = $olddoc)
+    #if($status.state == 'FINISHED')
       #set($finalizeHidden = $hasError)
       #set($cleanUpHidden = !$hasError)
     #else
@@ -1281,6 +1289,15 @@ return XWiki;
     &lt;/form&gt;
   {{/html}}
 
+#end
+##################################
+##           FINALIZE
+##
+## Just go the the created wiki
+##################################
+#macro(finalize)
+  #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
+  $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference))
 #end
 ##################################
 ##           CLEAN UP
@@ -1331,6 +1348,45 @@ return XWiki;
     {{/html}}
 
   #end
+#end
+#macro (getExtensionURL $extensionId $extensionVersion $extraParams)
+#set ($parameters = {})
+##
+#if ($extraParams)
+  #set ($discard = $parameters.putAll($extraParams))
+#end
+##
+#if ($extensionId)
+#set ($discard = $parameters.put('extensionId', $extensionId))
+#elseif ($request.extensionId)
+#set ($discard = $parameters.put('extensionId', $request.extensionId))
+#end
+##
+#if ($extensionVersion)
+#set ($discard = $parameters.put('extensionVersion', $extensionVersion))
+#elseif ($request.extensionVersion)
+#set ($discard = $parameters.put('extensionVersion', $request.extensionVersion))
+#end
+##
+#if ($request.extensionNamespace)
+#set ($discard = $parameters.put('extensionNamespace', $request.extensionNamespace))
+#end
+##
+#if ($xback)
+#set ($discard = $parameters.put('xback', $xback))
+#elseif ($request.xback)
+#set ($discard = $parameters.put('xback', $request.xback))
+#end
+##
+#if ($request.section)
+#set ($discard = $parameters.put('section', $request.section))
+#end
+##
+#set ($queryString = '')
+#foreach ($entry in $parameters.entrySet())
+#set ($queryString = "$queryString&amp;$escapetool.url($entry.key)=$escapetool.url($entry.value)")
+#end
+$xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section=XWiki.AddExtensions&amp;${queryString.substring(1)}")##
 #end
 {{/velocity}}
 </content>

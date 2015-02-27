@@ -38,8 +38,9 @@ public class ExtensionPage extends ViewPage
      */
     public boolean isValidExtension()
     {
-        for (WebElement message : getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//div[@class='box successmessage']"))) {
+        for (WebElement message : getDriver().findElementsWithoutWaiting(
+            By.xpath("//div[@class='box successmessage']")))
+        {
             if (message.getText().contains("Installable with the Extension Manager")) {
                 return true;
             }

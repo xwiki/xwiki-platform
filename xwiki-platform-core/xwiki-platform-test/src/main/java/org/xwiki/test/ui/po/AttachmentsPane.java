@@ -96,10 +96,11 @@ public class AttachmentsPane extends BaseElement
             By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
                 + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        waitUntilElementDisappears(By
+        getDriver().waitUntilElementDisappears(By
             .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
-        waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
+        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='"
+            + attachmentName + "']"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
     }
 
     /**
@@ -114,9 +115,9 @@ public class AttachmentsPane extends BaseElement
             .click();
 
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        waitUntilElementDisappears(By
+        getDriver().waitUntilElementDisappears(By
             .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp
+        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp
             + "']/../../span[2]/a[@class='deletelink']"));
     }
 

@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.ui;
 
-import org.openqa.selenium.WebDriver;
-
 /**
  * Authenticates the Admin user in the wiki before the test starts.
  *
@@ -29,8 +27,8 @@ import org.openqa.selenium.WebDriver;
  */
 public class AdminAuthenticationRule extends AuthenticationRule
 {
-    public AdminAuthenticationRule(TestUtils testUtils, WebDriver driver)
+    public AdminAuthenticationRule(TestUtils util)
     {
-        super("Admin", "admin", testUtils, driver);
+        super("Admin", "admin", util);
     }
 }

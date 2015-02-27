@@ -53,7 +53,7 @@ public class UploadImagePane extends WizardStepElement
     public UploadImagePane waitToLoad()
     {
         super.waitToLoad();
-        waitUntilElementIsVisible(By.className("xUploadPanel"));
+        getDriver().waitUntilElementIsVisible(By.className("xUploadPanel"));
         return this;
     }
 

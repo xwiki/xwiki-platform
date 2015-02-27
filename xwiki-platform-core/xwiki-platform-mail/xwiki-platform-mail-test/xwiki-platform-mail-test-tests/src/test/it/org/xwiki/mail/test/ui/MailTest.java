@@ -53,7 +53,7 @@ import static org.junit.Assert.*;
 public class MailTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private GreenMail mail;
 
@@ -109,7 +109,7 @@ public class MailTest extends AbstractTest
 
         // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
         // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        getDriver().waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
         // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 

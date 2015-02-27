@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.internal.manager;
+package org.xwiki.wiki.internal.provisioning;
 
 import java.util.List;
 
@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.PopLevelProgressEvent;
 import org.xwiki.job.event.status.PushLevelProgressEvent;
@@ -38,6 +39,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiCopier;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,7 +48,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Default implementation for {@link WikiCopier}.
  * @version $Id$
- * @since 5.3M2
+ * @since 7.0M2
  */
 @Component
 @Singleton
@@ -64,6 +66,9 @@ public class DefaultWikiCopier implements WikiCopier
 
     @Inject
     private ObservationManager observationManager;
+    
+    @Inject
+    private Logger logger;
 
     @Override
     public void copyDocuments(String fromWikiId, String toWikiId, boolean withHistory) throws WikiManagerException
@@ -84,16 +89,24 @@ public class DefaultWikiCopier implements WikiCopier
                         fromWikiReference);
                 DocumentReference newDocReference = new DocumentReference(toWikiId,
                         origDocReference.getLastSpaceReference().getName(), origDocReference.getName());
+                
+                logger.info("Copying document [{}] to [{}].", origDocReference, newDocReference);
                 xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
-
+                logger.info("Done copying document [{}] to [{}].", origDocReference, newDocReference);
+                
                 observationManager.notify(new StepProgressEvent(), this);
             }
 
             observationManager.notify(new PopLevelProgressEvent(), this);
         } catch (QueryException e) {
-            throw new WikiManagerException("Unable to get the source wiki documents.", e);
+            WikiManagerException thrownException = 
+                new WikiManagerException("Unable to get the list of wiki documents to copy.", e);
+            logger.error(thrownException.getMessage(), thrownException);
+            throw thrownException;
         } catch (XWikiException e) {
-            throw new WikiManagerException("Failed to copy document.", e);
+            WikiManagerException thrownException = new WikiManagerException("Failed to copy documents.", e);
+            logger.error(thrownException.getMessage(), thrownException);
+            throw thrownException;
         }
 
     }

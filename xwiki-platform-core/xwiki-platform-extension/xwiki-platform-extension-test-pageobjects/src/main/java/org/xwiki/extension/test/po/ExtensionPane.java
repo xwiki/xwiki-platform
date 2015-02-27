@@ -79,7 +79,7 @@ public class ExtensionPane extends BaseElement
     public String getStatusMessage()
     {
         By xpath = By.xpath("*[@class = 'extension-header']//*[@class = 'extension-status']");
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, xpath);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, xpath);
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 
@@ -97,7 +97,7 @@ public class ExtensionPane extends BaseElement
     public String getName()
     {
         By xpath = By.xpath("*[@class = 'extension-header']//*[@class = 'extension-name']");
-        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath).getText();
+        return getDriver().findElementWithoutWaiting(container, xpath).getText();
     }
 
     /**
@@ -106,7 +106,7 @@ public class ExtensionPane extends BaseElement
     public String getVersion()
     {
         By xpath = By.xpath("*[@class = 'extension-header']//*[@class = 'extension-version']");
-        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath).getText();
+        return getDriver().findElementWithoutWaiting(container, xpath).getText();
     }
 
     /**
@@ -114,7 +114,7 @@ public class ExtensionPane extends BaseElement
      */
     public List<WebElement> getAuthors()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-author"));
+        return getDriver().findElementsWithoutWaiting(container, By.className("extension-author"));
     }
 
     /**
@@ -122,8 +122,7 @@ public class ExtensionPane extends BaseElement
      */
     public String getSummary()
     {
-        List<WebElement> found =
-            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-summary"));
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, By.className("extension-summary"));
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 
@@ -164,9 +163,9 @@ public class ExtensionPane extends BaseElement
     {
         String xpath = getXPath();
         button.click();
-        waitUntilElementIsVisible(By.xpath(xpath + xpathSuffix));
+        getDriver().waitUntilElementIsVisible(By.xpath(xpath + xpathSuffix));
         // We have to create a new extension pane because the DOM has changed.
-        return new ExtensionPane(getUtil().findElementWithoutWaiting(getDriver(), By.xpath(xpath)));
+        return new ExtensionPane(getDriver().findElementWithoutWaiting(By.xpath(xpath)));
     }
 
     /**
@@ -175,7 +174,7 @@ public class ExtensionPane extends BaseElement
     private String getXPath()
     {
         String nameAndVersion =
-            getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-title")).getText();
+            getDriver().findElementWithoutWaiting(container, By.className("extension-title")).getText();
         return String.format("//form[contains(@class, 'extension-item') and descendant::*["
             + "contains(@class, 'extension-title') and normalize-space(.) = '%s']]", nameAndVersion);
     }
@@ -239,7 +238,7 @@ public class ExtensionPane extends BaseElement
      */
     private WebElement maybeFindElement(By locator)
     {
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, locator);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, locator);
         return found.size() > 0 ? found.get(0) : null;
     }
 
@@ -251,7 +250,7 @@ public class ExtensionPane extends BaseElement
     private ExtensionPane maybeOpenActionDropDownMenu()
     {
         String xpath = ".//*[@class = 'extension-actions']//*[@class = 'dropdown-toggle']";
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, By.xpath(xpath));
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, By.xpath(xpath));
         if (found.size() > 0) {
             found.get(0).click();
         }
@@ -339,7 +338,7 @@ public class ExtensionPane extends BaseElement
     private WebElement clickTab(String label)
     {
         By tabXPath = By.xpath(".//*[@class = 'innerMenu']//a[normalize-space(.) = '" + label + "']");
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, tabXPath);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, tabXPath);
         if (found.size() == 0) {
             return null;
         }
@@ -348,7 +347,7 @@ public class ExtensionPane extends BaseElement
         By sectionXPath =
             By.xpath(".//div[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
                 + sectionAnchor + "']]");
-        return getUtil().findElementWithoutWaiting(getDriver(), container, sectionXPath);
+        return getDriver().findElementWithoutWaiting(container, sectionXPath);
     }
 
     /**
@@ -389,8 +388,7 @@ public class ExtensionPane extends BaseElement
      */
     public ProgressBarPane getProgressBar()
     {
-        List<WebElement> found =
-            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("ui-progress"));
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, By.className("ui-progress"));
         return found.size() != 1 ? null : new ProgressBarPane(found.get(0));
     }
 }

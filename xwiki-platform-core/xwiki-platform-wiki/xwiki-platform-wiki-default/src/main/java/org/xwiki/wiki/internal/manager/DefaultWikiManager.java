@@ -36,6 +36,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiCopier;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -78,7 +79,8 @@ public class DefaultWikiManager implements WikiManager
     {
         // Check that the wiki Id is available
         if (failOnExist && !idAvailable(wikiId)) {
-            throw new WikiManagerException("wiki id is not valid");
+            throw new WikiManagerException(String.format("wiki id [%s] is already used and is thus not available",
+                wikiId));
         }
 
         XWikiContext context = xcontextProvider.get();

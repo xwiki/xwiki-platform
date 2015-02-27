@@ -50,7 +50,8 @@ public class LiveTableElement extends BaseElement
      */
     public boolean isReady()
     {
-        Object result = executeJavascript("return Element.hasClassName('" + livetableId + "-ajax-loader','hidden')");
+        Object result = getDriver().executeJavascript("return Element.hasClassName('"
+            + livetableId + "-ajax-loader','hidden')");
         return result instanceof Boolean ? (Boolean) result : false;
     }
 
@@ -61,12 +62,12 @@ public class LiveTableElement extends BaseElement
     public void waitUntilReady()
     {
         long t1 = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - t1 < getUtil().getTimeout() * 1000L)) {
+        while ((System.currentTimeMillis() - t1 < getDriver().getTimeout() * 1000L)) {
             if (isReady()) {
                 return;
             }
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 // Do nothing just break out
                 break;
@@ -77,18 +78,16 @@ public class LiveTableElement extends BaseElement
 
     public boolean hasColumn(String columnTitle)
     {
-        List<WebElement> elements =
-            getUtil().findElementsWithoutWaiting(
-                getDriver(),
-                By.xpath("//th[contains(@class, 'xwiki-livetable-display-header-text') and normalize-space(.) = '"
-                    + columnTitle + "']"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(
+            By.xpath("//th[contains(@class, 'xwiki-livetable-display-header-text') and normalize-space(.) = '"
+                + columnTitle + "']"));
         return elements.size() > 0;
     }
 
     public void filterColumn(String inputId, String filterValue)
     {
         // Make extra sure Selenium can't go quicker than the live table status by forcing it before filtering.
-        executeJavascript("return $('" + livetableId + "-ajax-loader').removeClassName('hidden')");
+        getDriver().executeJavascript("return $('" + livetableId + "-ajax-loader').removeClassName('hidden')");
 
         WebElement element = getDriver().findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
@@ -149,9 +148,9 @@ public class LiveTableElement extends BaseElement
      */
     public int getRowCount()
     {
-        WebElement liveTableBody = getUtil().findElementWithoutWaiting(getDriver(), By.id(livetableId + "-display"));
+        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(livetableId + "-display"));
         // We use XPath because we're interested only in the direct children.
-        return getUtil().findElementsWithoutWaiting(getDriver(), liveTableBody, By.xpath("tr")).size();
+        return getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath("tr")).size();
     }
 
     /**
@@ -159,8 +158,8 @@ public class LiveTableElement extends BaseElement
      */
     public WebElement getRow(int rowNumber)
     {
-        WebElement liveTableBody = getUtil().findElementWithoutWaiting(getDriver(), By.id(livetableId + "-display"));
-        return getUtil().findElementWithoutWaiting(getDriver(), liveTableBody, By.xpath("tr[" + rowNumber + "]"));
+        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(livetableId + "-display"));
+        return getDriver().findElementWithoutWaiting(liveTableBody, By.xpath("tr[" + rowNumber + "]"));
     }
 
     /**
@@ -168,7 +167,7 @@ public class LiveTableElement extends BaseElement
      */
     public WebElement getCell(WebElement rowElement, int columnNumber)
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), rowElement, By.xpath("td[" + columnNumber + "]"));
+        return getDriver().findElementWithoutWaiting(rowElement, By.xpath("td[" + columnNumber + "]"));
     }
 
     /**
@@ -190,7 +189,7 @@ public class LiveTableElement extends BaseElement
     public void waitUntilRowCountGreaterThan(final int minimalExpectedRowCount)
     {
         final By by = By.xpath("//tbody[@id = '" + this.livetableId + "-display']//tr");
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)

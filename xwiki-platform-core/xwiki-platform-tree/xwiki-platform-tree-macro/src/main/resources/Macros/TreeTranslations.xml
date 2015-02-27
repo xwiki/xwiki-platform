@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1424704114000</creationDate>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1424704928000</date>
+  <contentUpdateDate>1424704928000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=Tree
+rendering.macro.tree.description=Displays a tree hierarchy defined by the macro content or the source parameter.
+rendering.macro.tree.parameter.reference.name=Reference
+rendering.macro.tree.parameter.reference.description=The reference to the resource that describes the tree structure and its context menu and which is called to perform the actions on the tree nodes. This resource is used to load the tree dynamically (on demand) when a tree node is opened and to ask for the context menu when the user right-clicks on a tree node that has it. So the resource is not static. For static trees you should use the macro content instead. The reference can be a document reference or an URL/path.
+rendering.macro.tree.parameter.root.name=Root
+rendering.macro.tree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.
+rendering.macro.tree.parameter.dragAndDrop.name=Drag and Drop
+rendering.macro.tree.parameter.dragAndDrop.description=Specifies if the user should be able to drag &amp; drop tree nodes.
+rendering.macro.tree.parameter.contextMenu.name=Context Menu
+rendering.macro.tree.parameter.contextMenu.description=Whether to show the context menu when the user right-clicks a tree node.
+rendering.macro.tree.parameter.class.name=Class
+rendering.macro.tree.parameter.class.description=Additional CSS classes to add to the top level HTML element of the tree.
+rendering.macro.tree.parameter.icons.name=Icons
+rendering.macro.tree.parameter.icons.description=Whether to show the tree node icons or not. You may want to hide the icons if all the tree nodes are of the same type or if you want to win some horizontal space.
+rendering.macro.tree.parameter.edges.name=Edges
+rendering.macro.tree.parameter.edges.description=Whether to show the edges that connect the sibling tree nodes between themselves and with their parent.
+rendering.macro.tree.parameter.links.name=Links
+rendering.macro.tree.parameter.links.description=Specifies whether the node labels should look and behave as links (anchors).
+rendering.macro.tree.parameter.checkboxes.name=Checkboxes
+rendering.macro.tree.parameter.checkboxes.description=Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.
+rendering.macro.tree.parameter.openTo.name=Open to
+rendering.macro.tree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also.
+rendering.macro.tree.parameter.finder.name=Finder
+rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
+rendering.macro.tree.content.description=You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.</content>
+  <object>
+    <name>Macros.TreeTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>e6852cbd-9a31-42cd-b4a9-6cb3ddd120af</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
+</xwikidoc>

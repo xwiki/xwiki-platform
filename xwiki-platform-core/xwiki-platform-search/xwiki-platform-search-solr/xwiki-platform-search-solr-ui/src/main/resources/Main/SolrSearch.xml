@@ -142,8 +142,14 @@
       #extendQueryString($url $resetParameters)
       [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
     )))
+    ## We need to remove duplicates from the list of facets. This is a temporary fix for SOLR-6780. It won't be needed
+    ## after we upgrade to Solr 4.10.4. See XWIKI-11757: SOLR facets are displayed twice on the search result page
+    #set ($facetNames = $collectionstool.set)
     #foreach ($facetField in $searchResponse.facetFields)
-      #displaySearchFacet($facetField)
+      #if (!$facetNames.contains($facetField.name))
+        #set ($discard = $facetNames.add($facetField.name))
+        #displaySearchFacet($facetField)
+      #end
     #end
   )))
 #end

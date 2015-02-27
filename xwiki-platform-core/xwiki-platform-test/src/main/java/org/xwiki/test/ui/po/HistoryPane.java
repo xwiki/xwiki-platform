@@ -62,43 +62,32 @@ public class HistoryPane extends BaseElement
 
     public String getCurrentVersion()
     {
-        try {
-            // Try to find a radio button. This will mean there are several revisions in the table
-            // and we'll find the version written down in the 3rd column
-            pane.findElement(By.xpath(".//tr[2]/td/input"));
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[3]/a")).getText();
-        } catch (NoSuchElementException e) {
-            // If we cound not find the radio button, there is less columns displayed and the version will be
-            // in the first column
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[1]/a")).getText();
-        }
+        return getCurrentItemInTable("td[3]/a", "td[1]/a");
     }
 
     public String getCurrentVersionComment()
     {
-        try {
-            // Try to find a radio button. This will mean there are several revisions in the table
-            // and we'll find the version comment written down in the 6th column
-            pane.findElement(By.xpath(".//tr[2]/td/input"));
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[6]")).getText();
-        } catch (NoSuchElementException e) {
-            // If we cound not find the radio button, there is less columns displayed and the version comment will be
-            // in the 4th column
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[4]")).getText();
-        }
+        return getCurrentItemInTable("td[6]", "td[4]");
     }
 
     public String getCurrentAuthor()
     {
+        return getCurrentItemInTable("td[4]", "td[2]");
+    }
+
+    private String getCurrentItemInTable(String xpathFragment1, String xpathFragment2)
+    {
         try {
             // Try to find a radio button. This will mean there are several revisions in the table
-            // and we'll find the author written down in the 4th column
-            pane.findElement(By.xpath(".//tr[2]/td/input"));
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[4]")).getText();
+            // and we'll find the version written down in the 3rd column
+            getDriver().findElementWithoutWaiting(this.pane, By.xpath(".//tr[2]/td/input"));
+            return getDriver().findElementWithoutWaiting(this.pane,
+                By.xpath(".//*[contains(@class, 'currentversion')]/" + xpathFragment1)).getText();
         } catch (NoSuchElementException e) {
-            // If we cound not find the radio button, there is less columns displayed and the version will be
-            // in the second column
-            return pane.findElement(By.xpath(".//*[contains(@class, 'currentversion')]/td[2]")).getText();
+            // If we couldn't find the radio button, there is less columns displayed and the version will be
+            // in the first column
+            return getDriver().findElementWithoutWaiting(this.pane,
+                By.xpath(".//*[contains(@class, 'currentversion')]/" + xpathFragment2)).getText();
         }
     }
 
@@ -108,7 +97,7 @@ public class HistoryPane extends BaseElement
      */
     public ViewPage rollbackToVersion(String version)
     {
-        makeConfirmDialogSilent(true);
+        getDriver().makeConfirmDialogSilent(true);
 
         pane.findElement(
             By.xpath(".//table//tr[contains(., '" + version
@@ -124,7 +113,7 @@ public class HistoryPane extends BaseElement
 
     public HistoryPane deleteVersion(String version)
     {
-        makeConfirmDialogSilent(true);
+        getDriver().makeConfirmDialogSilent(true);
 
         pane.findElement(
             By.xpath(".//table//tr[contains(., '" + version
@@ -140,7 +129,7 @@ public class HistoryPane extends BaseElement
      */
     public HistoryPane showMinorEdits()
     {
-        getUtil().findElementWithoutWaiting(getDriver(), pane, By.name("viewminorversions")).click();
+        getDriver().findElementWithoutWaiting(pane, By.name("viewminorversions")).click();
         return new HistoryPane();
     }
 
@@ -154,11 +143,9 @@ public class HistoryPane extends BaseElement
     public ComparePage compare(String fromVersion, String toVersion)
     {
         String versionXPath = ".//input[@name = 'rev%s' and @value = '%s']";
-        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(String.format(versionXPath, 1, fromVersion)))
-            .click();
-        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(String.format(versionXPath, 2, toVersion)))
-            .click();
-        getUtil().findElementWithoutWaiting(getDriver(), pane, By.xpath(".//input[@accesskey = 'c']")).click();
+        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 1, fromVersion))).click();
+        getDriver().findElementWithoutWaiting(pane, By.xpath(String.format(versionXPath, 2, toVersion))).click();
+        getDriver().findElementWithoutWaiting(pane, By.xpath(".//input[@accesskey = 'c']")).click();
         return new ComparePage();
     }
 }

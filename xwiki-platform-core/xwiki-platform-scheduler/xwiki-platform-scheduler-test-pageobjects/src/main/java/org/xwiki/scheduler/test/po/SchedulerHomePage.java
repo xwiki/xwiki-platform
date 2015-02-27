@@ -123,7 +123,7 @@ public class SchedulerHomePage extends ViewPage
      */
     public boolean hasError()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//div[contains(@class, 'errormessage')]")).size() > 0;
     }
 
@@ -133,7 +133,7 @@ public class SchedulerHomePage extends ViewPage
      */
     public String getErrorMessage()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(),
+        return getDriver().findElementWithoutWaiting(
             By.xpath("//div[contains(@class, 'errormessage')]")).getText();
     }
 }

@@ -65,7 +65,7 @@ public class ExtensionDescriptionPane extends BaseElement
     public WebElement getWebSite()
     {
         By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH + "//a", "Website"));
-        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath);
+        return getDriver().findElementWithoutWaiting(container, xpath);
     }
 
     /**
@@ -91,6 +91,6 @@ public class ExtensionDescriptionPane extends BaseElement
     private String getMetaData(String label)
     {
         By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH, label));
-        return getUtil().findElementWithoutWaiting(getDriver(), container, xpath).getText();
+        return getDriver().findElementWithoutWaiting(container, xpath).getText();
     }
 }

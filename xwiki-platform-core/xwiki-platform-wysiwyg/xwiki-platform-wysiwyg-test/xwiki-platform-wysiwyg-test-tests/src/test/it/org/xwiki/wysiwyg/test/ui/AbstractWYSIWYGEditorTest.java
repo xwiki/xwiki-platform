@@ -41,8 +41,7 @@ public abstract class AbstractWYSIWYGEditorTest extends AbstractTest
     // Note: We do not use the @Rule annotation since we need this rule to be executed before the configure() method
     // below which runs **before** any @Rule (since it's tagged with @BeforeClass). Thus we trigger the authentication
     // manually.
-    public static SuperAdminAuthenticationRule authenticationRule =
-        new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public static SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     /**
      * The edited page.

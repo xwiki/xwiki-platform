@@ -169,7 +169,7 @@ public class DatePicker extends BaseElement
      */
     public boolean hasHourSelector()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("hour")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(container, By.className("hour")).size() > 0;
     }
 
     /**
@@ -179,7 +179,7 @@ public class DatePicker extends BaseElement
      */
     public DatePicker waitToLoad()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)

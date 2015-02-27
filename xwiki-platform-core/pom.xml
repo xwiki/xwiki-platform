@@ -68,13 +68,13 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.7-b3-xwiki-3</version>
+        <version>2.7-b4-xwiki-1</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.6.1.Final</version>
+        <version>3.6.2.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
@@ -470,6 +470,27 @@
               <className>org/xwiki/lesscss/cache/LESSCache</className>
               <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
               <justification>Young API. Fix a bad designed API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of jrcs Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev1()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev2()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
             </difference>
           </ignored>
           <excludes>

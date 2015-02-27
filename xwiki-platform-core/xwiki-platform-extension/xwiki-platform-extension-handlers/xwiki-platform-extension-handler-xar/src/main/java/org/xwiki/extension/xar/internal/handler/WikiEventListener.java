@@ -40,6 +40,7 @@ import org.xwiki.extension.handler.ExtensionHandler;
 import org.xwiki.extension.handler.ExtensionHandlerManager;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
@@ -53,6 +54,11 @@ import com.xpn.xwiki.XWikiContext;
 @Named("extension.xar.WikiCopiedListener")
 public class WikiEventListener extends AbstractEventListener
 {
+    /**
+     * The install request property that specifies which user triggered the install.
+     */
+    private static final String PROPERTY_USER_REFERENCE = "user.reference";
+
     @Inject
     private InstalledExtensionRepository installedRepository;
 
@@ -152,7 +158,14 @@ public class WikiEventListener extends AbstractEventListener
         Collection<InstalledExtension> installedExtensions = this.installedRepository.getInstalledExtensions(null);
 
         InstallRequest installRequest = new InstallRequest();
-        installRequest.setProperty("user.reference", context.getUserReference());
+        DocumentReference userReference = context.getUserReference();
+        if (userReference != null) {
+            installRequest.setProperty(PROPERTY_USER_REFERENCE, userReference);
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USER_REFERENCE, userReference.toString());
+        }
         installRequest.setVerbose(false);
         // TODO: make it interactive ? (require wiki creation to be job based)
         installRequest.setInteractive(false);

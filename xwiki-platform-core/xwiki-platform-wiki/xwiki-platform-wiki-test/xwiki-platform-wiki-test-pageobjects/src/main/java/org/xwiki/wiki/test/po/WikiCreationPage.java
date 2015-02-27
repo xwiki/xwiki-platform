@@ -23,13 +23,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class CreateWikiPageStepProvisioning extends ExtendedViewPage
+public class WikiCreationPage extends ExtendedViewPage
 {
     @FindBy(id = "finalize")
     private WebElement finalizeButton;
 
     @FindBy(xpath = "//div[@class='wizard-header']/h1/span")
     private WebElement stepTitle;
+
+    @FindBy(id = "creation-log")
+    private WebElement log;
 
     public static String getSpace()
     {
@@ -44,7 +47,7 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
     public WikiHomePage finalizeCreation()
     {
         // The finalize button is not visible until the provisioning is done, so we wait for it
-        waitUntilElementIsVisible(By.id("finalize"), 30);
+        getDriver().waitUntilElementIsVisible(By.id("finalize"), 30);
         // Now we can click
         finalizeButton.click();
         // And wait for the page to be loaded
@@ -66,5 +69,17 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
     public boolean isFinalizeButtonVisible()
     {
         return finalizeButton.isDisplayed();
+    }
+
+    public void waitForFinalizeButton(int timeout)
+    {
+        // The finalize button is not visible until the provisioning is done, so we wait for it
+        getDriver().waitUntilElementIsVisible(By.id("finalize"), timeout);
+    }
+
+    public boolean hasLogError()
+    {
+        return !getDriver().findElementsWithoutWaiting(
+                By.xpath("div[@id='creation-log']//li[contains(@class, 'log-item-error')]")).isEmpty();
     }
 }

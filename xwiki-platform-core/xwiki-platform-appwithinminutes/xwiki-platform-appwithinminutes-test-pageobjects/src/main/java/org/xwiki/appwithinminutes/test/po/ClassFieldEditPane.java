@@ -62,7 +62,7 @@ public class ClassFieldEditPane extends BaseElement
 
         // Wait for the element to become visible.
         By containerLocator = By.id("field-" + fieldName);
-        waitUntilElementIsVisible(containerLocator);
+        getDriver().waitUntilElementIsVisible(containerLocator);
 
         container = getDriver().findElement(containerLocator);
         toolBox = container.findElement(By.className("toolBox"));
@@ -109,11 +109,11 @@ public class ClassFieldEditPane extends BaseElement
         // substring(@id, string-length(@id) - string-length(suffix) + 1)
         String xpath = ".//*[substring(@id, string-length(@id) - %s - 2) = '_0_%s']";
         try {
-            return getUtil().findElementWithoutWaiting(getDriver(), container,
+            return getDriver().findElementWithoutWaiting(container,
                 By.xpath(String.format(xpath, fieldName.length(), fieldName)));
         } catch (NoSuchElementException e) {
             // Return the first input element from the field display. This is needed for the Title and Content fields.
-            return getUtil().findElementWithoutWaiting(getDriver(), container,
+            return getDriver().findElementWithoutWaiting(container,
                 By.xpath(".//dl[@class = 'field-viewer']/dd//*[@name]"));
         }
     }
@@ -133,7 +133,7 @@ public class ClassFieldEditPane extends BaseElement
     {
         clickToolBoxIcon("Preview");
         String previewXPath = "//*[@id = 'field-" + fieldName + "']//dl[@class = 'field-viewer']/dd";
-        waitUntilElementHasAttributeValue(By.xpath(previewXPath), "class", "");
+        getDriver().waitUntilElementHasAttributeValue(By.xpath(previewXPath), "class", "");
     }
 
     /**

@@ -24,7 +24,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -105,7 +104,7 @@ public abstract class AbstractTest
         return getClass().getSimpleName();
     }
 
-    protected static WebDriver getDriver()
+    protected static XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }

@@ -29,6 +29,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.rating.RatingExtension;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Provide safe Extension.
@@ -47,6 +48,12 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
     @SuppressWarnings("rawtypes")
     private ScriptSafeProvider defaultSafeProvider;
 
+    /**
+     * Required by the {@link SafeInstalledExtension} to resolve the reference of the user that installed the extension.
+     */
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
     @Override
     public <S> S get(Extension unsafe)
     {
@@ -55,8 +62,8 @@ public class ExtensionScriptSafeProvider implements ScriptSafeProvider<Extension
         if (unsafe instanceof CoreExtension) {
             safe = new SafeCoreExtension<CoreExtension>((CoreExtension) unsafe, this.defaultSafeProvider);
         } else if (unsafe instanceof InstalledExtension) {
-            safe =
-                new SafeInstalledExtension<InstalledExtension>((InstalledExtension) unsafe, this.defaultSafeProvider);
+            safe = new SafeInstalledExtension<InstalledExtension>((InstalledExtension) unsafe, this.defaultSafeProvider,
+                this.documentReferenceResolver);
         } else if (unsafe instanceof LocalExtension) {
             safe = new SafeLocalExtension<LocalExtension>((LocalExtension) unsafe, this.defaultSafeProvider);
         } else if (unsafe instanceof RatingExtension) {

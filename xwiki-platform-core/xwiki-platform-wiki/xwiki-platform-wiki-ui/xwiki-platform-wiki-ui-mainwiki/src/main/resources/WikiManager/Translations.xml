@@ -20,64 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>WikiManager</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1293832800000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1307189790000</date>
   <contentUpdateDate>1307189790000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.TranslationDocumentClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>1</number>
-        <prettyName>Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>WikiManager.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
-    <property>
-      <scope>GLOBAL</scope>
-    </property>
-  </object>
   <content>###############################################################################
 # WikiManager Manager translation page
 #
@@ -192,9 +153,11 @@ platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
 platform.wiki.users.profile.activity.show=show activity
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}?
-platform.wiki.delete.confirmation.yes=Yes
-platform.wiki.delete.confirmation.no=No
+platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
+platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
+platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
+platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
 ## Wiki macro
@@ -250,11 +213,6 @@ platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Step 2 — Choose members
 platform.wiki.create.wizard.step.users.shortname=Users
 platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
-platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete the wiki
 platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
 platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
@@ -269,6 +227,12 @@ platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the w
 platform.wiki.create.wizard.step.previous=Previous Step
 platform.wiki.create.wizard.step.next=Go to next step
 platform.wiki.create.wizard.step.create=Create
+
+platform.wiki.create.wizard.step.creation=Wiki creation
+platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
+platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
+platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some documents have not been installed. In consequence, the wiki might behave erroneously and you should probably delete it.
+platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
 admin.wikis.description=Wikis management.
@@ -319,7 +283,51 @@ platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager
 admin.wikis=Wikis
 admin.wikis.template=Wiki Template
 
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
+  <object>
+    <name>WikiManager.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>GLOBAL</scope>
+    </property>
+  </object>
 </xwikidoc>

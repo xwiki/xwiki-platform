@@ -4901,7 +4901,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
      * {@link #getChildren(int, int, com.xpn.xwiki.XWikiContext)}
      *
      * @since 2.2M2
@@ -4921,7 +4921,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
      *
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
@@ -4945,16 +4945,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
-            Query query =
-                getStore()
-                    .getQueryManager()
-                    .createQuery(
-                        "select distinct doc.space, doc.name from XWikiDocument doc where "
-                            + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
-                        Query.XWQL);
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
-            query
-                .bindValue("prefixedFullName", getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
+            Query query = getStore().getQueryManager().createQuery(
+                "select distinct doc.space, doc.name from XWikiDocument doc where "
+                    + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
+                Query.XWQL);
+            query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
+            query.bindValue("prefixedFullName",
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", getLocalEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
@@ -4965,7 +4962,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 children.add(new DocumentReference(this.getDocumentReference().getWikiReference().getName(),
                     (String) queryResult[0], (String) queryResult[1]));
             }
-
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                 String.format("Failed to retrieve children for document [%s]", this.getDocumentReference()), e);
@@ -6183,8 +6179,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
-     * their parent is passed in parameter.
+     * Same as {@link #rename(DocumentReference, List, XWikiContext)} but the list of documents having the current
+     * document as their parent is passed in parameter.
      *
      * @param newDocumentReference the new document reference
      * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be

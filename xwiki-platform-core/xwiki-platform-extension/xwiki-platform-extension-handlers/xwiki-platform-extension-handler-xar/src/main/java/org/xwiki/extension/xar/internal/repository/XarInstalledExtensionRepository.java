@@ -20,13 +20,10 @@
 package org.xwiki.extension.xar.internal.repository;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,7 +33,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
@@ -48,13 +44,7 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.internal.AbstractCachedExtensionRepository;
-import org.xwiki.extension.repository.internal.RepositoryUtils;
-import org.xwiki.extension.repository.internal.installed.DefaultInstalledExtensionRepository;
-import org.xwiki.extension.repository.result.CollectionIterableResult;
-import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.ExtensionQuery;
-import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.repository.internal.installed.AbstractInstalledExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -70,8 +60,8 @@ import org.xwiki.xar.XarException;
 @Component
 @Singleton
 @Named(XarExtensionHandler.TYPE)
-public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepository<XarInstalledExtension> implements
-    InstalledExtensionRepository, Initializable
+public class XarInstalledExtensionRepository extends AbstractInstalledExtensionRepository<XarInstalledExtension>
+    implements InstalledExtensionRepository, Initializable
 {
     private static final List<Event> EVENTS = Arrays.<Event>asList(new ExtensionInstalledEvent(),
         new ExtensionUninstalledEvent(), new ExtensionUpgradedEvent());
@@ -169,38 +159,7 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
         }
     }
 
-    // LocalExtensionRepository
-
-    @Override
-    public int countExtensions()
-    {
-        return this.extensions.size();
-    }
-
-    @Override
-    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
-    {
-        List<InstalledExtension> installedExtensions = new ArrayList<InstalledExtension>(extensions.size());
-        for (InstalledExtension localExtension : this.extensions.values()) {
-            if (localExtension.isInstalled(namespace)) {
-                installedExtensions.add(localExtension);
-            }
-        }
-
-        return installedExtensions;
-    }
-
-    @Override
-    public Collection<InstalledExtension> getInstalledExtensions()
-    {
-        return (Collection) this.extensions.values();
-    }
-
-    @Override
-    public InstalledExtension getInstalledExtension(ExtensionId extensionId)
-    {
-        return this.extensions.get(extensionId);
-    }
+    // InstalledExtensionRepository
 
     @Override
     public InstalledExtension getInstalledExtension(String id, String namespace)
@@ -216,13 +175,6 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
         }
 
         return extension;
-    }
-
-    @Override
-    public InstalledExtension installExtension(LocalExtension extension, String namespace, boolean dependency)
-        throws InstallException
-    {
-        return installExtension(extension, namespace, dependency, Collections.<String, Object>emptyMap());
     }
 
     @Override
@@ -255,41 +207,5 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
 
         return extension.getType().equals(XarExtensionHandler.TYPE) ? this.installedRepository
             .getBackwardDependencies(extensionId) : null;
-    }
-
-    @Override
-    public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
-    {
-        Pattern patternMatcher = RepositoryUtils.createPatternMatcher(pattern);
-
-        List<Extension> result = new ArrayList<Extension>();
-
-        for (XarInstalledExtension extension : this.extensions.values()) {
-            if (patternMatcher == null || RepositoryUtils.matches(patternMatcher, extension)) {
-                result.add(extension);
-            }
-        }
-
-        return new CollectionIterableResult<Extension>(this.extensions.size(), offset, result);
-    }
-
-    @Override
-    public IterableResult<Extension> searchInstalledExtensions(String pattern, String namespace, int offset, int nb)
-        throws SearchException
-    {
-        ExtensionQuery query = new ExtensionQuery(pattern);
-
-        query.setOffset(offset);
-        query.setLimit(nb);
-
-        return search(query);
-    }
-
-    @Override
-    public IterableResult<Extension> searchInstalledExtensions(String namespace, ExtensionQuery query)
-        throws SearchException
-    {
-        return DefaultInstalledExtensionRepository
-            .searchInstalledExtensions(namespace, query, this.extensions.values());
     }
 }

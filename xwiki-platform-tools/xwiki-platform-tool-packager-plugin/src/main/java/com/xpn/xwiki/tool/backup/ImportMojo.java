@@ -226,7 +226,8 @@ public class ImportMojo extends AbstractMojo
         extension.setFile(artifact.getFile());
 
         LocalExtension localExtension = localExtensionRepository.storeExtension(extension);
-        installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", !directDependency);
+        installedExtensionRepository.installExtension(localExtension, "wiki:xwiki", !directDependency,
+            Collections.<String, Object>singletonMap("user.reference", "xwiki:XWiki.Admin"));
     }
 
     private MavenProject getMavenProject(Artifact artifact) throws MojoExecutionException

@@ -56,7 +56,9 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        Thread.currentThread().setContextClassLoader(
-            new ContextNamespaceURLClassLoader(currentWikiProvider, this.classLoaderManager));
+        if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
+            Thread.currentThread().setContextClassLoader(
+                new ContextNamespaceURLClassLoader(currentWikiProvider, this.classLoaderManager));
+        }
     }
 }

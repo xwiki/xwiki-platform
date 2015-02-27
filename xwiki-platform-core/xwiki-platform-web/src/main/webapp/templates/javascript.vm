@@ -112,6 +112,7 @@ XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
 XWiki.editor = "$!{escapetool.javascript($editor)}";
 XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
+XWiki.skin = '$escapetool.javascript($xwiki.skin)';
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";

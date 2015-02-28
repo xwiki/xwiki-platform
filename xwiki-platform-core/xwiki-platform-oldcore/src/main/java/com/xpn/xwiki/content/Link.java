@@ -295,7 +295,7 @@ public class Link implements Cloneable
      */
     private String getLinkName()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (getVirtualWikiAlias() != null) {
             buffer.append(getVirtualWikiAlias());
@@ -336,7 +336,7 @@ public class Link implements Cloneable
      *
      * @param buffer the buffer to append to
      */
-    private void appendDelimiterSymbol(StringBuffer buffer)
+    private void appendDelimiterSymbol(StringBuilder buffer)
     {
         if (isUsingPipeDelimiter()) {
             buffer.append('|');
@@ -348,7 +348,7 @@ public class Link implements Cloneable
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (getAlias() != null) {
             buffer.append(getAlias());

@@ -178,7 +178,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
      */
     protected String getKey(DocumentReference documentReference, Object... extensions)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (extensions.length > 0) {
             buffer.append(escape(this.serializer.serialize(documentReference)));

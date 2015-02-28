@@ -122,7 +122,7 @@ public class AttachMacro extends BaseLocaleMacro
         }
 
         // Create the link code
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         String url;
         str.append("<a href=\"");
         if (filename.indexOf("tp://") != -1) {

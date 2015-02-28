@@ -161,7 +161,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
             // Copy all "driver" properties into "connectionProperties"
             Properties driverProps = ConnectionProviderFactory.getConnectionProperties(props);
             if (driverProps.size() > 0) {
-                StringBuffer connectionProperties = new StringBuffer();
+                StringBuilder connectionProperties = new StringBuilder();
                 for (Iterator iter = driverProps.keySet().iterator(); iter.hasNext();) {
                     String key = (String) iter.next();
                     String value = driverProps.getProperty(key);

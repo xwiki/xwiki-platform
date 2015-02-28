@@ -404,7 +404,7 @@ public class XWikiStatsReader
     private String createVisitStatisticsQuery(String action, Period period, Range range, List<Object> paramList,
         XWikiContext context)
     {
-        StringBuffer query = new StringBuffer("select name, sum(pageSaves), sum(pageViews), sum(downloads)");
+        StringBuilder query = new StringBuilder("select name, sum(pageSaves), sum(pageViews), sum(downloads)");
 
         query.append(" from VisitStats");
 
@@ -412,7 +412,7 @@ public class XWikiStatsReader
 
         // user filter
 
-        StringBuffer userListWhere = new StringBuffer();
+        StringBuilder userListWhere = new StringBuilder();
         try {
             for (DocumentReference user : StatsUtil.getRequestFilteredUsers(context)) {
                 if (userListWhere.length() > 0) {

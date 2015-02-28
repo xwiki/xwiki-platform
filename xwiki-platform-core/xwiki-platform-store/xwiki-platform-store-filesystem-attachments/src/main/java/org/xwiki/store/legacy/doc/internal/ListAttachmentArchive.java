@@ -194,7 +194,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
         final Node[] nodes = rcsArchive.changeLog();
         for (int i = nodes.length - 1; i > -1; i--) {
             final Object[] lines = rcsArchive.getRevision(nodes[i].getVersion());
-            final StringBuffer content = new StringBuffer();
+            final StringBuilder content = new StringBuilder();
             for (int j = 0; j < lines.length; j++) {
                 String line = lines[j].toString();
                 content.append(line);

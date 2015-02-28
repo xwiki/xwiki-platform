@@ -90,7 +90,7 @@ public class EditForm extends XWikiForm
             this.tags = null;
             return;
         }
-        StringBuffer tags = new StringBuffer();
+        StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
             if (!parameter[i].equals("")) {

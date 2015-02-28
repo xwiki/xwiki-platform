@@ -993,8 +993,8 @@ public final class RightsManager
 
         String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
 
-        StringBuffer where =
-            new StringBuffer(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
+        StringBuilder where =
+            new StringBuilder(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
                 + " and (obj.className=? or obj.className=?)");
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());

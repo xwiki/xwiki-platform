@@ -310,8 +310,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     {
         List<Object> parameterValues = new ArrayList<Object>();
 
-        StringBuffer where =
-            new StringBuffer(
+        StringBuilder where =
+            new StringBuilder(
                 ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
         parameterValues.add(CLASS_XWIKIGROUPS);
 
@@ -454,9 +454,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
         String classtemplate = user ? CLASSTEMPLATE_XWIKIUSERS : CLASSTEMPLATE_XWIKIGROUPS;
 
-        StringBuffer from = new StringBuffer(", BaseObject as obj");
+        StringBuilder from = new StringBuilder(", BaseObject as obj");
 
-        StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
         parameterValues.add(classtemplate);
         parameterValues.add("XWiki." + documentClass);
 
@@ -496,7 +496,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             }
         }
 
-        StringBuffer orderString = new StringBuffer();
+        StringBuilder orderString = new StringBuilder();
 
         // Manage order
         if (order != null && order.length > 0) {
@@ -662,7 +662,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     protected String createMatchGroupMembersWhereClause(String groupFullName, String matchField, Boolean orderAsc,
         Map<String, Object> parameterValues)
     {
-        StringBuffer queryString = new StringBuffer();
+        StringBuilder queryString = new StringBuilder();
 
         // Add from clause
         queryString.append(" FROM BaseObject as obj, StringProperty as field");
@@ -816,7 +816,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         Map<String, Object> parameterValues = new HashMap<String, Object>();
         // //////////////////////////////////////
         // Create the query string
-        StringBuffer queryString = new StringBuffer("SELECT field.value");
+        StringBuilder queryString = new StringBuilder("SELECT field.value");
 
         queryString.append(' ').append(
             createMatchGroupMembersWhereClause(groupDocument.getFullName(), matchField, orderAsc, parameterValues));

@@ -5826,7 +5826,7 @@ public class XWiki implements EventListener
 
     public String addTooltip(String html, String message, String params, XWikiContext context)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
         buffer.append(params);
         buffer.append("; return escape('");
@@ -5840,7 +5840,7 @@ public class XWiki implements EventListener
 
     public String addTooltipJS(XWikiContext context)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("<script type=\"text/javascript\" src=\"");
         buffer.append(getSkinFile("ajax/wzToolTip.js", context));
         buffer.append("\"></script>");

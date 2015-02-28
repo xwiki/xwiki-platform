@@ -2318,7 +2318,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private String generateWhereStatement(Object[][] whereParams)
     {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         str.append(" where ");
         for (int i = 0; i < whereParams.length; i++) {
@@ -2604,7 +2604,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String createSQLQuery(String queryPrefix, String whereSQL)
     {
-        StringBuffer sql = new StringBuffer(queryPrefix);
+        StringBuilder sql = new StringBuilder(queryPrefix);
 
         String normalizedWhereSQL;
         if (StringUtils.isBlank(whereSQL)) {
@@ -2637,7 +2637,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     protected String getColumnsForSelectStatement(String whereSQL)
     {
-        StringBuffer columns = new StringBuffer();
+        StringBuilder columns = new StringBuilder();
 
         int orderByPos = whereSQL.toLowerCase().indexOf("order by");
         if (orderByPos >= 0) {

@@ -203,7 +203,7 @@ public class RadeoxHelper
 
     public static String buildMacro(String name, Map params)
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("{" + name);
         if (!params.isEmpty()) {
             sb.append(":");

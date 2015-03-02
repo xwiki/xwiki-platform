@@ -19,8 +19,6 @@
  */
 package org.xwiki.filter.xar;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -36,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.test.ExtensionPackager;
 import org.xwiki.filter.FilterException;
-import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.filterxml.output.FilterXMLOutputProperties;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
 import org.xwiki.filter.input.DefaultFileInputSource;
@@ -50,7 +47,6 @@ import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.test.AllLogRule;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -59,9 +55,6 @@ public class XARInputFilterStreamTest
 {
     @Rule
     public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
-
-    @Rule
-    public AllLogRule allLogRule = new AllLogRule();
 
     private static final File FOLDER = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
 
@@ -116,7 +109,5 @@ public class XARInputFilterStreamTest
         xarProperties.setEntities(entities);
 
         assertXML("testSkipFirstDocument", xarProperties);
-
-        assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
     }
 }

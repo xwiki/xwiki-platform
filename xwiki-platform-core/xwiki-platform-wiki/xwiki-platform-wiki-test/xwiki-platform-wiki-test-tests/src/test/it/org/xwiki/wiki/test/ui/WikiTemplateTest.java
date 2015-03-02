@@ -51,7 +51,7 @@ public class WikiTemplateTest extends AbstractTest
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
-    public void createTemplateWiki() throws Exception
+    private void createTemplateWiki() throws Exception
     {
         // Go to the wiki creation wizard
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
@@ -98,7 +98,7 @@ public class WikiTemplateTest extends AbstractTest
 
     }
 
-    public void deleteTemplateWiki() throws Exception
+    private void deleteTemplateWiki() throws Exception
     {
         // Go to the template wiki
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
@@ -114,16 +114,13 @@ public class WikiTemplateTest extends AbstractTest
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new template"));
     }
-
-    @Test
-    public void createWikiFromTemplate() throws Exception
+    
+    private void createWikiFromTemplate()
     {
-        createTemplateWiki();
-
         // Go to the wiki creation wizard
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
-        
+
         // First step
         createWikiPage.setPrettyName("My new wiki");
         String wikiName = createWikiPage.getComputedName();
@@ -131,7 +128,7 @@ public class WikiTemplateTest extends AbstractTest
         createWikiPage.setTemplate(TEMPLATE_WIKI_ID);
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
-        
+
         // Second step
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
         WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
@@ -139,7 +136,7 @@ public class WikiTemplateTest extends AbstractTest
         wikiCreationPage.waitForFinalizeButton(30);
         // Ensure there is no error in the log
         assertFalse(wikiCreationPage.hasLogError());
-        
+
         // Finalization
         WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
 
@@ -162,6 +159,18 @@ public class WikiTemplateTest extends AbstractTest
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new wiki"));
+    }
+
+    @Test
+    public void createWikiFromTemplateTest() throws Exception
+    {
+        // Create the template
+        createTemplateWiki();
+        
+        // Create the wiki from the template
+        createWikiFromTemplate();
+        // Do it twice to check if we can create a wiki with the name of a deleted one
+        createWikiFromTemplate();
 
         // Delete the template wiki
         deleteTemplateWiki();

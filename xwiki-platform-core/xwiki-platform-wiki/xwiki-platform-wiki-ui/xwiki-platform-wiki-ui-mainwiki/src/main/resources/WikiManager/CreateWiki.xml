@@ -443,11 +443,11 @@ XWiki.WikiCreationStatusBar = Class.create({
       }.bind(this)
    });
   },
-  _refresh : function (status) {
-    if (status.status == 'FINISHED') {
+  _refresh : function (response) {
+    if (response.status == 'FINISHED') {
       $('ui-progress').addClassName('hidden');
       // We need to know if we have error
-      if (status.error.length &gt; 0) {
+      if (response.error.length &gt; 0) {
         $('errorMessage').removeClassName('hidden');
         $('cleanUp').removeClassName('hidden');
       } else {
@@ -457,7 +457,7 @@ XWiki.WikiCreationStatusBar = Class.create({
       }
     }
     else {
-      var progress = status.progress;
+      var progress = response.progress;
       if (progress != 'null') {
         if (progress &lt; 0)
           progress = 0;
@@ -469,15 +469,13 @@ XWiki.WikiCreationStatusBar = Class.create({
     }
     // Display logs
     var creationLogContainer = $('creation-log');
-    creationLogContainer.innerHTML = status.logs;
+    creationLogContainer.innerHTML = response.logs;
     creationLogContainer.firstDescendant().scrollTop=$$('.log-item-loading')[0].offsetTop;
   }
 });
 
 var init = function(event) {
-  if ($('progressBar')) {
-    new XWiki.WikiCreationStatusBar();
-  }
+  new XWiki.WikiCreationStatusBar();
   return true;
 };
 // When the document is loaded, trigger the Extension Manager form enhancements.
@@ -1131,6 +1129,14 @@ return XWiki;
 ## The final step that eventually create the wiki
 ##################################
 #macro(create)
+  ## Job Status
+  #set ($state = $services.wiki.creationjob.getJobStatus($request.wikiname).state)
+  ## If a deleted wiki had the same name, the job status may still be there (with a 'FINISHED' status)
+  ## So we have to check if the wiki really exists
+  #if ($state == 'FINISHED' &amp;&amp; !$services.wiki.exists($request.wikiname))
+    ## If not, consider that the new job has not been launched yet
+    #set($state = 'NONE')
+  #end
   ## CSRF checkFailed to execute the [velocity] macro. Click on this m
   #if (!$services.csrf.isTokenValid($request.form_token))
 
@@ -1139,7 +1145,7 @@ return XWiki;
     {{/warning}}
     
     #stepMembers()
-  #elseif("$!services.wiki.creationjob.getJobStatus($request.wikiname)" != '')
+  #elseif("$!state" != '' &amp;&amp; $state != 'NONE')
     #creation()
   #else
     #createWiki()
@@ -1241,12 +1247,11 @@ return XWiki;
   
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-    &lt;input type="hidden" id="progressBar" value="true" /&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
     &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
     #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.creation'))
     &lt;div class="wizard-body"&gt;
-      #if ($status.state == 'RUNNING')
+      #if ($status.state != 'FINISHED')
       &lt;div class="ui-progress" id="ui-progress"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.wait')
         &lt;div class="ui-progress-background"&gt;
@@ -1260,10 +1265,10 @@ return XWiki;
         &lt;/div&gt;
       &lt;/div&gt;
       #end
-      &lt;p class="successmessage box #if($hasError || $status.state == 'RUNNING')hidden#end" id="successMessage"&gt;
+      &lt;p class="successmessage box #if($hasError || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$hasError || $status.state == 'RUNNING')hidden#end" id="errorMessage"&gt;
+      &lt;p class="errormessage box #if(!$hasError || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.error', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;

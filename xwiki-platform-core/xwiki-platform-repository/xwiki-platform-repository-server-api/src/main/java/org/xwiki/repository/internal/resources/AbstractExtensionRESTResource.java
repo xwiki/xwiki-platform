@@ -321,13 +321,18 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             extensionDocument.getExternalURL("view", getXWikiContext())));
 
         // Authors
-        for (String authorId : (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
-            extension.getAuthors().add(resolveExtensionAuthor(authorId));
+        List<String> authors = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS);
+        if (authors != null) {
+            for (String authorId : authors) {
+                extension.getAuthors().add(resolveExtensionAuthor(authorId));
+            }
         }
 
         // Features
-        extension.getFeatures().addAll(
-            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
+        List<String> features = (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES);
+        if (features != null) {
+            extension.getFeatures().addAll(features);
+        }
 
         // Dependencies
         if (extensionVersion != null) {

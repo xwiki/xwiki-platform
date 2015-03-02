@@ -332,15 +332,18 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
 
         // Properties
-        for (String stringProperty : (List<String>) getValue(extensionObject,
-            XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES)) {
-            int index = stringProperty.indexOf('=');
-            if (index > 0) {
-                Property property = new Property();
-                property.setKey(stringProperty.substring(0, index));
-                property.setStringValue((index + 1) < stringProperty.length() ? stringProperty.substring(index + 1)
-                    : "");
-                extension.getProperties().add(property);
+        List<String> properties =
+            (List<String>) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES);
+        if (properties != null) {
+            for (String stringProperty : properties) {
+                int index = stringProperty.indexOf('=');
+                if (index > 0) {
+                    Property property = new Property();
+                    property.setKey(stringProperty.substring(0, index));
+                    property.setStringValue((index + 1) < stringProperty.length() ? stringProperty.substring(index + 1)
+                        : "");
+                    extension.getProperties().add(property);
+                }
             }
         }
 

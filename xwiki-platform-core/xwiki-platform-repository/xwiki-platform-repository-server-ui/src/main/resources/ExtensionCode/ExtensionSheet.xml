@@ -41,6 +41,8 @@
   <hidden>true</hidden>
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
+{{include reference="XWiki.RatingsMacros"/}}
+
 {{velocity output="false"}}
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
   #set($isEditMode = true)
@@ -243,20 +245,6 @@
       $doc.getValue("description")
     #else
       $doc.display("description")
-    #end
-    ##
-    ## Only display Compatibility section if there are ExtensionCompatibilityClass xobjects defined
-    #set($extensionCompatibilities = $doc.getObjects('ExtensionCode.ExtensionCompatibilityClass'))
-    #if ($extensionCompatibilities &amp;&amp; $extensionCompatibilities.size() &gt; 0)
-      = Compatibility =
-
-      This extension has been tested with the following configurations.
-
-      #set ($compatibilityMatrix = {})
-      |=Extension Version|=XWiki Flavor|=Notes
-      #foreach ($extensionCompatibility in $extensionCompatibilities)
-        |$extensionCompatibility.getProperty('extensionVersion').getValue()|$extensionCompatibility.getProperty('xwikiFlavor').getValue() $extensionCompatibility.getProperty('xwikiFlavorVersion').getValue()|$extensionCompatibility.get('notes')
-      #end
     #end
 
     #if ($extensionTypeObject &amp;&amp; $lastVersionObject &amp;&amp; "$!{extension.getProperty('customInstallationOnly').value}" != '1')

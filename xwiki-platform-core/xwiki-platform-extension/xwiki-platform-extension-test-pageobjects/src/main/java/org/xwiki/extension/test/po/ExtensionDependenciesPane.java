@@ -85,7 +85,7 @@ public class ExtensionDependenciesPane extends BaseElement
     List<DependencyPane> getDependenciesAfter(String label)
     {
         By xpath =
-            By.xpath(".//*[contains(@class, 'dependency-item') and ancestor::ul[preceding-sibling::p[starts-with(., '"
+            By.xpath(".//*[contains(@class, 'dependency-item') and ancestor::dd[preceding-sibling::dt[starts-with(., '"
                 + label + "')]]]");
         List<DependencyPane> dependencies = new ArrayList<DependencyPane>();
         for (WebElement element : getDriver().findElementsWithoutWaiting(container, xpath)) {

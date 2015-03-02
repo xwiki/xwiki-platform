@@ -39,7 +39,7 @@ public class SearchResultsPane extends BaseElement
      */
     public PaginationFilterPane getPagination()
     {
-        return getDriver().findElements(By.className("paginationFilter")).size() > 0 ? new PaginationFilterPane()
+        return getDriver().hasElementWithoutWaiting(By.className("paginationFilter")) ? new PaginationFilterPane()
             : null;
     }
 
@@ -48,7 +48,7 @@ public class SearchResultsPane extends BaseElement
      */
     public int getDisplayedResultsCount()
     {
-        return getDriver().findElements(By.className("extension-item")).size();
+        return getDriver().findElementsWithoutWaiting(By.className("extension-item")).size();
     }
 
     /**
@@ -58,7 +58,7 @@ public class SearchResultsPane extends BaseElement
     {
         String xpath =
             "//div[contains(@class, 'infomessage') and preceding-sibling::div[1][@class = 'extension-search-bar']]";
-        List<WebElement> found = getDriver().findElements(By.xpath(xpath));
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(By.xpath(xpath));
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 

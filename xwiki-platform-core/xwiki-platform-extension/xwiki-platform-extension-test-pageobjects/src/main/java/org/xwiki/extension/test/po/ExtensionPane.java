@@ -345,7 +345,7 @@ public class ExtensionPane extends BaseElement
         String sectionAnchor = StringUtils.substringAfterLast(found.get(0).getAttribute("href"), "#");
         found.get(0).click();
         By sectionXPath =
-            By.xpath(".//div[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
+            By.xpath(".//*[contains(@class, 'extension-body-section') and preceding-sibling::*[1][@id = '"
                 + sectionAnchor + "']]");
         return getDriver().findElementWithoutWaiting(container, sectionXPath);
     }

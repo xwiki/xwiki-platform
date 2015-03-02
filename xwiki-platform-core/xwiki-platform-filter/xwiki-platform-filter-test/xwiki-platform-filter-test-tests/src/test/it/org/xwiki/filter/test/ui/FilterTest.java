@@ -57,7 +57,7 @@ public class FilterTest extends AbstractTest
         // This verifies that the Filter application is registered in the Applications Panel.
         // It also verifies that the Translation is registered properly.
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-        this.vp = applicationPanel.clickApplication("Filter streams converter");
+        this.vp = applicationPanel.clickApplication("Filter Streams Converter");
 
         // Verify we're on the right page!
         Assert.assertEquals("Filter", this.vp.getMetaDataValue("space"));

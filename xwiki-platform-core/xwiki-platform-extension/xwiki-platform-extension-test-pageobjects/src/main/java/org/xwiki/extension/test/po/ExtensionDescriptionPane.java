@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.test.po;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.BaseElement;
@@ -64,8 +67,7 @@ public class ExtensionDescriptionPane extends BaseElement
      */
     public WebElement getWebSite()
     {
-        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH + "//a", "Website"));
-        return getDriver().findElementWithoutWaiting(container, xpath);
+        return getMetaDataLink("Website");
     }
 
     /**
@@ -77,11 +79,56 @@ public class ExtensionDescriptionPane extends BaseElement
     }
 
     /**
+     * @return the extensions features
+     */
+    public List<String> getFeatures()
+    {
+        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH, "Feature"));
+        List<WebElement> featureElements = getDriver().findElementsWithoutWaiting(container, xpath);
+        if (featureElements.isEmpty()) {
+            featureElements = getMetaDataList("Features");
+        }
+        List<String> features = new ArrayList<>();
+        for (WebElement element : featureElements) {
+            features.add(element.getText());
+        }
+        return features;
+    }
+
+    /**
      * @return the extension type
      */
     public String getType()
     {
         return getMetaData("Type");
+    }
+
+    /**
+     * @return the link to the extension sources
+     */
+    public WebElement getSources()
+    {
+        return getMetaDataLink("Sources");
+    }
+
+    /**
+     * @return the link to the extension issue tracker
+     */
+    public WebElement getIssues()
+    {
+        return getMetaDataLink("Issues");
+    }
+
+    /**
+     * @return the list of namespaces where the extension is installed
+     */
+    public List<String> getNamespaces()
+    {
+        List<String> namespaces = new ArrayList<>();
+        for (WebElement element : getMetaDataList("Installed on the following namespaces")) {
+            namespaces.add(element.getText());
+        }
+        return namespaces;
     }
 
     /**
@@ -92,5 +139,25 @@ public class ExtensionDescriptionPane extends BaseElement
     {
         By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH, label));
         return getDriver().findElementWithoutWaiting(container, xpath).getText();
+    }
+
+    /**
+     * @param label the meta data label
+     * @return the link element associated with the specified meta data
+     */
+    private WebElement getMetaDataLink(String label)
+    {
+        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH + "/a", label));
+        return getDriver().findElementWithoutWaiting(container, xpath);
+    }
+
+    /**
+     * @param label the meta data label
+     * @return the list items associated with the specified meta data
+     */
+    private List<WebElement> getMetaDataList(String label)
+    {
+        By xpath = By.xpath(String.format(DEFINITION_FOR_TERM_XPATH + "//li", label));
+        return getDriver().findElementsWithoutWaiting(container, xpath);
     }
 }

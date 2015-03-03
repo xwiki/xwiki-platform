@@ -558,16 +558,20 @@ $namespace##
     })
     <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
   #else
+    <dl>
     #foreach($entry in $extensionsByAction.entrySet())
       #if (!$entry.value.isEmpty())
-        <p>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</p>
-        <ul class="dependencies">
-          #foreach ($planAction in $entry.value)
-            <li>#displayDependency($planAction.extension $planAction.namespace)</li>
-          #end
-        </ul>
+        <dt>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</dt>
+        <dd>
+          <ul class="dependencies">
+            #foreach ($planAction in $entry.value)
+              <li>#displayDependency($planAction.extension $planAction.namespace)</li>
+            #end
+          </ul>
+        </dd>
       #end
     #end
+    </dl>
   #end
 #end
 

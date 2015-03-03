@@ -124,15 +124,19 @@
   display: block;
 }
 
-dl.extension-body-section {
+dl.extension-body-section,
+.extension-body-section > dl {
   margin: 0;
 }
-dl.extension-body-section > dt {
+dl.extension-body-section > dt,
+.extension-body-section > dl > dt {
   color: $theme.textSecondaryColor;
   font-weight: normal;
 }
 dl.extension-body-section > dd + dt,
-dl.extension-body-section > dt + dt {
+dl.extension-body-section > dt + dt,
+.extension-body-section > dl > dd + dt,
+.extension-body-section > dl > dt + dt {
   margin-top: .7em;
 }
 

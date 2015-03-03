@@ -78,7 +78,7 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepare(MimeMessage message, Map<String, Object> parameters)
     {
-        MailStatus status = createMailStatus(message, parameters);
+        MailStatus status = createMailStatus(message, MailState.READY, parameters);
         saveStatus(status, parameters);
 
         // Initialize the DatabaseMailStatusResult on first execution by passing the batch id
@@ -89,17 +89,35 @@ public class DatabaseMailListener implements MailListener, Initializable
     public void onSuccess(MimeMessage message, Map<String, Object> parameters)
     {
         String messageId = getMessageId(message);
-        MailStatus status = loadMailStatus(messageId, parameters);
+        MailStatus status;
+        try {
+            status = loadMailStatus(messageId, parameters);
+            if (status == null) {
+                // It's not normal to have no status in the mail status store since onPrepare should have been called
+                // before.
+                this.logger.warn("Failed to find a previous mail status for message id [{}]. However the mail was sent "
+                    + "successfully. Forcing status to [{}]", messageId, MailState.SENT);
+            }
+        } catch (MailStoreException e) {
+            this.logger.error("Error when looking for a previous mail status for message id [{}]. However the mail was "
+                + "sent successfully. Forcing status to [{}]", messageId, MailState.SENT, e);
+            status = null;
+        }
+
         if (status != null) {
             status.setState(MailState.SENT);
-            // Since the mail was sent successfully we don't need to keep its serialized content
-            deleteMailContent(status);
-            // And if the user doesn't want to keep it for tracability we also remove the mail status
-            if (this.configuration.discardSuccessStatuses()) {
-                deleteStatus(status, parameters);
-            } else {
-                saveStatus(status, parameters);
-            }
+        } else {
+            status = createMailStatus(message, MailState.SENT, parameters);
+        }
+
+        // Since the mail was sent successfully we don't need to keep its serialized content
+        deleteMailContent(status);
+
+        // If the user doesn't want to keep it for tracability we remove the mail status, otherwise we just update it
+        if (this.configuration.discardSuccessStatuses()) {
+            deleteStatus(status, parameters);
+        } else {
+            saveStatus(status, parameters);
         }
     }
 
@@ -107,12 +125,29 @@ public class DatabaseMailListener implements MailListener, Initializable
     public void onError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         String messageId = getMessageId(message);
-        MailStatus status = loadMailStatus(messageId, parameters);
+        MailStatus status;
+        try {
+            status = loadMailStatus(messageId, parameters);
+            if (status == null) {
+                // It's not normal to have no status in the mail status store since onPrepare should have been called
+                // before.
+                this.logger.warn("Failed to find a previous mail status for message id [{}]. In addition the mail has "
+                    + "failed to be sent successfully. Forcing status to [{}]", messageId, MailState.FAILED);
+            }
+        } catch (MailStoreException e) {
+            this.logger.error("Error when looking for a previous mail status for message id [{}]. In addition the mail "
+                + "has failed to be sent successfully. Forcing status to [{}]", messageId, MailState.FAILED, e);
+            status = null;
+        }
+
         if (status != null) {
             status.setState(MailState.FAILED);
-            status.setError(exception);
-            saveStatus(status, parameters);
+        } else {
+            status = createMailStatus(message, MailState.FAILED, parameters);
         }
+
+        status.setError(exception);
+        saveStatus(status, parameters);
     }
 
     @Override
@@ -126,21 +161,15 @@ public class DatabaseMailListener implements MailListener, Initializable
         return getSafeHeader("X-MailID", message);
     }
 
-    private MailStatus loadMailStatus(String messageId, Map<String, Object> parameters)
+    private MailStatus loadMailStatus(String messageId, Map<String, Object> parameters) throws MailStoreException
     {
         MailStatus status;
-        try {
-            List<MailStatus> statuses = this.mailStatusStore.load(
-                Collections.<String, Object>singletonMap("id", messageId), 0, 0);
-            if (statuses.isEmpty()) {
-                status = null;
-            } else {
-                status = statuses.get(0);
-            }
-        } catch (MailStoreException e) {
-            // Failed to load the status in the DB, we continue but log an error
-            this.logger.error("Failed to load mail status for message id [{}] from the database", messageId, e);
+        List<MailStatus> statuses = this.mailStatusStore.load(
+            Collections.<String, Object>singletonMap("id", messageId), 0, 0);
+        if (statuses.isEmpty()) {
             status = null;
+        } else {
+            status = statuses.get(0);
         }
         return status;
     }
@@ -176,9 +205,9 @@ public class DatabaseMailListener implements MailListener, Initializable
         }
     }
 
-    private MailStatus createMailStatus(MimeMessage message, Map<String, Object> parameters)
+    private MailStatus createMailStatus(MimeMessage message, MailState state, Map<String, Object> parameters)
     {
-        MailStatus status = new MailStatus(message, MailState.READY);
+        MailStatus status = new MailStatus(message, state);
         status.setWiki((String) parameters.get("wikiId"));
         return status;
     }

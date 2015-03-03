@@ -139,13 +139,13 @@ public class DatabaseMailListenerTest
 
         this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
 
-        assertEquals("Failed to load mail status for message id [" + this.mailId + "] from the database",
-            this.logRule.getMessage(0));
+        assertEquals("Error when looking for a previous mail status for message id [" + this.mailId + "]. However the "
+            + "mail was sent successfully. Forcing status to [sent]", this.logRule.getMessage(0));
 
-        // Verify that save didn't happen, nor the delete
-        verify(mailStatusStore, never()).save(any(MailStatus.class), anyMap());
+        // Verify that save and delete happened
+        verify(mailStatusStore).save(any(MailStatus.class), anyMap());
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        verify(mailContentStore, never()).delete(anyString(), anyString());
+        verify(mailContentStore).delete(anyString(), anyString());
     }
 
     @Test

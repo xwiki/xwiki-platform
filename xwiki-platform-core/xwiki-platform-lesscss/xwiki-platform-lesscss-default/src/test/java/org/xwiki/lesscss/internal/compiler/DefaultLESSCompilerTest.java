@@ -19,30 +19,22 @@
  */
 package org.xwiki.lesscss.internal.compiler;
 
+import java.io.FileInputStream;
+import java.io.StringWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.junit.Before;
+import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.lesscss.compiler.LESSCompiler;
-import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.jgroups.util.Util.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test class for {@link DefaultLESSCompiler}.
  *
- * @since 6.3M1
+ * @since 7.0RC1
  * @version $Id$
  */
 public class DefaultLESSCompilerTest
@@ -51,94 +43,41 @@ public class DefaultLESSCompilerTest
     public MockitoComponentMockingRule<DefaultLESSCompiler> mocker =
             new MockitoComponentMockingRule<>(DefaultLESSCompiler.class);
 
-    private ConfigurationSource configurationSource;
-
-    private ComponentManager componentManager;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        configurationSource = mocker.getInstance(ConfigurationSource.class);
-        componentManager = mocker.getInstance(ComponentManager.class);
-    }
-
     @Test
     public void compile() throws Exception
     {
-        // Mocks
-        when(configurationSource.getProperty(eq("less.compiler"), anyString())).thenReturn("elvis");
+        // Get an example
+        StringWriter source = new StringWriter();
+        IOUtils.copy(new FileInputStream(getClass().getResource("/style.less").getFile()), source);
 
-        // Mocked compiler
-        LESSCompiler mockedCompiler = mock(LESSCompiler.class);
-        when(mockedCompiler.compile(anyString())).thenReturn("It's ok");
-        when(mockedCompiler.compile(anyString(), any(Path[].class))).thenReturn("Good");
-        mocker.registerComponent(LESSCompiler.class, "elvis", mockedCompiler);
+        // Compile
+        String result = mocker.getComponentUnderTest().compile(source.toString());
 
-        // Test 1
-        String result = mocker.getComponentUnderTest().compile("Blah Blah");
-        assertEquals("It's ok", result);
+        // Get the expected result
+        StringWriter expectedResult = new StringWriter();
+        IOUtils.copy(new FileInputStream(getClass().getResource("/style.css").getFile()), expectedResult);
 
-        // Test 2
-        Path[] paths = new Path[1];
-        String result2 = mocker.getComponentUnderTest().compile("Blah Blah", paths);
-        assertEquals("Good", result2);
+        // Compare
+        assertEquals(expectedResult.toString(), result);
     }
 
     @Test
-    public void compileWithException() throws Exception
+    public void compileWithImports() throws Exception
     {
-        // Mocks
-        when(configurationSource.getProperty(eq("less.compiler"), anyString())).thenReturn("elvis");
+        // Get an example
+        StringWriter source = new StringWriter();
+        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.less").getFile()), source);
 
-        // Test
-        Exception exception = null;
-        try {
-            mocker.getComponentUnderTest().compile("Blah");
-        } catch (LESSCompilerException e) {
-            exception = e;
-        }
+        // Compile
+        Path[] paths = { Paths.get(getClass().getResource("/").getPath())};
+        String result = mocker.getComponentUnderTest().compile(source.toString(), paths);
 
-        // Verify
-        assertNotNull(exception);
-        assertTrue(exception instanceof  LESSCompilerException);
-        assertEquals("Unable to get the LESS Compiler component [elvis].", exception.getMessage());
-    }
+        // Get the expected result
+        StringWriter expectedResult = new StringWriter();
+        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.css").getFile()),
+                expectedResult);
 
-    @Test
-    public void compilePathsWithException() throws Exception
-    {
-        // Mocks
-        when(configurationSource.getProperty(eq("less.compiler"), anyString())).thenReturn("elvis");
-        Path[] paths = new Path[1];
-
-        // Test
-        Exception exception = null;
-        try {
-            mocker.getComponentUnderTest().compile("Blah", paths);
-        } catch (LESSCompilerException e) {
-            exception = e;
-        }
-
-        // Verify
-        assertNotNull(exception);
-        assertTrue(exception instanceof  LESSCompilerException);
-        assertEquals("Unable to get the LESS Compiler component [elvis].", exception.getMessage());
-    }
-
-    @Test
-    public void ensureLESS4JisTheDefault() throws Exception
-    {
-        when(configurationSource.getProperty(eq("less.compiler"), eq("less4j"))).thenReturn("less4j");
-
-        // Mocked compiler
-        LESSCompiler mockedCompiler = mock(LESSCompiler.class);
-        when(mockedCompiler.compile(anyString())).thenReturn("LESS4J did it");
-        mocker.registerComponent(LESSCompiler.class, "less4j", mockedCompiler);
-
-        // Test
-        String result = mocker.getComponentUnderTest().compile("Blah Blah");
-
-        // Verify
-        assertEquals("LESS4J did it", result);
+        // Compare
+        assertEquals(expectedResult.toString(), result);
     }
 }

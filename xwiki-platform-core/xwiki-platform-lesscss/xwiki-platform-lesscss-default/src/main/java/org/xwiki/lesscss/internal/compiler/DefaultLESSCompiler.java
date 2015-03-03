@@ -21,54 +21,59 @@ package org.xwiki.lesscss.internal.compiler;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.compiler.less4j.FileLESSSource;
+
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
- * Default implementation for {@link LESSCompiler}. Actually use the good implementation depending on the configuration.
+ * Implementation of {@link LESSCompiler} that uses https://github.com/SomMeri/less4j, a LESS compiler written in Java
+ * for better performances.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
 @Component
 @Singleton
 public class DefaultLESSCompiler implements LESSCompiler
 {
-    @Inject
-    private ComponentManager componentManager;
-
-    @Inject
-    private ConfigurationSource configurationSource;
-
-    private LESSCompiler getLessCompiler() throws LESSCompilerException
-    {
-        String compilerName = configurationSource.getProperty("less.compiler", "less4j");
-        try {
-            return componentManager.getInstance(LESSCompiler.class, compilerName);
-        } catch (ComponentLookupException e) {
-            throw new LESSCompilerException(String.format("Unable to get the LESS Compiler component [%s].",
-                    compilerName), e);
-        }
-    }
+    private static final String ERROR_MESSAGE = "Failed to compile the LESS code: [%s]";
 
     @Override
     public String compile(String lessCode) throws LESSCompilerException
     {
-        LESSCompiler lessCompiler = getLessCompiler();
-        return lessCompiler.compile(lessCode);
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
+        try {
+            LessCompiler.CompilationResult result = lessCompiler.compile(lessCode, options);
+            return result.getCss();
+        } catch (Less4jException e) {
+            throw new LESSCompilerException(ERROR_MESSAGE, e);
+        }
     }
 
     @Override
     public String compile(String lessCode, Path[] includePaths) throws LESSCompilerException
     {
-        LESSCompiler lessCompiler = getLessCompiler();
-        return lessCompiler.compile(lessCode, includePaths);
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
+        try {
+            FileLESSSource source = new FileLESSSource(lessCode, includePaths);
+            LessCompiler.CompilationResult result = lessCompiler.compile(source, options);
+            return result.getCss();
+        } catch (Less4jException | BugHappened e) {
+            throw new LESSCompilerException(String.format(ERROR_MESSAGE, e.getMessage()), e);
+        }
     }
+
+
 }

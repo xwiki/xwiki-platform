@@ -29,10 +29,10 @@ import com.github.sommeri.less4j.LessSource;
  * Used to emulate the --include-path options which is not natively implemented in Less4j.
  * See: https://github.com/SomMeri/less4j/wiki/Customizing-Compiler.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
-public class CustomLESSSource extends LessSource
+public class FileLESSSource extends LessSource
 {
     private Path[] includePaths;
 
@@ -44,7 +44,7 @@ public class CustomLESSSource extends LessSource
      * @param content a string containing the LESS code to compile.
      * @param includePaths an array of paths where the include files can be located.
      */
-    public CustomLESSSource(String content, Path[] includePaths)
+    public FileLESSSource(String content, Path[] includePaths)
     {
         this.content = content;
         this.includePaths = includePaths;
@@ -54,7 +54,7 @@ public class CustomLESSSource extends LessSource
      * @param file the file containing the LESS code to compile.
      * @param includePaths an array of paths where the include files can be located.
      */
-    public CustomLESSSource(File file, Path[] includePaths)
+    public FileLESSSource(File file, Path[] includePaths)
     {
         this.file = file;
         this.includePaths = includePaths;
@@ -68,7 +68,7 @@ public class CustomLESSSource extends LessSource
             File currentDir = file.getParentFile();
             File newFile = new File(currentDir, filename);
             if (newFile.exists()) {
-                return new CustomLESSSource(newFile, this.includePaths);
+                return new FileLESSSource(newFile, this.includePaths);
             }
         }
 
@@ -77,7 +77,7 @@ public class CustomLESSSource extends LessSource
             Path directory = includePaths[i];
             File newFile = new File(directory.toFile(), filename);
             if (newFile.exists()) {
-                return new CustomLESSSource(newFile, this.includePaths);
+                return new FileLESSSource(newFile, this.includePaths);
             }
         }
 

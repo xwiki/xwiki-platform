@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiSkinFileOverrideClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
@@ -127,6 +128,18 @@ public class WikiSkinUtils
     private Resource<?> getSkinResourceFromDocumentSkin(String resource, XWikiDocument skinDocument, Skin skin)
     {
         if (skinDocument != null) {
+            // Try to find a XWikiSkinFileOverrideClass object
+            BaseObject obj = skinDocument.getXObject(XWikiSkinFileOverrideClassDocumentInitializer.DOCUMENT_REFERENCE, 
+                XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_PATH, resource, false);
+            if (obj != null) {
+                ObjectPropertyReference reference = new ObjectPropertyReference(
+                    XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT,
+                        obj.getReference());
+                return new ObjectPropertyWikiResource(getPath(reference), skin, reference,
+                    skinDocument.getAuthorReference(), this.xcontextProvider,
+                        obj.getLargeStringValue(XWikiSkinFileOverrideClassDocumentInitializer.PROPERTY_CONTENT));
+            }
+            
             // Try parsing the object property
             BaseProperty<ObjectPropertyReference> property = getSkinResourceProperty(resource, skinDocument);
             if (property != null) {

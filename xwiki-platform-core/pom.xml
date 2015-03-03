@@ -163,12 +163,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.2</version>
-      </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
         <groupId>org.apache.struts</groupId>

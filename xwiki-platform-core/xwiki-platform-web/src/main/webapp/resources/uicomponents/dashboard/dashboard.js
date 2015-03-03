@@ -237,7 +237,7 @@ XWiki.Dashboard = Class.create( {
     // get the gadget wizard and start adding a gadget
     Wysiwyg.onModuleLoad(function() {
       if (!this.gadgetWizard) {
-        this.gadgetWizard = new XWiki.GadgetWizard(createGadgetWizardConfig());
+        this.gadgetWizard = new XWiki.GadgetWizard(this.createGadgetWizardConfig());
       }
       this.gadgetWizard.add(this.onAddGadgetComplete.bind(this));
     }.bind(this));

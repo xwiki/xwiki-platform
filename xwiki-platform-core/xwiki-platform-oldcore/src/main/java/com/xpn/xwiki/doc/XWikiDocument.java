@@ -582,15 +582,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Used to identify the object policy in #readFromForm(EditForm, XWikiContext).
-     */
-    private static final String OBJECT_POLICY_KEY = "objectPolicy";
-
-    private static final String OBJECT_POLICY_UPDATE = "update";
-
-    private static final String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
-
-    /**
      * @since 6.2
      */
     public XWikiDocument(DocumentReference reference, Locale locale)
@@ -3466,15 +3457,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * where key is <propertyname> and content is the array of corresponding values.
      * 
      * Example with a list of HTTP parameters:
-     * 
-     * * XWiki.XWikiRights_0_users=XWiki.Admin
-     * * XWiki.XWikiRights_0_users=XWiki.Me
-     * * XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup
-     * * XWiki.XWikiRights_1_user=XWiki.Admin
-     * * XWiki.XWikiUsers_1_name=Spirou
+     * <ul>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Me</li>
+     * <li>XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup</li>
+     * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
+     * <li>XWiki.XWikiUsers_1_name=Spirou</li>
+     * </ul>
      * 
      * will result in the following map
      * 
+     * <pre>
      * {
      *   "XWiki.XWikiRights": {
      *     "0": {
@@ -3491,9 +3484,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *     }
      *   ]
      * }
+     * </pre>
      * 
      * @param request The input HTTP request that provides the parameters
-     * @return The map containing ordered data (see more details in the method's documentation)
+     * @return The map containing ordered data
      */
     private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request)
     {

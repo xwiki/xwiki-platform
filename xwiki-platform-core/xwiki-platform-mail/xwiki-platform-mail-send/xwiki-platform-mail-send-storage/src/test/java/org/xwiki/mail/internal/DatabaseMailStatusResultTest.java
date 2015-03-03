@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.AllLogRule;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -42,10 +42,7 @@ import static org.junit.Assert.*;
 public class DatabaseMailStatusResultTest
 {
     @Rule
-    public LogRule logRule = new LogRule() {{
-        record(LogLevel.WARN);
-        recordLoggingForType(DatabaseMailStatusResult.class);
-    }};
+    public AllLogRule logRule = new AllLogRule();
 
     @Test
     public void getSize() throws Exception

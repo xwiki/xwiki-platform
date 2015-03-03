@@ -149,7 +149,11 @@ public class MailTest extends AbstractTest
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
-        assertTrue(liveTableElement.getRowCount() > 2);
+
+        // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
+        // but the mail status in the database may not have been updated yet.
+        liveTableElement.waitUntilRowCountGreaterThan(3);
+
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
         assertTrue(liveTableElement.getRowCount() > 0);
         assertTrue(liveTableElement.hasRow("Error", ""));

@@ -867,7 +867,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group:hover , .skin-colibri .admin-menu .current {
+.skin-colibri .admin-menu .group:hover , .skin-colibri .admin-menu .current-group {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'to': 'bottom',
      'colors': [

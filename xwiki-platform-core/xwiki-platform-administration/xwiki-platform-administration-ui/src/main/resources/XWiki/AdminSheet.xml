@@ -983,7 +983,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
+.skin-colibri .admin-menu .group.extensionmanagerIcon:hover , .skin-colibri .admin-menu .current.extensionmanagerIcon {
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
      'to': 'bottom',
      'colors': [

@@ -39,7 +39,7 @@ import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.AllLogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -55,10 +55,7 @@ import static org.mockito.Mockito.*;
 public class DatabaseMailListenerTest
 {
     @Rule
-    public LogRule logRule = new LogRule() {{
-        record(LogRule.LogLevel.WARN);
-        recordLoggingForType(DatabaseMailListener.class);
-    }};
+    public AllLogRule logRule = new AllLogRule();
 
     @Rule
     public MockitoComponentMockingRule<DatabaseMailListener> mocker =

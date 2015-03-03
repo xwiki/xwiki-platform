@@ -884,6 +884,15 @@ $namespace##
       <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
         "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+
+      ## DEBUG START: Check if there is any job status associated with the specified extension.
+      #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
+      #if ($jobStatus)
+        ## Normally we shouldn't get here.
+        <div class="errormessage">We found an extension job associated with the missing extension:</div>
+        #displayExtensionJobStatus($jobStatus)
+      #end
+      ## DEBUG STOP
     #end
   #end
 #end

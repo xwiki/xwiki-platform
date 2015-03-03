@@ -616,7 +616,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             content =
                 StringUtils.equals(Syntax.XWIKI_1_0.toIdString(), syntaxId)
                     ? "#includeForm(\"XWiki.FeedEntryClassSheet\")"
-                    : "{{include document=\"XWiki.FeedEntryClassSheet\" /}}";
+                    : "{{include reference=\"XWiki.FeedEntryClassSheet\" /}}";
         } else {
             content = context.getWiki().Param("xwiki.plugins.feed.entryContent");
         }
@@ -674,7 +674,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (StringUtils.isBlank(doc.getParent())) {
@@ -742,7 +742,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
 

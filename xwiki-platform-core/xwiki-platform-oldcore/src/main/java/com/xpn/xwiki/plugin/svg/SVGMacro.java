@@ -99,7 +99,7 @@ public class SVGMacro extends BaseLocaleMacro
             return;
         }
         // {svg:alternate text|height|width}
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         String text = params.get("text", 0);
         String height = params.get("height", 1);
         if (StringUtils.isBlank(height) || "none".equals(height) || !StringUtils.isNumeric(height.trim())) {

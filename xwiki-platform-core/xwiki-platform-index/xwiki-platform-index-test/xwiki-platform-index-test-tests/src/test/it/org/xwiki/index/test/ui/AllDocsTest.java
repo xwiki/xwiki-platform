@@ -50,7 +50,7 @@ public class AllDocsTest extends AbstractTest
     {
         // Test 1: Verify that the Action column is displayed only for logged in users
         // Create a test user
-        getUtil().createUserAndLogin(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
+        getUtil().createUserAndLogin(getTestClassName() + "_" + getTestMethodName(), "password");
         AllDocsPage page = AllDocsPage.gotoPage();
         LiveTableElement livetable = page.clickIndexTab();
         assertTrue("No Actions column found", livetable.hasColumn("Actions"));
@@ -58,22 +58,23 @@ public class AllDocsTest extends AbstractTest
         // Logs out to be guest to verify that the Action columns is no longer displayed
         getUtil().forceGuestUser();
 
+        page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
         assertFalse("Actions column shouldn't be visible for guests", livetable.hasColumn("Actions"));
 
         // Test 2: Verify filtering works by filtering on the document name
         livetable = page.clickIndexTab();
-        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", "XWikiAllGroup");
-        assertTrue(livetable.hasRow("Page", "XWikiAllGroup"));
+        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", getTestMethodName());
+        // We get one result for the user we've created
+        assertEquals(1, livetable.getRowCount());
+        assertTrue(livetable.hasRow("Page", getTestClassName() + "_" + getTestMethodName()));
     }
 
     @Test
     public void recycleBinTab() throws Exception
     {
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
-        AllDocsPage page = AllDocsPage.gotoPage();
+        getUtil().loginAsSuperAdminAndGotoPage(AllDocsPage.getURL());
+        AllDocsPage page = new AllDocsPage();
         assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
         assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
 

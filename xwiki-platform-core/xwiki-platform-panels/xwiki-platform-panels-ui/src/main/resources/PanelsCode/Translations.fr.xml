@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Panels.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1413990648000</creationDate>
+  <date>1413991189000</date>
+  <contentUpdateDate>1413991189000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
+platform.panels.applications.ajax.error=Enregistrement impossible.
+platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration. 
+platform.panels.applications.ajax.success=La configuration a été enregistrée.
+platform.panels.applications.blacklistedapps=Applications absentes de la barre
+platform.panels.applications.displayedapps=Applications présentes dans la barre
+platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
+platform.panels.applications.revert=Rétablir
+platform.panels.applications.save=Enregistrer
+</content>
+</xwikidoc>

@@ -220,7 +220,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         Map<String, ListItem> fileTree = new HashMap<String, ListItem>();
         List<ListItem> res = new ArrayList<ListItem>();
         for (String url : flatList) {
-            StringBuffer buf = new StringBuffer(url.length());
+            StringBuilder buf = new StringBuilder(url.length());
             String parentBuf = "";
             String[] aUrl = url.split(URL_SEPARATOR);
             for (int i = 0; i < aUrl.length; i++) {

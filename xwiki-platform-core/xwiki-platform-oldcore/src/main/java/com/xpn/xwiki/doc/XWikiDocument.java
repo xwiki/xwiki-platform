@@ -1696,7 +1696,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void appendMeta(String meta)
     {
-        StringBuffer buf = new StringBuffer(this.meta);
+        StringBuilder buf = new StringBuilder(this.meta);
         buf.append(meta);
         buf.append("\n");
         this.meta = buf.toString();
@@ -3163,7 +3163,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return "";
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         VelocityContext vcontext = new VelocityContext();
         for (String propertyName : bclass.getPropertyList()) {
             PropertyClass pclass = (PropertyClass) bclass.getField(propertyName);
@@ -3228,7 +3228,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return "";
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append("{table}\n");
         boolean first = true;
         for (String propertyName : bclass.getPropertyList()) {
@@ -4314,7 +4314,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         int length = xmlString.length();
         char character;
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < length; i++) {
             character = xmlString.charAt(i);
             switch (character) {
@@ -4901,7 +4901,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
      * {@link #getChildren(int, int, com.xpn.xwiki.XWikiContext)}
      *
      * @since 2.2M2
@@ -4921,7 +4921,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Returns a list of references of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent, in the current wiki.
      *
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
@@ -4945,16 +4945,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         List<DocumentReference> children = new ArrayList<DocumentReference>();
 
         try {
-            Query query =
-                getStore()
-                    .getQueryManager()
-                    .createQuery(
-                        "select distinct doc.space, doc.name from XWikiDocument doc where "
-                            + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
-                        Query.XWQL);
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
-            query
-                .bindValue("prefixedFullName", getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
+            Query query = getStore().getQueryManager().createQuery(
+                "select distinct doc.space, doc.name from XWikiDocument doc where "
+                    + "doc.parent=:prefixedFullName or doc.parent=:fullName or (doc.parent=:name and doc.space=:space)",
+                Query.XWQL);
+            query.addFilter(Utils.getComponent(QueryFilter.class, "hidden"));
+            query.bindValue("prefixedFullName",
+                getDefaultEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("fullName", getLocalEntityReferenceSerializer().serialize(getDocumentReference()));
             query.bindValue("name", getDocumentReference().getName());
             query.bindValue("space", getDocumentReference().getLastSpaceReference().getName());
@@ -4965,7 +4962,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 children.add(new DocumentReference(this.getDocumentReference().getWikiReference().getName(),
                     (String) queryResult[0], (String) queryResult[1]));
             }
-
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
                 String.format("Failed to retrieve children for document [%s]", this.getDocumentReference()), e);
@@ -6183,8 +6179,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
-     * their parent is passed in parameter.
+     * Same as {@link #rename(DocumentReference, List, XWikiContext)} but the list of documents having the current
+     * document as their parent is passed in parameter.
      *
      * @param newDocumentReference the new document reference
      * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
@@ -6659,7 +6655,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getEditURL(String action, String mode, String language, XWikiContext context)
     {
-        StringBuffer editparams = new StringBuffer();
+        StringBuilder editparams = new StringBuilder();
         if (!mode.equals("")) {
             editparams.append("xpage=");
             editparams.append(mode);
@@ -7589,7 +7585,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private String updateDocumentSection10(int sectionNumber, String newSectionContent) throws XWikiException
     {
-        StringBuffer newContent = new StringBuffer();
+        StringBuilder newContent = new StringBuilder();
         // get document section that will be edited
         DocumentSection docSection = getDocumentSection(sectionNumber);
         int numberOfSections = getSections().size();
@@ -7653,7 +7649,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             md5.update(valueBeforeMD5.getBytes());
 
             byte[] array = md5.digest();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (byte element : array) {
                 int b = element & 0xFF;
                 if (b < 0x10) {

@@ -34,6 +34,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

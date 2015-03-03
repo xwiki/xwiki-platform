@@ -139,7 +139,7 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     public ChangeAvatarPage changeAvatarImage()
     {
         this.changeAvatar.click();
-        waitUntilElementIsVisible(By.id("uploadAttachment"));
+        getDriver().waitUntilElementIsVisible(By.id("uploadAttachment"));
         return new ChangeAvatarPage();
     }
 

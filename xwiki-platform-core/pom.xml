@@ -39,6 +39,8 @@
     <xwiki.minification.skip>false</xwiki.minification.skip>
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <!-- The bootstrap version is used is several places -->
+    <bootstrap.version>3.3.2</bootstrap.version>
   </properties>
   <dependencies>
     <!-- Adds an Annotation Processor to automatically verify Component declarations.
@@ -66,13 +68,13 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.7-b3-xwiki-3</version>
+        <version>2.7-b4-xwiki-1</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.6.1.Final</version>
+        <version>3.6.2.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
@@ -161,12 +163,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.2</version>
-      </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
         <groupId>org.apache.struts</groupId>
@@ -241,6 +237,12 @@
         <version>1.11.1</version>
         <scope>runtime</scope>
       </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>${bootstrap.version}</version>
+        <scope>runtime</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -311,7 +313,21 @@
                 <value>${basedir}/target/screenshots</value>
               </property>
             </systemProperties>
+            <!-- Verify that unit tests don't output anything to stdout/stderr -->
+            <properties>
+              <property>
+                <name>listener</name>
+                <value>org.xwiki.test.CaptureConsoleRunListener</value>
+              </property>
+            </properties>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
@@ -443,6 +459,33 @@
               <field>configuration</field>
               <justification>Young API. Internal refactoring</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/lesscss/cache/LESSCache</className>
+              <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
+              <justification>Young API. Fix a bad designed API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of jrcs Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev1()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
+              <method>org.suigeneris.jrcs.rcs.Version getRev2()</method>
+              <to>java.lang.String</to>
+              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -540,6 +583,7 @@
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
+    <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
     <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>

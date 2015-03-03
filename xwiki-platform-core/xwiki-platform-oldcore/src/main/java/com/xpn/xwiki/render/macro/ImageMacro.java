@@ -151,7 +151,7 @@ public class ImageMacro extends BaseLocaleMacro
         }
 
         // Create the img code
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (halign != null && !halign.equals("none")) {
             str.append("<div class=\"img" + halign.trim() + "\">");
         }

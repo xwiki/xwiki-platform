@@ -1139,7 +1139,7 @@ public class Package
      */
     public String getFileNameFromDocument(XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer fileName = new StringBuffer(doc.getDocumentReference().getName());
+        StringBuilder fileName = new StringBuilder(doc.getDocumentReference().getName());
 
         // Add language
         String language = doc.getLanguage();

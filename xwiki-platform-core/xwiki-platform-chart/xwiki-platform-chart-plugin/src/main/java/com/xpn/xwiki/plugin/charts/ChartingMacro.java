@@ -85,7 +85,7 @@ public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWiki
             Map linkAttr = chartParams.getMap(ChartParams.LINK_ATTRIBUTES);
 
             // output the image links
-            StringBuffer sbuffer = new StringBuffer();
+            StringBuilder sbuffer = new StringBuilder();
             sbuffer.append("<a href=\"" + chart.getPageURL() + "\" ");
             if (title != null) {
                 sbuffer.append("title=\"" + title + "\"");

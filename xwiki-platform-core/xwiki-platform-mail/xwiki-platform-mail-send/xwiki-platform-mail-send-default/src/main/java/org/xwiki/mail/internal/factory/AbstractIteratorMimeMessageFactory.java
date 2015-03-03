@@ -36,11 +36,10 @@ import org.xwiki.mail.MimeMessageFactory;
 /**
  * Helper class for locating {@link org.xwiki.mail.MimeMessageFactory} and validating passed parameters.
  *
- * @param <T>
  * @version $Id$
  * @since 6.4.1
  */
-public abstract class AbstractIteratorMimeMessageFactory<T> implements MimeMessageFactory<T, Iterator<MimeMessage>>
+public abstract class AbstractIteratorMimeMessageFactory extends AbstractMimeMessageFactory<Iterator<MimeMessage>>
 {
     /**
      * The component manager instance to use to locate components dynamically.
@@ -54,7 +53,7 @@ public abstract class AbstractIteratorMimeMessageFactory<T> implements MimeMessa
     {
         try {
             return this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
-                MimeMessageFactory.class, source.getClass(), MimeMessage.class), hint);
+                MimeMessageFactory.class, MimeMessage.class), hint);
         } catch (ComponentLookupException e) {
             throw new MessagingException(String.format("Failed to find a [%s<%s, MimeMessage>] for hint [%s]",
                 MimeMessageFactory.class.getSimpleName(), source.getClass().getSimpleName(), hint));

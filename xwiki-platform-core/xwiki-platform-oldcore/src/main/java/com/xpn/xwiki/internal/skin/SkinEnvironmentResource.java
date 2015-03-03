@@ -24,6 +24,7 @@ import java.net.URL;
 import javax.inject.Provider;
 
 import org.xwiki.environment.Environment;
+import org.xwiki.skin.ResourceRepository;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;

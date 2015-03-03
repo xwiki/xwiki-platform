@@ -23,6 +23,7 @@ com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
+com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiGroupsDocumentInitializer
@@ -47,14 +48,14 @@ com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolv
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
-com.xpn.xwiki.internal.skin.SkinConfiguration
-com.xpn.xwiki.internal.skin.SkinManager
+com.xpn.xwiki.internal.skin.DefaultSkinManager
+com.xpn.xwiki.internal.skin.InternalSkinConfiguration
+com.xpn.xwiki.internal.skin.InternalSkinManager
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.template.SUExecutor
+com.xpn.xwiki.internal.template.DefaultTemplateManager
+com.xpn.xwiki.internal.template.InternalTemplateManager
 com.xpn.xwiki.internal.template.TemplateListener
-com.xpn.xwiki.internal.template.TemplateMacro
-com.xpn.xwiki.internal.template.TemplateScriptService
-com.xpn.xwiki.internal.template.TemplateManager
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
@@ -63,6 +64,7 @@ com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultModelBridge
+com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer

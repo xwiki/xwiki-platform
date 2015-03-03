@@ -35,6 +35,8 @@
   <description>Functional Tests for the User Profile Application</description>
   <properties>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

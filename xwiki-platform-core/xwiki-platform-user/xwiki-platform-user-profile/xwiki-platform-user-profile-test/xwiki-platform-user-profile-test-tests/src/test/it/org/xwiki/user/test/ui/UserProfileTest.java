@@ -86,9 +86,7 @@ public class UserProfileTest extends AbstractTest
     @BeforeClass
     public static void globalSetUp()
     {
-        getDriver().get(
-            getUtil().getURLToLoginAndGotoPage("superadmin", "pass", getUtil().getURL("XWiki", "ChangePassword")));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(getUtil().getURL("XWiki", "ChangePassword"));
         ChangePasswordPage changePasswordPage = new ChangePasswordPage();
         changePasswordPage.edit();
         changePasswordPage.clickSaveAndView();
@@ -169,16 +167,15 @@ public class UserProfileTest extends AbstractTest
         // Logout
         getUtil().forceGuestUser();
 
-        // Login with the new password
-        getDriver().get(getUtil().getURLToLoginAs(this.userName, newPassword));
-        // Navigate to a page to verify that the user is logged in
-        ViewPage vp = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        // Login with the new password and navigate to a page to verify that the user is logged in
+        getUtil().loginAndGotoPage(this.userName, newPassword,
+            getUtil().getURL(getTestClassName(), getTestMethodName()));
+        ViewPage vp = new ViewPage();
         Assert.assertTrue(vp.isAuthenticated());
         getUtil().recacheSecretToken();
         
         //Reset the password
-        getDriver().get(getUtil().getURLToLoginAndGotoPage("superadmin", "pass", this.customProfilePage.getURL()));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(this.customProfilePage.getURL());
 
         preferencesPage = this.customProfilePage.switchToPreferences();
         changePasswordPage = preferencesPage.changePassword();
@@ -305,8 +302,7 @@ public class UserProfileTest extends AbstractTest
     public void testChangePasswordOfAnotherUserWithTwoDifferentPasswords()
     {
         // Login as superadmin (to have Admin rights) and change the password of another user.
-        getDriver().get(getUtil().getURLToLoginAndGotoPage("superadmin", "pass", this.customProfilePage.getURL()));
-        getUtil().recacheSecretToken();
+        getUtil().loginAsSuperAdminAndGotoPage(this.customProfilePage.getURL());
 
         PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
         ChangePasswordPage changePasswordPage = preferencesPage.changePassword();

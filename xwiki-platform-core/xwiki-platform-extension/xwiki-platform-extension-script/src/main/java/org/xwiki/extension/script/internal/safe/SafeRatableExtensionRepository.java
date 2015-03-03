@@ -35,7 +35,7 @@ import org.xwiki.extension.version.Version;
  * @version $Id$
  * @since 6.4M3
  */
-public class SafeRatableExtensionRepository<T extends ExtensionRepository> extends SafeSearchableExtensionRepository<T>
+public class SafeRatableExtensionRepository<T extends ExtensionRepository> extends SafeExtensionRepository<T>
     implements Ratable
 {
     /**

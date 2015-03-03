@@ -36,6 +36,8 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-php</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PHP Macro</xwiki.extension.name>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -48,13 +50,11 @@
       <artifactId>resin-quercus</artifactId>
       <version>3.2.1</version>
     </dependency>
-
     <!-- Quercus needs the servlet API to properly initialize -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

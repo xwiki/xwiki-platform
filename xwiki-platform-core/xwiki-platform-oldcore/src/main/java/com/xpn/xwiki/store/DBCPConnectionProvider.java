@@ -26,8 +26,8 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Properties;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
@@ -97,7 +97,11 @@ public class DBCPConnectionProvider implements ConnectionProvider
     private BasicDataSource ds;
 
     // Old Environment property for backward-compatibility (property removed in Hibernate3)
-    private static final String DBCP_PS_MAXACTIVE = "hibernate.dbcp.ps.maxActive";
+    private static final String COMPATIBILITY_PS_MAXACTIVE = "ps.maxActive";
+
+    // Properties removed from DBCP 2.0
+    private static final String COMPATIBILITY_MAXACTIVE = "maxActive";
+    private static final String COMPATIBILITY_MAXWAIT = "maxWait";
 
     // Property doesn't exists in Hibernate2
     private static final String AUTOCOMMIT = "hibernate.connection.autocommit";
@@ -140,6 +144,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Turn off autocommit (unless autocommit property is set)
+            // Note that this property will be overwritten below if the DBCP "defaultAutoCommit" property is defined.
             String autocommit = props.getProperty(AUTOCOMMIT);
             if ((autocommit != null) && (autocommit.trim().length() > 0)) {
                 dbcpProperties.put("defaultAutoCommit", autocommit);
@@ -150,13 +155,13 @@ public class DBCPConnectionProvider implements ConnectionProvider
             // Pool size
             String poolSize = props.getProperty(Environment.POOL_SIZE);
             if ((poolSize != null) && (poolSize.trim().length() > 0) && (Integer.parseInt(poolSize) > 0)) {
-                dbcpProperties.put("maxActive", poolSize);
+                dbcpProperties.put("maxTotal", poolSize);
             }
 
             // Copy all "driver" properties into "connectionProperties"
             Properties driverProps = ConnectionProviderFactory.getConnectionProperties(props);
             if (driverProps.size() > 0) {
-                StringBuffer connectionProperties = new StringBuffer();
+                StringBuilder connectionProperties = new StringBuilder();
                 for (Iterator iter = driverProps.keySet().iterator(); iter.hasNext();) {
                     String key = (String) iter.next();
                     String value = driverProps.getProperty(key);
@@ -174,14 +179,23 @@ public class DBCPConnectionProvider implements ConnectionProvider
                 if (key.startsWith(PREFIX)) {
                     String property = key.substring(PREFIX.length());
                     String value = props.getProperty(key);
-                    dbcpProperties.put(property, value);
-                }
-            }
 
-            // Backward-compatibility
-            if (props.getProperty(DBCP_PS_MAXACTIVE) != null) {
-                dbcpProperties.put("poolPreparedStatements", String.valueOf(Boolean.TRUE));
-                dbcpProperties.put("maxOpenPreparedStatements", props.getProperty(DBCP_PS_MAXACTIVE));
+                    // Handle backward compatibility
+                    switch (property) {
+                        case COMPATIBILITY_PS_MAXACTIVE:
+                            dbcpProperties.put("poolPreparedStatements", String.valueOf(Boolean.TRUE));
+                            dbcpProperties.put("maxOpenPreparedStatements", value);
+                            break;
+                        case COMPATIBILITY_MAXACTIVE:
+                            dbcpProperties.put("maxTotal", value);
+                            break;
+                        case COMPATIBILITY_MAXWAIT:
+                            dbcpProperties.put("maxWaitMillis", value);
+                            break;
+                        default:
+                            dbcpProperties.put(property, value);
+                    }
+                }
             }
 
             // Some debug info
@@ -193,7 +207,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
             }
 
             // Let the factory create the pool
-            this.ds = (BasicDataSource) BasicDataSourceFactory.createDataSource(dbcpProperties);
+            this.ds = BasicDataSourceFactory.createDataSource(dbcpProperties);
 
             // The BasicDataSource has lazy initialization
             // borrowing a connection will start the DataSource
@@ -204,9 +218,8 @@ public class DBCPConnectionProvider implements ConnectionProvider
             // Log pool statistics before continuing.
             logStatistics();
         } catch (Exception e) {
-            String message =
-                "Could not create a DBCP pool. "
-                    + "There is an error in the hibernate configuration file, please review it.";
+            String message = "Could not create a DBCP pool. There is an error in the Hibernate configuration file, "
+                + "please review it.";
             LOGGER.error(message, e);
             if (this.ds != null) {
                 try {
@@ -288,7 +301,7 @@ public class DBCPConnectionProvider implements ConnectionProvider
     {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
-                this.ds.getMaxActive(), this.ds.getNumIdle(), this.ds.getMaxIdle());
+                this.ds.getMaxTotal(), this.ds.getNumIdle(), this.ds.getMaxIdle());
         }
     }
 }

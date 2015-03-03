@@ -132,7 +132,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
     private Object filter;
 
-    protected Object getFilter() throws FilterException
+    protected Object getFilter()
     {
         if (this.filter == null) {
             this.filter = this.filterManager.createCompositeFilter(this.contentListener, this);

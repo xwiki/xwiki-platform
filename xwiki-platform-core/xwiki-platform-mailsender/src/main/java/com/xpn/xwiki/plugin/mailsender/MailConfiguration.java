@@ -195,7 +195,7 @@ public class MailConfiguration
     @Override
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (getHost() != null) {
             buffer.append("Host [" + getHost() + "]");

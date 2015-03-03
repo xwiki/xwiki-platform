@@ -22,6 +22,8 @@ package com.xpn.xwiki.internal.skin;
 import javax.inject.Provider;
 
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.ResourceRepository;
 
 import com.xpn.xwiki.XWikiContext;
 

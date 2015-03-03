@@ -39,10 +39,11 @@ public interface CachedCompilerInterface<T>
      * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
      * @param useVelocity either or not the resource be parsed by Velocity before compiling it
      * defined there
+     * @param useLESS either or not the resource be compiled by the LESS compiler
      * @param skin skin in used for the compilation
      * @return the result of the compilation of the LESS Resource
      * @throws LESSCompilerException if problem occurs
      */
-    T compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity, String skin)
-        throws LESSCompilerException;
+    T compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        boolean useLESS, String skin) throws LESSCompilerException;
 }

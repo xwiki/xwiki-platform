@@ -42,6 +42,8 @@
 #set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
 #set($faqHome = $doc.getObject("FAQCode.FAQHomeClass"))
 #if($faqHome)
+  ## Don't display doc extra tabs for FAQ home pages
+  #set($docextras=[])
   $doc.use("FAQCode.FAQHomeClass")
   $xwiki.jsx.use('FAQCode.SkinExtension')
   $xwiki.ssx.use('FAQCode.SkinExtension')
@@ -111,9 +113,8 @@
   (% class="clearfloats" %)((()))(%%)
 
   {{faq filter="space=${faqSpace}"/}}
-  #else
-    This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
-  #end
-#set($docextras=[])
+#else
+  This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
+#end
 {{/velocity}}</content>
 </xwikidoc>

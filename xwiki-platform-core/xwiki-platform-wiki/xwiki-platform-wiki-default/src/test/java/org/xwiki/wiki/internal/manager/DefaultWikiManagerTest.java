@@ -36,6 +36,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiCopier;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;

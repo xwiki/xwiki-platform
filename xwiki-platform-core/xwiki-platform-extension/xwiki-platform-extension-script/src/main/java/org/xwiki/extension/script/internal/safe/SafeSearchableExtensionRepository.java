@@ -42,14 +42,14 @@ public class SafeSearchableExtensionRepository<T extends ExtensionRepository> ex
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeSearchableExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeSearchableExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);
     }
 
     // Searchable
-    
+
     @Override
     public IterableResult<Extension> search(String pattern, int offset, int nb) throws SearchException
     {

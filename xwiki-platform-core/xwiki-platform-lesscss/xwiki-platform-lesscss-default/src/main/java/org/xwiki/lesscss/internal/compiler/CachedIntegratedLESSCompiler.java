@@ -74,7 +74,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
 
     @Override
     public String compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
-        String skin) throws LESSCompilerException
+        boolean useLESS, String skin) throws LESSCompilerException
     {
         StringWriter source = new StringWriter();
         List<Path> includePaths = new ArrayList<>();
@@ -118,12 +118,17 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
             // Parse the LESS content with Velocity
             String lessCode = source.toString();
             if (useVelocity) {
-                lessCode = executeVelocity(source.toString(), skin);
+                lessCode = executeVelocity(lessCode, skin);
             }
 
+            String result;
             // Compile the LESS code
-            Path[] includePathsArray = includePaths.toArray(new Path[1]);
-            String result = lessCompiler.compile(lessCode, includePathsArray);
+            if (useLESS) {
+                Path[] includePathsArray = includePaths.toArray(new Path[1]);
+                result = lessCompiler.compile(lessCode, includePathsArray);
+            } else {
+                result = lessCode;
+            }
 
             // End
             return result;

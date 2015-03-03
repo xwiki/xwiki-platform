@@ -199,7 +199,7 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getUtil().findElementWithoutWaiting(getDriver(), getForm(), By.xpath(xpath));
+        return getDriver().findElementWithoutWaiting(getForm(), By.xpath(xpath));
     }
 
     /**
@@ -211,7 +211,7 @@ public class ApplicationHomeEditPage extends InlinePage
     {
         String escapedColumnLabel = columnLabel.replace("\\", "\\\\").replace("'", "\\'");
         String xpath = "//ul[@class = 'hList']/li[starts-with(., '" + escapedColumnLabel + "')]";
-        return getUtil().findElementsWithoutWaiting(getDriver(), getForm(), By.xpath(xpath)).size() > 0;
+        return getDriver().findElementsWithoutWaiting(getForm(), By.xpath(xpath)).size() > 0;
     }
 
     /**
@@ -231,9 +231,8 @@ public class ApplicationHomeEditPage extends InlinePage
      */
     public void removeAllDeprecatedLiveTableColumns(boolean yes)
     {
-        WebElement warningMessage =
-            getUtil().findElementWithoutWaiting(getDriver(), getForm(), By.className("warningmessage"));
-        getUtil().findElementWithoutWaiting(getDriver(), warningMessage, By.linkText(yes ? "Yes" : "No")).click();
+        WebElement warningMessage = getDriver().findElementWithoutWaiting(getForm(), By.className("warningmessage"));
+        getDriver().findElementWithoutWaiting(warningMessage, By.linkText(yes ? "Yes" : "No")).click();
     }
 
     /**
@@ -242,8 +241,7 @@ public class ApplicationHomeEditPage extends InlinePage
      */
     public boolean isDeprecatedLiveTableColumnsWarningDisplayed()
     {
-        List<WebElement> warnings =
-            getUtil().findElementsWithoutWaiting(getDriver(), getForm(), By.className("warningmessage"));
+        List<WebElement> warnings = getDriver().findElementsWithoutWaiting(getForm(), By.className("warningmessage"));
         return warnings.size() == 1 && warnings.get(0).isDisplayed();
     }
 

@@ -22,21 +22,52 @@ package com.xpn.xwiki.internal.skin;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.ResourceRepository;
+import org.xwiki.skin.Skin;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
 public abstract class AbstractSkin implements Skin
 {
-    protected SkinManager skinManager;
+    protected Skin VOID = new Skin()
+    {
+        @Override
+        public Resource<?> getResource(String resource)
+        {
+            return null;
+        }
 
-    protected SkinConfiguration configuration;
+        @Override
+        public Resource<?> getLocalResource(String resource)
+        {
+            return null;
+        }
+
+        @Override
+        public Skin getParent()
+        {
+            return null;
+        }
+
+        @Override
+        public String getId()
+        {
+            return null;
+        }
+    };
+
+    protected InternalSkinManager skinManager;
+
+    protected InternalSkinConfiguration configuration;
 
     protected String id;
 
-    protected ResourceRepository parent;
+    protected Skin parent;
 
-    public AbstractSkin(String id, SkinManager skinManager, SkinConfiguration configuration)
+    public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration)
     {
         this.id = id;
         this.skinManager = skinManager;
@@ -50,17 +81,13 @@ public abstract class AbstractSkin implements Skin
     }
 
     @Override
-    public ResourceRepository getParent()
+    public Skin getParent()
     {
         if (this.parent == null) {
             this.parent = createParent();
 
             if (this.parent == null) {
                 this.parent = this.skinManager.getSkin(this.configuration.getDefaultParentSkinId());
-            }
-
-            if (this.parent == null) {
-                this.parent = Skin.VOID;
             }
         }
 

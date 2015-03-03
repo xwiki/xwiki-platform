@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.Message;
@@ -40,6 +41,7 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -68,6 +70,9 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     static final String ERROR_KEY = "scriptservice.mailsender.error";
 
+    @Inject
+    private ConverterManager converterManager;
+
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
      * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
@@ -81,8 +86,8 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         MimeMessageWrapper result;
         try {
-            MimeMessageFactory<Object, MimeMessage> factory = MimeMessageFactoryProvider.get(hint, source.getClass(),
-                MimeMessage.class, this.componentManagerProvider.get());
+            MimeMessageFactory<MimeMessage> factory = MimeMessageFactoryProvider.get(hint, MimeMessage.class,
+                this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
             // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
@@ -133,8 +138,8 @@ public class MailSenderScriptService extends AbstractMailScriptService
     {
         Iterator<MimeMessage> result;
         try {
-            MimeMessageFactory<Object, Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
-                source.getClass(), new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
+            MimeMessageFactory<Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
+                new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
                 this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
             result = factory.createMessage(session, source, parameters);

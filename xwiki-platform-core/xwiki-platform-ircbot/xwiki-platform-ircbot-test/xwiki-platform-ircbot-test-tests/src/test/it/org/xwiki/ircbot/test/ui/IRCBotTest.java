@@ -20,12 +20,14 @@
 package org.xwiki.ircbot.test.ui;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.ircbot.test.po.IRCBotBotPage;
 import org.xwiki.ircbot.test.po.IRCBotConfigurationPage;
 import org.xwiki.ircbot.test.po.IRCBotHomePage;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
 
 import org.junit.Assert;
@@ -44,13 +46,13 @@ public class IRCBotTest extends AbstractTest
 
     private static final String LISTENER_PAGE = "TestListener";
 
+    // Login as superadmin to have delete rights.
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
     @Before
     public void setUp()
     {
-        // Login as superadmin to have delete rights.
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
         // Verify that the Bot is stopped, if not, stop it
         // We do this as the first thing since otherwise events could be sent to the bot which would make our
         // assertions below false.

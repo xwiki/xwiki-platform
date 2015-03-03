@@ -98,16 +98,16 @@ public class XWQLtoHQLTranslatorTest
     @Test
     public void testObject() throws Exception
     {
-        assertTranslate("select doc from Document as doc, doc.object('XWiki.XWikiUsers') as user",
+        assertTranslate("select doc from Document as doc, doc.object('XWiki.XWikiUs\u00E9rs') as user",
             "select doc from XWikiDocument as doc , BaseObject as user " +
-                "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers'");
+                "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUs\u00E9rs'");
     }
 
     @Test
     public void testProperty() throws Exception
     {
         assertTranslate(
-            "select doc from Document as doc, doc.object('XWiki.XWikiUsers') as user where user.email = 'some'",
+            "select doc from Document as doc, doc.object(XWiki.XWikiUsers) as user where user.email = 'some'",
             "select doc from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 " +
                 "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_email1.id.id=user.id and user_email1.id.name='email'");
     }
@@ -118,20 +118,20 @@ public class XWQLtoHQLTranslatorTest
         assertTranslate("", "select doc.fullName from XWikiDocument as doc");
         assertTranslate("where doc.title like '%test'",
             "select doc.fullName from XWikiDocument as doc where doc.title like '%test'");
-        assertTranslate("from doc.object('XWiki.XWikiUsers') as user",
+        assertTranslate("from doc.object(XWiki.XWikiUsers) as user",
             "select doc.fullName from XWikiDocument as doc , BaseObject as user " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers'");
-        assertTranslate("from doc.object('XWiki.XWikiUsers') as user where user.email = 'some'",
+        assertTranslate("from doc.object('XWiki.XWikiUs\u00E9rs') as user where user.email = 'some'",
             "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_email1 " +
-                "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_email1.id.id=user.id and user_email1.id.name='email'");
+                "where ( user_email1.value = 'some' ) and doc.fullName=user.name and user.className='XWiki.XWikiUs\u00E9rs' and user_email1.id.id=user.id and user_email1.id.name='email'");
     }
 
     @Test
     public void testObjDeclInWhere() throws Exception
     {
-        assertTranslate("where doc.object('XWiki.XWikiUsers').email = 'some'",
+        assertTranslate("where doc.object('XWiki.XWikiUs\u00E9rs').email = 'some'",
             "select doc.fullName from XWikiDocument as doc , BaseObject as _o1, StringProperty as _o1_email2 " +
-                "where ( _o1_email2.value = 'some' ) and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUsers' and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email'");
+                "where ( _o1_email2.value = 'some' ) and doc.fullName=_o1.name and _o1.className='XWiki.XWikiUs\u00E9rs' and _o1_email2.id.id=_o1.id and _o1_email2.id.name='email'");
     }
 
     @Test
@@ -152,7 +152,7 @@ public class XWQLtoHQLTranslatorTest
     {
         assertTranslate("order by doc.fullName",
             "select doc.fullName from XWikiDocument as doc order by doc.fullName");
-        assertTranslate("from doc.object('XWiki.XWikiUsers') as user order by user.firstname",
+        assertTranslate("from doc.object(XWiki.XWikiUsers) as user order by user.firstname",
             "select doc.fullName from XWikiDocument as doc , BaseObject as user , StringProperty as user_firstname1 " +
                 "where 1=1 and doc.fullName=user.name and user.className='XWiki.XWikiUsers' and user_firstname1.id.id=user.id and user_firstname1.id.name='firstname' order by user_firstname1.value");
         assertTranslate("order by lower(doc.fullName)",

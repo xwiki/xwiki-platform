@@ -58,7 +58,7 @@ public class AnnotationsLabel extends BaseElement
         Actions builder = new Actions(getDriver());
         builder.moveToElement(annotationIcon).build().perform();
 
-        waitUntilElementIsVisible(By.className("annotation-box-view"));
+        getDriver().waitUntilElementIsVisible(By.className("annotation-box-view"));
     }
 
     private void showAnnotationById(String idText)
@@ -80,7 +80,7 @@ public class AnnotationsLabel extends BaseElement
     {
         this.showAnnotationById(idText);
         this.deleteAnnotation.click();
-        waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//input[@value='Yes']"));
         getDriver().findElement(By.xpath("//input[@value='Yes']")).click();
     }
 
@@ -98,7 +98,7 @@ public class AnnotationsLabel extends BaseElement
 
     public String getAnnotationIdByText(String searchText)
     {
-        waitUntilElementIsVisible(By.xpath("//span[contains(.,'" + searchText + "')]"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//span[contains(.,'" + searchText + "')]"));
         WebElement annotation = getDriver().findElement(By.xpath("//span[contains(.,'" + searchText + "')]"));
         String classId = annotation.getAttribute("class");
         classId = classId.split("\\s+")[1];
@@ -108,7 +108,7 @@ public class AnnotationsLabel extends BaseElement
     public String getAnnotationContentByText(String searchText)
     {
         hoverOnAnnotationByText(searchText);
-        waitUntilElementIsVisible(By.xpath("//div[@class='annotationText']/p"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='annotationText']/p"));
         String annotationContent =
             getDriver().findElement(By.xpath("//*[@class='annotation-bubble']//div[@class='annotationText']/p"))
                 .getText();
@@ -118,7 +118,7 @@ public class AnnotationsLabel extends BaseElement
         // window disappear
         body.sendKeys(Keys.ESCAPE);
         body.sendKeys(Keys.ESCAPE);
-        waitUntilElementDisappears(By.className("annotation-box-view"));
+        getDriver().waitUntilElementDisappears(By.className("annotation-box-view"));
         return annotationContent;
     }
 }

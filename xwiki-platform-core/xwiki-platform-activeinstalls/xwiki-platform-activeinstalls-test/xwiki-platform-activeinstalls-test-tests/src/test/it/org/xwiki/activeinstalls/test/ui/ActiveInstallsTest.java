@@ -38,7 +38,7 @@ import static com.github.tlrx.elasticsearch.test.EsSetup.*;
 public class ActiveInstallsTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
     public void verifyPingIsSent() throws Exception

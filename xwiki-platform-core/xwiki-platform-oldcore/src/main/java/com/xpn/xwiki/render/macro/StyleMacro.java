@@ -108,7 +108,7 @@ public class StyleMacro extends BaseLocaleMacro
         if (("none".equals(type)) || (type == null) || ("".equals(type.trim()))) {
             type = "span";
         }
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("<" + type + " ");
 
         if ((!"none".equals(id)) && (id != null) && (!"".equals(id.trim()))) {

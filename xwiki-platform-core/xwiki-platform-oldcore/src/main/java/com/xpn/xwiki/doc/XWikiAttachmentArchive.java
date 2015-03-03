@@ -261,7 +261,7 @@ public class XWikiAttachmentArchive implements Cloneable
                 return null;
             }
             final Object[] lines = rcsArchive.getRevision(version);
-            final StringBuffer content = new StringBuffer();
+            final StringBuilder content = new StringBuilder();
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i].toString();
                 content.append(line);

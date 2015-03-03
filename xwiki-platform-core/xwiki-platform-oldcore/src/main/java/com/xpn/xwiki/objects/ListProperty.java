@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
@@ -33,6 +32,7 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
@@ -41,7 +41,13 @@ public class ListProperty extends BaseProperty implements Cloneable
      */
     protected transient List<String> list;
 
-    private String formStringSeparator = "|";
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
+    private String formStringSeparator = ListClass.DEFAULT_SEPARATOR;
 
     /**
      * This is the actual list. It will be used during serialization/deserialization.
@@ -52,11 +58,23 @@ public class ListProperty extends BaseProperty implements Cloneable
         this.list = new NotifyList(this.actualList, this);
     }
 
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
     public String getFormStringSeparator()
     {
         return this.formStringSeparator;
     }
 
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
     public void setFormStringSeparator(String formStringSeparator)
     {
         this.formStringSeparator = formStringSeparator;
@@ -87,17 +105,17 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public String toText()
     {
-        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
-            return "";
-        }
-
-        List<String> escapedValues = new ArrayList<String>();
-        for (String value : getList()) {
-            escapedValues.add(value.replace(this.formStringSeparator, "\\" + this.formStringSeparator));
-        }
-        return StringUtils.join(escapedValues, this.formStringSeparator);
+        // Always use the default separator because this is the value that is stored in the database (for non-relational
+        // lists).
+        String result = ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
+        return result;
     }
 
+    /**
+     * @deprecated Since 7.0M2. This method is here for a long time but it does not seem to have ever been used and it
+     *             does not bring any value compared to the existing {@link #toFormString()} method.
+     */
+    @Deprecated
     public String toSingleFormString()
     {
         return super.toFormString();

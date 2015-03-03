@@ -36,8 +36,6 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
-    <!-- Bootstrap version is used in several places -->
-    <bootstrap.version>3.3.1</bootstrap.version>
   </properties>
   <dependencies>
     <!-- LESS Module -->
@@ -65,7 +63,6 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>${bootstrap.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -112,7 +109,6 @@
                 <artifactItem>
                   <groupId>org.webjars</groupId>
                   <artifactId>bootstrap</artifactId>
-                  <version>${bootstrap.version}</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>

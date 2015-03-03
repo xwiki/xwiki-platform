@@ -308,7 +308,7 @@ public class DocumentLocaleReader extends AbstractReader
 
                 if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
                     if (!value.equals(this.currentSpace)) {
-                        if (this.currentSpace != null) {
+                        if (this.currentSpace != null && this.sentBeginWikiSpace) {
                             sendEndWikiSpace(proxyFilter);
                         }
                         this.currentSpace = value;

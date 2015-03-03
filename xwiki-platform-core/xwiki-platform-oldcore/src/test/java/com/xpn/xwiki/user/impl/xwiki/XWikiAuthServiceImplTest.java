@@ -239,4 +239,25 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         assertEquals("/something",
             this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), getContext()));
     }
+
+    public void testStripContextPathFromURLWhenRootWebAppAndJSessionId() throws Exception
+    {
+        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue(""));
+
+        // Simulate a rewrite filter that would add a jsession id and add a leading slash!
+        Mock xwikiResponse = mock(XWikiResponse.class);
+        xwikiResponse.stubs().method("encodeURL").with(eq("http://localhost:8080")).will(
+            new CustomStub("Implements XWikiResponse.encodeURL")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return "http://localhost:8080/;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F";
+                }
+            });
+        getContext().setResponse((XWikiResponse) xwikiResponse.proxy());
+
+        assertEquals("/something",
+            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"), getContext()));
+    }
 }

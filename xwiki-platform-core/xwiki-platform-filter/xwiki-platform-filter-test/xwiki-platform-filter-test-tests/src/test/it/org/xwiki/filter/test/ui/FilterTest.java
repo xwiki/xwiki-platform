@@ -27,11 +27,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -42,20 +44,20 @@ import org.xwiki.test.ui.po.ViewPage;
 // TODO: provide PO APIs when Filter application is in a more final state
 public class FilterTest extends AbstractTest
 {
+    // Login as superadmin to have delete rights.
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
     private ViewPage vp;
 
     @Before
     public void setUp()
     {
-        // Login as superadmin to have delete rights.
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
         // Navigate to the Filter app by clicking in the Application Panel.
         // This verifies that the Filter application is registered in the Applications Panel.
         // It also verifies that the Translation is registered properly.
         ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
-        this.vp = applicationPanel.clickApplication("Filter streams converter");
+        this.vp = applicationPanel.clickApplication("Filter Streams Converter");
 
         // Verify we're on the right page!
         Assert.assertEquals("Filter", this.vp.getMetaDataValue("space"));

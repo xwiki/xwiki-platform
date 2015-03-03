@@ -63,7 +63,7 @@ public class EditorElement extends BaseElement
      */
     public EditorElement waitToLoad()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<WebElement>()
+        getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(WebDriver driver)

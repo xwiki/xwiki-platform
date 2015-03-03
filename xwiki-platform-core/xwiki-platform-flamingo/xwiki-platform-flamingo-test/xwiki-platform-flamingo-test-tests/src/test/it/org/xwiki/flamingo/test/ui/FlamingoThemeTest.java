@@ -46,8 +46,7 @@ import static org.junit.Assert.assertTrue;
 public class FlamingoThemeTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule =
-            new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
     @Test
     public void editFlamingoTheme() throws Exception
     {
@@ -183,7 +182,7 @@ public class FlamingoThemeTest extends AbstractTest
         assertEquals("Test", themeApplicationWebHomePage.getCurrentTheme());
         // Look at the values
         assertEquals("rgba(255, 0, 0, 1)", themeApplicationWebHomePage.getPageBackgroundColor());
-        assertEquals("\"Monospace\"", themeApplicationWebHomePage.getFontFamily());
+        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
         // Test 'lessCode' is correctly handled
         assertEquals("rgba(0, 0, 255, 1)", themeApplicationWebHomePage.getTextColor());
 

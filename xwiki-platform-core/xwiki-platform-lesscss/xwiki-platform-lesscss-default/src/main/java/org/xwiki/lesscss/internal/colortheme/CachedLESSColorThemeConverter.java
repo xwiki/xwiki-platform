@@ -49,7 +49,7 @@ public class CachedLESSColorThemeConverter implements CachedCompilerInterface<Co
 
     @Override
     public ColorTheme compute(LESSResourceReference lessResourceReference, boolean includeSkinStyle,
-        boolean useVelocity, String skin)
+        boolean useVelocity, boolean useLESS, String skin)
         throws LESSCompilerException
     {
         return getColorThemeFromCSS(lessCompiler.compile(lessResourceReference, false, useVelocity, skin, false));

@@ -119,17 +119,24 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     {
         Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
 
-        while (messages.hasNext()) {
-            // We prepare a new Execution Context for each mail so that one mail doesn't interfere with another
+        // We prepare a new Execution Context for each mail so that one mail doesn't interfere with another
+        // Note that we need to have the hasNext() call after the context is ready since the implementation can need
+        // a valid XWiki Context.
+        boolean shouldStop = false;
+        while (!shouldStop) {
             prepareContext(item.getWikiId());
             try {
-                MimeMessage mimeMessage = messages.next();
-                // Skip message is message has failed to be created.
-                if (mimeMessage != null) {
-                    prepareSingleMail(mimeMessage, item);
+                if (messages.hasNext()) {
+                    MimeMessage mimeMessage = messages.next();
+                    // Skip message is message has failed to be created.
+                    if (mimeMessage != null) {
+                        prepareSingleMail(mimeMessage, item);
+                    } else {
+                        // We can't call a listener here because the message is null. Thus we simply log an error.
+                        this.logger.error("Failed to prepare message for [{}]", item);
+                    }
                 } else {
-                    // We can't call a listener here because the message is null. Thus we simply log an error.
-                    this.logger.error("Failed to prepare message for [{}]", item);
+                    shouldStop = true;
                 }
             } finally {
                 removeContext();

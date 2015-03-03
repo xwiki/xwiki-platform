@@ -21,6 +21,8 @@ package org.xwiki.mail.test.ui;
 
 import java.io.ByteArrayInputStream;
 
+import javax.mail.internet.MimeMessage;
+
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,7 +53,7 @@ import static org.junit.Assert.*;
 public class MailTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private GreenMail mail;
 
@@ -107,7 +109,7 @@ public class MailTest extends AbstractTest
 
         // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
         // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        getDriver().waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
         // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 
@@ -115,21 +117,48 @@ public class MailTest extends AbstractTest
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "General"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email", "Mail Sending"));
 
-        // Step 4: Try sending a template email (with an attachment) to a single user
-
-        // Remove existing pages (for pages that we create below)
+        // Step 4: Prepare a Template Mail
         getUtil().deletePage(getTestClassName(), "MailTemplate");
-        getUtil().deletePage(getTestClassName(), "SendMail");
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
-        // Note: we use the $doc binding in the content to verify that standard variables are correctly bound.
+        // Note: we use the $xwiki binding in the content to verify that standard variables are correctly bound.
+        // Note: we use the $doc binding to show that the user can add new bindings ($doc is not bound by default).
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
-            "subject", "Status for $name on $doc.fullName", "language", "en", "html", "<strong>Hello $name</strong>",
+            "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
+            "language", "en",
+            "html", "<strong>Hello $name</strong>",
             "text", "Hello $name");
         ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
+
+        // Step 5: Send a template email (with an attachment) to a single email address
+        sendTemplateMailToEmail();
+
+        // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
+        // two other users (however since they're part of the group they'll receive only one mail each).
+        sendTemplateMailToUsersAndGroup();
+
+        // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
+        // the sent mails
+        administrationPage = AdministrationPage.gotoPage();
+        administrationPage.clickSection("Email", "Mail Sending Status");
+        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
+        LiveTableElement liveTableElement = statusPage.getLiveTable();
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
+        assertTrue(liveTableElement.getRowCount() > 2);
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
+        assertTrue(liveTableElement.getRowCount() > 0);
+        assertTrue(liveTableElement.hasRow("Error", ""));
+    }
+
+    private void sendTemplateMailToEmail() throws Exception
+    {
+        // Remove existing pages (for pages that we create below)
+        getUtil().deletePage(getTestClassName(), "SendMail");
 
         // Create another page with the Velocity script to send the template email
         String velocity = "{{velocity}}\n"
@@ -160,28 +189,31 @@ public class MailTest extends AbstractTest
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
-        assertEquals("Status for John on " + getTestClassName() + ".SendMail",
-            this.mail.getReceivedMessages()[0].getSubject());
+        assertNumberOfReceivedMessagesWithSubject(1, "Status for John on " + getTestClassName() + ".SendMail");
+    }
 
-        // Step 5: Try sending a template email to all the users in the XWikiAllGroup Group (we'll create 2 users).
-
+    private void sendTemplateMailToUsersAndGroup() throws Exception
+    {
         // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMailGroup");
+        getUtil().deletePage(getTestClassName(), "SendMailGroupAndUsers");
 
         // Create 2 users
         getUtil().createUser("user1", "password1", getUtil().getURLToNonExistentPage(), "email", "user1@doe.com");
         getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
 
         // Create another page with the Velocity script to send the template email
-        velocity = "{{velocity}}\n"
+        String velocity = "{{velocity}}\n"
             + "#set ($templateParameters = {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
-                + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
+            + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
-            + "#set ($groupParameters = {'hint' : 'template', 'source' : $templateReference, "
-                + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
+            + "#set ($parameters = {'hint' : 'template', 'source' : $templateReference, "
+            + "'parameters' : $templateParameters, 'type' : 'Test'})\n"
             + "#set ($groupReference = $services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup'))\n"
-            + "#set ($messages = $services.mailsender.createMessages('group', $groupReference, $groupParameters))\n"
+            + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
+            + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
+            + "#set ($source = {'groups' : [$groupReference], 'users' : [$user1Reference, $user2Reference]})\n"
+            + "#set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))\n"
             + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
@@ -194,31 +226,29 @@ public class MailTest extends AbstractTest
             + "#end\n"
             + "{{/velocity}}";
         // This will create the page and execute its content and thus send the mail
-        vp = getUtil().createPage(getTestClassName(), "SendMailGroup", velocity, "");
+        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMailGroupAndUsers", velocity, "");
 
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", vp.getContent());
 
-        // Verify that the mail has been received (first mail above + the 2 mails sent to the group)
+        // Verify that the mails have been received (first mail above + the 2 mails sent to the group)
         this.mail.waitForIncomingEmail(10000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
-        assertEquals("Status for John on " + getTestClassName() + ".SendMailGroup",
-            this.mail.getReceivedMessages()[1].getSubject());
-        assertEquals("Status for John on " + getTestClassName() + ".SendMailGroup",
-            this.mail.getReceivedMessages()[2].getSubject());
+        assertNumberOfReceivedMessagesWithSubject(2,
+            "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers");
+    }
 
-        // Step 6: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
-        // the sent mails
-        administrationPage = AdministrationPage.gotoPage();
-        administrationPage.clickSection("Email", "Mail Sending Status");
-        MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
-        LiveTableElement liveTableElement = statusPage.getLiveTable();
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
-        assertTrue(liveTableElement.getRowCount() > 2);
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-4", "john@doe.com");
-        assertTrue(liveTableElement.getRowCount() > 0);
-        assertTrue(liveTableElement.hasRow("Error", ""));
+    private void assertNumberOfReceivedMessagesWithSubject(int nb, String subject) throws Exception
+    {
+        StringBuilder builder = new StringBuilder();
+        int count = 0;
+        for (MimeMessage message : this.mail.getReceivedMessages()) {
+            builder.append('[').append(message.getSubject()).append(']').append('\n');
+            if (message.getSubject().equals(subject)) {
+                count++;
+            }
+        }
+        assertEquals("We got the following subjects instead of the required " + nb + " for [" + subject + "]:\n"
+            + builder.toString(), nb, count);
     }
 }

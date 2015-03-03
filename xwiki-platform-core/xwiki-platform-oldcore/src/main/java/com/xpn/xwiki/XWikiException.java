@@ -402,7 +402,7 @@ public class XWikiException extends Exception
     @Override
     public String getMessage()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append("Error number ");
         buffer.append(getCode());
@@ -446,7 +446,7 @@ public class XWikiException extends Exception
 
     public String getFullMessage()
     {
-        StringBuffer buffer = new StringBuffer(getMessage());
+        StringBuilder buffer = new StringBuilder(getMessage());
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
         buffer.append("\n");

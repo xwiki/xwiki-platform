@@ -20,286 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ExtensionCode</web>
   <name>ExtensionSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ExtensionCode.ExtensionClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312816151000</creationDate>
-  <date>1384856926000</date>
-  <contentUpdateDate>1384856926000</contentUpdateDate>
+  <parent>ExtensionCode.ExtensionClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1425053984000</date>
+  <contentUpdateDate>1425053984000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>ExtensionCode.ExtensionSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>a11d8ef9-3862-4e83-81de-38c743abf3fe</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#template('colorThemeInit.vm')
-
-.box, div.floatinginfobox {
-  background-color: #fafafa;
-}
-
-.box.floatinginfobox {
-  margin-top: 0;
-  max-width: 50%;
-}
-
-.extensionSummary {
-  background-color: $theme.backgroundSecondaryColor;
-  border: 1px dotted $theme.borderColor;
-  padding: 5px;
-  display: block;
-}
-
-.errormessage, .warningmessage, .infomessage, .plainmessage {
-  background-color: $theme.backgroundSecondaryColor;
-}
-
-.main .extensionInfo {
-  margin: 0;
-}
-
-.label {
-  font-size: 0.85em;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.toc .label {
-  display: block;
-  margin-top: 1.1em;
-  padding: 0 1em;
-}
-
-.toc ul {
-  margin-top: 0;
-}
-
-.extensionInfo .rating-wrapper,
-.extensionInfo .rating-wrapper .rating-message {
-  float: none;
-}</code>
-    </property>
-    <property>
-      <name>Extension CSS</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>always</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>ExtensionCode.ExtensionSheet</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>2e60500a-2494-4583-97e6-603e30162f4a</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.extensionSummary td, /* PROBLEM: General styling reset */
-.extensionInfo td {
-  border: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.box.floatinginfobox, .box.toc {
-  max-width: 49%;
-}
-
-.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */
-  color: inherit;
-  text-align: inherit;
-  display: table-cell;
-}
-
-.toc .label {
-  margin: 0;
-}
-
-/* Download and Source button alignment */
-.box &gt; p {
-  margin-bottom: 0;
-}
-
-/* Spacing for repository info message */
-.box .extensionInfo {
-  margin-top: 10px;
-}</code>
-    </property>
-    <property>
-      <name>Junco</name>
-    </property>
-    <property>
-      <parse/>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
   <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
 {{include reference="XWiki.RatingsMacros"/}}
@@ -316,11 +55,20 @@
 #if ($extension)
   #set($id = $extension.getProperty('id').value)
   #set($type = $extension.getProperty('type').value)
+  #set($category = $extension.getProperty('category').value)
 
   #set ($extensionTypeDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionTypeClass) as type where type.id = :id').bindValue("id", $type).execute())
   #if ($extensionTypeDocumentNames.size() &gt; 0)
     #set ($extensionTypeDocumentName = $extensionTypeDocumentNames.get(0))
     #set($extensionTypeObject = $xwiki.getDocument($extensionTypeDocumentName).getObject("ExtensionCode.ExtensionTypeClass"))
+  #end
+
+  #if ($category)
+    #set ($extensionCategoryDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionCategoryClass) as category where category.id = :id').bindValue("id", $category).execute())
+    #if ($extensionCategoryDocumentNames.size() &gt; 0)
+      #set ($extensionCategoryDocumentName = $extensionCategoryDocumentNames.get(0))
+      #set($extensionCategoryObject = $xwiki.getDocument($extensionCategoryDocumentName).getObject("ExtensionCode.ExtensionCategoryClass"))
+    #end
   #end
 
   #set ($extensionSheetExtensionDocumentNames = $services.query.xwql('from doc.object(ExtensionCode.ExtensionSheetExtensionClass) as sheetExtension').execute())
@@ -367,6 +115,14 @@
         #set($typeDisplay = $type)
       #end
       |(% class="label" width='30%' %)Type(%%)|$typeDisplay
+      ##------- Category --------------
+      #set($categoryDisplay = $extensionCategoryObject.getProperty('name').value)
+      #if ("$!categoryDisplay" == '')
+        #set($categoryDisplay = $category)
+      #end
+      #if ($categoryDisplay)
+      |(% class="label" width='30%' %)Category(%%)|$categoryDisplay
+      #end
       ##------- Developed By --------
       #set($authors = $doc.getValue("authors"))
       |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
@@ -469,6 +225,7 @@
     (% class="extension" %)
     |Name|#if($proxyExtensionObject)$doc.display('name', 'view')#else$doc.display('name')#end~
     |Type|#if($proxyExtensionObject)$doc.display('type', 'view')#else$doc.display('type')#end~
+    |Category|#if($proxyExtensionObject)$doc.display('category', 'view')#else$doc.display('category')#end~
     |Summary|#if($proxyExtensionObject)$doc.display('summary', 'view')#else$doc.display('summary')#end~
     ## FIXME: there seems to be a bug with custom displayer where they don't take into account the mode passed to display
     |Authors|#if($proxyExtensionObject)$doc.getValue('authors')#else$doc.display('authors')#end~
@@ -610,4 +367,262 @@
   This class sheet must be applied on a document containing an ExtensionCode.ExtensionClass object
 #end
 {{/velocity}}</content>
+  <object>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a11d8ef9-3862-4e83-81de-38c743abf3fe</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.box, div.floatinginfobox {
+  background-color: #fafafa;
+}
+
+.box.floatinginfobox {
+  margin-top: 0;
+  max-width: 50%;
+}
+
+.extensionSummary {
+  background-color: $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  padding: 5px;
+  display: block;
+}
+
+.errormessage, .warningmessage, .infomessage, .plainmessage {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.main .extensionInfo {
+  margin: 0;
+}
+
+.label {
+  font-size: 0.85em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.toc .label {
+  display: block;
+  margin-top: 1.1em;
+  padding: 0 1em;
+}
+
+.toc ul {
+  margin-top: 0;
+}</code>
+    </property>
+    <property>
+      <name>Extension CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2e60500a-2494-4583-97e6-603e30162f4a</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.extensionSummary td, /* PROBLEM: General styling reset */
+.extensionInfo td {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.box.floatinginfobox, .box.toc {
+  max-width: 49%;
+}
+
+.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */
+  color: inherit;
+  text-align: inherit;
+  display: table-cell;
+}
+
+.toc .label {
+  margin: 0;
+}
+
+/* Download and Source button alignment */
+.box &gt; p {
+  margin-bottom: 0;
+}
+
+/* Spacing for repository info message */
+.box .extensionInfo {
+  margin-top: 10px;
+}
+
+/* XINFRA-134: Aligning table cell text */
+.floatinginfobox td {
+  vertical-align: baseline;
+}</code>
+    </property>
+    <property>
+      <name>Junco</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
 </xwikidoc>

@@ -33,6 +33,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.hibernate.collection.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
@@ -71,7 +72,45 @@ public abstract class ListClass extends PropertyClass
      */
     public static final String DISPLAYTYPE_SELECT = "select";
 
+    /**
+     * Default separator/delimiter to use to split or join a list stored as a string. Not to be confused with
+     * {@link #getSeparator()} and {@link #getSeparator()} which are used only for UI view and edit operations.
+     *
+     * @since 7.0M2
+     */
+    public static final String DEFAULT_SEPARATOR = "|";
+
+    /**
+     * Used to escape a separator character inside a string serialized list item.
+     * 
+     * @since 7.0M2
+     */
+    public static final char SEPARATOR_ESCAPE = '\\';
+
     private static final String XCLASSNAME = "list";
+
+    /**
+     * Regex used to split lists stored in a string. Supports escaped separators inside values. The individually
+     * regex-escaped separators string needs to be passed as parameter.
+     */
+    private static final String LIST_ITEM_SEPARATOR_REGEX_FORMAT = "(?<!\\\\)[%s]";
+
+    /**
+     * Regex used to unescape separators inside the actual values of the list. The individually regex-escaped separators
+     * string needs to be passed as parameter.
+     */
+    private static final String ESCAPED_SEPARATORS_REGEX_FORMAT = "\\%s([%s])";
+
+    /**
+     * Regex used to find unescaped separators in a list item's value. Regex-escaped separators string needs to be
+     * passed as parameter.
+     */
+    private static final String UNESCAPED_SEPARATORS_REGEX_FORMAT = "([%s])";
+
+    /**
+     * Replacement string used to escaped a separator found by the String.replace regex.
+     */
+    private static final String UNESCAPED_SEPARATOR_REPLACEMENT = String.format("\\%s$1", SEPARATOR_ESCAPE);
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -94,6 +133,12 @@ public abstract class ListClass extends PropertyClass
         this(null);
     }
 
+    /**
+     * @return a string of separator characters used to split/deserialize an input string coming from the UI (filled by
+     *         the user) that represents a serialized list
+     * @see #displayEdit(StringBuffer, String, String, BaseCollection, XWikiContext)
+     * @see #fromString(String)
+     */
     public String getSeparators()
     {
         String separators = getStringValue("separators");
@@ -103,6 +148,10 @@ public abstract class ListClass extends PropertyClass
         return separators;
     }
 
+    /**
+     * @param separators a string of characters used to split/deserialize an input string coming from the UI (filled by
+     *            the user) that represents a serialized list
+     */
     public void setSeparators(String separators)
     {
         setStringValue("separators", separators);
@@ -178,21 +227,46 @@ public abstract class ListClass extends PropertyClass
         setIntValue("picker", picker ? 1 : 0);
     }
 
+    /**
+     * @return a string (usually just 1 character long) used to join this list's items when displaying it in the UI in
+     *         view mode.
+     * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
+     */
     public String getSeparator()
     {
         return getStringValue("separator");
     }
 
+    /**
+     * @param separator a string (usually just 1 character long) used to join this list's items when displaying it in
+     *            the UI in view mode.
+     */
     public void setSeparator(String separator)
     {
         setStringValue("separator", separator);
     }
 
+    /**
+     * Convenience method, using {@value #DEFAULT_SEPARATOR} as separator and parsing key=value items.
+     * 
+     * @param value the string holding a serialized list
+     * @return the list that was stored in the input string
+     * @see #getListFromString(String, String, boolean)
+     */
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, "|", true);
+        return getListFromString(value, null, true);
     }
 
+    /**
+     * @param value the string holding a serialized list
+     * @param separators the separator characters (given as a string) used to delimit the list's items inside the input
+     *            string. These separators can also be present, in escaped ({@value #SEPARATOR_ESCAPE}) form, inside
+     *            list items
+     * @param withMap set to true if the list's values contain map entries (key=value pairs) that should also be parsed.
+     *            Only the keys are extracted from such list items
+     * @return the list that was stored in the input string
+     */
     public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
         List<String> list = new ArrayList<String>();
@@ -200,28 +274,91 @@ public abstract class ListClass extends PropertyClass
             return list;
         }
         if (separators == null) {
-            separators = "|";
+            separators = DEFAULT_SEPARATOR;
         }
 
-        String val = value;
-        if (separators.length() == 1) {
-            val = StringUtils.replace(val, "\\" + separators, "%PIPE%");
-        }
+        // Escape the list of separators individually to be safely used in regexes.
+        String regexEscapedSeparatorsRegexPart =
+            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
 
-        String[] result = StringUtils.split(val, separators);
-        String item = "";
-        for (String element2 : result) {
-            String element = StringUtils.replace(element2, "%PIPE%", separators);
-            if (withMap && (element.indexOf('=') != -1)) {
-                item = StringUtils.split(element, "=")[0];
-            } else {
-                item = element;
+        String escapedSeparatorsRegex =
+            String.format(ESCAPED_SEPARATORS_REGEX_FORMAT, SEPARATOR_ESCAPE, regexEscapedSeparatorsRegexPart);
+
+        // Split the values and process each list item.
+        String listItemSeparatorRegex =
+            String.format(LIST_ITEM_SEPARATOR_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
+        String[] elements = value.split(listItemSeparatorRegex);
+        for (String element : elements) {
+            // Adjacent separators are treated as one separator.
+            if (StringUtils.isBlank(element)) {
+                continue;
             }
-            if (!item.trim().equals("")) {
+
+            // Unescape any escaped separator in the individual list item.
+            String unescapedElement = element.replaceAll(escapedSeparatorsRegex, "$1");
+            String item = unescapedElement;
+
+            // Check if it is a map entry, i.e. "key=value"
+            if (withMap && (unescapedElement.indexOf('=') != -1)) {
+                // Get just the key, ignore the value/label.
+                item = StringUtils.split(unescapedElement, '=')[0];
+            }
+
+            // Ignore empty items.
+            if (StringUtils.isNotBlank(item.trim())) {
                 list.add(item);
             }
         }
+
         return list;
+    }
+
+    /**
+     * Convenience method, using {@value #DEFAULT_SEPARATOR} as separator.
+     * 
+     * @param list the list to serialize
+     * @return a string representing a serialized list, delimited by the first separator character (from the ones inside
+     *         the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
+     * @see #getStringFromList(List, String)
+     */
+    public static String getStringFromList(List<String> list)
+    {
+        return getStringFromList(list, null);
+    }
+
+    /**
+     * @param list the list to serialize
+     * @param separators the separator characters (given as a string) used when the list was populated with values. The
+     *            list's items can contain these separators in plain/unescaped form. The first separator character will
+     *            be used to join the list in the output.
+     * @return a string representing a serialized list, delimited by the first separator character (from the ones inside
+     *         the separators string). Separators inside list items are safely escaped ({@value #SEPARATOR_ESCAPE}).
+     */
+    public static String getStringFromList(List<String> list, String separators)
+    {
+        if ((list instanceof PersistentCollection) && (!((PersistentCollection) list).wasInitialized())) {
+            return "";
+        }
+
+        if (separators == null) {
+            separators = DEFAULT_SEPARATOR;
+        }
+
+        // Escape the list of separators individually to be safely used in regexes.
+        String regexEscapedSeparatorsRegexPart =
+            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
+
+        String unescapedSeparatorsRegex =
+            String.format(UNESCAPED_SEPARATORS_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
+
+        List<String> escapedValues = new ArrayList<String>();
+        for (String value : list) {
+            String escapedValue = value.replaceAll(unescapedSeparatorsRegex, UNESCAPED_SEPARATOR_REPLACEMENT);
+            escapedValues.add(escapedValue);
+        }
+
+        // Use the first separator to join the list.
+        return StringUtils.join(escapedValues, separators.charAt(0));
     }
 
     public static Map<String, ListItem> getMapFromString(String value)
@@ -231,10 +368,10 @@ public abstract class ListClass extends PropertyClass
             return map;
         }
 
-        String val = StringUtils.replace(value, "\\|", "%PIPE%");
+        String val = StringUtils.replace(value, SEPARATOR_ESCAPE + DEFAULT_SEPARATOR, "%PIPE%");
         String[] result = StringUtils.split(val, "|");
         for (String element2 : result) {
-            String element = StringUtils.replace(element2, "%PIPE%", "|");
+            String element = StringUtils.replace(element2, "%PIPE%", DEFAULT_SEPARATOR);
             if (element.indexOf('=') != -1) {
                 String[] data = StringUtils.split(element, "=");
                 map.put(data[0], new ListItem(data[0], data[1]));
@@ -243,6 +380,27 @@ public abstract class ListClass extends PropertyClass
             }
         }
         return map;
+    }
+
+    /**
+     * Used in {@link #displayEdit(StringBuffer, String, String, BaseCollection, XWikiContext)}.
+     *
+     * @param property a property to be used in an form input
+     * @return the text value to be used in an form input. If a {@link ListProperty} is passed, the list's separators
+     *         defined by {@link #getSeparators()} are escaped for each list item and the items are joined by the first
+     *         separator
+     * @see #getStringFromList(List, String)
+     */
+    public String toFormString(BaseProperty property)
+    {
+        String result;
+        if (property instanceof ListProperty) {
+            ListProperty listProperty = (ListProperty) property;
+            result = ListClass.getStringFromList(listProperty.getList(), getSeparators());
+        } else {
+            result = property.toText();
+        }
+        return result;
     }
 
     @Override
@@ -470,7 +628,7 @@ public abstract class ListClass extends PropertyClass
             input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
-                input.setValue(prop.toText());
+                input.setValue(this.toFormString(prop));
             }
             input.setType("text");
             input.setSize(getSize());

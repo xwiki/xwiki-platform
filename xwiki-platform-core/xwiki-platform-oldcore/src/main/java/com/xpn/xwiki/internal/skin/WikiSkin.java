@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
+
 /**
  * @version $Id$
  * @since 6.4M1
@@ -27,7 +30,7 @@ public class WikiSkin extends AbstractSkin
 {
     private WikiSkinUtils utils;
 
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration, WikiSkinUtils utils)
     {
         super(id, skinManager, configuration);
         this.utils = utils;

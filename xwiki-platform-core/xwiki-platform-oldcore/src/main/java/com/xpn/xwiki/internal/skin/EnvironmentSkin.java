@@ -32,6 +32,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -49,7 +51,7 @@ public class EnvironmentSkin extends AbstractSkin
 
     private Provider<XWikiContext> xcontextProvider;
 
-    public EnvironmentSkin(String id, SkinManager skinManager, SkinConfiguration configuration,
+    public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
         Environment environment, Provider<XWikiContext> xcontextProvider)
     {
         super(id, skinManager, configuration);
@@ -67,7 +69,8 @@ public class EnvironmentSkin extends AbstractSkin
 
         if (parentId != null) {
             if (parentId.isEmpty()) {
-                skin = Skin.VOID;
+                // There is explicitly no parent (make sure to not fallback on default parent skin)
+                skin = VOID;
             } else {
                 skin = this.skinManager.getSkin(parentId);
             }

@@ -41,7 +41,7 @@ public class StaticListClass extends ListClass
     public StaticListClass(PropertyMetaClass wclass)
     {
         super(XCLASSNAME, "Static List", wclass);
-        setSeparators(" ,|");
+        setSeparators("|, ");
     }
 
     public StaticListClass()
@@ -99,7 +99,7 @@ public class StaticListClass extends ListClass
             input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop != null) {
-                input.setValue(prop.toText());
+                input.setValue(this.toFormString(prop));
             }
             input.setType("text");
             input.setSize(getSize());

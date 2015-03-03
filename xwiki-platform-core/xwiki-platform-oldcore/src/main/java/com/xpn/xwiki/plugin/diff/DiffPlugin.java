@@ -133,7 +133,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
         text1 = "~~PLACEHOLDER~~" + text1 + "~~PLACEHOLDER~~";
         text2 = "~~PLACEHOLDER~~" + text2 + "~~PLACEHOLDER~~";
 
-        StringBuffer html = new StringBuffer("<div class=\"diffmodifiedline\">");
+        StringBuilder html = new StringBuilder("<div class=\"diffmodifiedline\">");
         List list = getWordDifferencesAsList(text1, text2);
         String[] words = StringUtils.splitPreserveAllTokens(text1, ' ');
         int cursor = 0;
@@ -221,7 +221,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
      */
     public String getDifferencesAsHTML(String text1, String text2, boolean allDoc) throws XWikiException
     {
-        StringBuffer html = new StringBuffer("<div class=\"diff\">");
+        StringBuilder html = new StringBuilder("<div class=\"diff\">");
         if (text1 == null) {
             text1 = "";
         }

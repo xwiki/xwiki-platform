@@ -27,6 +27,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
@@ -76,6 +78,8 @@ import com.xpn.xwiki.util.Util;
  */
 public class ImportAction extends XWikiAction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -310,6 +314,7 @@ public class ImportAction extends XWikiAction
         // Setup log
         xarProperties.setVerbose(true);
         instanceProperties.setVerbose(true);
+        instanceProperties.setStoppedWhenSaveFail(false);
         LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
         LogQueue logger = new LogQueue();
         if (loggerManager != null) {
@@ -328,6 +333,11 @@ public class ImportAction extends XWikiAction
             if (loggerManager != null) {
                 // Stop isolating log
                 loggerManager.popLogListener();
+            }
+
+            // Print the import log
+            if (LOGGER.isDebugEnabled()) {
+                logger.log(LOGGER);
             }
 
             // Close the input source

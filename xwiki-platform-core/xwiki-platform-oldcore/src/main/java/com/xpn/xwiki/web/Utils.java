@@ -673,8 +673,8 @@ public class Utils
             // This means the Context Root CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
 
-            LOGGER.warn("Failed to find context/root component manager ({}), return root component manager",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.warn("Failed to find the [context/root] Component Manager. Cause: [{}]. Using the Root Component "
+                + "Manager", ExceptionUtils.getRootCauseMessage(e));
         }
 
         return contextComponentManager;
@@ -698,7 +698,7 @@ public class Utils
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
 
-            LOGGER.warn("Failed to find context component manager ({}), return root component manager",
+            LOGGER.warn("Failed to find the [context] Component Manager. Cause: [{}]. Using the Root Component Manager",
                 ExceptionUtils.getRootCauseMessage(e));
         }
 

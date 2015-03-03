@@ -130,7 +130,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         FileUtils.writeStringToFile(targetLocation, content);
 
         // Rewrite the URL
-        StringBuffer path = new StringBuffer("file://");
+        StringBuilder path = new StringBuilder("file://");
         path.append(getSxPrefix());
         path.append(URL_PATH_SEPARATOR);
         path.append(encodeURLPart(web));

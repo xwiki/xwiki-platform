@@ -51,8 +51,8 @@ public class EditThemePage extends EditPage
                         + "//li//a[@data-toggle='tab' and text()='" + category + "']"));
         categoryElem.click();
         // Wait until the panel is displayed
-        waitUntilElementIsVisible(
-                By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
     }
 
     public List<String> getVariableCategories()
@@ -115,7 +115,7 @@ public class EditThemePage extends EditPage
 
     public void waitUntilPreviewIsLoaded()
     {
-        waitUntilElementDisappears(By.id("preview-curtain"));
+        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
     }
 
     public PreviewBox getPreviewBox()

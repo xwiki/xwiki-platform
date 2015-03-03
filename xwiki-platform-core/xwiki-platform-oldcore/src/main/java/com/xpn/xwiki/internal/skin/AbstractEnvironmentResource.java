@@ -26,6 +26,7 @@ import javax.inject.Provider;
 import org.xwiki.environment.Environment;
 import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.skin.ResourceRepository;
 
 import com.xpn.xwiki.XWikiContext;
 

@@ -37,13 +37,13 @@ public class ConfirmationModal extends ViewPage
 
     public void clickOk()
     {
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         this.buttonOk.click();
     }
 
     public void clickCancel()
     {
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         this.buttonCancel.click();
     }
 }

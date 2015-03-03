@@ -45,25 +45,22 @@ public class DeleteVersionsAction extends XWikiAction
             return true;
         }
 
-        Version v1;
-        Version v2;
-        if (form.getRev() == null) {
-            v1 = form.getRev1();
-            v2 = form.getRev2();
-        } else {
-            v1 = form.getRev();
-            v2 = form.getRev();
-        }
+        XWikiDocument doc = context.getDoc();
+        String language = form.getLanguage();
+        XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+        XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
+
+        // Get the versions
+        Version[] versions = getVersionsFromForm(form, archive);
+        Version v1 = versions[0];
+        Version v2 = versions[1];
 
         if (v1 != null && v2 != null) {
-            XWikiDocument doc = context.getDoc();
-            String language = form.getLanguage();
-            XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
-
-            XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
+            // Remove the versions
             archive.removeVersions(v1, v2, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             tdoc.setDocumentArchive(archive);
+
             // Is this the last remaining version? If so, then recycle the document.
             if (archive.getLatestVersion() == null) {
                 if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
@@ -90,6 +87,47 @@ public class DeleteVersionsAction extends XWikiAction
         }
         sendRedirect(context);
         return false;
+    }
+
+    /**
+     * @param form the {@link DeleteVersionsForm} which to extract versions from
+     * @param archive the document archive used to resolve pseudoversions, if needed
+     * @return an array of versions to use as interval for deletion, regardless if "rev1" and "rev2" were passed
+     *         individually or if just "rev" was used
+     */
+    private Version[] getVersionsFromForm(DeleteVersionsForm form, XWikiDocumentArchive archive)
+    {
+        // Determine if we used rev or rev1&rev2.
+        String[] versions = new String[2];
+        if (form.getRev() == null) {
+            versions[0] = form.getRev1();
+            versions[1] = form.getRev2();
+        } else {
+            versions[0] = form.getRev();
+            versions[1] = form.getRev();
+        }
+
+        // Convert to Version objects.
+        Version[] result = new Version[2];
+        for (int i = 0; i < versions.length; i++) {
+            // Support for the "latest" and "previous" pseudoversions.
+            if ("latest".equals(versions[i])) {
+                result[i] = archive.getLatestVersion();
+            } else if ("previous".equals(versions[i])) {
+                Version currentVersion = archive.getLatestVersion();
+                result[i] = archive.getPrevVersion(currentVersion);
+            } else {
+                // Just use the given value.
+                try {
+                    result[i] = new Version(versions[i]);
+                } catch (Exception e) {
+                    // Protect against invalid versions.
+                    result[i] = null;
+                }
+            }
+        }
+
+        return result;
     }
 
     /**

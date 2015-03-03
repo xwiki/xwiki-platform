@@ -118,7 +118,8 @@ public class EditRightsPane extends BaseElement
     public void clickGuestRight(Right right)
     {
         try {
-            executeJavascript("window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
+            getDriver().executeJavascript(
+                "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator = By.xpath("*//tr[@id='unregistered']/td[" + right.getColumnIndex() + "]/img");
             final WebElement button = getDriver().findElement(buttonLocator);
             State currentState = State.getButtonState(button);
@@ -126,9 +127,10 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            waitUntilElementEndsWithAttributeValue(buttonLocator, "src", currentState.getNextState().imageURL);
+            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src",
+                currentState.getNextState().imageURL);
         } finally {
-            executeJavascript("window.confirm = window.__oldConfirm;");
+            getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }
     }
 
@@ -141,7 +143,8 @@ public class EditRightsPane extends BaseElement
     public void clickRight(String entityName, Right right)
     {
         try {
-            executeJavascript("window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
+            getDriver().executeJavascript(
+                "window.__oldConfirm = window.confirm; window.confirm = function() { return true; };");
             final By buttonLocator =
                 By.xpath("//*[@id='usersandgroupstable-display']//td[@class='username']/a[contains(@href, '"
                     + entityName + "')]/../../td[" + right.getColumnIndex() + "]/img");
@@ -151,9 +154,9 @@ public class EditRightsPane extends BaseElement
             // Note: Selenium 2.0a4 returns a relative URL when calling getAttribute("src") but since we moved to
             // Selenium 2.0a7 it returns a *full* URL even though the DOM has a relative URL as in:
             // <img src="/xwiki/resources/js/xwiki/usersandgroups/img/allow.png">
-            waitUntilElementEndsWithAttributeValue(buttonLocator, "src", currentState.imageURL);
+            getDriver().waitUntilElementEndsWithAttributeValue(buttonLocator, "src", currentState.imageURL);
         } finally {
-            executeJavascript("window.confirm = window.__oldConfirm;");
+            getDriver().executeJavascript("window.confirm = window.__oldConfirm;");
         }
     }
 

@@ -37,7 +37,7 @@ public class WizardStepElement extends BaseElement
      */
     public WizardStepElement waitToLoad()
     {
-        waitUntilElementIsVisible(By
+        getDriver().waitUntilElementIsVisible(By
             .xpath("//div[contains(@class, 'xDialogBody') and not(contains(@class, 'loading'))]"));
         return this;
     }

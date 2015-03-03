@@ -28,6 +28,10 @@
   <artifactId>xwiki-platform-annotation-core</artifactId>
   <name>XWiki Platform - Annotations - Core Services</name>
   <packaging>jar</packaging>
+  <properties>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.rendering</groupId>

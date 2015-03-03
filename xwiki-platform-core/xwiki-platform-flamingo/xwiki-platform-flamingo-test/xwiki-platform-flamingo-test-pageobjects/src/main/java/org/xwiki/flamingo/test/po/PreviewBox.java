@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.TestUtils;
 
 public class PreviewBox extends CSSGetterPage
 {
@@ -43,8 +42,7 @@ public class PreviewBox extends CSSGetterPage
     {
         try {
             getDriver().switchTo().frame("iframe");
-            TestUtils utils = new TestUtils();
-            List<WebElement> errors = utils.findElementsWithoutWaiting(getDriver(), By.className("less-error-message"));
+            List<WebElement> errors = getDriver().findElementsWithoutWaiting(By.className("less-error-message"));
             return !errors.isEmpty();
         } finally {
             getDriver().switchTo().defaultContent();

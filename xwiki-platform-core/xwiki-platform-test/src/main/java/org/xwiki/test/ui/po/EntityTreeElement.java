@@ -212,7 +212,7 @@ public class EntityTreeElement extends BaseElement
         String className = selected ? "treeCellSelected" : "treeCell";
         String xpath =
             String.format("//td[contains(@class, '%s')]//*[@title = '%s' and . = '%s']", className, hint, label);
-        waitUntilElementIsVisible(By.xpath(xpath));
+        getDriver().waitUntilElementIsVisible(By.xpath(xpath));
         return this;
     }
 
@@ -228,7 +228,6 @@ public class EntityTreeElement extends BaseElement
         String format = "//td[starts-with(@class, 'treeCell')]//*[@title = '%s' and . = '%s']";
         // Note: make sure to use findElementsWithoutWaiting() to speed up tests. Tests need to call waitFor*() APIs
         // beforehand to ensure elements are visible in the tree.
-        return getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath(String.format(format, hint, label))).size() == 1;
+        return getDriver().findElementsWithoutWaiting(By.xpath(String.format(format, hint, label))).size() == 1;
     }
 }

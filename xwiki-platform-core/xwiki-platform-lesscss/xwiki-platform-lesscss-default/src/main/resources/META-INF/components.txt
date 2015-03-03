@@ -1,6 +1,7 @@
 org.xwiki.lesscss.internal.cache.CacheKeyFactory
 org.xwiki.lesscss.internal.cache.DefaultColorThemeCache
 org.xwiki.lesscss.internal.cache.DefaultLESSResourcesCache
+org.xwiki.lesscss.internal.cache.XWikiContextCacheKeyFactory
 org.xwiki.lesscss.internal.colortheme.CachedLESSColorThemeConverter
 org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter
 org.xwiki.lesscss.internal.colortheme.DefaultColorThemeReferenceFactory

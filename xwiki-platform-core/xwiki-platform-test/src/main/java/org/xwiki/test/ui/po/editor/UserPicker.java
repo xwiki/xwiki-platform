@@ -60,7 +60,7 @@ public class UserPicker extends BaseElement
          */
         public WebElement getAvatar()
         {
-            return getUtil().findElementWithoutWaiting(getDriver(), container, By.className("icon"));
+            return getDriver().findElementWithoutWaiting(container, By.className("icon"));
         }
 
         /**
@@ -68,11 +68,9 @@ public class UserPicker extends BaseElement
          */
         public String getName()
         {
-            String name =
-                getUtil().findElementWithoutWaiting(getDriver(), container, By.className("user-name")).getText();
+            String name = getDriver().findElementWithoutWaiting(container, By.className("user-name")).getText();
             // Remove the "x" coming from the delete icon.
-            List<WebElement> delete =
-                getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("delete-tool"));
+            List<WebElement> delete = getDriver().findElementsWithoutWaiting(container, By.className("delete-tool"));
             if (delete.size() > 0) {
                 name = StringUtils.removeEnd(name, delete.get(0).getText());
             }
@@ -84,7 +82,7 @@ public class UserPicker extends BaseElement
          */
         public String getAlias()
         {
-            return getUtil().findElementWithoutWaiting(getDriver(), container, By.className("user-alias")).getText();
+            return getDriver().findElementWithoutWaiting(container, By.className("user-alias")).getText();
         }
 
         /**
@@ -101,9 +99,8 @@ public class UserPicker extends BaseElement
          */
         public void delete()
         {
-            new Actions(getDriver()).moveToElement(container)
-                .click(getUtil().findElementWithoutWaiting(getDriver(), container, By.className("delete-tool")))
-                .perform();
+            new Actions(getDriver()).moveToElement(container).click(getDriver().findElementWithoutWaiting(container,
+                By.className("delete-tool"))).perform();
         }
 
         /**
@@ -177,7 +174,7 @@ public class UserPicker extends BaseElement
     public WebElement getClearSelectionLink()
     {
         String xpath = "preceding-sibling::a[@class = 'clear-tool' and position() = last()]";
-        return getUtil().findElementWithoutWaiting(getDriver(), textInput, By.xpath(xpath));
+        return getDriver().findElementWithoutWaiting(textInput, By.xpath(xpath));
     }
 
     /**
@@ -187,7 +184,7 @@ public class UserPicker extends BaseElement
      */
     public UserPicker waitForSuggestions()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             public Boolean apply(WebDriver driver)
             {
@@ -215,10 +212,10 @@ public class UserPicker extends BaseElement
      */
     private UserPicker waitForSuggestionsToDisappear(int timeout)
     {
-        int previousTimeout = getUtil().getTimeout();
-        getUtil().setTimeout(timeout);
+        int previousTimeout = getDriver().getTimeout();
+        getDriver().setTimeout(timeout);
         try {
-            getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+            getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
             {
                 public Boolean apply(WebDriver driver)
                 {
@@ -226,7 +223,7 @@ public class UserPicker extends BaseElement
                 }
             });
         } finally {
-            getUtil().setTimeout(previousTimeout);
+            getDriver().setTimeout(previousTimeout);
         }
         return this;
     }
@@ -259,7 +256,7 @@ public class UserPicker extends BaseElement
      */
     public UserPicker select(String userNameOrAlias)
     {
-        getUtil().findElementWithoutWaiting(getDriver(),
+        getDriver().findElementWithoutWaiting(
             By.xpath("//ul[@class = 'xlist suggestList']/li[contains(., '" + userNameOrAlias + "')]")).click();
         return this;
     }
@@ -270,8 +267,9 @@ public class UserPicker extends BaseElement
     public List<UserElement> getSuggestions()
     {
         List<UserElement> suggestions = new ArrayList<UserElement>();
-        for (WebElement item : getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//ul[@class = 'xlist suggestList']/li"))) {
+        for (WebElement item : getDriver().findElementsWithoutWaiting(
+            By.xpath("//ul[@class = 'xlist suggestList']/li")))
+        {
             suggestions.add(new UserElement(item));
         }
         return suggestions;
@@ -283,8 +281,9 @@ public class UserPicker extends BaseElement
     public List<UserElement> getAcceptedSuggestions()
     {
         List<UserElement> acceptedSuggestions = new ArrayList<UserElement>();
-        for (WebElement item : getUtil().findElementsWithoutWaiting(getDriver(), textInput,
-            By.xpath("preceding-sibling::ul[contains(@class, 'accepted-suggestions') and position() = last()]/li"))) {
+        for (WebElement item : getDriver().findElementsWithoutWaiting(textInput,
+            By.xpath("preceding-sibling::ul[contains(@class, 'accepted-suggestions') and position() = last()]/li")))
+        {
             acceptedSuggestions.add(new UserElement(item));
         }
         return acceptedSuggestions;
@@ -309,7 +308,7 @@ public class UserPicker extends BaseElement
      */
     public UserPicker waitToLoad()
     {
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             public Boolean apply(WebDriver driver)
             {

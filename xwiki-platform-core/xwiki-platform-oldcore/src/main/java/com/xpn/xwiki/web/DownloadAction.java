@@ -71,7 +71,7 @@ public class DownloadAction extends XWikiAction
     /** Key of the blacklist in xwiki.properties. */
     public static final String BLACKLIST_PROPERTY = "attachment.download.blacklist";
 
-    /** The URL part seperator. */
+    /** The URL part separator. */
     private static final String SEPARATOR = "/";
 
     /** The name of the HTTP Header that signals a byte-range request. */

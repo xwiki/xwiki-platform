@@ -40,17 +40,20 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 /**
- * Validate {@link TemplateManager}.
+ * Validate {@link DefaultTemplateManager}.
  * 
  * @version $Id$
  */
@@ -59,9 +62,9 @@ public class TemplateManagerTest
 {
     @Rule
     public final MockitoComponentMockingRule<TemplateManager> mocker =
-        new MockitoComponentMockingRule<TemplateManager>(TemplateManager.class);
+        new MockitoComponentMockingRule<TemplateManager>(DefaultTemplateManager.class);
 
-    private Environment environmentmMock;
+    private Environment environmentMock;
 
     private VelocityManager velocityManagerMock;
 
@@ -75,7 +78,8 @@ public class TemplateManagerTest
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
 
-        this.mocker.registerMemoryConfigurationSource();
+        MemoryConfigurationSource configuration = this.mocker.registerMemoryConfigurationSource();
+        this.mocker.registerComponent(MockConfigurationSource.getDescriptor("all"), configuration);
 
         this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
     }
@@ -83,7 +87,7 @@ public class TemplateManagerTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.environmentmMock = this.mocker.registerMockComponent(Environment.class);
+        this.environmentMock = this.mocker.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.mocker.registerMockComponent(VelocityManager.class);
         this.mocker.registerMockComponent(ConfigurationSource.class);
         this.mocker.registerMockComponent(TransformationManager.class);
@@ -91,9 +95,9 @@ public class TemplateManagerTest
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException
     {
-        when(this.environmentmMock.getResourceAsStream("/templates/template")).thenReturn(
+        when(this.environmentMock.getResourceAsStream("/templates/template")).thenReturn(
             new ByteArrayInputStream(content.getBytes("UTF8")));
-        when(this.environmentmMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
+        when(this.environmentMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
     }
 
     // Tests

@@ -26,8 +26,6 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
@@ -41,7 +39,7 @@ import org.xwiki.velocity.VelocityManager;
  */
 @Component
 @Singleton
-public class XWikiRenderingContext extends DefaultRenderingContext implements Initializable
+public class XWikiRenderingContext extends DefaultRenderingContext
 {
     @Inject
     private ComponentManager componentManager;
@@ -51,16 +49,17 @@ public class XWikiRenderingContext extends DefaultRenderingContext implements In
 
     private VelocityManager velocityManager;
 
-    @Override
-    public void initialize() throws InitializationException
+    private VelocityManager getVelocityManager()
     {
-        if (this.componentManager.hasComponent(VelocityManager.class)) {
+        if (this.velocityManager == null) {
             try {
                 this.velocityManager = this.componentManager.getInstance(VelocityManager.class);
             } catch (ComponentLookupException e) {
-                this.logger.warn("Failed to initialize VelocityManager, velocity cache won't be cleaned", e);
+                this.logger.debug("Failed to initialize VelocityManager, velocity cache won't be cleaned", e);
             }
         }
+
+        return this.velocityManager;
     }
 
     @Override
@@ -88,10 +87,10 @@ public class XWikiRenderingContext extends DefaultRenderingContext implements In
 
     private void openNamespace(String namespace)
     {
-        if (this.velocityManager != null) {
+        if (getVelocityManager() != null) {
             try {
                 // Mark that we're starting to use a different Velocity macro name-space.
-                velocityManager.getVelocityEngine().startedUsingMacroNamespace(namespace);
+                getVelocityManager().getVelocityEngine().startedUsingMacroNamespace(namespace);
                 logger.debug("Started using velocity macro namespace [{}].", namespace);
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
@@ -104,9 +103,9 @@ public class XWikiRenderingContext extends DefaultRenderingContext implements In
 
     private void closeNamespace(String namespace)
     {
-        if (this.velocityManager != null) {
+        if (getVelocityManager() != null) {
             try {
-                velocityManager.getVelocityEngine().stoppedUsingMacroNamespace(namespace);
+                getVelocityManager().getVelocityEngine().stoppedUsingMacroNamespace(namespace);
                 logger.debug("Stopped using velocity macro namespace [{}].", namespace);
             } catch (Exception e) {
                 // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but

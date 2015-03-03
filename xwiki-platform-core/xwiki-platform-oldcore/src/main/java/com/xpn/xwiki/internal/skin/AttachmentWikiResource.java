@@ -25,6 +25,7 @@ import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.skin.ResourceRepository;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;

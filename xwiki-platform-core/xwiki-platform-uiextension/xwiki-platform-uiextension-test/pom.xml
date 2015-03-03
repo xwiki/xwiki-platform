@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-uiextension-test</artifactId>
-  <name>XWiki Platform - User Interface Extension - Functional Tests</name>
+  <name>XWiki Platform - UI Extension Extension - Functional Tests</name>
   <!-- TODO: Move to use "functional-test" in the future when http://jira.codehaus.org/browse/MNG-1911 is fixed,
        see http://jira.xwiki.org/jira/browse/XWIKI-7683 -->
   <packaging>jar</packaging>
@@ -42,6 +42,8 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Override in order to activate the macro transformation required by UI Extensions -->
     <xwikiRenderingTransformations>macro</xwikiRenderingTransformations>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

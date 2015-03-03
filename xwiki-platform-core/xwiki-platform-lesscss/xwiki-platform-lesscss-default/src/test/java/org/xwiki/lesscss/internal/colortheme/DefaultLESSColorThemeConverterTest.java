@@ -28,7 +28,6 @@ import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.colortheme.ColorTheme;
 import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
-import org.xwiki.lesscss.internal.cache.CacheKeyFactory;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.lesscss.skin.FSSkinReference;
 import org.xwiki.lesscss.skin.SkinReferenceFactory;
@@ -58,15 +57,13 @@ public class DefaultLESSColorThemeConverterTest
 
     private ColorThemeCache cache;
 
-    protected Provider<XWikiContext> xcontextProvider;
+    private Provider<XWikiContext> xcontextProvider;
 
     private CurrentColorThemeGetter currentColorThemeGetter;
 
     private SkinReferenceFactory skinReferenceFactory;
 
     private ColorThemeReferenceFactory colorThemeReferenceFactory;
-
-    private CacheKeyFactory cacheKeyFactory;
 
     private XWikiContext xcontext;
 
@@ -79,19 +76,18 @@ public class DefaultLESSColorThemeConverterTest
         currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
         colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
-        cacheKeyFactory = mocker.getInstance(CacheKeyFactory.class);
         xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
-        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("colorTheme");
+        when(currentColorThemeGetter.getCurrentColorTheme(true, "default")).thenReturn("colorTheme");
         when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
         when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
                 new NamedColorThemeReference("colorTheme"));
-        when(cacheKeyFactory.getCacheKey(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
-                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("cacheKey");
+        when(cache.getMutex(eq(new LESSSkinFileResourceReference("file")), eq(new FSSkinReference("skin")),
+                eq(new NamedColorThemeReference("colorTheme")))).thenReturn("mutex");
     }
 
     @Test

@@ -130,6 +130,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
+        needsUpdate |= bclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");

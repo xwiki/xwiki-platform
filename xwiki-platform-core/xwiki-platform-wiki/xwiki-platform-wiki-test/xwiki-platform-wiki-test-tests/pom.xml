@@ -135,6 +135,7 @@
           <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
           <regex>false</regex>
           <commentsEnabled>false</commentsEnabled>
+          <skip>${skipTests}</skip>
           <replacements>
             <replacement>
               <token>&lt;/properties&gt;</token>

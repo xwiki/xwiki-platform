@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
@@ -177,14 +176,14 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     }
 
     @Override
-    public IterableResult<Extension> searchInstalledExtensions(String pattern, String namespace, int offset, int nb)
-        throws SearchException
+    public IterableResult<InstalledExtension> searchInstalledExtensions(String pattern, String namespace, int offset,
+        int nb) throws SearchException
     {
         return safe(getWrapped().searchInstalledExtensions(pattern, namespace, offset, nb));
     }
 
     @Override
-    public IterableResult<Extension> searchInstalledExtensions(String namespace, ExtensionQuery query)
+    public IterableResult<InstalledExtension> searchInstalledExtensions(String namespace, ExtensionQuery query)
         throws SearchException
     {
         return safe(getWrapped().searchInstalledExtensions(namespace, query));

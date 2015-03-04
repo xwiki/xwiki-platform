@@ -3467,7 +3467,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * will result in the following map
      * 
-     * <pre>
+     * <code><pre>
      * {
      *   "XWiki.XWikiRights": {
      *     "0": {
@@ -3484,7 +3484,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *     }
      *   ]
      * }
-     * </pre>
+     * </pre></code>
      * 
      * @param request The input HTTP request that provides the parameters
      * @return The map containing ordered data

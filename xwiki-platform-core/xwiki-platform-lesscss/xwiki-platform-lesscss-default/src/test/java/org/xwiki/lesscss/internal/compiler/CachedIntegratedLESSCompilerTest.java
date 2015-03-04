@@ -91,7 +91,7 @@ public class CachedIntegratedLESSCompilerTest
         when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
             thenReturn("Some Velocity-rendered LESS content");
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2"), eq(true)))
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2")))
             .thenReturn("output");
 
         // Tests
@@ -109,7 +109,7 @@ public class CachedIntegratedLESSCompilerTest
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
         when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
-        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"), eq(false))).thenReturn("output");
+        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"))).thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, true, "skin2"));
@@ -149,7 +149,7 @@ public class CachedIntegratedLESSCompilerTest
                 .thenReturn("@import (reference) \"style.less.vm\";\n"
                         +"Some Velocity-rendered LESS content");
         when(less4jCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
-            +"Some Velocity-rendered LESS content"), eq("skin"), eq(true)))
+            +"Some Velocity-rendered LESS content"), eq("skin")))
                 .thenReturn("output");
 
         // Tests
@@ -167,7 +167,7 @@ public class CachedIntegratedLESSCompilerTest
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
                 thenReturn("Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
-        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"), eq(true))).
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"))).
             thenThrow(lessCompilerException);
 
         // Tests

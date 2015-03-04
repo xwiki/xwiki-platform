@@ -72,10 +72,10 @@ public class Less4jCompilerTest
         // Is is actually more an integration test than a unit test
         
         // Import 1
-        when(skin.getResource("less/import1.less.vm")).thenReturn(mock(Resource.class));
+        when(skin.getResource("less/style.less.vm")).thenReturn(mock(Resource.class));
         StringWriter import1source = new StringWriter();
-        IOUtils.copy(new FileInputStream(getClass().getResource("/import1.less.vm").getFile()), import1source);
-        when(templateManager.renderFromSkin("less/import1.less.vm", skin)).thenReturn(import1source.toString());
+        IOUtils.copy(new FileInputStream(getClass().getResource("/style.less.vm").getFile()), import1source);
+        when(templateManager.renderFromSkin("less/style.less.vm", skin)).thenReturn(import1source.toString());
         
         
         // Import 2
@@ -102,7 +102,7 @@ public class Less4jCompilerTest
         // Test
         StringWriter source = new StringWriter();
         IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-        String result = mocker.getComponentUnderTest().compile(source.toString(), "skin", true);
+        String result = mocker.getComponentUnderTest().compile(source.toString(), "skin");
         
         // Verify
         StringWriter expected = new StringWriter();
@@ -123,7 +123,7 @@ public class Less4jCompilerTest
         try {
             StringWriter source = new StringWriter();
             IOUtils.copy(new FileInputStream(getClass().getResource("/style3.less").getFile()), source);
-            mocker.getComponentUnderTest().compile(source.toString(), "skin", false);
+            mocker.getComponentUnderTest().compile(source.toString(), "skin");
         } catch (Less4jException e) {
             caughtException = e;
         }

@@ -21,6 +21,7 @@ package org.xwiki.lesscss.internal.compiler.less4j;
 
 import java.io.File;
 
+import org.xwiki.lesscss.internal.compiler.CachedIntegratedLESSCompiler;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
@@ -41,11 +42,10 @@ public class TemplateLESSSource extends AbstractLESSSource
      * @param templateManager the template manager component
      * @param skin the skin holding the template
      * @param templateName the name of the template
-     * @param useVelocity set if velocity is executed or not 
      */
-    public TemplateLESSSource(TemplateManager templateManager, Skin skin, String templateName, boolean useVelocity)
+    public TemplateLESSSource(TemplateManager templateManager, Skin skin, String templateName)
     {
-        super(templateManager, skin, useVelocity, new File(templateName).getParent());
+        super(templateManager, skin, new File(templateName).getParent());
         this.templateName = templateName;
     }
 
@@ -53,8 +53,18 @@ public class TemplateLESSSource extends AbstractLESSSource
     public String getContent() throws FileNotFound, CannotReadFile
     {
         try {
-            // Execute Velocity on some files 
-            if (useVelocity && templateName.endsWith(".vm")) {
+            // We execute velocity on the main skin file only (which is included by SSX objects using LESS).
+            //
+            // This a limitation we introduce because when we do an HTML export, we must execute velocity to know which
+            // resources have to be included in the ZIP file, but we avoid executing LESS and we use the cache instead
+            // (otherwise the export would be too slow).
+            //
+            // When we do an HTML export, we execute Velocity on the main skin file, but not on any .less.vm that the 
+            // skin might have. Actually we have no way to know which .less.vm are included, without running LESS.
+            //
+            // That is why we do not execute Velocity on any ".less.vm" file but only on the main skin template.
+            String mainSkinTemplate = "less/" + CachedIntegratedLESSCompiler.MAIN_SKIN_STYLE_FILENAME;
+            if (mainSkinTemplate.equals(templateName)) {
                 return templateManager.renderFromSkin(templateName, skin);
             } 
             

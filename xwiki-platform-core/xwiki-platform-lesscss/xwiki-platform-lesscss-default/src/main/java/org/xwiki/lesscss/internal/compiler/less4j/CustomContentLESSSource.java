@@ -37,11 +37,10 @@ public class CustomContentLESSSource extends AbstractLESSSource
      * @param lessCode the LESS code to compile 
      * @param templateManager the template manager component
      * @param skin the skin holding the template
-     * @param useVelocity set if velocity is executed or not 
      */
-    public CustomContentLESSSource(String lessCode, TemplateManager templateManager, Skin skin, boolean useVelocity)
+    public CustomContentLESSSource(String lessCode, TemplateManager templateManager, Skin skin)
     {
-        super(templateManager, skin, useVelocity, "less");
+        super(templateManager, skin, "less");
         this.lessCode = lessCode;
     }
 

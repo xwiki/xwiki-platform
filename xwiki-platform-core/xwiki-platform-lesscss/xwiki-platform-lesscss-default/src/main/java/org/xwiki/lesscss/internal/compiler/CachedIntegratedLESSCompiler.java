@@ -48,9 +48,12 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<String>
 {
+    /**
+     * The name of the file holding the main skin style (on which Velocity is always executed).
+     */
+    public static final String MAIN_SKIN_STYLE_FILENAME = "style.less.vm";
+    
     private static final String SKIN_CONTEXT_KEY = "skin";
-
-    private static final String MAIN_SKIN_STYLE_FILENAME = "style.less.vm";
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -90,7 +93,7 @@ public class CachedIntegratedLESSCompiler implements CachedCompilerInterface<Str
             
             // Compile the LESS code
             if (useLESS) {
-                return less4JCompiler.compile(lessCode, skin, useVelocity);
+                return less4JCompiler.compile(lessCode, skin);
             }
             
             // Otherwise return the raw LESS code

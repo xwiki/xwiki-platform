@@ -51,17 +51,16 @@ public class Less4jCompiler
      * Compile the LESS code and get the included files from the skin templates.
      * @param lessCode code to compile
      * @param skin skin holding the templates
-     * @param useVelocity set if velocity is executed or not
      * @return the results of the LESS compilation
      * @throws Less4jException if problems occur
      */
-    public String compile(String lessCode, String skin, boolean useVelocity) throws Less4jException
+    public String compile(String lessCode, String skin) throws Less4jException
     {
         LessCompiler lessCompiler = new DefaultLessCompiler();
         LessCompiler.Configuration options = new LessCompiler.Configuration();
         options.setCompressing(true);
         LessSource lessSource = 
-            new CustomContentLESSSource(lessCode, templateManager, skinManager.getSkin(skin), useVelocity);
+            new CustomContentLESSSource(lessCode, templateManager, skinManager.getSkin(skin));
         LessCompiler.CompilationResult lessResult = lessCompiler.compile(lessSource, options);
         return lessResult.getCss();
     }

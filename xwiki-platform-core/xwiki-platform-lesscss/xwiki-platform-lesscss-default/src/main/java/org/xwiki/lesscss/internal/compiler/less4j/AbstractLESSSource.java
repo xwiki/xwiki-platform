@@ -45,14 +45,12 @@ public abstract class AbstractLESSSource extends LessSource
      * Default constructor.
      * @param templateManager the template manager component
      * @param skin the skin holding the templates
-     * @param useVelocity if velocity is executed or not
      * @param folder the folder in which the template is located
      */
-    public AbstractLESSSource(TemplateManager templateManager, Skin skin, boolean useVelocity, String folder)
+    public AbstractLESSSource(TemplateManager templateManager, Skin skin, String folder)
     {
         this.templateManager = templateManager;
         this.skin = skin;
-        this.useVelocity = useVelocity;
         this.folder = folder;
     }
     
@@ -62,7 +60,7 @@ public abstract class AbstractLESSSource extends LessSource
         String template = folder + "/" + filename;
         Resource resource = skin.getResource(template);
         if (resource != null) {
-            return new TemplateLESSSource(templateManager, skin, template, useVelocity);
+            return new TemplateLESSSource(templateManager, skin, template);
         }
 
         // The file has not been found

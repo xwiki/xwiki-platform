@@ -117,7 +117,8 @@
           </execution>
         </executions>
       </plugin>
-      <!-- We set a default UI for the subwiki in the webapp -->
+      <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
+       install on a subwiki by default (which is something we test) -->
       <plugin>
         <groupId>com.google.code.maven-replacer-plugin</groupId>
         <artifactId>replacer</artifactId>

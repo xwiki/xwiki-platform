@@ -1,0 +1,19 @@
+#if ($empty)
+  choose new flavor
+#else
+  $currentflavor = search flavor
+  #if (no flavor installed)
+    #if (none of the old XE ids is installed, or some other extension part of a configurable list)
+      #if (!empty)
+        repair
+        $currentflavor = repaired UI extension
+    #else
+      $currentflavor = the installed UI extension
+
+  #if ($currentflavor)
+    #if ($currentflavor is explicitely tagged as flavor)
+      search new version of the flavor
+    #else
+      choose new flavor
+  #end
+#end

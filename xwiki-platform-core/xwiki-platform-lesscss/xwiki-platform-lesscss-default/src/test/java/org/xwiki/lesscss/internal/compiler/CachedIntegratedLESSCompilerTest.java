@@ -19,26 +19,24 @@
  */
 package org.xwiki.lesscss.internal.compiler;
 
-import java.nio.file.Path;
-
 import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler;
 import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.github.sommeri.less4j.Less4jException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -60,11 +58,9 @@ public class CachedIntegratedLESSCompilerTest
 
     private Provider<XWikiContext> xcontextProvider;
 
-    private LESSCompiler lessCompiler;
-
-    private SkinDirectoryGetter skinDirectoryGetter;
-
     private LESSResourceReader lessResourceReader;
+    
+    private Less4jCompiler less4jCompiler;
 
     private XWikiContext xcontext;
 
@@ -75,8 +71,7 @@ public class CachedIntegratedLESSCompilerTest
     @Before
     public void setUp() throws Exception
     {
-        lessCompiler = mocker.getInstance(LESSCompiler.class);
-        skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
+        less4jCompiler = mocker.getInstance(Less4jCompiler.class);
         lessResourceReader = mocker.getInstance(LESSResourceReader.class);
         xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         xcontext = mock(XWikiContext.class);
@@ -93,13 +88,11 @@ public class CachedIntegratedLESSCompilerTest
     {
         // Mocks
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
-
-        Path path = mock(Path.class);
-        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
         when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
             thenReturn("Some Velocity-rendered LESS content");
-        when(lessCompiler.compile(eq("Some Velocity-rendered LESS content"), any(Path[].class))).thenReturn("output");
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2")))
+            .thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, true, true, "skin2"));
@@ -115,10 +108,8 @@ public class CachedIntegratedLESSCompilerTest
         // Mocks
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
-        Path path = mock(Path.class);
-        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
         when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
-        when(lessCompiler.compile(eq("Some LESS content"), any(Path[].class))).thenReturn("output");
+        when(less4jCompiler.compile(eq("Some LESS content"), eq("skin2"))).thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, false, false, true, "skin2"));
@@ -133,8 +124,6 @@ public class CachedIntegratedLESSCompilerTest
         // Mocks
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
-        Path path = mock(Path.class);
-        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
         when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
                 thenReturn("Some Velocity-rendered LESS content");
@@ -144,7 +133,7 @@ public class CachedIntegratedLESSCompilerTest
             true, false, "skin2"));
         
         // Verify that the LESS compiler is never called
-        verifyZeroInteractions(lessCompiler);
+        verifyZeroInteractions(less4jCompiler);
     }
 
     @Test
@@ -153,24 +142,15 @@ public class CachedIntegratedLESSCompilerTest
         // Mocks
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
 
-        Path path = mock(Path.class);
-        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin")).thenReturn(path);
-
-        // Main style
-        when(lessResourceReader.getContent(eq(new LESSSkinFileResourceReference("style.less.vm")), eq("skin"))).
-                thenReturn("LESS code from main file");
-        when(xwiki.parseContent(eq("LESS code from main file"), eq(xcontext))).
-                thenReturn("Velocity-rendered main style");
-
         // Resource
         when(lessResourceReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
+        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\n"
             + "Some LESS content"), eq(xcontext)))
-                .thenReturn("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
+                .thenReturn("@import (reference) \"style.less.vm\";\n"
                         +"Some Velocity-rendered LESS content");
-        when(lessCompiler.compile(eq("@import (reference) \"style.less.vm\";\n.realStartOfXWikiSSX{color:#000}"
-            +"Some Velocity-rendered LESS content"),any(Path[].class)))
-                .thenReturn(".realStartOfXWikiSSX{color:#000}output");
+        when(less4jCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
+            +"Some Velocity-rendered LESS content"), eq("skin")))
+                .thenReturn("output");
 
         // Tests
         assertEquals("output", mocker.getComponentUnderTest().compute(resource, true, true, true, "skin"));
@@ -182,20 +162,18 @@ public class CachedIntegratedLESSCompilerTest
     {
         // Mocks
         LESSSkinFileResourceReference resource = new LESSSkinFileResourceReference("file");
-
-        Path path = mock(Path.class);
-        when(skinDirectoryGetter.getLESSSkinFilesDirectory("skin2")).thenReturn(path);
-        when(lessResourceReader.getContent(eq(resource), eq("skin2"))).thenReturn("Some LESS content");
+        
+        when(lessResourceReader.getContent(eq(resource), eq("skin"))).thenReturn("Some LESS content");
         when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
                 thenReturn("Some Velocity-rendered LESS content");
-        LESSCompilerException lessCompilerException = new LESSCompilerException("error");
-        when(lessCompiler.compile(eq("Some Velocity-rendered LESS content"), any(Path[].class))).
+        Less4jException lessCompilerException = mock(Less4jException.class);
+        when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"))).
             thenThrow(lessCompilerException);
 
         // Tests
         LESSCompilerException caughtException = null;
         try {
-            mocker.getComponentUnderTest().compute(resource, false, true, true, "skin2");
+            mocker.getComponentUnderTest().compute(resource, false, true, true, "skin");
         } catch(LESSCompilerException e) {
             caughtException = e;
         }
@@ -203,7 +181,8 @@ public class CachedIntegratedLESSCompilerTest
         // Verify
         assertNotNull(caughtException);
         assertEquals(lessCompilerException, caughtException.getCause());
-        assertEquals("Failed to compile the resource [LessSkinFileResourceReference[file]] with LESS.", caughtException.getMessage());
+        assertEquals("Failed to compile the resource [LessSkinFileResourceReference[file]] with LESS.", 
+            caughtException.getMessage());
 
     }
 }

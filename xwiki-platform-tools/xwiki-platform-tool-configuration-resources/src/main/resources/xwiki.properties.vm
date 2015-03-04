@@ -697,6 +697,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.properties = mail.smtp.starttls.enable = true
 # mail.sender.properties = mail.smtp.socks.host = someserver
 
+
 #-# [Since 6.4M2]
 #-# Defines which authorization checks are done when sending mails using the Mail Sender Script Service.
 #-# Example of valid values:
@@ -721,5 +722,15 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# discarded or not. They could be kept for tracability purpose for example.
 #-# The default is:
 # mail.sender.database.discardSuccessStatuses = true
+
+#-------------------------------------------------------------------------------------
+# LESS
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.4RC1]
+#-# LESS CSS compiler to use. Valid values are:
+#-# - "javascript" : to use the official LESS compiler.
+#-# - "less4j" : (default) to use a Java version of LESS which has better performances.
+# less.compiler =
 
 $!xwikiPropertiesAdditionalProperties

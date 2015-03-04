@@ -32,9 +32,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test class for {@link org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler}.
+ * Test class for {@link DefaultLESSCompiler}.
  *
- * @since 6.1M1
+ * @since 7.0RC1
  * @version $Id$
  */
 public class DefaultLESSCompilerTest
@@ -69,12 +69,13 @@ public class DefaultLESSCompilerTest
         IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.less").getFile()), source);
 
         // Compile
-        Path[] paths = {Paths.get(getClass().getResource("/").getPath())};
+        Path[] paths = { Paths.get(getClass().getResource("/").getPath())};
         String result = mocker.getComponentUnderTest().compile(source.toString(), paths);
 
         // Get the expected result
         StringWriter expectedResult = new StringWriter();
-        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.css").getFile()), expectedResult);
+        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.css").getFile()),
+                expectedResult);
 
         // Compare
         assertEquals(expectedResult.toString(), result);

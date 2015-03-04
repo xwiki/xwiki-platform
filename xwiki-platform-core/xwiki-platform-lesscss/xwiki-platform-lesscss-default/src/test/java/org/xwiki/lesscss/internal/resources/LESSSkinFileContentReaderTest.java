@@ -19,28 +19,21 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.inject.Provider;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
-import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateContent;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiEngineContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,42 +47,34 @@ public class LESSSkinFileContentReaderTest
     public MockitoComponentMockingRule<LESSSkinFileReader> mocker =
             new MockitoComponentMockingRule<>(LESSSkinFileReader.class);
 
-    private Provider<XWikiContext> xcontextProvider;
+    private TemplateManager templateManager;
 
-    private SkinDirectoryGetter skinDirectoryGetter;
-
-    private XWikiContext xcontext;
-
-    private XWiki xwiki;
-
-    private XWikiEngineContext engineContext;
+    private SkinManager skinManager;
+    
+    private Skin skin;
 
     @Before
     public void setUp() throws Exception
     {
-        skinDirectoryGetter = mocker.getInstance(SkinDirectoryGetter.class);
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
-        engineContext = mock(XWikiEngineContext.class);
-        when(xwiki.getEngineContext()).thenReturn(engineContext);
+        templateManager = mocker.getInstance(TemplateManager.class);
+        skinManager = mocker.getInstance(SkinManager.class);
+        skin = mock(Skin.class);
+        when(skinManager.getSkin("skin")).thenReturn(skin);
     }
 
     @Test
     public void getContent() throws Exception
     {
         // Mocks
-        when(skinDirectoryGetter.getSkinDirectory("skin")).thenReturn("skins/skin");
-        when(engineContext.getRealPath("skins/skin/less/style2.less")).thenReturn(
-                getClass().getResource("/style2.less").getPath());
-        FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());
-        when(engineContext.getResourceAsStream("skins/skin/less/style2.less")).thenReturn(is);
+        Template template = mock(Template.class);
+        when(templateManager.getTemplate("less/style.less", skin)).thenReturn(template);
+        TemplateContent templateContent = mock(TemplateContent.class);
+        when(template.getContent()).thenReturn(templateContent);
+        when(templateContent.getContent()).thenReturn("// My LESS file");
 
         // Test
         assertEquals("// My LESS file", mocker.getComponentUnderTest().getContent(
-                new LESSSkinFileResourceReference("style2.less"), "skin"));
+                new LESSSkinFileResourceReference("style.less"), "skin"));
     }
 
     @Test
@@ -111,11 +96,6 @@ public class LESSSkinFileContentReaderTest
     @Test
     public void getContentWhenFileDoesNotExist() throws Exception
     {
-        // Mocks
-        when(skinDirectoryGetter.getSkinDirectory("skin")).thenReturn("skins/skin");
-        when(engineContext.getRealPath("skins/skin/less/not-existing-file.less")).
-                thenReturn(getClass().getResource("/").getPath() + "not-existing-file.less");
-
         // Test
         LESSCompilerException caughtException = null;
         try {
@@ -127,38 +107,31 @@ public class LESSSkinFileContentReaderTest
 
         // Verify
         assertNotNull(caughtException);
-        assertEquals("The path [skins/skin/less/not-existing-file.less] is not a file or does not exists.",
-            caughtException.getMessage());
+        assertEquals("The template [not-existing-file.less] does not exists.", caughtException.getMessage());
     }
 
     @Test
-    public void getContentWhenExceptionWhileReadingFile() throws Exception
+    public void getContentWhenException() throws Exception
     {
         // Mocks
-        when(skinDirectoryGetter.getSkinDirectory("skin")).thenReturn(
-                "skins/skin");
-
-        InputStream is = mock(InputStream.class);
-        when(engineContext.getRealPath("skins/skin/less/style2.less")).
-                thenReturn(getClass().getResource("/style2.less").getPath());
-        when(engineContext.getResourceAsStream("skins/skin/less/style2.less")).thenReturn(is);
-        IOException exception = new IOException("Test Exception");
-
-        // risky mock: it depends on the implementation of IOUtils.copy()
-        when(is.read(any(byte[].class))).thenThrow(exception);
+        Template template = mock(Template.class);
+        when(templateManager.getTemplate("less/file.less", skin)).thenReturn(template);
+        Exception exception = new Exception("exception");
+        when(template.getContent()).thenThrow(exception);
 
         // Test
         LESSCompilerException caughtException = null;
         try {
             mocker.getComponentUnderTest().getContent(
-                    new LESSSkinFileResourceReference("style2.less"), "skin");
+                    new LESSSkinFileResourceReference("file.less"), "skin");
         } catch (LESSCompilerException e) {
             caughtException = e;
         }
 
         // Verify
         assertNotNull(caughtException);
-        assertEquals("Error while reading the file [skins/skin/less/style2.less].", caughtException.getMessage());
+        assertEquals("Failed to get the content of the template [file.less].", caughtException.getMessage());
+        assertEquals(exception, caughtException.getCause());
     }
 
 }

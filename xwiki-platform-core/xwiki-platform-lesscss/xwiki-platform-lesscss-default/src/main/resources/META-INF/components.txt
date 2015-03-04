@@ -9,11 +9,15 @@ org.xwiki.lesscss.internal.colortheme.DefaultColorThemeReferenceSerializer
 org.xwiki.lesscss.internal.colortheme.DefaultLESSColorThemeConverter
 org.xwiki.lesscss.internal.colortheme.DocumentColorThemeReferenceSerializer
 org.xwiki.lesscss.internal.colortheme.NamedColorThemeReferenceSerializer
+org.xwiki.lesscss.internal.compiler.less4j.AbstractLESSSource
+org.xwiki.lesscss.internal.compiler.less4j.CustomContentLESSSource
+org.xwiki.lesscss.internal.compiler.less4j.FileLESSSource
+org.xwiki.lesscss.internal.compiler.less4j.Less4jCompiler
+org.xwiki.lesscss.internal.compiler.less4j.TemplateLESSSource
 org.xwiki.lesscss.internal.compiler.CachedIntegratedLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultIntegratedLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultLESSSkinFileCompiler
-org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReader
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReferenceSerializer
 org.xwiki.lesscss.internal.resources.LESSObjectPropertyReader

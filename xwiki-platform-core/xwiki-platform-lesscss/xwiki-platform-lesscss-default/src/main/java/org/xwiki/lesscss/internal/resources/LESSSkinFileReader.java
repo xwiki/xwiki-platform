@@ -19,26 +19,18 @@
  */
 package org.xwiki.lesscss.internal.resources;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.resources.LESSResourceReader;
 import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.lesscss.resources.LESSSkinFileResourceReference;
-import org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.skin.SkinManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
 
 /**
  * Specialized implementation of {@link org.xwiki.lesscss.resources.LESSResourceReader} to read resources referenced by an
@@ -53,10 +45,10 @@ import com.xpn.xwiki.XWikiContext;
 public class LESSSkinFileReader implements LESSResourceReader
 {
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
+    private TemplateManager templateManager;
+    
     @Inject
-    private SkinDirectoryGetter skinDirectoryGetter;
+    private SkinManager skinManager;
 
     @Override
     public String getContent(LESSResourceReference lessResourceReference, String skin) throws LESSCompilerException
@@ -67,34 +59,19 @@ public class LESSSkinFileReader implements LESSResourceReader
 
         LESSSkinFileResourceReference lessSkinFileResourceReference =
                 (LESSSkinFileResourceReference) lessResourceReference;
-        return getSkinFileContent(skinDirectoryGetter.getSkinDirectory(skin) + "/less/",
-                lessSkinFileResourceReference.getFileName());
 
-    }
-
-    private String getSkinFileContent(String directory, String fileName) throws LESSCompilerException
-    {
-        // Get the XWiki object
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        // Get the file
-        String fullFileName = directory + fileName;
-        File lessFile = new File(xwiki.getEngineContext().getRealPath(fullFileName));
-        if (!lessFile.exists() || !lessFile.isFile()) {
-            throw new LESSCompilerException(String.format("The path [%s] is not a file or does not exists.",
-                    fullFileName));
+        Template template = templateManager.getTemplate("less/" + lessSkinFileResourceReference.getFileName(),
+                skinManager.getSkin(skin));
+        if (template == null) {
+            throw new LESSCompilerException(String.format("The template [%s] does not exists.",
+                lessSkinFileResourceReference.getFileName()));
         }
-
-        // Get the file content
+        
         try {
-            InputStream is = xwiki.getEngineContext().getResourceAsStream(fullFileName);
-            StringWriter content = new StringWriter();
-            IOUtils.copy(is, content);
-            return content.toString();
-        } catch (IOException e) {
-            throw new LESSCompilerException(String.format("Error while reading the file [%s].",
-                    fullFileName));
+            return template.getContent().getContent();
+        } catch (Exception e) {
+            throw new LESSCompilerException(String.format("Failed to get the content of the template [%s].",
+                lessSkinFileResourceReference.getFileName()), e);
         }
     }
 }

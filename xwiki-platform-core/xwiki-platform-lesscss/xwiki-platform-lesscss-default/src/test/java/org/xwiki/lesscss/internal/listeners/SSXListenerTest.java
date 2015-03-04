@@ -20,11 +20,14 @@
 package org.xwiki.lesscss.internal.listeners;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.lesscss.cache.ColorThemeCache;
@@ -35,6 +38,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.observation.event.Event;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -43,6 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -73,6 +78,23 @@ public class SSXListenerTest
         lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+    }
+
+    @Test
+    public void getName() throws Exception
+    {
+        assertEquals("LESS SSX objects listener", mocker.getComponentUnderTest().getName());
+    }
+
+    @Test
+    public void getEvents() throws Exception
+    {
+        List<Event> eventsToObserve = Arrays.<Event>asList(
+                new DocumentCreatedEvent(),
+                new DocumentUpdatedEvent(),
+                new DocumentDeletedEvent());
+
+        assertEquals(eventsToObserve, mocker.getComponentUnderTest().getEvents());
     }
 
     @Test

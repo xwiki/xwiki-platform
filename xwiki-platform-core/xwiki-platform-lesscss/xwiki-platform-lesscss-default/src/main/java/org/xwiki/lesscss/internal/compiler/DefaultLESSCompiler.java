@@ -19,57 +19,43 @@
  */
 package org.xwiki.lesscss.internal.compiler;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import javax.inject.Singleton;
 
-import org.lesscss.LessCompiler;
-import org.lesscss.LessException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.internal.compiler.less4j.FileLESSSource;
+
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
- * Default implementation of {@link LESSCompiler}.
+ * Implementation of {@link LESSCompiler} that uses https://github.com/SomMeri/less4j, a LESS compiler written in Java
+ * for better performances.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultLESSCompiler implements LESSCompiler, Initializable
+public class DefaultLESSCompiler implements LESSCompiler
 {
-    private static final String LESS_SOURCE_FILE = "/less-rhino-1.7.0.js";
-
-    private static final String LESSC_SOURCE_FILE = "/lessc-rhino-1.7.0.js";
-
-    private static final String ERROR_MESSAGE = "Error during the LESS processing.";
-
-    /**
-     * The thread-safe LESS compiler.
-     */
-    private LessCompiler lessCompiler;
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        lessCompiler = new LessCompiler();
-        lessCompiler.setLessJs(getClass().getResource(LESS_SOURCE_FILE));
-        lessCompiler.setLesscJs(getClass().getResource(LESSC_SOURCE_FILE));
-        lessCompiler.setCompress(true);
-        lessCompiler.init();
-    }
+    private static final String ERROR_MESSAGE = "Failed to compile the LESS code: [%s]";
 
     @Override
     public String compile(String lessCode) throws LESSCompilerException
     {
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
         try {
-            return lessCompiler.compile(lessCode);
-        } catch (LessException e) {
+            LessCompiler.CompilationResult result = lessCompiler.compile(lessCode, options);
+            return result.getCss();
+        } catch (Less4jException e) {
             throw new LESSCompilerException(ERROR_MESSAGE, e);
         }
     }
@@ -77,24 +63,17 @@ public class DefaultLESSCompiler implements LESSCompiler, Initializable
     @Override
     public String compile(String lessCode, Path[] includePaths) throws LESSCompilerException
     {
-        LessCompiler compiler = this.lessCompiler;
-        if (includePaths.length > 0) {
-            StringBuilder paths = new StringBuilder("--include-path=");
-            for (int i = 0; i < includePaths.length; ++i) {
-                paths.append(includePaths[i].toString()).append(File.pathSeparator);
-            }
-            // We need to create a new instance of LessCompiler until
-            // https://github.com/marceloverdijk/lesscss-java/issues/49 is fixed
-            compiler = new LessCompiler(Arrays.<String>asList(paths.toString()));
-            compiler.setLessJs(getClass().getResource(LESS_SOURCE_FILE));
-            compiler.setLesscJs(getClass().getResource(LESSC_SOURCE_FILE));
-            compiler.setCompress(true);
-            compiler.init();
-        }
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
         try {
-            return compiler.compile(lessCode);
-        } catch (LessException e) {
-            throw new LESSCompilerException(ERROR_MESSAGE, e);
+            FileLESSSource source = new FileLESSSource(lessCode, includePaths);
+            LessCompiler.CompilationResult result = lessCompiler.compile(source, options);
+            return result.getCss();
+        } catch (Less4jException | BugHappened e) {
+            throw new LESSCompilerException(String.format(ERROR_MESSAGE, e.getMessage()), e);
         }
     }
+
+
 }

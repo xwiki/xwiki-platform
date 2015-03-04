@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal.colortheme;
+package org.xwiki.lesscss.internal.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.lesscss.cache.ColorThemeCache;
 import org.xwiki.lesscss.cache.LESSResourcesCache;
 import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
-import org.xwiki.lesscss.internal.listeners.ColorThemeListener;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

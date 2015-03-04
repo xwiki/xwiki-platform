@@ -788,7 +788,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public boolean addTemplateField(String fieldName, String fieldPrettyName)
     {
-        return addTextAreaField(fieldName, fieldPrettyName, 80, 15);
+        boolean result = addTextAreaField(fieldName, fieldPrettyName, 80, 15);
+        
+        if (result) {
+            TextAreaClass property = (TextAreaClass) get(fieldName);
+            property.setStringValue("editor", "PureText");
+        }
+        
+        return result;
     }
 
     public boolean addTextAreaField(String fieldName, String fieldPrettyName, int cols, int rows)

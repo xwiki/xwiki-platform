@@ -46,7 +46,7 @@
   <attachment>
     <filename>groups.png</filename>
     <filesize>498</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -55,7 +55,7 @@
   <attachment>
     <filename>metadata.gif</filename>
     <filesize>182</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251902071000</date>
     <version>1.1</version>
     <comment/>
@@ -64,7 +64,7 @@
   <attachment>
     <filename>dblist.png</filename>
     <filesize>600</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -73,7 +73,7 @@
   <attachment>
     <filename>attach.gif</filename>
     <filesize>560</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251901626000</date>
     <version>1.1</version>
     <comment/>
@@ -82,7 +82,7 @@
   <attachment>
     <filename>date.png</filename>
     <filesize>519</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -91,7 +91,7 @@
   <attachment>
     <filename>boolean.png</filename>
     <filesize>302</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -100,7 +100,7 @@
   <attachment>
     <filename>textarea.png</filename>
     <filesize>337</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -109,7 +109,7 @@
   <attachment>
     <filename>string.png</filename>
     <filesize>293</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -118,7 +118,7 @@
   <attachment>
     <filename>space.gif</filename>
     <filesize>996</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251111875000</date>
     <version>1.1</version>
     <comment/>
@@ -127,7 +127,7 @@
   <attachment>
     <filename>document.gif</filename>
     <filesize>379</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251111875000</date>
     <version>1.1</version>
     <comment/>
@@ -136,7 +136,7 @@
   <attachment>
     <filename>dbtreelist.png</filename>
     <filesize>193</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -145,7 +145,7 @@
   <attachment>
     <filename>wiki.gif</filename>
     <filesize>1074</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251111875000</date>
     <version>1.1</version>
     <comment/>
@@ -154,7 +154,7 @@
   <attachment>
     <filename>number.png</filename>
     <filesize>282</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -163,7 +163,7 @@
   <attachment>
     <filename>class.gif</filename>
     <filesize>589</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251901480000</date>
     <version>1.1</version>
     <comment/>
@@ -172,7 +172,7 @@
   <attachment>
     <filename>users.png</filename>
     <filesize>437</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -181,7 +181,7 @@
   <attachment>
     <filename>staticlist.png</filename>
     <filesize>280</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -190,7 +190,7 @@
   <attachment>
     <filename>levels.png</filename>
     <filesize>428</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -199,7 +199,7 @@
   <attachment>
     <filename>password.png</filename>
     <filesize>349</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251992318000</date>
     <version>1.1</version>
     <comment/>
@@ -208,7 +208,7 @@
   <attachment>
     <filename>object.gif</filename>
     <filesize>628</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1251901489000</date>
     <version>1.1</version>
     <comment/>
@@ -217,7 +217,7 @@
   <attachment>
     <filename>arrowup.gif</filename>
     <filesize>176</filesize>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1256570420000</date>
     <version>1.1</version>
     <comment/>

@@ -26,14 +26,14 @@
   <language>fr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>L10NCode.WebHome</parent>
+  <parent>Extension.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1352389357000</creationDate>
-  <date>1352389411000</date>
-  <contentUpdateDate>1352389411000</contentUpdateDate>
+  <creationDate>1319458064000</creationDate>
+  <date>1425054696000</date>
+  <contentUpdateDate>1425054615000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>

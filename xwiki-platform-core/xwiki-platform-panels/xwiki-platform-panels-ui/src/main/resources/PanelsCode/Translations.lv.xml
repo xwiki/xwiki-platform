@@ -23,7 +23,7 @@
 <xwikidoc>
   <web>PanelsCode</web>
   <name>Translations</name>
-  <language>fr</language>
+  <language>lv</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Panels.WebHome</parent>
@@ -43,16 +43,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
-admin.panels.applications=Panel d'applications
-platform.panels.applications.ajax.csrf=La validation CSRF a échoué. Merci de recharger la page.
-platform.panels.applications.ajax.error=Enregistrement impossible.
-platform.panels.applications.ajax.noright=Vous n'êtes pas autorisés à modifier PanelsCode.ApplicationsPanelConfiguration. 
-platform.panels.applications.ajax.success=La configuration a été enregistrée.
-platform.panels.applications.blacklistedapps=Applications absentes de la barre
-platform.panels.applications.displayedapps=Applications présentes dans la barre
-platform.panels.applications.helper=Vous pouvez définir quelles sont les applications affichées dans la Barre d'Applications (barre affichée par défaut à gauche). Toutes les nouvelles applications sont affichées dans cette barre. Si vous souhaitez en supprimer certaines, il suffit de cliquer/glisser l'icône d'un pavé à l'autre. N'oubliez pas d'enregistrer vos modifications.
-platform.panels.applications.revert=Rétablir
-platform.panels.applications.save=Enregistrer
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+admin.panels.applications=Lietotņu panelis
+platform.panels.applications.ajax.csrf=Neizdevās CSRF validācija. Mēģiniet pārlādēt lapu.
+platform.panels.applications.ajax.error=Neizdevās saglabāt izmaiņas.
+platform.panels.applications.ajax.noright=Jums nav tiesību mainīt PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.success=Iestatījumi ir saglabāti.
+platform.panels.applications.blacklistedapps=Lietotnes, kuras nav joslā
+platform.panels.applications.displayedapps=Lietotnes, kuras ir joslā
+platform.panels.applications.helper=Šeit jūs varat izvēlēties, kuras lietotnes rādīt Lietotņu joslā (pēc noklusēšanas, pa kreisi). Šeit tiks parādītas visas jaunās lietotnes. Ja vēlaties kādu no tām noņemt, pārvelciet ikonu no vienas joslas uz otru. Neaizmirstiet saglabāt izmaiņas\!
+platform.panels.applications.revert=Atcelt
+platform.panels.applications.save=Saglabāt
 </content>
 </xwikidoc>

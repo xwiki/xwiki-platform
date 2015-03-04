@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303158348000</creationDate>
+  <date>1307445978000</date>
+  <contentUpdateDate>1307445978000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+WikiManager.WikiCandidateMemberClass_status_accepted=Pieņemts
+WikiManager.WikiCandidateMemberClass_status_pending=Neizlemts
+WikiManager.WikiCandidateMemberClass_status_rejected=Noraidīts
+WikiManager.WikiCandidateMemberClass_type_invitation=Uzaicinājums
+WikiManager.WikiCandidateMemberClass_type_request=Pieprasījums
+admin.xwiki.manageworkspace.description=Pārvaldīt iestatījumus kā, piemēram, viki nosaukums, apraksts, īpašnieks un dalības veids.
+admin.xwiki.members.title=Tekošie dalībnieki
+admin.xwiki.usersconfiguration.title=Iestatījumi
+admin.xwiki.workspaceusers.description=Pārvaldīt viki dalībniekus\: pievienot, dzēst, uzaicināt, pieņemt vai noraidīt viki dalībnieku pieprasījumus.
+core.menu.admin.wiki=Pārvaldīt viki
+core.menu.type.wiki=Viki
+core.menu.watchlist.add.wiki=Vērot viki
+core.menu.watchlist.remove.wiki=Nevērot viki
+platform.wiki.currentwiki.candidateAcceptedSuccess=Pieprasījums veiksmīgi apstiprināts.
+platform.wiki.currentwiki.candidateHandledComment=Piezīmes\:
+platform.wiki.currentwiki.candidateHandledSaveComment=Apstrādāts kandidāts {0} (no {1})
+platform.wiki.currentwiki.candidateRejectedSuccess=Pieprasījums veiksmīgi noraidīts.
+platform.wiki.currentwiki.candidateReviewFailure=Kļūda\: Jūs nevarat atcelt šo uzaicinājumu.
+platform.wiki.currentwiki.candidates.accept.label=Pieņemt
+platform.wiki.currentwiki.candidates.hint=Lietotāji, kuri ir uzaicināti vai ir pieprasījuši pievienoties viki.
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Noraidīt uzaicinājumu
+platform.wiki.currentwiki.candidates.label=Kandidāti
+platform.wiki.currentwiki.candidates.reject.label=Noraidīt
+platform.wiki.currentwiki.candidates.reviewer.label=Admins\:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Admina ziņa\:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privāts komentārs\:
+platform.wiki.currentwiki.candidates.status.label=Statuss
+platform.wiki.currentwiki.candidates.type.label=Veids\:
+platform.wiki.currentwiki.currentUserCanLeave=Ja vēlaties jūs varat {0}atstāt šo viki{1}.
+platform.wiki.currentwiki.currentUserIsAdmin=Jūs esat šī viki administrators.
+platform.wiki.currentwiki.currentUserIsMember=Jūs esat šī viki dalībnieks.
+platform.wiki.currentwiki.currentUserIsOwner=Jūs esat šī viki īpašnieks.
+platform.wiki.currentwiki.currentUserNotMember=Jūs neesat šī viki dalībnieks.
+platform.wiki.currentwiki.currentuserCanJoin=Ja vēlaties, jūs varat {0}pievienoties šim wiki{1}.
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Aktīvākie dalībnieki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Viki informācija
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Lai apskatītu visus viki dalībniekus, jūs varat lietot {0}Lietotāju saraksta{1} lapu
+platform.wiki.currentwiki.invitation.view.label=Skatīt uzaicinājumu
+platform.wiki.currentwiki.invitationCancelFailure=Kļūda. Jūs nevarat atcelt šo uzaicinājumu.
+platform.wiki.currentwiki.invitationCancelNotification=Jūsu uzaicinājums ir atcelts un vairs nav spēkā.
+platform.wiki.currentwiki.invitationCancelSaveComment=Atcelts uzaicinājums {0} (no {1})
+platform.wiki.currentwiki.invitationCancelSuccess=Uzaicinājums sekmīgi atcelts.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Jūs esat uzaicināts piedalīties šajā viki
+platform.wiki.currentwiki.invite.button.label=Uzaicināt
+platform.wiki.currentwiki.invite.message.hint=Lietotājam nosūtītais ziņojums
+platform.wiki.currentwiki.invite.message.label=Ziņojums
+platform.wiki.currentwiki.invite.username.hint=Viki pievienojamā lietotāja vārds
+platform.wiki.currentwiki.invite.username.label=Lietotāja vārds
+platform.wiki.currentwiki.inviteNotification=Jūs esat uzaicināts pievienoties viki "{0}".
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} jau ir neizlemts uzaicinājums. Lūdzu atbildiet uz šo uzaicinājumu.
+</content>
+</xwikidoc>

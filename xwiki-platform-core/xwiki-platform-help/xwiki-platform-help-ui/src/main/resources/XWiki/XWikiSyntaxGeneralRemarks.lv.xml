@@ -57,5 +57,6 @@ XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse automātiski izlabo dažas
 |Divi atsevišķi elementi, kas nav atdalīti ar tukšu rindu|{{{| tabulas šūna}}}\\{{{* aizzīmēts saraksts}}}|{{{| tabulas šūna}}}\\\\{{{* aizzīmēts saraksts}}}
 |Divi atsevišķi elementi, kas nav atdalīti ar tukšu rindu|{{{rindkopa}}}\\{{{----}}}\\{{{rindkopa}}}|{{{rindkopa}}}\\\\{{{----}}}\\\\{{{rindkopa}}}
 |Saturs sākas ar tukšu rindu|&lt;tukša rinda dokumenta sākumā&gt;\\rindkopa|rindkopa
-|Neaizvērts virsraksts|{{{=== virsraksts}}}|{{{=== virsraksts ===}}}</content>
+|Neaizvērts virsraksts|{{{=== virsraksts}}}|{{{=== virsraksts ===}}}
+</content>
 </xwikidoc>

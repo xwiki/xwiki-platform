@@ -442,31 +442,6 @@
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
               <differenceType>7006</differenceType>
-              <className>org/xwiki/mail/MimeMessageFactory</className>
-              <method>javax.mail.internet.MimeMessage createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
-              <to>java.lang.Object</to>
-              <justification>Young API. Made the API more generic.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/script/MailSenderScriptService</className>
-              <method>java.util.Iterator createMessages(java.lang.String, java.lang.Object, java.lang.String, java.util.Map)</method>
-              <justification>Young API. Made the API more generic.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>org/xwiki/mail/script/AbstractMailScriptService</className>
-              <field>configuration</field>
-              <justification>Young API. Internal refactoring</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/lesscss/cache/LESSCache</className>
-              <method>java.lang.Object getMutex(org.xwiki.lesscss.resources.LESSResourceReference, org.xwiki.lesscss.skin.SkinReference, org.xwiki.lesscss.colortheme.ColorThemeReference)</method>
-              <justification>Young API. Fix a bad designed API.</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
               <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
               <method>org.suigeneris.jrcs.rcs.Version getRev()</method>
               <to>java.lang.String</to>
@@ -491,8 +466,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- We refactored the client code of the WYSIWYG editor to use the new tree. -->
-            <exclude>org/xwiki/gwt/wysiwyg/client/**</exclude>
           </excludes>
         </configuration>
       </plugin>

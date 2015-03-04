@@ -18,7 +18,6 @@ org.xwiki.lesscss.internal.compiler.CachedIntegratedLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultIntegratedLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler
 org.xwiki.lesscss.internal.compiler.DefaultLESSSkinFileCompiler
-org.xwiki.lesscss.internal.compiler.SkinDirectoryGetter
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReader
 org.xwiki.lesscss.internal.resources.DefaultLESSResourceReferenceSerializer
 org.xwiki.lesscss.internal.resources.LESSObjectPropertyReader

@@ -60,7 +60,7 @@ public class LESSSkinFileReader implements LESSResourceReader
         LESSSkinFileResourceReference lessSkinFileResourceReference =
                 (LESSSkinFileResourceReference) lessResourceReference;
 
-        Template template = templateManager.getTemplate(lessSkinFileResourceReference.getFileName(),
+        Template template = templateManager.getTemplate("less/" + lessSkinFileResourceReference.getFileName(),
                 skinManager.getSkin(skin));
         if (template == null) {
             throw new LESSCompilerException(String.format("The template [%s] does not exists.",

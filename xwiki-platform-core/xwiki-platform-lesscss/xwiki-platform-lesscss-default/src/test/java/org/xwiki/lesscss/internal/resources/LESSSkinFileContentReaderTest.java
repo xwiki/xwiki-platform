@@ -67,7 +67,7 @@ public class LESSSkinFileContentReaderTest
     {
         // Mocks
         Template template = mock(Template.class);
-        when(templateManager.getTemplate("style.less", skin)).thenReturn(template);
+        when(templateManager.getTemplate("less/style.less", skin)).thenReturn(template);
         TemplateContent templateContent = mock(TemplateContent.class);
         when(template.getContent()).thenReturn(templateContent);
         when(templateContent.getContent()).thenReturn("// My LESS file");
@@ -115,7 +115,7 @@ public class LESSSkinFileContentReaderTest
     {
         // Mocks
         Template template = mock(Template.class);
-        when(templateManager.getTemplate("file.less", skin)).thenReturn(template);
+        when(templateManager.getTemplate("less/file.less", skin)).thenReturn(template);
         Exception exception = new Exception("exception");
         when(template.getContent()).thenThrow(exception);
 

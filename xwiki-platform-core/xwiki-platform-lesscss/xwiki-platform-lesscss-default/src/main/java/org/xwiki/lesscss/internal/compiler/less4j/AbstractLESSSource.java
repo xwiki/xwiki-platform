@@ -36,8 +36,6 @@ public abstract class AbstractLESSSource extends LessSource
     protected TemplateManager templateManager;
 
     protected Skin skin;
-
-    protected boolean useVelocity;
     
     private String folder;
 

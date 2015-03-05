@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -41,7 +41,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.query.QueryManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.api.Document;
@@ -105,11 +104,8 @@ public class XWikiDocumentMockitoTest
     @Test
     public void getChildrenReferences() throws Exception
     {
-        QueryManager queryManager = mock(QueryManager.class);
-        when(this.oldcore.getMockStore().getQueryManager()).thenReturn(queryManager);
-
         Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
+        when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
 
         QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
@@ -142,7 +138,7 @@ public class XWikiDocumentMockitoTest
 
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
-        assertEquals(this.document, this.oldcore.getXWikiContext().getDoc());
+        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
         Wraps wrapsThisDocument = new Wraps(this.document);
         verify(velocityContext).put(eq("doc"), argThat(wrapsThisDocument));
         verify(velocityContext).put(eq("tdoc"), argThat(wrapsThisDocument));
@@ -163,7 +159,7 @@ public class XWikiDocumentMockitoTest
 
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
-        assertEquals(this.document, this.oldcore.getXWikiContext().getDoc());
+        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
         verify(velocityContext).put(eq("doc"), argThat(new Wraps(defaultTranslation)));
         verify(velocityContext).put(eq("tdoc"), argThat(new Wraps(this.document)));
         verify(velocityContext).put(eq("cdoc"), argThat(new Wraps(this.document)));

@@ -232,7 +232,8 @@
 #end
 
 #macro (addWikiDocumentChildren $wikiReference $offset $limit $children)
-  #getDocumentsQuery(["doc.parent = ''", 'doc.translation = 0'] {} $query)
+  ## On Oracle the empty parent is actually null.
+  #getDocumentsQuery(["(doc.parent = '' or doc.parent is null)", 'doc.translation = 0'] {} $query)
   #addDocumentNodesFromQuery($query $offset $limit $wikiReference $children)
 #end
 
@@ -282,7 +283,8 @@
   #set ($parameters = {'space': $spaceReference.name})
   #if ($docTreeConfig.showChildDocuments)
     ## Include only documents that either don't have a parent or that have a parent in a different space.
-    #set ($discard = $constraints.add("(doc.parent = '' or (doc.parent like '%.%' and doc.parent not like :absoluteRef and doc.parent not like :localRef))"))
+    ## On Oracle the empty parent is actually null.
+    #set ($discard = $constraints.add("(doc.parent = '' or doc.parent is null or (doc.parent like '%.%' and doc.parent not like :absoluteRef and doc.parent not like :localRef))"))
     #set ($absoluteRef = $services.model.resolveDocument('%', 'explicit', $spaceReference))
     #set ($parameters.absoluteRef = "$absoluteRef")
     #set ($parameters.localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))

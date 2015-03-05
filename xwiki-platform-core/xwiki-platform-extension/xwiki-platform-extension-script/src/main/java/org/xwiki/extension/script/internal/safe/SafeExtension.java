@@ -63,6 +63,24 @@ public class SafeExtension<T extends Extension> extends WrappingExtension<T>
     // Extension
 
     @Override
+    public <F> F get(String fieldName)
+    {
+        return safe(super.get(fieldName));
+    }
+
+    @Override
+    public <P> P getProperty(String key)
+    {
+        return safe(super.getProperty(key));
+    }
+
+    @Override
+    public <P> P getProperty(String key, P def)
+    {
+        return safe(super.getProperty(key));
+    }
+
+    @Override
     public ExtensionFile getFile()
     {
         return safe(super.getRepository());

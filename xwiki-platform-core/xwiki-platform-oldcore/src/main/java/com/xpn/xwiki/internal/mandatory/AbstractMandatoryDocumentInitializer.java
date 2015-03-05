@@ -27,7 +27,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -50,6 +52,9 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Inject
     @Named("document")
     protected SheetBinder documentSheetBinder;
+
+    @Inject
+    protected WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * @see #getDocumentReference()
@@ -77,7 +82,28 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Override
     public EntityReference getDocumentReference()
     {
+        // If a local reference was specified but isMainWikiOnly() is true, then convert to a main wiki reference.
+        if (this.reference != null && this.reference.extractReference(EntityType.WIKI) == null && isMainWikiOnly()) {
+            synchronized (this) {
+                if (this.reference.extractReference(EntityType.WIKI) == null) {
+                    String mainWikiId = this.wikiDescriptorManager.getMainWikiId();
+                    EntityReference mainWikiEntityReference =
+                        new EntityReference(this.reference, new WikiReference(mainWikiId));
+                    this.reference = mainWikiEntityReference;
+                }
+            }
+        }
+
         return this.reference;
+    }
+
+    /**
+     * @return true if the passed reference should be resolved to the main wiki instead of the local one. The default is
+     *         {@code false}. This is ignored if the passed reference already contains the wiki information.
+     */
+    protected boolean isMainWikiOnly()
+    {
+        return false;
     }
 
     /**

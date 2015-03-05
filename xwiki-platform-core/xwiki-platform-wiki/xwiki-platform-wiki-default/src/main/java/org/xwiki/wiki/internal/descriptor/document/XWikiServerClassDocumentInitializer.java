@@ -213,44 +213,18 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     private SheetBinder classSheetBinder;
 
     /**
-     * Used to access current XWikiContext.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
-     * Overriding the abstract class' private reference.
-     */
-    private DocumentReference reference;
-
-    /**
      * Default constructor.
      */
     public XWikiServerClassDocumentInitializer()
     {
-        // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
-        // getDocumentReference() returns the actual main wiki document reference.
         super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
     }
 
-    /**
-     * Initialize and return the main wiki's class document reference.
-     * 
-     * @return {@inheritDoc}
-     */
     @Override
-    public EntityReference getDocumentReference()
+    public boolean isMainWikiOnly()
     {
-        if (this.reference == null) {
-            synchronized (this) {
-                if (this.reference == null) {
-                    String mainWikiName = xcontextProvider.get().getMainXWiki();
-                    this.reference = new DocumentReference(mainWikiName, XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
-                }
-            }
-        }
-
-        return this.reference;
+        // Initialize it only for the main wiki.
+        return true;
     }
 
     @Override

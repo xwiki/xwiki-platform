@@ -46,6 +46,7 @@ import org.xwiki.stability.Unstable;
  * refer to a following number.
  * 
  * @version $Id$
+ * @since 7.0RC1
  */
 @Unstable
 public enum ObjectPolicyType {

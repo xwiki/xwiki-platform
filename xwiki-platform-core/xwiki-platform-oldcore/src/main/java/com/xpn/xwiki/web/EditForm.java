@@ -281,24 +281,33 @@ public class EditForm extends XWikiForm
     {
         this.hidden = hidden;
     }
-    
+
 	/**
-	 * 
-	 * Return the object policy given in the HTTP request. Object policy is
-	 * about which implementation to choose in order to parse the other
-	 * parameters of the query that concerns the objects (the ones that looks
-	 * like Space.ObjectClass_0_prop).
-	 * 
+	 *
+	 * Return the object policy given in the HTTP request. See
+	 * {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType} for more
+	 * information about what is an object policy.
+	 *
 	 * @return Return the Object Policy type
+	 * @since 7.0RC1
 	 */
     public ObjectPolicyType getObjectPolicy() {
         return this.objectPolicy;
     }
 
+    /**
+     * see {@link #getObjectPolicyType}
+     * @since 7.0RC1
+     */
     private void setObjectPolicy(ObjectPolicyType objectPolicy)
     {
         this.objectPolicy = objectPolicy;
     }
+
+    /**
+     * see {@link #getObjectPolicyType}
+     * @since 7.0RC1
+     */
     private void setObjectPolicy(String objectPolicyName)
     {
         this.objectPolicy = ObjectPolicyType.forName(objectPolicyName);

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import static org.mockito.Mockito.when;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,12 +39,12 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.velocity.VelocityContext;
-import org.jmock.Expectations;
 import org.jmock.Mock;
 import org.jmock.Mockery;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.junit.Assert;
+import org.mockito.Mockito;
 import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.EntityType;
@@ -73,7 +75,6 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -1637,25 +1638,19 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testReadObjectsFromForm() throws Exception
     {
-        final HttpServletRequest request = mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations()
-        {
-            {
-                Map<String, String[]> parameters = new HashMap<String, String[]>();
-                String[] string1 = {"string1"};
-                parameters.put("Space.Page_0_string", string1);
-                String[] int1 = {"7"};
-                parameters.put("Space.Page_1_int", int1);
-                String[] string2 = {"string2"};
-                String[] int2 = {"13"};
-                parameters.put("Space.Page_2_string", string2);
-                parameters.put("Space.Page_2_int", int2);
-                parameters.put("Space.Page_42_string", string1);
-                parameters.put("Space.Page_42_int", int1);
-                allowing(request).getParameterMap();
-                will(returnValue(parameters));
-            }
-        });
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Map<String, String[]> parameters = new HashMap<>();
+        String[] string1 = { "string1" };
+        parameters.put("Space.Page_0_string", string1);
+        String[] int1 = { "7" };
+        parameters.put("Space.Page_1_int", int1);
+        String[] string2 = { "string2" };
+        String[] int2 = { "13" };
+        parameters.put("Space.Page_2_string", string2);
+        parameters.put("Space.Page_2_int", int2);
+        parameters.put("Space.Page_42_string", string1);
+        parameters.put("Space.Page_42_int", int1);
+        when(request.getParameterMap()).thenReturn(parameters);
 
         EditForm eform = new EditForm();
         eform.setRequest(request);
@@ -1674,25 +1669,28 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testReadObjectsFromFormUpdateOrCreate() throws Exception
     {
-        final HttpServletRequest request = mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations()
-        {
-            {
-                Map<String, String[]> parameters = new HashMap<String, String[]>();
-                String[] string1 = {"string1"};
-                parameters.put("Space.Page_0_string", string1);
-                String[] int1 = {"7"};
-                parameters.put("Space.Page_1_int", int1);
-                String[] string2 = {"string2"};
-                String[] int2 = {"13"};
-                parameters.put("Space.Page_2_string", string2);
-                parameters.put("Space.Page_2_int", int2);
-                parameters.put("Space.Page_42_string", string1);
-                parameters.put("Space.Page_42_int", int1);
-                allowing(request).getParameterMap();
-                will(returnValue(parameters));
-            }
-        });
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Map<String, String[]> parameters = new HashMap<>();
+        String[] string1 = { "string1" };
+        parameters.put("Space.Page_0_string", string1);
+        String[] int1 = { "7" };
+        parameters.put("Space.Page_1_int", int1);
+        String[] string2 = { "string2" };
+        String[] int2 = { "13" };
+        parameters.put("Space.Page_2_string", string2);
+        parameters.put("Space.Page_2_int", int2);
+        parameters.put("Space.Page_42_string", string1);
+        parameters.put("Space.Page_42_int", int1);
+        // Testing that invalid parameter are ignored
+        parameters.put("invalid", new String[] { "whatever" });
+        // Testing that invalid xclass page are ignored
+        this.mockXWiki.stubs().method("getDocument").with(
+            eq(new DocumentReference("xwiki", "InvalidSpace", "InvalidPage")),
+                ANYTHING).will(returnValue(this.document));
+        parameters.put("InvalidSpace.InvalidPage_0_string", new String[] { "whatever" });
+        // Testing that an invalid number is ignored
+        parameters.put("Space.Page_notANumber_string", new String[] { "whatever" });
+        when(request.getParameterMap()).thenReturn(parameters);
 
         EditForm eform = new EditForm();
         eform.setRequest(request);

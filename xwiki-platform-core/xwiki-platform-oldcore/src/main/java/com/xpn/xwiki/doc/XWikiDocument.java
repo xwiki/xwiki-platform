@@ -60,6 +60,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -255,6 +256,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final Pattern HTML_TAG_PATTERN =
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
+
+    /**
+     * Format for passing xproperties references in URLs. General format:
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;}
+     * (e.g. {@code XWiki.XWikiRights_0_member}).
+     */
+    private static final Pattern XPROPERTY_URL_REFERENCE = Pattern.compile("(.+?)_([0-9]+)_(.+)");
 
     public static final EntityReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiComments");
 
@@ -3489,15 +3497,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param request The input HTTP request that provides the parameters
      * @return The map containing ordered data
      */
-    private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request)
+    private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request, XWikiContext context)
     {
-        Map<String, SortedMap<Integer, Map<String, String[]>>> result =
-            new HashMap<String, SortedMap<Integer, Map<String, String[]>>>();
-        Pattern pattern = Pattern.compile("(.+?)_([0-9]+)_(.+)");
+        Map<String, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = request.getParameterMap();
         for (Entry<String, String[]> parameter : allParameters.entrySet()) {
-            Matcher matcher = pattern.matcher(parameter.getKey());
+            Matcher matcher = XPROPERTY_URL_REFERENCE.matcher(parameter.getKey());
             if (matcher.matches() == false) {
                 continue;
             }
@@ -3505,33 +3511,36 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String classNumberAsString;
             Integer classNumber;
             String classPropertyName;
-            XWikiContext xcontext = this.getXWikiContext();
             className = matcher.group(1);
             classNumberAsString = matcher.group(2);
             classPropertyName = matcher.group(3);
+            DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
             try {
-                DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
-                BaseClass xClass = xcontext.getWiki().getDocument(classReference, xcontext).getXClass();
-                if (xClass == null) {
-                    continue;
-                }
-                classNumber = Integer.parseInt(classNumberAsString);
+                BaseClass xClass = context.getWiki().getDocument(classReference, context).getXClass();
                 if (xClass.getPropertyList().contains(classPropertyName) == false) {
                     continue;
                 }
-            } catch (Exception e) {
-                // If there is any error in the parsing of the parameter, just ignore it
+                classNumber = Integer.parseInt(classNumberAsString);
+            } catch (XWikiException e) {
+                // If the class page cannot be found, skip the property update
+                LOGGER.warn("Failed to load document [{}], ignoring property update [{}]. Reason: [{}]",
+                    classReference, parameter.getKey(), ExceptionUtils.getRootCauseMessage(e));
+                continue;
+            } catch (NumberFormatException e) {
+                // If the numner isn't valid, skip the property update
+                LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
+                    parameter.getKey());
                 continue;
             }
             SortedMap<Integer, Map<String, String[]>> objectMap = result.get(className);
             if (objectMap == null) {
-                objectMap = new TreeMap<Integer, Map<String, String[]>>();
+                objectMap = new TreeMap<>();
                 result.put(className, objectMap);
             }
             // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
             Map<String, String[]> object = objectMap.get(classNumber);
             if (objectMap.get(classNumber) == null) {
-                object = new HashMap<String, String[]>();
+                object = new HashMap<>();
                 objectMap.put(classNumber, object);
             }
             object.put(classPropertyName, parameter.getValue());
@@ -3550,31 +3559,31 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * For example, if the document already has 2 objects of type 'Space.Class', then it will create a new object only with 'Space.Class_2_prop=something'.
      * Every other parameter like 'Space.Class_42_prop=foobar' for example, will be ignore.
      * 
-     * @param eform
+     * @param eform Form information that contains all the query parameters
      * @param context
      * @throws XWikiException
+     * @since 7.0RC1
      */
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {
         Map<String, SortedMap<Integer, Map<String, String[]>>> fromRequest =
-            this.parseRequestUpdateOrCreate(eform.getRequest());
+            parseRequestUpdateOrCreate(eform.getRequest(), context);
         for (Entry<String, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest.entrySet()) {
-            WikiReference wikiRef = this.getDocumentReference().getWikiReference();
+            WikiReference wikiRef = getDocumentReference().getWikiReference();
             DocumentReference requestClassReference =
                 getCurrentDocumentReferenceResolver().resolve(requestClassEntries.getKey(), wikiRef);
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
-            List<BaseObject> newObjects = new ArrayList<BaseObject>();
-            // for (int requestObjectNumber = 0; requestObjectNumber < requestObjectList.size(); requestObjectNumber++)
-            // {
+            List<BaseObject> newObjects = new ArrayList<>();
             for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {
                 Integer requestObjectNumber = requestObjectEntry.getKey();
                 Map<String, String[]> requestObjectPropertyMap = requestObjectEntry.getValue();
-                BaseObject oldObject = this.getXObject(requestClassReference, requestObjectNumber);
+                BaseObject oldObject = getXObject(requestClassReference, requestObjectNumber);
                 if (oldObject == null) {
-                    // Create the object only if it have been numbered one more than the number of existing objects
+                    // Create the object only if it has been numbered one more than the number of existing objects
                     if (requestObjectPropertyMap != null
-                        && requestObjectNumber == this.getXObjectSize(requestClassReference)) {
-                        oldObject = this.newXObject(requestClassReference, context);
+                        && requestObjectNumber == getXObjectSize(requestClassReference))
+                    {
+                        oldObject = newXObject(requestClassReference, context);
                     } else {
                         break;
                     }
@@ -3617,7 +3626,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (templateDocumentReference != null) {
             String content = getContent();
             if ((!content.equals("\n")) && (!content.equals("")) && !isNew()) {
-                Object[] args = {getDefaultEntityReferenceSerializer().serialize(getDocumentReference())};
+                Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot add a template to document {0} because it already has content", null, args);
@@ -3626,8 +3635,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 XWikiDocument templatedoc = xwiki.getDocument(templateDocumentReference, context);
                 if (templatedoc.isNew()) {
                     Object[] args =
-                        {getDefaultEntityReferenceSerializer().serialize(templateDocumentReference),
-                        getCompactEntityReferenceSerializer().serialize(getDocumentReference())};
+                        { getDefaultEntityReferenceSerializer().serialize(templateDocumentReference),
+                        getCompactEntityReferenceSerializer().serialize(getDocumentReference()) };
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
                         "Template document {0} does not exist when adding to document {1}", null, args);

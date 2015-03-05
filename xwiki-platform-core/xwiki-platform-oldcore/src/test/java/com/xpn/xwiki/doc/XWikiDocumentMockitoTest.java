@@ -21,7 +21,6 @@ package com.xpn.xwiki.doc;
 
 import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,7 +35,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
@@ -53,33 +52,6 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  */
 public class XWikiDocumentMockitoTest
 {
-    /**
-     * Matches {@link Document}s that wrap the given {@link XWikiDocument} instance.
-     */
-    private static class Wraps extends ArgumentMatcher<Document>
-    {
-        /**
-         * The document to match.
-         */
-        private XWikiDocument document;
-
-        /**
-         * Creates a new matcher that matches {@link Document}s that wrap the given {@link XWikiDocument} instance.
-         * 
-         * @param document the document to match
-         */
-        public Wraps(XWikiDocument document)
-        {
-            this.document = document;
-        }
-
-        @Override
-        public boolean matches(Object document)
-        {
-            return this.document == ((Document) document).getDocument();
-        }
-    }
-
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
@@ -139,10 +111,14 @@ public class XWikiDocumentMockitoTest
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
         assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
-        Wraps wrapsThisDocument = new Wraps(this.document);
-        verify(velocityContext).put(eq("doc"), argThat(wrapsThisDocument));
-        verify(velocityContext).put(eq("tdoc"), argThat(wrapsThisDocument));
-        verify(velocityContext).put(eq("cdoc"), argThat(wrapsThisDocument));
+
+        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
+        verify(velocityContext).put(eq("doc"), argument.capture());
+        assertSame(this.document, argument.getValue().getDocument());
+        verify(velocityContext).put(eq("tdoc"), argument.capture());
+        assertSame(this.document, argument.getValue().getDocument());
+        verify(velocityContext).put(eq("cdoc"), argument.capture());
+        assertSame(this.document, argument.getValue().getDocument());
     }
 
     @Test
@@ -160,8 +136,13 @@ public class XWikiDocumentMockitoTest
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
         assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
-        verify(velocityContext).put(eq("doc"), argThat(new Wraps(defaultTranslation)));
-        verify(velocityContext).put(eq("tdoc"), argThat(new Wraps(this.document)));
-        verify(velocityContext).put(eq("cdoc"), argThat(new Wraps(this.document)));
+
+        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
+        verify(velocityContext).put(eq("doc"), argument.capture());
+        assertSame(defaultTranslation, argument.getValue().getDocument());
+        verify(velocityContext).put(eq("tdoc"), argument.capture());
+        assertSame(this.document, argument.getValue().getDocument());
+        verify(velocityContext).put(eq("cdoc"), argument.capture());
+        assertSame(this.document, argument.getValue().getDocument());
     }
 }

@@ -19,8 +19,6 @@
  */
 package org.xwiki.extension.distribution.internal.job.step;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,15 +27,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.extension.repository.search.SearchException;
 
 /**
  * Install and upgrade flavor extension.
@@ -73,55 +69,31 @@ public class FlavorDistributionStep extends AbstractDistributionStep
     public void prepare()
     {
         if (getState() == null) {
-            setState(State.COMPLETED);
+            InstalledExtension flavor = getFlavor();
 
-            ExtensionQuery extensionQuery = new ExtensionQuery();
-            extensionQuery.addFilter(field, "flavor", COMPARISON.EQUAL);
-
-            String namespace = "wiki:" + getWiki();
-
-            IterableResult<InstalledExtension> result = this.installedRepository.searchInstalledExtensions(namespace, extensionQuery);
-
-            if (result.getSize() > 0) {
-                InstalledExtension extension = result.iterator().next();
-                setState(null);
-            }
-            
-            
-            
-            
-            
-            if (isMainWiki()) {
-                WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
-
-                Collection<String> wikiIds;
-                try {
-                    wikiIds = wikiDescriptorManager.getAllIds();
-                } catch (WikiManagerException e) {
-                    this.logger.error("Failed to get the list of wikis", e);
-                    setState(null);
-                    return;
-                }
-
-                ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
-
-                for (String wikiId : wikiIds) {
-                    if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
-                        String namespace = "wiki:" + wikiId;
-
-                        // Only if the UI is not already installed
-                        if (wikiExtensionUI != null) {
-                            InstalledExtension installedExtension =
-                                this.installedRepository.getInstalledExtension(wikiExtensionUI.getId(), namespace);
-                            if (installedExtension == null
-                                || !installedExtension.getId().getVersion().equals(wikiExtensionUI.getVersion())) {
-                                setState(null);
-                                return;
-                            }
-                        }
-                    }
-                }
+            // If the extension is invalid it probably means it needs to be upgraded
+            if (flavor.isValid(getNamespace())) {
+                setState(State.COMPLETED);
             }
         }
+    }
+
+    private InstalledExtension getFlavor()
+    {
+        IterableResult<InstalledExtension> result;
+        try {
+            ExtensionQuery extensionQuery = new ExtensionQuery();
+            extensionQuery.addFilter(Extension.FIELD_CATEGORY, "flavor", COMPARISON.EQUAL);
+            result = this.installedRepository.searchInstalledExtensions(getNamespace(), extensionQuery);
+        } catch (SearchException e) {
+            this.logger.error("Failed to search installed extension", e);
+            return null;
+        }
+
+        if (result.getSize() > 0) {
+            return result.iterator().next();
+        }
+
+        return null;
     }
 }

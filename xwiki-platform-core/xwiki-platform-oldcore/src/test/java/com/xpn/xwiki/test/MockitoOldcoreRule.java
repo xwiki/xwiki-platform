@@ -570,7 +570,7 @@ public class MockitoOldcoreRule implements MethodRule
         });
 
         // Query Manager
-        this.mockQueryManager = mock(QueryManager.class);
+        this.mockQueryManager = getMocker().registerMockComponent(QueryManager.class);
         when(getMockStore().getQueryManager()).thenReturn(this.mockQueryManager);
     }
 

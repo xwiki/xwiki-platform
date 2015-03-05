@@ -1,4 +1,4 @@
-##!priviledged=true
+##!privileged=true
 #macro(handleStepAction $action)
   ## Allow the current step to handle the action or to perform something before moving to the next step.
   #set ($discard = $services.distribution.renderCurrentStepToXHTML())

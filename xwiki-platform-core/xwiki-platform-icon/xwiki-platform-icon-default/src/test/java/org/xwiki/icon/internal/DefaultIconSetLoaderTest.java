@@ -30,17 +30,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,14 +58,14 @@ public class DefaultIconSetLoaderTest
 
     private DocumentAccessBridge documentAccessBridge;
 
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Before
     public void setUp() throws Exception
     {
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
-                EntityReferenceSerializer.class, String.class));
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
     private void verifies(IconSet result) throws Exception
@@ -98,7 +98,8 @@ public class DefaultIconSetLoaderTest
     public void loadIconSetFromWikiDocument() throws Exception
     {
         DocumentReference iconSetRef = new DocumentReference("xwiki", "IconThemes", "Default");
-        when(entityReferenceSerializer.serialize(iconSetRef)).thenReturn("xwiki:IconThemes.Default");
+        DocumentReference iconClassRef = new DocumentReference("wikiId", "IconThemesCode", "IconThemeClass");
+        when(documentAccessBridge.getProperty(eq(iconSetRef), eq(iconClassRef), eq("name"))).thenReturn("MyIconTheme");
         DocumentModelBridge doc = mock(DocumentModelBridge.class);
         when(documentAccessBridge.getDocument(iconSetRef)).thenReturn(doc);
 
@@ -111,7 +112,7 @@ public class DefaultIconSetLoaderTest
 
         // Verify
         verifies(result);
-        assertEquals("xwiki:IconThemes.Default", result.getName());
+        assertEquals("MyIconTheme", result.getName());
     }
 
     @Test
@@ -140,7 +141,6 @@ public class DefaultIconSetLoaderTest
     {
         Exception exception = new Exception("test");
         when(documentAccessBridge.getDocument(any(DocumentReference.class))).thenThrow(exception);
-        when(entityReferenceSerializer.serialize(any(DocumentReference.class))).thenReturn("something");
 
         // Test
         Exception caughException = null;
@@ -153,6 +153,6 @@ public class DefaultIconSetLoaderTest
         assertNotNull(caughException);
         assert(caughException instanceof IconException);
         assertEquals(exception, caughException.getCause());
-        assertEquals("Failed to load the IconSet [something].", caughException.getMessage());
+        assertEquals("Failed to load the IconSet [a:b.c].", caughException.getMessage());
     }
 }

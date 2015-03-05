@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
  * <p>
  * Note: We extend {@link PdfExportImpl} for convenience. This is just a temporary solution. The entire export code
  * needs to be redesigned and moved in a separate module.
- * 
+ *
  * @version $Id$
  * @since 3.1M1
  */
@@ -64,8 +64,9 @@ public class OfficeExporter extends PdfExportImpl
      */
     public ExportType getExportType(String extension)
     {
-        if (officeServer.getState() == OfficeServer.ServerState.CONNECTED) {
-            DocumentFormat format = officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
+        if (this.officeServer.getState() == OfficeServer.ServerState.CONNECTED) {
+            DocumentFormat format =
+                this.officeServer.getConverter().getFormatRegistry().getFormatByExtension(extension);
             if (format != null) {
                 return new ExportType(format.getMediaType(), format.getExtension());
             }
@@ -79,12 +80,12 @@ public class OfficeExporter extends PdfExportImpl
     {
         // We assume the office server is connected. The code calling this method should check the server state.
         exportXHTML(xhtml, out,
-            officeServer.getConverter().getFormatRegistry().getFormatByExtension(type.getExtension()), context);
+            this.officeServer.getConverter().getFormatRegistry().getFormatByExtension(type.getExtension()), context);
     }
 
     /**
      * Converts the given XHTML to the specified format and writes the result to the output stream.
-     * 
+     *
      * @param xhtml the XHTML to be exported
      * @param out where to write the export result
      * @param format the office format to convert the XHTML to
@@ -106,7 +107,7 @@ public class OfficeExporter extends PdfExportImpl
         inputStreams.put(inputFileName, new ByteArrayInputStream(html.getBytes(charset)));
         addEmbeddedObjects(inputStreams, context);
 
-        OfficeConverter officeConverter = officeServer.getConverter();
+        OfficeConverter officeConverter = this.officeServer.getConverter();
         try {
             Map<String, byte[]> ouput = officeConverter.convert(inputStreams, inputFileName, outputFileName);
 
@@ -121,7 +122,7 @@ public class OfficeExporter extends PdfExportImpl
     /**
      * Adds the objects referenced in the exported XHTML to the map of input streams, allowing them to be embedded in
      * the output office document.
-     * 
+     *
      * @param inputStreams the map of input streams that is passed to the office converter
      * @param context the XWiki context, used to access the mapping between images embedded in the given XHTML and their
      *            location on the file system
@@ -142,7 +143,7 @@ public class OfficeExporter extends PdfExportImpl
 
     /**
      * Get the XSLT for preparing a (valid) XHTML to be converted to an office format.
-     * 
+     *
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      * @see PdfExportImpl#getXslt(String, String, XWikiContext)

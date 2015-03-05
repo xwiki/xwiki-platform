@@ -59,8 +59,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRenderingEngine.class);
 
     /** The default order in which the rendering engines will be run on the input. */
-    private static final String[] DEFAULT_RENDERING_ORDER = new String[] {"macromapping", "groovy", "velocity",
-    "plugin", "wiki", "wikiwiki"};
+    private static final String[] DEFAULT_RENDERING_ORDER = new String[] { "macromapping", "groovy", "velocity",
+        "plugin", "wiki", "wikiwiki" };
 
     @Inject
     @Named("xwikicfg")
@@ -118,10 +118,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
         }
 
         try {
-            for (int i = 0; i < renderingOrder.length; i++) {
-                if (this.configuration.getProperty("xwiki.render." + renderingOrder[i], "1").equals("1")) {
-                    String hint = renderingOrder[i];
-
+            for (String hint : renderingOrder) {
+                if (this.configuration.getProperty("xwiki.render." + hint, "1").equals("1")) {
                     if (this.componentManager.hasComponent(XWikiRenderer.class, hint)) {
                         XWikiRenderer renderer = this.componentManager.getInstance(XWikiRenderer.class, hint);
 

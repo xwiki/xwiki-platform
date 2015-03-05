@@ -226,9 +226,9 @@ public class Utils
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki private API object.
      */
-    public static String getAuthorName(String author, ComponentManager componentManager)
+    public static String getAuthorName(DocumentReference authorReference, ComponentManager componentManager)
     {
-        return getXWikiContext(componentManager).getWiki().getUserName(author, null, false,
+        return getXWikiContext(componentManager).getWiki().getPlainUserName(authorReference,
             getXWikiContext(componentManager));
     }
 

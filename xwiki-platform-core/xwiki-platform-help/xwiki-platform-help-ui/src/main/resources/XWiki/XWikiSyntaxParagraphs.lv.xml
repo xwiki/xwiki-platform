@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>= Rediģēt =
+  <content>= Mainīt =
 
 == Rindkopas ==
 
@@ -83,5 +83,6 @@ vairākām rindām
 \\2. rindkopa
 |Rindkopa ar parametriem |{{{(% style="text-align:center;color:blue" %)}}}
 Centrēta rindkopa ar zilu tekstu|(% style="text-align:center;color:blue" %)
-Centrēta rindkopa ar zilu tekstu</content>
+Centrēta rindkopa ar zilu tekstu
+</content>
 </xwikidoc>

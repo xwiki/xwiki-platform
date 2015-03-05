@@ -23,22 +23,20 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.DefaultMailResultListener;
 import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
 
@@ -50,36 +48,32 @@ import org.xwiki.stability.Unstable;
  * @since 6.1RC1
  */
 @Unstable
-public class MimeMessageWrapper
+public class MimeMessageWrapper extends MimeMessage
 {
     private ComponentManager componentManager;
 
-    private MailSender mailSender;
-
     private Execution execution;
-
-    private DefaultMailResultListener listener;
 
     private Session session;
 
     private ExtendedMimeMessage message;
-
     /**
      * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
-     * @param mailSender the component to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
-    public MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
+    // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
+    // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
+    // of it!
+    MimeMessageWrapper(ExtendedMimeMessage message, Session session, Execution execution,
         ComponentManager componentManager)
     {
+        super(session);
         this.message = message;
         this.session = session;
-        this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
-        this.listener = new DefaultMailResultListener();
     }
 
     /**
@@ -90,6 +84,13 @@ public class MimeMessageWrapper
         return this.message;
     }
 
+    /**
+     * @return the JavaMail session used to send the mail
+     */
+    public Session getSession()
+    {
+        return this.session;
+    }
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
@@ -129,28 +130,6 @@ public class MimeMessageWrapper
         }
     }
 
-    /**
-     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling
-     * {@link #getErrors()}.
-     */
-    public void send()
-    {
-        try {
-            this.mailSender.send(getMessage(), this.session);
-        } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
-            setError(e);
-        }
-    }
-
-    /**
-     * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking or simply use
-     * {@link #send()}. Any error can be retrieved by calling {@link #getErrors()}.
-     */
-    public void sendAsynchronously()
-    {
-        this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
-    }
     /**
      * @param subject the subject to set in the Mime Message
      */
@@ -216,30 +195,22 @@ public class MimeMessageWrapper
         }
     }
 
+    /**
+     * Specifies what type of email is being sent. This is useful for applications to sepcify a type when they send
+     * mail. This allows (for example) to filter these emails in the Mail Sender Status Admin UI.
+     *
+     * @param mailType the type of mail being sent (e.g "Watchlist", "Reset Password", "Send Page by Mail", etc)
+     */
+    public void setType(String mailType)
+    {
+        addHeader("X-MailType", mailType);
+    }
+
     private void setError(Exception e)
     {
         this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
     }
 
-    /**
-     * Wait for all messages on the sending queue to be sent before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     */
-    public void waitTillSent(long timeout)
-    {
-        this.mailSender.waitTillSent(timeout);
-    }
-
-    /**
-     * @return a queue containing top errors raised during the send of all emails in the queue for the current thread
-     *         when the sending was done asynchronously. If the send was done synchronously and an error happened
-     *         then it's available through the script service's {@code #getLastError()} method.
-     */
-    public BlockingQueue<Exception> getErrors()
-    {
-        return this.listener.getExceptionQueue();
-    }
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException
     {

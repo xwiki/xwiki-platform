@@ -45,7 +45,7 @@ public class Property extends Element
      */
     protected BaseProperty getBaseProperty()
     {
-        return (BaseProperty) element;
+        return (BaseProperty) this.element;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Property extends Element
     public BaseProperty getProperty()
     {
         if (hasProgrammingRights()) {
-            return (BaseProperty) element;
+            return (BaseProperty) this.element;
         } else {
             return null;
         }
@@ -66,11 +66,11 @@ public class Property extends Element
     public java.lang.Object getValue()
     {
         // This is evil, any property which happens to be called 'password' will be masked. TODO fix.
-        if (element.getName().equals("password")
+        if (this.element.getName().equals("password")
             && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(
                 getXWikiContext())) {
             return null;
         }
-        return ((BaseProperty) element).getValue();
+        return ((BaseProperty) this.element).getValue();
     }
 }

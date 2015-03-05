@@ -28,9 +28,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Action for disabling a property definition of the current class. The property to disable is specified in the {@code
- * propname} request parameter, and the class is the one defined in the requested document.
- * 
+ * Action for disabling a property definition of the current class. The property to disable is specified in the
+ * {@code propname} request parameter, and the class is the one defined in the requested document.
+ *
  * @version $Id$
  * @since 2.4M2
  */

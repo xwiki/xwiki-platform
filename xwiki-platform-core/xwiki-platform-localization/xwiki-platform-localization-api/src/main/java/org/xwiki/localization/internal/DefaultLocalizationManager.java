@@ -24,6 +24,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -45,6 +46,7 @@ import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
  * @since 4.3M2
  */
 @Component
+@Singleton
 public class DefaultLocalizationManager implements LocalizationManager
 {
     /**

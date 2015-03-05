@@ -173,12 +173,12 @@ public class BooleanClass extends PropertyClass
         option[] options;
 
         if (getDefaultValue() == -1) {
-            options = new option[] {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
+            options = new option[] { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
             options[0].addElement("---");
             options[1].addElement(XMLUtils.escape(String1));
             options[2].addElement(XMLUtils.escape(String0));
         } else {
-            options = new option[] {new option(String1, "1"), new option(String0, "0")};
+            options = new option[] { new option(String1, "1"), new option(String0, "0") };
             options[0].addElement(XMLUtils.escape(String1));
             options[1].addElement(XMLUtils.escape(String0));
             nb1 = 0;
@@ -260,9 +260,9 @@ public class BooleanClass extends PropertyClass
         labelFalse.setFor(prefix + name + "_false");
 
         if (getDefaultValue() == -1) {
-            inputs = new div[] {divNone, divTrue, divFalse};
+            inputs = new div[] { divNone, divTrue, divFalse };
         } else {
-            inputs = new div[] {divTrue, divFalse};
+            inputs = new div[] { divTrue, divFalse };
         }
 
         try {
@@ -290,8 +290,8 @@ public class BooleanClass extends PropertyClass
             e.printStackTrace();
         }
 
-        for (int i = 0; i < inputs.length; i++) {
-            buffer.append(inputs[i].toString());
+        for (div input : inputs) {
+            buffer.append(input.toString());
         }
     }
 
@@ -344,7 +344,7 @@ public class BooleanClass extends PropertyClass
      * <li>else, if a message with the key <T>_<V> exists, return it as D</li>
      * <li>else return V if V is 0 or 1, or --- if V is 2 (undecided)</li>
      * </ol>
-     * 
+     *
      * @param context The request context.
      * @param value The internal value.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.

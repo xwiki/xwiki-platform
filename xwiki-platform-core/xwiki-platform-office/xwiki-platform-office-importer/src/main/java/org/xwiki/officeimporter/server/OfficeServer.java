@@ -21,7 +21,6 @@ package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component interface for managing the office server connection / process.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.0M2
  */
 @Role
-@Unstable
 public interface OfficeServer
 {
     /**

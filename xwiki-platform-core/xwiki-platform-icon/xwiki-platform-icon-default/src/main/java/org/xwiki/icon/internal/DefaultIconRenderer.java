@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.icon.Icon;
@@ -33,9 +32,6 @@ import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
 import org.xwiki.skinx.SkinExtension;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation of {@link org.xwiki.icon.IconRenderer}.
@@ -45,9 +41,6 @@ import com.xpn.xwiki.XWikiContext;
  */
 public class DefaultIconRenderer implements IconRenderer
 {
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
     @Inject
     @Named("ssx")
     private SkinExtension skinExtension;
@@ -60,6 +53,8 @@ public class DefaultIconRenderer implements IconRenderer
     @Named("jsx")
     private SkinExtension jsExtension;
 
+    @Inject
+    private VelocityRenderer velocityRenderer;
 
     @Override
     public String render(String iconName, IconSet iconSet) throws IconException
@@ -73,7 +68,7 @@ public class DefaultIconRenderer implements IconRenderer
         return render(iconSet, iconName, iconSet.getRenderHTML());
     }
 
-    private String render(IconSet iconSet, String iconName, String renderer)
+    private String render(IconSet iconSet, String iconName, String renderer) throws IconException
     {
         if (!StringUtils.isBlank(iconSet.getCss())) {
             activeCSS(iconSet);
@@ -87,11 +82,9 @@ public class DefaultIconRenderer implements IconRenderer
         return renderIcon(iconSet, iconName, renderer);
     }
 
-    private void activeCSS(IconSet iconSet)
+    private void activeCSS(IconSet iconSet) throws IconException
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-        String url = xwiki.parseContent(iconSet.getCss(), xcontext);
+        String url = velocityRenderer.render(iconSet.getCss());
         Map<String, Object> parameters = new HashMap();
         parameters.put("rel", "stylesheet");
         linkExtension.use(url, parameters);
@@ -107,11 +100,8 @@ public class DefaultIconRenderer implements IconRenderer
         jsExtension.use(iconSet.getJsx());
     }
 
-    private String renderIcon(IconSet iconSet, String iconName, String renderer)
+    private String renderIcon(IconSet iconSet, String iconName, String renderer) throws IconException
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
         // Get the icon
         Icon icon = iconSet.getIcon(iconName);
 
@@ -128,6 +118,6 @@ public class DefaultIconRenderer implements IconRenderer
         contentToParse.write("\")\n");
         contentToParse.write(renderer);
 
-        return xwiki.parseContent(contentToParse.toString(), xcontext);
+        return velocityRenderer.render(contentToParse.toString());
     }
 }

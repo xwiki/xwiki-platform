@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -60,6 +61,9 @@ public class XWikiMessageToolBridgeTest
     @Before
     public void before() throws Exception
     {
+        // Register a mock Environment since we're in a test and we don't want spurious logs in the console.
+        this.oldcore.getMocker().registerMockComponent(Environment.class);
+
         Locale.setDefault(Locale.ROOT);
 
         // checking

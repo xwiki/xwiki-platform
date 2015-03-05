@@ -19,18 +19,13 @@
  */
 package com.xpn.xwiki.store;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import org.apache.fop.fo.properties.StringProperty;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -50,15 +45,18 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DoubleProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
@@ -199,48 +197,6 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         verify(dataMigrationManager).checkDatabase();
     }
 
-    /**
-     * Save an XClass that has a Number property whose type has changed and there is an instance of this class that has
-     * no value set for that Number property.
-     * 
-     * @see <a href="http://jira.xwiki.org/browse/XWIKI-8649">XWIKI-8649: Error when changing the number type of a field
-     *      from an application</a>
-     */
-    @Test
-    public void saveXWikiDocWithXClassAndNumberPropertyTypeChange() throws Exception
-    {
-        // The number property whose type has changed from Double to Integer.
-        IntegerProperty integerProperty = mock(IntegerProperty.class);
-        NumberClass numberField = mock(NumberClass.class);
-        when(numberField.newProperty()).thenReturn(integerProperty);
-        when(numberField.getNumberType()).thenReturn("integer");
-
-        // The XClass that has only the number property.
-        List<NumberClass> fieldList = Collections.singletonList(numberField);
-        BaseClass baseClass = mock(BaseClass.class);
-        when(baseClass.getFieldList()).thenReturn(fieldList);
-
-        // The document that is being saved.
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(document.getXClass()).thenReturn(baseClass);
-
-        // Assume there are two objects of the XClass previously defined: one that has no value set for the number
-        // property and one that has a value.
-        Query query = mock(Query.class);
-        DoubleProperty doubleProperty = mock(DoubleProperty.class);
-        when(doubleProperty.getValue()).thenReturn(3.5);
-        DoubleProperty doublePropertyUnset = mock(DoubleProperty.class, "unset");
-        List<DoubleProperty> properties = Arrays.asList(doublePropertyUnset, doubleProperty);
-        when(session.createQuery(anyString())).thenReturn(query);
-        when(query.setString(anyInt(), anyString())).thenReturn(query);
-        when(query.list()).thenReturn(properties);
-
-        store.saveXWikiDoc(document, context);
-
-        // 4 times, for each number type (Integer, Long, Double and Float).
-        verify(integerProperty, times(4)).setValue(3);
-    }
-
     @Test
     public void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
     {
@@ -376,5 +332,73 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         verify(query).setString("fullName", fullName);
         verify(query).setString("language", Locale.ENGLISH.toString());
+    }
+
+    @Test
+    public void migrateProperty() throws Exception
+    {
+        BaseProperty storedProperty = mock(BaseProperty.class, "stored");
+        BaseProperty newProperty = mock(BaseProperty.class, "new");
+        PropertyClass modifiedPropertyClass = mock(PropertyClass.class);
+
+        PropertyConverter propertyConverter = mocker.getInstance(PropertyConverter.class);
+        when(propertyConverter.convertProperty(storedProperty, modifiedPropertyClass)).thenReturn(newProperty);
+
+        migrateProperty(storedProperty, modifiedPropertyClass, session, Collections.<Long, BaseObject>emptyMap());
+
+        verify(session).delete(storedProperty);
+        verify(session).save(newProperty);
+    }
+
+    @Test
+    public void migrateUnsetProperty() throws Exception
+    {
+        BaseProperty storedProperty = mock(BaseProperty.class);
+
+        migrateProperty(storedProperty, mock(PropertyClass.class), session, Collections.<Long, BaseObject>emptyMap());
+
+        verify(session).delete(storedProperty);
+        verify(session, never()).save(any(BaseProperty.class));
+    }
+    
+    @Test
+    public void migrateLocalProperty() throws Exception
+    {
+        BaseProperty localProperty = mock(BaseProperty.class, "local");
+        BaseObject localObject = mock(BaseObject.class);
+        when(localObject.get("color")).thenReturn(localProperty);
+
+        Map<Long, BaseObject> localObjects = Collections.singletonMap(1L, localObject);
+
+        PropertyClass modifiedPropertyClass = mock(PropertyClass.class);
+        when(modifiedPropertyClass.getName()).thenReturn("color");
+
+        BaseProperty newProperty = mock(BaseProperty.class, "new");
+        PropertyConverter propertyConverter = mocker.getInstance(PropertyConverter.class);
+        when(propertyConverter.convertProperty(localProperty, modifiedPropertyClass)).thenReturn(newProperty);
+
+        BaseProperty storedProperty = mock(BaseProperty.class, "stored");
+        when(storedProperty.getId()).thenReturn(1L);
+
+        migrateProperty(storedProperty, modifiedPropertyClass, session, localObjects);
+
+        verify(session).evict(storedProperty);
+        verify(session, never()).delete(any(BaseProperty.class));
+        verify(session, never()).save(any(BaseProperty.class));
+
+        verify(localObject).put("color", newProperty);
+    }
+
+    /**
+     * This is a utility method used to call the private XWikiHibernateStore#migrateProperty(), which should be moved
+     * outside XWikiHibernateStore and we keep it private until then.
+     */
+    private void migrateProperty(BaseProperty<?> storedProperty, PropertyClass modifiedPropertyClass, Session session,
+        Map<Long, BaseObject> localObjects) throws Exception
+    {
+        Method migrateProperty = store.getClass().getDeclaredMethod("migrateProperty", BaseProperty.class,
+            PropertyClass.class, Session.class, Map.class);
+        migrateProperty.setAccessible(true);
+        migrateProperty.invoke(store, storedProperty, modifiedPropertyClass, session, localObjects);
     }
 }

@@ -30,7 +30,7 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 
 /**
  * Defines the meta properties of a users XClass property.
- * 
+ *
  * @version $Id$
  */
 @Component

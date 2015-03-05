@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that a method requires programming rights to be executed.
- * 
+ *
  * @since 1.4M1
  */
 @Documented

@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.render.filter;
 
+import java.util.LinkedList;
+
 import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.RegexTokenFilter;
 import org.radeox.regex.MatchResult;
-
-import java.util.LinkedList;
 
 /**
  * @see CodeRemoveFilter
@@ -40,9 +40,9 @@ public class CodeRestoreFilter extends RegexTokenFilter
     {
         LinkedList contentList =
             (LinkedList) context.getRenderContext().get(CodeRemoveFilter.CODE_MACRO_CONTENT);
-        
-    	buffer.append(result.group(1));
-    	buffer.append((String) contentList.removeFirst());
-    	buffer.append("{code}");
+
+        buffer.append(result.group(1));
+        buffer.append((String) contentList.removeFirst());
+        buffer.append("{code}");
     }
 }

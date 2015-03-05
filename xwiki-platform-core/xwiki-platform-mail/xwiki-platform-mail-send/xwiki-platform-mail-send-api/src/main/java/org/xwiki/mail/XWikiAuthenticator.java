@@ -34,19 +34,25 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class XWikiAuthenticator extends Authenticator
 {
-    private MailSenderConfiguration configuration;
+    private String username;
+
+    private String password;
 
     /**
      * @param configuration the configuration from which to extract the SMTP server's user name and password to use
      */
     public XWikiAuthenticator(MailSenderConfiguration configuration)
     {
-        this.configuration = configuration;
+        // Note: We resolve the user name and password early since if we were doing it in #getPasswordAuthentication
+        // then it would mean having an XWikiContext set up in the Mail Sender Thread (as the Configuration requires
+        // an XWikiContext and #getPasswordAuthentication() is called indirectly in the sender thread.
+        this.username = configuration.getUsername();
+        this.password = configuration.getPassword();
     }
 
     @Override
     protected PasswordAuthentication getPasswordAuthentication()
     {
-        return new PasswordAuthentication(this.configuration.getUsername(), this.configuration.getPassword());
+        return new PasswordAuthentication(this.username, this.password);
     }
 }

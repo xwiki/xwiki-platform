@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
 
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -49,6 +50,7 @@ import org.xwiki.rest.model.jaxb.Property;
 @Component("org.xwiki.rest.internal.representations.objects.FormUrlEncodedPropertyReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+@Singleton
 public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>, XWikiRestComponent
 {
     private static final String PROPERTY_PREFIX = "property#";

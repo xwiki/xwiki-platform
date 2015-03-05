@@ -45,7 +45,7 @@
 ############################
 #set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet'))
 #set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
-#set($discard = $xwiki.linkx.use($services.webjars.url('colpick/2.0.2/css/colpick.css'), {'rel': 'stylesheet'}))
+#set($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'), {'rel': 'stylesheet'}))
 ############################
 ## GLOBALS
 ############################
@@ -68,6 +68,7 @@
     "brand-info": "color",
     "brand-warning": "color",
     "brand-danger": "color",
+    "headings-color": "color",
     "component-active-color" : "color",
     "component-active-bg" : "color"
   },
@@ -128,7 +129,7 @@
   "breadcrumb": {
     "breadcrumb-bg": "color",
     "breadcrumb-color": "color",
-    "breadcrumb-separator": "text"
+    "breadcrumb-separator": "escapedText"
   },
   "advanced": {
     "lessCode": "textarea"
@@ -182,7 +183,7 @@
                 &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
                 #foreach($attachment in $doc.getAttachmentList())
                   #if($attachment.isImage())
-                    &lt;option value="$escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+                    &lt;option value="$!escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
                   #end
                 #end
               &lt;/select&gt;
@@ -192,11 +193,11 @@
                 &lt;div class="alert alert-warning"&gt;$services.localization.render("platform.flamingo.themes.lessCode.warning")&lt;/div&gt;
               #end
               &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $escapetool.xml($!doc.getValue($varName, $obj))
+                $!escapetool.xml($!doc.getValue($varName, $obj))
               &lt;/textarea&gt;
             #else
               &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end type-${varType}" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
               &lt;/div&gt;
             #end
           &lt;/div&gt;
@@ -235,7 +236,7 @@
     #foreach($var in $catVar.keySet())
       #set($varName = $var)
       #set($varType = $catVar.get($varName))
-      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" /&gt;
+      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" class="type-${varType}"/&gt;
     #end
   #end
   &lt;/div&gt;
@@ -363,8 +364,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#set($discard = $services.localization.use('document', 'FlamingoThemesCode.Translations'))
-// Require jQuery
+      <code>// Require jQuery
 require(['jquery'], function($) {
 
   // Waiting jQuery to be ready
@@ -385,12 +385,10 @@ require(['jquery'], function($) {
     // Put a gray curtain in front of the iframe
     var addCurtain = function() {
       var iframePosition = iframe.position();
-      var iframeWidth = iframe.width();
-      var iframeHeight = iframe.height();
       $("&lt;div id=\"preview-curtain\"&gt;&lt;h2&gt;$services.localization.render('platform.flamingo.themes.loading')&lt;/h2&gt;&lt;/div&gt;").insertAfter(iframe);
       var previewCurtain = $("#preview-curtain");
-      previewCurtain.width(iframe.width());
-      previewCurtain.height(iframe.height());
+      previewCurtain.width(iframe.outerWidth(true));
+      previewCurtain.height(iframe.outerHeight(true));
       previewCurtain.css("left", iframePosition.left);
       previewCurtain.css("right", iframePosition.right);
     }
@@ -431,7 +429,12 @@ require(['jquery'], function($) {
         // file. We currently have not a solution for this case.
         if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
-          varMap[name] = variableInput.value;
+          var value = variableInput.value
+          // Some values need to be placed inside a string
+          if ($(variableInput).hasClass('type-escapedText')) {
+            value = '"' + value.replace('"', '\\"') + '"';
+          }
+          varMap[name] = value;
         }
       }
       
@@ -477,7 +480,7 @@ require(['jquery'], function($) {
       link.type = "text/css";
       link.href = "$xwiki.getSkinFile('less/style.less.vm', true)?colorTheme=no";
       var script = document.createElement("script");
-      script.src = "$services.webjars.url('less/1.7.0/less.min.js')";
+      script.src = "$services.webjars.url('less', 'less.min.js')";
       iframeHead.appendChild(link);
       iframeHead.appendChild(script);
       waitUntilLessIsLoadedInIFrame(function(){
@@ -602,7 +605,7 @@ require(['jquery'], function($) {
       <code>// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
 require.config({
   paths: {
-    'colpick': '$services.webjars.url('colpick/2.0.2/js/colpick.js')'
+    'colpick': "$services.webjars.url('colpick', 'js/colpick.js')"
   },
   shim: {
     'colpick' : ['jquery']
@@ -714,6 +717,22 @@ require(['jquery', 'colpick'], function($, Colpick) {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -769,6 +788,9 @@ require(['jquery', 'colpick'], function($, Colpick) {
 }</code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>CSS</name>
     </property>
     <property>
@@ -818,6 +840,22 @@ require(['jquery', 'colpick'], function($, Colpick) {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -874,6 +912,9 @@ require(['jquery', 'colpick'], function($, Colpick) {
   padding: 0;
   border: 0;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Color picker</name>

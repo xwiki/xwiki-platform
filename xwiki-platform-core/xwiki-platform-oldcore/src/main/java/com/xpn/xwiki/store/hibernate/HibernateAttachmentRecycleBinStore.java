@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
  * Realization of {@link AttachmentRecycleBinStore} for Hibernate-based storage.
- * 
+ *
  * @version $Id$
  * @since 1.4M1
  */
@@ -63,7 +63,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
 
     /**
      * Constructor used by {@link com.xpn.xwiki.XWiki} during storage initialization.
-     * 
+     *
      * @param context The current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentRecycleBinStore.class) instead.
      */

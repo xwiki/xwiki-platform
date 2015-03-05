@@ -47,7 +47,8 @@
 
 == Skrypty ==
 
-=== Skrypty 1.0 ===
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
 
 {{info}}W Gramatyce XWiki 1.0 można było wprowadzać skrypty Velocity bezpośrednio na stronie w dowolnym miejscu. To może prowadzić do problemów np. wtedy gdy użytkownik wprowadzi skrypt Velocity nieumyślnie. Zabiera to także niepotrzebnie zasoby w przypadku stron niewymagających obsługi Velocity. Występuje także kilka innych technicznych ograniczeń. To samo dotyczy skryptów Groovy.
  it was possible to enter Velocity scripts anywhere directly in the page. This can lead to issues for example when the user was involuntarily entering Velocity content. It is also performance hungry for pages not requiring Velocity content. There are several other technical limitations. Same goes for entering Groovy scripts.{{/info}}
@@ -62,7 +63,7 @@ def var = "cokolwiek"
 %&gt;
 }}})))
 
-=== Skrypty 2.0 ===
+=== 2.0 Scripts ===
 
 {{info}}W związku z niedoskonałościami wersji 1.0 w Gramatyce XWiki wersji {{velocity}}$crtSyntaxVer{{/velocity}} skrypty Velocity muszą być wprowadzane przy pomocy makra ##velocity##. To samo dotyczy skryptów Groovy.
 {{/info}}

@@ -35,10 +35,12 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
@@ -46,7 +48,6 @@ import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.template.TemplateManager;
 
 /**
  * Unit tests for {@link DefaultVelocityManager}.
@@ -79,7 +80,7 @@ public class DefaultVelocityManagerTest
         executionContext.newProperty("velocityContext").initial(velocityContext).inherited().cloneValue().declare();
 
         XWikiContext mockContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(mockContext);
 
         this.mocker.getComponentUnderTest().getVelocityContext();
@@ -94,12 +95,16 @@ public class DefaultVelocityManagerTest
         ExecutionContext executionContext = new ExecutionContext();
         when(execution.getContext()).thenReturn(executionContext);
 
+        SkinManager skinManager = this.mocker.registerMockComponent(SkinManager.class);
+        Skin skin = mock(Skin.class);
+        when(skin.getId()).thenReturn("testskin");
+        when(skinManager.getCurrentSkin(true)).thenReturn(skin);
+
         XWikiContext xwikiContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(xwikiContext);
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xwikiContext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getSkin(any(XWikiContext.class))).thenReturn("testskin");
 
         VelocityFactory velocityFactory = this.mocker.getInstance(VelocityFactory.class);
         when(velocityFactory.hasVelocityEngine("default")).thenReturn(false);
@@ -110,10 +115,7 @@ public class DefaultVelocityManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityFactory.createVelocityEngine(eq("default"), any(Properties.class))).thenReturn(velocityEngine);
 
-        TemplateManager templates = mock(TemplateManager.class);
-        Provider<TemplateManager> templatesProvider = this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
-            TemplateManager.class));
-        when(templatesProvider.get()).thenReturn(templates);
+        this.mocker.registerMockComponent(TemplateManager.class);
 
         Assert.assertSame(velocityEngine, this.mocker.getComponentUnderTest().getVelocityEngine());
     }

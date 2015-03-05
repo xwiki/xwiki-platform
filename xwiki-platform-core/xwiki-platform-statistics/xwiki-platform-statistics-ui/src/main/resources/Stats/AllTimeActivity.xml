@@ -131,8 +131,8 @@
   #end
   #set ($pattern = 'yyyy')
   #set ($currentYear = $xwiki.criteriaService.periodFactory.currentYear)
-  #set ($periodStart = $xwiki.jodatime.getDateTime($currentYear.start).minusYears(2))
-  #set ($periodEnd = $xwiki.jodatime.getDateTime($currentYear.end).plusYears(2))
+  #set ($periodStart = $xwiki.jodatime.getDateTime($currentYear.start).minusYears(5))
+  #set ($periodEnd = $xwiki.jodatime.getDateTime($currentYear.end))
   #set ($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
   &lt;div style="text-align:center;"&gt;{{chart
         type="xy_line_and_shape"

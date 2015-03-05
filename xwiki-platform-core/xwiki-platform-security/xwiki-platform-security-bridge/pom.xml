@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-security</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-security-bridge</artifactId>
   <name>XWiki Platform - Security - Bridge</name>
@@ -32,6 +32,8 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -73,11 +75,10 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>

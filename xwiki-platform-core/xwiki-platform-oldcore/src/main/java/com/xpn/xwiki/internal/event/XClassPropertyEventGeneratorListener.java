@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Produce {@link XClassPropertyEvent property events} based on document events.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -55,7 +55,7 @@ public class XClassPropertyEventGeneratorListener implements EventListener
     /**
      * The events to match.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
     @Inject

@@ -19,6 +19,11 @@ input.suggestGroups {
      elements (we use an input with type=image here) */
   width: auto !important;
 }
+.skin-flamingo .scope {
+  /* Center the scope icon in flamingo.
+     Values are calculated for a 16x16 icon, an input height of 34px and a border of 25px. */
+  padding: 9px 4px;
+}
 .suggestUsers.withScope, .suggestGroups.withScope {
   /* Leave space for the scope icon. Make sure this rule is applied because xforms and the object/class editors apply a
      custom border on their input elements. */

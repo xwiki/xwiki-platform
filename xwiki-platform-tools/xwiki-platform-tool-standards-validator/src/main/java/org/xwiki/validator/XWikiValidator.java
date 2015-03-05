@@ -24,6 +24,10 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Document;
 import org.xwiki.validator.ValidationError.Type;
 import org.xwiki.validator.framework.AbstractDOMValidator;
+import org.xwiki.validator.framework.XMLResourcesEntityResolver;
+
+import nu.validator.htmlparser.common.XmlViolationPolicy;
+import nu.validator.htmlparser.dom.HtmlDocumentBuilder;
 
 /**
  * Validator allowing to validate (X)HTML content against some XWiki rules.
@@ -37,7 +41,19 @@ public class XWikiValidator extends AbstractDOMValidator
      */
     public XWikiValidator()
     {
-        super(false);
+        setValidateXML(false);
+
+        this.errorHandler = createXMLErrorHandler();
+
+        try {
+            // Use the HTML5 Document builder (from the 'nu' project) instead of the default DOM builder that fails
+            // with HTML 5
+            this.documentBuilder = new HtmlDocumentBuilder(XmlViolationPolicy.ALTER_INFOSET);
+            this.documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
+            this.documentBuilder.setErrorHandler(this.errorHandler);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

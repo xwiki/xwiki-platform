@@ -39,8 +39,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -93,7 +91,7 @@ public class XWiki extends Api
 
     /**
      * XWiki API Constructor
-     * 
+     *
      * @param xwiki XWiki Main Object to wrap
      * @param context XWikiContext to wrap
      */
@@ -108,7 +106,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API allowing to access the underlying main XWiki Object
-     * 
+     *
      * @return Privileged Main XWiki Object
      */
     @Programming
@@ -139,7 +137,7 @@ public class XWiki extends Api
 
     /**
      * API Allowing to access the current request URL being requested.
-     * 
+     *
      * @return the URL
      * @throws XWikiException failed to create the URL
      */
@@ -150,7 +148,7 @@ public class XWiki extends Api
 
     /**
      * API Allowing to access the current request URL being requested as a relative URL.
-     * 
+     *
      * @return the URL
      * @throws XWikiException failed to create the URL
      * @since 4.0M1
@@ -164,7 +162,7 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
-     * 
+     *
      * @param fullName the full name of the XWiki document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
@@ -188,7 +186,7 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
-     * 
+     *
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
@@ -215,7 +213,7 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
-     * 
+     *
      * @param fullName the full name of the XWiki document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
@@ -241,7 +239,7 @@ public class XWiki extends Api
     /**
      * Loads an Document from the database. Rights are checked on the author (contentAuthor) of the document containing
      * the currently executing script before sending back the loaded document.
-     * 
+     *
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
      *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
@@ -273,8 +271,8 @@ public class XWiki extends Api
             return Collections.emptyList();
         }
         List<DeletedDocument> result = new ArrayList<DeletedDocument>(dds.length);
-        for (int i = 0; i < dds.length; i++) {
-            result.add(new DeletedDocument(dds[i], this.context));
+        for (XWikiDeletedDocument dd : dds) {
+            result.add(new DeletedDocument(dd, this.context));
         }
         return result;
     }
@@ -303,7 +301,7 @@ public class XWiki extends Api
      * between different incarnations of a document name, and it does not require that the document still exists, it
      * returns all the attachments that at the time of their deletion had a document with the specified name as their
      * owner.
-     * 
+     *
      * @param docName the {@link XWikiDocument#getFullName() name} of the owner document
      * @return A list with all the deleted attachments which belonged to the specified document. If no such attachments
      *         are found in the trash, an empty list is returned.
@@ -333,7 +331,7 @@ public class XWiki extends Api
      * instances in the trash. Note that this does not distinguish between different incarnations of a document name,
      * and it does not require that the document still exists, it returns all the attachments that at the time of their
      * deletion had a document with the specified name as their owner.
-     * 
+     *
      * @param docName the {@link DeletedAttachment#getDocName() name of the document} the attachment belonged to
      * @param filename the {@link DeletedAttachment#getFilename() name} of the attachment to search for
      * @return A list with all the deleted attachments which belonged to the specified document and had the specified
@@ -360,7 +358,7 @@ public class XWiki extends Api
 
     /**
      * Retrieve a specific attachment from the trash.
-     * 
+     *
      * @param id the unique identifier of the entry in the trash
      * @return specified attachment from the trash, {@code null} if not found
      */
@@ -379,7 +377,7 @@ public class XWiki extends Api
 
     /**
      * Returns whether a document exists or not
-     * 
+     *
      * @param fullname Fullname of the XWiki document to be loaded
      * @return true if the document exists, false if not
      * @throws XWikiException
@@ -391,7 +389,7 @@ public class XWiki extends Api
 
     /**
      * Returns whether a document exists or not
-     * 
+     *
      * @param reference the reference of the document to check for its existence
      * @return true if the document exists, false if not
      * @since 2.3M2
@@ -404,7 +402,7 @@ public class XWiki extends Api
     /**
      * Verify the rights the current user has on a document. If the document requires rights and the user is not
      * authenticated he will be redirected to the login page.
-     * 
+     *
      * @param docname fullname of the document
      * @param right right to check ("view", "edit", "admin", "delete")
      * @return true if it exists
@@ -422,7 +420,7 @@ public class XWiki extends Api
 
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
-     * 
+     *
      * @param space Space to use in case no space is defined in the provided <code>fullname</code>
      * @param fullname the full name or relative name of the document to load
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
@@ -442,7 +440,7 @@ public class XWiki extends Api
 
     /**
      * Load a specific revision of a document
-     * 
+     *
      * @param doc Document for which to load a specific revision
      * @param rev Revision number
      * @return Specific revision of a document
@@ -473,7 +471,7 @@ public class XWiki extends Api
 
     /**
      * Output content in the edit content textarea
-     * 
+     *
      * @param content content to output
      * @return the textarea text content
      */
@@ -484,7 +482,7 @@ public class XWiki extends Api
 
     /**
      * Get the list of available classes in the wiki
-     * 
+     *
      * @return list of classes names
      * @throws XWikiException
      */
@@ -495,7 +493,7 @@ public class XWiki extends Api
 
     /**
      * Get the global MetaClass object
-     * 
+     *
      * @return MetaClass object
      */
     public MetaClass getMetaclass()
@@ -526,7 +524,7 @@ public class XWiki extends Api
      *       desc</code>. Result: All the documents with at least one comment from LudovicDubost ordered by the last
      * modification date from the most recent</li>
      * </ul>
-     * 
+     *
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by "where ..."
      * @return List of document names matching (Main.Page1, Main.Page2)
      * @throws XWikiException
@@ -541,7 +539,7 @@ public class XWiki extends Api
     /**
      * API allowing to search for document names matching a query return only a limited number of elements and skipping
      * the first rows. The query part is the same as searchDocuments
-     * 
+     *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param nb return only 'nb' rows
      * @param start skip the first 'start' rows
@@ -560,7 +558,7 @@ public class XWiki extends Api
      * Privileged API allowing to search for document names matching a query return only a limited number of elements
      * and skipping the first rows. The return values contain the list of columns specified in addition to the document
      * space and name The query part is the same as searchDocuments
-     * 
+     *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param nb return only 'nb' rows
      * @param start skip the first 'start' rows
@@ -581,7 +579,7 @@ public class XWiki extends Api
 
     /**
      * API allowing to search for documents allowing to have mutliple entries per language
-     * 
+     *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param distinctbylanguage true to return multiple rows per language
      * @return List of Document object matching
@@ -594,7 +592,7 @@ public class XWiki extends Api
 
     /**
      * API allowing to search for documents allowing to have multiple entries per language
-     * 
+     *
      * @param wheresql query to use similar to searchDocuments(wheresql)
      * @param distinctbylanguage true to return multiple rows per language
      * @return List of Document object matching
@@ -617,7 +615,7 @@ public class XWiki extends Api
      * <p>
      * Example
      * </p>
-     * 
+     *
      * <pre>
      * &lt;code&gt;
      * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
@@ -625,7 +623,7 @@ public class XWiki extends Api
      *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * &lt;/code&gt;
      * </pre>
-     * 
+     *
      * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
      * @param maxResults the number of rows to return. If 0 then all rows are returned
@@ -637,7 +635,7 @@ public class XWiki extends Api
      */
     @Deprecated
     public List<String> searchDocuments(String parameterizedWhereClause, int maxResults, int startOffset,
-        List< ? > parameterValues) throws XWikiException
+        List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, maxResults, startOffset,
             parameterValues, getXWikiContext());
@@ -645,12 +643,12 @@ public class XWiki extends Api
 
     /**
      * Same as {@link #searchDocuments(String, int, int, java.util.List)} but returns all rows.
-     * 
+     *
      * @see #searchDocuments(String, int, int, java.util.List)
      * @deprecated use query service instead
      */
     @Deprecated
-    public List<String> searchDocuments(String parameterizedWhereClause, List< ? > parameterValues)
+    public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues)
         throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
@@ -659,7 +657,7 @@ public class XWiki extends Api
     /**
      * Search documents in the provided wiki by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
-     * 
+     *
      * @param wikiName the name of the wiki where to search.
      * @param parameterizedWhereClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
@@ -673,7 +671,7 @@ public class XWiki extends Api
      */
     @Deprecated
     public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
-        int startOffset, List< ? > parameterValues) throws XWikiException
+        int startOffset, List<?> parameterValues) throws XWikiException
     {
         String database = this.context.getWikiId();
 
@@ -689,7 +687,7 @@ public class XWiki extends Api
     /**
      * Search spaces by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
-     * 
+     *
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
@@ -698,7 +696,7 @@ public class XWiki extends Api
      * @return a list of spaces names.
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+    public List<String> searchSpacesNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
         return this.xwiki.getStore().search(
@@ -710,7 +708,7 @@ public class XWiki extends Api
      * Search attachments by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
      * properties of attach (the attachment) or doc (the document it is attached to)
-     * 
+     *
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
      * @param nb The number of rows to return. If 0 then all rows are returned
@@ -720,8 +718,7 @@ public class XWiki extends Api
      * @throws XWikiException in case of error while performing the query
      * @since 5.0M2
      */
-    @Unstable
-    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
+    public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List<?> parameterValues)
         throws XWikiException
     {
         return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues,
@@ -730,7 +727,7 @@ public class XWiki extends Api
 
     /**
      * Count attachments returned by a given parameterized query
-     * 
+     *
      * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see:
      *            {@link #searchDocuments(String, int, int, List)}
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
@@ -739,19 +736,18 @@ public class XWiki extends Api
      * @see #searchAttachments(String, int, int, List)
      * @since 5.0M2
      */
-    @Unstable
-    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
+    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
     }
 
     /**
      * Function to wrap a list of XWikiDocument into Document objects
-     * 
+     *
      * @param docs list of XWikiDocument
      * @return list of Document objects
      */
-    public List<Document> wrapDocs(List< ? > docs)
+    public List<Document> wrapDocs(List<?> docs)
     {
         List<Document> result = new ArrayList<Document>();
         if (docs != null) {
@@ -779,7 +775,7 @@ public class XWiki extends Api
 
     /**
      * API allowing to parse a text content to evaluate velocity scripts
-     * 
+     *
      * @param content
      * @return evaluated content if the content contains velocity scripts
      */
@@ -792,7 +788,7 @@ public class XWiki extends Api
      * API to parse a velocity template provided by the current Skin The template is first looked in the skin active for
      * the user, the space or the wiki. If the template does not exist in that skin, the template is looked up in the
      * "parent skin" of the skin
-     * 
+     *
      * @param template Template name ("view", "edit", "comment")
      * @return Evaluated content from the template
      */
@@ -805,7 +801,7 @@ public class XWiki extends Api
      * API to render a velocity template provided by the current Skin The template is first looked in the skin active
      * for the user, the space or the wiki. If the template does not exist in that skin, the template is looked up in
      * the "parent skin" of the skin
-     * 
+     *
      * @param template Template name ("view", "edit", "comment")
      * @return Evaluated content from the template
      */
@@ -817,7 +813,7 @@ public class XWiki extends Api
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
      * RequestDispatcher, buffering the output, then returning it as a string.
-     * 
+     *
      * @param url URL of the servlet
      * @return text result of the servlet
      */
@@ -830,7 +826,7 @@ public class XWiki extends Api
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
-     * 
+     *
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @return URL to access this file
      */
@@ -843,7 +839,7 @@ public class XWiki extends Api
      * Return the URL of the static file provided by the current skin The file is first looked in the skin active for
      * the user, the space or the wiki. If the file does not exist in that skin, the file is looked up in the "parent
      * skin" of the skin. The file can be a CSS file, an image file, a javascript file, etc.
-     * 
+     *
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @param forceSkinAction true to make sure that static files are retrieved through the skin action, to allow
      *            parsing of velocity on CSS files
@@ -861,7 +857,7 @@ public class XWiki extends Api
      * XWiki preference "skin" is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
      * xwiki.defaultskin is looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
      * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is "colibri"
-     * 
+     *
      * @return The current skin for this request and user
      */
     public String getSkin()
@@ -873,7 +869,7 @@ public class XWiki extends Api
      * API to retrieve the current skin for this request and user. Each skin has a skin it is based on. If not the base
      * skin is the xwiki.cfg parameter "xwiki.defaultbaseskin". If this parameter does not exist or is empty, the base
      * skin is "colibri".
-     * 
+     *
      * @return The current baseskin for this request and user
      */
     public String getBaseSkin()
@@ -884,7 +880,7 @@ public class XWiki extends Api
     /**
      * API to access the copyright for this space. The copyright is read in the space preferences. If it does not exist
      * or is empty it is read from the XWiki preferences.
-     * 
+     *
      * @return the text for the copyright
      */
     public String getSpaceCopyright()
@@ -895,7 +891,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
@@ -907,7 +903,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language
@@ -921,7 +917,7 @@ public class XWiki extends Api
      * API to access an Space Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
@@ -934,7 +930,7 @@ public class XWiki extends Api
      * API to access an Space Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
-     * 
+     *
      * @param preference Preference name
      * @param space The space for which this preference is requested
      * @return The preference for this wiki and the current language
@@ -948,7 +944,7 @@ public class XWiki extends Api
      * API to access an Space Preference There can be one preference object per language This function will find the
      * right preference object associated to the current active language If no preference is found it will look in the
      * XWiki Preferences
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current language
@@ -960,7 +956,7 @@ public class XWiki extends Api
 
     /**
      * API to access a Skin Preference The skin object is the current user's skin
-     * 
+     *
      * @param preference Preference name
      * @return The preference for the current skin
      */
@@ -971,7 +967,7 @@ public class XWiki extends Api
 
     /**
      * API to access a Skin Preference The skin object is the current user's skin
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the preference does not exist or is empty
      * @return The preference for the current skin
@@ -984,7 +980,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @param space The space for which this preference is requested
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
@@ -998,7 +994,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in long format
@@ -1011,7 +1007,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language in long format
      */
@@ -1024,7 +1020,7 @@ public class XWiki extends Api
      * API to access a Space Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in long format
@@ -1038,7 +1034,7 @@ public class XWiki extends Api
      * API to access a Space Preference as a long number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language in long format
      */
@@ -1050,7 +1046,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference as an int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in int format
@@ -1063,7 +1059,7 @@ public class XWiki extends Api
     /**
      * API to access an XWiki Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language in int format
      */
@@ -1076,7 +1072,7 @@ public class XWiki extends Api
      * API to access a space Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
-     * 
+     *
      * @param preference Preference name
      * @param defaultValue default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language in int format
@@ -1090,7 +1086,7 @@ public class XWiki extends Api
      * API to access a Space Preference as a int number There can be one preference object per language This function
      * will find the right preference object associated to the current active language If no preference is found it will
      * look for the XWiki Preference
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language in int format
      */
@@ -1102,7 +1098,7 @@ public class XWiki extends Api
     /**
      * API to access a User Preference This function will look in the User profile for the preference If no preference
      * is found it will look in the Space Preferences If no preference is found it will look in the XWiki Preferences
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
@@ -1113,7 +1109,7 @@ public class XWiki extends Api
 
     /**
      * API to access a User Preference from cookie This function will look in the session cookie for the preference
-     * 
+     *
      * @param preference Preference name
      * @return The preference for this wiki and the current language
      */
@@ -1128,7 +1124,7 @@ public class XWiki extends Api
      * the language passed in the request. If none was passed try to get it from a cookie. If no language cookie exists
      * then use the user default language and barring that use the browser's "Accept-Language" header sent in HTTP
      * request. If none is defined use the default language.
-     * 
+     *
      * @return the language to use
      */
     public String getLanguagePreference()
@@ -1140,7 +1136,7 @@ public class XWiki extends Api
      * API to access the interface language preference for the request Order of evaluation is: Language of the wiki in
      * mono-lingual mode language request paramater language in context language user preference language in cookie
      * language accepted by the navigator
-     * 
+     *
      * @return the document language preference for the request
      */
     public String getInterfaceLanguagePreference()
@@ -1169,7 +1165,7 @@ public class XWiki extends Api
 
     /**
      * Convenience method to ask if the current XWiki instance contains subwikis (in addition to the main wiki)
-     * 
+     *
      * @return true if at least 1 subwiki exists; false otherwise
      * @see #getWikiNames()
      */
@@ -1180,7 +1176,7 @@ public class XWiki extends Api
 
     /**
      * API to check is wiki is multi-lingual
-     * 
+     *
      * @return true for multi-lingual/false for mono-lingual
      */
     public boolean isMultiLingual()
@@ -1215,7 +1211,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
-     * 
+     *
      * @return true for success/false for failure
      * @throws XWikiException
      */
@@ -1227,7 +1223,7 @@ public class XWiki extends Api
     /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
-     * 
+     *
      * @param withValidation true to send the validationemail
      * @return true for success/false for failure
      * @throws XWikiException
@@ -1240,7 +1236,7 @@ public class XWiki extends Api
     /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
-     * 
+     *
      * @param withValidation true to send the validation email
      * @param userRights Rights to set for the user for it's own page(defaults to "edit")
      * @return true for success/false for failure
@@ -1276,7 +1272,7 @@ public class XWiki extends Api
     /**
      * Privileged API to validate the return code given by a user in response to an email validation email The
      * validation information are taken from the request object
-     * 
+     *
      * @param withConfirmEmail true to send a account confirmation email/false to not send it
      * @return Success of Failure code (0 for success, -1 for missing programming rights, > 0 for other errors
      * @throws XWikiException
@@ -1288,7 +1284,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API to add a user to the XWiki.XWikiAllGroup
-     * 
+     *
      * @param fullwikiname user name to add
      * @throws XWikiException
      */
@@ -1301,7 +1297,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API to send a confirmation email to a user
-     * 
+     *
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
      * @param email email to send to
@@ -1319,7 +1315,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API to send a confirmation email to a user
-     * 
+     *
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
      * @param email email to send to
@@ -1336,7 +1332,7 @@ public class XWiki extends Api
 
     /**
      * API to copy a document to another document in the same wiki
-     * 
+     *
      * @param docname source document
      * @param targetdocname target document
      * @return true if the copy was sucessfull
@@ -1349,7 +1345,7 @@ public class XWiki extends Api
 
     /**
      * API to copy a translation of a document to another document in the same wiki
-     * 
+     *
      * @param docname source document
      * @param targetdocname target document
      * @param wikilanguage language to copy
@@ -1363,7 +1359,7 @@ public class XWiki extends Api
 
     /**
      * API to copy a translation of a document to another document of the same name in another wiki
-     * 
+     *
      * @param docname source document
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
@@ -1380,7 +1376,7 @@ public class XWiki extends Api
     /**
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version
-     * 
+     *
      * @param docname source document
      * @param sourceWiki source wiki
      * @param targetWiki target wiki
@@ -1398,7 +1394,7 @@ public class XWiki extends Api
     /**
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version and overwriting the previous document
-     * 
+     *
      * @param docname source document name
      * @param targetdocname target document name
      * @param sourceWiki source wiki
@@ -1432,7 +1428,7 @@ public class XWiki extends Api
     /**
      * API to copy a translation of a document to another document of the same name in another wiki additionally
      * resetting the version and overwriting the previous document
-     * 
+     *
      * @param sourceDocumentReference the reference to the document to copy
      * @param targetDocumentReference the reference to the document to create
      * @param wikilanguage language to copy
@@ -1465,7 +1461,7 @@ public class XWiki extends Api
 
     /**
      * Privileged API to copy a space to another wiki, optionally deleting all document of the target space
-     * 
+     *
      * @param space source Space
      * @param sourceWiki source Wiki
      * @param targetWiki target Wiki
@@ -1486,7 +1482,7 @@ public class XWiki extends Api
 
     /**
      * API to include a topic into another The topic is rendered fully in the context of itself
-     * 
+     *
      * @param topic page name of the topic to include
      * @return the content of the included page
      * @throws XWikiException if the include failed
@@ -1500,7 +1496,7 @@ public class XWiki extends Api
      * API to execute a form in the context of an including topic The rendering is evaluated in the context of the
      * including topic All velocity variables are the one of the including topic This api is usually called using
      * #includeForm in a page, which modifies the behavior of "Edit this page" button to direct for Form mode (inline)
-     * 
+     *
      * @param topic page name of the form to execute
      * @return the content of the included page
      * @throws XWikiException if the include failed
@@ -1513,7 +1509,7 @@ public class XWiki extends Api
     /**
      * API to include a topic into another, optionally surrounding the content with {pre}{/pre} to avoid future wiki
      * rendering. The topic is rendered fully in the context of itself.
-     * 
+     *
      * @param topic page name of the topic to include
      * @param pre true to add {pre} {/pre} (only if includer document is 1.0 syntax)
      * @return the content of the included page
@@ -1539,7 +1535,7 @@ public class XWiki extends Api
      * to avoid future wiki rendering The rendering is evaluated in the context of the including topic All velocity
      * variables are the one of the including topic This api is usually called using #includeForm in a page, which
      * modifies the behavior of "Edit this page" button to direct for Form mode (inline).
-     * 
+     *
      * @param topic page name of the form to execute
      * @param pre true to add {pre} {/pre} (only if includer document is 1.0 syntax)
      * @return the content of the included page
@@ -1562,7 +1558,7 @@ public class XWiki extends Api
 
     /**
      * API to check rights on the current document for the current user
-     * 
+     *
      * @param level right to check (view, edit, comment, delete)
      * @return true if right is granted/false if not
      */
@@ -1573,7 +1569,7 @@ public class XWiki extends Api
 
     /**
      * API to check rights on a document for a given user
-     * 
+     *
      * @param level right to check (view, edit, comment, delete)
      * @param user user for which to check the right
      * @param docname document on which to check the rights
@@ -1590,7 +1586,7 @@ public class XWiki extends Api
 
     /**
      * API to render a text in the context of a document
-     * 
+     *
      * @param text text to render
      * @param doc the text is evaluated in the content of this document
      * @return evaluated content
@@ -1603,7 +1599,7 @@ public class XWiki extends Api
 
     /**
      * API to render a chunk (difference between two versions
-     * 
+     *
      * @param chunk difference between versions to render
      * @param doc document to use as a context for rendering
      * @return resuilt of the rendering
@@ -1615,7 +1611,7 @@ public class XWiki extends Api
 
     /**
      * API to render a chunk (difference between two versions
-     * 
+     *
      * @param chunk difference between versions to render
      * @param doc document to use as a context for rendering
      * @param source true to render the difference as wiki source and not as wiki rendered text
@@ -1638,7 +1634,7 @@ public class XWiki extends Api
 
     /**
      * API to list all non-hidden spaces in the current wiki.
-     * 
+     *
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
@@ -1650,7 +1646,7 @@ public class XWiki extends Api
 
     /**
      * API to list all non-hidden documents in a space.
-     * 
+     *
      * @param spaceName the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
@@ -1664,7 +1660,7 @@ public class XWiki extends Api
     /**
      * API to retrieve the current encoding of the wiki engine The encoding is stored in xwiki.cfg Default encoding is
      * ISO-8891-1
-     * 
+     *
      * @return encoding active in this wiki
      */
     public String getEncoding()
@@ -1677,7 +1673,7 @@ public class XWiki extends Api
      * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
-     * 
+     *
      * @param fullname page name which includes the attached file
      * @param filename attached filename to create a link for
      * @return a URL as a string pointing to the filename
@@ -1693,7 +1689,7 @@ public class XWiki extends Api
      * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
-     * 
+     *
      * @param fullname the name of the document for which to return the URL for
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
@@ -1708,7 +1704,7 @@ public class XWiki extends Api
      * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
      * is important to always use the URL functions to generate URL and never hardcode URLs
-     * 
+     *
      * @param reference the reference to the document for which to return the URL for
      * @return a URL as a string pointing to the wiki document in view mode
      * @throws XWikiException if the URL could not be generated properly
@@ -1724,7 +1720,7 @@ public class XWiki extends Api
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment).
      * It is important to always use the URL functions to generate URL and never hardcode URLs.
-     * 
+     *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
      * @return a URL as a string pointing to the wiki document in view mode
@@ -1741,7 +1737,7 @@ public class XWiki extends Api
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
      * environments will not accept this (like the Portlet environement).
-     * 
+     *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
      * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
@@ -1759,7 +1755,7 @@ public class XWiki extends Api
      * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
      * environment needs it. It is important to not add the query string parameter manually after a URL. Some
      * environments will not accept this (like the Portlet environement).
-     * 
+     *
      * @param reference the reference to the document for which to return the URL for
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
      * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
@@ -1778,7 +1774,7 @@ public class XWiki extends Api
      * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
      * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
      * this (like the Portlet environement).
-     * 
+     *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
      * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
@@ -1795,7 +1791,7 @@ public class XWiki extends Api
      * API to retrieve a viewable referer text for a referer Referers are URL where users have clicked on a link to an
      * XWiki page Search engine referer URLs are transformed to a nicer view (Google: search query string) For other URL
      * the http:// part is stripped
-     * 
+     *
      * @param referer referer URL to transform
      * @return A viewable string
      */
@@ -1812,7 +1808,7 @@ public class XWiki extends Api
      * API to retrieve a viewable referer text for a referer with a maximum length Referers are URL where users have
      * clicked on a link to an XWiki page Search engine referer URLs are transformed to a nicer view (Google: search
      * query string) For other URL the http:// part is stripped
-     * 
+     *
      * @param referer referer URL to transform
      * @param length Maximum length. "..." is added to the end of the text
      * @return A viewable string
@@ -1827,9 +1823,22 @@ public class XWiki extends Api
     }
 
     /**
+     * Generate and return an unescaped user display name.
+     *
+     * @param userReference the user reference
+     * @param context the XWiki context
+     * @return the unescaped display user name
+     * @since 6.4RC1
+     */
+    public String getPlainUserName(DocumentReference userReference)
+    {
+        return this.xwiki.getPlainUserName(userReference, getXWikiContext());
+    }
+
+    /**
      * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
      * will link to the page on the wiki where the user is registered
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
      */
@@ -1842,7 +1851,7 @@ public class XWiki extends Api
      * API to retrieve a link to the User Name page displayed with a custom view. The link will link to the page on the
      * wiki where the user is registered. The formating is done using the format parameter which can contain velocity
      * scripting and access all properties of the User profile using variables ($first_name $last_name $email $city)
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1855,7 +1864,7 @@ public class XWiki extends Api
     /**
      * API to retrieve a link to the User Name page displayed for the first name and last name of the user. The link
      * will link to the page on the local wiki even if the user is registered on a different wiki.
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @return The first name and last name fields surrounded with a link to the user page
      */
@@ -1873,7 +1882,7 @@ public class XWiki extends Api
      * local wiki even if the user is registered on a different wiki. The formating is done using the format parameter
      * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
      * $last_name $email $city)
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1891,7 +1900,7 @@ public class XWiki extends Api
      * API to retrieve a text representing the user with the first name and last name of the user. With the link param
      * set to false it will not link to the user page With the link param set to true, the link will link to the page on
      * the wiki where the user was registered.
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1906,7 +1915,7 @@ public class XWiki extends Api
      * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
      * registered. The formating is done using the format parameter which can contain velocity scripting and access all
      * properties of the User profile using variables ($first_name $last_name $email $city)
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
      * @param link false to not add an HTML link to the user profile
@@ -1921,7 +1930,7 @@ public class XWiki extends Api
      * API to retrieve a text representing the user with the first name and last name of the user. With the link param
      * set to false it will not link to the user page. With the link param set to true, the link will link to the page
      * on the local wiki even if the user is registered on a different wiki.
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
      * @return The first name and last name fields surrounded with a link to the user page
@@ -1940,7 +1949,7 @@ public class XWiki extends Api
      * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
      * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
      * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
-     * 
+     *
      * @param user Fully qualified username as retrieved from $xcontext.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
      * @param link false to not add an HTML link to the user profile
@@ -1968,7 +1977,7 @@ public class XWiki extends Api
     /**
      * API allowing to format a date according to the default Wiki setting The date format is provided in the
      * 'dateformat' parameter of the XWiki Preferences
-     * 
+     *
      * @param date date object to format
      * @return A string with the date formating from the default Wiki setting
      */
@@ -1981,7 +1990,7 @@ public class XWiki extends Api
      * API allowing to format a date according to a custom format The date format is from java.text.SimpleDateFormat
      * Example: "dd/MM/yyyy HH:mm:ss" or "d MMM yyyy" If the format is invalid the default format will be used to show
      * the date
-     * 
+     *
      * @param date date to format
      * @param format format of the date to be used
      * @return the formatted date
@@ -2007,7 +2016,7 @@ public class XWiki extends Api
      * has a feature in that if a class has a get method, using the dot notation will automatically call the get method
      * for the class. See http://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#propertylookuprules.
      * This this allows the following constructs: <code>$xwiki.pluginName.somePluginMethod()</code>
-     * 
+     *
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object
      */
@@ -2018,7 +2027,7 @@ public class XWiki extends Api
 
     /**
      * Returns a plugin from the plugin API. Plugin Rights can be verified.
-     * 
+     *
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object
      */
@@ -2029,7 +2038,7 @@ public class XWiki extends Api
 
     /**
      * Returns the Advertisement system from the preferences
-     * 
+     *
      * @return "google" or "none"
      */
     public String getAdType()
@@ -2039,7 +2048,7 @@ public class XWiki extends Api
 
     /**
      * Returns the Advertisement client ID from the preferences
-     * 
+     *
      * @return an Ad affiliate ID
      */
     public String getAdClientId()
@@ -2049,7 +2058,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
-     * 
+     *
      * @param surl url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
@@ -2068,7 +2077,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL
-     * 
+     *
      * @param surl url to retrieve
      * @return Content of the specified URL
      * @throws IOException
@@ -2085,7 +2094,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
-     * 
+     *
      * @param surl url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
@@ -2105,7 +2114,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL
-     * 
+     *
      * @param surl url to retrieve
      * @param timeout manuel timeout in milliseconds
      * @return Content of the specified URL
@@ -2122,7 +2131,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication as Bytes
-     * 
+     *
      * @param surl url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
@@ -2140,7 +2149,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL as Bytes
-     * 
+     *
      * @param surl url to retrieve
      * @return Content of the specified URL
      * @throws IOException
@@ -2156,7 +2165,7 @@ public class XWiki extends Api
 
     /**
      * Returns the list of Macros documents in the specified content
-     * 
+     *
      * @param defaultSpace Default space to use for relative path names
      * @param content Content to parse
      * @return ArrayList of document names
@@ -2168,7 +2177,7 @@ public class XWiki extends Api
 
     /**
      * returns true if xwiki.readonly is set in the configuration file
-     * 
+     *
      * @return the value of xwiki.isReadOnly()
      * @see com.xpn.xwiki.XWiki
      */
@@ -2181,7 +2190,7 @@ public class XWiki extends Api
      * Privileged API to set/unset the readonly status of the Wiki After setting this to true no writing to the database
      * will be performed All Edit buttons will be removed and save actions disabled This is used for maintenance
      * purposes
-     * 
+     *
      * @param ro true to set read-only mode/false to unset
      */
     public void setReadOnly(boolean ro)
@@ -2194,7 +2203,7 @@ public class XWiki extends Api
     /**
      * Priviledge API to regenerate the links/backlinks table Normally links and backlinks are stored when a page is
      * modified This function will regenerate all the backlinks This function can be long to run
-     * 
+     *
      * @throws XWikiException exception if the generation fails
      */
     public void refreshLinks() throws XWikiException
@@ -2206,7 +2215,7 @@ public class XWiki extends Api
 
     /**
      * API to check if the backlinks feature is active Backlinks are activated in xwiki.cfg or in the XWiki Preferences
-     * 
+     *
      * @return true if the backlinks feature is active
      * @throws XWikiException exception if the preference could not be retrieved
      */
@@ -2217,7 +2226,7 @@ public class XWiki extends Api
 
     /**
      * API to check if the tags feature is active. Tags are activated in xwiki.cfg or in the XWiki Preferences
-     * 
+     *
      * @return true if the tags feature is active, false otherwise
      * @throws XWikiException exception if the preference could not be retrieved
      */
@@ -2229,7 +2238,7 @@ public class XWiki extends Api
     /**
      * API to check if the edit comment feature is active Edit comments are activated in xwiki.cfg or in the XWiki
      * Preferences
-     * 
+     *
      * @return
      */
     public boolean hasEditComment()
@@ -2240,7 +2249,7 @@ public class XWiki extends Api
     /**
      * API to check if the edit comment field is shown in the edit form Edit comments are activated in xwiki.cfg or in
      * the XWiki Preferences
-     * 
+     *
      * @return
      */
     public boolean isEditCommentFieldHidden()
@@ -2251,7 +2260,7 @@ public class XWiki extends Api
     /**
      * API to check if the edit comment is suggested (prompted once by Javascript if empty) Edit comments are activated
      * in xwiki.cfg or in the XWiki Preferences
-     * 
+     *
      * @return
      */
     public boolean isEditCommentSuggested()
@@ -2262,7 +2271,7 @@ public class XWiki extends Api
     /**
      * API to check if the edit comment is mandatory (prompted by Javascript if empty) Edit comments are activated in
      * xwiki.cfg or in the XWiki Preferences
-     * 
+     *
      * @return
      */
     public boolean isEditCommentMandatory()
@@ -2290,7 +2299,7 @@ public class XWiki extends Api
     /**
      * API to rename a page (experimental) Rights are necessary to edit the source and target page All objects and
      * attachments ID are modified in the process to link to the new page name
-     * 
+     *
      * @param doc page to rename
      * @param newFullName target page name to move the information to
      */
@@ -2316,7 +2325,7 @@ public class XWiki extends Api
     /**
      * Retrieves the current editor preference for the request The preference is first looked up in the user preference
      * and then in the space and wiki preference
-     * 
+     *
      * @return "wysiwyg" or "text"
      */
     public String getEditorPreference()
@@ -2327,7 +2336,7 @@ public class XWiki extends Api
     /**
      * Privileged API to retrieve an object instantiated from groovy code in a String. Note that Groovy scripts
      * compilation is cached.
-     * 
+     *
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException
@@ -2343,7 +2352,7 @@ public class XWiki extends Api
     /**
      * Privileged API to retrieve an object instantiated from groovy code in a String, using a classloader including all
      * JAR files located in the passed page as attachments. Note that Groovy scripts compilation is cached
-     * 
+     *
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException
@@ -2360,7 +2369,7 @@ public class XWiki extends Api
     /**
      * Privileged API to retrieve an object instanciated from groovy code in a String Groovy scripts compilation is
      * cached
-     * 
+     *
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
      * @return An object instanciating this class
      * @throws XWikiException
@@ -2377,7 +2386,7 @@ public class XWiki extends Api
     /**
      * API to get the macro list from the XWiki Preferences The macro list are the macros available from the Macro
      * Mapping System
-     * 
+     *
      * @return String with each macro on each line
      */
     public String getMacroList()
@@ -2387,7 +2396,7 @@ public class XWiki extends Api
 
     /**
      * API to check if using which toolbars in Wysiwyg editor
-     * 
+     *
      * @return a string value
      */
     public String getWysiwygToolbars()
@@ -2398,7 +2407,7 @@ public class XWiki extends Api
     /**
      * API to create an object from the request The parameters are the ones that are created from
      * doc.display("field","edit") calls
-     * 
+     *
      * @param className XWiki Class Name to create the object from
      * @return a BaseObject wrapped in an Object
      * @throws XWikiException exception if the object could not be read
@@ -2411,7 +2420,7 @@ public class XWiki extends Api
 
     /**
      * API to create an empty document
-     * 
+     *
      * @return an XWikiDocument wrapped in a Document
      */
     public Document createDocument()
@@ -2422,7 +2431,7 @@ public class XWiki extends Api
     /**
      * API to convert the username depending on the configuration The username can be converted from email to a valid
      * XWiki page name hidding the email address The username can be then used to login and link to the right user page
-     * 
+     *
      * @param username username to use for login
      * @return converted wiki page name for this username
      */
@@ -2434,7 +2443,7 @@ public class XWiki extends Api
     /**
      * API to get the Property object from a class based on a property path A property path looks like
      * XWiki.ArticleClass_fieldname
-     * 
+     *
      * @param propPath Property path
      * @return a PropertyClass object from a BaseClass object
      */
@@ -2445,7 +2454,7 @@ public class XWiki extends Api
 
     /**
      * Generates a unique page name based on initial page name and already existing pages
-     * 
+     *
      * @param name
      * @return a unique page name
      */
@@ -2456,7 +2465,7 @@ public class XWiki extends Api
 
     /**
      * Generates a unique page name based on initial page name and already existing pages
-     * 
+     *
      * @param space
      * @param name
      * @return a unique page name
@@ -2468,7 +2477,7 @@ public class XWiki extends Api
 
     /**
      * Inserts a tooltip using toolTip.js
-     * 
+     *
      * @param html HTML viewed
      * @param message HTML Tooltip message
      * @param params Parameters in Javascropt added to the tooltip config
@@ -2481,7 +2490,7 @@ public class XWiki extends Api
 
     /**
      * Inserts a tooltip using toolTip.js
-     * 
+     *
      * @param html HTML viewed
      * @param message HTML Tooltip message
      * @return HTML with working tooltip
@@ -2493,7 +2502,7 @@ public class XWiki extends Api
 
     /**
      * Inserts the tooltip Javascript
-     * 
+     *
      * @return
      */
     public String addTooltipJS()
@@ -2517,7 +2526,7 @@ public class XWiki extends Api
      * thus useful in cases where the calling code doesn't have the access right to the specified Document. It is safe
      * because there are no sensitive data stored in a Class definition.
      * </p>
-     * 
+     *
      * @param documentName the name of the document for which to get the Class object. For example
      *            "XWiki.XWikiPreferences"
      * @return the XWiki Class object defined in the passed Document name. If the passed Document name points to a
@@ -2535,7 +2544,7 @@ public class XWiki extends Api
 
     /**
      * Provides an absolute counter
-     * 
+     *
      * @param name Counter name
      * @return String
      */
@@ -2554,7 +2563,7 @@ public class XWiki extends Api
 
     /**
      * Check authentication from request and set according persitent login information If it fails user is unlogged
-     * 
+     *
      * @return null if failed, non null XWikiUser if sucess
      * @throws XWikiException
      */
@@ -2566,7 +2575,7 @@ public class XWiki extends Api
     /**
      * Check authentication from username and password and set according persitent login information If it fails user is
      * unlogged
-     * 
+     *
      * @param username username to check
      * @param password password to check
      * @param rememberme "1" if you want to remember the login accross navigator restart
@@ -2580,7 +2589,7 @@ public class XWiki extends Api
 
     /**
      * Access statistics api
-     * 
+     *
      * @return a StatsService instance that can be used to retrieve different xwiki statistics
      */
     public StatsService getStatsService()
@@ -2591,7 +2600,7 @@ public class XWiki extends Api
     /**
      * API to get the xwiki criteria service which allow to create various criteria : integer ranges, date periods, date
      * intervals, etc.
-     * 
+     *
      * @return the xwiki criteria service
      */
     public CriteriaService getCriteriaService()
@@ -2610,7 +2619,7 @@ public class XWiki extends Api
     /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
      * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
-     * 
+     *
      * @param wikiName wiki for which to get the path
      * @return The servlet path
      */
@@ -2622,7 +2631,7 @@ public class XWiki extends Api
     /**
      * API to get the Servlet path for the current wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
      * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
-     * 
+     *
      * @return The servlet path
      */
     public String getServletPath()
@@ -2633,7 +2642,7 @@ public class XWiki extends Api
     /**
      * API to get the webapp path for the current wiki. This usually is "xwiki/". It can be configured in xwiki.cfg with
      * the config <tt>xwiki.webapppath</tt>.
-     * 
+     *
      * @return The servlet path
      */
     public String getWebAppPath()
@@ -2653,7 +2662,7 @@ public class XWiki extends Api
      * Find the corresponding available renderer syntax.
      * <p>
      * If <code>syntaxVersion</code> is null the last version of the available provided syntax type is returned.
-     * 
+     *
      * @param syntaxType the syntax type
      * @param syntaxVersion the syntax version
      * @return the available corresponding {@link Syntax}. Null if no available renderer can be found.
@@ -2691,6 +2700,15 @@ public class XWiki extends Api
     }
 
     /**
+     * @return true if section editing is enabled (can be configured through the {@code xwiki.section.edit}
+     *         configuration property. Defaults to 1 (=enabled) when not defined
+     */
+    public boolean hasSectionEdit()
+    {
+        return this.xwiki.hasSectionEdit(getXWikiContext());
+    }
+
+    /**
      * @return the section depth for which section editing is available (can be configured through
      *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
      */
@@ -2719,7 +2737,7 @@ public class XWiki extends Api
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
      * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
-     * 
+     *
      * @return the syntax identifier
      */
     public String getCurrentContentSyntaxId()

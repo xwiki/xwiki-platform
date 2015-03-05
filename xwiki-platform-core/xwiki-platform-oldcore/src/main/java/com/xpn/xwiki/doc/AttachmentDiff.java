@@ -85,7 +85,7 @@ public class AttachmentDiff
      */
     public XWikiAttachment getOrigAttachment()
     {
-        return origAttachment;
+        return this.origAttachment;
     }
 
     /**
@@ -93,7 +93,7 @@ public class AttachmentDiff
      */
     public XWikiAttachment getNewAttachment()
     {
-        return newAttachment;
+        return this.newAttachment;
     }
 
     @Deprecated

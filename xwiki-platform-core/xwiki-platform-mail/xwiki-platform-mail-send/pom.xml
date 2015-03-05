@@ -25,22 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <packaging>pom</packaging>
   <artifactId>xwiki-platform-mail-send</artifactId>
   <name>XWiki Platform - Mail - Send - Parent POM</name>
   <description>XWiki Platform - Mail - Send - Parent POM</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-send-api</module>
     <module>xwiki-platform-mail-send-default</module>
+    <module>xwiki-platform-mail-send-storage</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-mail-send-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

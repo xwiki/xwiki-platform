@@ -49,7 +49,7 @@ public class XWikiDBVersion implements Comparable<XWikiDBVersion>
     /** @return data version */
     public int getVersion()
     {
-        return version;
+        return this.version;
     }
 
     /** @param version - data version */

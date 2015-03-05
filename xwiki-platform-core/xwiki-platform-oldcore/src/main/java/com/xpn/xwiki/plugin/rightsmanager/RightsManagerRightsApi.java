@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * API for managing rights and inheritance.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -56,7 +56,7 @@ public class RightsManagerRightsApi extends Api
 
     /**
      * Create an instance of RightsManageRightsApi.
-     * 
+     *
      * @param context the XWiki context.
      */
     public RightsManagerRightsApi(XWikiContext context)
@@ -66,7 +66,7 @@ public class RightsManagerRightsApi extends Api
 
     /**
      * Log error and register {@link #CONTEXT_LASTERRORCODE} and {@link #CONTEXT_LASTEXCEPTION}.
-     * 
+     *
      * @param comment the comment to use with {@link #LOGGER}.
      * @param e the exception.
      */
@@ -82,7 +82,7 @@ public class RightsManagerRightsApi extends Api
 
     /**
      * Get the document containing inherited rights of provided document.
-     * 
+     *
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @return the document containing inherited rights of provided document.
      * @throws XWikiException error when browsing rights preferences.
@@ -92,12 +92,12 @@ public class RightsManagerRightsApi extends Api
         Document parent = null;
 
         try {
-            XWikiDocument xdoc = RightsManager.getInstance().getParentPreference(spaceOrPage, context);
+            XWikiDocument xdoc = RightsManager.getInstance().getParentPreference(spaceOrPage, this.context);
 
             parent = convert(xdoc);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get parent rights preference for [{0}]", new Object[] {spaceOrPage}),
-                e);
+            logError(
+                MessageFormat.format("Try to get parent rights preference for [{0}]", new Object[] { spaceOrPage }), e);
         }
 
         return parent;

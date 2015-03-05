@@ -42,7 +42,7 @@ import com.xpn.xwiki.XWikiContext;
  * <dt>img</dt>
  * <dd>An image to print before the URL. Actually not used, this parameter is always ignored.</dd>
  * </dl>
- * 
+ *
  * @deprecated It provides limited functionality compared to the wiki link syntax.
  * @version $Id$
  */
@@ -57,7 +57,7 @@ public class LinkMacro extends BaseLocaleMacro
 
     /**
      * Main macro execution method, replaces the macro instance with the generated output.
-     * 
+     *
      * @param writer the place where to write the output
      * @param params the parameters this macro is called with
      * @throws IllegalArgumentException if the mandatory argument ({@code text}) is missing

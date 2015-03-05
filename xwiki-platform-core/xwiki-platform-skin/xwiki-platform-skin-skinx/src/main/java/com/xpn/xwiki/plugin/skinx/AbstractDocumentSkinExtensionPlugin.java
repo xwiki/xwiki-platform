@@ -67,7 +67,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     /**
      * Log helper for logging messages in this class.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDocumentSkinExtensionPlugin.class);
 
     /**
      * The name of the field that indicates whether an extension should always be used, or only when explicitly pulled.
@@ -310,7 +310,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {

@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 
 /**
  * Default implementation of {@link MandatoryDocumentInitializerManager}.
- * 
+ *
  * @version $Id$
  * @since 5.2M2
  */

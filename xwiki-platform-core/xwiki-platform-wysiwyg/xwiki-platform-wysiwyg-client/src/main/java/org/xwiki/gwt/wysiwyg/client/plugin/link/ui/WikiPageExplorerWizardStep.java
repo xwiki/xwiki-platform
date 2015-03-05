@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.wysiwyg.client.plugin.link.ui;
 
+import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.wysiwyg.client.Strings;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig.LinkType;
@@ -36,12 +37,14 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
      * Creates a wiki page selection wizard step that allows the user to select the page to link to from a tree.
+     *
+     * @param config the configuration object
      */
-    public WikiPageExplorerWizardStep()
+    public WikiPageExplorerWizardStep(Config config)
     {
         // Build a standard selector which shows "Add page" and no attachments.
         // FIXME: Size hard-coding is very bad, remove when a method to control this from CSS will be found.
-        super(true, false, false, 455, 280);
+        super(config.getParameter("documentTreeURL"), 455, 280);
 
         setStepTitle(Strings.INSTANCE.linkSelectWikipageTitle());
         setHelpLabelText(Strings.INSTANCE.linkSelectWikipageHelpLabel());
@@ -69,7 +72,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
         pageReference.setSpaceName(getExplorer().getSelectedSpace());
         pageReference.setPageName(getExplorer().getSelectedPage());
 
-        if (getExplorer().isNewPageSelectedFromTreeNode()) {
+        if (getExplorer().isNewPage()) {
             getData().getData().setType(LinkType.NEW_WIKIPAGE);
             getData().getDestination().setEntityReference(pageReference.getEntityReference());
             async.onSuccess(true);
@@ -82,8 +85,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
             async.onSuccess(true);
         } else {
             updateLinkConfig(pageReference.getEntityReference());
-            LinkType linkType = getExplorer().isNewPage() ? LinkType.NEW_WIKIPAGE : LinkType.WIKIPAGE;
-            getData().getData().setType(linkType);
+            getData().getData().setType(LinkType.WIKIPAGE);
             async.onSuccess(true);
         }
     }

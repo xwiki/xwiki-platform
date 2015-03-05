@@ -21,17 +21,26 @@
 package com.xpn.xwiki.i18n;
 
 @Deprecated
-public class i18n {
+public class i18n
+{
     public static final int TRANSLATION_CONTENT = 1;
+
     public static final int TRANSLATION_OBJECTS = 2;
+
     public static final int TRANSLATION_CLASS = 4;
+
     public static final int TRANSLATION_ALL = 0x11111111;
 
     public static final String LANGUAGE_DEFAULT = "";
+
     public static final String LANGUAGE_FRENCH = "fr";
+
     public static final String LANGUAGE_ENGLISH = "en";
+
     public static final String LANGUAGE_GERMAN = "de";
+
     public static final String LANGUAGE_SPANISH = "es";
+
     public static final String LANGUAGE_ITALIAN = "it";
 
 }

@@ -20,29 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ExtensionCode</web>
   <name>ExtensionClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1359990173000</creationDate>
-  <date>1359997467000</date>
-  <contentUpdateDate>1359997467000</contentUpdateDate>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1423573118000</date>
+  <contentUpdateDate>1423573118000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
   <class>
     <name>ExtensionCode.ExtensionClass</name>
     <customClass/>
@@ -73,6 +70,30 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </authors>
+    <category>
+      <cache>0</cache>
+      <classname>ExtensionCode.ExtensionCategoryClass</classname>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <idField>id</idField>
+      <multiSelect>0</multiSelect>
+      <name>category</name>
+      <number>16</number>
+      <picker>0</picker>
+      <prettyName>Category</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators/>
+      <size>1</size>
+      <sort>value</sort>
+      <sql/>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <valueField>name</valueField>
+      <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+    </category>
     <customInstallationOnly>
       <customDisplay/>
       <defaultValue>0</defaultValue>
@@ -211,6 +232,27 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </name>
+    <properties>
+      <cache>0</cache>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <displayType>input</displayType>
+      <multiSelect>1</multiSelect>
+      <name>properties</name>
+      <number>17</number>
+      <picker>0</picker>
+      <prettyName>Properties</prettyName>
+      <relationalStorage>1</relationalStorage>
+      <separator> </separator>
+      <separators>|</separators>
+      <size>1</size>
+      <sort>none</sort>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <values/>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </properties>
     <source>
       <customDisplay/>
       <disabled>0</disabled>
@@ -290,6 +332,10 @@
     </website>
   </class>
   <object>
+    <name>ExtensionCode.ExtensionClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>3b8efbcb-ecec-4be1-ad78-34ff59766b6f</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -313,13 +359,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>ExtensionCode.ExtensionClass</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>3b8efbcb-ecec-4be1-ad78-34ff59766b6f</guid>
     <property>
       <sheet>ExtensionCode.ExtensionSheet</sheet>
     </property>
   </object>
-  <content>{{include reference="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

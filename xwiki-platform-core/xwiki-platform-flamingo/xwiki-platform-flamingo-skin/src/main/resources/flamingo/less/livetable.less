@@ -3,6 +3,11 @@
 // 
 // Some adaptations to make the livetable responsive to the screen size
 // --------------------------------------------------
+// Looks nicer with the .table-striped() mix-in of bootstrap
+.xwiki-livetable-display {
+  .table;
+  .table-striped;
+}
 
 @media only screen and (max-width: @screen-xs-max) {
 
@@ -17,7 +22,10 @@
     .xwiki-livetable-display-header tr {
       width: 50%;
       float: left;
-      border: 1px solid #ccc;
+      
+      th.xwiki-livetable-display-header-text {
+        background-color: @table-border-color;
+      }
       
       &:first-child{
         border-right: 0;
@@ -29,6 +37,7 @@
     }
     
     .xwiki-livetable-display-header{ // I'm forced to be that specific to override the rules of livetable.css
+      border-top: 2px solid @table-border-color;
     
       .xwiki-livetable-display-header-text, .xwiki-livetable-display-header-filter {
         height: @input-height-base + @padding-base-vertical;
@@ -42,46 +51,69 @@
         }
       }
     }
-
+    
+    // Re-use mix-ins from "tables.less"
     .xwiki-livetable-display-body {
-      clear: left;
+      .responsive-table-tbody();
       
-      tr {
-        border: 1px solid #ccc;
-        border-top: 0;
-      }
-      
-      td {
-        // Behave like a "row"
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        white-space: normal;
-        text-align:left;
+      > tr {
+        .responsive-table-tbody-tr();
         
-        &:before {
-          // Now like a table header
-          position: absolute;
-          // Top/left values mimic padding
-          top: 6px;
-          left: 6px;
-          width: 45%;
-          padding-right: 10px;
-          white-space: nowrap;
-          text-align: left;
-          font-weight: bold;
-          content: attr(data-title);
+        > td, > th {
+          .responsive-table-tbody-tr-tdth();
         }
-        
-        &:last-child {
-          border: 0;
-        }
-        
       }
-      
     }
   }
 }
 
+// Some adaptations for livetable related to user rights
+// see: http://jira.xwiki.org/browse/XWIKI-11583
+@media only screen and (max-width: @screen-xs-max) {
+  .skin-flamingo { // Needed to override the rules from livetable.css and usersandgroups.css
+  
+    #usersandgroupstable td.rights{
+      padding-left: 50% !important; // overwrite usersandgroups.css
+    }
+    
+    #usersandgroupstable.rights .rights {
+      width: 100% !important; // overwrite usersandgroups.css
+    }
+  
+    .xwiki-livetable-display-header {
+          
+      > .userorgroups-header {
+        width: 100%;
+        
+        > .rights {
+          // Hide the headers that do not propose filtering
+          display: none;
+        }
+      }
+      
+      > #usersandgroupstable-filters {
+        width: 100%;
+      }
+      
+      #unregistered {
+        .responsive-table-tbody-tr();
+        width: 100%;
+        border: 0;
+        border-bottom: 2px solid @table-border-color;
+        
+        > td {
+          .responsive-table-tbody-tr-tdth();
+          width: 100%;
+        }
+      }
+    }
 
+    // Overwrite XWiki.AdminSheet
+    #userstable, #groupstable, #usersandgroupstable, #alldocstable { 
+      .xwiki-livetable-display-body td {
+        border-color: @table-border-color;
+        width: 100%;
+      }
+    }
+  }
+}

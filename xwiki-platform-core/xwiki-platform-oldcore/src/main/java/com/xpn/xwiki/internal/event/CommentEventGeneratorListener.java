@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Produce comments related events based on {@link XObjectEvent object events}.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -60,7 +60,7 @@ public class CommentEventGeneratorListener implements EventListener
     /**
      * The matched events.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectAddedEvent(COMMENTCLASS_REFERENCE),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new XObjectAddedEvent(COMMENTCLASS_REFERENCE),
         new XObjectDeletedEvent(COMMENTCLASS_REFERENCE), new XObjectUpdatedEvent(COMMENTCLASS_REFERENCE));
 
     /**

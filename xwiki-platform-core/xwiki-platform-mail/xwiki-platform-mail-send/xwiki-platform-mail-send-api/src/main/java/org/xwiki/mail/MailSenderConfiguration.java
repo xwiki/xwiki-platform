@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
@@ -55,9 +56,17 @@ public interface MailSenderConfiguration
     String getPassword();
 
     /**
-     * @return the email address sending the email
+     * @return the default email address to use when sending the email. This is optional and if the user of the API sets
+     *         it, then it overrides this default value
      */
     String getFromAddress();
+
+    /**
+     * @return the list of default email addresses to add to the BCC mail header when sending email.This is optional and
+     *         if the user of the API sets it, then it overrides this default value
+     * @since 6.4M2
+     */
+    List<String> getBCCAddresses();
 
     /**
      * @return the list of additional Java Mail properties (in addition to the host, port, username and from
@@ -79,4 +88,19 @@ public interface MailSenderConfiguration
      * @return if true then the SMTP server requires authentication
      */
     boolean usesAuthentication();
+
+    /**
+     * @return the hint of the {@link org.xwiki.mail.script.ScriptServicePermissionChecker} component to use to check if a
+     *         mail is allowed to be sent or not when using the Mail Sender Script Service API. For example:
+     *         "alwaysallow", "programmingrights".
+     * @since 6.4M2
+     */
+    String getScriptServicePermissionCheckerHint();
+
+    /**
+     * @return the delay to wait between each mail being sent, in milliseconds. This is done to support mail throttling
+     *         and not considered a spammer by mail servers.
+     * @since 6.4RC1
+     */
+    long getSendWaitTime();
 }

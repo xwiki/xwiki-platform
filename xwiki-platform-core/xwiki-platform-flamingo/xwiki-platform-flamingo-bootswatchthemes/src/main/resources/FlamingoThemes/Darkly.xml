@@ -31,8 +31,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414591072000</creationDate>
-  <date>1414596140000</date>
-  <contentUpdateDate>1414594421000</contentUpdateDate>
+  <date>1418726862000</date>
+  <contentUpdateDate>1418668181000</contentUpdateDate>
   <version>1.1</version>
   <title>Darkly</title>
   <defaultTemplate/>
@@ -958,7 +958,7 @@ RK5CYII=
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Darkly 3.2.0
+      <lessCode>// Darkly 3.3.1
 // Variables
 // --------------------------------------------------
 
@@ -967,7 +967,8 @@ RK5CYII=
 //
 //## Gray and brand colors for use across Bootstrap.
 
-@gray-darker:            lighten(#000, 13.5%); // #222
+@gray-base:              #000;
+@gray-darker:            lighten(@gray-base, 13.5%); // #222
 @gray-dark:              #303030;   // #333
 @gray:                   #464545;
 @gray-light:             #999;   // #999
@@ -993,6 +994,8 @@ RK5CYII=
 @link-color:            desaturate(lighten(@brand-success, 10%),10%);
 //** Link hover color set via `darken()` function.
 @link-hover-color:      @link-color;
+//** Link hover decoration.
+@link-hover-decoration: underline;
 
 
 //== Typography
@@ -1088,7 +1091,7 @@ RK5CYII=
 //** Default background color used for all tables.
 @table-bg:                      transparent;
 //** Background color used for `.table-striped`.
-@table-bg-accent:               @gray-dark;
+@table-bg-accent:               lighten(@gray-dark, 5%);
 //** Background color used for `.table-hover`.
 @table-bg-hover:                @gray;
 @table-bg-active:               @table-bg-hover;
@@ -1143,8 +1146,15 @@ RK5CYII=
 @input-color:                    @gray;
 //** `&lt;input&gt;` border color
 @input-border:                   #f1f1f1;
-//** `&lt;input&gt;` border radius
+
+// TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
+//** Default `.form-control` border radius
 @input-border-radius:            @border-radius-base;
+//** Large `.form-control` border radius
+@input-border-radius-large:      @border-radius-large;
+//** Small `.form-control` border radius
+@input-border-radius-small:      @border-radius-small;
+
 //** Border color for inputs on focus
 @input-border-focus:             #fff;
 
@@ -1166,6 +1176,9 @@ RK5CYII=
 //** Border color for textual input addons
 @input-group-addon-border-color: transparent;
 
+//** Disabled cursor for form controls and buttons.
+@cursor-disabled:                not-allowed;
+
 
 //== Dropdowns
 //
@@ -1185,7 +1198,7 @@ RK5CYII=
 //** Hover color for dropdown links.
 @dropdown-link-hover-color:      #fff;
 //** Hover background for dropdown links.
-@dropdown-link-hover-bg:         @dropdown-link-active-bg;
+@dropdown-link-hover-bg:         @component-active-bg;
 
 //** Active dropdown menu item text color.
 @dropdown-link-active-color:     #fff;
@@ -1193,10 +1206,10 @@ RK5CYII=
 @dropdown-link-active-bg:        @component-active-bg;
 
 //** Disabled dropdown menu item background color.
-@dropdown-link-disabled-color:   @text-muted;
+@dropdown-link-disabled-color:   @gray-light;
 
 //** Text color for headers within dropdown menus.
-@dropdown-header-color:          @text-muted;
+@dropdown-header-color:          @gray-light;
 
 //** Deprecated `@dropdown-caret-color` as of v3.1.0
 @dropdown-caret-color:           #000;
@@ -1214,8 +1227,7 @@ RK5CYII=
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal-background:  1040;
-@zindex-modal:             1050;
+@zindex-modal:             1040;
 
 
 //== Media queries breakpoints
@@ -1277,17 +1289,17 @@ RK5CYII=
 //## Define the maximum width of `.container` for different screen sizes.
 
 // Small screen / tablet
-@container-tablet:             ((720px + @grid-gutter-width));
+@container-tablet:             (720px + @grid-gutter-width);
 //** For `@screen-sm-min` and up.
 @container-sm:                 @container-tablet;
 
 // Medium screen / desktop
-@container-desktop:            ((940px + @grid-gutter-width));
+@container-desktop:            (940px + @grid-gutter-width);
 //** For `@screen-md-min` and up.
 @container-md:                 @container-desktop;
 
 // Large screen / wide desktop
-@container-large-desktop:      ((1140px + @grid-gutter-width));
+@container-large-desktop:      (1140px + @grid-gutter-width);
 //** For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
 
@@ -1365,8 +1377,6 @@ RK5CYII=
 @nav-disabled-link-color:                   lighten(@gray, 10%);
 @nav-disabled-link-hover-color:             lighten(@gray, 10%);
 
-@nav-open-link-hover-color:                 #fff;
-
 //== Tabs
 @nav-tabs-border-color:                     @gray;
 
@@ -1402,7 +1412,7 @@ RK5CYII=
 @pagination-active-border:             transparent;
 
 @pagination-disabled-color:            #fff;
-@pagination-disabled-bg:               darken(@brand-success, 15%);;
+@pagination-disabled-bg:               darken(@brand-success, 15%);
 @pagination-disabled-border:           transparent;
 
 
@@ -1590,6 +1600,8 @@ RK5CYII=
 @progress-bg:                 @gray-lighter;
 //** Progress bar text color
 @progress-bar-color:          #fff;
+//** Variable for setting rounded corners on progress bar.
+@progress-border-radius:      @border-radius-base;
 
 //** Default progress bar color
 @progress-bar-bg:             @brand-primary;
@@ -1806,7 +1818,7 @@ RK5CYII=
 @hr-border:                   @gray;
 
 
-// Darkly 3.2.0
+// Darkly 3.3.1
 // Bootswatch
 // -----------------------------------------------------
 
@@ -1892,6 +1904,10 @@ table,
 
   a:not(.btn) {
     text-decoration: underline;
+  }
+
+  .dropdown-menu a {
+    text-decoration: none;
   }
 
   .success,
@@ -2079,6 +2095,48 @@ textarea {
 
 .well {
   .box-shadow(none);
+}
+
+a.list-group-item {
+
+  &amp;.active,
+  &amp;.active:hover,
+  &amp;.active:focus {
+    border-color: @list-group-border;
+  }
+
+  &amp;-success {
+    &amp;.active {
+      background-color: @state-success-bg;
+    }
+
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-success-bg, 5%);
+    }
+  }
+
+  &amp;-warning {
+    &amp;.active {
+      background-color: @state-warning-bg;
+    }
+    
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-warning-bg, 5%);
+    }
+  }
+
+  &amp;-danger {
+    &amp;.active {
+      background-color: @state-danger-bg;
+    }
+    
+    &amp;.active:hover,
+    &amp;.active:focus {
+      background-color: darken(@state-danger-bg, 5%);
+    }
+  }
 }
 
 .popover {

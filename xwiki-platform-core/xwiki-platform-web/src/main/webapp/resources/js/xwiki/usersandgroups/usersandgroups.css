@@ -27,6 +27,8 @@
 .rights {
   padding-left: 0px !important;
   padding-top: 4px;
+  text-align: center;
+  white-space: nowrap;
   width: 9%;
 }
 .rights th, .rights td {

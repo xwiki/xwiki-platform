@@ -22,7 +22,6 @@ package org.xwiki.test.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openqa.selenium.WebDriver;
 import org.xwiki.test.integration.XWikiExecutor;
 
 /**
@@ -42,7 +41,7 @@ public class PersistentTestContext
     /** This starts and stops the wiki engine. */
     private final XWikiExecutor executor;
 
-    private final WebDriver driver;
+    private final XWikiWebDriver driver;
 
     /** Utility methods which should be available to tests and to pages. */
     private final TestUtils util = new TestUtils();
@@ -70,9 +69,6 @@ public class PersistentTestContext
         // extensions such as Firebug), simply uncomment the following line:
         // System.setProperty("webdriver.firefox.profile", "default");
         this.driver = this.webDriverFactory.createWebDriver(BROWSER_NAME_SYSTEM_PROPERTY);
-
-        // Wait when trying to find elements on the page till the timeout expires
-        getUtil().setDriverImplicitWait(this.driver);
     }
 
     public PersistentTestContext(PersistentTestContext toClone)
@@ -82,7 +78,7 @@ public class PersistentTestContext
         this.properties.putAll(toClone.properties);
     }
 
-    public WebDriver getDriver()
+    public XWikiWebDriver getDriver()
     {
         return this.driver;
     }

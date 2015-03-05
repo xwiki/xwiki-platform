@@ -59,7 +59,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
  * services. The implementation is inside the old core, and not in a component because it has dependencies on the old
  * core.
- * 
+ *
  * @version $Id$
  * @since 1.6M1
  */
@@ -829,7 +829,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * Utility method for checking access rights of the current user on a target document.
-     * 
+     *
      * @param documentReference the reference of the document
      * @param right Access right requested.
      * @return True if the current user has the given access right, false otherwise.
@@ -841,7 +841,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * Utility method for checking access rights of the current user on a target document.
-     * 
+     *
      * @param documentReference the reference of the document
      * @param right Access right requested.
      * @return True if the current user has the given access right, false otherwise.
@@ -863,7 +863,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * Utility method for saving an {@link XWikiDocument}. This method takes care of setting authors and creators
      * appropriately.
-     * 
+     *
      * @param doc the {@link XWikiDocument} to be saved.
      * @param comment the edit comment.
      * @param isMinorEdit if the change in document is minor.

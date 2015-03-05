@@ -27,12 +27,16 @@
   <parent>
     <artifactId>xwiki-platform-flamingo</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-bootswatchthemes</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Flamingo - Bootswatch Themes</name>
   <description>Nice Themes for Flamingo created by Bootswatch.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Bootswatch Themes for Flamingo</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -42,7 +42,7 @@ import org.xwiki.test.ui.po.ViewPage;
 public class ImportTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 

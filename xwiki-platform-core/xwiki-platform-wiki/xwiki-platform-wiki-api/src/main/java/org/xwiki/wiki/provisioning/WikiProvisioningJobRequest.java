@@ -25,7 +25,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for {@link org.xwiki.job.Request} implementations used by wiki provisioners.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.3M2
  * @version $Id$
  */
-@Unstable
 public class WikiProvisioningJobRequest extends AbstractRequest
 {
     /**
@@ -56,7 +54,7 @@ public class WikiProvisioningJobRequest extends AbstractRequest
      * @param id id of the job request
      * @param wikiId id of the wiki to provision
      * @param parameter the parameter to be used by the provisioning job
-     * @deprecated use {@link #WikiProvisioningJobRequest(List<String>, String, Object, DocumentReference)} instead
+     * @deprecated use {@link #WikiProvisioningJobRequest(List, String, Object, DocumentReference)}
      */
     @Deprecated
     public WikiProvisioningJobRequest(List<String> id, String wikiId, Object parameter)

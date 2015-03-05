@@ -158,8 +158,6 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        this.cache.removeAll();
-
         this.observation.removeListener(getCacheId());
     }
 
@@ -305,7 +303,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     protected <T> T getPropertyValue(String key, Class<T> valueClass)
     {
-        String cacheKey = getCacheKeyPrefix() + ':' + key;
+        String cacheKey = getCacheKeyPrefix() + ':' + (valueClass != null ? valueClass.getName() : null) + ':' + key;
 
         Object result = this.cache.get(cacheKey);
 

@@ -53,7 +53,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link XWikiRightService}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiRightServiceImpl implements XWikiRightService
@@ -798,7 +798,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
         // to retrieve only the page name
         DocumentReference userReference =
-            Utils.<DocumentReferenceResolver<String>> getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
+            Utils.<DocumentReferenceResolver<String>>getComponent(DocumentReferenceResolver.TYPE_STRING).resolve(
                 username);
         return StringUtils.equalsIgnoreCase(userReference.getName(), SUPERADMIN_USER);
     }

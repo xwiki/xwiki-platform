@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-script</artifactId>
   <name>XWiki Platform - Wiki - Script services</name>
@@ -38,6 +38,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Not very clean, but we want to access the document of a descriptor. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +138,32 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
     }
+
+    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors =
+            Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", true),
+                new WikiMacroParameterDescriptor("param2", "This is param2", true));
+        registerWikiMacro(macroId, macroContent, syntax, parameterDescriptors);
+    }
+
+    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
+        List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
+    {
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
+                WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
+
+        Parser parser = getComponentManager().getInstance(Parser.class, syntax.toIdString());
+
+        DefaultWikiMacro wikiMacro =
+            new DefaultWikiMacro(wikiMacroDocumentReference, null, true, descriptor, parser.parse(new StringReader(
+                macroContent)), syntax, getComponentManager());
+
+        this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
+    }
+
+    // Tests
 
     /**
      * Test normal wiki macro execution.
@@ -302,27 +329,31 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         Assert.assertEquals("<p>default_value</p>", printer.toString());
     }
 
-    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax) throws Exception
+    @Test
+    public void testGetCurrentMacroBlock() throws Exception
     {
-        List<WikiMacroParameterDescriptor> parameterDescriptors =
-            Arrays.asList(new WikiMacroParameterDescriptor("param1", "This is param1", true),
-                new WikiMacroParameterDescriptor("param2", "This is param2", true));
-        registerWikiMacro(macroId, macroContent, syntax, parameterDescriptors);
-    }
+        registerWikiMacro("wikimacro",
+            "{{groovy}}"
+            + "println xcontext.macro.context.getCurrentMacroBlock().id\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().parent.class\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().nextSibling.children[0].word\n"
+            + "println xcontext.macro.context.getCurrentMacroBlock().previousSibling.children[0].word\n"
+            + "{{/groovy}}",
+            Syntax.XWIKI_2_0, Collections.<WikiMacroParameterDescriptor>emptyList());
 
-    private void registerWikiMacro(String macroId, String macroContent, Syntax syntax,
-        List<WikiMacroParameterDescriptor> parameterDescriptors) throws Exception
-    {
-        WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor(new MacroId(macroId), "Wiki Macro", "Description", "Test",
-                WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
+        Converter converter = getComponentManager().getInstance(Converter.class);
 
-        Parser parser = getComponentManager().getInstance(Parser.class, syntax.toIdString());
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("before\n\n{{wikimacro/}}\n\nafter"), Syntax.XWIKI_2_0,
+            Syntax.PLAIN_1_0, printer);
 
-        DefaultWikiMacro wikiMacro =
-            new DefaultWikiMacro(wikiMacroDocumentReference, null, true, descriptor, parser.parse(new StringReader(
-                macroContent)), syntax, getComponentManager());
-
-        this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
+        Assert.assertEquals("before"
+            + "\n\n"
+            + "wikimacro\n"
+            + "class org.xwiki.rendering.block.XDOM\n"
+            + "after\n"
+            + "before"
+            + "\n\n"
+            + "after", printer.toString());
     }
 }

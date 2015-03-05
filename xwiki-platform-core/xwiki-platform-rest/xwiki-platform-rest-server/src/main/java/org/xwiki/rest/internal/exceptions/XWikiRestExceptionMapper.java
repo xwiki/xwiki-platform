@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.exceptions;
 
+import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Component("org.xwiki.rest.internal.exceptions.XWikiRestExceptionMapper")
 @Provider
+@Singleton
 public class XWikiRestExceptionMapper implements ExceptionMapper<XWikiRestException>, XWikiRestComponent
 {
     @Override

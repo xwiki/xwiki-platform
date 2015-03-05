@@ -19,13 +19,15 @@
  */
 package org.xwiki.flamingo.test.po;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.ViewPage;
 
-public class PreviewBox extends ViewPage
+public class PreviewBox extends CSSGetterPage
 {
-    private String getElementCSSValue(final By locator, String attribute)
+    @Override
+    protected String getElementCSSValue(final By locator, String attribute)
     {
         try {
             getDriver().switchTo().frame("iframe");
@@ -36,18 +38,14 @@ public class PreviewBox extends ViewPage
         }
     }
 
-    public String getTextColor()
+    public boolean hasError()
     {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "color");
-    }
-
-    public String getPageBackgroundColor()
-    {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "background-color");
-    }
-
-    public String getFontFamily()
-    {
-        return getElementCSSValue(By.xpath("//div[@class='main']"), "font-family");
+        try {
+            getDriver().switchTo().frame("iframe");
+            List<WebElement> errors = getDriver().findElementsWithoutWaiting(By.className("less-error-message"));
+            return !errors.isEmpty();
+        } finally {
+            getDriver().switchTo().defaultContent();
+        }
     }
 }

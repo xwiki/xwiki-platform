@@ -19,25 +19,23 @@
  */
 package com.xpn.xwiki.web;
 
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.util.Util;
 
 /**
  * Struts form for {@link DeleteVersionsAction}.
- * 
+ *
  * @version $Id$
  */
 public class DeleteVersionsForm extends XWikiForm
 {
     /** from revision. */
-    private Version rev1;
+    private String rev1;
 
     /** to revision. */
-    private Version rev2;
+    private String rev2;
 
     /** single version. */
-    private Version rev;
+    private String rev;
 
     /** document language. */
     private String language;
@@ -49,48 +47,35 @@ public class DeleteVersionsForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        rev1 = getVersion(request.getParameter("rev1"));
-        rev2 = getVersion(request.getParameter("rev2"));
-        rev = getVersion(request.getParameter("rev"));
-        language = Util.normalizeLanguage(request.getParameter("language"));
-        confirm = request.getParameter("confirm") != null;
-    }
-
-    /**
-     * @return {@link Version}, or null if ver is incorrect
-     * @param ver string representation of {@link Version}
-     */
-    private Version getVersion(String ver)
-    {
-        try {
-            return new Version(ver);
-        } catch (Exception e) {
-            return null;
-        }
+        this.rev1 = request.getParameter("rev1");
+        this.rev2 = request.getParameter("rev2");
+        this.rev = request.getParameter("rev");
+        this.language = Util.normalizeLanguage(request.getParameter("language"));
+        this.confirm = request.getParameter("confirm") != null;
     }
 
     /**
      * @return from revision
      */
-    public Version getRev1()
+    public String getRev1()
     {
-        return rev1;
+        return this.rev1;
     }
 
     /**
      * @return to revision
      */
-    public Version getRev2()
+    public String getRev2()
     {
-        return rev2;
+        return this.rev2;
     }
 
     /**
      * @return single revision
      */
-    public Version getRev()
+    public String getRev()
     {
-        return rev;
+        return this.rev;
     }
 
     /**
@@ -98,7 +83,7 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     /**
@@ -106,6 +91,6 @@ public class DeleteVersionsForm extends XWikiForm
      */
     public boolean isConfirmed()
     {
-        return confirm;
+        return this.confirm;
     }
 }

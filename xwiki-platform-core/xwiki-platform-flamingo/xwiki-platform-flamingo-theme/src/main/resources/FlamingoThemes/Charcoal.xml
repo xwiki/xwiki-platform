@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>Charcoal</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1402406667000</creationDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1407339637000</date>
   <contentUpdateDate>1407339637000</contentUpdateDate>
   <version>1.1</version>
   <title>Charcoal</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>FlamingoThemes.Charcoal</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>614640f3-1c3d-4ff0-9834-b8f01cca31b9</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -776,10 +778,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </xwiki-page-content-bg>
     </class>
-    <name>FlamingoThemes.Charcoal</name>
-    <number>0</number>
-    <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>614640f3-1c3d-4ff0-9834-b8f01cca31b9</guid>
     <property>
       <body-bg>#F5F5F5</body-bg>
     </property>
@@ -956,5 +954,4 @@
       <xwiki-page-content-bg>#FFFFFF</xwiki-page-content-bg>
     </property>
   </object>
-  <content/>
 </xwikidoc>

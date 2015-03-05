@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * URL Factory which always prints the absolute (external) form of URLs.
- * 
+ *
  * @version $Id$
  * @since 2.6 RC2
  */
@@ -33,7 +33,7 @@ public class ExternalServletURLFactory extends XWikiServletURLFactory
 {
     /**
      * Old-school constructor using the XWikiContext to initialize the factory.
-     * 
+     *
      * @param context the current request context
      */
     public ExternalServletURLFactory(XWikiContext context)

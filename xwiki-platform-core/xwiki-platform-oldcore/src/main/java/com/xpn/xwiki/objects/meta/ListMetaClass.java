@@ -26,7 +26,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 
 /**
  * Defines the default meta properties for all list XClass property types.
- * 
+ *
  * @version $Id$
  */
 public class ListMetaClass extends PropertyMetaClass
@@ -106,7 +106,7 @@ public class ListMetaClass extends PropertyMetaClass
 
     /**
      * Creates a new boolean property that is displayed as a check box.
-     * 
+     *
      * @param checked whether the check box is checked or not by default
      * @return a new {@link BooleanClass} instance that is displayed as a check box
      */

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -50,6 +51,7 @@ import org.xwiki.rest.model.jaxb.Tags;
 @Component("org.xwiki.rest.internal.representations.tags.FormUrlEncodedTagsReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+@Singleton
 public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiRestComponent
 {
     private static final String TAGS_FIELD_NAME = "tags";

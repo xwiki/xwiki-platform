@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -41,6 +42,7 @@ import org.xwiki.rest.model.jaxb.Page;
 @Component("org.xwiki.rest.internal.representations.pages.TextPlainPageReader")
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
+@Singleton
 public class TextPlainPageReader extends TextPlainReader<Page>
 {
     @Override

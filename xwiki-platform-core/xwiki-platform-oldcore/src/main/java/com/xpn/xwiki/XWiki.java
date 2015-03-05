@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,7 +31,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormatSymbols;
@@ -53,6 +53,11 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -73,8 +78,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.net.smtp.SMTPClient;
-import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -94,15 +97,25 @@ import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.component.manager.NamespacedComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
+import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailResult;
+import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MailStatusResultSerializer;
+import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -119,14 +132,20 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.skin.Resource;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -155,7 +174,8 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.internal.template.TemplateManager;
+import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
+import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -198,6 +218,7 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
+@Serializable(false)
 public class XWiki implements EventListener
 {
     /** Name of the default wiki. */
@@ -212,11 +233,11 @@ public class XWiki implements EventListener
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
 
-    public static final String CKEY_SKIN = "skin";
+    public static final String CKEY_SKIN = InternalSkinManager.CKEY_SKIN;
 
-    public static final String CKEY_BASESKIN = "baseskin";
+    public static final String CKEY_BASESKIN = InternalSkinManager.CKEY_PARENTSKIN;
 
-    public static final String DEFAULT_SKIN = "flamingo";
+    public static final String DEFAULT_SKIN = InternalSkinConfiguration.DEFAULT_SKIN;
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
@@ -248,7 +269,7 @@ public class XWiki implements EventListener
 
     /**
      * Storage for deleted attachment.
-     * 
+     *
      * @since 1.4M1
      */
     private AttachmentRecycleBinStore attachmentRecycleBinStore;
@@ -322,6 +343,8 @@ public class XWiki implements EventListener
      */
     private static final String VERSION_FILE_PROPERTY = "version";
 
+    private static XWikiInitializerJob job;
+
     /** List of configured syntax ids. */
     private List<String> configuredSyntaxes;
 
@@ -361,9 +384,15 @@ public class XWiki implements EventListener
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
 
+    private InternalSkinManager internalSkinManager;
+
+    private TemplateManager templateManager;
+
+    private RenderingContext renderingContext;
+
     /**
      * Whether backlinks are enabled or not (cached for performance).
-     * 
+     *
      * @since 3.2M2
      */
     private Boolean hasBacklinks;
@@ -376,7 +405,9 @@ public class XWiki implements EventListener
 
     private ConfigurationSource spaceConfiguration;
 
-    private static XWikiInitializerJob job;
+    private ObservationManager observationManager;
+
+    private Provider<XWikiContext> xcontextProvider;
 
     private ConfigurationSource getConfiguration()
     {
@@ -412,6 +443,61 @@ public class XWiki implements EventListener
         }
 
         return this.userConfiguration;
+    }
+
+    private InternalSkinManager getInternalSkinManager()
+    {
+        if (this.internalSkinManager == null) {
+            this.internalSkinManager = Utils.getComponent(InternalSkinManager.class);
+        }
+
+        return this.internalSkinManager;
+    }
+
+    private TemplateManager getTemplateManager()
+    {
+        if (this.templateManager == null) {
+            this.templateManager = Utils.getComponent(TemplateManager.class);
+        }
+
+        return this.templateManager;
+    }
+
+    private RenderingContext getRenderingContext()
+    {
+        if (this.renderingContext == null) {
+            this.renderingContext = Utils.getComponent(RenderingContext.class);
+        }
+
+        return this.renderingContext;
+    }
+
+    private MutableRenderingContext getMutableRenderingContext()
+    {
+        if (this.renderingContext == null) {
+            this.renderingContext = Utils.getComponent(RenderingContext.class);
+        }
+
+        return this.renderingContext instanceof MutableRenderingContext
+            ? (MutableRenderingContext) this.renderingContext : null;
+    }
+
+    private ObservationManager getObservationManager()
+    {
+        if (this.observationManager == null) {
+            this.observationManager = Utils.getComponent((Type) ObservationManager.class);
+        }
+
+        return this.observationManager;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        if (this.xcontextProvider == null) {
+            this.xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+        }
+
+        return this.xcontextProvider.get();
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -471,7 +557,7 @@ public class XWiki implements EventListener
 
     /**
      * Return the XWiki object (as in "the Wiki API") corresponding to the requested wiki.
-     * 
+     *
      * @param context the current context
      * @return an XWiki object configured for the wiki corresponding to the current request
      * @throws XWikiException if the requested URL does not correspond to a real wiki, or if there's an error in the
@@ -486,7 +572,7 @@ public class XWiki implements EventListener
      * Return the XWiki object (as in "the Wiki API") corresponding to the requested wiki.
      * <p>
      * Unless <code>wait</code> is false the method return right away null if XWiki is not yet initialized.
-     * 
+     *
      * @param wait wait until XWiki is initialized
      * @param context the current context
      * @return an XWiki object configured for the wiki corresponding to the current request
@@ -700,7 +786,7 @@ public class XWiki implements EventListener
 
     /**
      * Initialize all xwiki subsystems.
-     * 
+     *
      * @deprecated since 6.1M2, use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
     @Deprecated
@@ -774,7 +860,7 @@ public class XWiki implements EventListener
 
             // Make sure these classes exists
             if (noupdate) {
-                initializeMandatoryClasses(context);
+                initializeMandatoryDocuments(context);
                 getStatsService(context);
             }
 
@@ -792,8 +878,7 @@ public class XWiki implements EventListener
             String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/1.0");
             this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
-            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-            observationManager.addListener(this);
+            getObservationManager().addListener(this);
         } finally {
             progress.popLevelProgress(this);
         }
@@ -803,7 +888,7 @@ public class XWiki implements EventListener
      * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create them if they don't
      * exist.
      */
-    private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
+    private void initializeMandatoryDocuments(XWikiContext context)
     {
         if (context.get("initdone") == null) {
             @SuppressWarnings("deprecation")
@@ -811,17 +896,39 @@ public class XWiki implements EventListener
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
 
             for (MandatoryDocumentInitializer initializer : initializers) {
-                DocumentReference documentReference =
-                    this.currentReferenceDocumentReferenceResolver.resolve(initializer.getDocumentReference());
+                initializeMandatoryDocument(initializer, context);
+            }
+        }
+    }
 
-                if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
-                    XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+    private void initializeMandatoryDocument(String wiki, MandatoryDocumentInitializer initializer, XWikiContext context)
+    {
+        String currentWiki = context.getWikiId();
 
-                    if (initializer.updateDocument(document)) {
-                        saveDocument(document, context);
-                    }
+        try {
+            context.setWikiId(wiki);
+
+            initializeMandatoryDocument(initializer, context);
+        } finally {
+            context.setWikiId(currentWiki);
+        }
+    }
+
+    private void initializeMandatoryDocument(MandatoryDocumentInitializer initializer, XWikiContext context)
+    {
+        try {
+            DocumentReference documentReference =
+                this.currentReferenceDocumentReferenceResolver.resolve(initializer.getDocumentReference());
+
+            if (documentReference.getWikiReference().getName().equals(context.getWikiId())) {
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+
+                if (initializer.updateDocument(document)) {
+                    saveDocument(document, context);
                 }
             }
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to initialize mandatory document", e);
         }
     }
 
@@ -882,7 +989,7 @@ public class XWiki implements EventListener
 
                     // Make sure these classes exists
                     if (initClasses) {
-                        initializeMandatoryClasses(context);
+                        initializeMandatoryDocuments(context);
                         getPluginManager().virtualInit(context);
                         getRenderingEngine().virtualInit(context);
                     }
@@ -948,7 +1055,7 @@ public class XWiki implements EventListener
 
     /**
      * Get the reference of the owner for the provider wiki.
-     * 
+     *
      * @param wikiName the technical name of the wiki
      * @param context the XWiki context
      * @return the wiki owner or null if none is set
@@ -1266,8 +1373,7 @@ public class XWiki implements EventListener
                 document.setOriginalDocument(originalDocument);
             }
 
-            @SuppressWarnings("deprecation")
-            ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
+            ObservationManager om = getObservationManager();
 
             // Notify listeners about the document about to be created or updated
 
@@ -1459,7 +1565,7 @@ public class XWiki implements EventListener
      * between different incarnations of a document name, and it does not require that the document still exists, it
      * returns all the attachments that at the time of their deletion had a document with the specified name as their
      * owner.
-     * 
+     *
      * @param docName the {@link XWikiDocument#getFullName() name} of the owner document
      * @param context the current request context
      * @return A list with all the deleted attachments which belonged to the specified document. If no such attachments
@@ -1481,7 +1587,7 @@ public class XWiki implements EventListener
      * instances in the trash. Note that this does not distinguish between different incarnations of a document name,
      * and it does not require that the document still exists, it returns all the attachments that at the time of their
      * deletion had a document with the specified name as their owner.
-     * 
+     *
      * @param docName the {@link DeletedAttachment#getDocName() name of the document} the attachment belonged to
      * @param filename the {@link DeletedAttachment#getFilename() name} of the attachment to search for
      * @param context the current request context
@@ -1502,7 +1608,7 @@ public class XWiki implements EventListener
 
     /**
      * Retrieve a specific attachment from the trash.
-     * 
+     *
      * @param id the unique identifier of the entry in the trash
      * @return specified attachment from the trash, {@code null} if not found
      * @throws XWikiException if an error occurs while loading the attachments
@@ -1619,44 +1725,67 @@ public class XWiki implements EventListener
 
     /**
      * Evaluate provided template content using velocity engine.
-     * 
+     *
      * @param template the template to evaluate
      * @param context the XWiki context
      * @return the return of the velocity script
      * @throws IOException failed to get the template content
      * @since 2.2.2
+     * @deprecated since 7.0M1, use {@link TemplateManager#render(String)} instead
      */
+    @Deprecated
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
+        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
+
+        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
         try {
-            return Utils.getComponent(TemplateManager.class).render(template);
+            // Force rendering with XHTML 1.0 syntax for retro-compatibility
+            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+
+            return getTemplateManager().render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
             Object[] args = {template};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template {0}",
-                    e, args);
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
+                    "Error while evaluating velocity template {0}", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
+        } finally {
+            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
-    public String parseTemplate(String template, String skin, XWikiContext context)
+    /**
+     * @deprecated since 7.0M1, use {@link TemplateManager#renderFromSkin(String, Skin)} instead
+     */
+    @Deprecated
+    public String parseTemplate(String template, String skinId, XWikiContext context)
     {
-        try {
-            return Utils.getComponent(TemplateManager.class).renderFromSkin(template, skin);
-        } catch (Exception e) {
-            LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
+        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
 
-            Object[] args = {template, skin};
+        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
+        try {
+            // Force rendering with XHTML 1.0 syntax for retro-compatibility
+            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
+
+            Skin skin = getInternalSkinManager().getSkin(skinId);
+            return getTemplateManager().renderFromSkin(template, skin);
+        } catch (Exception e) {
+            LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skinId, e);
+
+            Object[] args = {template, skinId};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template [{0}] from skin [{1}]",
-                    e, args);
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
+                    "Error while evaluating velocity template [{0}] from skin [{1}]", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
+        } finally {
+            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
@@ -1685,7 +1814,7 @@ public class XWiki implements EventListener
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates; works by creating a
      * RequestDispatcher, buffering the output, then returning it as a string.
-     * 
+     *
      * @author LBlaze
      */
     public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
@@ -1727,19 +1856,27 @@ public class XWiki implements EventListener
 
         try {
             // Try in the specified skin
-            String skin = getSkin(context);
-            String result = getSkinFile(filename, skin, forceSkinAction, context);
-            if (result != null) {
-                return result;
+            Skin skin = getInternalSkinManager().getCurrentSkin(true);
+            if (skin != null) {
+                Resource<?> resource = skin.getResource(filename);
+                if (resource != null) {
+                    return resource.getURL(forceSkinAction);
+                }
+            } else {
+                // Try in the current parent skin
+                Skin parentSkin = getInternalSkinManager().getCurrentParentSkin(true);
+                if (parentSkin != null) {
+                    Resource<?> resource = parentSkin.getResource(filename);
+                    if (resource != null) {
+                        return resource.getURL(forceSkinAction);
+                    }
+                }
             }
 
-            // Try in the parent skin
-            String baseskin = getBaseSkin(context);
-            if (StringUtils.isNotEmpty(baseskin) && !skin.equals(baseskin)) {
-                result = getSkinFile(filename, baseskin, forceSkinAction, context);
-                if (result != null) {
-                    return result;
-                }
+            // Look for a resource file
+            if (resourceExists("/resources/" + filename)) {
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                return urlf.getURL(url, context);
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
@@ -1762,124 +1899,48 @@ public class XWiki implements EventListener
         return getSkinFile(filename, skin, false, context);
     }
 
-    public String getSkinFile(String filename, String skin, boolean forceSkinAction, XWikiContext context)
+    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
     {
-        XWikiURLFactory urlf = context.getURLFactory();
         try {
-            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
-            XWikiDocument doc = getDocument(skinReference, context);
-            if (!doc.isNew()) {
-                // Look for an object property
-                BaseObject object =
-                    doc.getXObject(new DocumentReference(doc.getDocumentReference().getWikiReference().getName(),
-                        SYSTEM_SPACE, "XWikiSkins"));
-                if (object != null) {
-                    String content = object.getStringValue(filename);
-                    if (StringUtils.isNotBlank(content)) {
-                        URL url =
-                            urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc.getDatabase(), context);
-                        return urlf.getURL(url, context);
-                    }
-                }
+            Skin skin = getInternalSkinManager().getSkin(skinId);
 
-                // Look for an attachment
-                String shortName = StringUtils.replaceChars(filename, '/', '.');
-                XWikiAttachment attachment = doc.getAttachment(shortName);
-                if (attachment != null) {
-                    return doc.getAttachmentURL(shortName, "skin", context);
-                }
-            }
+            Resource<?> resource = skin.getLocalResource(filename);
 
-            // Look for a skin file
-            if (resourceExists("/skins/" + skin + "/" + filename)) {
-                URL url;
-
-                if (forceSkinAction) {
-                    url = urlf.createSkinURL(filename, "skins", skin, context);
-                } else {
-                    url = urlf.createSkinURL(filename, skin, context);
-                }
-                return urlf.getURL(url, context);
+            if (resource != null) {
+                return resource.getURL(forceSkinAction);
             }
 
             // Look for a resource file
             if (resourceExists("/resources/" + filename)) {
-                URL url;
-                url = urlf.createResourceURL(filename, forceSkinAction, context);
+                XWikiURLFactory urlf = context.getURLFactory();
+
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
                 return urlf.getURL(url, context);
             }
-
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [" + filename + "] from skin [" + skin + "]", e);
+                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", filename, skinId, e);
             }
         }
 
         return null;
     }
 
+    /**
+     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} instead
+     */
+    @Deprecated
     public String getSkin(XWikiContext context)
     {
-        String skin = "";
+        String skin;
+
         try {
-            // Try to get it from context
-            skin = (String) context.get(CKEY_SKIN);
-            if (skin != null) {
-                return skin;
-            }
-
-            // Try to get it from URL
-            if (context.getRequest() != null) {
-                skin = context.getRequest().getParameter("skin");
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Requested skin in the URL: [{}]", skin);
-                    }
-                }
-            }
-
-            if (StringUtils.isEmpty(skin)) {
-                skin = getUserPreference("skin", context);
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured skin in user preferences: [{}]", skin);
-                    }
-                }
-            }
-            if (StringUtils.isEmpty(skin)) {
-                skin = getConfiguration().getProperty("xwiki.defaultskin");
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured default skin in preferences: [{}]", skin);
-                    }
-                }
-            }
-            if (StringUtils.isEmpty(skin)) {
-                skin = getDefaultBaseSkin(context);
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured default base skin in preferences: [{}]", skin);
-                    }
-                }
-            }
+            skin = getInternalSkinManager().getCurrentSkinId(true);
         } catch (Exception e) {
             LOGGER.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
         }
 
-        try {
-            if (skin.indexOf('.') != -1) {
-                if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
-                    LOGGER.debug("Cannot access configured skin due to access rights, using the default skin.");
-                    skin = getConfiguration().getProperty("xwiki.defaultskin", getDefaultBaseSkin(context));
-                }
-            }
-        } catch (XWikiException e) {
-            // if it fails here, let's just ignore it
-            LOGGER.debug("Exception while determining current skin", e);
-        }
-
-        context.put(CKEY_SKIN, skin);
         return skin;
     }
 
@@ -1918,80 +1979,56 @@ public class XWiki implements EventListener
         return default_value;
     }
 
+    /**
+     * @deprecated since 7.0M1, use {@link SkinManager#getDefaultParentSkin()} instead
+     */
+    @Deprecated
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        // We do not pass a default value, because we want to know if the property is set to an empty value (and so it
-        // would be intended) or if it is not set at all
-        String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin");
-        if (defaultbaseskin == null) {
-            // if the property is not set, we fallback to the default skin
-            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", DEFAULT_SKIN);
-        }
-        return defaultbaseskin;
+        return getInternalSkinManager().getDefaultParentSkinId();
     }
 
+    /**
+     * @deprecated since 7.0M1
+     */
+    @Deprecated
     public String getBaseSkin(XWikiContext context)
     {
         return getBaseSkin(context, false);
     }
 
+    /**
+     * @deprecated since 7.0M1
+     */
+    @Deprecated
     public String getBaseSkin(XWikiContext context, boolean fromRenderSkin)
     {
         String baseskin = "";
         try {
-            // Try to get it from context
-            baseskin = (String) context.get(CKEY_BASESKIN);
-            if (baseskin != null) {
-                return baseskin;
-            } else {
-                baseskin = "";
-            }
-
-            // Let's get the base skin doc itself
-            if (fromRenderSkin) {
-                baseskin = context.getDoc().getStringValue("XWiki.XWikiSkins", "baseskin");
-            }
-
-            if (baseskin.equals("")) {
-                // Let's get the base skin from the skin itself
-                String skin = getSkin(context);
-                baseskin = getBaseSkin(skin, context);
-            }
-
-            if (baseskin.equals("")) {
-                baseskin = getDefaultBaseSkin(context);
-            }
+            return getInternalSkinManager().getCurrentParentSkinId(false);
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
 
             LOGGER.debug("Exception while determining base skin", e);
         }
 
-        context.put(CKEY_BASESKIN, baseskin);
-
         return baseskin;
     }
 
     /**
-     * @param skin the full name of the skin document for which to return the base skin. For example :
-     *            <tt>XWiki.DefaultSkin</tt>
+     * @param skin the name of the skin for which to return the base skin. For example : <tt>XWiki.DefaultSkin</tt>
      * @param context the XWiki context
      * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2
      * @since 2.1M1
+     * @deprecated since 7.0M1, use {@link SkinManager#getCurrentSkin(boolean)} and {@link Skin#getParent()} instead
      */
+    @Deprecated
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
-        if (context.getWiki().exists(skinReference, context)) {
-            try {
-                return getDocument(skinReference, context).getStringValue("XWiki.XWikiSkins", "baseskin");
-            } catch (XWikiException e) {
-                // Do nothing and let return the empty string.
-            }
-        }
+        String baseSkin = getInternalSkinManager().getParentSkin(skin);
 
-        return "";
+        return baseSkin != null ? baseSkin : "";
     }
 
     public String getSpaceCopyright(XWikiContext context)
@@ -2009,7 +2046,7 @@ public class XWiki implements EventListener
      * Obtain a preference value for the wiki, looking up first in the XWiki.XWikiPreferences document, then fallbacking
      * on a config parameter when the first lookup gives an empty string, then returning the default value if the config
      * parameter returned itself an empty string.
-     * 
+     *
      * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
      *            document of the wiki.
      * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
@@ -2114,7 +2151,7 @@ public class XWiki implements EventListener
      * the language passed in the request. If none was passed try to get it from a cookie. If no language cookie exists
      * then use the user default language and barring that use the browser's "Accept-Language" header sent in HTTP
      * request. If none is defined use the default language.
-     * 
+     *
      * @return the language to use
      */
     public String getLanguagePreference(XWikiContext context)
@@ -2229,7 +2266,7 @@ public class XWiki implements EventListener
      * Construct a list of language codes (ISO 639-1) from the Accept-Languages header. This method filters out some
      * bugs in different browsers or containers, like returning '*' as a language (Jetty) or using '_' as a
      * language--country delimiter (some versions of Opera).
-     * 
+     *
      * @param request The client request.
      * @return A list of language codes, in the client preference order; might be empty if the header is not well
      *         formed.
@@ -2260,7 +2297,7 @@ public class XWiki implements EventListener
 
     /**
      * The default locale in the preferences.
-     * 
+     *
      * @param xcontext the XWiki context.
      * @return the default locale
      * @since 5.1M2
@@ -2288,7 +2325,7 @@ public class XWiki implements EventListener
 
     /**
      * Get the available locales according to the preferences.
-     * 
+     *
      * @param xcontext the XWiki context
      * @return all the available locales
      * @since 5.1M2
@@ -2679,7 +2716,7 @@ public class XWiki implements EventListener
     /**
      * Verify if the provided xclass page exists and that it contains all the required configuration properties to make
      * the tag feature work properly. If some properties are missing they are created and saved in the database.
-     * 
+     *
      * @param context the XWiki Context
      * @param classReference the reference of the document containing the class
      * @return the Base Class object containing the properties
@@ -2706,7 +2743,7 @@ public class XWiki implements EventListener
      * Verify if the <code>XWiki.TagClass</code> page exists and that it contains all the required configuration
      * properties to make the tag feature work properly. If some properties are missing they are created and saved in
      * the database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the TagClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2722,7 +2759,7 @@ public class XWiki implements EventListener
      * the database. SheetClass is used to a page as a sheet. When a page is tagged as a sheet and that page is included
      * in another page using the include macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0
      * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm).
-     * 
+     *
      * @param context the XWiki Context
      * @return the SheetClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the database
@@ -2743,7 +2780,7 @@ public class XWiki implements EventListener
      * macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0 only - for XWiki Syntax 1.0
      * automatic inline edition is triggered using #includeForm). It replaces and enhances the SheetClass mechanism (see
      * {@link #getSheetClass(XWikiContext)}).
-     * 
+     *
      * @param context the XWiki Context
      * @return the EditModeClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the database
@@ -2759,7 +2796,7 @@ public class XWiki implements EventListener
      * Verify if the <code>XWiki.XWikiUsers</code> page exists and that it contains all the required configuration
      * properties to make the user feature work properly. If some properties are missing they are created and saved in
      * the database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the XWikiUsers Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2773,7 +2810,7 @@ public class XWiki implements EventListener
      * Verify if the <code>XWiki.GlobalRedirect</code> page exists and that it contains all the required configuration
      * properties to make the redirection feature work properly. If some properties are missing they are created and
      * saved in the database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the GlobalRedirect Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2787,7 +2824,7 @@ public class XWiki implements EventListener
      * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required configuration
      * properties to make XWiki work properly. If some properties are missing they are created and saved in the
      * database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2886,7 +2923,7 @@ public class XWiki implements EventListener
             String content;
             Syntax syntax;
             if (!getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-                content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
+                content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
                 syntax = Syntax.XWIKI_2_0;
             } else {
                 content = "#includeForm(\"XWiki.XWikiUserSheet\")";
@@ -2966,7 +3003,7 @@ public class XWiki implements EventListener
     /**
      * Method allows to create an empty user with no password (he won't be able to login) This method is usefull for
      * authentication like LDAP or App Server trusted
-     * 
+     *
      * @param xwikiname
      * @param userRights
      * @param context
@@ -3001,11 +3038,12 @@ public class XWiki implements EventListener
     public void sendValidationEmail(String xwikiname, String password, String email, String addfieldname,
         String addfieldvalue, String contentfield, XWikiContext context) throws XWikiException
     {
+        MailSenderConfiguration configuration = Utils.getComponent(MailSenderConfiguration.class);
+
         String sender;
         String content;
-
         try {
-            sender = getXWikiPreference("admin_email", context);
+            sender = configuration.getFromAddress();
             if (StringUtils.isBlank(sender)) {
                 String server = context.getRequest().getServerName();
                 if (server.matches("\\[.*\\]|(\\d{1,3}+\\.){3}+\\d{1,3}+")) {
@@ -3038,148 +3076,28 @@ public class XWiki implements EventListener
         }
 
         // Let's now send the message
-        sendMessage(sender, email, content, context);
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    public void sendMessage(String sender, String[] recipients, String rawMessage, XWikiContext context)
-        throws XWikiException
-    {
-        LOGGER.trace("Entering sendMessage()");
-
-        // We'll be using the MailSender plugin, which has much more advanced capabilities (authentication, TLS).
-        // Since the plugin is in another module, and it depends on the core, we have to use it through reflection in
-        // order to avoid cyclic dependencies. This should be fixed once the mailsender becomes a clean component
-        // instead of a plugin.
-        Object mailSender;
-        Class mailSenderClass;
-        Method mailSenderSendRaw;
-
         try {
-            mailSender = getPluginApi("mailsender", context);
-            mailSenderClass = Class.forName("com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi");
-
-            // public int sendRawMessage(String from, String to, String rawMessage)
-            mailSenderSendRaw =
-                mailSenderClass.getMethod("sendRawMessage", new Class[] {String.class, String.class, String.class});
-        } catch (Exception e) {
-            LOGGER.error("Problem getting MailSender via Reflection. Using the old sendMessage mechanism.", e);
-            sendMessageOld(sender, recipients, rawMessage, context);
-            return;
-        }
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Sending message = \"" + rawMessage + "\"");
-        }
-
-        String messageRecipients = StringUtils.join(recipients, ',');
-
-        try {
-            mailSenderSendRaw.invoke(mailSender, sender, messageRecipients, rawMessage);
-        } catch (InvocationTargetException ite) {
-            Throwable cause = ite.getCause();
-            if (cause instanceof XWikiException) {
-                throw (XWikiException) cause;
-            } else {
-                throw new RuntimeException(cause);
+            Session session =
+                Session.getInstance(configuration.getAllProperties(), new XWikiAuthenticator(configuration));
+            InputStream is = new ByteArrayInputStream(content.getBytes());
+            MimeMessage message = new MimeMessage(session, is);
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(Message.RecipientType.TO, email);
+            message.setHeader("X-MailType", "Account Validation");
+            MailSender mailSender = Utils.getComponent(MailSender.class);
+            MailListener mailListener = Utils.getComponent(MailListener.class, "database");
+            MailResult mailResult = mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
+            mailResult.waitTillProcessed(Long.MAX_VALUE);
+            String errorMessage = MailStatusResultSerializer.serializeErrors(mailListener.getMailStatusResult());
+            if (errorMessage != null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                    XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, String.format(
+                        "Error while sending the validation email. %s", errorMessage));
             }
         } catch (Exception e) {
-            // Probably either IllegalAccessException or IllegalArgumentException
-            // Shouldn't happen unless there were an incompatible code change
-            throw new RuntimeException(e);
-        }
-
-        LOGGER.info("Exiting sendMessage(). It seems everything went ok.");
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    private void sendMessageOld(String sender, String[] recipient, String message, XWikiContext context)
-        throws XWikiException
-    {
-        SMTPClient smtpc = null;
-        try {
-            String server = getXWikiPreference("smtp_server", context);
-            String port = getXWikiPreference("smtp_port", context);
-            String login = getXWikiPreference("smtp_login", context);
-
-            if (context.get("debugMail") != null) {
-                StringBuffer msg = new StringBuffer(message);
-                msg.append("\n Recipient: ");
-                msg.append(recipient);
-                recipient = ((String) context.get("debugMail")).split(",");
-                message = msg.toString();
-            }
-
-            if ((server == null) || server.equals("")) {
-                server = "127.0.0.1";
-            }
-            if ((port == null) || (port.equals(""))) {
-                port = "25";
-            }
-            if ((login == null) || login.equals("")) {
-                login = InetAddress.getLocalHost().getHostName();
-            }
-
-            smtpc = new SMTPClient();
-            smtpc.connect(server, Integer.parseInt(port));
-            int reply = smtpc.getReplyCode();
-            if (!SMTPReply.isPositiveCompletion(reply)) {
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
-                    "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-            if (smtpc.login(login) == false) {
-                reply = smtpc.getReplyCode();
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
-                    "Could not login to mail server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-            if (smtpc.sendSimpleMessage(sender, recipient, message) == false) {
-                reply = smtpc.getReplyCode();
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
-                    "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-        } catch (IOException e) {
-            Object[] args = {sender, recipient};
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Exception while sending email from {0} to {1}",
-                e, args);
-        } finally {
-            if ((smtpc != null) && (smtpc.isConnected())) {
-                try {
-                    smtpc.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Error while sending the validation email", e);
         }
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    public void sendMessage(String sender, String recipient, String message, XWikiContext context)
-        throws XWikiException
-    {
-        String[] recip = recipient.split(",");
-        sendMessage(sender, recip, message, context);
     }
 
     public String generateRandomString(int size)
@@ -3194,7 +3112,7 @@ public class XWiki implements EventListener
 
     /**
      * Create a new user.
-     * 
+     *
      * @param userName the name of the user (without the space)
      * @param map extra datas to add to user profile object
      * @param context the XWiki context
@@ -3211,7 +3129,7 @@ public class XWiki implements EventListener
 
     /**
      * Create a new user.
-     * 
+     *
      * @param userName the name of the user (without the space)
      * @param map extra datas to add to user profile object
      * @param userRights the right of the user on his own profile page
@@ -3230,7 +3148,7 @@ public class XWiki implements EventListener
         String content;
         Syntax syntax;
         if (!context.getWiki().getDefaultDocumentSyntax().equals(Syntax.XWIKI_1_0.toIdString())) {
-            content = "{{include document=\"XWiki.XWikiUserSheet\"/}}";
+            content = "{{include reference=\"XWiki.XWikiUserSheet\"/}}";
             syntax = Syntax.XWIKI_2_0;
         } else {
             content = "#includeForm(\"XWiki.XWikiUserSheet\")";
@@ -3270,7 +3188,7 @@ public class XWiki implements EventListener
 
     /**
      * Create a new user.
-     * 
+     *
      * @param userName the name of the user (without the space)
      * @param map extra datas to add to user profile object
      * @param parentReference the parent of the user profile
@@ -3408,7 +3326,7 @@ public class XWiki implements EventListener
      * Prepares the localized resources, according to the selected language. From any point in the code (java, velocity
      * or groovy) the "msg" parameter holds an instance of the localized resource bundle, and the "locale" parameter
      * holds the current locale settings.
-     * 
+     *
      * @param context The request context.
      */
     public void prepareResources(XWikiContext context)
@@ -3603,7 +3521,7 @@ public class XWiki implements EventListener
     /**
      * Render content from the passed included document, setting the correct security doc (sdoc) and including doc
      * (idoc).
-     * 
+     *
      * @since 2.2M2
      */
     private String getRenderedContent(XWikiDocument includedDoc, XWikiDocument includingDoc, XWikiContext context)
@@ -3649,8 +3567,7 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            @SuppressWarnings("deprecation")
-            ObservationManager om = Utils.getComponent(ObservationManager.class);
+            ObservationManager om = getObservationManager();
 
             // Inform notification mechanisms that a document is about to be deleted
             // Note that for the moment the event being send is a bridge event, as we are still passing around
@@ -4039,7 +3956,7 @@ public class XWiki implements EventListener
      * Copy an entire wiki to a target wiki.
      * <p>
      * It does not override document already existing in target wiki.
-     * 
+     *
      * @param sourceWiki the source wiki identifier
      * @param targetWiki the target wiki identifier
      * @param language the language to copy
@@ -4057,7 +3974,7 @@ public class XWiki implements EventListener
 
     /**
      * Copy an entire wiki to a target wiki.
-     * 
+     *
      * @param sourceWiki the source wiki identifier
      * @param targetWiki the target wiki identifier
      * @param language the language to copy
@@ -4384,7 +4301,7 @@ public class XWiki implements EventListener
      * requested URI and returns the remainder. This method is needed because special characters in the path can be
      * URL-encoded, depending on whether the request is forwarded through the request dispatcher or not, and also
      * depending on the client (some browsers encode -, while some don't).
-     * 
+     *
      * @param path the path, as taken from the requested URI
      * @param segment the segment to remove, as reported by the container
      * @return the path with the specified segment trimmed from its start
@@ -4866,30 +4783,58 @@ public class XWiki implements EventListener
         if (StringUtils.isBlank(user)) {
             return context.getMessageTool().get("core.users.unknownUser");
         }
+
+        DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
+
+        return getUserName(userReference, format, link, true, context);
+    }
+
+    /**
+     * Generate a display user name and return it.
+     *
+     * @param userReference
+     * @param format a Velocity scnippet used to format the user name
+     * @param link true if a full html link snippet should be returned
+     * @param escapeXML true if the returned name should be escaped (forced true if <code>link</link> is true)
+     * @param context the XWiki context
+     * @return the display user name or a html snippet with the link to the passed user
+     * @since 6.4RC1
+     */
+    public String getUserName(DocumentReference userReference, String format, boolean link, boolean escapeXML,
+        XWikiContext context)
+    {
+        if (userReference == null) {
+            return context.getMessageTool().get("core.users.unknownUser");
+        }
+
         XWikiDocument userdoc = null;
         try {
-            DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
             userdoc = getDocument(userReference, context);
             if (userdoc == null) {
-                return XMLUtils.escape(user);
+                return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
             }
 
             BaseObject userobj = userdoc.getObject("XWiki.XWikiUsers");
             if (userobj == null) {
-                return XMLUtils.escape(userdoc.getDocumentReference().getName());
+                return escapeXML ? XMLUtils.escape(userdoc.getDocumentReference().getName()) : userdoc
+                    .getDocumentReference().getName();
             }
 
-            Set<String> proplist = userobj.getPropertyList();
             String text;
 
             if (format == null) {
-                text = userobj.getStringValue("first_name") + " " + userobj.getStringValue("last_name");
+                text = userobj.getStringValue("first_name");
+                String lastName = userobj.getStringValue("last_name");
+                if (!text.isEmpty() && !lastName.isEmpty()) {
+                    text += ' ';
+                }
+                text += userobj.getStringValue("last_name");
                 if (StringUtils.isBlank(text)) {
                     text = userdoc.getDocumentReference().getName();
                 }
             } else {
                 VelocityContext vcontext = new VelocityContext();
-                for (String propname : proplist) {
+                for (String propname : userobj.getPropertyList()) {
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text =
@@ -4897,7 +4842,9 @@ public class XWiki implements EventListener
                         + context.getDoc().getDocumentReference() + ">", vcontext, context);
             }
 
-            text = XMLUtils.escape(text.trim());
+            if (escapeXML || link) {
+                text = XMLUtils.escape(text.trim());
+            }
 
             if (link) {
                 text =
@@ -4908,12 +4855,21 @@ public class XWiki implements EventListener
         } catch (Exception e) {
             LOGGER.error("Failed to get user profile page", e);
 
-            if (userdoc != null) {
-                return userdoc.getDocumentReference().getName();
-            }
-
-            return user;
+            return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
         }
+    }
+
+    /**
+     * Generate and return an unescaped user display name.
+     *
+     * @param userReference the user reference
+     * @param context the XWiki context
+     * @return the unescaped display user name
+     * @since 6.4RC1
+     */
+    public String getPlainUserName(DocumentReference userReference, XWikiContext context)
+    {
+        return getUserName(userReference, null, false, false, context);
     }
 
     public boolean hasCentralizedAuthentication(XWikiContext context)
@@ -5248,7 +5204,7 @@ public class XWiki implements EventListener
 
     /**
      * API to list all non-hidden spaces in the current wiki.
-     * 
+     *
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
@@ -5265,7 +5221,7 @@ public class XWiki implements EventListener
 
     /**
      * API to list all non-hidden documents in a space.
-     * 
+     *
      * @param spaceName the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
@@ -5307,7 +5263,7 @@ public class XWiki implements EventListener
 
     /**
      * accessor for the isReadOnly instance var.
-     * 
+     *
      * @see #isReadOnly
      */
     public boolean isReadOnly()
@@ -5520,7 +5476,7 @@ public class XWiki implements EventListener
     /**
      * Indicates whether deleted attachments are stored in a recycle bin or not. This can be configured using the key
      * <var>storage.attachment.recyclebin</var>.
-     * 
+     *
      * @param context The current {@link XWikiContext context}, maybe will be useful.
      */
     public boolean hasAttachmentRecycleBin(XWikiContext context)
@@ -5601,7 +5557,7 @@ public class XWiki implements EventListener
     /**
      * Privileged API to retrieve an object instantiated from groovy code in a String. Note that Groovy scripts
      * compilation is cached.
-     * 
+     *
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException
@@ -5619,7 +5575,7 @@ public class XWiki implements EventListener
     /**
      * Privileged API to retrieve an object instantiated from groovy code in a String, using a classloader including all
      * JAR files located in the passed page as attachments. Note that Groovy scripts compilation is cached
-     * 
+     *
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException
@@ -5726,11 +5682,6 @@ public class XWiki implements EventListener
     public long getSectionEditingDepth()
     {
         return getConfiguration().getProperty("xwiki.section.depth", 2L);
-    }
-
-    public boolean hasCaptcha(XWikiContext context)
-    {
-        return (getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
     }
 
     public String getWysiwygToolbars(XWikiContext context)
@@ -5875,7 +5826,7 @@ public class XWiki implements EventListener
 
     public String addTooltip(String html, String message, String params, XWikiContext context)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
         buffer.append(params);
         buffer.append("; return escape('");
@@ -5889,7 +5840,7 @@ public class XWiki implements EventListener
 
     public String addTooltipJS(XWikiContext context)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("<script type=\"text/javascript\" src=\"");
         buffer.append(getSkinFile("ajax/wzToolTip.js", context));
         buffer.append("\"></script>");
@@ -5948,7 +5899,7 @@ public class XWiki implements EventListener
 
     /**
      * Restore a document with passed index from recycle bin.
-     * 
+     *
      * @param doc the document to restore
      * @param comment the comment to use when saving the document
      * @param context the XWiki context
@@ -5967,7 +5918,7 @@ public class XWiki implements EventListener
 
     /**
      * Restore a document with passed index from recycle bin.
-     * 
+     *
      * @param doc the document to restore
      * @param index the index of the document in the recycle bin
      * @param comment the comment to use when saving the document
@@ -6198,7 +6149,7 @@ public class XWiki implements EventListener
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
      * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
-     * 
+     *
      * @param defaultSyntaxId the default value to return if no document can be found
      * @return the syntax identifier
      */
@@ -6223,7 +6174,7 @@ public class XWiki implements EventListener
      * If the current document can't be found, the method assume that the executed document is the context document
      * (it's generally the case when a document is directly rendered with
      * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
-     * 
+     *
      * @return the syntax identifier
      */
     public String getCurrentContentSyntaxId(XWikiContext context)
@@ -6266,23 +6217,62 @@ public class XWiki implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof WikiDeletedEvent) {
-            getVirtualWikiList().remove(((WikiDeletedEvent) event).getWikiId());
-            return;
+            // A wiki has been deleted
+            onWikiDeletedEvent((WikiDeletedEvent) event);
+        } else if (event instanceof ComponentDescriptorAddedEvent) {
+            // A new mandatory document initializer has been installed
+            onMandatoryDocumentInitializerAdded((ComponentDescriptorAddedEvent) event, (ComponentManager) source);
+        } else {
+            // Document modifications
+
+            XWikiDocument doc = (XWikiDocument) source;
+            XWikiContext context = (XWikiContext) data;
+
+            if (event instanceof XObjectPropertyEvent) {
+                EntityReference reference = ((XObjectPropertyEvent) event).getReference();
+                String modifiedProperty = reference.getName();
+                if ("backlinks".equals(modifiedProperty)) {
+                    this.hasBacklinks =
+                        doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
+                            getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+                }
+            } else if (event instanceof XObjectEvent) {
+                onServerObjectEvent(event, doc, context);
+            }
+        }
+    }
+
+    private void onWikiDeletedEvent(WikiDeletedEvent event)
+    {
+        getVirtualWikiList().remove(event.getWikiId());
+    }
+
+    private void onMandatoryDocumentInitializerAdded(ComponentDescriptorAddedEvent event,
+        ComponentManager componentManager)
+    {
+        String namespace;
+        if (componentManager instanceof NamespacedComponentManager) {
+            namespace = ((NamespacedComponentManager) componentManager).getNamespace();
+        } else {
+            namespace = null;
         }
 
-        XWikiDocument doc = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
+        MandatoryDocumentInitializer initializer;
+        try {
+            initializer = componentManager.getInstance(MandatoryDocumentInitializer.class, event.getRoleHint());
 
-        if (event instanceof XObjectPropertyEvent) {
-            EntityReference reference = ((XObjectPropertyEvent) event).getReference();
-            String modifiedProperty = reference.getName();
-            if ("backlinks".equals(modifiedProperty)) {
-                this.hasBacklinks =
-                    doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
-                        getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
+            XWikiContext context = getXWikiContext();
+            if (namespace == null) {
+                // Initialize in already initialized wikis (will be initialized in others when they are initialized)
+                for (String wiki : this.virtualWikiList) {
+                    initializeMandatoryDocument(wiki, initializer, context);
+                }
+            } else if (namespace.startsWith("wiki:")) {
+                // Initialize in the wiki where the extension is installed
+                initializeMandatoryDocument(namespace.substring("wiki:".length()), initializer, context);
             }
-        } else if (event instanceof XObjectEvent) {
-            onServerObjectEvent(event, doc, context);
+        } catch (ComponentLookupException e) {
+            LOGGER.error("Failed to lookup mandatory document initializer", e);
         }
     }
 
@@ -6315,6 +6305,7 @@ public class XWiki implements EventListener
             add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
             add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
             add(new WikiDeletedEvent());
+            add(new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
         }
     };
 
@@ -6332,7 +6323,7 @@ public class XWiki implements EventListener
 
     /**
      * Return the document reference to the wiki preferences.
-     * 
+     *
      * @param context The current xwiki context.
      * @since 4.3M2
      */
@@ -6351,7 +6342,7 @@ public class XWiki implements EventListener
     /**
      * Search attachments by passing HQL where clause values as parameters. You can specify properties of the "attach"
      * (the attachment) or "doc" (the document it is attached to)
-     * 
+     *
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
      * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
@@ -6412,7 +6403,7 @@ public class XWiki implements EventListener
 
     /**
      * Count attachments returned by a given parameterized query
-     * 
+     *
      * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @param context the underlying context used for running the database query

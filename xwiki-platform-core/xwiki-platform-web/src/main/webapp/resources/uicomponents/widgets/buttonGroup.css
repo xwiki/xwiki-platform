@@ -60,11 +60,13 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   /* Hidden by default. */
   display: none;
+  float: none;
   left: 0;
   margin: 2px 0 0;
   min-width: 160px;
   padding: 5px 0;
   position: absolute;
+  top: auto;
   z-index: 200;
 }
 
@@ -84,6 +86,7 @@
   background-image: none;
   border: 0 none transparent;
   border-radius: 0;
+  box-shadow: none;
   color: $theme.textColor;
   display: block;
   /* Reset the IE filter. */

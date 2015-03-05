@@ -19,30 +19,32 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
-import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.internal.thread.MailQueueManager;
+import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
+import org.xwiki.mail.internal.thread.MailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueItem;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 
 /**
- * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
- * asynchronously.
+ * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails asynchronously.
  *
  * @version $Id$
  * @since 6.1M2
@@ -51,108 +53,96 @@ import org.xwiki.mail.MailSenderConfiguration;
 @Singleton
 public class DefaultMailSender implements MailSender, Initializable
 {
-    @Inject
-    private MailSenderThread mailSenderThread;
+    private static final String SESSION_BATCHID_KEY = "xwiki.batchId";
 
     @Inject
-    private MailSenderConfiguration configuration;
+    private ComponentManager componentManager;
 
     @Inject
-    private Logger logger;
+    private ModelContext modelContext;
 
-    /**
-     * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
-     * mail asynchronously.
-     */
-    private Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
+    @Inject
+    @Named("prepare")
+    private MailRunnable prepareMailRunnable;
+
+    @Inject
+    @Named("send")
+    private MailRunnable sendMailRunnable;
+
+    @Inject
+    private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
+
+    @Inject
+    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
+
+    private Thread prepareMailThread;
+
+    private Thread sendMailThread;
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.mailSenderThread.setName("Mail Sender Thread");
-        this.mailSenderThread.startProcessing(getMailQueue());
+        // Step 1: Start the Mail Prepare Thread
+        this.prepareMailThread = new Thread(this.prepareMailRunnable);
+        this.prepareMailThread.setName("Mail Prepare Thread");
+        this.prepareMailThread.start();
+
+        // Step 2: Start the Mail Sender Thread
+        this.sendMailThread = new Thread(this.sendMailRunnable);
+        this.sendMailThread.setName("Mail Sender Thread");
+        this.sendMailThread.start();
     }
 
     @Override
-    public void send(MimeMessage message, Session session) throws MessagingException
+    public MailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, Session session,
+        MailListener listener)
     {
-        DefaultMailResultListener listener = new DefaultMailResultListener();
-        sendAsynchronously(message, session, listener);
-        waitTillSent(Long.MAX_VALUE);
-        BlockingQueue<Exception> errorQueue = listener.getExceptionQueue();
-        if (!errorQueue.isEmpty()) {
-            throw new MessagingException(String.format("Failed to send mail message [%s]", message), errorQueue.peek());
+        // If the session has specified a batch id, then use it! This can be used for example when resending email.
+        String batchId = session.getProperty(SESSION_BATCHID_KEY);
+        if (batchId == null) {
+            batchId = UUID.randomUUID().toString();
         }
-    }
 
-    @Override
-    public void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener)
-    {
-        try {
-            // Perform some basic verification to avoid NPEs in JavaMail
-            if (message.getFrom() == null) {
-                // Try using the From address in the Session
-                String from = this.configuration.getFromAddress();
-                if (from != null) {
-                    message.setFrom(new InternetAddress(from));
-                } else {
-                    throw new MessagingException("Missing the From Address for sending the mail. "
-                        + "You need to either define it in the Mail Configuration or pass it in your message.");
-                }
-            }
+        // Pass the current wiki so that the mail message will be prepared and later sent in the context of that wiki.
+        String wikiId = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
 
-            // Push new mail message on the queue
-            getMailQueue().add(new MailSenderQueueItem(message, session, listener));
-        } catch (Exception e) {
-            // Save any exception in the listener
-            listener.onError(message, e);
-        }
+        this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId, wikiId));
+
+        return new DefaultMailResult(batchId, this.sendMailQueueManager);
     }
 
     /**
-     * @return the mail queue containing all pending mails to be sent
+     * Stops the Mail Prepare and Sender threads. Should be called when the application is stopped for a clean shutdown.
+     *
+     * @throws InterruptedException if a thread fails to be stopped
      */
-    public Queue<MailSenderQueueItem> getMailQueue()
+    public void stopMailThreads() throws InterruptedException
     {
-        return this.mailQueue;
-    }
+        // Step 1: Stop the Mail Sender Thread
 
-    @Override
-    public void waitTillSent(long timeout)
-    {
-        long startTime = System.currentTimeMillis();
-        while (hasMailQueueItemForCurrentThread() && System.currentTimeMillis() - startTime < timeout) {
-            try {
-                Thread.sleep(100L);
-            } catch (InterruptedException e) {
-                // Ignore but consider that the mail was sent
-                this.logger.warn("Interrupted while waiting for mail to be sent. Reason [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
-                break;
-            }
-        }
-    }
-
-    private boolean hasMailQueueItemForCurrentThread()
-    {
-        Iterator<MailSenderQueueItem> iterator = getMailQueue().iterator();
-        while (iterator.hasNext()) {
-            MailSenderQueueItem item = iterator.next();
-            if (Thread.currentThread().getId() == item.getThreadId()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Stops the sending thread. Should be called when the application is stopped for a clean shutdown.
-     * @throws InterruptedException if the thread failed to be stopped
-     */
-    public void stopMailSenderThread() throws InterruptedException
-    {
-        this.mailSenderThread.stopProcessing();
+        this.sendMailRunnable.stopProcessing();
+        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
+        this.sendMailThread.interrupt();
         // Wait till the thread goes away
-        this.mailSenderThread.join();
+        this.sendMailThread.join();
+
+        // Step 2: Stop the Mail Prepare Thread
+
+        this.prepareMailRunnable.stopProcessing();
+        // Make sure the Thread goes out of sleep if it's sleeping so that it stops immediately.
+        this.prepareMailThread.interrupt();
+        // Wait till the thread goes away
+        this.prepareMailThread.join();
+    }
+
+    private MailListener getListener(String hint) throws MessagingException
+    {
+        MailListener listener;
+        try {
+            listener = this.componentManager.getInstance(MailListener.class, hint);
+        } catch (ComponentLookupException e) {
+            throw new MessagingException(String.format("Failed to locate Mail listener [%s].", hint), e);
+        }
+        return listener;
     }
 }

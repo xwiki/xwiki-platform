@@ -67,8 +67,7 @@ public class DependencyPane extends BaseElement
      */
     public String getStatusMessage()
     {
-        List<WebElement> found =
-            getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("extension-status"));
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, By.className("extension-status"));
         return found.size() > 0 ? found.get(0).getText() : null;
     }
 
@@ -78,7 +77,7 @@ public class DependencyPane extends BaseElement
     public WebElement getLink()
     {
         By linkLocator = By.cssSelector("a.extension-link");
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, linkLocator);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, linkLocator);
         return found.isEmpty() ? null : found.get(0);
     }
 
@@ -101,7 +100,7 @@ public class DependencyPane extends BaseElement
      */
     public String getVersion()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.className("extension-version")).getText();
+        return getDriver().findElementWithoutWaiting(container, By.className("extension-version")).getText();
     }
 
     /**

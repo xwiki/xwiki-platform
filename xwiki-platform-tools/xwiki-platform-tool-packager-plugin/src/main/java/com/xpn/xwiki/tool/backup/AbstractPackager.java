@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
@@ -80,8 +81,10 @@ public abstract class AbstractPackager
         xcontext.setWikiId(databaseName);
         xcontext.setMainXWiki(databaseName);
 
-        // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
+        // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
+        // Factory and any code requiring those objects will work.
         xcontext.setRequest(new XWikiServletRequestStub());
+        xcontext.setResponse(new XWikiServletResponseStub());
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.

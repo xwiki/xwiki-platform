@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Initializes a document before it is edited.
- * 
+ *
  * @version $Id$
  */
 public class EditAction extends XWikiAction
@@ -77,7 +77,7 @@ public class EditAction extends XWikiAction
     /**
      * Determines the edited document (translation) and updates it based on the template specified on the request and
      * any additional request parameters that overwrite the default values from the template.
-     * 
+     *
      * @param context the XWiki context
      * @return the edited document
      * @throws XWikiException if something goes wrong
@@ -110,7 +110,7 @@ public class EditAction extends XWikiAction
      * </ul>
      * Most of the code deals with the really bad way the default language can be specified (empty string, 'default' or
      * a real language code).
-     * 
+     *
      * @param context the XWiki context
      * @return the edited document translation based on the language specified on the request
      * @throws XWikiException if something goes wrong
@@ -185,7 +185,7 @@ public class EditAction extends XWikiAction
     /**
      * Updates the title and content of the given document with values taken from the 'title' and 'content' request
      * parameters or based on the document section specified on the request.
-     * 
+     *
      * @param document the document whose title and content should be updated
      * @param context the XWiki context
      * @throws XWikiException if something goes wrong
@@ -223,7 +223,7 @@ public class EditAction extends XWikiAction
 
     /**
      * Exposes the given document in the XWiki context and the Velocity context under the 'tdoc' and 'cdoc' keys.
-     * 
+     *
      * @param document the document to expose
      * @param context the XWiki context
      */
@@ -242,7 +242,7 @@ public class EditAction extends XWikiAction
     /**
      * Locks the given document unless it is already locked by a different user and the current user didn't request to
      * force the lock.
-     * 
+     *
      * @param document the document to lock
      * @param context the XWiki context
      */

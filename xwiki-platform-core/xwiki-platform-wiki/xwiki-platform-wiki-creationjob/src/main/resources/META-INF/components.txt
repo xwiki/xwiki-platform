@@ -1,0 +1,8 @@
+org.xwiki.platform.wiki.creationjob.internal.steps.AddUsersStep
+org.xwiki.platform.wiki.creationjob.internal.steps.CreateWikiStep
+org.xwiki.platform.wiki.creationjob.internal.steps.ProvisionWikiStep
+org.xwiki.platform.wiki.creationjob.internal.steps.SaveWikiMetaDataStep
+org.xwiki.platform.wiki.creationjob.internal.DefaultWikiCreator
+org.xwiki.platform.wiki.creationjob.internal.ExtensionInstaller
+org.xwiki.platform.wiki.creationjob.internal.WikiCreationJob
+org.xwiki.platform.wiki.creationjob.script.WikiCreationJobScriptServices

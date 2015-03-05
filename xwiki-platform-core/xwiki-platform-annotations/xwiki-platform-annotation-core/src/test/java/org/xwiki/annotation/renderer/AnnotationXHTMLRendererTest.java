@@ -146,6 +146,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         addFileToTest("renderer/verbatim/Verbatim8.test");
         addFileToTest("renderer/verbatim/Verbatim9.test");
         addFileToTest("renderer/verbatim/Verbatim10.test");
+        addFileToTest("renderer/verbatim/Verbatim11.test");
 
         // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
         addFileToTest("renderer/partialwords/PartialWords1.test");

@@ -30,7 +30,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Utility APIs, available to scripting environments under the {@code util} variable.
- * 
+ *
  * @version $Id$
  */
 public class Util extends Api
@@ -41,7 +41,7 @@ public class Util extends Api
     /**
      * Simple constructor, initializes a new utility API with the current {@link com.xpn.xwiki.XWikiContext context} and
      * the current global {@link com.xpn.xwiki.XWiki XWiki} object.
-     * 
+     *
      * @param xwiki the current global XWiki object
      * @param context the current context
      * @see Api#Api(com.xpn.xwiki.XWikiContext)
@@ -54,7 +54,7 @@ public class Util extends Api
 
     /**
      * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}.
-     * 
+     *
      * @param text the encoded text
      * @return decoded text
      * @since 1.3 Milestone 2
@@ -68,7 +68,7 @@ public class Util extends Api
     /**
      * Creates a new {@link Date} object corresponding to the current time. This is useful from Velocity since new
      * objects cannot be created.
-     * 
+     *
      * @return the current date
      * @since 1.3 Milestone 2
      * @deprecated use <code>$datetool.date</code> instead
@@ -82,7 +82,7 @@ public class Util extends Api
     /**
      * Creates a new {@link Date} object corresponding to the specified time. This is useful from Velocity since new
      * objects cannot be created.
-     * 
+     *
      * @param time time in milliseconds since 1970, 00:00:00 GMT
      * @return Date a date from a time in milliseconds since 01/01/1970 as a Java {@link Date} Object
      * @since 1.3 Milestone 2
@@ -97,7 +97,7 @@ public class Util extends Api
     /**
      * Compute the elapsed time, in milliseconds, since the specified unix-epoch timestamp. This is useful from Velocity
      * since new objects cannot be created.
-     * 
+     *
      * @param time the time in milliseconds
      * @return the time delta in milliseconds between the current date and the time passed as parameter
      * @since 1.3 Milestone 2
@@ -109,7 +109,7 @@ public class Util extends Api
 
     /**
      * Get a stack trace as a String.
-     * 
+     *
      * @param e the exception to convert to a String
      * @return the exception stack trace as a String
      * @since 1.3 Milestone 2
@@ -121,7 +121,7 @@ public class Util extends Api
 
     /**
      * Generate a random string, containing only alpha-numeric characters.
-     * 
+     *
      * @param size the desired size of the string
      * @return the randomly generated string
      * @since 1.3 Milestone 2
@@ -135,7 +135,7 @@ public class Util extends Api
      * Output a BufferedImage object into the response outputstream. Once this method has been called, no further action
      * is possible. Users should set {@code $xcontext.setFinished(true)} to avoid template output. The image is served
      * as image/jpeg.
-     * 
+     *
      * @param image the BufferedImage to output
      * @throws java.io.IOException if the output fails
      * @since 1.3 Milestone 2
@@ -149,7 +149,7 @@ public class Util extends Api
 
     /**
      * Get a Null value. This is useful in Velocity where there is no real {@code null} object for comparisons.
-     * 
+     *
      * @return a {@code null} Object
      * @since 1.3 Milestone 2
      */
@@ -161,7 +161,7 @@ public class Util extends Api
     /**
      * Get a New Line character. This is useful in Velocity where there is no real new line character for inclusion in
      * texts.
-     * 
+     *
      * @return a new line character
      * @since 1.3 Milestone 2
      */
@@ -172,7 +172,7 @@ public class Util extends Api
 
     /**
      * Convert a {@code String} to a {@code Boolean} object.
-     * 
+     *
      * @param str the String containing the boolean representation to be parsed
      * @return the boolean represented by the string argument, {@code false} if the string is not representing a boolean
      * @since 1.8 Milestone 2
@@ -184,7 +184,7 @@ public class Util extends Api
 
     /**
      * Replace all accented characters by their ASCII equivalent.
-     * 
+     *
      * @param text the text to parse
      * @return a string with accents replaced with their alpha equivalent
      * @since 1.3 Milestone 2
@@ -196,7 +196,7 @@ public class Util extends Api
 
     /**
      * Cleans up the passed text by removing all accents and special characters to make it a valid page name.
-     * 
+     *
      * @param documentName the document name to normalize
      * @return the equivalent valid document name
      * @since 1.3 Milestone 2
@@ -209,7 +209,7 @@ public class Util extends Api
     /**
      * Removes all non alpha numerical characters from the passed text. First tries to convert accented chars to their
      * ASCII representation. Then it removes all the remaining non-alphanumeric non-ASCII characters.
-     * 
+     *
      * @param text the text to convert
      * @return the alpha numeric equivalent
      * @since 1.3 Milestone 2

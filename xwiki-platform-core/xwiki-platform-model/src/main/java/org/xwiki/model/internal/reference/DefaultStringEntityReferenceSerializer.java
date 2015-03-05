@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Singleton;
+
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
@@ -36,6 +38,7 @@ import org.xwiki.text.StringUtils;
  * @since 2.2M1
  */
 @Component
+@Singleton
 public class DefaultStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
     @Override

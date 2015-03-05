@@ -31,8 +31,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414594179000</creationDate>
-  <date>1414598827000</date>
-  <contentUpdateDate>1414594244000</contentUpdateDate>
+  <date>1418729348000</date>
+  <contentUpdateDate>1418668183000</contentUpdateDate>
   <version>1.1</version>
   <title>Yeti</title>
   <defaultTemplate/>
@@ -909,7 +909,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Yeti 3.2.0
+      <lessCode>// Yeti 3.3.1
 // Variables
 // --------------------------------------------------
 
@@ -918,11 +918,12 @@
 //
 //## Gray and brand colors for use across Bootstrap.
 
-@gray-darker:            lighten(#000, 13.5%); // #222
-@gray-dark:              lighten(#000, 20%);   // #333
+@gray-base:              #000;
+@gray-darker:            lighten(@gray-base, 13.5%); // #222
+@gray-dark:              lighten(@gray-base, 20%);   // #333
 @gray:                   #6f6f6f; // #555
-@gray-light:             lighten(#000, 60%);   // #999
-@gray-lighter:           lighten(#000, 93.5%); // #eee
+@gray-light:             lighten(@gray-base, 60%);   // #999
+@gray-lighter:           lighten(@gray-base, 93.5%); // #eee
 
 @brand-primary:         #008cba;
 @brand-success:         #43ac6a;
@@ -944,6 +945,8 @@
 @link-color:            @brand-primary;
 //** Link hover color set via `darken()` function.
 @link-hover-color:      darken(@link-color, 15%);
+//** Link hover decoration.
+@link-hover-decoration: underline;
 
 
 //== Typography
@@ -1094,8 +1097,15 @@
 @input-color:                    @gray;
 //** `&lt;input&gt;` border color
 @input-border:                   #ccc;
-//** `&lt;input&gt;` border radius
+
+// TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
+//** Default `.form-control` border radius
 @input-border-radius:            @border-radius-base;
+//** Large `.form-control` border radius
+@input-border-radius-large:      @border-radius-large;
+//** Small `.form-control` border radius
+@input-border-radius-small:      @border-radius-small;
+
 //** Border color for inputs on focus
 @input-border-focus:             #66afe9;
 
@@ -1116,6 +1126,9 @@
 @input-group-addon-bg:           @gray-lighter;
 //** Border color for textual input addons
 @input-group-addon-border-color: @input-border;
+
+//** Disabled cursor for form controls and buttons.
+@cursor-disabled:                not-allowed;
 
 
 //== Dropdowns
@@ -1165,8 +1178,7 @@
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal-background:  1040;
-@zindex-modal:             1050;
+@zindex-modal:             1040;
 
 
 //== Media queries breakpoints
@@ -1228,17 +1240,17 @@
 //## Define the maximum width of `.container` for different screen sizes.
 
 // Small screen / tablet
-@container-tablet:             ((720px + @grid-gutter-width));
+@container-tablet:             (720px + @grid-gutter-width);
 //** For `@screen-sm-min` and up.
 @container-sm:                 @container-tablet;
 
 // Medium screen / desktop
-@container-desktop:            ((940px + @grid-gutter-width));
+@container-desktop:            (940px + @grid-gutter-width);
 //** For `@screen-md-min` and up.
 @container-md:                 @container-desktop;
 
 // Large screen / wide desktop
-@container-large-desktop:      ((1140px + @grid-gutter-width));
+@container-large-desktop:      (1140px + @grid-gutter-width);
 //** For `@screen-lg-min` and up.
 @container-lg:                 @container-large-desktop;
 
@@ -1316,18 +1328,16 @@
 @nav-disabled-link-color:                   @gray-light;
 @nav-disabled-link-hover-color:             @gray-light;
 
-@nav-open-link-hover-color:                 #fff;
-
 //== Tabs
-@nav-tabs-border-color:                     #ddd;
+@nav-tabs-border-color:                     @table-border-color;
 
 @nav-tabs-link-hover-border-color:          @gray-lighter;
 
 @nav-tabs-active-link-hover-bg:             @body-bg;
 @nav-tabs-active-link-hover-color:          @gray;
-@nav-tabs-active-link-hover-border-color:   #ddd;
+@nav-tabs-active-link-hover-border-color:   @table-border-color;
 
-@nav-tabs-justified-link-border-color:            #ddd;
+@nav-tabs-justified-link-border-color:            @table-border-color;
 @nav-tabs-justified-active-link-border-color:     @body-bg;
 
 //== Pills
@@ -1541,6 +1551,8 @@
 @progress-bg:                 #f5f5f5;
 //** Progress bar text color
 @progress-bar-color:          #fff;
+//** Variable for setting rounded corners on progress bar.
+@progress-border-radius:      @border-radius-base;
 
 //** Default progress bar color
 @progress-bar-bg:             @brand-primary;
@@ -1561,7 +1573,7 @@
 //** Background color on `.list-group-item`
 @list-group-bg:                 #fff;
 //** `.list-group-item` border color
-@list-group-border:             #ddd;
+@list-group-border:             @table-border-color;
 //** List group border radius
 @list-group-border-radius:      @border-radius-base;
 
@@ -1599,11 +1611,11 @@
 @panel-border-radius:         @border-radius-base;
 
 //** Border color for elements within panels
-@panel-inner-border:          #ddd;
+@panel-inner-border:          @table-border-color;
 @panel-footer-bg:             #f5f5f5;
 
 @panel-default-text:          @gray-dark;
-@panel-default-border:        #ddd;
+@panel-default-border:        @table-border-color;
 @panel-default-heading-bg:    #f5f5f5;
 
 @panel-primary-text:          #fff;
@@ -1636,7 +1648,7 @@
 //** Thumbnail background color
 @thumbnail-bg:                @body-bg;
 //** Thumbnail border color
-@thumbnail-border:            #ddd;
+@thumbnail-border:            @table-border-color;
 //** Thumbnail border radius
 @thumbnail-border-radius:     @border-radius-base;
 
@@ -1658,10 +1670,10 @@
 //
 //##
 
-@badge-color:                 #777;
+@badge-color:                 #fff;
 //** Linked badge text color on hover
 @badge-link-hover-color:      #fff;
-@badge-bg:                    @btn-default-bg;
+@badge-bg:                    @btn-primary-bg;
 
 //** Badge text color in active nav link
 @badge-active-color:          @link-color;
@@ -1748,15 +1760,15 @@
 //** Blockquote font size
 @blockquote-font-size:        (@font-size-base * 1.25);
 //** Blockquote border color
-@blockquote-border-color:     @hr-border;
+@blockquote-border-color:     @table-border-color;
 //** Page header border color
-@page-header-border-color:    @hr-border;
+@page-header-border-color:    @table-border-color;
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
 //** Horizontal line color.
-@hr-border:                   #ddd;
+@hr-border:                   @table-border-color;
 
-// Yeti 3.2.0
+// Yeti 3.3.1
 // Bootswatch
 // -----------------------------------------------------
 
@@ -2007,6 +2019,11 @@ label,
   font-weight: normal;
 }
 
+input[type="radio"],
+input[type="checkbox"] {
+  margin-top: 1px;
+}
+
 // Navs =======================================================================
 
 .nav {
@@ -2192,9 +2209,7 @@ label,
 // XWiki customization
 .globalsearch .btn {
   height: 30px;
-}
-
-</lessCode>
+}</lessCode>
     </property>
     <property>
       <link-color/>

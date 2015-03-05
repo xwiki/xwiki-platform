@@ -100,6 +100,20 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
     }
 
+    @Test
+    public void testGetPropertyTwiceWithDifferentType() throws Exception
+    {
+        when(this.mockConverter.convert(String.class, "10")).thenReturn("10");
+        when(this.mockConverter.convert(Integer.class, "10")).thenReturn(10);
+
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "10");
+
+        Assert.assertEquals("10", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
+        Assert.assertEquals((Integer) 10,
+            this.componentManager.getComponentUnderTest().<Integer>getProperty("key", Integer.class));
+    }
+
     @Test(expected = ConversionException.class)
     public void testGetPropertyWithWrongType() throws Exception
     {

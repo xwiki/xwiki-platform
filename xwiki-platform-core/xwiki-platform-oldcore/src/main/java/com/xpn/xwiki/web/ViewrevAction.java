@@ -42,8 +42,9 @@ public class ViewrevAction extends XWikiAction
                 context.put("message", "revisiondoesnotexist");
                 return "exception";
 
-            } else
+            } else {
                 throw e;
+            }
         }
         return "view";
     }

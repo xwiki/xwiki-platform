@@ -55,6 +55,7 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
@@ -216,6 +217,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.registerComponents();
 
+        // Mock xwiki.cfg
+        getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), getConfigurationSource());
+
         // Setup display configuration.
         this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
         this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
@@ -278,6 +282,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("=== level3");
         this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
         // Overwrite the title heading depth.
         this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(3));

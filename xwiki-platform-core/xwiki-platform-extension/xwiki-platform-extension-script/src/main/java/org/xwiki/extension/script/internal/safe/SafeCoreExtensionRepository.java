@@ -36,7 +36,7 @@ import org.xwiki.extension.repository.CoreExtensionRepository;
  * @since 4.0M2
  */
 public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> extends
-    SafeSearchableExtensionRepository<T> implements CoreExtensionRepository
+    SafeAdvancedSearchableExtensionRepository<T> implements CoreExtensionRepository
 {
     /**
      * @param repository wrapped repository
@@ -44,7 +44,7 @@ public class SafeCoreExtensionRepository<T extends CoreExtensionRepository> exte
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public SafeCoreExtensionRepository(T repository, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public SafeCoreExtensionRepository(T repository, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(repository, safeProvider, execution, hasProgrammingRight);

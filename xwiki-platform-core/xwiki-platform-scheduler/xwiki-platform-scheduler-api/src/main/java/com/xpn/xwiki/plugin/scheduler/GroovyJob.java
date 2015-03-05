@@ -80,7 +80,7 @@ public class GroovyJob extends AbstractJob
                 Binding binding = new Binding(data.getWrappedMap());
 
                 // Execute the Groovy script
-                GroovyShell shell = new GroovyShell(binding);
+                GroovyShell shell = new GroovyShell(Thread.currentThread().getContextClassLoader(), binding);
                 shell.evaluate(object.getLargeStringValue("script"));
             } else {
                 throw new JobExecutionException("The user [" + context.getUser() + "] didn't have "

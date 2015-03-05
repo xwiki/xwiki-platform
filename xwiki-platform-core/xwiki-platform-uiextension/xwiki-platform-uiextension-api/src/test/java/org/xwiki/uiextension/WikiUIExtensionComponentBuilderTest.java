@@ -20,293 +20,175 @@
 package org.xwiki.uiextension;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Vector;
-
-import javax.inject.Provider;
 
 import org.apache.velocity.VelocityContext;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.internal.multi.DelegateComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.ModelContext;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-import org.xwiki.uiextension.internal.WikiUIExtension;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.uiextension.internal.WikiUIExtensionComponentBuilder;
 import org.xwiki.uiextension.internal.WikiUIExtensionConstants;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-@ComponentList({
-    DefaultModelContext.class,
-    DefaultModelConfiguration.class,
-    LocalStringEntityReferenceSerializer.class,
-    RelativeStringEntityReferenceResolver.class,
-    CurrentReferenceDocumentReferenceResolver.class,
-    CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceValueProvider.class,
-    CurrentMixedStringDocumentReferenceResolver.class,
-    CurrentMixedEntityReferenceValueProvider.class,
-    DefaultEntityReferenceValueProvider.class,
-    CompactWikiStringEntityReferenceSerializer.class,
-    DefaultStringDocumentReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultStringEntityReferenceResolver.class,
-    DefaultStringEntityReferenceSerializer.class
-})
-@MockingRequirement(value = WikiUIExtensionComponentBuilder.class,
-    exceptions = {EntityReferenceSerializer.class})
-public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponentTestCase
-    implements WikiUIExtensionConstants
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
+public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConstants
 {
-    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension");
+    public MockitoComponentMockingRule<WikiComponentBuilder> mocker =
+        new MockitoComponentMockingRule<WikiComponentBuilder>(WikiUIExtensionComponentBuilder.class,
+            WikiComponentBuilder.class, "uiextension");
+
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
+
+    private static final DocumentReference DOC_REF = new DocumentReference("xwiki", "XWiki", "MyUIExtension",
+        Locale.ROOT);
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private XWiki mockXWiki;
-
-    private XWikiContext xwikiContext;
-
-    private XWikiDocument mockComponentDoc;
-
-    private WikiUIExtensionComponentBuilder builder;
-
-    private Execution execution;
+    private XWikiDocument componentDoc;
 
     @Before
     public void configure() throws Exception
     {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        // Required by BaseObjectReference
+        DocumentReferenceResolver<String> resolver =
+            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
+        when(resolver.resolve("XWiki.UIExtension")).thenReturn(
+            new DocumentReference("xwiki", "XWiki", "UIExtensionClass"));
 
-        Utils.setComponentManager(getComponentManager());
+        DelegateComponentManager wikiComponentManager = new DelegateComponentManager();
+        wikiComponentManager.setComponentManager(this.mocker);
+        this.mocker.registerComponent(ComponentManager.class, "wiki", wikiComponentManager);
 
-        execution = registerMockComponent(Execution.class);
-        final ExecutionContext context = new ExecutionContext();
+        // Components accessed through dynamic lookup.
+        VelocityManager velocityManager = this.mocker.registerMockComponent(VelocityManager.class);
+        when(velocityManager.getVelocityEngine()).thenReturn(mock(VelocityEngine.class));
+        when(velocityManager.getVelocityContext()).thenReturn(mock(VelocityContext.class));
 
-        final Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(XWikiContext.TYPE_PROVIDER);
+        ModelContext modelContext = this.mocker.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(DOC_REF);
 
-        this.mockXWiki = getMockery().mock(XWiki.class);
+        this.mocker.registerMockComponent(RenderingContext.class);
+        this.mocker.registerMockComponent(Transformation.class, "macro");
+        this.mocker.registerMockComponent(ContentParser.class);
 
-        this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setWikiId("xwiki");
-        this.xwikiContext.setWiki(this.mockXWiki);
-
-        context.setProperty("xwikicontext", this.xwikiContext);
-
-        this.mockComponentDoc = getMockery().mock(XWikiDocument.class);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(xcontextProvider).get();
-                will(returnValue(xwikiContext));
-                allowing(execution).getContext();
-                will(returnValue(context));
-
-                allowing(mockXWiki).getDocument(DOC_REF, xwikiContext);
-                will(returnValue(mockComponentDoc));
-                allowing(mockComponentDoc).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-            }
-        });
-
-        this.builder = getComponentManager().getInstance(WikiComponentBuilder.class, "uiextension");
+        // The document holding the UI extension object.
+        this.componentDoc = mock(XWikiDocument.class, "xwiki:XWiki.MyUIExtension");
+        when(this.componentDoc.getDocumentReference()).thenReturn(DOC_REF);
+        when(this.componentDoc.getAuthorReference()).thenReturn(AUTHOR_REFERENCE);
+        when(this.componentDoc.getContentAuthorReference()).thenReturn(AUTHOR_REFERENCE);
+        when(this.componentDoc.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        this.oldcore.getDocuments().put(DOC_REF, componentDoc);
     }
 
     @Test
-    public void buildExtensionsWithoutExtensionObject() throws Exception
+    public void buildComponentsWithoutExtensionObject() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockComponentDoc).getDocumentReference();
-                will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
-                will(returnValue(new ArrayList()));
-            }
-        });
+        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Collections.<BaseObject>emptyList());
 
         try {
-            this.builder.buildComponents(DOC_REF);
-            Assert.fail("Should have thrown an exception");
+            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+            fail("Should have thrown an exception");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("No UI extension object could be found in document [xwiki:XWiki.MyUIExtension]",
+            assertEquals("No UI extension object could be found in document [xwiki:XWiki.MyUIExtension()]",
                 expected.getMessage());
         }
     }
 
     @Test
-    public void buildExtensionsWithoutAdminRights() throws Exception
+    public void buildGlobalComponentsWithoutPR() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
-        final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
-        final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
-        extensionObjects.add(extensionObject);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockComponentDoc).getDocumentReference();
-                will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
-                will(returnValue(extensionObjects));
-                oneOf(extensionObject).getStringValue(ID_PROPERTY);
-                will(returnValue("name"));
-                oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
-                will(returnValue("extensionPointId"));
-                oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
-                will(returnValue("content"));
-                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
-                will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
-                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
-                will(returnValue("wiki"));
-                oneOf(mockComponentDoc).getContentAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-                oneOf(authorization).hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki"));
-                will(returnValue(false));
-            }
-        });
+        BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "global");
+        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
 
         try {
-            this.builder.buildComponents(DOC_REF);
-            Assert.fail("Should have thrown an exception");
+            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+            fail("You shouldn't be able to register global UI extensions without PR.");
         } catch (WikiComponentException expected) {
-            Assert.assertEquals("Registering UI extensions requires admin rights", expected.getMessage());
+            assertEquals("Registering global UI extensions requires programming rights", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void buildWikiLevelComponentsWithoutAdminRights() throws Exception
+    {
+        BaseObject extensionObject = createExtensionObject("id", "extensionPointId", "content", "parameters", "wiki");
+        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
+
+        try {
+            this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
+            fail("You shouldn't be able to register UI extensions at wiki level without wiki admin rights.");
+        } catch (WikiComponentException expected) {
+            assertEquals("Registering UI extensions at wiki level requires wiki administration rights",
+                expected.getMessage());
         }
     }
 
     @Test
     public void buildComponents() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
-        final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
-        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
-        final Transformation transformation = getMockery().mock(Transformation.class, "macro");
-        final ModelContext modelContext = getMockery().mock(ModelContext.class);
-        final ContentParser contentParser = getMockery().mock(ContentParser.class);
-        final VelocityManager velocityManager = getMockery().mock(VelocityManager.class);
-        final VelocityEngine velocityEngine = getMockery().mock(VelocityEngine.class);
-        final VelocityContext velocityContext = new VelocityContext();
+        BaseObject extensionObject =
+            createExtensionObject("name", "extensionPointId", "content",
+                "key=value=foo\nkey2=value2\ninvalid=\n\n=invalid", "user");
+        when(this.componentDoc.getXObjects(UI_EXTENSION_CLASS)).thenReturn(Arrays.asList(null, extensionObject));
 
-        final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
-        final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
-        extensionObjects.add(null);
-        extensionObjects.add(extensionObject);
+        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
+        VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
 
-        final ObjectReference extensionReference = new BaseObjectReference(DOC_REF, 1, DOC_REF);
-        final StringWriter writer = new StringWriter();
-        writer.append("value=foo");
-        final XDOM xdom = new XDOM(new ArrayList<Block>());
+        List<WikiComponent> components = this.mocker.getComponentUnderTest().buildComponents(DOC_REF);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockComponentDoc).getContentAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-                allowing(mockComponentDoc).getDocumentReference();
-                will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
-                will(returnValue(extensionObjects));
-                oneOf(mockComponentDoc).getAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-                oneOf(authorization).hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki"));
-                will(returnValue(true));
-                allowing(extensionObject).getReference();
-                will(returnValue(extensionReference));
-                oneOf(extensionObject).getStringValue(ID_PROPERTY);
-                will(returnValue("name"));
-                oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
-                will(returnValue("extensionPointId"));
-                oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
-                will(returnValue("content"));
-                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
-                will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
-                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
-                will(returnValue("wiki"));
-                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0, DOC_REF);
-                will(returnValue(xdom));
-                oneOf(componentManager).getInstance(RenderingContext.class);
-                will(returnValue(renderingContext));
-                oneOf(componentManager).getInstance(Transformation.class, "macro");
-                will(returnValue(transformation));
-                oneOf(componentManager).getInstance(Execution.class);
-                will(returnValue(execution));
-                oneOf(componentManager).getInstance(ModelContext.class);
-                will(returnValue(modelContext));
-                oneOf(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("xwiki")));
-                oneOf(componentManager).getInstance(ContentParser.class);
-                will(returnValue(contentParser));
-                oneOf(componentManager).getInstance(Execution.class);
-                will(returnValue(execution));
-                oneOf(componentManager).getInstance(VelocityManager.class);
-                will(returnValue(velocityManager));
-                allowing(velocityManager).getVelocityEngine();
-                will(returnValue(velocityEngine));
-                allowing(velocityManager).getVelocityContext();
-                will(returnValue(velocityContext));
-                oneOf(velocityEngine).evaluate(with(any(VelocityContext.class)), with(any(StringWriter.class)),
-                    with(equal("")), with(equal("value=foo")));
-                oneOf(velocityEngine).evaluate(with(any(VelocityContext.class)), with(any(StringWriter.class)),
-                    with(equal("")), with(equal("value2")));
-                will(returnValue(true));
-            }
-        });
+        assertEquals(1, components.size());
+        verify(contentParser).parse("content", Syntax.XWIKI_2_1, DOC_REF);
 
-        List<WikiComponent> components = this.builder.buildComponents(DOC_REF);
-        Assert.assertEquals(1, components.size());
-
-        UIExtension uiExtension = (WikiUIExtension) components.get(0);
+        UIExtension uiExtension = (UIExtension) components.get(0);
         Map<String, String> parameters = uiExtension.getParameters();
-        Assert.assertEquals(2, parameters.size());
+
+        assertEquals(2, parameters.size());
+        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
+            eq("name:key"), eq("value=foo"));
+        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
+            eq("name:key2"), eq("value2"));
+    }
+
+    private BaseObject createExtensionObject(String id, String extensionPointId, String content, String parameters,
+        String scope)
+    {
+        BaseObject extensionObject = mock(BaseObject.class, id);
+        when(extensionObject.getStringValue(ID_PROPERTY)).thenReturn(id);
+        when(extensionObject.getStringValue(EXTENSION_POINT_ID_PROPERTY)).thenReturn(extensionPointId);
+        when(extensionObject.getStringValue(CONTENT_PROPERTY)).thenReturn(content);
+        when(extensionObject.getStringValue(PARAMETERS_PROPERTY)).thenReturn(parameters);
+        when(extensionObject.getStringValue(SCOPE_PROPERTY)).thenReturn(scope);
+        BaseObjectReference objectReference =
+            new BaseObjectReference(new ObjectReference("XWiki.UIExtensionClass[0]", DOC_REF));
+        when(extensionObject.getReference()).thenReturn(objectReference);
+        return extensionObject;
     }
 }

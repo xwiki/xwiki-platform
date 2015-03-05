@@ -21,6 +21,8 @@ package org.xwiki.container.internal;
 
 import java.util.Stack;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -35,6 +37,7 @@ import org.xwiki.container.Session;
  * Objects.
  */
 @Component
+@Singleton
 public class DefaultContainer implements Container
 {
     /**

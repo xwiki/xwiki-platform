@@ -164,7 +164,6 @@
     </property>
     <property>
       <script>{{groovy}}
-import com.xpn.xwiki.*
 import org.apache.commons.lang3.*
 
 def irccontext = services.get("ircbot").getContext() 
@@ -172,44 +171,39 @@ def message = irccontext.get("message")
 def xwikiContext = xcontext.getContext()
 
 if (message.startsWith("!search")) {
-  def lucenePlugin = xwiki.getXWiki().getPlugin("lucene", xwikiContext)
-  if (lucenePlugin) {
-    // Number of search results to display
-    int maxResults = 4
+  // Number of search results to display
+  int maxResults = 4
 
-    if (StringUtils.trim(message).length() &gt; "!search".length()) {
-      // Remove the prefix "search " from the message to extract the query
-      String query = message[8..-1]
+  if (StringUtils.trim(message).length() &gt; "!search".length()) {
+    // Remove the prefix "search " from the message to extract the query
+    String query = message[8..-1]
 
-      println "Results for [${query}] (${maxResults} results only)"
+    println "Results for [${query}] (${maxResults} results only)"
 
-      try {
-        // Since Lucene doesn't support '*' or '?' as the first character we just remove it for now. Note that the SOLR
-        // search doesn't have this limitation
-        query = StringUtils.removeStart(query, '*')
-        query = StringUtils.removeStart(query, '?')
-        if (!StringUtils.isEmpty(query)) {
-          def results = lucenePlugin.getSearchResults(query, (String) null,  null, null, xwikiContext)
-          if (results.hitcount &gt; 0) {
-            for (result in results.getResults(1, maxResults)) {
-              def itemDoc = xwiki.getXWiki().getDocument("${result.wiki}:${result.web}.${result.name}", xwikiContext)
-              println "  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", xwikiContext)}"
-            }
-          } else {
-            println "No match found"
+    try {
+      if (!StringUtils.isEmpty(query)) {
+        def solrQuery = services.query.createQuery(query, 'solr')
+        solrQuery.setLimit(maxResults)
+        solrQuery.bindValue('sort', "score desc")
+        solrQuery.bindValue('fq', '{!q.op=AND} type:DOCUMENT hidden:false')
+        def results = solrQuery.execute()[0].getResults()
+        if (results.getNumFound() &gt; 0) {
+          for (result in results) {
+            def itemDoc = xwiki.getXWiki().getDocument("${result.wiki}:${result.space}.${result.name}", xwikiContext)
+            println "  * ${itemDoc.database}:${itemDoc.fullName} - ${itemDoc.getExternalURL("view", xwikiContext)}"
           }
         } else {
-          println "Search cannot start with '*' or '?'"
+          println "No match found"
         }
-      } catch (e) {
-        e.printStackTrace();
-        println "Error: ${e.message}"
+      } else {
+        println "Search cannot start with '*' or '?'"
       }
-    } else {
-      println "Empty search query!"
+    } catch (e) {
+      e.printStackTrace();
+      println "Error: ${e.message}"
     }
   } else {
-    println "Lucene plugin is not installed!"
+    println "Empty search query!"
   }
 }
 {{/groovy}}</script>

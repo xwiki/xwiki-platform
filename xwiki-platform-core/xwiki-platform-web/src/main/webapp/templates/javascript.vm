@@ -1,15 +1,19 @@
+## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+#set ($jsExtension = '.min.js')
+#if ($request.minify == 'false')
+  #set ($jsExtension = '.js')
+#end
 ##
 ## JS Libraries.
 ##
-$xwiki.jsfx.use('js/amd/require.js', {'defer': false})##
+<script type="text/javascript" src="$services.webjars.url('requirejs', "require$jsExtension")"></script>
 ##
 $xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
 $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
-##
-## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
-## avoid using the minified versions of JS/CSS.
-##
-#if ("$!request.minify" == 'false')
+## xwiki-min.js and xwiki-min.css aggregate a couple of JavaScript and CSS files that are used on each page. In order to
+## help debugging we provide/bundle the individual files also and you can load them instead of the aggregated files by
+## passing 'minify=false' in the request query string.
+#if ($request.minify == 'false')
   $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
   $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
   $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
@@ -80,23 +84,18 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ## Note that velocity takes argument references by name (see: https://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#velocimacros).
 ## So we set the value of the $expr in the $url variable to not execute $expr multiple times.
 #set ($url = $expr)
-#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js'))#else$url#{end}
+#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js')#else$url#{end}
 #end
 ##
 ## Start the requirejs config.
 ##
 require.config({
-  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
-## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
-#if($request.minify == 'false')
-  #set($jsExtension = '.js')
-#else
-  #set($jsExtension = '.min.js')
-#end
   paths: {
-    'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
-    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
+    'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')',
+    'xwiki-events-bridge': "$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js')"
   },
+  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   map: {
     '*': { 'jquery': 'jQueryNoConflict' },
     'jQueryNoConflict': { 'jquery': 'jquery' }
@@ -113,6 +112,7 @@ XWiki.currentPage = "$!{escapetool.javascript($doc.name)}";
 XWiki.editor = "$!{escapetool.javascript($editor)}";
 XWiki.viewer = "$!{escapetool.javascript($viewer)}";
 XWiki.contextaction = "${xcontext.getAction()}";
+XWiki.skin = '$escapetool.javascript($xwiki.skin)';
 XWiki.docisnew = $!doc.isNew();
 XWiki.docsyntax = "$!doc.getSyntax().toIdString()";
 XWiki.docvariant = "$!{escapetool.javascript($docvariant.replace('&amp;', '&'))}";

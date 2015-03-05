@@ -51,7 +51,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
 
     /**
      * Creates a new instance of this plugin API.
-     * 
+     *
      * @param imagePlugin the underlying image plugin that is exposed by this API
      * @param context the XWiki context
      */
@@ -62,7 +62,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
 
     /**
      * Detects the height of an image attached to a wiki page.
-     * 
+     *
      * @param pageName the name of a wiki page
      * @param attachmentName the name of an image attached to the specified page
      * @return the height of the specified image
@@ -79,7 +79,7 @@ public class ImagePluginAPI extends PluginApi<ImagePlugin>
 
     /**
      * Detects the width of an image attached to a wiki page.
-     * 
+     *
      * @param pageName the name of a wiki page
      * @param attachmentName the name of an image attached to the specified page
      * @return the width of the specified image

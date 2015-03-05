@@ -21,7 +21,6 @@ package org.xwiki.bridge.event;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.event.filter.EventFilter;
-import org.xwiki.stability.Unstable;
 
 /**
  * An event triggered before a document is rolled back to a previous revision.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.0M2
  */
-@Unstable
 public class DocumentRollingBackEvent extends AbstractDocumentEvent
 {
     /**

@@ -559,9 +559,11 @@ xwiki.defaultskin=$xwikiCfgDefaultSkin
 xwiki.defaultbaseskin=$!xwikiCfgDefaultBaseSkin
 
 #-# Defines whether title handling should be using the compatibility mode or not. When the compatibility
-#-# mode is active, if the document's content first header (level 1 or level 2) matches the document's title
+#-# mode is active, XWiki will try to extract a title from the document content.
+#-# If the document's content first header (level 1 or level 2) matches the document's title
 #-# the first header is stripped.
-xwiki.title.compatibility=1
+#-# The default value is 0.
+# xwiki.title.compatibility=1
 
 #-# Defines the maximum header depth to look for when computing a document's title from its content. If no header
 #-# equal or lower to the specified depth is found then the computed title falls back to the document name.

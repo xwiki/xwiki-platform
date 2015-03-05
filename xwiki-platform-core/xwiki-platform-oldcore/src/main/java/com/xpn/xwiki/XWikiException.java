@@ -402,7 +402,7 @@ public class XWikiException extends Exception
     @Override
     public String getMessage()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         buffer.append("Error number ");
         buffer.append(getCode());
@@ -421,8 +421,9 @@ public class XWikiException extends Exception
                 } catch (Exception e) {
                     buffer.append("Cannot format message [" + message + "] with args ");
                     for (int i = 0; i < this.args.length; i++) {
-                        if (i != 0)
+                        if (i != 0) {
                             buffer.append(",");
+                        }
                         buffer.append(this.args[i]);
                     }
                 }
@@ -434,7 +435,7 @@ public class XWikiException extends Exception
 
     /**
      * Has no effect.
-     * 
+     *
      * @deprecated since 5.2M2, the message should be passed to the constructor
      */
     @Deprecated
@@ -445,7 +446,7 @@ public class XWikiException extends Exception
 
     public String getFullMessage()
     {
-        StringBuffer buffer = new StringBuffer(getMessage());
+        StringBuilder buffer = new StringBuilder(getMessage());
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
         buffer.append("\n");

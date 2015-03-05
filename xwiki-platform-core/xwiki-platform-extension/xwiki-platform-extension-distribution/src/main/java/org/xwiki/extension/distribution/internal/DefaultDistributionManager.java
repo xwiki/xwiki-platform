@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -68,6 +69,7 @@ import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
  * @since 4.2M3
  */
 @Component
+@Singleton
 public class DefaultDistributionManager implements DistributionManager, Initializable
 {
     private static final String JOBID = "distribution";

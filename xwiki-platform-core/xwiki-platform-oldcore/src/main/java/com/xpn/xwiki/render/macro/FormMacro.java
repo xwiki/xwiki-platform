@@ -51,10 +51,11 @@ public class FormMacro extends BaseLocaleMacro
         String className = params.get("text", 0);
 
         String result;
-        if (className == null)
+        if (className == null) {
             result = doc.displayForm(doc.getFullName(), xcontext);
-        else
+        } else {
             result = doc.displayForm(className, xcontext);
+        }
 
         writer.write(result);
     }

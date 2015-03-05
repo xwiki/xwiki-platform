@@ -137,7 +137,7 @@ public class CreatePagePage extends ViewPage
      */
     public void waitForErrorMessage()
     {
-        waitUntilElementIsVisible(By.className("errormessage"));
+        getDriver().waitUntilElementIsVisible(By.className("errormessage"));
     }
 
     /**
@@ -147,6 +147,6 @@ public class CreatePagePage extends ViewPage
      */
     public void waitForFieldErrorMessage()
     {
-        waitUntilElementIsVisible(new ByChained(By.className("LV_invalid")));
+        getDriver().waitUntilElementIsVisible(new ByChained(By.className("LV_invalid")));
     }
 }

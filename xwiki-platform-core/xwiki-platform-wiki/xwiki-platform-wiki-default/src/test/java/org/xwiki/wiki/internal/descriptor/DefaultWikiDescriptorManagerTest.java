@@ -28,7 +28,6 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -47,6 +46,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -80,7 +81,7 @@ public class DefaultWikiDescriptorManagerTest
     public void setUp() throws Exception
     {
         // Injection
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
@@ -142,6 +143,8 @@ public class DefaultWikiDescriptorManagerTest
         when(document.isNew()).thenReturn(true);
 
         assertNull(this.mocker.getComponentUnderTest().getById("wikiid"));
+
+        verify(cache).addFromId(eq("wikiid"), same(DefaultWikiDescriptor.VOID));
     }
 
     @Test
@@ -185,6 +188,8 @@ public class DefaultWikiDescriptorManagerTest
     public void getByAliasWhenNotInCacheAndItDoesntExist() throws Exception
     {
         assertNull(this.mocker.getComponentUnderTest().getByAlias("wikialias"));
+
+        verify(cache).addFromAlias(eq("wikialias"), same(DefaultWikiDescriptor.VOID));
     }
 
     @Test

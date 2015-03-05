@@ -43,9 +43,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>false</hidden>
-  <content>Le Bac à Sable est un endroit que vous pouvez librement modifier car son but est de vous familiariser avec l'édition des documents wiki. Grâce à lui vous découvrirez comment créer et modifier des pages. Pour commencer, cliquez tout simplement sur "Éditer".
+  <content>Le Bac à sable contient des pages que vous pouvez librement modifier. Son but est de vous familiariser à la contribution au wiki. Grâce à lui vous découvrirez comment créer et modifier des pages. Pour commencer, cliquez tout simplement sur "Modifier".
 
-{{info}}Ne vous souciez pas d'écraser ou de perdre des informations lors de l'édition de la page car vous pouvez toujours revenir aux versions précédentes du document via l'onglet "Historique" en bas de page.{{/info}}
+{{info}}Ne vous souciez pas d'écraser ou de perdre des informations lors de la modification de la page car vous pouvez toujours revenir aux versions précédentes du document via l'onglet "Historique" en bas de page.{{/info}}
 
 Il existe trois pages de test :
 
@@ -148,7 +148,7 @@ Cette macro vous permet d'attirer l'attention des utilisateurs :
 
 == Table de matières ==
 
-Cette macro génère automatiquement une table des matières à partir des titres présents dans le contenu de votre page wiki :
+Cette macro génère automatiquement une table des matières à partir des niveaux de titres présents dans le contenu de votre page wiki :
 
-{{toc/}} </content>
+{{toc/}}</content>
 </xwikidoc>

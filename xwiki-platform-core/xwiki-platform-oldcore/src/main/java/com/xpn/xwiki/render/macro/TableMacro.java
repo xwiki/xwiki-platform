@@ -30,7 +30,7 @@ import org.radeox.macro.table.Table;
  * Macro for defining and displaying tables. The rows of the table are devided by newlins and the columns are divided by
  * pipe symbols "|". The first line of the table is rendered as column headers. {table} A|B|C 1|2|3 {table} @author
  * stephan @team sonicteam
- * 
+ *
  * @version $Id$
  */
 public class TableMacro extends BaseLocaleMacro

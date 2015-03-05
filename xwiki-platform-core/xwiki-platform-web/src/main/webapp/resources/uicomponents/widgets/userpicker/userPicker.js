@@ -86,10 +86,18 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     var avatarWrapper = new Element('div', {'class': 'user-avatar-wrapper'});
     avatarWrapper.insert(new Element('img', {src: data.icon, alt: data.info, 'class': 'icon'}));
     container.insert(avatarWrapper);
-    var userName = source.highlight ? this.emphasizeMatches(this.sInput, data.info) : data.info;
+    var userName = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.info.escapeHTML()) : data.info.escapeHTML();
     container.insert(new Element('div', {'class': 'user-name'}).update(userName));
-    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput, data.id) : data.id;
-    container.insert(new Element('div', {'class': 'user-alias'}).update(userAlias));
+    var referenceWrapper = new Element('div');
+    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.id.escapeHTML()) : data.id.escapeHTML();
+    referenceWrapper.insert(new Element('span', {'class': 'user-alias'}).update(userAlias));
+    var userReference = XWiki.Model.resolve(data.value, XWiki.EntityType.DOCUMENT);
+    var wiki = userReference.extractReferenceValue(XWiki.EntityType.WIKI) || XWiki.currentWiki;
+    // Display the wiki only for local users (in order to be consistent with the display in view mode).
+    if (wiki !== '$xcontext.mainWikiName') {
+      referenceWrapper.insert(new Element('span', {'class': 'user-wiki'}).update(wiki.escapeHTML()));
+    }
+    container.insert(referenceWrapper);
     return container;
   },
 

@@ -49,15 +49,15 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * The filter dispatches requests based on the presence of a request parameter starting with <tt>action_</tt> followed
  * by the name of the struts action that should actually process the request. For example, the button that does
  * <tt>Save and Continue</tt> looks like:
- * 
+ *
  * <pre>
  * &lt;input type=&quot;submit&quot; name=&quot;action_saveandcontinue&quot; value=&quot;...&quot;/&gt;
  * </pre>
- * 
+ *
  * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
  * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
  * </p>
- * 
+ *
  * @version $Id$
  * @since 1.8M1
  */
@@ -126,7 +126,7 @@ public class ActionFilter implements Filter
      * application context, so that it can be used with {@link HttpServletRequest#getRequestDispatcher(String)}. For
      * example, calling this method with a request for <tt>/xwiki/bin/edit/Some/Document</tt> and <tt>action_save</tt>,
      * the result is <tt>/bin/save/Some/Document</tt>.
-     * 
+     *
      * @param request the original request
      * @param action the action parameter, starting with <tt>action_</tt>
      * @return The rebuilt URL path, with the specified action in place of the original Struts action. Note that unlike

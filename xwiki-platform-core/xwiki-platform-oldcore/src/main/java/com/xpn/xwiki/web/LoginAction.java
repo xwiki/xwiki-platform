@@ -24,7 +24,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Action for displaying the login form.
- * 
+ *
  * @version $Id$
  */
 public class LoginAction extends XWikiAction

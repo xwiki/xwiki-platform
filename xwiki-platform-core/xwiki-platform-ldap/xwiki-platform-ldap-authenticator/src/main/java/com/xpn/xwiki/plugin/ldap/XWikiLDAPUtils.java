@@ -1148,7 +1148,7 @@ public class XWikiLDAPUtils
                 // If the document is new, set its content
                 if (groupDoc.isNew()) {
                     groupDoc.setSyntax(Syntax.XWIKI_2_0);
-                    groupDoc.setContent("{{include document='XWiki.XWikiGroupSheet' /}}");
+                    groupDoc.setContent("{{include reference='XWiki.XWikiGroupSheet' /}}");
                 }
 
                 // Save modifications

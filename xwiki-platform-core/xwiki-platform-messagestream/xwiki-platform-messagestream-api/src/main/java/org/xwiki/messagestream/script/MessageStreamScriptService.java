@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
@@ -38,6 +39,17 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class MessageStreamScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    static final String ERROR_KEY = "scriptservice.messageStream.error";
+
+    /**
+     * Provides access to the current context.
+     */
+    @Inject
+    protected Execution execution;
+
     /** The wrapped stream that is exposed in this service. */
     @Inject
     private MessageStream stream;
@@ -53,7 +65,8 @@ public class MessageStreamScriptService implements ScriptService
         try {
             this.stream.postPublicMessage(message);
             return true;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            setError(e);
             return false;
         }
     }
@@ -70,7 +83,8 @@ public class MessageStreamScriptService implements ScriptService
         try {
             this.stream.postPersonalMessage(message);
             return true;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            setError(e);
             return false;
         }
     }
@@ -87,7 +101,8 @@ public class MessageStreamScriptService implements ScriptService
         try {
             this.stream.postDirectMessageToUser(message, user);
             return true;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            setError(e);
             return false;
         }
     }
@@ -104,7 +119,8 @@ public class MessageStreamScriptService implements ScriptService
         try {
             this.stream.postMessageToGroup(message, group);
             return true;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            setError(e);
             return false;
         }
     }
@@ -120,8 +136,30 @@ public class MessageStreamScriptService implements ScriptService
         try {
             this.stream.deleteMessage(id);
             return true;
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            setError(e);
             return false;
         }
+    }
+
+    /**
+     * Get the error generated while performing the previously called action.
+     *
+     * @return the exception or {@code null} if no exception was thrown
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     */
+    protected void setError(Exception e)
+    {
+        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

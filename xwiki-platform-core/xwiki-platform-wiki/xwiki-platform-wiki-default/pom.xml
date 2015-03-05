@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-default</artifactId>
   <name>XWiki Platform - Wiki - Default Implementation</name>
   <description>XWiki Platform - Wiki - Default Implementation</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

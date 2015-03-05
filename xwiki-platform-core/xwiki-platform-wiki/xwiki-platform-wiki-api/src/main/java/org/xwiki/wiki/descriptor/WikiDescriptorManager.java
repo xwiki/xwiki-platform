@@ -22,7 +22,6 @@ package org.xwiki.wiki.descriptor;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
@@ -32,7 +31,6 @@ import org.xwiki.wiki.manager.WikiManagerException;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface WikiDescriptorManager
 {
     /**
@@ -85,6 +83,12 @@ public interface WikiDescriptorManager
      * @return the Id of the current wiki
      */
     String getCurrentWikiId();
+
+    /**
+     * @return the descriptor of the current wiki
+     * @throws WikiManagerException if problems occur
+     */
+    WikiDescriptor getCurrentWikiDescriptor() throws WikiManagerException;
 
     /**
      * Check if a wiki corresponding to an Id exists.

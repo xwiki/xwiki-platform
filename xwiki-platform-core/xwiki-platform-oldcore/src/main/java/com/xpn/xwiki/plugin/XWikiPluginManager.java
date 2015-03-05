@@ -27,12 +27,10 @@ import java.util.Vector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.classloader.ClassLoaderManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.web.Utils;
 
 public class XWikiPluginManager
 {
@@ -73,7 +71,7 @@ public class XWikiPluginManager
             return;
         }
         try {
-            Class< ? >[] classes = new Class< ? >[3];
+            Class<?>[] classes = new Class<?>[3];
             classes[0] = String.class;
             classes[1] = String.class;
             classes[2] = context.getClass();
@@ -116,8 +114,8 @@ public class XWikiPluginManager
                 .setURLFactory(context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context));
         }
         initInterface();
-        for (int i = 0; i < classNames.length; i++) {
-            addPlugin(classNames[i], classNames[i], context);
+        for (String className : classNames) {
+            addPlugin(className, className, context);
         }
     }
 

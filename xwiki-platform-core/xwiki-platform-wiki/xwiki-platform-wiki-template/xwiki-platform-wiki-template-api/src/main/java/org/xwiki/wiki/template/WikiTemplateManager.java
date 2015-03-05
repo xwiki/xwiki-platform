@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 
@@ -34,7 +33,6 @@ import org.xwiki.wiki.provisioning.WikiProvisioningJob;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface WikiTemplateManager
 {
     /**

@@ -91,14 +91,13 @@ public abstract class AbstractRegistrationPage extends BasePage
     /** @return a list of WebElements representing validation failure messages. Use after calling register() */
     public List<WebElement> getValidationFailureMessages()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//dd/span[@class='LV_validation_message LV_invalid']"));
+        return getDriver().findElementsWithoutWaiting(By.xpath("//dd/span[@class='LV_validation_message LV_invalid']"));
     }
 
     /** @return Is the specified message included in the list of validation failure messages. */
     public boolean validationFailureMessagesInclude(String message)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//dd/span[@class='LV_validation_message LV_invalid' and . = '" + message + "']")).size() > 0;
     }
 
@@ -108,13 +107,12 @@ public abstract class AbstractRegistrationPage extends BasePage
         // By manually invoking onsubmit with null as it's parameter,
         // liveValidation will check fields but when it attempts to call submit with null as the
         // input, it encounters an error which keeps the next page from loading.
-        executeJavascript("try{ document.getElementById('register_first_name').focus(); " +
+        getDriver().executeJavascript("try{ document.getElementById('register_first_name').focus(); " +
             "document.getElementById('register').onsubmit(null); }catch(err){}");
     }
 
     public boolean isLiveValidationEnabled()
     {
-        return !getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='mainContentArea']/script")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='mainContentArea']/script")).isEmpty();
     }
 }

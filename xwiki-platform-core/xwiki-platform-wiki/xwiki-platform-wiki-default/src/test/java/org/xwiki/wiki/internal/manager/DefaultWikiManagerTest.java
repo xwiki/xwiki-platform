@@ -30,13 +30,13 @@ import org.xwiki.bridge.event.WikiCreateFailedEvent;
 import org.xwiki.bridge.event.WikiCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiCopier;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -87,7 +87,7 @@ public class DefaultWikiManagerTest
     {
         // Injection
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         observationManager = mocker.getInstance(ObservationManager.class);
         wikiCopier = mocker.getInstance(WikiCopier.class);
         wikiDeleter = mocker.getInstance(WikiDeleter.class);

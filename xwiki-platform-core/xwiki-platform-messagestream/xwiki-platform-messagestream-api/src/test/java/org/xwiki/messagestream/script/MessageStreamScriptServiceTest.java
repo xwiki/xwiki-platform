@@ -19,25 +19,29 @@
  */
 package org.xwiki.messagestream.script;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.messagestream.MessageStream;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 /**
- * Tests for the {@link org.xwiki.userstatus.internal.DefaultEvent default event} and
- * {@link org.xwiki.messagestream.internal.DefaultMessageStream default event factory}.
+ * Unit tests for {@link MessageStreamScriptService}.
  * 
  * @version $Id$
  */
-@MockingRequirement(MessageStreamScriptService.class)
-public class MessageStreamScriptServiceTest extends AbstractMockingComponentTestCase<ScriptService>
+public class MessageStreamScriptServiceTest
 {
+    @Rule
+    public MockitoComponentMockingRule<MessageStreamScriptService> mocker =
+        new MockitoComponentMockingRule<>(MessageStreamScriptService.class);
+
     private MessageStreamScriptService streamService;
 
     private final DocumentReference targetUser = new DocumentReference("wiki", "XWiki", "JaneBuck");
@@ -47,145 +51,104 @@ public class MessageStreamScriptServiceTest extends AbstractMockingComponentTest
     @Before
     public void configure() throws Exception
     {
-        this.streamService = getComponentManager().getInstance(ScriptService.class, "messageStream");
+        this.streamService = this.mocker.getComponentUnderTest();
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        when(execution.getContext()).thenReturn(executionContext);
     }
 
     @Test
-    public void testPostPublicMessage() throws Exception
+    public void postPublicMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postPublicMessage("Hello World!");
-            }
-        });
-        Assert.assertTrue(this.streamService.postPublicMessage("Hello World!"));
+        assertTrue(this.streamService.postPublicMessage("Hello World!"));
+
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        verify(stream).postPublicMessage("Hello World!");
     }
 
     @Test
-    public void testPostPublicMessageWithFailure() throws Exception
+    public void postPublicMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postPublicMessage("Hello World!");
-                will(throwException(new NullPointerException()));
-            }
-        });
-        Assert.assertFalse(this.streamService.postPublicMessage("Hello World!"));
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        doThrow(new RuntimeException("error")).when(stream).postPublicMessage("Hello World!");
+
+        assertFalse(this.streamService.postPublicMessage("Hello World!"));
     }
 
     @Test
-    public void testPostPersonalMessage() throws Exception
+    public void postPersonalMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postPersonalMessage("Hello World!");
-            }
-        });
-        Assert.assertTrue(this.streamService.postPersonalMessage("Hello World!"));
+        assertTrue(this.streamService.postPersonalMessage("Hello World!"));
+
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        verify(stream).postPersonalMessage("Hello World!");
     }
 
     @Test
-    public void testPostPersonalMessageWithFailure() throws Exception
+    public void postPersonalMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postPersonalMessage("Hello World!");
-                will(throwException(new NullPointerException()));
-            }
-        });
-        Assert.assertFalse(this.streamService.postPersonalMessage("Hello World!"));
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        doThrow(new RuntimeException("error")).when(stream).postPersonalMessage("Hello World!");
+
+        assertFalse(this.streamService.postPersonalMessage("Hello World!"));
+        assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void testPostDirectMessage() throws Exception
+    public void postDirectMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postDirectMessageToUser("Hello World!",
-                    MessageStreamScriptServiceTest.this.targetUser);
-            }
-        });
-        Assert.assertTrue(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
+        assertTrue(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
+
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        verify(stream).postDirectMessageToUser("Hello World!", this.targetUser);
     }
 
     @Test
-    public void testPostDirectMessageWithFailure() throws Exception
+    public void postDirectMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postDirectMessageToUser("Hello World!",
-                    MessageStreamScriptServiceTest.this.targetUser);
-                will(throwException(new NullPointerException()));
-            }
-        });
-        Assert.assertFalse(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        doThrow(new RuntimeException("error")).when(stream).postDirectMessageToUser("Hello World!", this.targetUser);
+
+        assertFalse(this.streamService.postDirectMessageToUser("Hello World!", this.targetUser));
+        assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void testPostGroupMessage() throws Exception
+    public void postGroupMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postMessageToGroup("Hello World!",
-                    MessageStreamScriptServiceTest.this.targetGroup);
-            }
-        });
-        Assert.assertTrue(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
+        assertTrue(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
+
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        verify(stream).postMessageToGroup("Hello World!", this.targetGroup);
     }
 
     @Test
-    public void testPostGroupMessageWithFailure() throws Exception
+    public void postGroupMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).postMessageToGroup("Hello World!",
-                    MessageStreamScriptServiceTest.this.targetGroup);
-                will(throwException(new NullPointerException()));
-            }
-        });
-        Assert.assertFalse(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        doThrow(new RuntimeException("error")).when(stream).postMessageToGroup("Hello World!", this.targetGroup);
+
+        assertFalse(this.streamService.postMessageToGroup("Hello World!", this.targetGroup));
+        assertEquals("error", this.streamService.getLastError().getMessage());
     }
 
     @Test
-    public void testDeleteMessage() throws Exception
+    public void deleteMessage() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).deleteMessage("abc123");
-            }
-        });
-        Assert.assertTrue(this.streamService.deleteMessage("abc123"));
+        assertTrue(this.streamService.deleteMessage("abc123"));
+
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        verify(stream).deleteMessage("abc123");
     }
 
     @Test
-    public void testDeleteMessageWithFailure() throws Exception
+    public void deleteMessageWithFailure() throws Exception
     {
-        final MessageStream mockStream = getComponentManager().getInstance(MessageStream.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                exactly(1).of(mockStream).deleteMessage("abc123");
-                will(throwException(new IllegalArgumentException()));
-            }
-        });
-        Assert.assertFalse(this.streamService.deleteMessage("abc123"));
+        MessageStream stream = this.mocker.getInstance(MessageStream.class);
+        doThrow(new IllegalArgumentException("error")).when(stream).deleteMessage("abc123");
+
+        assertFalse(this.streamService.deleteMessage("abc123"));
+        assertEquals("error", this.streamService.getLastError().getMessage());
     }
 }

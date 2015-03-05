@@ -28,14 +28,14 @@ import com.xpn.xwiki.XWikiException;
  * <p>
  * This means that by default there is not UI and it's not registered in the statistics since the main page is already
  * logged.
- * 
+ *
  * @version $Id$
  */
 public class GetAction extends XWikiAction
 {
     /**
      * The identifier of the view action.
-     * 
+     *
      * @todo need an enumerated class for actions.
      */
     public static final String GET_ACTION = "get";

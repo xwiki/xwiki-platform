@@ -30,7 +30,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Exports a document as PDF.
- * 
+ *
  * @deprecated Use {@link ExportAction}.
  * @version $Id$
  */

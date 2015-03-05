@@ -23,10 +23,10 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.test.jmock.XWikiComponentInitializer;
 
 /**
@@ -95,7 +95,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
      *         then be put in the XWiki Context for testing.
      */
-    public EmbeddableComponentManager getComponentManager() throws Exception
+    public MockingComponentManager getComponentManager() throws Exception
     {
         return this.initializer.getComponentManager();
     }

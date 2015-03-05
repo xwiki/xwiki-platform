@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
 import com.novell.ldap.LDAPConnection;
-import com.novell.ldap.LDAPConstraints;
 import com.novell.ldap.LDAPDN;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;

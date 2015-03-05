@@ -63,6 +63,6 @@ public class LogItemPane extends BaseElement
      */
     public String getMessage()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.tagName("DIV")).getText();
+        return getDriver().findElementWithoutWaiting(container, By.tagName("DIV")).getText();
     }
 }

@@ -36,7 +36,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
@@ -55,7 +54,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("wiki.user")
 @Singleton
-@Unstable
 public class WikiUserManagerScriptService implements ScriptService
 {
     /**

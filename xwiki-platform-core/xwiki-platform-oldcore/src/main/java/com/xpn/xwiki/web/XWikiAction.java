@@ -50,9 +50,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
@@ -61,14 +59,13 @@ import org.xwiki.resource.ResourceReferenceHandler;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -124,7 +121,7 @@ public abstract class XWikiAction extends Action
 
     /**
      * Handle server requests.
-     * 
+     *
      * @param mapping The ActionMapping used to select this instance
      * @param form The optional ActionForm bean for this request (if any)
      * @param req The HTTP request we are processing
@@ -327,7 +324,7 @@ public abstract class XWikiAction extends Action
                     Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
                     entityResourceReferenceHandler.handle(resourceReference, new DefaultResourceReferenceHandlerChain(
-                        Collections.<ResourceReferenceHandler> emptyList()));
+                        Collections.<ResourceReferenceHandler>emptyList()));
                     // Don't let the old actions kick in!
                     return null;
                 } catch (NotFoundResourceHandlerException e) {
@@ -610,7 +607,7 @@ public abstract class XWikiAction extends Action
     /**
      * Send redirection based on a regexp pattern (if any) set at the main wiki level. To enable this feature you must
      * add xwiki.preferences.redirect=1 to your xwiki.cfg.
-     * 
+     *
      * @param response the servlet response
      * @param url url of the request
      * @param context the XWiki context
@@ -649,7 +646,7 @@ public abstract class XWikiAction extends Action
                 response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
-            Object[] args = {url};
+            Object[] args = { url };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);
@@ -660,7 +657,7 @@ public abstract class XWikiAction extends Action
      * Gets the translated version of a document, in the specified language. If the translation does not exist, a new
      * document translation is created. If the requested language does not correspond to a translation (is not defined
      * or is the same as the main document), then the main document is returned.
-     * 
+     *
      * @param doc the main (default, untranslated) document to translate
      * @param language the requested document language
      * @param context the current request context
@@ -689,7 +686,7 @@ public abstract class XWikiAction extends Action
     /**
      * Perform CSRF check and redirect to the resubmission page if needed. Throws an exception if the access should be
      * denied, returns false if the check failed and the user will be redirected to a resubmission page.
-     * 
+     *
      * @param context current xwiki context containing the request
      * @return true if the check succeeded, false if resubmission is needed
      * @throws XWikiException if the check fails

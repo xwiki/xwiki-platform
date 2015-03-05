@@ -8,16 +8,16 @@ viewers.Comments = Class.create({
   xcommentSelector : ".xwikicomment",
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
-    if ($("commentscontent")) {
-      // If the comments area is already visible, enhance it.
+    var commentsContent = $('commentscontent');
+    if (commentsContent) {
+      // If the comments area is already visible, enhance them.
       this.startup();
     }
     if ($("Commentstab")) {
       this.container = $("Commentspane");
-      this.generatorTemplate = "commentsinline.vm";
-    } else if ($$(".main.layoutsubsection").size() > 0 && $$(".main.layoutsubsection").first().down("#commentscontent")) {
-      this.container = $$(".main.layoutsubsection").first();
-      this.generatorTemplate = "comments.vm";
+    } else if (commentsContent) {
+      // We need to wrap the comments because we replace all of them when a new comment is added.
+      this.container = commentsContent.wrap('div', {'id': 'Commentspane'});
     }
     // We wait for a notification for the AJAX loading of the Comments metadata tab.
     this.addTabLoadListener();
@@ -272,10 +272,11 @@ viewers.Comments = Class.create({
         event.stop();
         if (form.down('textarea').value != "") {
           var formData = new Hash(form.serialize(true));
-          formData.set('xredirect', window.docgeturl + '?xpage=xpart&vm=' + this.generatorTemplate);
+          formData.set('xredirect', window.docgeturl + '?xpage=xpart&vm=commentsinline.vm&skin=' + encodeURIComponent(XWiki.skin));
           // Allows CommentAddAction to parse a template which will return a message telling if the captcha was wrong.
           formData.set('xpage', 'xpart');
-          formData.set('vm', this.generatorTemplate);
+          formData.set('vm', 'commentsinline.vm');
+          formData.set('skin', XWiki.skin);
           // Strip form parameters from the form action query string to prevent them from being overwriten.
           var queryStringParams = $H(form.action.toQueryParams());
           formData.keys().each(queryStringParams.unset.bind(queryStringParams));

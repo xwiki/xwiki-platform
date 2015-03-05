@@ -26,9 +26,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.EditPage;
 
-public class EditThemePage extends ViewPage
+public class EditThemePage extends EditPage
 {
     @FindBy(id = "autosync")
     private WebElement autoSyncCheckBox;
@@ -51,8 +51,8 @@ public class EditThemePage extends ViewPage
                         + "//li//a[@data-toggle='tab' and text()='" + category + "']"));
         categoryElem.click();
         // Wait until the panel is displayed
-        waitUntilElementIsVisible(
-                By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
     }
 
     public List<String> getVariableCategories()
@@ -80,7 +80,20 @@ public class EditThemePage extends ViewPage
         WebElement variableField = getDriver().findElement(By.xpath("//label[text() = '@"+variableName+"']/..//input"));
         // Remove the previous value
         variableField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
-        // Write the one
+        // Write the new one
+        variableField.sendKeys(value);
+    }
+
+    /**
+     * @since 6.3RC1
+     */
+    public void setTextareaValue(String variableName, String value)
+    {
+        WebElement variableField = getDriver().findElement(
+                By.xpath("//label[text() = '@"+variableName+"']/..//textarea"));
+        // Remove the previous value
+        variableField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
+        // Write the new one
         variableField.sendKeys(value);
     }
 
@@ -102,12 +115,19 @@ public class EditThemePage extends ViewPage
 
     public void waitUntilPreviewIsLoaded()
     {
-        waitUntilElementDisappears(By.id("preview-curtain"));
+        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
     }
 
     public PreviewBox getPreviewBox()
     {
         return new PreviewBox();
+    }
+
+    @Override
+    public ViewThemePage clickSaveAndView()
+    {
+        this.save.click();
+        return new ViewThemePage();
     }
 
 }

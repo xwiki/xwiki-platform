@@ -19,6 +19,9 @@
  */
 package org.xwiki.skinx.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.skinx.AbstractWrapperSkinExtension;
 
@@ -28,7 +31,9 @@ import org.xwiki.skinx.AbstractWrapperSkinExtension;
  * @version $Id$
  * @since 6.2M1
  */
-@Component("linkx")
+@Component
+@Named("linkx")
+@Singleton
 public class LinkSkinExtension extends AbstractWrapperSkinExtension
 {
 }

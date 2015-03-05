@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 5.3RC1
  */
 @Component
+@Singleton
 public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerFromAttachedXAR
 {
     @Inject

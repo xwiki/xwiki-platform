@@ -225,6 +225,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testGetDisplayWhenNoTitleButSectionExists()
     {
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
         this.document.setContent("Some content\n1 Title");
         this.mockVelocityEngine.expects(once()).method("evaluate").with(null, ANYTHING, ANYTHING, eq("Title"))
             .will(velocityEngineEvaluateStub);

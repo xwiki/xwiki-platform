@@ -20,7 +20,6 @@
 package org.xwiki.wiki.configuration;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options for the Wiki module.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.4.4
  */
 @Role
-@Unstable
 public interface WikiConfiguration
 {
     /**

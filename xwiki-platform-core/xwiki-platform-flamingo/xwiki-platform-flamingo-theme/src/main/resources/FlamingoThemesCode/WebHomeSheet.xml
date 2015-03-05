@@ -517,7 +517,7 @@
     {{/html}}
   #else
     ## Let's do it
-    $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference('', 'FlamingoThemes', $request.newThemeName)).getURL('edit', "template=FlamingoThemesCode.ThemeTemplate&amp;title=$escapetool.url($request.newThemeName)&amp;parent=$doc.fullName"))
+    $response.sendRedirect($xwiki.getDocument($services.model.createDocumentReference('', 'FlamingoThemes', $request.newThemeName)).getURL('edit', "template=FlamingoThemesCode.ThemeTemplate&amp;title=$escapetool.url($request.newThemeName)&amp;parent=$doc.fullName&amp;xhidden=1"))
   #end
 #end
 ####################################

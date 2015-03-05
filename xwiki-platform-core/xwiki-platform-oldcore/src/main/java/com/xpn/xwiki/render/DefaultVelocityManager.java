@@ -19,21 +19,39 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
+import org.apache.commons.io.output.NullWriter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.skin.Skin;
+import org.xwiki.skin.SkinManager;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
+import org.xwiki.template.event.TemplateDeletedEvent;
+import org.xwiki.template.event.TemplateEvent;
+import org.xwiki.template.event.TemplateUpdatedEvent;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
@@ -44,19 +62,19 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.internal.template.TemplateManager;
+import com.xpn.xwiki.internal.template.SUExecutor;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
  * populate the Velocity Context with XWiki objects that are located in the Core (such as the XWiki object for example)
  * and since the Core needs to call the Velocity module this would cause a circular dependency.
- * 
+ *
  * @version $Id$
  * @since 1.5M1
  */
 @Component
 @Singleton
-public class DefaultVelocityManager implements VelocityManager
+public class DefaultVelocityManager implements VelocityManager, Initializable
 {
     /**
      * The name of the Velocity configuration property that specifies the ResourceLoader name that Velocity should use
@@ -71,6 +89,9 @@ public class DefaultVelocityManager implements VelocityManager
     private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
 
     private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
+
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new TemplateUpdatedEvent(),
+        new TemplateDeletedEvent());
 
     /**
      * Used to access the current {@link org.xwiki.context.ExecutionContext}.
@@ -101,6 +122,47 @@ public class DefaultVelocityManager implements VelocityManager
      */
     @Inject
     private Provider<TemplateManager> templates;
+
+    @Inject
+    private SkinManager skinManager;
+
+    @Inject
+    private ObservationManager observation;
+
+    @Inject
+    private SUExecutor suExecutor;
+
+    @Inject
+    private Logger logger;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.observation.addListener(new EventListener()
+        {
+            @Override
+            public void onEvent(Event event, Object source, Object data)
+            {
+                if (event instanceof TemplateEvent) {
+                    TemplateEvent templateEvent = (TemplateEvent) event;
+
+                    DefaultVelocityManager.this.velocityFactory.removeVelocityEngine(templateEvent.getId());
+                }
+            }
+
+            @Override
+            public String getName()
+            {
+                return DefaultVelocityManager.class.getName();
+            }
+
+            @Override
+            public List<Event> getEvents()
+            {
+                return EVENTS;
+            }
+        });
+    }
 
     @Override
     public VelocityContext getVelocityContext()
@@ -137,38 +199,34 @@ public class DefaultVelocityManager implements VelocityManager
      * @return the key used to cache the Velocity Engines. We have one Velocity Engine per skin which has a macros.vm
      *         file on the filesystem. Right now we don't support macros.vm defined in custom skins in wiki pages.
      */
-    private String getVelocityEngineCacheKey(XWikiContext xcontext)
+    private Template getVelocityEngineMacrosTemplate()
     {
-        String cacheKey = null;
-        Map<String, String> cacheKeyCache = null;
+        Template template = null;
+        Map<String, Template> templateCache = null;
 
-        String currentSkin = xcontext.getWiki().getSkin(xcontext);
+        Skin currentSkin = this.skinManager.getCurrentSkin(true);
 
         // Generating this key is very expensive so we cache it in the context
         ExecutionContext econtext = this.execution.getContext();
         if (econtext != null) {
-            cacheKeyCache = (Map<String, String>) econtext.getProperty(VELOCITYENGINE_CACHEKEY_NAME);
-            if (cacheKeyCache == null) {
-                cacheKeyCache = new HashMap<String, String>();
-                econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, cacheKeyCache);
+            templateCache = (Map<String, Template>) econtext.getProperty(VELOCITYENGINE_CACHEKEY_NAME);
+            if (templateCache == null) {
+                templateCache = new HashMap<>();
+                econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, templateCache);
             } else {
-                cacheKey = cacheKeyCache.get(currentSkin);
+                template = templateCache.get(currentSkin.getId());
             }
         }
 
-        if (cacheKey == null) {
-            cacheKey = this.templates.get().getPath("macros.vm");
+        if (template == null) {
+            template = this.templates.get().getTemplate("macros.vm");
 
-            if (cacheKey == null) {
-                cacheKey = "default";
-            }
-
-            if (cacheKeyCache != null) {
-                cacheKeyCache.put(currentSkin, cacheKey);
+            if (templateCache != null) {
+                templateCache.put(currentSkin.getId(), template);
             }
         }
 
-        return cacheKey;
+        return template;
     }
 
     /**
@@ -191,27 +249,26 @@ public class DefaultVelocityManager implements VelocityManager
         // Get the location of the skin's macros.vm file
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        String cacheKey;
+        final Template template;
         if (xcontext != null && xcontext.getWiki() != null) {
-            cacheKey = getVelocityEngineCacheKey(xcontext);
+            template = getVelocityEngineMacrosTemplate();
         } else {
-            cacheKey = "";
+            template = null;
         }
 
+        String cacheKey = template != null ? template.getId() : "default";
+
         // Get the Velocity Engine to use
-        VelocityEngine velocityEngine;
-        if (this.velocityFactory.hasVelocityEngine(cacheKey)) {
-            velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
-        } else {
+        VelocityEngine velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
+        if (velocityEngine == null) {
             // Note 1: This block is synchronized to prevent threads from creating several instances of
             // Velocity Engines (for the same skin).
             // Note 2: We do this instead of marking the whole method as synchronized since it seems this method is
             // called quite often and we would incur the synchronization penalty. Ideally the engine should be
             // created only when a new skin is created and not be on the main execution path.
             synchronized (this) {
-                if (this.velocityFactory.hasVelocityEngine(cacheKey)) {
-                    velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
-                } else {
+                velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
+                if (velocityEngine == null) {
                     // Gather the global Velocity macros that we want to have. These are skin dependent.
                     Properties properties = new Properties();
 
@@ -227,11 +284,34 @@ public class DefaultVelocityManager implements VelocityManager
                         // xwiki.render.velocity.macrolist to an empty string value.
                         String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist");
                         if (macroList == null) {
-                            macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
+                            macroList = "/templates/macros.vm";
                         }
                         properties.put(RuntimeConstants.VM_LIBRARY, macroList);
                     }
                     velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, properties);
+
+                    if (template != null) {
+                        // Local macros template
+                        // We execute it ourself to support any kind of template, Velocity only support resource
+                        // template by default
+                        try {
+                            final VelocityEngine finalVelocityEngine = velocityEngine;
+
+                            this.suExecutor.call(new Callable<XDOM>()
+                            {
+                                @Override
+                                public XDOM call() throws Exception
+                                {
+                                    finalVelocityEngine.evaluate(new VelocityContext(), NullWriter.NULL_WRITER, "",
+                                        template.getContent().getContent());
+
+                                    return null;
+                                }
+                            }, template.getContent().getAuthorReference());
+                        } catch (Exception e) {
+                            this.logger.error("Failed to evaluate macros templates [{}]", template.getPath(), e);
+                        }
+                    }
                 }
             }
         }

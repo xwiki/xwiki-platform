@@ -34,7 +34,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiURLFactoryService.class);
 
-    private Map factoryMap;
+    private Map<Integer, Class<? extends XWikiURLFactory>> factoryMap;
 
     public XWikiURLFactoryServiceImpl(XWiki xwiki)
     {
@@ -43,7 +43,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 
     private void init(XWiki xwiki)
     {
-        factoryMap = new HashMap();
+        this.factoryMap = new HashMap<>();
         register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXmlRpcURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");
@@ -51,16 +51,17 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         register(xwiki, XWikiContext.MODE_GWT_DEBUG, XWikiDebugGWTURLFactory.class, "xwiki.urlfactory.servletclass");
     }
 
-    protected void register(XWiki xwiki, int mode, Class defaultImpl, String propertyName)
+    protected void register(XWiki xwiki, int mode, Class<? extends XWikiURLFactory> defaultImpl, String propertyName)
     {
-        Integer factoryMode = new Integer(mode);
-        factoryMap.put(factoryMode, defaultImpl);
+        this.factoryMap.put(mode, defaultImpl);
         String urlFactoryClassName = xwiki.Param(propertyName);
         if (urlFactoryClassName != null) {
             try {
                 LOGGER.debug("Using custom url factory [" + urlFactoryClassName + "]");
-                Class urlFactoryClass = Class.forName(urlFactoryClassName);
-                factoryMap.put(factoryMode, urlFactoryClass);
+                @SuppressWarnings("unchecked")
+                Class<? extends XWikiURLFactory> urlFactoryClass =
+                    (Class<? extends XWikiURLFactory>) Class.forName(urlFactoryClassName);
+                this.factoryMap.put(mode, urlFactoryClass);
             } catch (Exception e) {
                 LOGGER.error("Failed to load custom url factory class [" + urlFactoryClassName + "]");
             }
@@ -72,8 +73,8 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
     {
         XWikiURLFactory urlf = null;
         try {
-            Class urlFactoryClass = (Class) factoryMap.get(new Integer(mode));
-            urlf = (XWikiURLFactory) urlFactoryClass.newInstance();
+            Class<? extends XWikiURLFactory> urlFactoryClass = this.factoryMap.get(mode);
+            urlf = urlFactoryClass.newInstance();
             urlf.init(context);
         } catch (Exception e) {
             LOGGER.error("Failed to create url factory", e);

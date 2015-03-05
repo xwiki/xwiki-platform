@@ -88,7 +88,7 @@ public class ChangesPane extends BaseElement
     public List<String> getChangedMetaData()
     {
         By xpath = By.xpath("dl[preceding-sibling::*[1][. = 'Metadata changes']]/dt");
-        return getText(getUtil().findElementsWithoutWaiting(getDriver(), container, xpath));
+        return getText(getDriver().findElementsWithoutWaiting(container, xpath));
     }
 
     /**
@@ -101,7 +101,7 @@ public class ChangesPane extends BaseElement
         String xpath =
             ".//dd[preceding-sibling::dt[1][. = '" + propertyLabel + "'] and "
                 + "parent::dl[preceding-sibling::*[1][. = 'Metadata changes']]]/*[1]";
-        return getDiff(getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath)));
+        return getDiff(getDriver().findElementWithoutWaiting( container, By.xpath(xpath)));
     }
 
     /**
@@ -111,17 +111,17 @@ public class ChangesPane extends BaseElement
     private String getDiff(WebElement element)
     {
         if ("diff-line".equals(element.getAttribute("class"))) {
-            return (String) executeJavascript("return arguments[0].innerHTML", element);
+            return (String) getDriver().executeJavascript("return arguments[0].innerHTML", element);
         } else {
             By xpath = By.xpath(".//td[3]");
             StringBuilder diff = new StringBuilder();
-            for (WebElement line : getUtil().findElementsWithoutWaiting(getDriver(), element, xpath)) {
+            for (WebElement line : getDriver().findElementsWithoutWaiting(element, xpath)) {
                 if (diff.length() > 0) {
                     diff.append('\n');
                 }
-                if (getUtil().findElementsWithoutWaiting(getDriver(), line, By.tagName("ins")).size() > 0
-                    || getUtil().findElementsWithoutWaiting(getDriver(), line, By.tagName("del")).size() > 0) {
-                    diff.append(executeJavascript("return arguments[0].innerHTML", line));
+                if (getDriver().findElementsWithoutWaiting(line, By.tagName("ins")).size() > 0
+                    || getDriver().findElementsWithoutWaiting(line, By.tagName("del")).size() > 0) {
+                    diff.append(getDriver().executeJavascript("return arguments[0].innerHTML", line));
                 } else {
                     diff.append(line.getText());
                 }
@@ -136,7 +136,7 @@ public class ChangesPane extends BaseElement
     public String getContentChanges()
     {
         By xpath = By.xpath("div[@class = 'diff-container' and preceding-sibling::*[1][. = 'Content changes']]");
-        List<WebElement> found = getUtil().findElementsWithoutWaiting(getDriver(), container, xpath);
+        List<WebElement> found = getDriver().findElementsWithoutWaiting(container, xpath);
         return found.size() > 0 ? getDiff(found.get(0)) : null;
     }
 
@@ -146,7 +146,7 @@ public class ChangesPane extends BaseElement
     public List<String> getAttachmentChanges()
     {
         By xpath = By.xpath("ul[preceding-sibling::*[1][. = 'Attachment changes']]/li");
-        return getText(getUtil().findElementsWithoutWaiting(getDriver(), container, xpath));
+        return getText(getDriver().findElementsWithoutWaiting(container, xpath));
     }
 
     /**
@@ -160,7 +160,7 @@ public class ChangesPane extends BaseElement
         String xpath =
             ".//dd[preceding-sibling::dt[1][. = '" + propertyLabel + "'] and "
                 + "parent::dl[preceding-sibling::*[1][starts-with(., 'Comment number " + commentNumber + "')]]]/*[1]";
-        return getDiff(getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath)));
+        return getDiff(getDriver().findElementWithoutWaiting(container, By.xpath(xpath)));
     }
 
     /**
@@ -169,7 +169,7 @@ public class ChangesPane extends BaseElement
     public List<String> getCommentChangeSummaries()
     {
         By xpath = By.xpath("*[starts-with(name(), 'H') and starts-with(., 'Comment number ')]");
-        return getText(getUtil().findElementsWithoutWaiting(getDriver(), container, xpath));
+        return getText(getDriver().findElementsWithoutWaiting(container, xpath));
     }
 
     /**
@@ -185,7 +185,7 @@ public class ChangesPane extends BaseElement
             ".//dd[preceding-sibling::dt[1][. = '" + propertyLabel + "'] and "
                 + "parent::dl[preceding-sibling::*[1][starts-with(., 'Object number " + objectNumber + " of type "
                 + objectType + "')]]]/*[1]";
-        return getDiff(getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath)));
+        return getDiff(getDriver().findElementWithoutWaiting(container, By.xpath(xpath)));
     }
 
     /**
@@ -194,7 +194,7 @@ public class ChangesPane extends BaseElement
     public List<String> getObjectChangeSummaries()
     {
         By xpath = By.xpath("*[starts-with(name(), 'H') and starts-with(., 'Object number ')]");
-        return getText(getUtil().findElementsWithoutWaiting(getDriver(), container, xpath));
+        return getText(getDriver().findElementsWithoutWaiting(container, xpath));
     }
 
     /**
@@ -203,7 +203,7 @@ public class ChangesPane extends BaseElement
     public List<String> getClassChanges()
     {
         By xpath = By.xpath("ul[preceding-sibling::*[1][. = 'Class changes']]/li");
-        return getText(getUtil().findElementsWithoutWaiting(getDriver(), container, xpath));
+        return getText(getDriver().findElementsWithoutWaiting(container, xpath));
     }
 
     /**
@@ -224,7 +224,7 @@ public class ChangesPane extends BaseElement
      */
     public boolean hasNoChanges()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), container,
+        return getDriver().findElementsWithoutWaiting(container,
             By.xpath("div[@class = 'infomessage' and . = 'No changes']")).size() > 0;
     }
 }

@@ -19,13 +19,6 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-import groovy.lang.Writable;
-import groovy.text.Template;
-import groovy.text.TemplateEngine;
-
 import java.beans.Introspector;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,6 +31,13 @@ import java.util.Map;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.xwiki.cache.DisposableCacheValue;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+import groovy.lang.Writable;
+import groovy.text.Template;
+import groovy.text.TemplateEngine;
 
 /**
  * This simple template engine uses JSP <% %> script and <%= %> expression syntax. It also lets you use normal groovy
@@ -74,7 +74,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
 
         /**
          * Write the template document with the set binding applied to the writer.
-         * 
+         *
          * @see groovy.lang.Writable#writeTo(java.io.Writer)
          */
         public Writer writeTo(Writer writer) throws IOException
@@ -95,7 +95,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
          * {@inheritDoc}
          * <p>
          * Convert the template and binding into a result String.
-         * 
+         *
          * @see java.lang.Object#toString()
          */
         @Override
@@ -223,7 +223,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
                  * {@inheritDoc}
                  * <p>
                  * Write the template document with the set binding applied to the writer.
-                 * 
+                 *
                  * @see groovy.lang.Writable#writeTo(java.io.Writer)
                  */
                 @Override
@@ -235,7 +235,8 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
                     } else {
                         binding = new Binding(map);
                     }
-                    Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
+                    Script scriptObject =
+                        InvokerHelper.createScript(XWikiSimpleTemplate.this.script.getClass(), binding);
                     PrintWriter pw = new PrintWriter(writer);
                     scriptObject.setProperty("out", pw);
                     scriptObject.run();
@@ -248,7 +249,7 @@ public class XWikiSimpleTemplateEngine extends TemplateEngine
                  * {@inheritDoc}
                  * <p>
                  * Convert the template and binding into a result String.
-                 * 
+                 *
                  * @see java.lang.Object#toString()
                  */
                 @Override

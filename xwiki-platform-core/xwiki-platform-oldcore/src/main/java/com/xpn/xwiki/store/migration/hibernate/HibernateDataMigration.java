@@ -26,6 +26,7 @@ import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
  * Hibernate data migrations role.
+ *
  * @version $Id$
  * @since 3.4M1
  */

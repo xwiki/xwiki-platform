@@ -34,7 +34,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
  * The behavior is the one defined in
  * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider}.
- * 
+ *
  * @version $Id$
  * @since 2.2M1
  */

@@ -29,7 +29,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
@@ -38,7 +37,6 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
  * @version $Id$
  * @since 5.3M2
  */
-@Unstable
 public class WikiDescriptor
 {
     /**

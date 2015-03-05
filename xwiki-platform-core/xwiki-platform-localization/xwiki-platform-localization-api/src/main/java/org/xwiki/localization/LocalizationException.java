@@ -19,15 +19,12 @@
  */
 package org.xwiki.localization;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * All Localization module API must raise an exception of this type.
  * 
  * @version $Id$
  * @since 4.3M2
  */
-@Unstable
 public class LocalizationException extends Exception
 {
     /**

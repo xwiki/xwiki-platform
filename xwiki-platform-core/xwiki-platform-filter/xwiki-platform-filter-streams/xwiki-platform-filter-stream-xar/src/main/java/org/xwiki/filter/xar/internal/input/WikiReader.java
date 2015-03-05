@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Inject;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -81,7 +80,7 @@ public class WikiReader
         return this.xarPackage;
     }
 
-    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
+    public void read(Object filter, XARInputFilter proxyFilter) throws IOException,
         FilterException
     {
         InputStream stream;
@@ -110,8 +109,7 @@ public class WikiReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        IOException, FilterException
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws IOException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
@@ -140,7 +138,7 @@ public class WikiReader
                 } catch (Exception e) {
                     if (this.properties.isVerbose()) {
                         this.logger.warn(LOG_DOCUMENT_FAILREAD, "Failed to read XAR XML document from entry [{}]: {}",
-                            entry.getName(), ExceptionUtils.getRootCauseMessage(e));
+                            entry.getName(), ExceptionUtils.getRootCauseMessage(e), e);
                     }
                 }
             }

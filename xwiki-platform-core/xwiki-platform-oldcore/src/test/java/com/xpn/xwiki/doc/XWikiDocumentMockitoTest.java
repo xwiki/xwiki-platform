@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -37,23 +38,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
-import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.velocity.VelocityManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -89,73 +80,42 @@ public class XWikiDocumentMockitoTest
         }
     }
 
-    /**
-     * A component manager that allows us to register mock components.
-     */
     @Rule
-    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     /**
      * The object being tested.
      */
     private XWikiDocument document;
 
-    /**
-     * A mock {@link XWikiContext};
-     */
-    private XWikiContext context = mock(XWikiContext.class);
-
     @Before
     public void setUp() throws Exception
     {
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
-        mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "default");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
-        mocker.registerMockComponent(SyntaxFactory.class);
-
-        Utils.setComponentManager(mocker);
-        document = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
-
-        XWiki wiki = mock(XWiki.class);
-        when(context.getWiki()).thenReturn(wiki);
+        this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
         // Activate programming rights in order to be able to call com.xpn.xwiki.api.Document#getDocument().
-        XWikiRightService rightsService = mock(XWikiRightService.class);
-        when(wiki.getRightService()).thenReturn(rightsService);
-        when(rightsService.hasProgrammingRights(context)).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
+
+        this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.oldcore.getMockXWiki().saveDocument(this.document, "", true, this.oldcore.getXWikiContext());
     }
 
     @Test
     public void getChildrenReferences() throws Exception
     {
-        XWikiStoreInterface store = mock(XWikiStoreInterface.class);
-        document.setStore(store);
-
-        QueryManager queryManager = mock(QueryManager.class);
-        when(store.getQueryManager()).thenReturn(queryManager);
-
         Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
+        when(this.oldcore.getQueryManager().createQuery(anyString(), eq(Query.XWQL))).thenReturn(query);
 
-        QueryFilter hiddenFilter = mocker.registerMockComponent(QueryFilter.class, "hidden");
+        QueryFilter hiddenFilter = this.oldcore.getMocker().registerMockComponent(QueryFilter.class, "hidden");
 
         when(query.setLimit(7)).thenReturn(query);
 
-        List<Object[]> result = Arrays.asList(new Object[] {"X", "y"}, new Object[] {"A", "b"});
+        List<Object[]> result = Arrays.asList(new Object[]{ "X", "y" }, new Object[]{ "A", "b" });
         when(query.<Object[]> execute()).thenReturn(result);
 
-        List<DocumentReference> childrenReferences = document.getChildrenReferences(7, 3, context);
+        List<DocumentReference> childrenReferences = document.getChildrenReferences(7, 3,
+            this.oldcore.getXWikiContext());
 
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
@@ -172,13 +132,13 @@ public class XWikiDocumentMockitoTest
     @Test
     public void setAsContextDoc() throws Exception
     {
-        VelocityManager velocityManager = mocker.registerMockComponent(VelocityManager.class);
+        VelocityManager velocityManager = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
         VelocityContext velocityContext = mock(VelocityContext.class);
         when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
 
-        this.document.setAsContextDoc(context);
+        this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
-        verify(context).setDoc(document);
+        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
         Wraps wrapsThisDocument = new Wraps(this.document);
         verify(velocityContext).put(eq("doc"), argThat(wrapsThisDocument));
         verify(velocityContext).put(eq("tdoc"), argThat(wrapsThisDocument));
@@ -188,18 +148,18 @@ public class XWikiDocumentMockitoTest
     @Test
     public void setTranslationAsContextDoc() throws Exception
     {
-        VelocityManager velocityManager = mocker.registerMockComponent(VelocityManager.class);
+        VelocityManager velocityManager = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
         VelocityContext velocityContext = mock(VelocityContext.class);
         when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
 
         this.document.setLocale(Locale.US);
         XWikiDocument defaultTranslation = new XWikiDocument(this.document.getDocumentReference());
-        when(context.getWiki().getDocument(this.document.getDocumentReference(), context)).thenReturn(
-            defaultTranslation);
+        when(this.oldcore.getMockXWiki().getDocument(this.document.getDocumentReference(),
+            this.oldcore.getXWikiContext())).thenReturn(defaultTranslation);
 
-        this.document.setAsContextDoc(context);
+        this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 
-        verify(context).setDoc(document);
+        assertSame(this.document, this.oldcore.getXWikiContext().getDoc());
         verify(velocityContext).put(eq("doc"), argThat(new Wraps(defaultTranslation)));
         verify(velocityContext).put(eq("tdoc"), argThat(new Wraps(this.document)));
         verify(velocityContext).put(eq("cdoc"), argThat(new Wraps(this.document)));

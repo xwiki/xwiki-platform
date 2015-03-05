@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -40,12 +41,13 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * Fix any existing mistake with document translation field. It should be synchronized with the language.
  * <p>
  * This kind of mistake should not be possible anymore with the fix for XWIKI-11110.
- * 
+ *
  * @version $Id$
  * @since 5.4.6
  */
 @Component
 @Named("R54600Translation")
+@Singleton
 public class R54600TranslationDataMigration extends AbstractHibernateDataMigration
 {
     @Override

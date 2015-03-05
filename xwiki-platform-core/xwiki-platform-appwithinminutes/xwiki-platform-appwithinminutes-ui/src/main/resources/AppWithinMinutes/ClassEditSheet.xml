@@ -485,7 +485,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     ## FIXME: even if it is not a good practice to have an object in the class document, it is still possible. We should handle field renames for the class document
     ## as well. Note that there is a possibility that objects in the class' document are automatically updated. Needs checking.
     ##
-    #set($instancesStatement = "from doc.object($doc.fullName) as obj where doc.fullName not in (:className,:templateName)")
+    #set($instancesStatement = "from doc.object('$doc.fullName') as obj where doc.fullName not in (:className,:templateName)")
     #set($className = $stringtool.removeEnd($doc.name, 'Class'))
     #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
     #set($templateFullName = $services.model.serialize($templateRef, 'local'))

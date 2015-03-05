@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 /**
  * Computed Field Class allows to create a field without storage that will display computed values based on other data
  * in the object or wiki.
- * 
+ *
  * @version $Id$
  * @since 4.2M2
  */

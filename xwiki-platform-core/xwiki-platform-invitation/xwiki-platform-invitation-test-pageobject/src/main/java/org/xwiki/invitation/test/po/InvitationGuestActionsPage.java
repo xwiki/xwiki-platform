@@ -71,8 +71,7 @@ public class InvitationGuestActionsPage extends BasePage
 
     public String getMessage()
     {
-        List<WebElement> elements =
-            getUtil().findElementsWithoutWaiting(getDriver(), By.id("invitation-action-message"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("invitation-action-message"));
         if (elements.size() > 0) {
             return elements.get(0).getText();
         }

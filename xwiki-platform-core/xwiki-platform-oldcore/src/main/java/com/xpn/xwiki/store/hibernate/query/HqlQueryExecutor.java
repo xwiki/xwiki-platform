@@ -47,7 +47,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * QueryExecutor implementation for Hibernate Store.
- * 
+ *
  * @version $Id$
  * @since 1.6M1
  */
@@ -207,7 +207,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
     /**
      * Sets the value of the specified named parameter, taking into account the type of the given value.
-     * 
+     *
      * @param query the query to set the parameter for
      * @param name the parameter name
      * @param value the non-null parameter value
@@ -215,7 +215,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected void setNamedParameter(org.hibernate.Query query, String name, Object value)
     {
         if (value instanceof Collection) {
-            query.setParameterList(name, (Collection< ? >) value);
+            query.setParameterList(name, (Collection<?>) value);
         } else if (value.getClass().isArray()) {
             query.setParameterList(name, (Object[]) value);
         } else {

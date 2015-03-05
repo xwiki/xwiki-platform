@@ -70,7 +70,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI are compatible with
  * Confluence.
- * 
+ *
  * @version $Id$
  */
 public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
@@ -99,7 +99,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Login.
-     * 
+     *
      * @return A token to be used in subsequent calls as an identification.
      * @throws Exception If authentication fails.
      */
@@ -124,7 +124,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Logout.
-     * 
+     *
      * @param token The authentication token.
      * @return True is logout was successful.
      * @throws Exception An invalid token is provided.
@@ -139,7 +139,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get server information.
-     * 
+     *
      * @param token The authentication token.
      * @return The server information
      * @throws Exception An invalid token is provided.
@@ -154,8 +154,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         Integer majorVersion = null;
         Integer minorVersion = null;
         Map serverInfoMap = new HashMap();
-        serverInfoMap.put("DefaultSyntax", xwikiApi.getDefaultDocumentSyntax());
-        serverInfoMap.put("ConfiguredSyntaxes", xwikiApi.getConfiguredSyntaxes());
+        serverInfoMap.put("DefaultSyntax", this.xwikiApi.getDefaultDocumentSyntax());
+        serverInfoMap.put("ConfiguredSyntaxes", this.xwikiApi.getConfiguredSyntaxes());
 
         ServerInfo serverInfo = new ServerInfo(serverInfoMap);
         if (version != null) {
@@ -185,7 +185,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get the list of spaces.
-     * 
+     *
      * @param token The authentication token.
      * @return A list of Maps that represent SpaceSummary objects.
      * @throws Exception An invalid token is provided.
@@ -221,7 +221,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get information about a given space.
-     * 
+     *
      * @param token The authentication token.
      * @param spaceKey The space name.
      * @return A map representing a Space object.
@@ -257,7 +257,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Add a new space. It basically creates a SpaceKey.WebHome page with no content and the space title as its title.
-     * 
+     *
      * @param token The authentication token.
      * @param spaceMap The map representing a Space object.
      * @return The newly created space as a Space object.
@@ -293,7 +293,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Removes a space by deleting every page in it.
-     * 
+     *
      * @param token The authentication token.
      * @param spaceKey The space name.
      * @return True if the space has been successfully deleted.
@@ -379,7 +379,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     /**
      * Retrieves a page. The returned page title is set the current title if the current title != "", otherwise it is
      * set to the page name (i.e., the name part in the page Space.Name id)
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page[?language=l&version=v&minorVersion=mv]' format.
      * @return A map representing a Page object containing information about the requested page.
@@ -433,7 +433,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * the user want to to rename the page or set its title? According to the assumption stated before we assume that
      * the user wants to rename the page so we will rename the page to Space.NewTitle and set its title to NewTitle.
      * </p>
-     * 
+     *
      * @param token The authentication token.
      * @param pageMap A map representing the Page object to be stored.
      * @return A map representing a Page object with the updated information.
@@ -470,7 +470,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         /* If the syntax field is null then set it to the default wiki syntax */
         if (page.getSyntaxId() == null) {
-            page.setSyntaxId(xwikiApi.getDefaultDocumentSyntax());
+            page.setSyntaxId(this.xwikiApi.getDefaultDocumentSyntax());
         }
 
         /* Build the extended id from the page id */
@@ -612,7 +612,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Remove a page.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
@@ -642,7 +642,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get revision history of a page.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page[?language=lang]' format.
      * @return A list of maps representing PageHistorySummary objects.
@@ -675,7 +675,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Render a page or content in HTML.
-     * 
+     *
      * @param token The authentication token.
      * @param space Ignored
      * @param pageId The page id in the form of Space.Page
@@ -712,7 +712,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             baseDocument.setContentAuthor(this.xwikiContext.getUser());
         }
 
-        return baseDocument.getRenderedContent(content, baseDocument.getSyntaxId(), xwikiContext);
+        return baseDocument.getRenderedContent(content, baseDocument.getSyntaxId(), this.xwikiContext);
     }
 
     /**
@@ -745,7 +745,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     /**
      * Get a specific comment. This method is here just for completeness because getComments already returns the list
      * containing all the objects that might be retrieved using this method.
-     * 
+     *
      * @param token The authentication token.
      * @param commentId The comment id.
      * @return A map representing a Comment object.
@@ -769,7 +769,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Add a comment.
-     * 
+     *
      * @param token The authentication token.
      * @param commentMap A map representing a Comment object.
      * @return A map representing a Comment object with updated information.
@@ -800,7 +800,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Remove a comment.
-     * 
+     *
      * @param token The authentication token.
      * @return True if the comment has been successfully removed.
      * @throws Exception An invalid token is provided or the user has not the right to access it.
@@ -830,7 +830,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get attachments.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing Attachment objects.
@@ -857,7 +857,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Add an attachment.
-     * 
+     *
      * @param token The authentication token.
      * @param contentId Ignored
      * @param attachmentMap The Attachment object used to identify the page id, and attachment metadata.
@@ -891,7 +891,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get the attachment data.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param versionNumber (Ignored)
@@ -918,7 +918,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Remove attachment.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the attachment has been removed.
@@ -964,7 +964,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get classes.
-     * 
+     *
      * @param token The authentication token.
      * @return A list of maps representing XWikiClass objects.
      * @throws Exception An invalid token is provided.
@@ -987,7 +987,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Get a specific class.
-     * 
+     *
      * @param token The authentication token.
      * @param className The class name.
      * @return A map representing a XWikiClass object.
@@ -1041,7 +1041,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * The getObject function will return an XWikiObject where only non-null properties are included in the mapping
      * 'field' -> 'value' In order to know all the available fields and their respective types and attributes, clients
      * should refer to the object's class.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param className The class of the object.
@@ -1069,7 +1069,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Update the object or create a new one if it doesn't exist.
-     * 
+     *
      * @param token The authentication token.
      * @param objectMap A map representing the XWikiObject to be updated/created.
      * @return A map representing the XWikiObject with the updated information.
@@ -1184,7 +1184,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Search pages.
-     * 
+     *
      * @param token The authentication token.
      * @param query The string to be looked for. If it is "__ALL_PAGES__" the search will return all the page ids
      *            available in the Wiki.
@@ -1229,7 +1229,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     /**
      * Returns a list of XWikiPageHistorySummary containing all the pages that have been modified since a given date in
      * all their versions.
-     * 
+     *
      * @param token
      * @param date The starting date
      * @param numberOfResults The number of results to be returned
@@ -1282,7 +1282,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
     /**
      * This is a version of storePage that fails to store the page if the current version of the page doesn't match the
      * one of the page passed as parameter (i.e., the page has been modified since the last getPage)
-     * 
+     *
      * @param token
      * @param pageMap A map representing the Page object to be stored.
      * @param checkVersion True if the current version of the page and the one of the page passed as parameter must
@@ -1328,7 +1328,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * This is a version of storeObject that fails to store the object if the current version of the page associated to
      * the object doesn't match the one of the object passed as parameter (i.e., the object's page has been modified
      * since the last getObject)
-     * 
+     *
      * @param token The authentication token.
      * @param objectMap A map representing the XWikiObject to be updated/created.
      * @param checkVersion True if the current version of the object's page and the one of the one passed as parameter
@@ -1369,7 +1369,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * The getObject function will return an XWikiObject where only non-null properties are included in the mapping
      * 'field' -> 'value' In order to know all the available fields and their respective types and attributes, clients
      * should refer to the object's class.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The pageId.
      * @param guid The object's guid.
@@ -1395,7 +1395,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Converts a wiki source from a syntax to another syntax.
-     * 
+     *
      * @param token The authentication token.
      * @param source The content to be converted.
      * @param initialSyntaxId The initial syntax of the source.
@@ -1424,7 +1424,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Gets all syntaxes supported by the rendering parsers as an input for a syntax conversion.
-     * 
+     *
      * @param token The authentication token.
      * @return A list containing all syntaxes supported by rendering parsers.
      * @throws Exception An invalid token is provided or the syntax lookup fails.
@@ -1449,7 +1449,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Gets all syntaxes supported by the rendering as an output for a syntax conversion.
-     * 
+     *
      * @param token The authentication token.
      * @return A list containing all syntaxes supported by renderers.
      * @throws Exception An invalid token is provided or the syntax lookup fails.
@@ -1475,7 +1475,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Renders a text in the context of a wiki page.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The id of the page.
      * @param content The context to be rendered.
@@ -1498,7 +1498,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     /**
      * Gets the rendered content of an existing document.
-     * 
+     *
      * @param token The authentication token.
      * @param pageId The id of the page.
      * @param syntaxId The target syntax of the rendered content

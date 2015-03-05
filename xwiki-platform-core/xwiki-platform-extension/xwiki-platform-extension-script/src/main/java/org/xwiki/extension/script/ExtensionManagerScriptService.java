@@ -61,8 +61,10 @@ import org.xwiki.extension.version.internal.DefaultVersionRange;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -345,6 +347,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, id, namespace));
         installRequest.setInteractive(true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
+        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
+        if (currentUserReference != null) {
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USERREFERENCE, currentUserReference.toString());
+        }
 
         return installRequest;
     }
@@ -727,7 +736,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     // Jobs
 
     /**
-     * Get a reference to the currently executing job, if any.
+     * Get a reference to the currently job executed.
+     * <p>
+     * Current here basically means the extension related job that is going to block any new job that would be
+     * associated to the current namespace.
      * 
      * @return currently executing job, or {@code null} if no job is being executed
      */
@@ -740,7 +752,18 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             return null;
         }
 
-        return this.jobExecutor.getCurrentJob(AbstractExtensionJob.ROOT_GROUP);
+        // TODO: probably check current user namespace
+
+        // Check current wiki namespace
+        String namespace = "wiki:" + this.xcontextProvider.get().getWikiId();
+        Job job = this.jobExecutor.getCurrentJob(new JobGroupPath(namespace, AbstractExtensionJob.ROOT_GROUP));
+
+        // Check root namespace
+        if (job == null) {
+            job = this.jobExecutor.getCurrentJob(AbstractExtensionJob.ROOT_GROUP);
+        }
+
+        return job;
     }
 
     private JobStatus getJobStatus(List<String> jobId)

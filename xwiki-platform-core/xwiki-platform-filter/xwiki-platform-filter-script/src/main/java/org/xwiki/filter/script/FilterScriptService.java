@@ -81,7 +81,7 @@ public class FilterScriptService extends AbstractFilterScriptService
 
     @Inject
     @Named(FilterStreamConverterJob.JOBTYPE)
-    private Provider<FilterStreamConverterJob> jobProvider;
+    private Provider<Job> jobProvider;
 
     public ScriptService get(String id)
     {
@@ -122,6 +122,7 @@ public class FilterScriptService extends AbstractFilterScriptService
             if (async) {
                 job = this.jobExecutor.execute(FilterStreamConverterJob.JOBTYPE, request);
             } else {
+                // Not using the job executor to make sure to be executed the current thread
                 job = this.jobProvider.get();
                 job.initialize(request);
                 job.run();

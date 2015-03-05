@@ -58,7 +58,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Exports in XAR, PDF, RTF or HTML formats.
- * 
+ *
  * @version $Id$
  */
 public class ExportAction extends XWikiAction
@@ -89,7 +89,7 @@ public class ExportAction extends XWikiAction
 
     /**
      * Create ZIP archive containing wiki pages rendered in HTML, attached files and used skins.
-     * 
+     *
      * @param context the XWiki context.
      * @return always return null.
      * @throws XWikiException error when exporting HTML ZIP package.
@@ -372,8 +372,7 @@ public class ExportAction extends XWikiAction
                 export.backupWiki();
             } else {
                 if (pages != null) {
-                    for (int i = 0; i < pages.length; i++) {
-                        String pageName = pages[i];
+                    for (String pageName : pages) {
                         String defaultAction = request.get("action_" + pageName);
                         int iAction;
                         try {

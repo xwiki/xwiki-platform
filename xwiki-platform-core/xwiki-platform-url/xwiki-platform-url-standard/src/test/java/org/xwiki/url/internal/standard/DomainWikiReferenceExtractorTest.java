@@ -113,6 +113,12 @@ public class DomainWikiReferenceExtractorTest
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "wiki");
     }
 
+    @Test
+    public void extractWhenUnderscoreInDomainName() throws Exception
+    {
+        testAndAssert("http://some_domain.server.com/xwiki/bin/view/Main/WebHome", "some_domain");
+    }
+
     private void testAndAssert(String urlToTest, String expectedWikiId) throws Exception
     {
         ExtendedURL url = new ExtendedURL(new URL(urlToTest), "xwiki");

@@ -168,7 +168,7 @@ public class WatchListJobManager
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {
@@ -295,11 +295,10 @@ public class WatchListJobManager
             needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate |= setWatchListCommonDocumentsFields(doc);
 
-            if (StringUtils.isBlank(doc.getTitle()) || StringUtils.isBlank(doc.getContent())) {
+            if (StringUtils.isBlank(doc.getTitle())) {
                 needsUpdate = true;
                 doc.setTitle("$services.localization.render('" + nameResource + "')");
-                doc.setContent("{{include document=\"XWiki.SchedulerJobSheet\"/}}");
-                doc.setSyntax(Syntax.XWIKI_2_0);
+                doc.setSyntax(Syntax.XWIKI_2_1);
             }
 
             if (!doc.isHidden()) {

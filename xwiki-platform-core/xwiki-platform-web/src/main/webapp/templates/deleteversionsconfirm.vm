@@ -16,7 +16,7 @@
   <center><a href="javascript:history.go(-1)">$services.localization.render('core.versions.delete.goback')</a></center>
 #else
   #set($fullmsg = $services.localization.render('core.versions.delete.confirm.many', [${escapetool.xml($rev1)}, ${escapetool.xml($rev2)}]))
-  #xwikimessagebox($services.localization.render('core.delete') $fullmsg $doc.getURL('deleteversions', "confirm=1&amp;rev1=$!{escapetool.url($rev1)}&amp;rev2=$!{escapetool.url($rev2)}&amp;$!{redirectparam}&amp;$languageparams") $doc.getURL('view', "viewer=history$!{redirectparam}&amp;$languageparams") $services.localization.render('yes') $services.localization.render('no'))
+  #xwikimessagebox($services.localization.render('core.delete') $fullmsg $doc.getURL('deleteversions', "confirm=1&amp;rev1=$!{escapetool.url($rev1)}&amp;rev2=$!{escapetool.url($rev2)}&amp;$!{redirectparam}&amp;$languageparams&amp;form_token=$!{escapetool.url($services.csrf.token)}") $doc.getURL('view', "viewer=history$!{redirectparam}&amp;$languageparams") $services.localization.render('yes') $services.localization.render('no'))
 #end
 <div class="clearfloats"></div>
 </div>## mainContentArea

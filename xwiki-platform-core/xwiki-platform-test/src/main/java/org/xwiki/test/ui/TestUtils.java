@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -57,8 +56,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -134,11 +131,6 @@ public class TestUtils
         }
     }
 
-    /**
-     * How long to wait before failing a test because an element cannot be found. Can be overridden with setTimeout.
-     */
-    private int timeout = 10;
-
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -157,7 +149,7 @@ public class TestUtils
         TestUtils.context = context;
     }
 
-    protected WebDriver getDriver()
+    protected XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -180,6 +172,51 @@ public class TestUtils
             this.secretToken = session.getSecretToken();
         } else {
             recacheSecretToken();
+        }
+    }
+
+    public void loginAsSuperAdmin()
+    {
+        login(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsSuperAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void loginAsAdmin()
+    {
+        login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void login(String username, String password)
+    {
+        if (!username.equals(getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            // Also recache the CSRF token
+            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            recacheSecretTokenWhenOnRegisterPage();
+            getDriver().get(getURLToNonExistentPage());
+        }
+    }
+
+    public void loginAndGotoPage(String username, String password, String pageURL)
+    {
+        if (!username.equals(getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            // Also recache the CSRF token
+            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            recacheSecretTokenWhenOnRegisterPage();
+            // Go to the page asked
+            getDriver().get(pageURL);
         }
     }
 
@@ -258,13 +295,11 @@ public class TestUtils
     /**
      * After successful completion of this function, you are guaranteed to be logged in as the given user and on the
      * page passed in pageURL.
-     *
-     * @param pageURL
      */
     public void assertOnPage(final String pageURL)
     {
         final String pageURI = pageURL.replaceAll("\\?.*", "");
-        waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -274,24 +309,10 @@ public class TestUtils
         });
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        getDriver().manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), getTimeout());
-        try {
-            wait.until(condition);
-        } finally {
-            // Reset timeout
-            setDriverImplicitWait(getDriver());
-        }
-    }
-
     public String getLoggedInUserName()
     {
         String loggedInUserName = null;
-        List<WebElement> elements = findElementsWithoutWaiting(getDriver(), By.xpath("//div[@id='tmUser']/span/a"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.xpath("(//.[@id='tmUser']//a)[1]"));
         if (!elements.isEmpty()) {
             String href = elements.get(0).getAttribute("href");
             loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
@@ -325,16 +346,6 @@ public class TestUtils
         if (properties.length > 0) {
             updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
         }
-    }
-
-    /**
-     * @deprecated starting with 5.0M2 use {@link #createUserAndLogin(String, String, Object...)} instead
-     */
-    @Deprecated
-    public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
-    {
-        createUserAndLogin(username, password);
-        getDriver().get(pageURL);
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -524,7 +535,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(new String[] { space, page }, action, queryString);
+        return getURL(new String[] {space, page}, action, queryString);
     }
 
     private String getURL(String[] path, String action, String queryString)
@@ -575,7 +586,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(new String[] { space, page, attachment }, action, queryString);
+        return getURL(new String[] {space, page, attachment}, action, queryString);
     }
 
     /**
@@ -616,6 +627,13 @@ public class TestUtils
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
         gotoPage("XWiki", "Register", "register");
+        recacheSecretTokenWhenOnRegisterPage();
+        // Return to the previous page.
+        getDriver().get(previousURL);
+    }
+
+    private void recacheSecretTokenWhenOnRegisterPage()
+    {
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
@@ -624,8 +642,6 @@ public class TestUtils
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
             exception.printStackTrace();
         }
-        // Return to the previous page.
-        getDriver().get(previousURL);
     }
 
     /**
@@ -692,38 +708,15 @@ public class TestUtils
         }
     }
 
-    public int getTimeout()
-    {
-        return this.timeout;
-    }
-
-    /**
-     * @param timeout the number of seconds after which we consider the action to have failed
-     */
-    public void setTimeout(int timeout)
-    {
-        this.timeout = timeout;
-    }
-
-    /**
-     * Forces the passed driver to wait for a {@link #getTimeout()} number of seconds when looking up page elements
-     * before declaring that it cannot find them.
-     */
-    public void setDriverImplicitWait(WebDriver driver)
-    {
-        driver.manage().timeouts().implicitlyWait(getTimeout(), TimeUnit.SECONDS);
-    }
-
     public boolean isInWYSIWYGEditMode()
     {
-        return getDriver()
-            .findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]")).size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))
+            .size() > 0;
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
-            .size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).size() > 0;
     }
 
     public boolean isInViewMode()
@@ -933,86 +926,6 @@ public class TestUtils
         }
     }
 
-    public WebElement findElementWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public WebElement findElementWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(By by)
-    {
-        try {
-            getDriver().findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    public boolean hasElementWithoutWaiting(By by)
-    {
-        try {
-            findElementWithoutWaiting(getDriver(), by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(WebElement element, By by)
-    {
-        try {
-            element.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
     public ObjectEditPage editObjects(String space, String page)
     {
         gotoPage(space, page, "edit", "editor=object");
@@ -1172,5 +1085,69 @@ public class TestUtils
         }
 
         return putMethod;
+    }
+
+    /**
+     * Delete the latest version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void deleteLatestVersion(String space, String page)
+    {
+        deleteVersion(space, page, "latest");
+    }
+
+    /**
+     * Delete a specific version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersion(String space, String page, String version)
+    {
+        deleteVersions(space, page, version, version);
+    }
+
+    /**
+     * Delete an interval of versions from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param v1 the starting version to delete
+     * @param v2 the ending version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersions(String space, String page, String v1, String v2)
+    {
+        gotoPage(space, page, "deleteversions", "rev1", v1, "rev2", v2, "confirm", "1");
+    }
+
+    /**
+     * Roll back a page to the previous version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void rollbackToPreviousVersion(String space, String page)
+    {
+        rollBackTo(space, page, "previous");
+    }
+
+    /**
+     * Roll back a page to the specified version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to rollback to
+     * @since 7.0M2
+     */
+    public void rollBackTo(String space, String page, String version)
+    {
+        gotoPage(space, page, "rollback", "rev", version, "confirm", "1");
     }
 }

@@ -137,7 +137,7 @@ public class BasePage extends BaseElement
     {
         // Note that we cannot test if the userLink field is accessible since we're using an AjaxElementLocatorFactory
         // and thus it would wait 15 seconds before considering it's not accessible.
-        return !getUtil().findElementsWithoutWaiting(getDriver(), By.id("tmUser")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(By.id("tmUser")).isEmpty();
     }
 
     /**
@@ -160,7 +160,7 @@ public class BasePage extends BaseElement
         // Open the edit menu
         getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
         // Wait for the submenu entry to be visible
-        waitUntilElementIsVisible(By.id(id));
+        getDriver().waitUntilElementIsVisible(By.id(id));
         // Click on the specified entry
         getDriver().findElement(By.id(id)).click();
     }
@@ -171,7 +171,7 @@ public class BasePage extends BaseElement
     public void edit()
     {
         // The edit button is not the same depending on whether the user is advanced or not
-        if (getUtil().hasElementWithoutWaiting(By.xpath("//div[@id='tmEdit']//a"))) {
+        if (getDriver().hasElementWithoutWaiting(By.xpath("//div[@id='tmEdit']//a"))) {
             getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).click();
         } else {
             getDriver().findElement(By.xpath("//a[@id='tmEdit']")).click();
@@ -266,7 +266,7 @@ public class BasePage extends BaseElement
      */
     public BasePage waitUntilPageIsLoaded()
     {
-        waitUntilElementIsVisible(By.id("footerglobal"));
+        getDriver().waitUntilElementIsVisible(By.id("footerglobal"));
         return this;
     }
 
@@ -293,7 +293,7 @@ public class BasePage extends BaseElement
      */
     public void togglePageMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmPage");
     }
 
     /**
@@ -301,7 +301,7 @@ public class BasePage extends BaseElement
      */
     public void toggleUserMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmUser']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmUser");
     }
 
     /**
@@ -309,7 +309,7 @@ public class BasePage extends BaseElement
      */
     public void toggleSpaceMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmSpace']//a[contains(@class, 'dropdown-toggle')]")).click();
+        toggleTopMenu("tmSpace");
     }
 
     /**
@@ -319,11 +319,29 @@ public class BasePage extends BaseElement
     {
         // Depending on if the current wiki is a subwiki or not
         String wikiMenuId = "tmWiki";
-        if (!getUtil().hasElement(By.id(wikiMenuId))) {
+        if (!getDriver().hasElement(By.id(wikiMenuId))) {
             wikiMenuId = "tmMainWiki";
         }
-        getDriver().findElement(By.xpath("//li[@id='" + wikiMenuId + "']//a[contains(@class, 'dropdown-toggle')]"))
-            .click();
+        toggleTopMenu(wikiMenuId);
+    }
+
+    /**
+     * @return {@code true} if the screen is extra small (as defined by Bootstrap), {@code false} otherwise
+     */
+    private boolean isExtraSmallScreen()
+    {
+        return getDriver().manage().window().getSize().getWidth() < 768;
+    }
+
+    private By getTopMenuToggleSelector(String menuId)
+    {
+        String side = isExtraSmallScreen() ? "left" : "right";
+        return By.xpath("//li[@id='" + menuId + "']//a[contains(@class, 'dropdown-split-" + side + "')]");
+    }
+
+    private void toggleTopMenu(String menuId)
+    {
+        getDriver().findElement(getTopMenuToggleSelector(menuId)).click();
     }
 
     /**
@@ -371,9 +389,9 @@ public class BasePage extends BaseElement
      */
     public boolean canDelete()
     {
-        if (getUtil().hasElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]"))) {
+        if (getDriver().hasElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]"))) {
             togglePageMenu();
-            return getUtil().hasElement(By.id("tmActionDelete"));
+            return getDriver().hasElement(By.id("tmActionDelete"));
         } else {
             return false;
         }
@@ -395,7 +413,7 @@ public class BasePage extends BaseElement
     {
         // Note that we cannot test if the loginLink field is accessible since we're using an AjaxElementLocatorFactory
         // and thus it would wait 15 seconds before considering it's not accessible.
-        return !getUtil().findElementsWithoutWaiting(getDriver(), By.id("tmLogin")).isEmpty();
+        return !getDriver().findElementsWithoutWaiting(By.id("tmLogin")).isEmpty();
     }
 
     /**
@@ -483,10 +501,10 @@ public class BasePage extends BaseElement
     public void waitUntilPageJSIsLoaded()
     {
         // Prototype
-        waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
+        getDriver().waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
 
         // JQuery and dependencies
         // JQuery dropdown plugin needed for the edit button's dropdown menu.
-        waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        getDriver().waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
     }
 }

@@ -67,7 +67,7 @@ public class CommentForm extends BaseElement
     {
         getContainer().findElement(By.xpath(".//input[@type = 'button' and @value = 'Preview']")).click();
         By previewLocator = By.className("commentPreview");
-        waitUntilElementIsVisible(previewLocator);
+        getDriver().waitUntilElementIsVisible(previewLocator);
         return getContainer().findElement(previewLocator);
     }
 

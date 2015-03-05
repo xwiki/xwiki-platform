@@ -98,7 +98,7 @@ public class ApplicationClassEditPage extends InlinePage
      */
     public boolean hasPreviousStep()
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(), By.linkText("PREVIOUS STEP")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.linkText("PREVIOUS STEP")).size() > 0;
     }
 
     @Override
@@ -145,7 +145,7 @@ public class ApplicationClassEditPage extends InlinePage
         new Actions(getDriver()).dragAndDrop(field, fieldsCanvas).perform();
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)

@@ -19,19 +19,16 @@
  */
 package org.xwiki.test.ui;
 
-import org.openqa.selenium.WebDriver;
-
 /**
  * Authenticates the Admin user in the wiki before the test starts.
  *
  * @version $Id$
  * @since 5.1M1
- * @todo decide if we want this way of authenticating to replace {@link AbstractAdminAuthenticatedTest}
  */
 public class AdminAuthenticationRule extends AuthenticationRule
 {
-    public AdminAuthenticationRule(TestUtils testUtils, WebDriver driver)
+    public AdminAuthenticationRule(TestUtils util)
     {
-        super("Admin", "admin", testUtils, driver);
+        super("Admin", "admin", util);
     }
 }

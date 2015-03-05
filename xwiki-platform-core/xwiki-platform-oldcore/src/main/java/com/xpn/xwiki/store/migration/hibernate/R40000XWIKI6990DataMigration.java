@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
@@ -57,7 +58,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
@@ -90,31 +90,32 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.util.Util;
 
 /**
- * Migration for XWIKI-6990 Reduce the likelihood of having same (hibernate) document id for different documents.
- * This data migration convert document ID to a new hash algorithm.
+ * Migration for XWIKI-6990 Reduce the likelihood of having same (hibernate) document id for different documents. This
+ * data migration convert document ID to a new hash algorithm.
  *
  * @version $Id$
  * @since 4.0M1
  */
 @Component
 @Named("R40000XWIKI6990")
+@Singleton
 public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 {
     /** Document classes to migrate, using the document id in the first column of their key. */
-    private static final Class< ? >[] DOC_CLASSES = new Class< ? >[] {
+    private static final Class<?>[] DOC_CLASSES = new Class<?>[] {
         XWikiDocument.class,
         XWikiRCSNodeInfo.class,
         XWikiLink.class
     };
 
     /** Document related classes to migrate, using a property docId without FK information. */
-    private static final Class< ? >[] DOCLINK_CLASSES = new Class< ? >[] {
+    private static final Class<?>[] DOCLINK_CLASSES = new Class<?>[] {
         XWikiAttachment.class,
         DeletedAttachment.class
     };
 
     /** Property classes to migrate, using the object id in the first column of their key. */
-    private static final Class< ? >[] PROPERTY_CLASS = new Class< ? >[] {
+    private static final Class<?>[] PROPERTY_CLASS = new Class<?>[] {
         DateProperty.class,
         DBStringListProperty.class,
         DoubleProperty.class,
@@ -128,7 +129,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     };
 
     /** Statistics classes to migrate. (ID is the stats identifier) */
-    private static final Class< ? >[] STATS_CLASSES = new Class< ? >[] {
+    private static final Class<?>[] STATS_CLASSES = new Class<?>[] {
         DocumentStats.class,
         RefererStats.class,
         VisitStats.class
@@ -213,7 +214,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         @Override
         public Object doInHibernate(Session session)
         {
-            timer = 0;
+            this.timer = 0;
             this.session = session;
             doUpdate();
             this.session = null;
@@ -272,12 +273,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Update object id in a given field for a given object class.
-         * 
+         *
          * @param klass the class of the persisted object
          * @param field the field name of the persisted object
          * @return the time elapsed during the operation
          */
-        public long executeIdUpdate(Class< ? > klass, String field)
+        public long executeIdUpdate(Class<?> klass, String field)
         {
             return executeIdUpdate(klass.getName(), field);
         }
@@ -384,12 +385,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 .append("\" table=\"").append(TEMPTABLE).append("\">\n")
                 .append(" <id name=\"").append(OLDID).append("\" type=\"long\" unsaved-value=\"any\">\n")
                 .append("   <column name=\"").append(OLDIDCOL).append("\" not-null=\"true\" ")
-                .append((isOracle) ? "sql-type=\"integer\" " : "")
+                .append((R40000XWIKI6990DataMigration.this.isOracle) ? "sql-type=\"integer\" " : "")
                 .append("/>\n   <generator class=\"assigned\" />\n")
                 .append(" </id>\n")
                 .append("<property name=\"").append(NEWID).append("\" type=\"long\"");
 
-            if (isOracle) {
+            if (R40000XWIKI6990DataMigration.this.isOracle) {
                 sb.append(">\n")
                     .append("<column name=\"").append(NEWIDCOL).append("\" sql-type=\"integer\" />\n")
                     .append("</property>\n");
@@ -405,21 +406,25 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         /**
          * Create the temporary table using hibernate to obtain the creation string.
          */
-        private void createTemporaryTable() {
+        private void createTemporaryTable()
+        {
             Configuration tempConfig = getTempTableMapping();
             Mapping mapping = tempConfig.buildMapping();
             PersistentClass pClass = tempConfig.getClassMapping(TEMPENTITY);
-            if (!logger.isDebugEnabled()) {
-                loggerManager.pushLogListener(null);
+            if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
+                R40000XWIKI6990DataMigration.this.loggerManager.pushLogListener(null);
             }
             try {
-                session.createSQLQuery(pClass.getTable().sqlTemporaryTableCreateString(dialect, mapping))
+                this.session.createSQLQuery(
+                    pClass.getTable().sqlTemporaryTableCreateString(R40000XWIKI6990DataMigration.this.dialect,
+                        mapping))
                     .executeUpdate();
             } catch (Throwable t) {
-                logger.debug("unable to create temporary id migration table [{}]", t.getMessage());
+                R40000XWIKI6990DataMigration.this.logger.debug("unable to create temporary id migration table [{}]",
+                    t.getMessage());
             } finally {
-                if (!logger.isDebugEnabled()) {
-                    loggerManager.popLogListener();
+                if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
+                    R40000XWIKI6990DataMigration.this.loggerManager.popLogListener();
                 }
             }
         }
@@ -427,27 +432,29 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         /**
          * Delete all rows in the temporary table, we never know, it may be reused, and drop it if required.
          */
-        private void dropTemporaryTable() {
+        private void dropTemporaryTable()
+        {
             StringBuilder sb = new StringBuilder(128);
             sb = new StringBuilder(128);
 
             sb.append("DELETE FROM ").append(TEMPTABLE);
-            session.createSQLQuery(sb.toString()).executeUpdate();
+            this.session.createSQLQuery(sb.toString()).executeUpdate();
 
-            if (dialect.dropTemporaryTableAfterUse()) {
+            if (R40000XWIKI6990DataMigration.this.dialect.dropTemporaryTableAfterUse()) {
                 sb = new StringBuilder(128);
                 sb.append("DROP TABLE ").append(TEMPTABLE);
 
-                if (!logger.isDebugEnabled()) {
-                    loggerManager.pushLogListener(null);
+                if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
+                    R40000XWIKI6990DataMigration.this.loggerManager.pushLogListener(null);
                 }
                 try {
-                    session.createSQLQuery(sb.toString()).executeUpdate();
+                    this.session.createSQLQuery(sb.toString()).executeUpdate();
                 } catch (Throwable t) {
-                    logger.debug("unable to drop temporary id migration table [{}]", t.getMessage());
+                    R40000XWIKI6990DataMigration.this.logger.debug("unable to drop temporary id migration table [{}]",
+                        t.getMessage());
                 } finally {
-                    if (!logger.isDebugEnabled()) {
-                        loggerManager.popLogListener();
+                    if (!R40000XWIKI6990DataMigration.this.logger.isDebugEnabled()) {
+                        R40000XWIKI6990DataMigration.this.loggerManager.popLogListener();
                     }
                 }
             }
@@ -456,13 +463,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         /**
          * Build the insert statement into the temporary table and store it for future use.
          */
-        private void prepareInsertStatement() {
+        private void prepareInsertStatement()
+        {
             StringBuilder sb = new StringBuilder(128);
             sb.append("INSERT INTO ").append(TEMPTABLE)
                 .append(" (").append(OLDIDCOL).append(',').append(NEWIDCOL).append(')')
                 .append(" VALUES (:").append(OLDID).append(",:").append(NEWID).append(')');
 
-            insertStatement = sb.toString();
+            this.insertStatement = sb.toString();
         }
 
         /**
@@ -472,10 +480,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Insert all ids from the provided map into the temporary table.
+         *
          * @param map map of two long with the oldid as key, and the new id as value
          * @return the time elapsed.
          */
-        public long insertIdUpdates(Map<Long, Long> map) {
+        public long insertIdUpdates(Map<Long, Long> map)
+        {
             long elapsedTime = 0;
             for (Map.Entry<Long, Long> entry : map.entrySet()) {
                 elapsedTime += executeSqlIdInsert(entry.getKey(), entry.getValue());
@@ -485,13 +495,15 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Execute an insert in the temporary table.
+         *
          * @param oldId the old id to use as key
          * @param newId the new id to be used for replacement
          * @return the time elapsed
          */
-        private long executeSqlIdInsert(long oldId, long newId) {
+        private long executeSqlIdInsert(long oldId, long newId)
+        {
             long now = System.nanoTime();
-            session.createSQLQuery(insertStatement)
+            this.session.createSQLQuery(this.insertStatement)
                 .setLong(OLDID, oldId)
                 .setLong(NEWID, newId)
                 .executeUpdate();
@@ -500,19 +512,21 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         /**
          * Execute an update of all ids in the temporary table in the provided table.
+         *
          * @param name name of the table to update.
          * @param field name of the column to convert.
          * @return the time elpased
          */
-        public long executeSqlIdUpdate(String name, String field) {
+        public long executeSqlIdUpdate(String name, String field)
+        {
             StringBuilder sb = new StringBuilder(128);
-            if (isMySQL) {
+            if (R40000XWIKI6990DataMigration.this.isMySQL) {
                 // MySQL does not support multiple references to a temporary table in a single statement but support
                 // this non-standard SQL syntax with a single reference to the temporary table
                 sb.append("UPDATE ").append(name).append(" t, ").append(TEMPTABLE).append(" m")
                     .append(" SET t.").append(field).append('=').append("m.").append(NEWIDCOL)
                     .append(" WHERE t.").append(field).append('=').append("m.").append(OLDIDCOL);
-            } else if (isMSSQL) {
+            } else if (R40000XWIKI6990DataMigration.this.isMSSQL) {
                 // MS-SQL does not support aliases on updated table, but support inner joins during updates
                 sb.append("UPDATE ").append(name)
                     .append(" SET ").append(field).append('=').append("m.").append(NEWIDCOL)
@@ -528,7 +542,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     .append(" FROM ").append(TEMPTABLE).append(')');
             }
             long now = System.nanoTime();
-            session.createSQLQuery(sb.toString()).executeUpdate();
+            this.session.createSQLQuery(sb.toString()).executeUpdate();
             return System.nanoTime() - now;
         }
     }
@@ -540,7 +554,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     {
         /**
          * Callback to process a custom mapped class.
-         * 
+         *
          * @param store the hibernate store
          * @param name the name of the Xclass
          * @param mapping the custom mapping of the Xclass
@@ -628,7 +642,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /**
      * Calls callback for each custom mapped XClass defined. If needed, the mapping is added and injected at the end of
      * the processing into the hibernate session factory.
-     * 
+     *
      * @param store the hibernate store
      * @param callback the callback to be called
      * @param context th current XWikiContext
@@ -737,7 +751,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
                 Table collTable = coll.getCollectionTable();
                 if (!this.fkTables.contains(collTable)) {
-                    list.add(new String[] {collTable.getName(), getKeyColumnName(coll)});
+                    list.add(new String[] { collTable.getName(), getKeyColumnName(coll) });
                 }
             }
         }
@@ -761,7 +775,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             for (org.hibernate.mapping.Collection coll : getCollection(pClass)) {
                 Table collTable = coll.getCollectionTable();
                 if (all || !this.fkTables.contains(collTable)) {
-                    list.add(new String[] {collTable.getName(), getKeyColumnName(coll)});
+                    list.add(new String[] { collTable.getName(), getKeyColumnName(coll) });
                 }
             }
         }
@@ -771,6 +785,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Retrieve the list of collection properties of the provided persisted class.
+     *
      * @param pClass the persisted class to analyse
      * @return a list of hibernate collections
      */
@@ -794,6 +809,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get all table to process, including collections if needed.
+     *
      * @param className the persistent class
      * @return a list of pair of table name and key field name.
      * @throws DataMigrationException on failure
@@ -805,13 +821,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get hibernate mapping of the given class or entity name.
+     *
      * @param className the class or entity name
      * @return a list of pair of table name and the property field name.
      * @throws DataMigrationException if mapping cannot be found
      */
     private PersistentClass getClassMapping(String className) throws DataMigrationException
     {
-        PersistentClass pClass = configuration.getClassMapping(className);
+        PersistentClass pClass = this.configuration.getClassMapping(className);
 
         if (pClass == null) {
             throw new DataMigrationException(
@@ -830,6 +847,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get all table to process, including collections if needed.
+     *
      * @param className the class or entity name
      * @param propertyName the name of the property for which the column name is returned
      * @return a list of pair of table name and the property field name.
@@ -842,6 +860,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get all table to process, including collections if needed.
+     *
      * @param pClass the persistent class
      * @param propertyName the name of the property for which the column name is returned
      * @return a list of pair of table name and the property field name.
@@ -855,13 +874,14 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
         // Skip classes that will be updated by cascaded updates
         if (!this.fkTables.contains(pClass.getTable())) {
-            list.add(new String[] {pClass.getTable().getName(), getColumnName(pClass, propertyName)});
+            list.add(new String[] { pClass.getTable().getName(), getColumnName(pClass, propertyName) });
         }
         return list;
     }
 
     /**
      * get name of the first column of the key of a given collection property.
+     *
      * @param coll the collection property
      * @return the column name of the key
      */
@@ -872,6 +892,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
     /**
      * get name of the first column of the key of a given pClass.
+     *
      * @param pClass the persistent class
      * @return the column name of the key
      */
@@ -881,11 +902,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-    * get column name (first one) of a property of the given pClass.
-    * @param pClass the persistent class
-    * @param propertyName the name of the property, or null to return the first column of the key
-    * @return the column name of the property
-    */
+     * get column name (first one) of a property of the given pClass.
+     *
+     * @param pClass the persistent class
+     * @param propertyName the name of the property, or null to return the first column of the key
+     * @return the column name of the property
+     */
     private String getColumnName(PersistentClass pClass, String propertyName)
     {
         if (propertyName != null) {
@@ -978,7 +1000,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 logProgress("Retrieved %d custom mapped classes to be processed.", customMappedClasses.size());
             }
 
-            private void fillStatsConversionMap(Session session, Class< ? > klass, Map<Long, Long> map)
+            private void fillStatsConversionMap(Session session, Class<?> klass, Map<Long, Long> map)
             {
                 @SuppressWarnings("unchecked")
                 List<Object[]> results = session.createQuery(
@@ -996,7 +1018,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                             map.put(oldId, newId);
                         }
                     } else {
-                        logger.debug("Skipping invalid statistical entry [{}] with name [{}]", oldId, statsName);
+                        R40000XWIKI6990DataMigration.this.logger.debug(
+                            "Skipping invalid statistical entry [{}] with name [{}]", oldId, statsName);
                     }
                 }
 
@@ -1019,7 +1042,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     }
 
                     // Retrieve statistics ID conversion
-                    for (Class< ? > statsClass : STATS_CLASSES) {
+                    for (Class<?> statsClass : STATS_CLASSES) {
                         Map<Long, Long> map = new HashMap<Long, Long>();
                         fillStatsConversionMap(session, statsClass, map);
                         stats.add(map);
@@ -1035,17 +1058,16 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         });
 
         // Cache the configuration and the dialect
-        configuration = getStore().getConfiguration();
-        dialect = configuration.buildSettings().getDialect();
+        this.configuration = getStore().getConfiguration();
+        this.dialect = this.configuration.buildSettings().getDialect();
 
         // Check configuration for safe mode
-        XWikiConfig config = getXWikiContext().getWiki().getConfig();
         /* True if migration should use safe but slower non-bulk native updates. */
         boolean useSafeUpdates =
-            "1".equals(config.getProperty("xwiki.store.migration." + this.getName() + ".safemode", "0"));
+            "1".equals(getXWikiContext().getWiki().Param("xwiki.store.migration." + this.getName() + ".safemode", "0"));
 
         // Use safe mode if the database has no temporary table supported by hibernate
-        useSafeUpdates = useSafeUpdates || !configuration.buildSettings().getDialect().supportsTemporaryTables();
+        useSafeUpdates = useSafeUpdates || !this.configuration.buildSettings().getDialect().supportsTemporaryTables();
 
         // Proceed to document id conversion
         if (!docs.isEmpty()) {
@@ -1053,10 +1075,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 // Pair table,key for table that need manual updates
                 final List<String[]> tableToProcess = new ArrayList<String[]>();
 
-                for (Class< ? > docClass : DOC_CLASSES) {
+                for (Class<?> docClass : DOC_CLASSES) {
                     tableToProcess.addAll(getAllTableToProcess(docClass.getName()));
                 }
-                for (Class< ? > docClass : DOCLINK_CLASSES) {
+                for (Class<?> docClass : DOCLINK_CLASSES) {
                     tableToProcess.addAll(getAllTableToProcess(docClass.getName(), "docId"));
                 }
 
@@ -1069,10 +1091,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         @Override
                         public void doBulkIdUpdate()
                         {
-                            times[timer++] += insertIdUpdates(docs);
+                            times[this.timer++] += insertIdUpdates(docs);
 
                             for (String[] table : tableToProcess) {
-                                times[timer++] += executeSqlIdUpdate(table[0], table[1]);
+                                times[this.timer++] += executeSqlIdUpdate(table[0], table[1]);
                             }
                         }
                     });
@@ -1081,20 +1103,20 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
                         + " migration failed", e);
                 }
-                if (logger.isDebugEnabled()) {
+                if (this.logger.isDebugEnabled()) {
                     int timer = 0;
-                    logger.debug("Time elapsed for inserts: {} ms", times[timer++] / 1000000);
+                    this.logger.debug("Time elapsed for inserts: {} ms", times[timer++] / 1000000);
 
                     for (String[] table : tableToProcess) {
-                        logger.debug("Time elapsed for {} table: {} ms", table[0], times[timer++] / 1000000);
+                        this.logger.debug("Time elapsed for {} table: {} ms", table[0], times[timer++] / 1000000);
                     }
                 }
             } else {
                 final List<String[]> docsColl = new ArrayList<String[]>();
-                for (Class< ? > docClass : DOC_CLASSES) {
+                for (Class<?> docClass : DOC_CLASSES) {
                     docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
-                for (Class< ? > docClass : DOCLINK_CLASSES) {
+                for (Class<?> docClass : DOCLINK_CLASSES) {
                     docsColl.addAll(getCollectionProperties(getClassMapping(docClass.getName())));
                 }
 
@@ -1108,29 +1130,29 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     public void doSingleUpdate()
                     {
                         for (String[] coll : docsColl) {
-                            times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
+                            times[this.timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                         }
 
-                        for (Class< ? > doclinkClass : DOCLINK_CLASSES) {
-                            times[timer++] += executeIdUpdate(doclinkClass, DOCID);
+                        for (Class<?> doclinkClass : DOCLINK_CLASSES) {
+                            times[this.timer++] += executeIdUpdate(doclinkClass, DOCID);
                         }
-                        times[timer++] += executeIdUpdate(XWikiLink.class, DOCID);
-                        times[timer++] += executeIdUpdate(XWikiRCSNodeInfo.class, ID + '.' + DOCID);
-                        times[timer++] += executeIdUpdate(XWikiDocument.class, ID);
+                        times[this.timer++] += executeIdUpdate(XWikiLink.class, DOCID);
+                        times[this.timer++] += executeIdUpdate(XWikiRCSNodeInfo.class, ID + '.' + DOCID);
+                        times[this.timer++] += executeIdUpdate(XWikiDocument.class, ID);
                     }
                 });
-                if (logger.isDebugEnabled()) {
+                if (this.logger.isDebugEnabled()) {
                     int timer = 0;
                     for (String[] coll : docsColl) {
-                        logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                        this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
                     }
-                    for (Class< ? > doclinkClass : DOCLINK_CLASSES) {
-                        logger.debug("Time elapsed for {} class: {} ms", doclinkClass.getName(),
+                    for (Class<?> doclinkClass : DOCLINK_CLASSES) {
+                        this.logger.debug("Time elapsed for {} class: {} ms", doclinkClass.getName(),
                             times[timer++] / 1000000);
                     }
-                    logger.debug("Time elapsed for {} class: {} ms", XWikiRCSNodeInfo.class.getName(),
+                    this.logger.debug("Time elapsed for {} class: {} ms", XWikiRCSNodeInfo.class.getName(),
                         times[timer++] / 1000000);
-                    logger.debug("Time elapsed for {} class: {} ms", XWikiDocument.class.getName(),
+                    this.logger.debug("Time elapsed for {} class: {} ms", XWikiDocument.class.getName(),
                         times[timer++] / 1000000);
                 }
             }
@@ -1148,13 +1170,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 PersistentClass objklass = getClassMapping(BaseObject.class.getName());
                 tableToProcess.addAll(getCollectionProperties(objklass));
 
-                for (Class< ? > propertyClass : PROPERTY_CLASS) {
+                for (Class<?> propertyClass : PROPERTY_CLASS) {
                     tableToProcess.addAll(getAllTableToProcess(propertyClass.getName()));
                 }
                 for (String customClass : customMappedClasses) {
                     tableToProcess.addAll(getAllTableToProcess(customClass));
                 }
-                tableToProcess.add(new String[] {objklass.getTable().getName(), getKeyColumnName(objklass)});
+                tableToProcess.add(new String[] { objklass.getTable().getName(), getKeyColumnName(objklass) });
 
                 logProgress("Converting %d object IDs in %d tables...", objs.size(), tableToProcess.size());
 
@@ -1165,10 +1187,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         @Override
                         public void doBulkIdUpdate()
                         {
-                            times[timer++] += insertIdUpdates(objs);
+                            times[this.timer++] += insertIdUpdates(objs);
 
                             for (String[] table : tableToProcess) {
-                                times[timer++] += executeSqlIdUpdate(table[0], table[1]);
+                                times[this.timer++] += executeSqlIdUpdate(table[0], table[1]);
                             }
                         }
                     });
@@ -1177,12 +1199,12 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
                         + " migration failed", e);
                 }
-                if (logger.isDebugEnabled()) {
+                if (this.logger.isDebugEnabled()) {
                     int timer = 0;
-                    logger.debug("Time elapsed for inserts: {} ms", times[timer++] / 1000000);
+                    this.logger.debug("Time elapsed for inserts: {} ms", times[timer++] / 1000000);
 
                     for (String[] table : tableToProcess) {
-                        logger.debug("Time elapsed for {} table: {} ms", table[0], times[timer++] / 1000000);
+                        this.logger.debug("Time elapsed for {} table: {} ms", table[0], times[timer++] / 1000000);
                     }
                 }
             } else {
@@ -1194,7 +1216,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 final List<String[]> objsColl = new ArrayList<String[]>();
 
                 objsColl.addAll(getCollectionProperties(getClassMapping(BaseObject.class.getName())));
-                for (Class< ? > propertyClass : PROPERTY_CLASS) {
+                for (Class<?> propertyClass : PROPERTY_CLASS) {
                     String className = propertyClass.getName();
                     PersistentClass klass = getClassMapping(className);
 
@@ -1230,34 +1252,34 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     public void doSingleUpdate()
                     {
                         for (String[] coll : objsColl) {
-                            times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
+                            times[this.timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                         }
 
                         for (String customMappedClass : customClassToProcess) {
-                            times[timer++] += executeIdUpdate(customMappedClass, ID);
+                            times[this.timer++] += executeIdUpdate(customMappedClass, ID);
                         }
 
                         for (String propertyClass : classToProcess) {
-                            times[timer++] += executeIdUpdate(propertyClass, IDID);
+                            times[this.timer++] += executeIdUpdate(propertyClass, IDID);
                         }
 
-                        times[timer++] += executeIdUpdate(BaseObject.class, ID);
+                        times[this.timer++] += executeIdUpdate(BaseObject.class, ID);
                     }
                 });
-                if (logger.isDebugEnabled()) {
+                if (this.logger.isDebugEnabled()) {
                     int timer = 0;
                     for (String[] coll : objsColl) {
-                        logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
+                        this.logger.debug("Time elapsed for {} collection: {} ms", coll[0], times[timer++] / 1000000);
                     }
                     for (String customMappedClass : customClassToProcess) {
-                        logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass,
+                        this.logger.debug("Time elapsed for {} custom table: {} ms", customMappedClass,
                             times[timer++] / 1000000);
                     }
                     for (String propertyClass : classToProcess) {
-                        logger.debug("Time elapsed for {} property table: {} ms", propertyClass,
+                        this.logger.debug("Time elapsed for {} property table: {} ms", propertyClass,
                             times[timer++] / 1000000);
                     }
-                    logger.debug("Time elapsed for {} class: {} ms", BaseObject.class.getName(),
+                    this.logger.debug("Time elapsed for {} class: {} ms", BaseObject.class.getName(),
                         times[timer++] / 1000000);
                 }
             }
@@ -1267,7 +1289,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         // Proceed to statistics id conversions
-        for (final Class< ? > statsClass : STATS_CLASSES) {
+        for (final Class<?> statsClass : STATS_CLASSES) {
 
             Map<Long, Long> map = stats.poll();
             String klassName = statsClass.getName().substring(statsClass.getName().lastIndexOf('.') + 1);
@@ -1280,7 +1302,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
 
                     PersistentClass statklass = getClassMapping(statsClass.getName());
                     tableToProcess.addAll(getCollectionProperties(statklass));
-                    tableToProcess.add(new String[] {statklass.getTable().getName(), getKeyColumnName(statklass)});
+                    tableToProcess.add(new String[] { statklass.getTable().getName(), getKeyColumnName(statklass) });
 
                     logProgress("Converting %d %s statistics IDs in %d tables...",
                         map.size(), klassName, tableToProcess.size());
@@ -1292,10 +1314,10 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                             @Override
                             public void doBulkIdUpdate()
                             {
-                                times[timer++] += insertIdUpdates(statids);
+                                times[this.timer++] += insertIdUpdates(statids);
 
                                 for (String[] table : tableToProcess) {
-                                    times[timer++] += executeSqlIdUpdate(table[0], table[1]);
+                                    times[this.timer++] += executeSqlIdUpdate(table[0], table[1]);
                                 }
                             }
                         });
@@ -1304,13 +1326,13 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                             XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName()
                             + " migration failed", e);
                     }
-                    if (logger.isDebugEnabled()) {
+                    if (this.logger.isDebugEnabled()) {
                         int timer = 0;
-                        logger.debug("Time elapsed for inserts: {} ms",
+                        this.logger.debug("Time elapsed for inserts: {} ms",
                             times[timer++] / 1000000);
 
                         for (String[] table : tableToProcess) {
-                            logger.debug("Time elapsed for {} table: {} ms", table[0],
+                            this.logger.debug("Time elapsed for {} table: {} ms", table[0],
                                 times[timer++] / 1000000);
                         }
                     }
@@ -1328,18 +1350,18 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                         public void doSingleUpdate()
                         {
                             for (String[] coll : statsColl) {
-                                times[timer++] += executeSqlIdUpdate(coll[0], coll[1]);
+                                times[this.timer++] += executeSqlIdUpdate(coll[0], coll[1]);
                             }
-                            times[timer++] += executeIdUpdate(statsClass, ID);
+                            times[this.timer++] += executeIdUpdate(statsClass, ID);
                         }
                     });
-                    if (logger.isDebugEnabled()) {
+                    if (this.logger.isDebugEnabled()) {
                         int timer = 0;
                         for (String[] coll : statsColl) {
-                            logger.debug("Time elapsed for {} collection: {} ms", coll[0],
+                            this.logger.debug("Time elapsed for {} collection: {} ms", coll[0],
                                 times[timer++] / 1000000);
                         }
-                        logger.debug("Time elapsed for {} class: {} ms", statsClass.getName(),
+                        this.logger.debug("Time elapsed for {} class: {} ms", statsClass.getName(),
                             times[timer++] / 1000000);
                     }
                 }
@@ -1381,7 +1403,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                 });
             } catch (Exception e) {
                 // ignored since it is really unlikely to happen
-                logger.debug("Fail retrieving the primary key constraints name", e);
+                this.logger.debug("Fail retrieving the primary key constraints name", e);
             }
         }
 
@@ -1481,9 +1503,9 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     }
 
     /**
-     * Create liquibase change log to modify the column type to BIGINT.
-     * If the database is MSSQL, drop PK constraints and indexes during operation.
-     * 
+     * Create liquibase change log to modify the column type to BIGINT. If the database is MSSQL, drop PK constraints
+     * and indexes during operation.
+     *
      * @param sb append the result into this string builder
      * @param table the table name
      * @param column the column name
@@ -1533,7 +1555,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /**
      * Append change log to fix identifier type of a given persistent class. Collection table storing properties of this
      * persistent class will also be updated.
-     * 
+     *
      * @param sb the string builder to append to
      * @param pClass the persistent class to process
      */
@@ -1720,7 +1742,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
             return;
         }
 
-        isMySQL = true;
+        this.isMySQL = true;
 
         String createTable = store.failSafeExecuteRead(getXWikiContext(),
             new HibernateCallback<String>()
@@ -1740,34 +1762,38 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     public String getLiquibaseChangeLog() throws DataMigrationException
     {
         final XWikiHibernateBaseStore store = getStore();
-        configuration = store.getConfiguration();
+        this.configuration = store.getConfiguration();
         final StringBuilder sb = new StringBuilder(12000);
         final List<PersistentClass> classes = new ArrayList<PersistentClass>();
 
         detectDatabaseProducts(store);
 
-        if (logger.isDebugEnabled()) {
+        if (this.logger.isDebugEnabled()) {
             if (this.isOracle) {
-                logger.debug("Oracle database detected, proceeding to all updates manually with deferred constraints.");
+                this.logger
+                    .debug("Oracle database detected, proceeding to all updates manually with deferred constraints.");
             }
             if (this.isMySQL && !this.isMySQLMyISAM) {
-                logger.debug("MySQL innoDB database detected, proceeding to simplified updates with cascaded updates.");
+                this.logger
+                    .debug("MySQL innoDB database detected, proceeding to simplified updates with cascaded updates.");
             }
             if (this.isMySQLMyISAM) {
-                logger.debug("MySQL MyISAM database detected, proceeding to all updates manually without constraints.");
+                this.logger
+                    .debug("MySQL MyISAM database detected, proceeding to all updates manually without constraints.");
             }
             if (this.isMSSQL) {
-                logger.debug("Microsoft SQL Server database detected, proceeding to simplified updates with cascaded u"
+                this.logger
+                    .debug("Microsoft SQL Server database detected, proceeding to simplified updates with cascaded u"
                     + "pdates. During data type changes, Primary Key constraints and indexes are temporarily dropped.");
             }
         }
 
         // Build the list of classes to check for updates
         classes.add(getClassMapping(BaseObject.class.getName()));
-        for (Class< ? > klass : PROPERTY_CLASS) {
+        for (Class<?> klass : PROPERTY_CLASS) {
             classes.add(getClassMapping(klass.getName()));
         }
-        for (Class< ? > klass : STATS_CLASSES) {
+        for (Class<?> klass : STATS_CLASSES) {
             classes.add(getClassMapping(klass.getName()));
         }
 
@@ -1811,7 +1837,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     boolean hasDynamicMapping) throws XWikiException
                 {
                     if (INTERNAL.equals(mapping) || hasDynamicMapping) {
-                        PersistentClass klass = configuration.getClassMapping(name);
+                        PersistentClass klass = R40000XWIKI6990DataMigration.this.configuration.getClassMapping(name);
                         if (!R40000XWIKI6990DataMigration.this.isMySQLMyISAM) {
                             List<Table> tables = getForeignKeyTables(klass);
                             for (Table table : tables) {
@@ -1843,8 +1869,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         }
 
         logProgress("%d schema updates required.", this.logCount);
-        if (logger.isDebugEnabled()) {
-            logger.debug("About to execute this Liquibase XML: {}", sb.toString());
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("About to execute this Liquibase XML: {}", sb.toString());
         }
         return sb.toString();
     }

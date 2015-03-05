@@ -30,7 +30,6 @@ import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,12 +70,6 @@ public class EmbeddedSolrInstanceInitializationTest
         PERMANENT_DIRECTORY.mkdirs();
 
         this.mockXWikiProperties = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
     @Test

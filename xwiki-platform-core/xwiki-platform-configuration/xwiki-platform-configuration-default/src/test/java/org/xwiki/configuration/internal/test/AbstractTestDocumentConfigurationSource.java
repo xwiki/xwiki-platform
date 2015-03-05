@@ -19,7 +19,6 @@
  */
 package org.xwiki.configuration.internal.test;
 
-import static org.hamcrest.CoreMatchers.anything;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
@@ -28,7 +27,6 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.invocation.InvocationOnMock;

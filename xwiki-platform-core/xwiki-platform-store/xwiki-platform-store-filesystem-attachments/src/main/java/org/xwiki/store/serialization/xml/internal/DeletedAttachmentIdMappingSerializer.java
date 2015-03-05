@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.xwiki.component.annotation.Component;
@@ -35,7 +38,9 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 3.0M3
  */
-@Component("deleted-attachment-id-mappings/1.0")
+@Component
+@Named("deleted-attachment-id-mappings/1.0")
+@Singleton
 public class DeletedAttachmentIdMappingSerializer
     extends AbstractXMLSerializer<Map<Long, String>, Map<Long, String>>
 {

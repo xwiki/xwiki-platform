@@ -51,12 +51,17 @@ public class ComponentScriptService implements ScriptService
     private static final String ERROR_KEY = "scriptservice.component.error";
 
     /**
-     * The Component Manager that we'll return to the user or use to return component instances to the user.
-     * Note that we use a Context Component Manager so that the user gets all components registered in its context.
+     * The Component Manager that we'll return to the user or use to return component instances to the user. Note that
+     * we use a Context Component Manager so that the user gets all components registered in its context.
      */
     @Inject
     @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
+    @Inject
+    @Named("context/root")
+    @Deprecated
+    private Provider<ComponentManager> contextrootComponentManagerProvider;
 
     /**
      * Used to access the component manager corresponding to a specific namespace.
@@ -77,11 +82,34 @@ public class ComponentScriptService implements ScriptService
     private Execution execution;
 
     /**
+     * A Component Manager which read in contextual Component Manager and write in root component manager.
+     * 
      * @return the Component Manager if the document has Programming Rights or null otherwise
+     * @deprecated since 6.4.1, 6.2.6, use {@link #getContextComponentManager()} or
+     *             {@link #getContextComponentManager()} instead
      */
+    @Deprecated
     public ComponentManager getComponentManager()
     {
-        return this.bridge.hasProgrammingRights() ? this.componentManagerProvider.get() : null;
+        return this.bridge.hasProgrammingRights() ? this.contextrootComponentManagerProvider.get() : null;
+    }
+
+    /**
+     * @return the contextual Component Manager if the document has Programming Rights or null otherwise
+     * @since 6.4.1, 6.2.6
+     */
+    public ComponentManager getContextComponentManager()
+    {
+        return this.bridge.hasProgrammingRights() ? this.contextComponentManagerProvider.get() : null;
+    }
+
+    /**
+     * @return the root Component Manager if the document has Programming Rights or null otherwise
+     * @since 6.4.1, 6.2.6
+     */
+    public ComponentManager getRootComponentManager()
+    {
+        return getComponentManager(null);
     }
 
     /**
@@ -115,12 +143,11 @@ public class ComponentScriptService implements ScriptService
     public <T> T getInstance(Type roleType)
     {
         T result = null;
-        ComponentManager cm = getComponentManager();
+        ComponentManager cm = getContextComponentManager();
         if (cm != null) {
             try {
                 result = cm.getInstance(roleType);
             } catch (ComponentLookupException e) {
-                result = null;
                 setError(e);
             }
         }
@@ -141,12 +168,11 @@ public class ComponentScriptService implements ScriptService
     public <T> T getInstance(Type roleType, String roleHint)
     {
         T result = null;
-        ComponentManager cm = getComponentManager();
+        ComponentManager cm = getContextComponentManager();
         if (cm != null) {
             try {
                 result = cm.getInstance(roleType, roleHint);
             } catch (ComponentLookupException e) {
-                result = null;
                 setError(e);
             }
         }

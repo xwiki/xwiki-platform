@@ -19,14 +19,14 @@
  */
 package org.xwiki.mail.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -35,25 +35,42 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.mail.MailResultListener;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.environment.internal.EnvironmentConfiguration;
+import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.XWikiAuthenticator;
+import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.mail.internal.thread.PrepareMailRunnable;
+import org.xwiki.mail.internal.thread.SendMailQueueManager;
+import org.xwiki.mail.internal.thread.SendMailRunnable;
+import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
+import org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.model.ModelContext;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.XWikiContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -61,15 +78,28 @@ import com.icegreen.greenmail.util.ServerSetupTest;
  * @version $Id$
  * @since 6.1M2
  */
-@AllComponents
+@ComponentList({
+    TextMimeBodyPartFactory.class,
+    HTMLMimeBodyPartFactory.class,
+    AttachmentMimeBodyPartFactory.class,
+    StandardEnvironment.class,
+    DefaultMailSender.class,
+    MemoryMailListener.class,
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
+})
 public class JavaIntegrationTest
 {
     @Rule
+    public GreenMailRule mail = new GreenMailRule(ServerSetupTest.SMTP);
+
+    @Rule
     public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
-    private GreenMail mail;
-
-    private MailSenderConfiguration configuration;
+    private TestMailSenderConfiguration configuration;
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
@@ -77,45 +107,32 @@ public class JavaIntegrationTest
 
     private MailSender sender;
 
-    private MailResultListener listener = new MailResultListener()
+    @BeforeComponent
+    public void registerConfiguration() throws Exception
     {
-        @Override
-        public void onSuccess(MimeMessage message)
-        {
-            // Do nothing, we check below that the mail has been received!
-        }
+        this.configuration = new TestMailSenderConfiguration(
+            this.mail.getSmtp().getPort(), null, null, new Properties());
+        this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
 
-        @Override
-        public void onError(MimeMessage message, Exception e)
-        {
-            // Shouldn't happen, fail the test!
-            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
-        }
-    };
+        // Set the current wiki in the Context
+        ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
-    @Before
-    public void startMail()
-    {
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
-    }
+        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
+            XWikiContext.TYPE_PROVIDER);
+        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
-    @After
-    public void stopMail()
-    {
-        if (this.mail != null) {
-            this.mail.stop();
-        }
+        this.componentManager.registerMockComponent(ExecutionContextManager.class);
+        this.componentManager.registerMockComponent(Execution.class);
+
+        EnvironmentConfiguration environmentConfiguration =
+            this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
+        when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
     }
 
     @Before
     public void initialize() throws Exception
     {
-        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
-        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("documents"));
-        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("xwikiproperties"));
-
-        this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.htmlBodyPartFactory = this.componentManager.getInstance(
@@ -128,15 +145,14 @@ public class JavaIntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.sender).stopMailSenderThread();
+        ((DefaultMailSender) this.sender).stopMailThreads();
     }
 
     @Test
     public void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
@@ -145,38 +161,46 @@ public class JavaIntegrationTest
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
-        // Add HTML in the body
+        // Add text in the body
         multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
+        // We also test using some default BCC addresses from configuration in this test
+        this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
+
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.sendAsynchronously(message, session, this.listener);
-        this.sender.waitTillSent(10000L);
+        MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
+        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, memoryMailListener);
+
+        // Note: we don't test status reporting from the listener since this is already tested in the
+        // ScriptingIntegrationTest test class.
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        // Note: we're receiving 9 messages since we sent 3 with 3 recipients (2 BCC and 1 to)!
+        assertEquals(9, messages.length);
 
+        // Assert the email parts that are the same for all mails
+        assertEquals("subject", messages[0].getHeader("Subject", null));
         assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
-
         BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
         assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
         assertEquals("some text here", textBodyPart.getContent());
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
+
+        // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
+        // messages ;) But we chekced that we received 9 emails above so that's good enough.
     }
 
     @Test
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+        Session session = Session.getInstance(this.configuration.getAllProperties());
 
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
@@ -223,14 +247,14 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(message, session);
+        this.sender.sendAsynchronously(Arrays.asList(message), session, null);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        assertEquals("subject", messages[0].getHeader("Subject")[0]);
-        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+        assertEquals("subject", messages[0].getHeader("Subject", null));
+        assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 

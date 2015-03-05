@@ -223,24 +223,36 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
                 new MacroMarkerBlock(wikiMacroBlock.getId(), wikiMacroBlock.getParameters(),
                     wikiMacroBlock.getContent(), xdom.getChildren(), wikiMacroBlock.isInline());
 
-            // make sure to use provided metadatas
+            // Make sure to use provided metadatas
             MetaDataBlock metaDataBlock =
                 new MetaDataBlock(Collections.<Block> singletonList(wikiMacroMarker), xdom.getMetaData());
 
-            // otherwise the inner macros will not be able to access the parent DOM
-            metaDataBlock.setParent(wikiMacroBlock.getParent());
+            // Make sure the context XDOM contains the wiki macro content
+            wikiMacroBlock.getParent().replaceChild(metaDataBlock, wikiMacroBlock);
 
-            if (observation != null) {
-                observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+            // "Emulate" the fact that wiki macro block is still part of the XDOM (what is in the XDOM is a
+            // MacroMarkerBlock and MacroTransformationContext current macro block only support MacroBlock so we can't
+            // switch it without breaking some APIs)
+            wikiMacroBlock.setParent(metaDataBlock.getParent());
+            wikiMacroBlock.setNextSiblingBlock(metaDataBlock.getNextSibling());
+            wikiMacroBlock.setPreviousSiblingBlock(metaDataBlock.getPreviousSibling());
+
+            try {
+                if (observation != null) {
+                    observation.notify(STARTEXECUTION_EVENT, this, macroBinding);
+                }
+
+                // Perform internal macro transformations.
+                TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
+                txContext.setId(context.getId());
+
+                RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
+                    wikiMacroMarker);
+            } finally {
+                // Restore context XDOM to its previous state
+                metaDataBlock.getParent().replaceChild(wikiMacroBlock, metaDataBlock);
             }
-
-            // Perform internal macro transformations.
-            TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
-            txContext.setId(context.getId());
-
-            RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
-                wikiMacroMarker);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {

@@ -27,7 +27,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
  * Composite ID component used in {@link XWikiRCSNodeInfo} & {@link XWikiRCSNodeContent}. Immutable.
- * 
+ *
  * @version $Id$
  * @since 1.2M1
  */
@@ -66,7 +66,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     public long getDocId()
     {
-        return docId;
+        return this.docId;
     }
 
     /**
@@ -82,7 +82,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     public Version getVersion()
     {
-        return version;
+        return this.version;
     }
 
     /**
@@ -98,7 +98,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     protected int getVersion1()
     {
-        return version.at(0);
+        return this.version.at(0);
     }
 
     /**
@@ -106,7 +106,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     protected int getVersion2()
     {
-        return version.at(1);
+        return this.version.at(1);
     }
 
     /**
@@ -114,7 +114,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     protected void setVersion1(int v1)
     {
-        this.version = new Version(v1, version.at(1));
+        this.version = new Version(v1, this.version.at(1));
     }
 
     /**
@@ -122,7 +122,7 @@ public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable,
      */
     protected void setVersion2(int v2)
     {
-        this.version = new Version(version.at(0), v2);
+        this.version = new Version(this.version.at(0), v2);
     }
 
     @Override

@@ -20,24 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>ConfigurableClassMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.ConfigurableClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016388000</creationDate>
-  <date>1373028868000</date>
-  <contentUpdateDate>1373028868000</contentUpdateDate>
+  <parent>XWiki.ConfigurableClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1418555451000</date>
+  <contentUpdateDate>1418555451000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.admin.configurable.macros.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -119,7 +116,9 @@
   ##
 #end
 
-
+#*
+ * Augment the $adminMenu variable with all $nameOfThisDocument (i.e. XWiki.ConfigurableClass) xobjects found on this wiki.
+ *###
 #macro(findCustomSectionsToConfigure $adminMenu)
   #set ($outputList = [])
   #set ($global = ($editor == 'globaladmin'))
@@ -148,6 +147,39 @@
     #end
     ##
     #foreach ($configurableObject in $app.getObjects($nameOfThisDocument))
+      #set ($displayInCategory = $app.getValue('displayInCategory', $configurableObject))
+      ## It's ok to not specify a category, in which case the app will be added to a default one (i.e. "applications")
+      #if ("$!displayInCategory" != '')
+        #if ($categoriesByName.containsKey($displayInCategory))
+          ## Add a new section in this category
+          #set ($appCategory = $categoriesByName.get($displayInCategory))
+        #else
+          ## Add a new section
+          #set($key = "admin.${displayInCategory.toLowerCase()}")
+          #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInCategory) #end
+          #set ($appCategory= {'id' : $displayInCategory, 'name' : $name, 'children': []})
+          #set ($discard = $categoriesByName.put($displayInCategory, $appCategory))
+          ## Insert at the specified position
+          #set ($displayBeforeCategory = $app.getValue('displayBeforeCategory', $configurableObject))
+          #if ("$!displayBeforeCategory" != '')
+            #set ($listPosition = $adminMenu.indexOf($categoriesByName.get($displayBeforeCategory)))
+            #if ($listPosition &gt; -1)
+              #set ($discard = $adminMenu.add($listPosition, $appCategory))
+            #else
+              #set ($discard = $adminMenu.add($appCategory))
+            #end
+          #else
+            #set ($discard = $adminMenu.add($appCategory))
+          #end
+        #end
+        #set ($categoryIcon = $app.getValue('categoryIcon', $configurableObject))
+        #if ("$!categoryIcon" != '')
+          #set ($appCategory.categoryIcon = $categoryIcon)
+        #end
+      #else
+        #set ($appCategory = $categoriesByName.get('applications'))
+      #end
+      ##
       #set ($displayInSection = $app.getValue('displayInSection', $configurableObject))
       ##
       ## If there is no section specified in the object, just skip it
@@ -165,7 +197,7 @@
         ## If there is no section for this configurable, then we will have to add one.
         #set($key = "admin.${displayInSection.toLowerCase()}")
         #if($services.localization.get($key)) #set($name = $services.localization.render($key)) #else #set($name = $displayInSection) #end
-        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true})
+        #set ($appSection = {'id' : $displayInSection, 'name' : $name, 'url': $xwiki.getURL($currentDoc, $adminAction, "${query}&amp;amp;section=$escapetool.url(${displayInSection})"), 'configurable' : true, 'order': $configurableObject.getValue('sectionOrder')})
         #if ($app.getValue('configureGlobally', $configurableObject) != 1)
           #set ($appSection.perSpace = true)
         #end
@@ -174,7 +206,7 @@
           #set ($appSection.description = $services.localization.render($key))
         #end
         #set ($discard = $sectionsByName.put($displayInSection, $appSection))
-        #set ($discard = $categoriesByName.get('applications').children.add($appSection))
+        #set ($discard = $appCategory.children.add($appSection))
         #set ($newSection = true)
       #end
       ##

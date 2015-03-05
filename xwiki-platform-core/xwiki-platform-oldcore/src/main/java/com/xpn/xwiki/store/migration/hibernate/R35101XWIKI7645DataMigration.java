@@ -50,7 +50,7 @@ import com.xpn.xwiki.web.Utils;
  * BLOB since this is the expected column type when using the new mapping files. Rebuilding the indexes is needed
  * because changing a table's columns automatically invalidates the indexes on those tables, and with unusable indexes
  * any new insertion in those tables will trigger an exception.
- * 
+ *
  * @version $Id$
  * @since 3.5.1
  */
@@ -104,7 +104,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
 
     /**
      * Hibernate {@link Work} class doing the actual work of this migrator.
-     * 
+     *
      * @version $Id$
      */
     private static class R35101Work implements Work
@@ -113,8 +113,8 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
         public void execute(Connection connection) throws SQLException
         {
             String[][] tablesToFix = new String[][] {
-                {"XWIKIATTACHMENT_CONTENT", "XWA_CONTENT"},
-                {"XWIKIATTACHMENT_ARCHIVE", "XWA_ARCHIVE"}};
+                { "XWIKIATTACHMENT_CONTENT", "XWA_CONTENT" },
+                { "XWIKIATTACHMENT_ARCHIVE", "XWA_ARCHIVE" } };
             Statement stmt = connection.createStatement();
             PreparedStatement getIndexesQuery = connection.prepareStatement(
                 "SELECT index_name FROM all_indexes WHERE table_owner=? AND table_name=? AND index_type='NORMAL'");

@@ -22,6 +22,9 @@ package org.xwiki.formula.internal;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -46,7 +49,9 @@ import org.xwiki.formula.ImageData;
  * @version $Id$
  * @since 2.0M3
  */
-@Component("mathtran")
+@Component
+@Named("mathtran")
+@Singleton
 public final class MathTranFormulaRenderer extends AbstractFormulaRenderer implements Initializable
 {
     /** The base URL of the mathematical formula transformation service. */

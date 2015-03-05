@@ -230,19 +230,21 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach($user in $usersList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($userReference = $user.extractReference('DOCUMENT'))
       #if (!$userReference)
-        #set ($userReference = $services.model.resolveDocument($user, 'explicit', $xcontext.userReference))
+        #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
       #end
       #set ($userName = ${userReference.name})
       #getUserAvatarURL($userReference $avatarURL 30)
       <li class="user">
-       <div class="user-avatar-wrapper">
-         ## The string returned by XWiki#getUserName() is XML encoded.
-         <img src="${escapetool.xml($avatarURL.url)}" class="icon"
-           alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
-      </div>
-      <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
+        <div class="user-avatar-wrapper">
+          ## The string returned by XWiki#getUserName() is XML encoded.
+          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
+            alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
+        </div>
+        <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
         <div>
           <span class="user-alias">${escapetool.xml($userReference.name)}</span>
           ## Display the wiki only for local users.
@@ -272,9 +274,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach ($group in $groupsList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($groupReference = $group.extractReference('DOCUMENT'))
       #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($group, 'explicit', $xcontext.userReference))
+        #set ($groupReference = $services.model.resolveDocument($group, 'group/current'))
       #end
       #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
       #if ("$!groupTitle" == '')
@@ -289,15 +293,15 @@ $xwiki.getUserName("xwiki:${username}")
         <div class="user-name">
           <a href="${escapetool.xml($xwiki.getURL($groupReference))}">${escapetool.xml($groupTitle)}</a>
         </div>
-    <div>
-    <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
-      ## Display the wiki only for local groups.
-      #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
-        <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
-      #end
-    </div>
-  </li>
-  #end
+        <div>
+          <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
+          ## Display the wiki only for local groups.
+          #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
+            <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
+          #end
+        </div>
+      </li>
+    #end
   </ul>
 #end
 
@@ -1620,14 +1624,13 @@ ${Msz}Mb##
 })();
    //]]>
   </script>
-</div> ## xwiki-livetable-container
-  ## Close wiki syntax wrappers.
-  #if("$!options.outputOnlyHtml" != 'true')
-    #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+</div>## xwiki-livetable-container
+## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
+#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
-#else {/pre} #end
-  #end
-#end
+#else{/pre}#end##
+#end## end-wrappers
+#end## end-livetable-macro
 
 #**
  * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function
@@ -2078,19 +2081,23 @@ function (row, i, table) {
   * @param $lazy {@code true} to download the WYSIWYG code only when it is needed, {@code false} to download it when the page is loaded
   *#
 #macro(wysiwyg_import $lazy)
-## SmartClient (used by the XWikiExplorer)
-## NOTE: We can't defer the SmartClient loading because it uses document.write() to load stylesheets in IE.
-$xwiki.jsfx.use("js/smartclient/initsc.js", {'forceSkinAction': true, 'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", {'defer': false})
-$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js", {'defer': false})
-## XWikiExplorer (used by the link plug-in)
-$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
-## WYSIWYG
+## Load the CSS of the tree used by the Create Link Wizard (the JavaScript code is loaded with Require.js).
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'})
+$xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'finder.min.css',
+  {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'})
+## We use directly FontAwesome for the tree node icons for two reasons:
+## * the XWiki icon set (available through the icon themes) is limited
+## * jsTree expects an URL/path or a CSS class name as the value of the tree node icon configuration when JSON source is
+##   used; the icon theme API is currently only able to render an icon but there's no way to get the icon configuration
+##   as jsTree expects it. The alternative is to use the HTML source to feed the tree but then the tree definition and
+##   configuration becomes complex.
+## We don't load the FontAwesome CSS directly from its WebJar because it contains some relative paths that currently are
+## not handled correctly by the WebJar action. This has been fixed in the FontAwesome icon theme so we load the theme
+## SSX instead.
+$xwiki.ssx.use('IconThemes.FontAwesome')
+## Include also the fix for the FontAwesome loading issue on IE8.
+$xwiki.jsx.use('IconThemes.FontAwesome')
 $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {'forceSkinAction': true, 'lazy': $lazy})
 #end
 
@@ -2223,6 +2230,19 @@ var $jsVarName = {
 #if("$!request.debug" != '')
   #set($ok = $parameters.put('debug', $request.debug))
 #end
+#set($ok = $parameters.put('documentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+  'outputSyntax': 'plain',
+  'showSpaces': true,
+  'showAddDocument': true,
+  'showTranslations': false,
+  'showAttachments': false
+}))))
+#set($ok = $parameters.put('attachmentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+  'outputSyntax': 'plain',
+  'showSpaces': true,
+  'showTranslations': false,
+  'showAddAttachment': true
+}))))
 #end
 
 #**
@@ -2388,10 +2408,44 @@ var $jsVarName = {
   #end
   $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
   #if ($hasChildren)
-    #foreach ($child in $item.children)
+    #set ($children = [])
+    #sortCollectionOfMapsByField($item.children, 'order', 99999, 'asc', $children)
+    #foreach ($child in $children)
       #verticalNavigationItem($child $level.concat('*') $options)
     #end
   #end
+#end
+
+#**
+ * Sort a collection containing maps by a field.
+ *
+ *
+ * @param $collection - List - Collection to sort.
+ *
+ * @param $field - String - Name of the field of the map to sort on.
+ *
+ * @param $defaultValue - Any - The default value for the sort if one of the elements has a NULL field
+ *
+ * @param $order - String - Must be 'asc' for ascending, or 'desc' for descending
+ *
+ * @param $outList - List - The returns from this macro will be put in this list, passing the list as a parameter
+ *                          a safety measure because macros can't return values.
+ *#
+#macro (sortCollectionOfMapsByField $collection $field $defaultValue $order $outputList)
+  ## If an alement has a null field, $sorttool.sort() won't return anything.
+  ## To avoid this situation, we create a new list that contains the elements with a default field if it is missing
+  #set ($newList = [])
+  #foreach ($element in $collection)
+    #if ("$!element.get($field)" == '')
+      #set ($elementCopy = {})
+      #set ($discard = $elementCopy.putAll($element))
+      #set ($discard = $elementCopy.put($field, $defaultValue))
+      #set ($discard = $newList.add($elementCopy))
+    #else
+      #set ($discard = $newList.add($element))
+    #end
+  #end
+  #set ($discard = $outputList.addAll($sorttool.sort($newList, "${field}:${order}")))
 #end
 
 #**
@@ -2543,6 +2597,9 @@ $string##
 #if (!$condition && "$!condition" == '')##
 ## Undefined condition. Use the default condition.
 #set ($condition = $doc.getObject('XWiki.SheetDescriptorClass'))
+#elseif ($condition.getClass().getName() == 'java.lang.String')##
+## The condition is the name of an xclass. Display the sheet title if the current document doesn't have such an object.
+#set ($condition = !$doc.getObject($condition))
 #end##
 ##
 #if ($condition)##

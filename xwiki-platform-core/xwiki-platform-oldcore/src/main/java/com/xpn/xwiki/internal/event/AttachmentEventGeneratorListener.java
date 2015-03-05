@@ -44,7 +44,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce attachment events based on document events.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -56,7 +56,7 @@ public class AttachmentEventGeneratorListener implements EventListener
     /**
      * The events to match.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
 
     /**

@@ -22,7 +22,6 @@ package org.xwiki.test.ui.po.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -63,11 +62,11 @@ public class ObjectEditPage extends EditPage
         getForm().setFieldValue(this.classNameField, className);
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
-        final int initialObjectCount = getUtil().findElementsWithoutWaiting(getDriver(), objectsLocator).size();
+        final int initialObjectCount = getDriver().findElementsWithoutWaiting(objectsLocator).size();
         this.classNameSubmit.click();
 
         // Make sure we wait for the element to appear since there's no page refresh.
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -88,7 +87,7 @@ public class ObjectEditPage extends EditPage
         getDriver().findElement(By.cssSelector("[id='add_xobject_" + className + "'] .xobject-add-control")).click();
 
         // Make sure we wait for the element to appear since there's no page refresh.
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -106,7 +105,7 @@ public class ObjectEditPage extends EditPage
      */
     public void removeAllObjects(String className)
     {
-        List<WebElement> objectContainers = getUtil().findElementsWithoutWaiting(getDriver(),
+        List<WebElement> objectContainers = getDriver().findElementsWithoutWaiting(
             By.xpath("//div[starts-with(@id, '" + "xobject_" + className + "_')]"));
         // Exclude ids ending with _title and _content since we have 3 matches for each id...
         List<WebElement> validElements = new ArrayList<WebElement>();
@@ -136,15 +135,15 @@ public class ObjectEditPage extends EditPage
         deleteLink.click();
 
         // Expect a confirmation box
-        waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
+        getDriver().waitUntilElementIsVisible(By.className("xdialog-box-confirmation"));
         getDriver().findElement(By.cssSelector(".xdialog-box-confirmation input[value='Yes']")).click();
-        waitUntilElementDisappears(objectLocator);
+        getDriver().waitUntilElementDisappears(objectLocator);
     }
 
     public void removeAllDeprecatedProperties()
     {
         getDriver().findElement(By.className("syncAllProperties")).click();
-        waitUntilElementDisappears(By.className("deprecatedProperties"));
+        getDriver().waitUntilElementDisappears(By.className("deprecatedProperties"));
     }
 
     /**

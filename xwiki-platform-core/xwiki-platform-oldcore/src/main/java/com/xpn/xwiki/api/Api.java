@@ -24,8 +24,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.xwiki.stability.Unstable;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -36,14 +34,14 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from Velocity or Groovy in
  * XWiki documents.
- * 
+ *
  * @version $Id$
  */
 public class Api
 {
     /**
      * The current context, needed by the underlying protected object.
-     * 
+     *
      * @see #getXWikiContext()
      * @todo make this variable private after we agree on it on the mailing list. It'll break non-core plugins but
      *       better do it now rather than after the 1.0 release...
@@ -62,12 +60,12 @@ public class Api
     }
 
     /**
-     * Note 1: This method is protected so that users of this API do not get to see the XWikiContext object which
-     * should not be exposed.
+     * Note 1: This method is protected so that users of this API do not get to see the XWikiContext object which should
+     * not be exposed.
      * <p/>
      * Note 2: This is not longer the canonical way of retrieving the XWiki Context. The new way is to get it from the
      * {@link org.xwiki.context.ExecutionContext}.
-     * 
+     *
      * @return the current context containing all state information about the current request
      */
     protected XWikiContext getXWikiContext()
@@ -87,7 +85,7 @@ public class Api
     /**
      * Check if the current document has programming rights, meaning that it was last saved by a user with the
      * programming right globally granted.
-     * 
+     *
      * @return <tt>true</tt> if the current document has the Programming right or <tt>false</tt> otherwise.
      */
     public boolean hasProgrammingRights()
@@ -98,7 +96,7 @@ public class Api
 
     /**
      * Check if the current user has administration rights either on the current wiki or on the current space.
-     * 
+     *
      * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
      */
     public boolean hasAdminRights()
@@ -110,7 +108,7 @@ public class Api
     /**
      * Check if the current user has administration rights on the current wiki, regardless of any space admin rights
      * that might also be available.
-     * 
+     *
      * @return <code>true</code> if the current user has the <code>admin</code> right or <code>false</code> otherwise.
      * @since 3.2M3
      */
@@ -122,7 +120,7 @@ public class Api
 
     /**
      * Check if the current user has an access level on a given document.
-     * 
+     *
      * @param right The name of the right to verify (eg "programming", "admin", "register", etc).
      * @param docname The document for which to verify the right.
      * @return <tt>true</tt> if the current user has the specified right, <tt>false</tt> otherwise.
@@ -136,7 +134,7 @@ public class Api
 
     /**
      * Convert a list of internal representation of documents to public api documents.
-     * 
+     *
      * @param xdocList the internal documents.
      * @return the plublic api documents.
      */
@@ -152,7 +150,7 @@ public class Api
 
     /**
      * Convert an internal representation of document to public api document.
-     * 
+     *
      * @param xdoc the internal document.
      * @return the plublic api document.
      */
@@ -166,7 +164,7 @@ public class Api
      * {@link Context#dropPermissions()} has been called then this will return the guest user no matter who the real
      * author is. If there is no current document then the guest user is returned because there is no reason for script
      * to have any permission if does not exist in any document.
-     * 
+     *
      * @return the name of the document author or guest.
      */
     String getEffectiveScriptAuthorName()
@@ -187,7 +185,6 @@ public class Api
      * @return The public api Attachment object
      * @since 5.0M2
      */
-    @Unstable
     protected Attachment convert(XWikiAttachment xattach)
     {
         return xattach == null ? null : new Attachment(convert(xattach.getDoc()), xattach, this.context);
@@ -200,7 +197,6 @@ public class Api
      * @return A List of Attachment objects
      * @since 5.0M2
      */
-    @Unstable
     protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)
     {
         List<Attachment> outList = new ArrayList<Attachment>(xattaches.size());

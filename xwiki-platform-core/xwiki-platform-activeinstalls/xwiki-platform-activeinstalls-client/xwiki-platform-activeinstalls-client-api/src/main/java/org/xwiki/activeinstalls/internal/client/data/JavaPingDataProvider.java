@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.activeinstalls.internal.client.PingDataProvider;
 import org.xwiki.component.annotation.Component;
@@ -35,6 +36,7 @@ import org.xwiki.component.annotation.Component;
  */
 @Component
 @Named("java")
+@Singleton
 public class JavaPingDataProvider implements PingDataProvider
 {
     private static final String PROPERTY_JAVA_VENDOR = "javaVendor";

@@ -5,6 +5,7 @@
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
 #set($discard = $services.template.execute('job_macros.vm'))
+#set($discard = $services.template.execute('rating_macros.vm'))
 
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
@@ -163,6 +164,16 @@
   #end
 #end
 
+#macro (displayExtensionRating $extension)
+  #set ($rating = $extension.getRating())
+  #if ($rating != $NULL)
+    #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+    <div class="extension-rating">
+      #ratingstars($id "" "" $rating.averageVote $rating.totalVotes true)
+    </div>
+  #end
+#end
+
 #macro (displayExtensionAuthors $extension)
   #set ($authors = [])
   #foreach ($author in $extension.authors)
@@ -216,99 +227,133 @@
 
 #macro (displayExtensionDetails_description $extension)
   <div id="extension-body-description-$extensionIdHashCode"></div>
-  <div class="extension-body-description extension-body-section">
-    <dl class="extension-metadata">
-      <dt>$services.localization.render('extensions.info.id')</dt>
-      <dd>$extension.id.id</dd>
+  <dl class="extension-body-description extension-body-section">
+    <dt>$services.localization.render('extensions.info.id')</dt>
+    <dd>$extension.id.id</dd>
 
-      #if ($extension.features.size() > 0)
-        <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
-        <dd>
-        #if ($extension.features.size() == 1)
-          $escapetool.xml($extension.features.iterator().next())
+    #if ($extension.features.size() > 0)
+      <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
+      <dd>
+      #if ($extension.features.size() == 1)
+        $escapetool.xml($extension.features.iterator().next())
+      #else
+        <ul>
+          #foreach ($feature in $extension.features)
+            <li>$escapetool.xml($feature)</li>
+          #end
+        </ul>
+      #end
+      </dd>
+    #end
+
+    <dt>$services.localization.render('extensions.info.type')</dt>
+    <dd>$extension.type</dd>
+
+    <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
+    #if ($extension.licenses.size() > 0)
+      <dd>
+        #if ($extension.licenses.size() == 1)
+          $extension.licenses.iterator().next().name
         #else
           <ul>
-            #foreach ($feature in $extension.features)
-              <li>$escapetool.xml($feature)</li>
+            #foreach ($license in $extension.licenses)
+              <li>$license.name</li>
             #end
           </ul>
         #end
-        </dd>
+      </dd>
+    #end
+
+    #if ("$!{extension.webSite}" != '')
+      <dt>$services.localization.render('extensions.info.website')</dt>
+      <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+    #end
+
+    #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
+      <dt>$services.localization.render('extensions.info.repository')</dt>
+      <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
+    #end
+
+    #if ($extension.scm)
+      #if ($extension.scm.url)
+        <dt>$services.localization.render('extensions.info.scm')</dt>
+        <dd><a href="$extension.scm.url">$escapetool.xml($extension.scm.url.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+      #elseif ($extension.scm.connection)
+        <dt>$services.localization.render('extensions.info.scm')</dt>
+        <dd><a href="$extension.scm.connection.path">$escapetool.xml($extension.scm.connection.system)</a></dd>
       #end
+    #end
 
-      <dt>$services.localization.render('extensions.info.type')</dt>
-      <dd>$extension.type</dd>
+    #if ($extension.issueManagement.getURL())
+      <dt>$services.localization.render('extensions.info.issueManagement')</dt>
+      <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
+    #end
 
-      <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
-      #if ($extension.licenses.size() > 0)
-        <dd>
-          #if ($extension.licenses.size() == 1)
-            $extension.licenses.iterator().next().name
-          #else
-            <ul>
-              #foreach ($license in $extension.licenses)
-                <li>$license.name</li>
-              #end
-            </ul>
-          #end
-        </dd>
-      #end
+    #if ($extension.isInstalled())
+      #displayExtensionDetails_description_wikis($extension)
+    #end
 
-      #if ("$!{extension.webSite}" != '')
-        <dt>$services.localization.render('extensions.info.website')</dt>
-        <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
-      #end
+    #if ($extensionStatus != 'loading')
+      #displayExtensionDetails_description_versions($extension)
+    #end
 
-      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
-        <dt>$services.localization.render('extensions.info.repository')</dt>
-        <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
-      #end
-
-      #if ($extension.scm)
-        #if ($extension.scm.url)
-          <dt>$services.localization.render('extensions.info.scm')</dt>
-          <dd><a href="$extension.scm.url">$escapetool.xml($extension.scm.url.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
-        #elseif ($extension.scm.connection)
-          <dt>$services.localization.render('extensions.info.scm')</dt>
-          <dd><a href="$extension.scm.connection.path">$escapetool.xml($extension.scm.connection.system)</a></dd>
-        #end
-      #end
-
-      #if ($extension.issueManagement)
-        <dt>$services.localization.render('extensions.info.issueManagement')</dt>
-        <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
-      #end
-
-      #if ($extension.isInstalled())
-        #displayExtensionDetails_description_wikis($extension)
-      #end
-
-      #if ($extensionStatus != 'loading')
-        #displayExtensionDetails_description_versions($extension)
-      #end
-
-      ##
-      ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
-      ## server side generated HTML, etc.)
-      ## <dt>Description</dt>
-      ## <dd>$!extension.description</dd>
-    </dl>
-  </div>
+    ##
+    ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
+    ## server side generated HTML, etc.)
+    ## <dt>Description</dt>
+    ## <dd>$!extension.description</dd>
+  </dl>
 #end
 
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #getInstallInfo($extension $NULL $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedGloballyBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #else
+      <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #end
   #elseif ($xcontext.isMainWiki())
     ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
     <dt>$services.localization.render('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
-        <li>#displayExtensionNamespace($namespace)</li>
+        #getInstallInfo($extension $namespace $install)
+        #if ($install.date)
+          <li>$services.localization.render('extensions.info.installedOnNamespaceBy', [
+            "#displayExtensionNamespace($namespace)",
+            $xwiki.getUserName($install.userReference),
+            $xwiki.formatDate($install.date)
+          ])</li>
+        #else
+          <li>#displayExtensionNamespace($namespace)</li>
+        #end
       #end
     </ul></dd>
+  #else
+    #getInstallInfo($extension $extensionNamespace $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #end
   #end
+#end
+
+#macro (getInstallInfo $installedExtension $namespace $return)
+  #set ($install = {'date': $installedExtension.getInstallDate($namespace)})
+  #if ($install.date)
+    #set ($install.userReference = $installedExtension.getUserReference($namespace))
+  #else
+    #set ($installJobStatus = $extensionManager.getExtensionJobStatus($installedExtension.id.id, $namespace))
+    #if ($installJobStatus && $installJobStatus.request.getProperty('job.type') == 'install')
+      #set ($install.date = $installJobStatus.startDate)
+      #set ($install.userReference = $installJobStatus.request.getProperty('user.reference'))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $install)
 #end
 
 #macro (displayExtensionNamespace $namespace)
@@ -322,17 +367,14 @@ $namespace##
 #end
 
 #macro (displayExtensionDetails_description_versions $extension)
-  #if (!$request.listVersions)
-    <dt></dt>
-    <dd>
+  <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
+  <dd>
+    #if (!$request.listVersions)
       <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
         class="extension-versions-link">
         $services.localization.render('extensions.info.stableVersions.linkLabel')
       </a>
-    </dd>
-  #else
-    <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
-    <dd>
+    #else
       #set ($stableVersions = [])
       #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
         #if ($version.type == 'STABLE')
@@ -350,8 +392,8 @@ $namespace##
       #else
         $services.localization.render('extensions.info.stableVersions.noResults')
       #end
-    </dd>
-  #end
+    #end
+  </dd>
 #end
 
 #**
@@ -403,25 +445,29 @@ $namespace##
 
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   #if ($extension.dependencies.size() > 0)
-    <p>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
-    <ul class="dependencies">
-      #foreach ($dependency in $extension.dependencies)
-        <li>#displayDependency($dependency $extensionNamespace)</li>
-      #end
-    </ul>
+    <dt>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</dt>
+    <dd>
+      <ul class="dependencies">
+        #foreach ($dependency in $extension.dependencies)
+          <li>#displayDependency($dependency $extensionNamespace)</li>
+        #end
+      </ul>
+    </dd>
   #end
 #end
 
 #macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
   #if ($backwardDependencies.size() > 0)
-    <p>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
-    <ul class="dependencies">
-      #foreach ($namespace in $backwardDependencies.entrySet())
-        #foreach ($dependency in $namespace.value)
-          <li>#displayDependency($dependency $namespace.key)</li>
+    <dt>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</dt>
+    <dd>
+      <ul class="dependencies">
+        #foreach ($namespace in $backwardDependencies.entrySet())
+          #foreach ($dependency in $namespace.value)
+            <li>#displayDependency($dependency $namespace.key)</li>
+          #end
         #end
-      #end
-    </ul>
+      </ul>
+    </dd>
   #end
 #end
 
@@ -429,10 +475,10 @@ $namespace##
   #if ($extension.dependencies.size() > 0 || $backwardDependencies.size() > 0)
     <div id="extension-body-dependencies-$extensionIdHashCode"></div>
     #computeXBack()
-    <div class="extension-body-dependencies extension-body-section">
+    <dl class="extension-body-dependencies extension-body-section">
       #displayExtensionDetails_dependencies_upstream($extension)
       #displayExtensionDetails_dependencies_downstream($backwardDependencies)
-    </div>
+    </dl>
   #end
 #end
 
@@ -459,7 +505,22 @@ $namespace##
   #if ($isExtensionPlan)
     #displayExtensionPlan($jobStatus)
   #else
-    #displayJobStatusLog($jobStatus)
+    ## Display any incompatibility errors
+    #set ($jobStatusCollapsed = false)
+    #if ($jobStatus.state == 'FINISHED')
+      ## Check if there are any logged errors.
+      #foreach ($log in $jobStatus.log.getLogs('ERROR'))
+        #if ($log.throwable && $exceptiontool.getRootCauseMessage($log.throwable).contains('not compatible'))
+          #set ($jobStatusCollapsed = true)
+          #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
+          #set ($errorMessage = "${errorMessage}<br/>")
+          #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
+          <p>#error($errorMessage)</p>
+          #break
+        #end
+      #end
+    #end
+    #displayJobStatusLog($jobStatus, $jobStatusCollapsed)
   #end
 #end
 
@@ -497,16 +558,20 @@ $namespace##
     })
     <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
   #else
+    <dl>
     #foreach($entry in $extensionsByAction.entrySet())
       #if (!$entry.value.isEmpty())
-        <p>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</p>
-        <ul class="dependencies">
-          #foreach ($planAction in $entry.value)
-            <li>#displayDependency($planAction.extension $planAction.namespace)</li>
-          #end
-        </ul>
+        <dt>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</dt>
+        <dd>
+          <ul class="dependencies">
+            #foreach ($planAction in $entry.value)
+              <li>#displayDependency($planAction.extension $planAction.namespace)</li>
+            #end
+          </ul>
+        </dd>
       #end
     #end
+    </dl>
   #end
 #end
 
@@ -751,6 +816,7 @@ $namespace##
         <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
       #end
       #displayExtensionActionButtons($extension)
+      #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
       #end
@@ -818,6 +884,15 @@ $namespace##
       <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
         "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+
+      ## DEBUG START: Check if there is any job status associated with the specified extension.
+      #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
+      #if ($jobStatus)
+        ## Normally we shouldn't get here.
+        <div class="errormessage">We found an extension job associated with the missing extension:</div>
+        #displayExtensionJobStatus($jobStatus)
+      #end
+      ## DEBUG STOP
     #end
   #end
 #end
@@ -982,6 +1057,8 @@ $namespace##
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
         #set ($status = 'installed-invalid')
+      #elseif ($extension.isDependency($extensionNamespace))
+        #set ($status = 'installed-dependency')
       #else
         #set ($status = 'installed')
       #end
@@ -995,9 +1072,7 @@ $namespace##
         #getInstalledExtension($extension $extensionNamespace $currentVersion)
       #end
       #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.descriptor.id)
-        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
-        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
+        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint)")
       #else
         #set ($status = 'remote')
       #end
@@ -1013,16 +1088,20 @@ $namespace##
   #setVariable ("$_extensionStatusMessage" $message)
 #end
 
-#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
-#set ($status = $options.get(0))
-#if ($alice.id.equals($bob.id))
-#set ($status = $options.get(1))
-#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
-#set ($status = $options.get(2))
-#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
-#set ($status = $options.get(3))
+#macro (determineVersionCompatibility $alice $bob $versionConstraint)
+#set ($prefix = '')
+#if (!$alice.id.equals($bob.id))
+#set ($prefix = 'remote-')
 #end
-$status##
+#set ($suffix = '')
+#if ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
+#set ($suffix = '-incompatible')
+#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
+#set ($suffix = '-invalid')
+#elseif ($bob.isDependency($extensionNamespace))
+#set ($suffix = '-dependency')
+#end
+${prefix}${bob.repository.descriptor.id}${suffix}##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)

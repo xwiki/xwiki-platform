@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
  */
 @Component
 @Named("database")
+@Singleton
 public class DatabasePingDataProvider implements PingDataProvider
 {
     private static final String PROPERTY_DB_NAME = "dbName";

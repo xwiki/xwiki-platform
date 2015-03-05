@@ -21,6 +21,7 @@ package org.xwiki.security.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
@@ -34,6 +35,7 @@ import org.xwiki.script.service.ScriptServiceManager;
  */
 @Component
 @Named(SecurityScriptService.ROLEHINT)
+@Singleton
 public class SecurityScriptService implements ScriptService
 {
     /**

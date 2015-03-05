@@ -41,7 +41,6 @@ import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -58,8 +57,6 @@ public class DocumentTranslationBundleFactoryTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
-
-    private QueryManager mockQueryManager;
 
     private Query mockQuery;
 
@@ -86,8 +83,8 @@ public class DocumentTranslationBundleFactoryTest
 
         this.mockQuery = mock(Query.class);
 
-        when(this.mockQueryManager.createQuery(Mockito.any(String.class), Mockito.any(String.class))).thenReturn(
-            this.mockQuery);
+        when(this.oldcore.getQueryManager().createQuery(Mockito.any(String.class),
+            Mockito.any(String.class))).thenReturn(this.mockQuery);
         when(this.mockQuery.execute()).thenReturn(Collections.EMPTY_LIST);
 
         when(this.mockWikiDescriptorManager.getMainWikiId()).thenReturn(this.oldcore.getXWikiContext().getMainXWiki());
@@ -104,7 +101,6 @@ public class DocumentTranslationBundleFactoryTest
     @AfterComponent
     public void registerComponents() throws Exception
     {
-        this.mockQueryManager = this.oldcore.getMocker().registerMockComponent(QueryManager.class);
         this.mockWikiDescriptorManager = this.oldcore.getMocker().registerMockComponent(WikiDescriptorManager.class);
     }
 

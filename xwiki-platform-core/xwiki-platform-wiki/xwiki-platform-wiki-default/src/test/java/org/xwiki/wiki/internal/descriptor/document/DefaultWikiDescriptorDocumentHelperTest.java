@@ -19,12 +19,17 @@
  */
 package org.xwiki.wiki.internal.descriptor.document;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
@@ -34,12 +39,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper}.
@@ -51,9 +50,7 @@ public class DefaultWikiDescriptorDocumentHelperTest
 {
     @Rule
     public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorDocumentHelper> mocker =
-            new MockitoComponentMockingRule(DefaultWikiDescriptorDocumentHelper.class);
-
-    private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
+            new MockitoComponentMockingRule<>(DefaultWikiDescriptorDocumentHelper.class);
 
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -70,18 +67,17 @@ public class DefaultWikiDescriptorDocumentHelperTest
     @Before
     public void setUp() throws Exception
     {
-        wikiDescriptorManagerProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
-                WikiDescriptorManager.class));
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        queryManager = mocker.getInstance(QueryManager.class);
-        documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
+        wikiDescriptorManager = mocker.registerMockComponent(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         context = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(context);
         xwiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xwiki);
-        wikiDescriptorManager = mock(WikiDescriptorManager.class);
-        when(wikiDescriptorManagerProvider.get()).thenReturn(wikiDescriptorManager);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+
+        queryManager = mocker.getInstance(QueryManager.class);
+        documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
     }
 
     @Test

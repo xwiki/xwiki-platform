@@ -26,7 +26,7 @@ import org.radeox.macro.code.SourceCodeFormatter;
  * Redefinition of the Java code formatter ({@code org.radeox.macro.code.JavaCodeFilter}) from Radeox. This was needed
  * because of the inefficient regular expression for detecting string literals, which caused exponential rendering times
  * for certain inputs.
- * 
+ *
  * @version $Id$
  */
 public class XWikiJavaCodeFilter extends DefaultRegexCodeFormatter implements SourceCodeFormatter

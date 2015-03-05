@@ -27,6 +27,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
@@ -65,16 +67,19 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
+import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
 /**
  * XWiki Action responsible for importing XAR archives.
- * 
+ *
  * @version $Id$
  */
 public class ImportAction extends XWikiAction
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -186,7 +191,7 @@ public class ImportAction extends XWikiAction
     }
 
     private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
-        throws IOException, XWikiException, FilterException
+        throws IOException, XWikiException
     {
         PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
 
@@ -309,6 +314,7 @@ public class ImportAction extends XWikiAction
         // Setup log
         xarProperties.setVerbose(true);
         instanceProperties.setVerbose(true);
+        instanceProperties.setStoppedWhenSaveFail(false);
         LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
         LogQueue logger = new LogQueue();
         if (loggerManager != null) {
@@ -329,6 +335,11 @@ public class ImportAction extends XWikiAction
                 loggerManager.popLogListener();
             }
 
+            // Print the import log
+            if (LOGGER.isDebugEnabled()) {
+                logger.log(LOGGER);
+            }
+
             // Close the input source
             source.close();
 
@@ -337,7 +348,7 @@ public class ImportAction extends XWikiAction
 
         // Generate import report
         // Emulate old packager report (for retro compatibility)
-        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        Package oldImporter = new Package();
         if (logger.containLogsFrom(LogLevel.ERROR)) {
             context.put("install_status", DocumentInfo.INSTALL_ERROR);
         } else {
@@ -350,14 +361,20 @@ public class ImportAction extends XWikiAction
             if (marker != null) {
                 if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
                     || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
-                    importer.getInstalled().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getInstalled(context).add(
+                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
-                    importer.getSkipped().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getSkipped(context).add(
+                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
-                    importer.getErrors().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    Object entity = log.getArgumentArray()[0];
+                    if (entity != null) {
+                        oldImporter.getErrors(context).add(
+                            entity instanceof EntityReference ? serializer.serialize((EntityReference) log
+                                .getArgumentArray()[0]) : entity.toString());
+                    }
                 }
             }
         }
-
     }
 }

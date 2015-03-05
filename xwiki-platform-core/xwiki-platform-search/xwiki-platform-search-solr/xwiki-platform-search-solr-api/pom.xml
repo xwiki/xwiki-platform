@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -34,6 +34,8 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -75,19 +77,16 @@
       <groupId>org.restlet.jee</groupId>
       <artifactId>org.restlet.ext.servlet</artifactId>
     </dependency>
-
     <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <!-- Apache xalan used for Solr's internal XML operations. -->
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-
     <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -119,20 +118,18 @@
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
-      <!-- This is needed at runtime by solrconfig.xml. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-plugin</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-data</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
-
     <!-- Testing dependencies -->
-
     <!-- Since we're mocking a class (XWiki) we need those -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -154,6 +151,32 @@
             **/AbstractSolrMetadataExtractor.java
           </excludes>
         </configuration>
+      </plugin>
+      <!-- Attach default configuration package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-default-configuration</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

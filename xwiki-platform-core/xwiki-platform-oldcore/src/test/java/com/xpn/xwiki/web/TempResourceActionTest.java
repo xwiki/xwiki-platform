@@ -22,9 +22,8 @@ package com.xpn.xwiki.web;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
-
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -32,6 +31,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
 /**
@@ -101,6 +101,7 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
         File emptyFile = new File(base, path);
         emptyFile.getParentFile().mkdirs();
         emptyFile.createNewFile();
+        emptyFile.deleteOnExit();
     }
 
     /**
@@ -155,5 +156,18 @@ public class TempResourceActionTest extends AbstractBridgedComponentTestCase
         createEmptyFile("temp/officeviewer/xwiki/Sp*ace/Pa-ge/presentation.odp/presentation-slide0.jpg");
         Assert.assertNotNull(action.getTemporaryFile(
             "/xwiki/bin/temp/Sp%2Aace/Pa%2Dge/officeviewer/presentation.odp/presentation-slide0.jpg", getContext()));
+    }
+
+    /**
+     * Tests {@link TempResourceAction#getTemporaryFile(String, XWikiContext)} when the URL is partially decoded. This
+     * can happen for instance when XWiki is behind Apache's {@code mode_proxy} with {@code nocanon} option disabled.
+     */
+    @Test
+    public void testGetTemporaryFileForPartiallyDecodedURL() throws Exception
+    {
+        createEmptyFile("temp/officeviewer/xwiki/Space/Page/"
+            + "attach%3Axwiki%3ASpace.Page%40pres%2Fentation.odp/13/presentation-slide0.jpg");
+        Assert.assertNotNull(action.getTemporaryFile("/xwiki/bin/temp/Space/Page/officeviewer/"
+            + "attach:xwiki:Space.Page@pres%2Fentation.odp/13/presentation-slide0.jpg", getContext()));
     }
 }

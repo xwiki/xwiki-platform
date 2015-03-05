@@ -27,7 +27,7 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 /**
  * Provides new instances of a specific type of XClass property and also give access to the meta class of an XClass
  * property (its definition).
- * 
+ *
  * @version $Id$
  * @since 4.3M2
  */

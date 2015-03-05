@@ -59,6 +59,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -102,6 +103,8 @@ public class MockitoOldcoreRule implements MethodRule
     private AuthorizationManager mockAuthorizationManager;
 
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
+
+    private QueryManager mockQueryManager;
 
     protected Map<DocumentReference, XWikiDocument> documents =
         new ConcurrentHashMap<DocumentReference, XWikiDocument>();
@@ -238,7 +241,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
-            Provider<XWikiContext> xcontextProvider = mock(Provider.class);
+            Provider<XWikiContext> xcontextProvider = this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
             when(xcontextProvider.get()).thenReturn(this.context);
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
@@ -565,6 +568,10 @@ public class MockitoOldcoreRule implements MethodRule
                 return groupClass;
             }
         });
+
+        // Query Manager
+        this.mockQueryManager = getMocker().registerMockComponent(QueryManager.class);
+        when(getMockStore().getQueryManager()).thenReturn(this.mockQueryManager);
     }
 
     protected void after() throws Exception
@@ -627,5 +634,13 @@ public class MockitoOldcoreRule implements MethodRule
     public ObservationManager getObservationManager() throws ComponentLookupException
     {
         return getMocker().getInstance(ObservationManager.class);
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    public QueryManager getQueryManager()
+    {
+        return this.mockQueryManager;
     }
 }

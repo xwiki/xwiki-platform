@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Default implementation of XWikiStubContextProvider.
- * 
+ *
  * @todo make DefaultXWikiStubContextProvider able to generate a stub context from scratch some way, it will need some
  *       refactor around XWiki class for this to be possible. The current limitation is that without a first request
  *       this provider is unusable.

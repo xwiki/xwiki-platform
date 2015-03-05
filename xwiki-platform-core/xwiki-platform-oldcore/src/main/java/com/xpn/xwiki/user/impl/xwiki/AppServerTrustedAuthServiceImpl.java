@@ -29,7 +29,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 /**
  * Implements an authentication mechanism which is trusting the App Server authentication. If it fails it falls back to
  * the standard XWiki authentication.
- * 
+ *
  * @version $Id$
  */
 public class AppServerTrustedAuthServiceImpl extends XWikiAuthServiceImpl

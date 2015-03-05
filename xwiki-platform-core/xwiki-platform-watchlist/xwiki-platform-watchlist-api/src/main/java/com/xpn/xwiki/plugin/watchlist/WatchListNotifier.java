@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -121,8 +122,8 @@ public class WatchListNotifier
             return;
         }
 
-        // Get wiki administrator email (default : mailer@xwiki.localdomain.com)
-        String sender = context.getWiki().getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com", context);
+        // Get from email address from the configuration (default : mailer@xwiki.localdomain.com)
+        String from = getFromAddress();
 
         // Set email template
         String template = "";
@@ -135,6 +136,16 @@ public class WatchListNotifier
         }
 
         // Send message from template
-        emailService.sendMailFromTemplate(template, sender, emailAddr, null, null, language, vcontext, context);
+        emailService.sendMailFromTemplate(template, from, emailAddr, null, null, language, vcontext, context);
+    }
+
+    private String getFromAddress()
+    {
+        // Get from email address from the configuration (default : mailer@xwiki.localdomain.com)
+        String from = Utils.getComponent(MailSenderConfiguration.class).getFromAddress();
+        if (from == null) {
+            from = "mailer@xwiki.localdomain.com";
+        }
+        return from;
     }
 }

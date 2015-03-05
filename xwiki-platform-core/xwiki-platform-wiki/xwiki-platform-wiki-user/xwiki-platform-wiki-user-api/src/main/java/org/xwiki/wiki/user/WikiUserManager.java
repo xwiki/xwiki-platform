@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Component that manage how users can participate on a wiki (local users, members, invitation, etc...).
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface WikiUserManager
 {
     /**

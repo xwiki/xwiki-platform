@@ -44,6 +44,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
@@ -56,7 +58,10 @@ public class WatchListStore implements EventListener
 {
     /**
      * Character used to separated elements in Watchlist lists (pages, spaces, etc).
+     * 
+     * @deprecated: since 7.0M2. Elements are now stored individually.
      */
+    @Deprecated
     public static final String WATCHLIST_ELEMENT_SEP = ",";
 
     /**
@@ -203,14 +208,34 @@ public class WatchListStore implements EventListener
         }
 
         // Create storage properties
-        needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_WIKIS_PROP, "Wiki list", 80, 5);
-        needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_SPACES_PROP, "Space list", 80, 5);
-        needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_DOCUMENTS_PROP, "Document list", 80, 5);
-        needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_USERS_PROP, "User list", 80, 5);
+        needsUpdate |= this.addDBListField(bclass, WATCHLIST_CLASS_WIKIS_PROP, "Wiki list");
+        needsUpdate |= this.addDBListField(bclass, WATCHLIST_CLASS_SPACES_PROP, "Space list");
+        needsUpdate |= this.addDBListField(bclass, WATCHLIST_CLASS_DOCUMENTS_PROP, "Document list");
+        needsUpdate |= this.addDBListField(bclass, WATCHLIST_CLASS_USERS_PROP, "User list");
 
         needsUpdate |=
             bclass.addStaticListField(WATCHLIST_CLASS_AUTOMATICWATCH, "Automatic watching",
                 "default|" + StringUtils.join(AutomaticWatchMode.values(), PIPE_SEP));
+
+        return needsUpdate;
+    }
+
+    /**
+     * @param bclass the class to add to
+     * @param name the name of the property to add
+     * @param prettyName the pretty name of the property to add
+     * @return true if the property was added; false otherwise
+     */
+    private boolean addDBListField(BaseClass bclass, String name, String prettyName)
+    {
+        boolean needsUpdate = false;
+
+        needsUpdate = bclass.addDBListField(name, prettyName, 80, true, null);
+        if (needsUpdate) {
+            // Set the input display type in order to easily debug from the object editor.
+            DBListClass justAddedProperty = (DBListClass) bclass.get(name);
+            justAddedProperty.setDisplayType(ListClass.DISPLAYTYPE_INPUT);
+        }
 
         return needsUpdate;
     }
@@ -243,7 +268,7 @@ public class WatchListStore implements EventListener
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {
@@ -325,8 +350,7 @@ public class WatchListStore implements EventListener
     public void init(XWikiContext context) throws XWikiException
     {
         try {
-            final Query q =
-                context.getWiki().getStore().getQueryManager().getNamedQuery("getWatchlistJobDocuments");
+            final Query q = context.getWiki().getStore().getQueryManager().getNamedQuery("getWatchlistJobDocuments");
             this.jobDocumentNames = (List<String>) (List) q.execute();
         } catch (QueryException e) {
             throw new XWikiException(0, 0, "Failed to run query for watchlist jobs.", e);
@@ -416,62 +440,9 @@ public class WatchListStore implements EventListener
     public List<String> getWatchedElements(String user, ElementType type, XWikiContext context) throws XWikiException
     {
         BaseObject watchListObject = getWatchListObject(user, context);
-        String watchedItems = watchListObject.getLargeStringValue(getWatchListClassPropertyForType(type)).trim();
-        return unescapeList(watchedItems);
-    }
+        List<String> watchedItems = watchListObject.getListValue(getWatchListClassPropertyForType(type));
 
-    /**
-     * @param watchedItems the items to watch as a String with entries separated by the WATCHLIST_ELEMENT_SEP separator
-     * @return the items as a List (handles escapes so that items can contain the WATCHLIST_ELEMENT_SEP char)
-     * @todo Move this code to a central location so that other modules can reuse this too
-     */
-    private List<String> unescapeList(String watchedItems)
-    {
-        if (StringUtils.isBlank(watchedItems)) {
-            return Collections.EMPTY_LIST;
-        }
-
-        List<String> elements = new ArrayList<String>();
-        StringBuilder currentElement = new StringBuilder();
-        int previousPos = 0;
-        int newPos;
-        while ((newPos = StringUtils.indexOf(watchedItems, WATCHLIST_ELEMENT_SEP, previousPos)) > -1) {
-            if (newPos > 0 && watchedItems.charAt(newPos - 1) != '\\') {
-                currentElement.append(watchedItems.substring(previousPos, newPos));
-                elements.add(currentElement.toString());
-                currentElement.setLength(0);
-            } else if (newPos > previousPos) {
-                currentElement.append(watchedItems.substring(previousPos, newPos - 1)).append(WATCHLIST_ELEMENT_SEP);
-            }
-            previousPos = newPos + 1;
-        }
-        currentElement.append(watchedItems.substring(previousPos));
-        elements.add(currentElement.toString());
-        return elements;
-    }
-    
-    /**
-     * the inverse to {@link #unescapeList(String)}.
-     * @param watchedItems the list of watched items, each unescaped
-     * @return a string comma separated, escaped items 
-     */
-    private String escapeList(List<String> watchedItems)
-    {
-        if (watchedItems == null || watchedItems.isEmpty()) {
-            return StringUtils.EMPTY;
-        }
-        StringBuilder currentElement = new StringBuilder();
-        boolean empty = true;
-        for (String item : watchedItems) {
-            if (!empty) {
-                currentElement.append(WATCHLIST_ELEMENT_SEP);
-            }
-            // Escape the element to watch in case it contains the WATCHLIST_ELEMENT_SEP separator
-            String escapedItem = item.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
-            currentElement.append(escapedItem);
-            empty = false;
-        }
-        return currentElement.toString();
+        return watchedItems;
     }
 
     /**
@@ -486,6 +457,9 @@ public class WatchListStore implements EventListener
      */
     public boolean isWatched(String element, String user, ElementType type, XWikiContext context) throws XWikiException
     {
+        // TODO: Can this be optimized by a direct "exists" query on the list item? Would it e better than what we
+        // currently have with the document cache? It would also need to be performed on the user's wiki/database, not
+        // the current one.
         return getWatchedElements(user, type, context).contains(element);
     }
 
@@ -627,9 +601,7 @@ public class WatchListStore implements EventListener
         XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
-        userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
-            escapeList(elements));
-        userDocument.isMinorEdit();
+        userDocument.setDBStringListValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type), elements);
         context.getWiki().saveDocument(userDocument, context.getMessageTool().get("watchlist.save.object"), true,
             context);
     }

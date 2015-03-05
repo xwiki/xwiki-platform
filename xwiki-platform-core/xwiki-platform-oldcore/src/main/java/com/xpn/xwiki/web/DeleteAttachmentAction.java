@@ -37,7 +37,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Delete attachment xwiki action.
- * 
+ *
  * @version $Id$
  */
 public class DeleteAttachmentAction extends XWikiAction

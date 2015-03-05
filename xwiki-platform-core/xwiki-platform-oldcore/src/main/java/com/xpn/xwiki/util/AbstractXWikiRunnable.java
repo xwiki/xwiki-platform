@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for any XWiki daemon class. It provide tools to initialize execution context.
- * 
+ *
  * @since 1.8.4,1.9RC1,2.0M1
  * @version $Id$
  */
@@ -86,7 +86,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     /**
      * Initialize execution context for the current thread.
-     * 
+     *
      * @return the new execution context
      * @throws ExecutionContextException error when try to initialize execution context
      */
@@ -94,7 +94,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
     {
         // Keep a reference to the Execution component to avoid a lookup in #cleanupExecutionContext() in case this
         // thread is stopped after the Component Manager disposes its components.
-        execution = Utils.getComponent(Execution.class);
+        this.execution = Utils.getComponent(Execution.class);
 
         ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         ExecutionContext context = new ExecutionContext();
@@ -112,7 +112,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
     {
         // We must ensure we clean the ThreadLocal variables located in the Execution
         // component as otherwise we will have a potential memory leak.
-        execution.removeContext();
+        this.execution.removeContext();
     }
 
     @Override

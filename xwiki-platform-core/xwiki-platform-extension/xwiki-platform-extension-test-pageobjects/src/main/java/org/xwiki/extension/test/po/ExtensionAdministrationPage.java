@@ -34,19 +34,19 @@ public class ExtensionAdministrationPage extends ViewPage
     /**
      * The link to the administration section from where we can add extensions.
      */
-    @FindBy(linkText = "Add extensions")
+    @FindBy(linkText = "Add Extensions")
     private WebElement addExtensionsLink;
 
     /**
      * The link to the administration section that lists the installed extensions.
      */
-    @FindBy(linkText = "Installed extensions")
+    @FindBy(linkText = "Installed Extensions")
     private WebElement installedExtensionsLink;
 
     /**
      * The link to the administration section that lists the core extensions.
      */
-    @FindBy(linkText = "Core extensions")
+    @FindBy(linkText = "Core Extensions")
     private WebElement coreExtensionsLink;
 
     /**
@@ -77,7 +77,7 @@ public class ExtensionAdministrationPage extends ViewPage
     }
 
     /**
-     * Clicks on the link to the 'Add extensions' section.
+     * Clicks on the link to the 'Add Extensions' section.
      * 
      * @return the newly loaded administration page
      */
@@ -88,7 +88,7 @@ public class ExtensionAdministrationPage extends ViewPage
     }
 
     /**
-     * Clicks on the link to the 'Installed extensions' section.
+     * Clicks on the link to the 'Installed Extensions' section.
      * 
      * @return the newly loaded administration page
      */
@@ -99,7 +99,7 @@ public class ExtensionAdministrationPage extends ViewPage
     }
 
     /**
-     * Clicks on the link to the 'Core extensions' section.
+     * Clicks on the link to the 'Core Extensions' section.
      * 
      * @return the newly loaded administration page
      */

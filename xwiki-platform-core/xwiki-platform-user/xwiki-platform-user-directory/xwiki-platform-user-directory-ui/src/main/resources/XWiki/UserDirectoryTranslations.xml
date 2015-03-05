@@ -24,7 +24,7 @@
   <web>XWiki</web>
   <name>UserDirectoryTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <parent>Main.UserDirectory</parent>

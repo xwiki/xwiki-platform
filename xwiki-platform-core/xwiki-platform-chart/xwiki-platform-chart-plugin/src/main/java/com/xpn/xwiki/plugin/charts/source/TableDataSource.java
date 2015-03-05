@@ -228,7 +228,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource
     private Number toNumber(String str) throws NumberFormatException
     {
         str = str.trim();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < str.length(); i++) {
             char ch = str.charAt(i);
             if ('0' <= ch && ch <= '9') {

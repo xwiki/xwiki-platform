@@ -48,7 +48,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
-     * 
+     *
      * @param xwiki
      * @param context
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
@@ -71,7 +71,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
-     * 
+     *
      * @param hibpath
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.class) instead.
      */
@@ -103,49 +103,48 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         // Protect against a corrupted attachment. This can happen if an attachment is listed in the Attachment
         // table but not listed in the Attachment Content table! In this case don't save anything.
         if (content != null) {
+            String currentWiki = context.getWikiId();
+
             try {
+                // Switch context wiki to attachment wiki
+                String attachmentWiki =
+                    (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
+                        .getWikiReference().getName();
+                if (attachmentWiki != null) {
+                    context.setWikiId(attachmentWiki);
+                }
+
                 if (bTransaction) {
                     checkHibernate(context);
                     bTransaction = beginTransaction(context);
                 }
                 Session session = getSession(context);
 
-                String db = context.getWikiId();
-                String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
-                try {
-                    if (attachdb != null) {
-                        context.setWikiId(attachdb);
-                    }
+                Query query =
+                    session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
+                query.setLong("id", content.getId());
+                if (query.uniqueResult() == null) {
+                    session.save(content);
+                } else {
+                    session.update(content);
+                }
 
-                    Query query =
-                        session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
-                    query.setLong("id", content.getId());
-                    if (query.uniqueResult() == null) {
-                        session.save(content);
-                    } else {
-                        session.update(content);
-                    }
+                if (attachment.getAttachment_archive() == null) {
+                    attachment.loadArchive(context);
+                }
+                // The archive has been updated in XWikiHibernateStore.saveAttachment()
+                context.getWiki().getAttachmentVersioningStore()
+                    .saveArchive(attachment.getAttachment_archive(), context, false);
 
-                    if (attachment.getAttachment_archive() == null) {
-                        attachment.loadArchive(context);
-                    }
-                    // The archive has been updated in XWikiHibernateStore.saveAttachment()
-                    context.getWiki().getAttachmentVersioningStore()
-                        .saveArchive(attachment.getAttachment_archive(), context, false);
-
-                    if (parentUpdate) {
-                        context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
-                    }
-
-                } finally {
-                    context.setWikiId(db);
+                if (parentUpdate) {
+                    context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
                 }
 
                 if (bTransaction) {
                     endTransaction(context, true);
                 }
             } catch (Exception e) {
-                Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+                Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachment {0} of document {1}", e, args);
@@ -156,6 +155,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     }
                 } catch (Exception e) {
                 }
+
+                // Restore context wiki
+                context.setWikiId(currentWiki);
             }
         } else {
             LOGGER.warn("Failed to save the Attachment content for [{}] at [{}] since no content could be found!",
@@ -201,35 +203,36 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
+        String currentWiki = context.getWikiId();
+
         try {
+            // Switch context wiki to attachment wiki
+            String attachmentWiki =
+                (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
+                    .getWikiReference().getName();
+            if (attachmentWiki != null) {
+                context.setWikiId(attachmentWiki);
+            }
+
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
-            String db = context.getWikiId();
-            String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
-            try {
-                if (attachdb != null) {
-                    context.setWikiId(attachdb);
-                }
-                XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-                session.load(content, new Long(content.getId()));
+            XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
+            session.load(content, new Long(content.getId()));
 
-                // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
-                content.setContentDirty(false);
+            // Hibernate calls setContent which causes isContentDirty to be true. This is not what we want.
+            content.setContentDirty(false);
 
-                attachment.setAttachment_content(content);
-            } finally {
-                context.setWikiId(db);
-            }
+            attachment.setAttachment_content(content);
 
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                 "Exception while loading attachment {0} of document {1}", e, args);
@@ -240,6 +243,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
             } catch (Exception e) {
             }
+
+            // Restore context wiki
+            context.setWikiId(currentWiki);
         }
     }
 
@@ -254,7 +260,17 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
+        String currentWiki = context.getWikiId();
+
         try {
+            // Switch context wiki to attachment wiki
+            String attachmentWiki =
+                (attachment.getReference() == null) ? null : attachment.getReference().getDocumentReference()
+                    .getWikiReference().getName();
+            if (attachmentWiki != null) {
+                context.setWikiId(attachmentWiki);
+            }
+
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -262,32 +278,21 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             Session session = getSession(context);
 
-            String db = context.getWikiId();
-            String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
+            // Delete the three attachment entries
             try {
-                if (attachdb != null) {
-                    context.setWikiId(attachdb);
-                }
+                session.delete(new XWikiAttachmentContent(attachment));
+            } catch (Exception e) {
+                LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
+                    attachment.getDoc().getDocumentReference());
+            }
 
-                // Delete the three attachment entries
-                try {
-                    session.delete(new XWikiAttachmentContent(attachment));
-                } catch (Exception e) {
-                    LOGGER.warn("Error deleting attachment content [{}] of document [{}]", attachment.getFilename(),
-                        attachment.getDoc().getDocumentReference());
-                }
+            context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
 
-                context.getWiki().getAttachmentVersioningStore().deleteArchive(attachment, context, false);
-
-                try {
-                    session.delete(attachment);
-                } catch (Exception e) {
-                    LOGGER.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
-                        attachment.getDoc().getDocumentReference());
-                }
-
-            } finally {
-                context.setWikiId(db);
+            try {
+                session.delete(attachment);
+            } catch (Exception e) {
+                LOGGER.warn("Error deleting attachment meta data [{}] of document [{}]", attachment.getFilename(),
+                    attachment.getDoc().getDocumentReference());
             }
 
             try {
@@ -311,7 +316,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
                 "Exception while deleting attachment {0} of document {1}", e, args);
@@ -322,6 +327,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
             } catch (Exception e) {
             }
+
+            // Restore context wiki
+            context.setWikiId(currentWiki);
         }
     }
 }

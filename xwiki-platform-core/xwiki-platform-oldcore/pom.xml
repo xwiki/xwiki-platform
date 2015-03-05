@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -36,7 +36,9 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -102,8 +104,8 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -118,8 +120,8 @@
       <artifactId>commons-httpclient</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-dbcp2</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-fileupload</groupId>
@@ -136,6 +138,10 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
     </dependency>
 
     <!-- For extracting metadata from various document types -->
@@ -340,6 +346,11 @@
     </dependency>
     <!-- Mail sender -->
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
     </dependency>
@@ -440,6 +451,16 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-sheet-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-skin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-template-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Used by com.xpn.xwiki.web.CommentAction -->
@@ -635,10 +656,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
       <!-- Publish a Core Test JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -729,8 +746,9 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
-              **/internal/template/TemplateScriptService.java,
-              **/internal/template/TemplateManager.java,
+              **/internal/skin/*.java,
+              **/internal/template/InternalTemplateManager.java,
+              **/internal/template/TemplateEnvironmentResource.java,
               **/monitor/api/MonitorData.java,
               **/monitor/api/MonitorPlugin.java,
               **/monitor/api/MonitorTimer.java,

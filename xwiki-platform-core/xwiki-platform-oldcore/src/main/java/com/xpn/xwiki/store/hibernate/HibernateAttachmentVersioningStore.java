@@ -38,7 +38,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 
 /**
  * Realization of {@link AttachmentVersioningStore} for Hibernate-based storage.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -90,7 +90,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             attachment.setAttachment_archive(archive);
             return archive;
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                 "Exception while loading attachment archive {0} of document {1}", e, args);

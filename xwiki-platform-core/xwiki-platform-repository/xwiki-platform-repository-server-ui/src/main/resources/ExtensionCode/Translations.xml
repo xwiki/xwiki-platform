@@ -20,30 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ExtensionCode</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <parent>WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1319458064000</creationDate>
+  <parent>Extension.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1352389357000</creationDate>
-  <date>1352389411000</date>
-  <contentUpdateDate>1352389411000</contentUpdateDate>
+  <date>1425054696000</date>
+  <contentUpdateDate>1425054615000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
+extension.repository.name=Name
+extension.repository.summary=Summary
+extension.repository.type=Type
+extension.repository.category=Category
+extension.repository.authors=Authors
+extension.repository.doc.creationDate=Created On
+extension.repository.doc.date=Last Modified
+
+## Administration UI
+admin.repository=Extension Repository</content>
   <object>
+    <name>ExtensionCode.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>d2ddfe2d-0a69-4a56-8045-b3c6ae5a8d54</guid>
     <class>
       <name>XWiki.TranslationDocumentClass</name>
       <customClass/>
@@ -70,23 +82,8 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>ExtensionCode.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>98b1e81f-64f5-4bc2-a372-6693d25c940c</guid>
     <property>
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>## Translations for the livetables column titles
-extension.repository.emptyvalue=
-extension.repository.name=Name
-extension.repository.summary=Summary
-extension.repository.type=Type
-extension.repository.authors=Authors
-extension.repository.doc.creationDate=Created On
-extension.repository.doc.date=Last Modified
-
-## Administration UI
-admin.repository=Extension Repository</content>
 </xwikidoc>

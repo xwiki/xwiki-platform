@@ -101,5 +101,6 @@
 #end
 &lt;/div&gt;
 {{/html}}
+#set($docextras=[])
 {{/velocity}}</content>
 </xwikidoc>

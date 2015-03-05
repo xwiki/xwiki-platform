@@ -19,26 +19,58 @@
  */
 package com.xpn.xwiki.doc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.LogRule;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link XWikiAttachment}.
  * 
  * @version $Id$
  */
-public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
+public class XWikiAttachmentTest
 {
+    @Rule
+    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+
+    @Rule
+    public LogRule logger = new LogRule();
+
+    @Before
+    public void configure() throws Exception
+    {
+        this.logger.recordLoggingForType(XWikiAttachment.class);
+
+        Utils.setComponentManager(this.mocker);
+
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        this.mocker.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
+        this.mocker.registerMockComponent(Environment.class);
+    }
+
     /**
      * Unit test for <a href="http://jira.xwiki.org/browse/XWIKI-9075">XWIKI-9075</a> to prove that calling
      * {@code fromXML} doesn't set the metadata dirty flag.
@@ -149,25 +181,112 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
     }
 
     @Test
-    public void testGetMimeType()
+    public void testGetMimeType() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setFilename("image.jpg");
 
-        Assert.assertEquals("image/jpeg", attachment.getMimeType(null));
+        assertEquals("image/jpeg", attachment.getMimeType(null));
 
         attachment.setFilename("xml.xml");
 
-        Assert.assertEquals("application/xml", attachment.getMimeType(null));
+        assertEquals("application/xml", attachment.getMimeType(null));
 
         attachment.setFilename("zip.zip");
 
-        Assert.assertEquals("application/zip", attachment.getMimeType(null));
+        assertEquals("application/zip", attachment.getMimeType(null));
 
         attachment.setFilename("unknown");
+        attachment.setDoc(new XWikiDocument(new DocumentReference("wiki", "Space", "Page")));
+        assertEquals(0, this.logger.size());
+        assertEquals("application/octet-stream", attachment.getMimeType(null));
+        assertTrue(this.logger.contains("Failed to read the content of "
+            + "[Attachment wiki:Space.Page@unknown] in order to detect its mime type."));
 
-        Assert.assertEquals("application/octet-stream", attachment.getMimeType(null));
+        // Test content-based detection.
+        attachment.setFilename("unknown");
+        attachment.setContent(new ByteArrayInputStream("content".getBytes()));
+        assertEquals("text/plain", attachment.getMimeType(null));
+    }
 
+    @Test
+    public void testAuthorWithDocument() throws Exception
+    {
+        EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        DocumentReferenceResolver<EntityReference> explicitDocumentReferenceResolver =
+            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+        EntityReferenceResolver<String> xclassEntityReferenceResolver =
+            this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiAttachment attachment = new XWikiAttachment(document, "filename");
+
+        // getAuthor() based on getAuthorReference()
+        DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        attachment.setAuthorReference(userReference);
+        assertEquals(userReference, attachment.getAuthorReference());
+        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachment.getReference())).thenReturn(
+            "stringUserReference");
+        assertEquals("stringUserReference", attachment.getAuthor());
+
+        // getAuthorReference() based on getAuthor()
+        attachment.setAuthor("author");
+        assertEquals("author", attachment.getAuthor());
+        userReference = new DocumentReference("wiki", "XWiki", "author");
+        EntityReference relativeUserReference = userReference.removeParent(userReference.getWikiReference());
+        when(xclassEntityReferenceResolver.resolve("author", EntityType.DOCUMENT)).thenReturn(relativeUserReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
+            userReference);
+        assertEquals(userReference, attachment.getAuthorReference());
+
+        // Guest author.
+        attachment.setAuthor(XWikiRightService.GUEST_USER);
+        userReference = new DocumentReference("wiki", "XWiki", XWikiRightService.GUEST_USER);
+        relativeUserReference = userReference.removeParent(userReference.getWikiReference());
+        when(xclassEntityReferenceResolver.resolve(any(String.class), eq(EntityType.DOCUMENT))).thenReturn(
+            relativeUserReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
+            userReference);
+        assertNull(attachment.getAuthorReference());
+    }
+
+    @Test
+    public void testAuthorWithoutDocument() throws Exception
+    {
+        EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        AttachmentReferenceResolver<String> currentAttachmentReferenceResolver =
+            this.mocker.getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
+        DocumentReferenceResolver<EntityReference> explicitDocumentReferenceResolver =
+            this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+        EntityReferenceResolver<String> xclassEntityReferenceResolver =
+            this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+
+        XWikiAttachment attachment = new XWikiAttachment(null, "filename");
+        DocumentReference currentDocumentReference =
+            new DocumentReference("currentWiki", "currentSpage", "currentPage");
+        AttachmentReference attachmentReference =
+            new AttachmentReference(attachment.getFilename(), currentDocumentReference);
+
+        // getAuthor() based on getAuthorReference()
+        DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        attachment.setAuthorReference(userReference);
+        assertEquals(userReference, attachment.getAuthorReference());
+        when(currentAttachmentReferenceResolver.resolve(attachment.getFilename())).thenReturn(attachmentReference);
+        when(compactWikiEntityReferenceSerializer.serialize(userReference, attachmentReference)).thenReturn(
+            "stringUserReference");
+        assertEquals("stringUserReference", attachment.getAuthor());
+
+        // getAuthorReference() based on getAuthor()
+        attachment.setAuthor("author");
+        assertEquals("author", attachment.getAuthor());
+        userReference = new DocumentReference("wiki", "XWiki", "author");
+        EntityReference relativeUserReference = userReference.removeParent(userReference.getWikiReference());
+        when(xclassEntityReferenceResolver.resolve("author", EntityType.DOCUMENT)).thenReturn(relativeUserReference);
+        when(explicitDocumentReferenceResolver.resolve(relativeUserReference, attachment.getReference())).thenReturn(
+            userReference);
+        assertEquals(userReference, attachment.getAuthorReference());
     }
 }

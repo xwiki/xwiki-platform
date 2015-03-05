@@ -120,7 +120,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
     /**
      * Parse the user name out of the BASIC authorization header string.
-     * 
+     *
      * @param decoded
      * @return user name parsed out of decoded string
      */
@@ -140,7 +140,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
     /**
      * Parse the password out of the decoded BASIC authorization header string.
-     * 
+     *
      * @param decoded
      * @return password parsed out of decoded string
      */
@@ -160,7 +160,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
 
     /**
      * Decode the BASIC authorization string.
-     * 
+     *
      * @param authorization
      * @return decoded string
      */
@@ -209,6 +209,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException
     {
-        showLogin(request, response, realmName);
+        showLogin(request, response, this.realmName);
     }
 }

@@ -41,8 +41,8 @@ import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARDocumentModel;
-import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
+import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.input.AttachmentReader.WikiAttachment;
 import org.xwiki.filter.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.filter.xar.internal.input.WikiObjectReader.WikiObject;
@@ -51,7 +51,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 
@@ -253,8 +252,7 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocumentRevision = false;
     }
 
-    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException, FilterException,
-        ParseException
+    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException, FilterException
     {
         XMLStreamReader xmlReader = XMLInputFilterStreamUtils.createXMLStreamReader(this.properties);
 
@@ -265,8 +263,8 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
-        FilterException, ParseException
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
+        FilterException
     {
         XMLStreamReader xmlReader =
             this.properties.getEncoding() != null ? XMLInputFactory.newInstance().createXMLStreamReader(stream,
@@ -276,7 +274,7 @@ public class DocumentLocaleReader extends AbstractReader
     }
 
     public void read(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        IOException, FilterException, ParseException
+        FilterException
     {
         reset();
 
@@ -290,7 +288,7 @@ public class DocumentLocaleReader extends AbstractReader
     }
 
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
-        throws XMLStreamException, FilterException, ParseException, IOException
+        throws XMLStreamException, FilterException
     {
         // Initialize with a few defaults (thing that don't exist in old XAR format)
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
@@ -310,7 +308,7 @@ public class DocumentLocaleReader extends AbstractReader
 
                 if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
                     if (!value.equals(this.currentSpace)) {
-                        if (this.currentSpace != null) {
+                        if (this.currentSpace != null && this.sentBeginWikiSpace) {
                             sendEndWikiSpace(proxyFilter);
                         }
                         this.currentSpace = value;
@@ -348,7 +346,7 @@ public class DocumentLocaleReader extends AbstractReader
                                 } else {
                                     objectValue = convert(parameter.type, value);
                                 }
-                                
+
                                 if (objectValue != null) {
                                     this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
                                 }
@@ -369,8 +367,8 @@ public class DocumentLocaleReader extends AbstractReader
         sendEndWikiDocument(proxyFilter);
     }
 
-    private void readObject(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        FilterException, IOException, ParseException
+    private void readObject(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
 
@@ -383,8 +381,8 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readClass(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
-        FilterException, IOException, ParseException
+    private void readClass(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
+        throws XMLStreamException, FilterException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
 
@@ -396,7 +394,7 @@ public class DocumentLocaleReader extends AbstractReader
     }
 
     private void readAttachment(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
-        throws XMLStreamException, FilterException, ParseException
+        throws XMLStreamException, FilterException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
 

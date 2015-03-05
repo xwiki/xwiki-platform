@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 import com.xpn.xwiki.XWiki;
@@ -206,6 +205,10 @@ public class XWikiLDAPConfigTest extends AbstractBridgedComponentTestCase
                 return default_value;
             }
         };
+
+        for (Map.Entry<Object, Object> entry : CONFIG.entrySet()) {
+            getConfigurationSource().setProperty((String) entry.getKey(), entry.getValue());
+        }
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:

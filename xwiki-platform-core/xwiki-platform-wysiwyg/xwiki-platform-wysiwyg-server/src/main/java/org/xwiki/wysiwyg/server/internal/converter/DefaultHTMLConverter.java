@@ -33,6 +33,7 @@ import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -44,6 +45,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
 
 /**
  * Converts HTML into/from xwiki/2.0 syntax.
@@ -54,6 +56,8 @@ import org.xwiki.rendering.transformation.TransformationContext;
 @Singleton
 public class DefaultHTMLConverter implements HTMLConverter
 {
+    private static final String TRANSFORMATION_ID = "wysiwygtxid";
+
     /**
      * Logger.
      */
@@ -146,18 +150,15 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Parse
-            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
+            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
-            // Execute macro transformations
-            TransformationContext txContext = new TransformationContext();
-            txContext.setXDOM(xdom);
-            txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntaxId));
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
+            // Execute the macro transformation
+            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            xhtmlRenderer.render(xdom, printer);
+            this.xhtmlRenderer.render(xdom, printer);
 
             return printer.toString();
         } catch (Exception e) {
@@ -182,11 +183,8 @@ public class DefaultHTMLConverter implements HTMLConverter
             Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, syntax);
 
-            // Execute macro transformations
-            TransformationContext txContext = new TransformationContext();
-            txContext.setXDOM(xdom);
-            txContext.setSyntax(syntax);
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
+            // Execute the macro transformation
+            executeMacroTransformation(xdom, this.syntaxFactory.createSyntaxFromIdString(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -197,5 +195,19 @@ public class DefaultHTMLConverter implements HTMLConverter
             this.logger.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while refreshing HTML", e);
         }
+    }
+
+    private void executeMacroTransformation(XDOM xdom, Syntax syntax) throws TransformationException, ParseException
+    {
+        TransformationContext txContext = new TransformationContext();
+        txContext.setXDOM(xdom);
+        txContext.setSyntax(syntax);
+
+        // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
+        // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined
+        // in the first one...
+        txContext.setId(TRANSFORMATION_ID);
+
+        ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
     }
 }

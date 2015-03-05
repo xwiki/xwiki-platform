@@ -53,25 +53,25 @@ public class DownloadAction extends XWikiAction
 {
     /** The identifier of the download action. */
     public static final String ACTION_NAME = "download";
-    
+
     /** The identifier of the attachment disposition. */
     public static final String ATTACHMENT = "attachment";
-    
+
     /** List of authorized attachment mimetypes. */
-    public static final List<String> MIMETYPE_WHITELIST = 
-        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis", 
-            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg", 
+    public static final List<String> MIMETYPE_WHITELIST =
+        Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
+            "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
             "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf",
-            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", 
+            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv",
             "video/x-flv");
-    
+
     /** Key of the whitelist in xwiki.properties. */
     public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
-    
+
     /** Key of the blacklist in xwiki.properties. */
     public static final String BLACKLIST_PROPERTY = "attachment.download.blacklist";
-    
-    /** The URL part seperator. */
+
+    /** The URL part separator. */
     private static final String SEPARATOR = "/";
 
     /** The name of the HTTP Header that signals a byte-range request. */
@@ -101,7 +101,7 @@ public class DownloadAction extends XWikiAction
         }
 
         if (attachment == null) {
-            Object[] args = {filename};
+            Object[] args = { filename };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found",
                 null, args);
@@ -115,7 +115,7 @@ public class DownloadAction extends XWikiAction
         try {
             attachment.getContentSize(context);
         } catch (XWikiException e) {
-            Object[] args = {filename};
+            Object[] args = { filename };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
                 "Attachment content {0} not found", null, args);
@@ -124,7 +124,7 @@ public class DownloadAction extends XWikiAction
         long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
         long lastModifiedOnServer = attachment.getDate().getTime();
         if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
-            response.setStatus(XWikiResponse.SC_NOT_MODIFIED);
+            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
             return null;
         }
 
@@ -147,13 +147,13 @@ public class DownloadAction extends XWikiAction
      * SATISFIABLE} response if the requested byte range falls outside the length of the attachment. If the range
      * request header is syntactically invalid, nothing is written, and instead {@code false} is returned, letting the
      * action handler ignore the Range header and treat this as a normal (full) download request.
-     * 
+     *
      * @param attachment the attachment to get content from
      * @param request the current client request
      * @param response the response to write to.
      * @param context the current request context
-     * @return {@code true} if the partial content request was syntactically valid and a response was sent, {@code
-     *         false} otherwise
+     * @return {@code true} if the partial content request was syntactically valid and a response was sent,
+     *         {@code false} otherwise
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
@@ -191,7 +191,7 @@ public class DownloadAction extends XWikiAction
     /**
      * Write a byte range from the attachment to the response, if the requested range is valid and falls within the file
      * limits.
-     * 
+     *
      * @param attachment the attachment to get content from
      * @param start the first byte to write
      * @param end the last byte to write
@@ -226,7 +226,7 @@ public class DownloadAction extends XWikiAction
 
     /**
      * Send the attachment content in the response.
-     * 
+     *
      * @param attachment the attachment to get content from
      * @param request the current client request
      * @param response the response to write to.
@@ -260,7 +260,7 @@ public class DownloadAction extends XWikiAction
 
     /**
      * Get the filename of the attachment from the path and the action.
-     * 
+     *
      * @param path the request URI.
      * @param action the action used to download the attachment.
      * @return the filename of the attachment.
@@ -280,7 +280,7 @@ public class DownloadAction extends XWikiAction
 
     /**
      * Set the response HTTP headers common to both partial (Range) and full responses.
-     * 
+     *
      * @param attachment the attachment to get content from
      * @param request the current client request
      * @param response the response to write to.
@@ -309,12 +309,12 @@ public class DownloadAction extends XWikiAction
         // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
         // Save dialog box (exe, zip, xar, etc).
         String dispType = "inline";
-        
+
         // Determine whether the user who attached the file has Programming Rights or not.
         boolean hasPR = false;
         String author = attachment.getAuthor();
         try {
-            hasPR = 
+            hasPR =
                 context.getWiki().getRightService().hasAccessLevel(
                     "programming", author, "XWiki.XWikiPreferences", context);
         } catch (Exception e) {
@@ -337,11 +337,11 @@ public class DownloadAction extends XWikiAction
      * Check if the specified byte range first and last bytes form a syntactically valid range. For a range to be valid,
      * at least one of the ends must be specified, and if both are present, the range end must be greater than the range
      * start.
-     * 
+     *
      * @param start the requested range start, i.e. the first byte to be transfered, or {@code null} if missing from the
-     *        Range header
+     *            Range header
      * @param end the requested range end, i.e. the last byte to be transfered, or {@code null} if missing from the
-     *        Range header
+     *            Range header
      * @return {@code true} if the range is valid, {@code false} otherwise
      */
     private static boolean isValidRange(Long start, Long end)
@@ -351,7 +351,7 @@ public class DownloadAction extends XWikiAction
         }
         return start == null || end == null || end >= start;
     }
-    
+
     private static boolean isAuthorized(String mimeType)
     {
         ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");

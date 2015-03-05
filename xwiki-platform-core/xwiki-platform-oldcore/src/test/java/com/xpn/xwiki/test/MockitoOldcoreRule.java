@@ -104,7 +104,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
 
-    private QueryManager mockQueryManager;
+    private QueryManager queryManager;
 
     protected Map<DocumentReference, XWikiDocument> documents =
         new ConcurrentHashMap<DocumentReference, XWikiDocument>();
@@ -570,8 +570,13 @@ public class MockitoOldcoreRule implements MethodRule
         });
 
         // Query Manager
-        this.mockQueryManager = getMocker().registerMockComponent(QueryManager.class);
-        when(getMockStore().getQueryManager()).thenReturn(this.mockQueryManager);
+        // If there's already a Query Manager registered, use it instead
+        if (!this.componentManager.hasComponent(QueryManager.class)) {
+            this.queryManager = getMocker().registerMockComponent(QueryManager.class);
+        } else {
+            this.queryManager = this.componentManager.getInstance(QueryManager.class);
+        }
+        when(getMockStore().getQueryManager()).thenReturn(this.queryManager);
     }
 
     protected void after() throws Exception
@@ -641,6 +646,6 @@ public class MockitoOldcoreRule implements MethodRule
      */
     public QueryManager getQueryManager()
     {
-        return this.mockQueryManager;
+        return this.queryManager;
     }
 }

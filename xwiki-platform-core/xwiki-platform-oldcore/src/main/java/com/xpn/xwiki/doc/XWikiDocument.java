@@ -3568,9 +3568,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Map<String, SortedMap<Integer, Map<String, String[]>>> fromRequest =
             parseRequestUpdateOrCreate(eform.getRequest(), context);
         for (Entry<String, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest.entrySet()) {
-            WikiReference wikiRef = getDocumentReference().getWikiReference();
             DocumentReference requestClassReference =
-                getCurrentDocumentReferenceResolver().resolve(requestClassEntries.getKey(), wikiRef);
+                getCurrentDocumentReferenceResolver().resolve(requestClassEntries.getKey());
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
             List<BaseObject> newObjects = new ArrayList<>();
             for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {

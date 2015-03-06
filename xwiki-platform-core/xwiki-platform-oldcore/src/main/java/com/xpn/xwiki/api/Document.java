@@ -87,9 +87,6 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-/**
- * @version $Id$
- */
 public class Document extends Api
 {
     /** Logging helper object. */

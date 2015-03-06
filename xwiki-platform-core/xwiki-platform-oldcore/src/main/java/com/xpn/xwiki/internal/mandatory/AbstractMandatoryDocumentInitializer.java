@@ -24,6 +24,7 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -57,6 +58,12 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
      */
     @Inject
     protected WikiDescriptorManager wikiDescriptorManager;
+
+    /**
+     * Used to get the default document name.
+     */
+    @Inject
+    protected ModelConfiguration modelConfiguration;
 
     /**
      * @see #getDocumentReference()
@@ -170,7 +177,10 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
             needsUpdate = true;
             // Use the current document's space homepage.
             EntityReference spaceReference = getDocumentReference().extractReference(EntityType.SPACE);
-            document.setParentReference(spaceReference);
+            String spaceHomepageDocName = modelConfiguration.getDefaultReferenceValue(EntityType.DOCUMENT);
+            EntityReference parentReference =
+                new EntityReference(spaceHomepageDocName, EntityType.DOCUMENT, spaceReference);
+            document.setParentReference(parentReference);
         }
 
         if (StringUtils.isBlank(document.getTitle())) {

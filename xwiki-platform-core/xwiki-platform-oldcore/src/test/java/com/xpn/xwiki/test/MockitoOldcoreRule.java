@@ -106,8 +106,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     private QueryManager queryManager;
 
-    protected Map<DocumentReference, XWikiDocument> documents =
-        new ConcurrentHashMap<DocumentReference, XWikiDocument>();
+    protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
     private boolean notifyDocumentCreatedEvent;
 

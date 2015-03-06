@@ -208,7 +208,7 @@ public class MockitoOldcoreRule implements MethodRule
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (this.componentManager.hasComponent(Environment.class)) {
-            ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
+            ServletEnvironment environment = this.componentManager.getInstance(Environment.class);
 
             ServletContext servletContextMock = mock(ServletContext.class);
             environment.setServletContext(servletContextMock);

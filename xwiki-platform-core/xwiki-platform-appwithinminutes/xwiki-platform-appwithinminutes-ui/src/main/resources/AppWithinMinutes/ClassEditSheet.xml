@@ -658,7 +658,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 {{/velocity}}</content>
   <attachment>
     <filename>arrow-move.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
     <comment/>
@@ -667,7 +667,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   </attachment>
   <attachment>
     <filename>bulletcross.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
     <comment/>
@@ -676,7 +676,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   </attachment>
   <attachment>
     <filename>bullettick.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1319483586000</date>
     <version>1.1</version>
     <comment/>

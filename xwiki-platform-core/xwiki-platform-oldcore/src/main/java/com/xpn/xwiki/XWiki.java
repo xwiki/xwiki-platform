@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.annotation.Priority;
 import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -894,6 +896,25 @@ public class XWiki implements EventListener
             @SuppressWarnings("deprecation")
             List<MandatoryDocumentInitializer> initializers =
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
+
+            // Sort the initializers based on priority. Lower priority values are first.
+            Collections.sort(initializers, new Comparator<MandatoryDocumentInitializer>()
+            {
+                @Override
+                public int compare(MandatoryDocumentInitializer left, MandatoryDocumentInitializer right)
+                {
+                    Priority leftPriority = left.getClass().getAnnotation(Priority.class);
+                    int leftPriorityValue =
+                        leftPriority != null ? leftPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
+
+                    Priority rightPriority = right.getClass().getAnnotation(Priority.class);
+                    int rightPriorityValue =
+                        rightPriority != null ? rightPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
+
+                    // Compare the two.
+                    return leftPriorityValue - rightPriorityValue;
+                }
+            });
 
             for (MandatoryDocumentInitializer initializer : initializers) {
                 initializeMandatoryDocument(initializer, context);

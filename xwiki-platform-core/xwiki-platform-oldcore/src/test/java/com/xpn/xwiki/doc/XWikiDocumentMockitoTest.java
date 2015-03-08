@@ -213,8 +213,10 @@ public class XWikiDocumentMockitoTest
 		// Testing that invalid xclass page are ignored
 		parameters.put("InvalidSpace.InvalidPage_0_string",
 				new String[] { "whatever" });
-		// Testing that an invalid number is ignored
+		// Testing that an invalid number is ignored (first should be ignored by regexp parser, second by an exception)
 		parameters.put("space.page_notANumber_string",
+				new String[] { "whatever" });
+		parameters.put("space.page_9999999999_string",
 				new String[] { "whatever" });
 		return parameters;
 	}

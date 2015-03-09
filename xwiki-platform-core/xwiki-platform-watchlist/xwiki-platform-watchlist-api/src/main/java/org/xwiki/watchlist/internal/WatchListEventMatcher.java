@@ -89,6 +89,7 @@ public class WatchListEventMatcher
         parameters.add(start);
 
         try {
+            // FIXME: Watch out for memory usage here, since the list of events could be huge in some cases.
             rawEvents =
                 actStream.searchEvents(
                     "act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','") + "')", false,

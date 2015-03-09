@@ -107,7 +107,7 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
      */
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-    
+
     /**
      * Used to get the list of possible values for {@value #INTERVAL_PROPERTY}.
      */
@@ -139,6 +139,7 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
         Collection<String> jobDocumentNames = notificationCacheProvider.get().getJobDocumentNames();
         if (!CollectionUtils.disjunction(jobDocumentNames, intervalValues).isEmpty()) {
             needsUpdate = true;
+            // TODO: Sort them by cron expression?
             intervalClass.setValues(StringUtils.join(jobDocumentNames, ListClass.DEFAULT_SEPARATOR));
         }
 

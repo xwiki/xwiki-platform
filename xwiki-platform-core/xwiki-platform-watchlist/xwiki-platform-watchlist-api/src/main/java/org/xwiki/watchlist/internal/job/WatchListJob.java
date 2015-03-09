@@ -239,14 +239,17 @@ public class WatchListJob extends AbstractJob implements Job
             WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
             setPreviousFireTime();
 
+            // Stop here if nobody is interested.
             if (!hasSubscribers()) {
                 return;
             }
 
+            // Stop here if nothing happened in the meantime.
             if (eventMatcher.getEventNumber() == 0) {
                 return;
             }
 
+            // Notify all interested subscribers, one at a time.
             for (String subscriber : subscribers) {
                 try {
                     Collection<String> wikis =
@@ -257,6 +260,9 @@ public class WatchListJob extends AbstractJob implements Job
                         this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.DOCUMENT);
                     Collection<String> users =
                         this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.USER);
+
+                    // Determine what happened since the last execution on the watched elements of the current
+                    // subscriber only.
                     List<WatchListEvent> matchingEvents =
                         eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
                     String userWiki = StringUtils.substringBefore(subscriber, DefaultWatchListStore.WIKI_SPACE_SEP);

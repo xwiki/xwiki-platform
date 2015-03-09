@@ -23,13 +23,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.exception.VelocityException;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.container.Container;
@@ -37,6 +41,7 @@ import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
+import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -58,112 +63,110 @@ public class WebJarsResourceReferenceHandlerTest
 {
     @Rule
     public MockitoComponentMockingRule<TestableWebJarsResourceReferenceHandler> componentManager =
-        new MockitoComponentMockingRule<TestableWebJarsResourceReferenceHandler>(TestableWebJarsResourceReferenceHandler.class);
+        new MockitoComponentMockingRule<TestableWebJarsResourceReferenceHandler>(
+            TestableWebJarsResourceReferenceHandler.class);
+
+    private ServletRequest request;
+
+    private ServletResponse response;
+
+    private EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "Space",
+        "Page"), EntityResourceAction.VIEW);
+
+    private ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+
+    private TestableWebJarsResourceReferenceHandler handler;
+
+    private ClassLoader classLoader = mock(ClassLoader.class);
+
+    @Before
+    public void configure() throws Exception
+    {
+        Container container = this.componentManager.getInstance(Container.class);
+
+        this.response = mock(ServletResponse.class);
+        ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
+        when(this.response.getOutputStream()).thenReturn(responseOutputStream);
+
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(this.response.getHttpServletResponse()).thenReturn(httpResponse);
+        when(container.getResponse()).thenReturn(this.response);
+
+        this.request = mock(ServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(this.request.getHttpServletRequest()).thenReturn(httpRequest);
+        when(container.getRequest()).thenReturn(this.request);
+
+        this.handler = this.componentManager.getComponentUnderTest();
+        this.handler.setClassLoader(this.classLoader);
+    }
 
     @Test
     public void executeWhenResourceDoesntExist() throws Exception
     {
-        EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "space", "page"),
-            EntityResourceAction.VIEW);
-        reference.addParameter("value", "angular/2.1.11/angular.js");
-        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
-        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+        this.reference.addParameter("value", "angular/2.1.11/angular.js");
 
-        ClassLoader classLoader = mock(ClassLoader.class);
+        this.handler.handle(this.reference, this.chain);
 
-        handler.setClassLoader(classLoader);
-
-        handler.handle(reference, chain);
-
-        verify(classLoader).getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js");
+        verify(this.classLoader).getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js");
+        verify(this.response.getHttpServletResponse())
+            .sendError(404, "Resource not found [angular/2.1.11/angular.js].");
+        verify(this.chain).handleNext(this.reference);
     }
 
     @Test
     public void executeWhenResourceExists() throws Exception
     {
-        EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "space", "page"),
-            EntityResourceAction.VIEW);
-        reference.addParameter("value", "angular/2.1.11/angular.js");
-        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
-        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+        this.reference.addParameter("value", "angular/2.1.11/angular.js");
 
-        ClassLoader classLoader = mock(ClassLoader.class);
-        ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
-        when(classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
-            bais);
+        ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
+        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
+            resourceStream);
 
-        Container container = this.componentManager.getInstance(Container.class);
-        ServletResponse response = mock(ServletResponse.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        when(response.getHttpServletResponse()).thenReturn(httpResponse);
-        when(container.getResponse()).thenReturn(response);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        when(response.getOutputStream()).thenReturn(baos);
-        handler.setClassLoader(classLoader);
-
-        handler.handle(reference, chain);
+        Long now = new Date().getTime();
+        this.handler.handle(this.reference, this.chain);
 
         // Verify that the resource content has been copied to the Response output stream.
-        assertEquals("content", baos.toString());
+        assertEquals("content", this.response.getOutputStream().toString());
         // Verify that the correct Content Type has been set.
-        verify(response).setContentType("application/javascript");
+        verify(this.response).setContentType("application/javascript");
+
+        // Verify that the static resource is cached permanently.
+        verify(this.response.getHttpServletResponse()).setHeader("Cache-Control", "public");
+        ArgumentCaptor<Long> expireDate = ArgumentCaptor.forClass(Long.class);
+        verify(this.response.getHttpServletResponse()).setDateHeader(eq("Expires"), expireDate.capture());
+        // The expiration date should be in one year from now.
+        assertTrue(expireDate.getValue() >= (now + 365 * 24 * 3600 * 1000L));
 
         // Also verify that the "Last-Modified" header has been set in the response so that the browser will send
         // an If-Modified-Since header for the next request and we can tell it to use its cache.
-        verify(httpResponse).setDateHeader(eq("Last-Modified"), anyLong());
+        verify(this.response.getHttpServletResponse()).setDateHeader(eq("Last-Modified"), anyLong());
+
+        verify(this.chain).handleNext(this.reference);
     }
 
     @Test
     public void return304WhenIfModifiedSinceHeader() throws Exception
     {
-        EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "space", "page"),
-            EntityResourceAction.VIEW);
-        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
-        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+        when(this.request.getHttpServletRequest().getHeader("If-Modified-Since")).thenReturn("some value");
 
-        Container container = this.componentManager.getInstance(Container.class);
-
-        ServletResponse response = mock(ServletResponse.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        when(response.getHttpServletResponse()).thenReturn(httpResponse);
-        when(container.getResponse()).thenReturn(response);
-
-        ServletRequest request = mock(ServletRequest.class);
-        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        when(httpRequest.getHeader("If-Modified-Since")).thenReturn("some value");
-        when(request.getHttpServletRequest()).thenReturn(httpRequest);
-        when(container.getRequest()).thenReturn(request);
-
-        handler.handle(reference, chain);
+        this.handler.handle(this.reference, this.chain);
 
         // This the test: we verify that 304 is returned when the "If-Modified-Since" header is found in the request
-        verify(httpResponse).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        verify(this.response.getHttpServletResponse()).setStatus(304);
+
+        verify(this.chain).handleNext(this.reference);
     }
 
     @Test
     public void evaluateResource() throws Exception
     {
-        EntityResourceReference reference =
-            new EntityResourceReference(new DocumentReference("wiki", "Space", "Page"), EntityResourceAction.VIEW);
-        reference.addParameter("value", "angular/2.1.11/angular.js");
-        reference.addParameter("evaluate", "true");
-
-        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
-
-        ClassLoader classLoader = mock(ClassLoader.class);
-        handler.setClassLoader(classLoader);
+        this.reference.addParameter("value", "angular/2.1.11/angular.js");
+        this.reference.addParameter("evaluate", "true");
 
         ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
-        when(classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
+        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
             resourceStream);
-
-        Container container = this.componentManager.getInstance(Container.class);
-        ServletResponse response = mock(ServletResponse.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        when(response.getHttpServletResponse()).thenReturn(httpResponse);
-        when(container.getResponse()).thenReturn(response);
-        ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
-        when(response.getOutputStream()).thenReturn(responseOutputStream);
 
         VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
@@ -179,16 +182,48 @@ public class WebJarsResourceReferenceHandlerTest
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(StringWriter.class),
             eq("angular/2.1.11/angular.js"), any(Reader.class));
 
-        handler.handle(reference, mock(ResourceReferenceHandlerChain.class));
+        this.handler.handle(this.reference, this.chain);
 
         // Verify that the resource content has been evaluated and copied to the Response output stream.
-        assertEquals("evaluated content", responseOutputStream.toString());
+        assertEquals("evaluated content", this.response.getOutputStream().toString());
 
         // Verify that the correct Content Type has been set.
-        verify(response).setContentType("application/javascript");
+        verify(this.response).setContentType("application/javascript");
 
-        // Also verify that the "Last-Modified" header has not been set in the response because the resource is dynamic
-        // (has Velocity code that is evaluated on each request).
-        verify(httpResponse, never()).setDateHeader(eq("Last-Modified"), anyLong());
+        // Verify that the dynamic resource is not cached.
+        verify(this.response.getHttpServletResponse(), never()).setHeader(any(String.class), any(String.class));
+        verify(this.response.getHttpServletResponse(), never()).setDateHeader(any(String.class), any(Long.class));
+    }
+
+    @Test
+    public void failingResourceEvaluation() throws Exception
+    {
+        this.reference.addParameter("value", "angular/2.1.11/angular.js");
+        this.reference.addParameter("evaluate", "true");
+
+        ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
+        when(this.classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
+            resourceStream);
+
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
+        VelocityEngine velocityEngine = mock(VelocityEngine.class);
+        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+
+        when(velocityEngine.evaluate(any(VelocityContext.class), any(StringWriter.class),
+            eq("angular/2.1.11/angular.js"), any(Reader.class))).thenThrow(new VelocityException("Bad code!"));
+
+        this.handler.handle(this.reference, this.chain);
+
+        // Verify the exception is logged.
+        verify(this.componentManager.getMockedLogger()).error(
+            eq("Faild to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]"),
+            any(ResourceReferenceHandlerException.class));
+
+        // Verify that the client is properly notified about the failure.
+        verify(this.response.getHttpServletResponse()).sendError(500,
+            "Faild to evaluate the Velocity code from WebJar resource [angular/2.1.11/angular.js]");
+
+        // The next handlers are still called.
+        verify(this.chain).handleNext(this.reference);
     }
 }

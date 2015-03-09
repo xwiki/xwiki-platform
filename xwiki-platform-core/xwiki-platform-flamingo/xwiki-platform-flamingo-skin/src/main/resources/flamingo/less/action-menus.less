@@ -96,9 +96,14 @@
        * where the menu is displayed vertically) and the other has the caret for larger screens (where the menu is
        * displayed horizontally).
        */
-      display: inline-block;
+      float: left;
     }
     > .dropdown-split-left {
+      /* When the page name is long, add ellipsis. */
+      max-width: 10em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       /* Display it closer to the menu toggle. */
       padding-right: ceil(@navbar-padding-horizontal / 2);
       > .caret {

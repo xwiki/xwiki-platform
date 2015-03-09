@@ -1,32 +1,25 @@
 #set ($do = "$!request.do")
+##
 #if ($request.reference) {
   #set ($watchRef = $request.reference)
-#else
-  #if ($do == 'addspace' || $do == 'removespace')
-    #set ($watchRef = $doc.space)
-  #elseif ($do == 'addwiki' || $do == 'removewiki')
-    #set ($watchRef = $doc.wiki)
-  #else
-    #set ($watchRef = $doc.getPrefixedFullName())
-  #end
 #end
-#if ($do == 'adddocument')
-  $xwiki.watchlist.addDocument($watchRef)
-#elseif ($do == 'removedocument')
-  $xwiki.watchlist.removeDocument($watchRef)
-#elseif ($do == 'addspace')
-  $xwiki.watchlist.addSpace($watchRef)
-#elseif ($do == 'removespace')
-  $xwiki.watchlist.removeSpace($watchRef)
-#elseif ($do == 'addwiki')
-  $xwiki.watchlist.addWiki($watchRef)
-#elseif ($do == 'removewiki')
-  $xwiki.watchlist.removeWiki($watchRef)
-#elseif ($do == 'adduser')
-  $xwiki.watchlist.addUser($watchRef)
-#elseif ($do == 'removeuser')
-  $xwiki.watchlist.removeUser($watchRef)
+##
+#if ($do.contains('wiki'))
+  #set ($elementType = 'WIKI')
+#elseif ($do.contains('space'))
+  #set ($elementType = 'SPACE')
+#elseif ($do.contains('document'))
+  #set ($elementType = 'DOCUMENT')
+#elseif ($do.contains('user'))
+  #set ($elementType = 'USER')
 #end
+##
+#if ($do.startsWith('add'))
+  #set ($discard = $services.watchlist.addWatchedElement($watchRef, $elementType))
+#elseif ($do.startsWith('remove'))
+  #set ($discard = $services.watchlist.removeWatchedElement($watchRef, $elementType))
+#end
+##
 #if ("$!request.xredirect" != "")
   $response.sendRedirect($request.xredirect)
 #end

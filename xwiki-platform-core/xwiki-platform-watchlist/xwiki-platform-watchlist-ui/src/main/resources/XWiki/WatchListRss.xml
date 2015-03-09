@@ -46,7 +46,7 @@
 WatchList RSS feed
 #else
 $!response.setContentType('application/rss+xml')##
-#set($feed = $xwiki.watchlist.getFeed(20))##
+#set($feed = $services.watchlist.getFeed(20))##
 #set($discard = $feed.setPublishedDate($datetool.date))
 $xwiki.feed.getFeedOutput($feed, 'rss_2.0')##
 #end

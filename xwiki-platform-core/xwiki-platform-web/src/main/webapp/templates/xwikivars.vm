@@ -22,7 +22,7 @@
 #set ($hasCreateWiki = $xwiki.hasAccessLevel('createwiki', 'XWiki.XWikiPreferences'))
 #set ($spacePreferencesDocumentReference = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
 #set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocumentReference, 'default')))
-#set ($hasWatch = $xwiki.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
+#set ($hasWatch = $services.watchlist && !$isGuest && !$isSuperAdmin && $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUserWatchListSheet'), 'local')))
 #set ($hasDashboard = $xwiki.exists($services.model.serialize($services.model.createDocumentReference($xcontext.database, 'Dashboard', 'XWikiUserDashboardSheet'), 'local')))
 ##
 ## Are comments, attachments, history etc. enabled?

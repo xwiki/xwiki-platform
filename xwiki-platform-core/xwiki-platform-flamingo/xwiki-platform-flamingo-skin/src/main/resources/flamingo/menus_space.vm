@@ -14,7 +14,7 @@
     #if ($hasWatch)
       #set ($watchClasses = '')
       #set ($unwatchClasses = 'hidden')
-      #if ($xwiki.watchlist.isSpaceWatched())
+      #if ($services.watchlist.isWatched("SPACE"))
         #set ($watchClasses = 'hidden')
         #set ($unwatchClasses = '')
       #end

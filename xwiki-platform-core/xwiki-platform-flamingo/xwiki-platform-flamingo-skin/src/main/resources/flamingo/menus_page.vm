@@ -18,7 +18,7 @@
     #if ($canWatch)
      #set ($watchClasses = '')
       #set ($unwatchClasses = 'hidden')
-      #if ($xwiki.watchlist.isDocumentWatched())
+      #if ($services.watchlist.isWatched("DOCUMENT"))
         #set ($watchClasses = 'hidden')
         #set ($unwatchClasses = '')
       #end

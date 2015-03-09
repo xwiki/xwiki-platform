@@ -1104,6 +1104,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 .actionmenu .hasIcon a.hastype, .actionmenu a.hastype {
   padding-left: 0;
   text-transform: none;
+  /* When the page name is long, add ellipsis. */
+  max-width: 10em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .actionmenu a.hastype strong {

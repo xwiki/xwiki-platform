@@ -19,30 +19,30 @@
  */
 package org.xwiki.watchlist.internal.api;
 
+import org.xwiki.component.annotation.Role;
+
 /**
- * Possible ways of automatically watching documents.
+ * Offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they want to follow.
+ * At a frequency chosen by the user, XWiki will send an email notification to him with a list of the elements that has
+ * been modified since the last notification.
  * 
  * @version $Id$
  */
-public enum AutomaticWatchMode
+@Role
+public interface WatchList
 {
     /**
-     * Disabled.
+     * @return the store instance.
      */
-    NONE,
+    WatchListStore getStore();
 
     /**
-     * Watch any modified document.
+     * @return the notifier instance.
      */
-    ALL,
+    WatchListNotifier getNotifier();
 
     /**
-     * Watch any modified document when it's not a minor edit.
+     * @return the feed manager instance.
      */
-    MAJOR,
-
-    /**
-     * Watch any new document.
-     */
-    NEW
+    WatchListEventFeedManager getFeedManager();
 }

@@ -19,30 +19,30 @@
  */
 package org.xwiki.watchlist.internal.api;
 
+import java.util.Date;
+import java.util.List;
+
+import org.xwiki.component.annotation.Role;
+
+import com.xpn.xwiki.XWikiException;
+
 /**
- * Possible ways of automatically watching documents.
+ * Component that sends notifications to users.
  * 
  * @version $Id$
  */
-public enum AutomaticWatchMode
+@Role
+public interface WatchListNotifier
 {
     /**
-     * Disabled.
+     * Sends out a notification to the subscriber that certain events occurred.
+     * 
+     * @param subscriber user to notify
+     * @param events list of events
+     * @param templateDocument the document which contains the template to use for the message that is being sent
+     * @param previousFireTime last time the notification was fired
+     * @throws XWikiException if mail sending fails
      */
-    NONE,
-
-    /**
-     * Watch any modified document.
-     */
-    ALL,
-
-    /**
-     * Watch any modified document when it's not a minor edit.
-     */
-    MAJOR,
-
-    /**
-     * Watch any new document.
-     */
-    NEW
+    void sendNotification(String subscriber, List<WatchListEvent> events, String templateDocument,
+        Date previousFireTime) throws XWikiException;
 }

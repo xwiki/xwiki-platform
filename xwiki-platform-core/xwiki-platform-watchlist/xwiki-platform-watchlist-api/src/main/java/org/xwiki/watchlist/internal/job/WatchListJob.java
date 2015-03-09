@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal.job;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -32,13 +33,18 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.watchlist.internal.DefaultWatchListStore;
+import org.xwiki.watchlist.internal.WatchListEventMatcher;
+import org.xwiki.watchlist.internal.api.WatchList;
+import org.xwiki.watchlist.internal.api.WatchListEvent;
+import org.xwiki.watchlist.internal.api.WatchedElementType;
+import org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.scheduler.AbstractJob;
-import com.xpn.xwiki.plugin.watchlist.WatchListStore.ElementType;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -56,7 +62,7 @@ public class WatchListJob extends AbstractJob implements Job
     /**
      * Logger.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListJob.class);
 
     /**
      * Scheduler Job XObject.
@@ -74,9 +80,9 @@ public class WatchListJob extends AbstractJob implements Job
     private XWikiContext context;
 
     /**
-     * Caller plugin.
+     * Caller component.
      */
-    private WatchListPlugin plugin;
+    private WatchList watchlist;
 
     /**
      * Sets objects required by the Job : XWiki, XWikiContext, WatchListPlugin, etc.
@@ -88,14 +94,14 @@ public class WatchListJob extends AbstractJob implements Job
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
         // clone the context to make sure we have a new one per run
-        this.context =  ((XWikiContext) data.get("context")).clone();
+        this.context = ((XWikiContext) data.get("context")).clone();
         // clean up the database connections
         this.context.getWiki().getStore().cleanUp(this.context);
-        this.plugin = (WatchListPlugin) this.context.getWiki().getPlugin(WatchListPlugin.ID, this.context);
+        this.watchlist = Utils.getComponent(WatchList.class);
         this.schedulerJobObject = (BaseObject) data.get("xjob");
         this.watchListJobObject =
-            this.context.getWiki().getDocument(this.schedulerJobObject.getName(), this.context)
-                .getObject(WatchListJobManager.WATCHLIST_JOB_CLASS);
+            this.context.getWiki().getDocument(this.schedulerJobObject.getDocumentReference(), this.context)
+                .getXObject(WatchListJobClassDocumentInitializer.DOCUMENT_REFERENCE);
         initializeComponents(this.context);
     }
 
@@ -146,7 +152,7 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private Date getPreviousFireTime()
     {
-        return this.watchListJobObject.getDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP);
+        return this.watchListJobObject.getDateValue(WatchListJobClassDocumentInitializer.LAST_FIRE_TIME_FIELD);
     }
 
     /**
@@ -156,11 +162,15 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private void setPreviousFireTime() throws XWikiException
     {
-        XWikiDocument doc = this.context.getWiki().getDocument(this.watchListJobObject.getName(), this.context);
-        this.watchListJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
+        XWikiDocument doc =
+            this.context.getWiki().getDocument(this.watchListJobObject.getDocumentReference(), this.context);
+
+        this.watchListJobObject.setDateValue(WatchListJobClassDocumentInitializer.LAST_FIRE_TIME_FIELD, new Date());
+
         // Prevent version changes
         doc.setMetaDataDirty(false);
         doc.setContentDirty(false);
+
         this.context.getWiki().saveDocument(doc, "Updated last fire time", true, this.context);
     }
 
@@ -170,14 +180,14 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private String getEmailTemplate(String userWiki)
     {
-        String fullName = this.watchListJobObject.getStringValue(WatchListJobManager.WATCHLIST_JOB_EMAIL_PROP);
+        String fullName = this.watchListJobObject.getStringValue(WatchListJobClassDocumentInitializer.TEMPLATE_FIELD);
         String prefixedFullName;
 
-        if (fullName.contains(WatchListStore.WIKI_SPACE_SEP)) {
+        if (fullName.contains(DefaultWatchListStore.WIKI_SPACE_SEP)) {
             // If the configured template is already an absolute reference it's meant to force the template.
             prefixedFullName = fullName;
         } else {
-            prefixedFullName = userWiki + WatchListStore.WIKI_SPACE_SEP + fullName;
+            prefixedFullName = userWiki + DefaultWatchListStore.WIKI_SPACE_SEP + fullName;
             if (this.context.getWiki().exists(prefixedFullName, this.context)) {
                 // If the configured template exists in the user wiki, use it.
                 return prefixedFullName;
@@ -189,13 +199,13 @@ public class WatchListJob extends AbstractJob implements Job
 
     /**
      * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who have an Object of class
-     * WATCHLIST_CLASS attached AND who have choosen the current job for their notifications.
+     * WATCHLIST_CLASS attached AND who have chosen the current job for their notifications.
      * 
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
      */
-    private List<String> getSubscribers()
+    private Collection<String> getSubscribers()
     {
-        return this.plugin.getStore().getSubscribersForJob(this.schedulerJobObject.getName());
+        return this.watchlist.getStore().getSubscribers(this.schedulerJobObject.getName());
     }
 
     /**
@@ -203,13 +213,9 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private boolean hasSubscribers()
     {
-        List<String> subscribers = getSubscribers();
+        Collection<String> subscribers = getSubscribers();
 
-        if (subscribers.isEmpty()) {
-            return false;
-        }
-
-        return true;
+        return !subscribers.isEmpty();
     }
 
     /**
@@ -228,7 +234,7 @@ public class WatchListJob extends AbstractJob implements Job
                 return;
             }
 
-            List<String> subscribers = getSubscribers();
+            Collection<String> subscribers = getSubscribers();
             Date previousFireTime = getPreviousFireTime();
             WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
             setPreviousFireTime();
@@ -243,22 +249,22 @@ public class WatchListJob extends AbstractJob implements Job
 
             for (String subscriber : subscribers) {
                 try {
-                    List<String> wikis =
-                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.WIKI, this.context);
-                    List<String> spaces =
-                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
-                    List<String> documents =
-                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
-                    List<String> users =
-                        this.plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
+                    Collection<String> wikis =
+                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.WIKI);
+                    Collection<String> spaces =
+                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.SPACE);
+                    Collection<String> documents =
+                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.DOCUMENT);
+                    Collection<String> users =
+                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.USER);
                     List<WatchListEvent> matchingEvents =
                         eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
-                    String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
+                    String userWiki = StringUtils.substringBefore(subscriber, DefaultWatchListStore.WIKI_SPACE_SEP);
 
                     // If events have occurred on at least one element watched by the user, send the email
                     if (matchingEvents.size() > 0) {
-                        this.plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents,
-                            getEmailTemplate(userWiki), previousFireTime, this.context);
+                        this.watchlist.getNotifier().sendNotification(subscriber, matchingEvents,
+                            getEmailTemplate(userWiki), previousFireTime);
                     }
                 } catch (Exception e) {
                     LOGGER.error("Failed to send watchlist notification to user [{}]", subscriber, e);

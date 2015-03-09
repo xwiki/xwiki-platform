@@ -17,46 +17,49 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.JobEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.EventListener;
+import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.BeginEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
+import org.xwiki.watchlist.internal.api.WatchListStore;
+import org.xwiki.watchlist.internal.api.WatchedElementType;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
-import com.xpn.xwiki.plugin.watchlist.WatchListStore.ElementType;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Automatically watch modified documents.
  * 
  * @version $Id$
  */
-public class AutomaticWatchModeListener implements EventListener
+@Component
+@Named(AutomaticWatchModeListener.LISTENER_NAME)
+@Singleton
+public class AutomaticWatchModeListener extends AbstractEventListener
 {
-    /**
-     * Logging helper object.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutomaticWatchModeListener.class);
-
     /**
      * The name of the listener.
      */
-    private static final String LISTENER_NAME = "AutomaticWatchModeListener";
+    public static final String LISTENER_NAME = "AutomaticWatchModeListener";
 
     /**
      * The events to match.
@@ -70,28 +73,62 @@ public class AutomaticWatchModeListener implements EventListener
     };
 
     /**
-     * The skipped events groups matcher.
+     * The skipped events group matcher.
      */
     private static final BeginEvent SKIPPED_EVENTS = new BeginEvent()
     {
         @Override
         public boolean matches(Object otherEvent)
         {
-            return otherEvent instanceof WikiCreatingEvent || otherEvent instanceof XARImportingEvent;
+            // 1. Skip bulk user actions as do not reflect expressed interest in the particular pages.
+
+            // 2. Skip events coming from background jobs, since they are not attributed and are not relevant to a
+            // particular user's behavior. E.g.: XWiki initialization job (mandatory document initializers, plugin
+            // initializers, etc.)
+
+            return otherEvent instanceof WikiCreatingEvent || otherEvent instanceof XARImportingEvent
+                || otherEvent instanceof JobEvent;
         }
     };
 
     /**
+     * Logging helper object.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * The watchlist storage manager.
      */
+    @Inject
     private WatchListStore store;
 
     /**
-     * @param store the watchlist storage manager
+     * Used to detect if certain events are not independent, i.e. executed in the context of other events, case in which
+     * they should be skipped.
      */
-    public AutomaticWatchModeListener(WatchListStore store)
+    @Inject
+    private ObservationContext observationContext;
+
+    /**
+     * Default constructor.
+     */
+    public AutomaticWatchModeListener()
     {
-        this.store = store;
+        super(LISTENER_NAME, LISTENER_EVENTS);
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument currentDoc = (XWikiDocument) source;
+        XWikiContext context = (XWikiContext) data;
+
+        // Does not auto-watch updated or created documents when they are in the context of a XAR import or a Wiki
+        // creation.
+        if (!observationContext.isIn(SKIPPED_EVENTS)) {
+            documentModifiedHandler(event, currentDoc, context);
+        }
     }
 
     /**
@@ -103,13 +140,18 @@ public class AutomaticWatchModeListener implements EventListener
      */
     private void documentModifiedHandler(Event event, XWikiDocument currentDoc, XWikiContext context)
     {
-        boolean register = false;
-
         String user = currentDoc.getContentAuthor();
         DocumentReference userReference = currentDoc.getContentAuthorReference();
 
-        AutomaticWatchMode mode = this.store.getAutomaticWatchMode(user, context);
+        // Avoid handling guests or the superadmin user.
+        if (userReference == null || !context.getWiki().exists(userReference, context)) {
+            return;
+        }
 
+        // Determine if the current event should be registered, based on the user's prefereces.
+        boolean register = false;
+
+        AutomaticWatchMode mode = this.store.getAutomaticWatchMode(user);
         switch (mode) {
             case ALL:
                 register = true;
@@ -126,42 +168,10 @@ public class AutomaticWatchModeListener implements EventListener
 
         if (register) {
             try {
-                if (StringUtils.isNotEmpty(user) && userReference != null
-                    && context.getWiki().exists(userReference, context)) {
-                    this.store.addWatchedElement(user, currentDoc.getPrefixedFullName(), ElementType.DOCUMENT, context);
-                }
+                this.store.addWatchedElement(user, currentDoc.getPrefixedFullName(), WatchedElementType.DOCUMENT);
             } catch (XWikiException e) {
-                LOGGER.warn("Failed to watch document [{}] for user [{}]", currentDoc.getPrefixedFullName(), user, e);
+                logger.warn("Failed to watch document [{}] for user [{}]", currentDoc.getPrefixedFullName(), user, e);
             }
         }
-    }
-
-    // EventListener
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        XWikiDocument currentDoc = (XWikiDocument) source;
-        XWikiContext context = (XWikiContext) data;
-
-        ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
-
-        // Does not auto-watch updated or created documents when they are in the context of a XAR import or a Wiki
-        // creation.
-        if (!observationContext.isIn(SKIPPED_EVENTS)) {
-            documentModifiedHandler(event, currentDoc, context);
-        }
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        return LISTENER_EVENTS;
-    }
-
-    @Override
-    public String getName()
-    {
-        return LISTENER_NAME;
     }
 }

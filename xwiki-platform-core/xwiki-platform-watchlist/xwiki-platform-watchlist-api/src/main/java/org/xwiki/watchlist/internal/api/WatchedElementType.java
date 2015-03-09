@@ -20,29 +20,29 @@
 package org.xwiki.watchlist.internal.api;
 
 /**
- * Possible ways of automatically watching documents.
+ * The type of elements that can be watched.
  * 
  * @version $Id$
  */
-public enum AutomaticWatchMode
+public enum WatchedElementType
 {
     /**
-     * Disabled.
+     * Wiki.
      */
-    NONE,
+    WIKI,
 
     /**
-     * Watch any modified document.
+     * Space.
      */
-    ALL,
+    SPACE,
 
     /**
-     * Watch any modified document when it's not a minor edit.
+     * Document.
      */
-    MAJOR,
+    DOCUMENT,
 
     /**
-     * Watch any new document.
+     * User.
      */
-    NEW
+    USER
 }

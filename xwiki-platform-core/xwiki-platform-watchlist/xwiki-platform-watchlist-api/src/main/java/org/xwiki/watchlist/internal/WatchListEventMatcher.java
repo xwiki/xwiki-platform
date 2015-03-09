@@ -17,28 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.watchlist.internal.api.WatchList;
+import org.xwiki.watchlist.internal.api.WatchListEvent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
+import com.xpn.xwiki.web.Utils;
 
 /**
- * Matcher for WatchList events. This class store all the events fired during a given interval. It also allows to 
+ * Matcher for WatchList events. This class stores all the events fired during a given interval. It also allows to
  * perform a match between events and elements watched by a user.
  * 
  * @version $Id$
@@ -76,22 +80,23 @@ public class WatchListEventMatcher
      */
     public WatchListEventMatcher(Date start, XWikiContext context)
     {
-        ActivityStream actStream = 
-            ((ActivityStreamPlugin) 
-                context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context)).getActivityStream();
+        ActivityStream actStream =
+            ((ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context))
+                .getActivityStream();
         List<Object> parameters = new ArrayList<Object>();
         List<ActivityEvent> rawEvents;
 
         parameters.add(start);
-        
+
         try {
             rawEvents =
-                actStream.searchEvents("act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','")
-                    + "')", false, true, 0, 0, parameters, context);
+                actStream.searchEvents(
+                    "act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','") + "')", false,
+                    true, 0, 0, parameters, context);
 
             // If the page has been modified several times we want to display only one diff, if the page has been
-            // delete after update events we want to discard the update events since we won't be able to display 
-            // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and 
+            // delete after update events we want to discard the update events since we won't be able to display
+            // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and
             // WatchListEvent#equals(WatchListEvent).
             for (ActivityEvent rawEvent : rawEvents) {
                 WatchListEvent event = new WatchListEvent(rawEvent, context);
@@ -120,32 +125,32 @@ public class WatchListEventMatcher
     /**
      * Get the events matching criteria.
      * 
-     * @param wikis a list of wikis from which events should match
-     * @param spaces a list of spaces from which events should match
-     * @param documents a list of documents from which events should match
-     * @param users a list of users from which events should match
+     * @param wikis the wikis from which events should match
+     * @param spaces the spaces from which events should match
+     * @param documents the documents from which events should match
+     * @param users the users from which events should match
      * @param userName notification recipient
      * @param context the XWiki context
-     * @return the list of events matching the given scopes
+     * @return a list of events matching the given scopes
      */
-    public List<WatchListEvent> getMatchingEvents(List<String> wikis, List<String> spaces, List<String> documents,
-        List<String> users, String userName, XWikiContext context)
+    public List<WatchListEvent> getMatchingEvents(Collection<String> wikis, Collection<String> spaces,
+        Collection<String> documents, Collection<String> users, String userName, XWikiContext context)
     {
-        List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();        
-        WatchListPlugin plugin = (WatchListPlugin) context.getWiki().getPlugin(WatchListPlugin.ID, context);
-        List<String> jobDocumentNames = plugin.getStore().getJobDocumentNames();
-        
+        List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();
+        WatchList watchlist = Utils.getComponent(WatchList.class);
+        Collection<String> jobDocumentNames = watchlist.getStore().getJobDocumentNames();
+
         for (WatchListEvent event : events) {
             if (wikis.contains(event.getWiki()) || spaces.contains(event.getPrefixedSpace())
-                || documents.contains(event.getPrefixedFullName()) 
-                || ListUtils.intersection(users, event.getAuthors()).size() > 0) {
+                || documents.contains(event.getPrefixedFullName())
+                || CollectionUtils.intersection(users, event.getAuthors()).size() > 0) {
                 try {
                     // We exclude watchlist jobs from notifications since they are modified each time they are fired,
                     // producing useless noise. We also ensure that users have the right to view documents we send
                     // notifications for.
-                    if (!jobDocumentNames.contains(event.getFullName()) 
-                        && context.getWiki().getRightService().hasAccessLevel("view", userName, 
-                            event.getPrefixedFullName(), context)) {
+                    if (!jobDocumentNames.contains(event.getFullName())
+                        && context.getWiki().getRightService()
+                            .hasAccessLevel("view", userName, event.getPrefixedFullName(), context)) {
                         matchingEvents.add(event);
                     }
                 } catch (XWikiException e) {

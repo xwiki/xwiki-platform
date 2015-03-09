@@ -20,29 +20,39 @@
 package org.xwiki.watchlist.internal.api;
 
 /**
- * Possible ways of automatically watching documents.
+ * Default exception thrown by the watchlist module.
  * 
  * @version $Id$
  */
-public enum AutomaticWatchMode
+public class WatchListException extends Exception
 {
     /**
-     * Disabled.
+     * Class ID used in serialization.
      */
-    NONE,
+    private static final long serialVersionUID = -7465297713674629352L;
 
     /**
-     * Watch any modified document.
+     * @param message the exception message
      */
-    ALL,
+    public WatchListException(String message)
+    {
+        super(message);
+    }
 
     /**
-     * Watch any modified document when it's not a minor edit.
+     * @param cause the cause of this exception
      */
-    MAJOR,
+    public WatchListException(Throwable cause)
+    {
+        super(cause);
+    }
 
     /**
-     * Watch any new document.
+     * @param message the exception message
+     * @param cause the cause of this exception
      */
-    NEW
+    public WatchListException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

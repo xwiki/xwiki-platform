@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -31,12 +31,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.plugin.watchlist.WatchListStore}.
+ * Unit tests for {@link org.xwiki.watchlist.internal.DefaultWatchListStore}.
  *
  * @version $Id$
  * @since 5.3M1
  */
-public class WatchListStoreTest
+public class DefaultWatchListStoreTest
 {
     private static final String TEST_USERDOC_NAME = "userspace.userpage";
 

@@ -17,15 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.collections.functors.ConstantTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.watchlist.internal.api.WatchListEventFeedManager;
+import org.xwiki.watchlist.internal.api.WatchListStore;
+import org.xwiki.watchlist.internal.api.WatchedElementType;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
@@ -34,42 +44,42 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPluginApi;
 
 /**
- * Manager for watchlist events RSS feeds.
+ * Default implementation for {@link WatchListEventFeedManager}.
  * 
  * @version $Id$
  */
-public class WatchListEventFeedManager
+@Component
+@Singleton
+public class DefaultWatchListEventFeedManager implements WatchListEventFeedManager
 {
     /**
-     * The watchlist plugin instance.
+     * The watchlist store component instance.
      */
-    private final WatchListPlugin plugin;
+    @Inject
+    private WatchListStore store;
 
     /**
-     * Constructor.
-     * 
-     * @param plugin Watchlist plugin instance.
+     * Used to resolve translations.
      */
-    public WatchListEventFeedManager(WatchListPlugin plugin)
-    {
-        this.plugin = plugin;
-    }
+    @Inject
+    private ContextualLocalizationManager localization;
 
     /**
-     * @param user user to get the RSS feed for
-     * @param entryNumber number of entries to retrieve
-     * @param context the XWiki context
-     * @return The watchlist RSS feed for the given user
-     * @throws XWikiException if the retrieval of RSS entries fails
+     * Used to obtain the current context.
      */
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    @Override
     @SuppressWarnings("unchecked")
-    public SyndFeed getFeed(String user, int entryNumber, XWikiContext context) throws XWikiException
+    public SyndFeed getFeed(String user, int entryNumber) throws XWikiException
     {
-        List<String> wikis = plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.WIKI, context);
-        List<String> spaces = plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.SPACE, context);
-        List<String> documents = 
-            plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.DOCUMENT, context);
-        List<Object> parameters = new ArrayList<Object>(); 
+        XWikiContext context = contextProvider.get();
+
+        Collection<String> wikis = store.getWatchedElements(user, WatchedElementType.WIKI);
+        Collection<String> spaces = store.getWatchedElements(user, WatchedElementType.SPACE);
+        Collection<String> documents = store.getWatchedElements(user, WatchedElementType.DOCUMENT);
+        List<Object> parameters = new ArrayList<Object>();
         ActivityStreamPluginApi asApi =
             (ActivityStreamPluginApi) context.getWiki().getPluginApi("activitystream", context);
 
@@ -92,12 +102,14 @@ public class WatchListEventFeedManager
             query += " or act.wiki in (" + StringUtils.join(wikisPlaceholders, listItemsJoint) + ')';
         }
         if (!spaces.isEmpty()) {
-            query += concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.space) in ("
-                + StringUtils.join(spacesPlaceholders, listItemsJoint) + ')';
+            query +=
+                concatWiki + DefaultWatchListStore.WIKI_SPACE_SEP + "',act.space) in ("
+                    + StringUtils.join(spacesPlaceholders, listItemsJoint) + ')';
         }
         if (!documents.isEmpty()) {
-            query += concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.page) in ("
-                + StringUtils.join(documentsPlaceholders, listItemsJoint) + ')';
+            query +=
+                concatWiki + DefaultWatchListStore.WIKI_SPACE_SEP + "',act.page) in ("
+                    + StringUtils.join(documentsPlaceholders, listItemsJoint) + ')';
         }
         List<ActivityEvent> events = asApi.searchEvents(query, false, true, entryNumber, 0, parameters);
 
@@ -116,10 +128,11 @@ public class WatchListEventFeedManager
      */
     private void setFeedMetaData(SyndFeed feed, XWikiContext context) throws XWikiException
     {
-        String msgPrefix = WatchListPlugin.APP_RES_PREFIX + "rss.";
-        feed.setAuthor(context.getMessageTool().get(msgPrefix + "author"));
-        feed.setTitle(context.getMessageTool().get(msgPrefix + "title")); 
-        feed.setDescription(context.getMessageTool().get(msgPrefix + "description")); 
+        String msgPrefix = DefaultWatchList.APP_RES_PREFIX + "rss.";
+
+        feed.setAuthor(localization.getTranslationPlain(msgPrefix + "author"));
+        feed.setTitle(localization.getTranslationPlain(msgPrefix + "title"));
+        feed.setDescription(localization.getTranslationPlain(msgPrefix + "description"));
         feed.setCopyright(context.getWiki().getXWikiPreference("copyright", context));
         feed.setLink(context.getWiki().getExternalURL("xwiki:Main.WebHome", "view", context));
     }

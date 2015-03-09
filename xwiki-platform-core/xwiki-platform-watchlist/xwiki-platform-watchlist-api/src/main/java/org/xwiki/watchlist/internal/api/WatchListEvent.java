@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal.api;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.html.Div;
 import org.apache.ecs.html.Span;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.watchlist.internal.DefaultWatchListStore;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -157,8 +158,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         this.context = context;
         this.activityEvents.add(activityEvent);
         type = activityEvent.getType();
-        prefixedSpace = activityEvent.getWiki() + WatchListStore.WIKI_SPACE_SEP + activityEvent.getSpace();
-        prefixedFullName = activityEvent.getWiki() + WatchListStore.WIKI_SPACE_SEP + activityEvent.getPage();
+        prefixedSpace = activityEvent.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + activityEvent.getSpace();
+        prefixedFullName = activityEvent.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + activityEvent.getPage();
 
         int hash = 3;
         if (ActivityEventType.UPDATE.equals(activityEvent)) {
@@ -318,7 +319,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 authors.add(getAuthor());
             } else {
                 for (ActivityEvent event : activityEvents) {
-                    String prefixedAuthor = event.getWiki() + WatchListStore.WIKI_SPACE_SEP + event.getUser();
+                    String prefixedAuthor = event.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + event.getUser();
                     if (!authors.contains(prefixedAuthor)) {
                         authors.add(prefixedAuthor);
                     }

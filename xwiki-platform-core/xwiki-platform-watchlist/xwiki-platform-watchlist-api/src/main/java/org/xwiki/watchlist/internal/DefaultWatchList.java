@@ -17,138 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.observation.ObservationManager;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.web.Utils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.watchlist.internal.api.WatchList;
+import org.xwiki.watchlist.internal.api.WatchListEventFeedManager;
+import org.xwiki.watchlist.internal.api.WatchListNotifier;
+import org.xwiki.watchlist.internal.api.WatchListStore;
 
 /**
- * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
- * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
- * elements that has been modified since the last notification.
+ * Default implementation for {@link WatchList}.
  * 
  * @version $Id$
  */
-public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+@Component
+@Singleton
+public class DefaultWatchList implements WatchList
 {
-    /**
-     * Plugin name.
-     */
-    public static final String ID = "watchlist";
-
     /**
      * Prefix used in ApplicationResources for this plugin.
      */
     public static final String APP_RES_PREFIX = "watchlist.";
 
     /**
-     * Default XWiki Administrator.
-     */
-    public static final String DEFAULT_DOC_AUTHOR = "superadmin";
-
-    /**
-     * Default parent to use for class pages.
-     */
-    public static final String DEFAULT_CLASS_PARENT = "XWiki.XWikiClasses";
-
-    /**
-     * Logger to log.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListPlugin.class);
-
-    /**
-     * Job manager instance.
-     */
-    private final WatchListJobManager jobManager = new WatchListJobManager();
-
-    /**
      * Store instance.
      */
-    private WatchListStore store = new WatchListStore();
-
-    /**
-     * Auto watch listener.
-     */
-    private AutomaticWatchModeListener autoWatch = new AutomaticWatchModeListener(store);
+    @Inject
+    private WatchListStore store;
 
     /**
      * Notifier instance.
      */
-    private WatchListNotifier notifier = new WatchListNotifier();
+    @Inject
+    private WatchListNotifier notifier;
 
     /**
      * Feed manager instance.
      */
-    private WatchListEventFeedManager feedManager = new WatchListEventFeedManager(this);
-
-    /**
-     * @param name the plugin name
-     * @param className the plugin classname (used in logs for example)
-     * @param context the XWiki Context
-     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
-     */
-    public WatchListPlugin(String name, String className, XWikiContext context)
-    {
-        super(name, className, context);
-    }
-
-    @Override
-    public String getName()
-    {
-        return ID;
-    }
-
-    @Override
-    public void init(XWikiContext context)
-    {
-        super.init(context);
-
-        try {
-            this.jobManager.init(context);
-            this.store.init(context);
-
-            // Listen to Events.
-            ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
-            if (observationManager.getListener(this.store.getName()) == null) {
-                observationManager.addListener(this.store);
-                observationManager.addListener(this.autoWatch);
-            }
-        } catch (XWikiException e) {
-            LOGGER.error("init", e);
-        }
-    }
-
-    @Override
-    public void virtualInit(XWikiContext context)
-    {
-        super.virtualInit(context);
-        try {
-            this.store.virtualInit(context);
-        } catch (XWikiException e) {
-            LOGGER.error("virtualInit", e);
-        }
-    }
-
-    @Override
-    public WatchListPluginApi getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
-    {
-        return new WatchListPluginApi((WatchListPlugin) plugin, context);
-    }
-
-    /**
-     * @return the job manager instance.
-     */
-    public WatchListJobManager getJobManager()
-    {
-        return this.jobManager;
-    }
+    @Inject
+    private WatchListEventFeedManager feedManager;
 
     /**
      * @return the store instance.

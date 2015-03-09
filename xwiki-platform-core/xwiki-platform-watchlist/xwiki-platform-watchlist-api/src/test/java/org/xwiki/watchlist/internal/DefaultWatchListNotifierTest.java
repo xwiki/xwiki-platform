@@ -17,60 +17,75 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.Date;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.watchlist.internal.api.WatchListNotifier;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Property;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.mockito.Mockito.*;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.plugin.watchlist.WatchListNotifier}.
+ * Unit tests for {@link org.xwiki.watchlist.internal.DefaultWatchListNotifier}.
  *
  * @version $Id$
  * @since 5.0M2
  */
-public class WatchListNotifierTest
+public class DefaultWatchListNotifierTest
 {
     private XWikiContext xcontext;
 
-    private com.xpn.xwiki.XWiki xwiki;
+    private XWiki xwiki;
 
-    private com.xpn.xwiki.api.Object userObject;
+    private BaseObject userObject;
 
-    private WatchListNotifier notifier = new WatchListNotifier();
+    @Rule
+    public MockitoComponentMockingRule<WatchListNotifier> mocker = new MockitoComponentMockingRule<WatchListNotifier>(
+        DefaultWatchListNotifier.class);
 
     @Before
     public void setUp() throws Exception
     {
         this.xcontext = mock(XWikiContext.class);
+
+        Provider<XWikiContext> contextProvider =
+            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        when(contextProvider.get()).thenReturn(this.xcontext);
+
         this.xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
-        XWikiDocument xwikiDocument = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument("subscriber", this.xcontext)).thenReturn(xwikiDocument);
-        Document subscriberDocument = mock(Document.class);
-        when(xwikiDocument.newDocument(this.xcontext)).thenReturn(subscriberDocument);
-        this.userObject = mock(com.xpn.xwiki.api.Object.class);
+
+        XWikiDocument subscriberDocument = mock(XWikiDocument.class);
+        when(this.xwiki.getDocument("subscriber", this.xcontext)).thenReturn(subscriberDocument);
+
+        this.userObject = mock(BaseObject.class);
         when(subscriberDocument.getObject("XWiki.XWikiUsers")).thenReturn(this.userObject);
     }
 
     @Test
     public void sendEmailNotificationDoNothingIfEmailAddressDoesntContainAtSymbol() throws Exception
     {
-        Property emailProperty = mock(Property.class);
-        when(this.userObject.getProperty("email")).thenReturn(emailProperty);
-        when(emailProperty.getValue()).thenReturn("invalidemail");
+        when(this.userObject.getStringValue(DefaultWatchListNotifier.XWIKI_USER_CLASS_EMAIL_PROP)).thenReturn(
+            "invalidemail");
 
-        this.notifier.sendEmailNotification("subscriber", Collections.EMPTY_LIST, "emailtemplate", new Date(),
-            this.xcontext);
+        mocker.getComponentUnderTest().sendNotification("subscriber", Collections.EMPTY_LIST, "emailtemplate",
+            new Date());
 
         verify(this.xwiki, never()).getPlugin("mailsender", this.xcontext);
     }

@@ -17,13 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
-
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.context.Execution;
@@ -33,73 +38,74 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.internal.DefaultObservationContext;
 import org.xwiki.observation.internal.ObservationContextListener;
-import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.watchlist.internal.AutomaticWatchModeListener;
+import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
+import org.xwiki.watchlist.internal.api.WatchListStore;
+import org.xwiki.watchlist.internal.api.WatchedElementType;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Unit tests for {@link AutomaticWatchModeListener}.
  * 
  * @version $Id$
  */
-@ComponentList({
-    ObservationContextListener.class,
-    DefaultExecution.class,
-    DefaultObservationContext.class
-})
+@ComponentList({ObservationContextListener.class, DefaultExecution.class, DefaultObservationContext.class})
 public class AutomaticWatchModeListenerTest
 {
     private WatchListStore mockStore;
 
-    private AutomaticWatchModeListener listener;
-
     private EventListener observationContextListener;
 
     @Rule
-    public final ComponentManagerRule componentManager = new ComponentManagerRule();
+    public final MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
+        AutomaticWatchModeListener.class);
 
     @Before
     public void setUp() throws Exception
     {
-        this.mockStore = mock(WatchListStore.class);
-        this.listener = new AutomaticWatchModeListener(this.mockStore);
-
-        Utils.setComponentManager(this.componentManager);
+        this.mockStore = mocker.getInstance(WatchListStore.class);
 
         // Make sure we have an Execution Context since the observationContextListener will store current events in it
-        Execution execution = this.componentManager.getInstance(Execution.class);
+        Execution execution = mocker.getInstance(Execution.class);
         execution.setContext(new ExecutionContext());
 
-        this.observationContextListener =
-            this.componentManager.getInstance(EventListener.class, "ObservationContextListener");
+        this.observationContextListener = mocker.getInstance(EventListener.class, "ObservationContextListener");
     }
 
     /**
      * Verify that we don't do anything when the current event is inside a WikiCreatingEvent.
      */
     @Test
-    public void onEventWhenInContextOfWikiCreatingEvent()
+    public void onEventWhenInContextOfWikiCreatingEvent() throws Exception
     {
         // We simulate a WikiCreatingEvent in the Execution Context
         this.observationContextListener.onEvent(new WikiCreatingEvent(), null, null);
 
-        this.listener.onEvent(new DocumentCreatedEvent(), null, null);
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
+
+        verify(mockStore, never()).getAutomaticWatchMode(anyString());
+        verify(mockStore, never()).addWatchedElement(anyString(), anyString(), any(WatchedElementType.class));
     }
 
     /**
      * Verify that we don't do anything when the current event is inside a XARImportingEvent.
      */
     @Test
-    public void onEventWhenInContextOXARImportingEvent()
+    public void onEventWhenInContextOXARImportingEvent() throws Exception
     {
         // We simulate a XARImportingEvent in the Execution Context
         this.observationContextListener.onEvent(new XARImportingEvent(), null, null);
 
-        this.listener.onEvent(new DocumentCreatedEvent(), null, null);
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), null, null);
+
+        verify(mockStore, never()).getAutomaticWatchMode(anyString());
+        verify(mockStore, never()).addWatchedElement(anyString(), anyString(), any(WatchedElementType.class));
     }
 
     @Test
@@ -113,18 +119,17 @@ public class AutomaticWatchModeListenerTest
         when(document.getContentAuthorReference()).thenReturn(documentReference);
         when(document.getPrefixedFullName()).thenReturn("authorSpace.authorPage");
 
-        when(this.mockStore.getAutomaticWatchMode("content author", context)).thenReturn(
-                AutomaticWatchMode.ALL);
+        when(this.mockStore.getAutomaticWatchMode("content author")).thenReturn(AutomaticWatchMode.ALL);
 
-        com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
+        XWiki xwiki = mock(XWiki.class);
         when(xwiki.exists(documentReference, context)).thenReturn(true);
 
         when(context.getWiki()).thenReturn(xwiki);
 
-        this.listener.onEvent(new DocumentCreatedEvent(), document, context);
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(), document, context);
 
         // Verify that the document is added to the watchlist
-        verify(this.mockStore).addWatchedElement(
-            "content author", "authorSpace.authorPage", WatchListStore.ElementType.DOCUMENT, context);
+        verify(this.mockStore).addWatchedElement("content author", "authorSpace.authorPage",
+            org.xwiki.watchlist.internal.api.WatchedElementType.DOCUMENT);
     }
 }

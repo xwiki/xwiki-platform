@@ -17,32 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.watchlist;
+package org.xwiki.watchlist.internal;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.watchlist.internal.api.WatchListEvent;
+import org.xwiki.watchlist.internal.api.WatchListNotifier;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
-import com.xpn.xwiki.web.Utils;
 
 /**
- * Utility class used by the watchlist plugin to send notifications to users. The current implementation offers email
- * notifications only.
+ * Default implementation for {@link WatchListNotifier}. The current implementation offers email notifications only.
  * 
  * @version $Id$
  */
-public class WatchListNotifier
+@Component
+@Singleton
+public class DefaultWatchListNotifier implements WatchListNotifier
 {
     /**
      * Wiki page which contains the default watchlist email template.
@@ -67,42 +74,49 @@ public class WatchListNotifier
     /**
      * XWiki User Class email property.
      */
-    private static final String XWIKI_USER_CLASS_EMAIL_PROP = "email";
+    public static final String XWIKI_USER_CLASS_EMAIL_PROP = "email";
 
     /**
-     * Sends the email notifying the subscriber that the updatedDocuments have been changed.
-     * 
-     * @param subscriber user to notify
-     * @param events list of events
-     * @param emailTemplate email template to use
-     * @param previousFireTime last time the notification was fired
-     * @param context the XWiki context
-     * @throws XWikiException if mail sending fails
+     * Context provider.
      */
-    public void sendEmailNotification(String subscriber, List<WatchListEvent> events, String emailTemplate,
-        Date previousFireTime, XWikiContext context) throws XWikiException
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
+    /**
+     * Email service configuration.
+     */
+    @Inject
+    private MailSenderConfiguration mailConfiguration;
+
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
+
+    @Override
+    public void sendNotification(String subscriber, List<WatchListEvent> events, String templateDocument,
+        Date previousFireTime) throws XWikiException
     {
+        XWikiContext context = contextProvider.get();
+
         // Get user email
-        Document subscriberDocument = context.getWiki().getDocument(subscriber, context).newDocument(context);
-        Object userObj = subscriberDocument.getObject(XWIKI_USER_CLASS);
-        String emailAddr = (String) userObj.getProperty(XWIKI_USER_CLASS_EMAIL_PROP).getValue();
+        XWikiDocument subscriberDocument = context.getWiki().getDocument(subscriber, context);
+        BaseObject userObj = subscriberDocument.getObject(XWIKI_USER_CLASS);
+        String emailAddr = (String) userObj.getStringValue(XWIKI_USER_CLASS_EMAIL_PROP);
         if (emailAddr == null || emailAddr.length() == 0 || emailAddr.indexOf("@") < 0) {
             // Invalid email
             return;
         }
-        
+
         List<String> modifiedDocuments = new ArrayList<String>();
         for (WatchListEvent event : events) {
             if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
-                modifiedDocuments.add(event.getPrefixedFullName());                
+                modifiedDocuments.add(event.getPrefixedFullName());
             }
         }
 
         // Prepare email template (wiki page) context
         VelocityContext vcontext = new VelocityContext();
-        vcontext
-            .put(XWIKI_USER_CLASS_FIRST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_FIRST_NAME_PROP).getValue());
-        vcontext.put(XWIKI_USER_CLASS_LAST_NAME_PROP, userObj.getProperty(XWIKI_USER_CLASS_LAST_NAME_PROP).getValue());
+        vcontext.put(XWIKI_USER_CLASS_FIRST_NAME_PROP, userObj.getStringValue(XWIKI_USER_CLASS_FIRST_NAME_PROP));
+        vcontext.put(XWIKI_USER_CLASS_LAST_NAME_PROP, userObj.getStringValue(XWIKI_USER_CLASS_LAST_NAME_PROP));
         vcontext.put("events", events);
         vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
         vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
@@ -111,12 +125,13 @@ public class WatchListNotifier
         vcontext.put("previousFireTime", previousFireTime);
         vcontext.put("context", new DeprecatedContext(context));
         vcontext.put("xcontext", new Context(context));
-        vcontext.put("services", Utils.getComponent(ScriptServiceManager.class));
+        vcontext.put("services", scriptServiceManager);
 
         // Get wiki's default language (default en)
         String language = context.getWiki().getXWikiPreference("default_language", "en", context);
 
         // Get mailsenderplugin
+        // FIXME: Use the new mail module instead.
         MailSenderPlugin emailService = (MailSenderPlugin) context.getWiki().getPlugin(MailSenderPlugin.ID, context);
         if (emailService == null) {
             return;
@@ -126,14 +141,7 @@ public class WatchListNotifier
         String from = getFromAddress();
 
         // Set email template
-        String template = "";
-        if (context.getWiki().exists(emailTemplate, context)) {
-            template = emailTemplate;
-        } else if (context.getWiki().exists(DEFAULT_EMAIL_TEMPLATE, context)) {
-            template = DEFAULT_EMAIL_TEMPLATE;
-        } else {
-            template = context.getMainXWiki() + ":" + DEFAULT_EMAIL_TEMPLATE;
-        }
+        String template = getTemplateDocument(templateDocument, context);
 
         // Send message from template
         emailService.sendMailFromTemplate(template, from, emailAddr, null, null, language, vcontext, context);
@@ -142,10 +150,28 @@ public class WatchListNotifier
     private String getFromAddress()
     {
         // Get from email address from the configuration (default : mailer@xwiki.localdomain.com)
-        String from = Utils.getComponent(MailSenderConfiguration.class).getFromAddress();
+        String from = mailConfiguration.getFromAddress();
         if (from == null) {
             from = "mailer@xwiki.localdomain.com";
         }
         return from;
+    }
+
+    /**
+     * @param templateDocument
+     * @param context
+     * @return
+     */
+    private String getTemplateDocument(String templateDocument, XWikiContext context)
+    {
+        String template = "";
+        if (context.getWiki().exists(templateDocument, context)) {
+            template = templateDocument;
+        } else if (context.getWiki().exists(DEFAULT_EMAIL_TEMPLATE, context)) {
+            template = DEFAULT_EMAIL_TEMPLATE;
+        } else {
+            template = context.getMainXWiki() + ":" + DEFAULT_EMAIL_TEMPLATE;
+        }
+        return template;
     }
 }

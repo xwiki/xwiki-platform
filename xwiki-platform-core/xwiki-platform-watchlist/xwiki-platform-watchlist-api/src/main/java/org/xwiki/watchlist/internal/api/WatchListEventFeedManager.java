@@ -19,30 +19,24 @@
  */
 package org.xwiki.watchlist.internal.api;
 
+import org.xwiki.component.annotation.Role;
+
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.xpn.xwiki.XWikiException;
+
 /**
- * Possible ways of automatically watching documents.
+ * Manager for watchlist events RSS feeds.
  * 
  * @version $Id$
  */
-public enum AutomaticWatchMode
+@Role
+public interface WatchListEventFeedManager
 {
     /**
-     * Disabled.
+     * @param user user to get the RSS feed for
+     * @param entryNumber number of entries to retrieve
+     * @return The watchlist RSS feed for the given user
+     * @throws XWikiException if the retrieval of RSS entries fails
      */
-    NONE,
-
-    /**
-     * Watch any modified document.
-     */
-    ALL,
-
-    /**
-     * Watch any modified document when it's not a minor edit.
-     */
-    MAJOR,
-
-    /**
-     * Watch any new document.
-     */
-    NEW
+    SyndFeed getFeed(String user, int entryNumber) throws XWikiException;
 }

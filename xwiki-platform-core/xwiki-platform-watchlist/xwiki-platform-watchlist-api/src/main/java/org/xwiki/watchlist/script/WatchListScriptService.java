@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.watchlist.internal.DefaultWatchListStore;
@@ -76,6 +77,52 @@ public class WatchListScriptService implements ScriptService
      */
     public boolean isWatched(WatchedElementType type)
     {
+        return isWatched(null, type);
+    }
+
+    /**
+     * @param element the element to check. A {@code null} value will fallback on the current element for the specified
+     *            type
+     * @param type the type of element, as defined by {@link WatchedElementType}
+     * @return true if the specified element of the specified type is watched by the current user, false otherwise or in
+     *         case of error.
+     */
+    public boolean isWatched(String element, WatchedElementType type)
+    {
+        XWikiContext context = contextProvider.get();
+
+        try {
+            String safeElement = getSafeElement(element, type);
+
+            return watchlist.getStore().isWatched(safeElement, context.getUser(), type);
+        } catch (Exception e) {
+            setError(e);
+            return false;
+        }
+    }
+
+    /**
+     * @param element the element to check
+     * @param type the type of element to check
+     * @return the given element if it is not {@code null} or {@link #getCurrentElementOfType(WatchedElementType)}
+     *         instead
+     */
+    private String getSafeElement(String element, WatchedElementType type)
+    {
+        String safeElement = element;
+        if (safeElement == null) {
+            safeElement = getCurrentElementOfType(type);
+        }
+
+        return safeElement;
+    }
+
+    /**
+     * @param type the type of element, as defined by {@link WatchedElementType}
+     * @return the current (context) element of the specified type
+     */
+    private String getCurrentElementOfType(WatchedElementType type)
+    {
         XWikiContext context = contextProvider.get();
         XWikiDocument currentDocument = context.getDoc();
 
@@ -97,43 +144,43 @@ public class WatchListScriptService implements ScriptService
                 break;
         }
 
-        // We do not care about null elements because it is caused by an unsuported type and let the module throw an
-        // exception, if needed, that we will catch and silence.
-        return isWatched(element, type);
-    }
-
-    /**
-     * @param element the element to check
-     * @param type the type of element, as defined by {@link WatchedElementType}
-     * @return true if the specified element of the specified type is watched by the current user, false otherwise or in
-     *         case of error.
-     */
-    public boolean isWatched(String element, WatchedElementType type)
-    {
-        XWikiContext context = contextProvider.get();
-
-        try {
-            return watchlist.getStore().isWatched(element, context.getUser(), type);
-        } catch (Exception e) {
-            setError(e);
-            return false;
-        }
+        return element;
     }
 
     /**
      * Add the specified element to the current user's WatchList.
      *
-     * @param element the element to add
+     * @param element the element to add. A {@code null} value will fallback on the current element for the specified
+     *            type
      * @param type the type of element, as defined by {@link WatchedElementType}
      * @return true if the specified element wasn't already in the current user's WatchList, false otherwise or in case
      *         of an error
      */
     public boolean addWatchedElement(String element, WatchedElementType type)
     {
+        return addWatchedElement(null, element, type);
+    }
+
+    /**
+     * Adds the specified element to the specified user's WatchList.
+     * 
+     * @param user the user to add the element to. If specified, the current user's admin rights will be checked and, if
+     *            they are not present, the operation will fail. A {@code null} value will fallback on the current user
+     * @param element the element to add. A {@code null} value will fallback on the current element for the specified
+     *            type
+     * @param type the type of element, as defined by {@link WatchedElementType}
+     * @return true if the specified element wasn't already in the specified user's WatchList, false otherwise or in
+     *         case of an error
+     */
+    public boolean addWatchedElement(String user, String element, WatchedElementType type)
+    {
         XWikiContext context = contextProvider.get();
 
         try {
-            return watchlist.getStore().addWatchedElement(context.getUser(), element, type);
+            String safeUser = getSafeUser(user, context);
+            String safeElement = getSafeElement(element, type);
+
+            return watchlist.getStore().addWatchedElement(safeUser, safeElement, type);
         } catch (Exception e) {
             setError(e);
             return false;
@@ -141,58 +188,58 @@ public class WatchListScriptService implements ScriptService
     }
 
     /**
-     * Allows Administrators to add the specified document in the specified user's WatchList.
-     * 
-     * @param user the user to add the element to
-     * @param element the element to add
-     * @param type the type of element, as defined by {@link WatchedElementType}
-     * @return true if the specified element wasn't already in the current user's WatchList, false otherwise or in case
-     *         of an error
+     * @param user the user to check
+     * @param context the context to use
+     * @return the given user if it is not {@code null} or the current context user instead
+     * @throws AccessDeniedException if a user was specified, but the current user executing this code does not have
+     *             admin rights to act upon the given user
      */
-    public boolean addWatchedElement(String user, String element, WatchedElementType type)
+    private String getSafeUser(String user, XWikiContext context) throws AccessDeniedException
     {
-        try {
-            authorizationManager.checkAccess(Right.ADMIN);
+        String safeUser = user;
 
-            return watchlist.getStore().addWatchedElement(user, element, WatchedElementType.DOCUMENT);
-        } catch (Exception e) {
-            setError(e);
-            return false;
+        if (safeUser == null) {
+            safeUser = context.getUser();
+        } else {
+            authorizationManager.checkAccess(Right.ADMIN);
         }
+
+        return safeUser;
     }
 
     /**
      * Removed the specified element from the current user's WatchList.
      *
-     * @param element the element to remove
+     * @param element the element to remove. A {@code null} value will fallback on the current element for the specified
+     *            type
      * @param type the type of element, as defined by {@link WatchedElementType}
      * @return true if the element was in the WatchList and has been removed, false otherwise or in case of an error
      */
     public boolean removeWatchedElement(String element, WatchedElementType type)
     {
-        XWikiContext context = contextProvider.get();
-        try {
-            return watchlist.getStore().removeWatchedElement(context.getUser(), element, type);
-        } catch (Exception e) {
-            setError(e);
-            return false;
-        }
+        return removeWatchedElement(null, element, type);
     }
 
     /**
      * Allows Administrators to remove the specified element from the specified user's WatchList.
      *
-     * @param user the user to remove the element from
-     * @param element the element to remove
+     * @param user the user to remove the element from. If specified, the current user's admin rights will be checked
+     *            and, if they are not present, the operation will fail. A {@code null} value will fallback on the
+     *            current user
+     * @param element the element to remove. A {@code null} value will fallback on the current element for the specified
+     *            type
      * @param type the type of element, as defined by {@link WatchedElementType}
      * @return true if the element was in the WatchList and has been removed, false otherwise or in case of an error
      */
     public boolean removeWatchedElement(String user, String element, WatchedElementType type)
     {
-        try {
-            authorizationManager.checkAccess(Right.ADMIN);
+        XWikiContext context = contextProvider.get();
 
-            return watchlist.getStore().removeWatchedElement(user, element, type);
+        try {
+            String safeUser = getSafeUser(user, context);
+            String safeElement = getSafeElement(element, type);
+
+            return watchlist.getStore().removeWatchedElement(safeUser, safeElement, type);
         } catch (Exception e) {
             setError(e);
             return false;

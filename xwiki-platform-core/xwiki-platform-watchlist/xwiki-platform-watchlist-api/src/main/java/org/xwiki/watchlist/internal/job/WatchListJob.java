@@ -235,14 +235,16 @@ public class WatchListJob extends AbstractJob implements Job
             }
 
             Collection<String> subscribers = getSubscribers();
-            Date previousFireTime = getPreviousFireTime();
-            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
-            setPreviousFireTime();
 
             // Stop here if nobody is interested.
             if (!hasSubscribers()) {
                 return;
             }
+
+            // Determine what happened since the last execution for everybody.
+            Date previousFireTime = getPreviousFireTime();
+            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
+            setPreviousFireTime();
 
             // Stop here if nothing happened in the meantime.
             if (eventMatcher.getEventNumber() == 0) {

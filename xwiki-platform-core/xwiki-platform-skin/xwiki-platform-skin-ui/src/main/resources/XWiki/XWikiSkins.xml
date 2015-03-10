@@ -211,7 +211,7 @@
     <className>XWiki.ClassSheetBinding</className>
     <guid>789667d7-b354-4446-ac50-c2d0d6fff0b4</guid>
     <property>
-      <sheet>XWikiSkinsSheet</sheet>
+      <sheet>SkinsCode.XWikiSkinsSheet</sheet>
     </property>
   </object>
   <object>

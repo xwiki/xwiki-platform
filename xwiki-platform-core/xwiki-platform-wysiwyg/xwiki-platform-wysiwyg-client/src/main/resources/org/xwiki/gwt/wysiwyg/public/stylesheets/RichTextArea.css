@@ -49,6 +49,11 @@ a:hover:-moz-read-write {
   text-decoration: underline !important;
 }
 
+/* Delimit table cells withouth interfering with the skin's styling */
+td, th {
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
 .readOnly {
   /* Use a hidden border so that the read-only container is not resized when hovered. */
   border: 1px dotted transparent;

@@ -4,6 +4,7 @@ org.xwiki.watchlist.internal.DefaultWatchListEventFeedManager
 org.xwiki.watchlist.internal.DefaultWatchListNotificationCache
 org.xwiki.watchlist.internal.DefaultWatchListNotifier
 org.xwiki.watchlist.internal.DefaultWatchListStore
+org.xwiki.watchlist.internal.WatchListNotificationCacheListener
 org.xwiki.watchlist.internal.documents.DailyWatchListJobDocumentInitializer
 org.xwiki.watchlist.internal.documents.HourlyWatchListJobDocumentInitializer
 org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer

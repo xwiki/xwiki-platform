@@ -23,17 +23,24 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer;
 import org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
@@ -42,6 +49,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * 
  * @version $Id$
  */
+@Component
+@Singleton
 public class WatchListNotificationCacheListener extends AbstractEventListener
 {
     /**
@@ -62,6 +71,25 @@ public class WatchListNotificationCacheListener extends AbstractEventListener
      */
     @Inject
     private Provider<WatchListNotificationCache> notificationCacheProvider;
+
+    /**
+     * Needed to reinitialize the watchlist class.
+     */
+    @Inject
+    @Named(WatchListClassDocumentInitializer.DOCUMENT_FULL_NAME)
+    private MandatoryDocumentInitializer watchListClassInitializer;
+
+    /**
+     * Used to get the list of all wikis.
+     */
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    /**
+     * Logging framework.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Default constructor.
@@ -95,18 +123,61 @@ public class WatchListNotificationCacheListener extends AbstractEventListener
         BaseObject originalJob = originalDoc.getXObject(WatchListJobClassDocumentInitializer.DOCUMENT_REFERENCE);
         BaseObject currentJob = currentDoc.getXObject(WatchListJobClassDocumentInitializer.DOCUMENT_REFERENCE);
 
+        boolean reinitWatchListClass = false;
+
         // WatchListJob deleted
         if (originalJob != null && currentJob == null) {
             String deletedJobDocument = originalDoc.getFullName();
 
-            notificationCacheProvider.get().removeJobDocument(deletedJobDocument);
+            reinitWatchListClass |= notificationCacheProvider.get().removeJobDocument(deletedJobDocument);
         }
 
         // WatchListJob created
         if (originalJob == null && currentJob != null) {
             String newJobDocument = currentDoc.getFullName();
 
-            notificationCacheProvider.get().addJobDocument(newJobDocument);
+            reinitWatchListClass |= notificationCacheProvider.get().addJobDocument(newJobDocument);
+        }
+
+        // If the list of WatchListJob documents was altered, the WatchListClass "interval" property needs to be updated
+        // for all existing wikis.
+        if (reinitWatchListClass) {
+            // TODO: Maybe this can be moved inside WatchListNotificationCache.add/removeJobDocument(), since it would
+            // benefit from the synchronization done there.
+            reinitializeWatchListClass(context);
+        }
+    }
+
+    /**
+     * @param context the context to use. Since everything happens in the same thread, it's safe to assume that this is
+     *            the request's context and not a synthetic one.
+     */
+    private void reinitializeWatchListClass(XWikiContext context)
+    {
+        String currentWikiId = context.getWikiId();
+        try {
+            // Reinitialize on all wikis.
+            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+                try {
+                    context.setWikiId(wikiId);
+
+                    XWikiDocument document =
+                        context.getWiki().getDocument(watchListClassInitializer.getDocumentReference(), context);
+
+                    if (watchListClassInitializer.updateDocument(document)) {
+                        context.getWiki().saveDocument(document, context);
+                    }
+                } catch (XWikiException e) {
+                    logger.error("Failed to re-initialize mandatory document [{}] on wiki [{}]",
+                        WatchListClassDocumentInitializer.DOCUMENT_FULL_NAME, wikiId, e);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to re-initialize mandatory document [{}]",
+                WatchListClassDocumentInitializer.DOCUMENT_FULL_NAME, e);
+        } finally {
+            // Restore the contex wiki.
+            context.setWikiId(currentWikiId);
         }
     }
 

@@ -52,7 +52,8 @@ public interface WatchListNotificationCache
      * @param oldIntervalId the interval from which to move the subscriber
      * @param newIntervalId the new interval to move the subscriber to
      * @param user subscriber to add
-     * @return true if the intervals were valid and the subscriber was moved, false otherwise
+     * @return true if at least the new interval was valid and the subscriber is in the new interval (i.e. was moved),
+     *         false otherwise
      */
     boolean moveSubscriber(String oldIntervalId, String newIntervalId, String user);
 

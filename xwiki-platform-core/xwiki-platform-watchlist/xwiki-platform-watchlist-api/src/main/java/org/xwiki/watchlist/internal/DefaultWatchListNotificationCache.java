@@ -259,11 +259,11 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
         // Atomic operation.
         subscribersLock.writeLock().lock();
         try {
-            if (removeSubscriber(oldIntervalId, user)) {
-                return addSubscriber(newIntervalId, user);
-            }
+            // We do not really care if the remove is successful (i.e. valid interval or existed in the first place).
+            removeSubscriber(oldIntervalId, user);
 
-            return false;
+            // We mark the move operation success based on the add operation.
+            return addSubscriber(newIntervalId, user);
         } finally {
             subscribersLock.writeLock().unlock();
         }

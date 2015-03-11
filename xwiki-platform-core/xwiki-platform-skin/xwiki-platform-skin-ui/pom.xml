@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-platform-skin-ui</artifactId>
   <name>XWiki Platform - Skin - UI</name>
-  <description>XWiki Platform - Skin - UI</description>
+  <description>Create, edit and manage skins in XWiki.</description>
   <packaging>xar</packaging>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->

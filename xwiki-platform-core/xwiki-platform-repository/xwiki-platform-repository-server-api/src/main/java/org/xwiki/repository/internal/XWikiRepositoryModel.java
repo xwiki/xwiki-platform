@@ -19,95 +19,179 @@
  */
 package org.xwiki.repository.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.extension.Extension;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
-public interface XWikiRepositoryModel
+public class XWikiRepositoryModel
 {
     // References
 
-    String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
+    public static final String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
 
-    String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
+    public static final String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
 
-    String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
+    public static final String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
 
-    String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
+    public static final String EXTENSIONPROXY_CLASSNAME = "ExtensionCode.ExtensionProxyClass";
 
-    EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
-
-    EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
-
-    EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference("ExtensionDependencyClass",
+    public static final EntityReference EXTENSION_CLASSREFERENCE = new EntityReference("ExtensionClass",
         EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final EntityReference EXTENSIONVERSION_CLASSREFERENCE = new EntityReference("ExtensionVersionClass",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final EntityReference EXTENSIONDEPENDENCY_CLASSREFERENCE = new EntityReference(
+        "ExtensionDependencyClass", EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
+    public static final EntityReference EXTENSIONPROXY_CLASSREFERENCE = new EntityReference("ExtensionProxyClass",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final EntityReference EXTENSION_TEMPLATEREFERENCE = new EntityReference("ExtensionTemplate",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
-    EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig", EntityType.DOCUMENT,
-        new EntityReference("ExtensionCode", EntityType.SPACE));
+    public static final String CONFIGURATION_CLASSNAME = "ExtensionCode.RepositoryConfigClass";
+
+    public static final EntityReference CONFIGURATION_CLASSREFERENCE = new EntityReference("RepositoryConfigClass",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
+
+    public static final EntityReference CONFIGURATION_REFERENCE = new EntityReference("RepositoryConfig",
+        EntityType.DOCUMENT, new EntityReference("ExtensionCode", EntityType.SPACE));
 
     // Properties
 
-    String PROP_EXTENSION_ID = "id";
+    public static final String PROP_EXTENSION_ID = "id";
 
-    String PROP_EXTENSION_TYPE = "type";
+    public static final String PROP_EXTENSION_TYPE = "type";
 
-    String PROP_EXTENSION_LICENSENAME = "licenseName";
+    public static final String PROP_EXTENSION_LICENSENAME = "licenseName";
 
-    String PROP_EXTENSION_SUMMARY = "summary";
+    public static final String PROP_EXTENSION_SUMMARY = "summary";
 
-    String PROP_EXTENSION_DESCRIPTION = "description";
+    public static final String PROP_EXTENSION_DESCRIPTION = "description";
 
-    String PROP_EXTENSION_NAME = "name";
+    public static final String PROP_EXTENSION_NAME = "name";
 
-    String PROP_EXTENSION_WEBSITE = "website";
+    public static final String PROP_EXTENSION_WEBSITE = "website";
 
-    String PROP_EXTENSION_AUTHORS = "authors";
+    public static final String PROP_EXTENSION_AUTHORS = "authors";
 
-    String PROP_EXTENSION_FEATURES = "features";
+    public static final String PROP_EXTENSION_FEATURES = "features";
 
-    String PROP_EXTENSION_CATEGORY = "category";
+    public static final String PROP_EXTENSION_CATEGORY = "category";
 
-    String PROP_EXTENSION_PROPERTIES = "properties";
+    public static final String PROP_EXTENSION_SCMURL = "source";
 
-    String PROP_VERSION_ID = "id";
+    public static final String PROP_EXTENSION_SCMCONNECTION = "scmconnection";
 
-    String PROP_VERSION_VERSION = "version";
+    public static final String PROP_EXTENSION_SCMDEVCONNECTION = "scmdevconnection";
 
-    String PROP_VERSION_DOWNLOAD = "download";
+    public static final String PROP_EXTENSION_PROPERTIES = "properties";
 
-    String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
+    public static final String PROP_VERSION_ID = "id";
 
-    String PROP_DEPENDENCY_ID = "id";
+    public static final String PROP_VERSION_VERSION = "version";
 
-    String PROP_DEPENDENCY_CONSTRAINT = "constraint";
+    public static final String PROP_VERSION_DOWNLOAD = "download";
 
-    String PROP_PROXY_REPOSITORYID = "repositoryId";
+    public static final String PROP_DEPENDENCY_EXTENSIONVERSION = "extensionVersion";
 
-    String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
+    public static final String PROP_DEPENDENCY_ID = "id";
 
-    String PROP_PROXY_REPOSITORYURI = "repositoryURI";
+    public static final String PROP_DEPENDENCY_CONSTRAINT = "constraint";
 
-    String PROP_PROXY_AUTOUPDATE = "autoUpdate";
+    public static final String PROP_PROXY_REPOSITORYID = "repositoryId";
 
-    String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
+    public static final String PROP_PROXY_REPOSITORYTYPE = "repositoryType";
 
-    String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
+    public static final String PROP_PROXY_REPOSITORYURI = "repositoryURI";
+
+    public static final String PROP_PROXY_AUTOUPDATE = "autoUpdate";
+
+    public static final String PROP_CONFIGURATION_DEFAULTIDPREFIX = "defaultIdPrefix";
+
+    public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
 
     // Consolidation
 
-    String PROP_EXTENSION_LASTVERSION = "lastVersion";
+    public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
 
-    String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
+    public static final String PROP_EXTENSION_VALIDEXTENSION = "validExtension";
+
+    // Solr
+
+    public static final String SOLR_STRING = "string";
+
+    public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
+
+    public static class SolrField
+    {
+        public final String name;
+
+        public final float boost;
+
+        public SolrField(String name, float boost)
+        {
+            this.name = name;
+            this.boost = boost;
+        }
+    }
+
+    static {
+        SOLR_FIELDS.put(Extension.FIELD_ID, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_ID), 10.0f));
+        SOLR_FIELDS.put(Extension.FIELD_FEATURE, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_FEATURES), 9.0f));
+        SOLR_FIELDS.put(Extension.FIELD_FEATURES, SOLR_FIELDS.get(Extension.FIELD_FEATURE));
+        SOLR_FIELDS.put(Extension.FIELD_NAME, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_NAME), 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_TYPE, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_TYPE), 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_CATEGORY, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_CATEGORY), 7.0f));
+        SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY), 6.0f));
+        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION), 5.0f));
+
+        // Not very interesting for fulltext search
+        SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_AUTHORS), 0.0f));
+        SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION), 0.0f));
+        SOLR_FIELDS.put(Extension.FIELD_LICENSE, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME), 0.0f));
+        SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
+        SOLR_FIELDS.put(Extension.FIELD_SCM, new SolrField(
+            toExtensionClassSolrProperty(XWikiRepositoryModel.PROP_EXTENSION_SCMURL), 0.0f));
+
+        // Fields not stored
+        // Extension.FIELD_REPOSITORY
+        // Extension.FIELD_WEBSITE
+    }
+
+    public static String toExtensionClassSolrProperty(String propertyName)
+    {
+        return toExtensionClassSolrProperty(propertyName, SOLR_STRING);
+    }
+
+    public static String toExtensionClassSolrProperty(String propertyName, String type)
+    {
+        return "property." + XWikiRepositoryModel.EXTENSION_CLASSNAME + '.' + propertyName + '_' + type;
+    }
+
+    public static String toSolrField(String restField)
+    {
+        SolrField field = SOLR_FIELDS.get(restField);
+
+        if (field == null) {
+            return null;
+        }
+
+        return field.name;
+    }
 }

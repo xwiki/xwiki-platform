@@ -51,6 +51,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionScm;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
@@ -760,6 +761,25 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, extension.getLicenses().iterator()
                 .next().getName(), xcontext);
             needSave = true;
+        }
+
+        // SCM
+        ExtensionScm scm = extension.getScm();
+        if (scm != null) {
+            if (scm.getUrl() != null) {
+                needSave |=
+                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMURL, scm.getUrl().toString());
+            }
+            if (scm.getConnection() != null) {
+                needSave |=
+                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, scm.getConnection()
+                        .toString());
+            }
+            if (scm.getDeveloperConnection() != null) {
+                needSave |=
+                    update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION, scm
+                        .getDeveloperConnection().toString());
+            }
         }
 
         // Authors

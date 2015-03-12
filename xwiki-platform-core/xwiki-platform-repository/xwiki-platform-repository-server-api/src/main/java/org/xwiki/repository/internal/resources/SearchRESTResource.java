@@ -26,19 +26,24 @@ import java.util.List;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.repository.xwiki.model.jaxb.COMPARISON;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionQuery;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.repository.xwiki.model.jaxb.Filter;
-import org.xwiki.extension.repository.xwiki.model.jaxb.ORDER;
 import org.xwiki.extension.repository.xwiki.model.jaxb.SortClause;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.repository.Resources;
+import org.xwiki.repository.internal.XWikiRepositoryModel;
 
 /**
  * @version $Id$
@@ -49,9 +54,6 @@ import org.xwiki.repository.Resources;
 @Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource
 {
-    private static final String WHERE = "lower(extension.id) like :pattern or lower(extension.name) like :pattern"
-        + " or lower(extension.summary) like :pattern or lower(extension.description) like :pattern";
-
     /**
      * @since 3.3M2
      */
@@ -63,39 +65,32 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         @QueryParam(Resources.QPARAM_LIST_REQUIRETOTALHITS) @DefaultValue("true") boolean requireTotalHits)
         throws QueryException
     {
-        ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
+        ExtensionQuery query = this.extensionObjectFactory.createExtensionQuery();
 
-        result.setOffset(offset);
+        query.setQuery(pattern);
+        query.setOffset(offset);
+        query.setLimit(number);
 
-        if (requireTotalHits) {
-            Query query = createExtensionsCountQuery(null, WHERE);
-
-            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
-
-            result.setTotalHits((int) getExtensionsCountResult(query));
-        } else {
-            result.setTotalHits(-1);
-        }
-
-        if (number != 0 && (result.getTotalHits() == -1 || offset < result.getTotalHits())) {
-            Query query = createExtensionsQuery(null, WHERE, offset, number);
-
-            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
-
-            getExtensions(result.getExtensions(), query);
-        }
-
-        return result;
+        return searchPost(query);
     }
 
-    @POST
-    public ExtensionsSearchResult searchPost(ExtensionQuery query)
+    private String toSolrStatement(String query)
+    {
+        if (StringUtils.isBlank(query)) {
+            return "*";
+        }
+
+        return query;
+    }
+
+    @PUT
+    public ExtensionsSearchResult searchPost(ExtensionQuery query) throws QueryException
     {
         ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
 
         result.setOffset(query.getOffset());
 
-        Query solrQuery = this.queryManager.createQuery(query.getQuery(), "solr");
+        Query solrQuery = this.queryManager.createQuery(toSolrStatement(query.getQuery()), "solr");
 
         // /////////////////
         // Limit and offset
@@ -107,41 +102,63 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // /////////////////
         // Boost
         // /////////////////
-        // TODO
 
-        solrQuery.bindValue("qf",
-            "title^10.0 name^10.0 doccontent^2.0 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4 "
-                + "author_display^0.08 creator_display^0.08 " + "comment^0.016 attauthor_display^0.016 space^0.016");
+        solrQuery.bindValue("qf", DEFAULT_BOOST);
+
+        // /////////////////
+        // Fields
+        // /////////////////
+
+        solrQuery.bindValue("fl", DEFAULT_FL);
 
         // /////////////////
         // Ordering
         // /////////////////
-        // TODO
 
-        if (!query.getSortClauses().isEmpty()) {
-            List<String> sortClauses = new ArrayList<String>(query.getSortClauses().size());
-            for (SortClause sortClause : query.getSortClauses()) {
-                sortClauses.add(toSolrField(sortClause.getField()) + ' ' + sortClause.getOrder().name().toLowerCase());
+        List<String> sortClauses = new ArrayList<String>(query.getSortClauses().size() + 1);
+        for (SortClause sortClause : query.getSortClauses()) {
+            String solrField = XWikiRepositoryModel.toSolrField(sortClause.getField());
+            if (solrField != null) {
+                sortClauses.add(solrField + ' ' + sortClause.getOrder().name().toLowerCase());
             }
-            solrQuery.bindValue("sort", sortClauses);
         }
+
+        // Sort by score by default
+        sortClauses.add("score desc");
+
+        solrQuery.bindValue("sort", sortClauses);
 
         // /////////////////
         // Filtering
         // /////////////////
-        // TODO
 
         List<String> fq = new ArrayList<String>(query.getFilters().size() + 1);
 
-        // TODO: only current wiki ?
+        // TODO: should be filter only on current wiki ?
 
         // We want only documents
-        fq.add("{!tag=type}type:(\"DOCUMENT\")");
+        fq.add("type:(\"DOCUMENT\")");
+        // We want only extensions
+        fq.add("class:(\"" + XWikiRepositoryModel.EXTENSION_CLASSNAME + "\")");
 
         // Request filters
         for (Filter fiter : query.getFilters()) {
-            // TODO: we may need to double the index of object in documents
-            fq.add(e);
+            String solrField = XWikiRepositoryModel.toSolrField(fiter.getField());
+            if (solrField != null) {
+                StringBuilder builder = new StringBuilder();
+
+                builder.append(solrField);
+                builder.append(':');
+
+                if (fiter.getComparison() == COMPARISON.EQUAL) {
+                    // FIXME: depending on the field it might not be the expected behavior
+                    builder.append(fiter.getValueString());
+                } else {
+                    builder.append('*' + fiter.getValueString() + '*');
+                }
+
+                fq.add(builder.toString());
+            }
         }
 
         solrQuery.bindValue("fq", fq);
@@ -150,29 +167,17 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         // Execute
         // /////////////////
 
-        ////////////////////////
-        
-        if (requireTotalHits) {
-            Query query = createExtensionsCountQuery(null, WHERE);
+        QueryResponse response = (QueryResponse) solrQuery.execute().get(0);
 
-            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
+        SolrDocumentList documents = response.getResults();
 
-            result.setTotalHits((int) getExtensionsCountResult(query));
-        }
+        result.setOffset((int) documents.getStart());
+        result.setTotalHits((int) documents.getNumFound());
 
-        if (query.getLimit() != 0 && (result.getTotalHits() == -1 || query.getLimit() < result.getTotalHits())) {
-            Query query = createExtensionsQuery(null, WHERE, offset, number);
-
-            query.bindValue("pattern", '%' + pattern.toLowerCase() + '%');
-
-            getExtensions(result.getExtensions(), query);
+        for (SolrDocument document : documents) {
+            result.getExtensions().add(createExtensionVersionFromSolrDocument(document));
         }
 
         return result;
-    }
-
-    private String toSolrField(String restField)
-    {
-        
     }
 }

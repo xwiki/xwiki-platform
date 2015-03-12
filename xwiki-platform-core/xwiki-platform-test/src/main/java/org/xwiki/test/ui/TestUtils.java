@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -45,6 +47,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
@@ -1034,6 +1037,28 @@ public class TestUtils
         return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
     }
 
+    public InputStream postRESTInputStream(String resourceUri, Object restObject, Map<String, Object[]> queryParams,
+        Object... elements) throws Exception
+    {
+        UriBuilder builder =
+            UriBuilder.fromUri(BASE_REST_URL.substring(0, BASE_REST_URL.length() - 1)).path(
+                !resourceUri.isEmpty() && resourceUri.charAt(0) == '/' ? resourceUri.substring(1) : resourceUri);
+
+        if (queryParams != null) {
+            for (Map.Entry<String, Object[]> entry : queryParams.entrySet()) {
+                builder.queryParam(entry.getKey(), entry.getValue());
+            }
+        }
+
+        String url = builder.build(elements).toString();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        marshaller.marshal(restObject, stream);
+
+        return executePost(url, new ByteArrayInputStream(stream.toByteArray()), MediaType.APPLICATION_XML,
+            Status.OK.getStatusCode()).getResponseBodyAsStream();
+    }
+
     public byte[] getRESTBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
         throws Exception
     {
@@ -1060,6 +1085,22 @@ public class TestUtils
         return resource;
     }
 
+    public <T> T postRESTResource(String resourceUri, Object entity, Object... elements) throws Exception
+    {
+        return postRESTResource(resourceUri, entity, Collections.emptyMap(), elements);
+    }
+
+    public <T> T postRESTResource(String resourceUri, Object entity, Map<String, Object[]> queryParams,
+        Object... elements) throws Exception
+    {
+        T resource;
+        try (InputStream is = postRESTInputStream(resourceUri, entity, queryParams, elements)) {
+            resource = (T) unmarshaller.unmarshal(is);
+        }
+
+        return resource;
+    }
+
     protected GetMethod executeGet(String uri, int expectedCode) throws Exception
     {
         GetMethod getMethod = new GetMethod(uri);
@@ -1070,6 +1111,21 @@ public class TestUtils
         }
 
         return getMethod;
+    }
+
+    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
+        throws Exception
+    {
+        PostMethod putMethod = new PostMethod(uri);
+        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
+        putMethod.setRequestEntity(entity);
+
+        int code = this.adminHTTPClient.executeMethod(putMethod);
+        if (!ArrayUtils.contains(expectedCodes, code)) {
+            throw new Exception("Failed to execute post [" + uri + "] with code [" + code + "]");
+        }
+
+        return putMethod;
     }
 
     protected PutMethod executePut(String uri, InputStream content, String mediaType, int... expectedCodes)

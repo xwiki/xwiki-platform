@@ -7,6 +7,7 @@ org.xwiki.repository.internal.resources.ExtensionsRESTResource
 org.xwiki.repository.internal.resources.ExtensionVersionFileRESTResource
 org.xwiki.repository.internal.resources.ExtensionVersionRESTResource
 org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource
+org.xwiki.repository.internal.resources.RepositoryRESTResource
 org.xwiki.repository.internal.resources.SearchRESTResource
 org.xwiki.repository.internal.xhtml.ExtensionXHTMLLinkTypeRenderer
 org.xwiki.repository.script.RepositoryScriptService

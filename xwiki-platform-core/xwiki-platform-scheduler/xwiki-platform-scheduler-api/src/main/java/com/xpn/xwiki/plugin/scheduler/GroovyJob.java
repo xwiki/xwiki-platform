@@ -54,7 +54,7 @@ public class GroovyJob extends AbstractJob
      *            retrieved
      * @throws JobExecutionException if the script fails to execute or if the user didn't have programming rights when
      *             the Job was scheduled
-     * @see Job#execute(org.quartz.JobExecutionContext)
+     * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
     @Override
     protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException

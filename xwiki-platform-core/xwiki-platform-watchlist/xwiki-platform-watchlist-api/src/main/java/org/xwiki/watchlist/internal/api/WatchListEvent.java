@@ -35,8 +35,8 @@ import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.diff.DiffPluginApi;
 
 /**
@@ -51,12 +51,12 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Prefix used in inline style we put in HTML diffs.
      */
     private static final String HTML_STYLE_PLACEHOLDER_PREFIX = "WATCHLIST_STYLE_DIFF_";
-    
+
     /**
      * Suffix used to insert images later in HTML diffs.
      */
     private static final String HTML_IMG_PLACEHOLDER_SUFFIX = "_WATCHLIST_IMG_PLACEHOLDER";
-    
+
     /**
      * Prefix used to insert the metadata icon later in HTML diffs.
      */
@@ -66,32 +66,32 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Prefix used to insert the attachment icon later in HTML diffs.
      */
     private static final String HTML_IMG_ATTACHMENT_PREFIX = "attach";
-    
+
     /**
      * Default document version on creation.
      */
     private static final String INITIAL_DOCUMENT_VERSION = "1.1";
-    
+
     /**
      * The version before the initial version used for document, used to get empty versions of documents.
      */
     private static final String PREINITIAL_DOCUMENT_VERSION = "1.0";
-    
+
     /**
      * Value to display in diffs for hidden properties (email, password, etc).
      */
     private static final String HIDDEN_PROPERTIES_OBFUSCATED_VALUE = "******************";
-    
+
     /**
      * Name of the password class.
      */
     private static final String PASSWORD_CLASS_NAME = "Password";
-    
+
     /**
      * Name of email property.
      */
     private static final String EMAIL_PROPERTY_NAME = "email";
-    
+
     /**
      * Event hashcode.
      */
@@ -106,7 +106,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Prefixed document fullName in which the event happened.
      */
     private final String prefixedFullName;
-    
+
     /**
      * The XWiki context.
      */
@@ -258,20 +258,20 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         return prefixedFullName;
     }
-    
+
     /**
      * @return The URL of the document which has fired the event
      */
-    public String getUrl() 
+    public String getUrl()
     {
         String url = "";
-        
+
         try {
             url = context.getWiki().getDocument(getPrefixedFullName(), context).getExternalURL("view", context);
         } catch (Exception e) {
             // Do nothing, we don't want to throw exceptions in notification emails.
         }
-        
+
         return url;
     }
 
@@ -403,7 +403,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                         currentVersion = allVersions.get(allVersions.size() - 1);
                     }
                 }
-                
+
                 if (currentVersion.equals(INITIAL_DOCUMENT_VERSION)) {
                     previousVersion = PREINITIAL_DOCUMENT_VERSION;
                 }
@@ -459,39 +459,39 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
         return span;
     }
-    
+
     /**
      * Compute the HTML diff for a given property.
      * 
      * @param objectDiff object diff object
-     * @param diff  the diff plugin API 
+     * @param diff the diff plugin API
      * @return the HTML diff
      * @throws XWikiException if the diff plugin fails to compute the HTML diff
      */
     private String getPropertyHTMLDiff(ObjectDiff objectDiff, DiffPluginApi diff) throws XWikiException
     {
         String propDiff =
-            diff.getDifferencesAsHTML(objectDiff.getPrevValue().toString(), objectDiff.getNewValue().toString(), 
-                false);
-        
+            diff.getDifferencesAsHTML(objectDiff.getPrevValue().toString(), objectDiff.getNewValue().toString(), false);
+
         // We hide PasswordClass properties and properties named "email" from notifications for security reasons.
-        if ((objectDiff.getPropType().equals(PASSWORD_CLASS_NAME) 
-            || objectDiff.getPropName().equals(EMAIL_PROPERTY_NAME)) && !StringUtils.isBlank(propDiff)) {
+        if ((objectDiff.getPropType().equals(PASSWORD_CLASS_NAME) || objectDiff.getPropName().equals(
+            EMAIL_PROPERTY_NAME))
+            && !StringUtils.isBlank(propDiff)) {
             propDiff = HIDDEN_PROPERTIES_OBFUSCATED_VALUE;
         }
-         
+
         return propDiff;
     }
 
     /**
      * @param objectDiffs List of object diff
-     * @param isXWikiClass is the diff to compute the diff for a xwiki class, the other possibility being a plain xwiki 
-     *        object
-     * @param documentFullName full name of the document the diff is computed for       
+     * @param isXWikiClass is the diff to compute the diff for a xwiki class, the other possibility being a plain xwiki
+     *            object
+     * @param documentFullName full name of the document the diff is computed for
      * @param diff the diff plugin API
      * @return The HTML diff
      */
-    private String getObjectsHTMLDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass, 
+    private String getObjectsHTMLDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass,
         String documentFullName, DiffPluginApi diff)
     {
         StringBuffer result = new StringBuffer();
@@ -514,14 +514,14 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                         String propDiff = getPropertyHTMLDiff(oDiff, diff);
                         if (!StringUtils.isBlank(oDiff.getPropName()) && !StringUtils.isBlank(propDiff)) {
                             Div propDiv = createDiffDiv("propDiffContainer");
-                            Span propNameSpan = createDiffSpan("propName");                            
+                            Span propNameSpan = createDiffSpan("propName");
                             propNameSpan.addElement(oDiff.getPropName() + propSeparator);
                             String shortPropType = StringUtils.removeEnd(oDiff.getPropType(), "Class").toLowerCase();
                             if (StringUtils.isBlank(shortPropType)) {
                                 // When the diff shows a property that has been deleted, its type is not available.
                                 shortPropType = HTML_IMG_METADATA_PREFIX;
                             }
-                            propDiv.addElement(shortPropType + HTML_IMG_PLACEHOLDER_SUFFIX);                            
+                            propDiv.addElement(shortPropType + HTML_IMG_PLACEHOLDER_SUFFIX);
                             propDiv.addElement(propNameSpan);
                             Div propDiffDiv = createDiffDiv("propDiff");
                             propDiffDiv.addElement(propDiff);
@@ -541,8 +541,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
-     * @return The diff, formatted in HTML, to display to the user when a document has been updated, or null if an
-     *         error occurred while computing the diff
+     * @return The diff, formatted in HTML, to display to the user when a document has been updated, or null if an error
+     *         occurred while computing the diff
      */
     public String getHTMLDiff()
     {
@@ -553,22 +553,22 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
 
                 if (getType().equals(WatchListEventType.CREATE)) {
-                    d2 = context.getWiki().getDocument(d2, INITIAL_DOCUMENT_VERSION, context);                    
+                    d2 = context.getWiki().getDocument(d2, INITIAL_DOCUMENT_VERSION, context);
                 }
-                
+
                 XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(), context);
                 List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);
                 List<List<ObjectDiff>> objectDiffs = d2.getObjectDiff(d1, d2, context);
                 List<List<ObjectDiff>> classDiffs = d2.getClassDiff(d1, d2, context);
                 List<MetaDataDiff> metaDiffs = d2.getMetaDataDiff(d1, d2, context);
 
-                if (!d1.getContent().equals(d2.getContent())) {                    
+                if (!d1.getContent().equals(d2.getContent())) {
                     Div contentDiv = createDiffDiv("contentDiff");
                     String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent(), false);
                     contentDiv.addElement(contentDiff);
                     result.append(contentDiv);
                 }
-                                
+
                 for (AttachmentDiff aDiff : attachDiffs) {
                     Div attachmentDiv = createDiffDiv("attachmentDiff");
                     attachmentDiv.addElement(HTML_IMG_ATTACHMENT_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
@@ -578,7 +578,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
                 result.append(getObjectsHTMLDiff(objectDiffs, false, getFullName(), diff));
                 result.append(getObjectsHTMLDiff(classDiffs, true, getFullName(), diff));
-                
+
                 for (MetaDataDiff mDiff : metaDiffs) {
                     Div metaDiv = createDiffDiv("metaDiff");
                     metaDiv.addElement(HTML_IMG_METADATA_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
@@ -632,7 +632,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         if (!(obj instanceof WatchListEvent)) {
             return false;
         }
- 
+
         // At first this method was returning true when the documents were the same and the events were the same type.
         // Since we don't want to keep update events for documents that have been deleted this method has been modified
         // to a point were it performs something different from a equals(), it returns true when obj is a delete event

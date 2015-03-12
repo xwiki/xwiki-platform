@@ -136,10 +136,8 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
 
         // TODO: should be filter only on current wiki ?
 
-        // We want only documents
-        fq.add("type:(\"DOCUMENT\")");
-        // We want only extensions
-        fq.add("class:(\"" + XWikiRepositoryModel.EXTENSION_CLASSNAME + "\")");
+        // We want only valid extensions documents
+        fq.add(XWikiRepositoryModel.SOLRPROP_EXTENSION_VALIDEXTENSION + ":true");
 
         // Request filters
         for (Filter fiter : query.getFilters()) {

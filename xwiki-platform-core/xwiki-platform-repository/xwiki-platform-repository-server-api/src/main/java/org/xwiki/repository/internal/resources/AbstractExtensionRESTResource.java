@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.internal.maven.MavenUtils;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
@@ -129,17 +130,22 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         // Solr
 
         StringBuilder boostBuilder = new StringBuilder();
-        StringBuilder flBuilder = new StringBuilder();
+        StringBuilder flBuilder = new StringBuilder("wiki,space,name");
         for (SolrField field : XWikiRepositoryModel.SOLR_FIELDS.values()) {
-            if (boostBuilder.length() > 0) {
-                boostBuilder.append(' ');
-                flBuilder.append(',');
+            // Boost
+            if (field.boost != null) {
+                if (boostBuilder.length() > 0) {
+                    boostBuilder.append(' ');
+                }
+                boostBuilder.append(field.name);
+                boostBuilder.append('^');
+                boostBuilder.append(field.boost);
             }
 
-            boostBuilder.append(field.name);
-            boostBuilder.append('^');
-            boostBuilder.append(field.boost);
-
+            // Fields list
+            if (flBuilder.length() > 0) {
+                flBuilder.append(',');
+            }
             flBuilder.append(field.name);
         }
         DEFAULT_BOOST = boostBuilder.toString();
@@ -557,15 +563,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
-        extension.setId(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
-        extension.setName(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_NAME));
-        extension.setSummary(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
-        extension.setDescription(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
+        extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID));
+        extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE));
+        extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME));
+        extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY));
+        extension.setDescription(this.<String>getSolrValue(document, Extension.FIELD_DESCRIPTION));
 
         // SCM
         ExtensionScm scm = new ExtensionScm();
-        scm.setUrl(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_SCMURL));
+        scm.setUrl(this.<String>getSolrValue(document, Extension.FIELD_SCM));
         scm.setConnection(toScmConnection(this.<String>getSolrValue(document,
             XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION)));
         scm.setDeveloperConnection(toScmConnection(this.<String>getSolrValue(document,
@@ -580,28 +586,27 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setRating(getExtensionRating(extensionDocumentReference));
 
         // Website
-        extension.setWebsite(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE));
+        extension.setWebsite(this.<String>getSolrValue(document, Extension.FIELD_WEBSITE));
         if (StringUtils.isBlank(extension.getWebsite())) {
             extension.setWebsite(xcontext.getWiki().getURL(
                 new DocumentReference(xcontext.getWikiId(), documentSpace, documentName), "view", xcontext));
         }
 
         // Authors
-        for (String authorId : this.<String>getSolrValues(document, XWikiRepositoryModel.PROP_EXTENSION_AUTHORS)) {
+        for (String authorId : this.<String>getSolrValues(document, Extension.FIELD_AUTHORS)) {
             extension.getAuthors().add(resolveExtensionAuthor(authorId));
         }
 
         // Features
-        extension.getFeatures().addAll(
-            this.<String>getSolrValues(document, XWikiRepositoryModel.PROP_EXTENSION_FEATURES));
+        extension.getFeatures().addAll(this.<String>getSolrValues(document, Extension.FIELD_FEATURES));
 
         // License
         License license = this.extensionObjectFactory.createLicense();
-        license.setName(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
+        license.setName(this.<String>getSolrValue(document, Extension.FIELD_LICENSE));
         extension.getLicenses().add(license);
 
         // Version
-        extension.setVersion(this.<String>getSolrValue(document, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION));
+        extension.setVersion(this.<String>getSolrValue(document, Extension.FIELD_VERSION));
 
         // TODO: add support for
         // * dependencies

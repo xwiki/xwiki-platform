@@ -100,13 +100,13 @@ public class DefaultWatchListNotifier implements WatchListNotifier
         // Get user email
         XWikiDocument subscriberDocument = context.getWiki().getDocument(subscriber, context);
         BaseObject userObj = subscriberDocument.getObject(XWIKI_USER_CLASS);
-        String emailAddr = (String) userObj.getStringValue(XWIKI_USER_CLASS_EMAIL_PROP);
+        String emailAddr = userObj.getStringValue(XWIKI_USER_CLASS_EMAIL_PROP);
         if (emailAddr == null || emailAddr.length() == 0 || emailAddr.indexOf("@") < 0) {
             // Invalid email
             return;
         }
 
-        List<String> modifiedDocuments = new ArrayList<String>();
+        List<String> modifiedDocuments = new ArrayList<>();
         for (WatchListEvent event : events) {
             if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
                 modifiedDocuments.add(event.getPrefixedFullName());

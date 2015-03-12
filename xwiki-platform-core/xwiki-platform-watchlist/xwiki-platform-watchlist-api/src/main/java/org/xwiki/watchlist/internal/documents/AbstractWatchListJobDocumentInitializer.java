@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.scheduler.JobState;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -165,6 +166,7 @@ public abstract class AbstractWatchListJobDocumentInitializer extends AbstractMa
             job.setStringValue("contextUser", XWikiRightService.SUPERADMIN_USER_FULLNAME);
             job.setStringValue("contextLang", "en");
             job.setStringValue("contextDatabase", "xwiki");
+            job.setStringValue("status", JobState.STATE_NORMAL);
         }
 
         return needsUpdate;

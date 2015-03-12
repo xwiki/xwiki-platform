@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,20 +19,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-skin</artifactId>
-  <name>XWiki Platform - Skin - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Skin - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-skin-api</module>
-    <module>xwiki-platform-skin-skinx</module>
-    <module>xwiki-platform-skin-ui</module>
-  </modules>
-</project>
+<xwikidoc version="1.1">
+  <web>SkinsCode</web>
+  <name>WebHome</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1426000144000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1426000179000</date>
+  <contentUpdateDate>1426000179000</contentUpdateDate>
+  <version>1.1</version>
+  <title>WebHome</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{spaceindex sort="docName"/}}</content>
+</xwikidoc>

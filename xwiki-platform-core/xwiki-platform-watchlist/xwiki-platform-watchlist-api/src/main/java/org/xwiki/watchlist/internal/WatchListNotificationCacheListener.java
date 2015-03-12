@@ -50,13 +50,14 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  */
 @Component
+@Named(WatchListNotificationCacheListener.LISTENER_NAME)
 @Singleton
 public class WatchListNotificationCacheListener extends AbstractEventListener
 {
     /**
      * The name of the listener.
      */
-    private static final String LISTENER_NAME = "watchlistNotificationCache";
+    public static final String LISTENER_NAME = "WatchListNotificationCacheListener";
 
     /**
      * The events to match.

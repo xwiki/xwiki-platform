@@ -243,12 +243,6 @@
         <version>${bootstrap.version}</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used in oldcore to prioritize MandatoryDocumentInitializers -->
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>1.2</version>
-    </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

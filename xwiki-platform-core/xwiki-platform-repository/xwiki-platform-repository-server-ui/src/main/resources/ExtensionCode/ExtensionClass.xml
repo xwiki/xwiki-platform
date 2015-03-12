@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,8 +30,8 @@
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1423573118000</date>
-  <contentUpdateDate>1423573118000</contentUpdateDate>
+  <date>1426153495000</date>
+  <contentUpdateDate>1426153495000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -70,6 +69,32 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </authors>
+    <cacheAverageVote>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>cacheAverageVote</name>
+      <number>20</number>
+      <numberType>float</numberType>
+      <prettyName>Average Vote cache</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </cacheAverageVote>
+    <cacheTotalVotes>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>cacheTotalVotes</name>
+      <number>21</number>
+      <numberType>long</numberType>
+      <prettyName>Total Votes cache</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </cacheTotalVotes>
     <category>
       <cache>0</cache>
       <classname>ExtensionCode.ExtensionCategoryClass</classname>
@@ -253,6 +278,32 @@
       <values/>
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </properties>
+    <scmconnection>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>scmconnection</name>
+      <number>18</number>
+      <picker>0</picker>
+      <prettyName>Sources connection</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </scmconnection>
+    <scmdevconnection>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>scmdevconnection</name>
+      <number>19</number>
+      <picker>0</picker>
+      <prettyName>Sources dev connection</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </scmdevconnection>
     <source>
       <customDisplay/>
       <disabled>0</disabled>

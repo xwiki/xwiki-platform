@@ -519,7 +519,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         DocumentReference extensionDocumentReference =
             new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
         // FIXME: this adds potentially tons of new request to what used to be carefully crafted to produce a single
-        // request for the whole search... Should be cached in a filed of the document.
+        // request for the whole search... Should be cached in a filed of the document (like the last version is for example).
         extension.setRating(getExtensionRating(extensionDocumentReference));
 
         // Website
@@ -580,7 +580,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         // Rating
         // FIXME: this adds potentially tons of new DB requests to what used to be carefully crafted to produce a single
-        // request for the whole search... Should be cached in a filed of the document.
+        // request for the whole search... Should be cached in a field of the document (like the last version is for example).
         DocumentReference extensionDocumentReference =
             new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
         extension.setRating(getExtensionRating(extensionDocumentReference));

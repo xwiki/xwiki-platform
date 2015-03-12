@@ -148,14 +148,18 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     private String htmlDiff;
 
     /**
-     * Constructor.
+     * Constructor for a non-composite event.
      * 
-     * @param activityEvent activity stream event to wrap
+     * @param eventData the event data to use. At the moment, it should be an {@link ActivityEvent} instance.
      * @param context the XWiki context
      */
-    public WatchListEvent(ActivityEvent activityEvent, XWikiContext context)
+    public WatchListEvent(Object eventData, XWikiContext context)
     {
         this.context = context;
+
+        // FIXME: This should be better handled!
+        ActivityEvent activityEvent = (ActivityEvent) eventData;
+
         this.activityEvents.add(activityEvent);
         type = activityEvent.getType();
         prefixedSpace = activityEvent.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + activityEvent.getSpace();
@@ -168,6 +172,24 @@ public class WatchListEvent implements Comparable<WatchListEvent>
             hashCode =
                 42 * hash + prefixedFullName.hashCode() + activityEvent.getType().hashCode()
                     + activityEvent.getDate().hashCode();
+        }
+
+    }
+
+    /**
+     * Constructor for a composite event.
+     * 
+     * @param eventData the list of data corresponding to the associated events. At the moment, they should be
+     *            {@link ActivityEvent} instances.
+     * @param context the XWiki context
+     */
+    public WatchListEvent(List<Object> eventData, XWikiContext context)
+    {
+        this(eventData.get(0), context);
+
+        for (int i = 1; i < eventData.size(); i++) {
+            WatchListEvent associatedEvent = new WatchListEvent(eventData.get(i), context);
+            this.addEvent(associatedEvent);
         }
     }
 

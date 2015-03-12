@@ -21,13 +21,11 @@ package com.xpn.xwiki.plugin.watchlist;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
@@ -74,11 +72,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     private WatchListStore store = new WatchListStore();
 
     /**
-     * Auto watch listener.
-     */
-    private AutomaticWatchModeListener autoWatch = new AutomaticWatchModeListener(store);
-
-    /**
      * Notifier instance.
      */
     private WatchListNotifier notifier = new WatchListNotifier();
@@ -111,15 +104,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         super.init(context);
 
         try {
-            this.jobManager.init(context);
             this.store.init(context);
-
-            // Listen to Events.
-            ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
-            if (observationManager.getListener(this.store.getName()) == null) {
-                observationManager.addListener(this.store);
-                observationManager.addListener(this.autoWatch);
-            }
         } catch (XWikiException e) {
             LOGGER.error("init", e);
         }
@@ -129,11 +114,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
-        try {
-            this.store.virtualInit(context);
-        } catch (XWikiException e) {
-            LOGGER.error("virtualInit", e);
-        }
     }
 
     @Override

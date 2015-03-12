@@ -469,13 +469,17 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
     }
 
-    protected <T> T getSolrValue(SolrDocument document, String property)
+    protected <T> T getSolrValue(SolrDocument document, String property, boolean emptyIsNull)
     {
         Object value = document.getFieldValue(XWikiRepositoryModel.toSolrField(property));
 
         if (value instanceof Collection) {
             Collection collectionValue = (Collection) value;
             value = collectionValue.size() > 0 ? collectionValue.iterator().next() : null;
+        }
+
+        if (emptyIsNull && value instanceof String && ((String) value).isEmpty()) {
+            value = null;
         }
 
         return (T) value;
@@ -519,7 +523,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         DocumentReference extensionDocumentReference =
             new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
         // FIXME: this adds potentially tons of new request to what used to be carefully crafted to produce a single
-        // request for the whole search... Should be cached in a filed of the document (like the last version is for example).
+        // request for the whole search... Should be cached in a filed of the document (like the last version is for
+        // example).
         extension.setRating(getExtensionRating(extensionDocumentReference));
 
         // Website
@@ -563,31 +568,34 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
-        extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID));
-        extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE));
-        extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME));
-        extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY));
-        extension.setDescription(this.<String>getSolrValue(document, Extension.FIELD_DESCRIPTION));
+        extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID, true));
+        extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
+        extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
+        extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
+        extension.setDescription(this.<String>getSolrValue(document, Extension.FIELD_DESCRIPTION, false));
 
         // SCM
         ExtensionScm scm = new ExtensionScm();
-        scm.setUrl(this.<String>getSolrValue(document, Extension.FIELD_SCM));
+        scm.setUrl(this.<String>getSolrValue(document, Extension.FIELD_SCM, true));
         scm.setConnection(toScmConnection(this.<String>getSolrValue(document,
-            XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION)));
+            XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, true)));
         scm.setDeveloperConnection(toScmConnection(this.<String>getSolrValue(document,
-            XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION)));
-        extension.setScm(scm);
+            XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION, true)));
+        if (scm.getUrl() != null || scm.getConnection() != null || scm.getDeveloperConnection() != null) {
+            extension.setScm(scm);
+        }
 
         // Rating
         // FIXME: this adds potentially tons of new DB requests to what used to be carefully crafted to produce a single
-        // request for the whole search... Should be cached in a field of the document (like the last version is for example).
+        // request for the whole search... Should be cached in a field of the document (like the last version is for
+        // example).
         DocumentReference extensionDocumentReference =
             new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
         extension.setRating(getExtensionRating(extensionDocumentReference));
 
         // Website
-        extension.setWebsite(this.<String>getSolrValue(document, Extension.FIELD_WEBSITE));
-        if (StringUtils.isBlank(extension.getWebsite())) {
+        extension.setWebsite(this.<String>getSolrValue(document, Extension.FIELD_WEBSITE, true));
+        if (extension.getWebsite() == null) {
             extension.setWebsite(xcontext.getWiki().getURL(
                 new DocumentReference(xcontext.getWikiId(), documentSpace, documentName), "view", xcontext));
         }
@@ -601,12 +609,15 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.getFeatures().addAll(this.<String>getSolrValues(document, Extension.FIELD_FEATURES));
 
         // License
-        License license = this.extensionObjectFactory.createLicense();
-        license.setName(this.<String>getSolrValue(document, Extension.FIELD_LICENSE));
-        extension.getLicenses().add(license);
+        String licenseName = this.<String>getSolrValue(document, Extension.FIELD_LICENSE, true);
+        if (licenseName != null) {
+            License license = this.extensionObjectFactory.createLicense();
+            license.setName(licenseName);
+            extension.getLicenses().add(license);
+        }
 
         // Version
-        extension.setVersion(this.<String>getSolrValue(document, Extension.FIELD_VERSION));
+        extension.setVersion(this.<String>getSolrValue(document, Extension.FIELD_VERSION, true));
 
         // TODO: add support for
         // * dependencies

@@ -4113,24 +4113,27 @@ public class XWiki implements EventListener
 
     public String getWebAppPath(XWikiContext context)
     {
-        String path = context.getURL().getPath();
-        String contextPath = getConfiguration().getProperty("xwiki.webapppath", "");
-        if (contextPath.equals("")) {
-            try {
-                contextPath = context.getRequest().getContextPath();
-                // TODO We're using URL parts in a wrong way, since contextPath and servletPath are
-                // returned with a leading /, while we need a trailing /. This code moves the / from
-                // the beginning to the end.
-                // If the app is deployed as the ROOT ap, then there's no need to move the /.
-                if (contextPath.length() > 0) {
-                    contextPath = contextPath.substring(1) + "/";
-                }
-            } catch (Exception e) {
-                contextPath = path.substring(0, path.indexOf('/', 1) + 1);
+        String contextPath = getConfiguration().getProperty("xwiki.webapppath");
+        if (contextPath == null) {
+            // Try getting the context path by asking the request for it (if a request exists!) and if it doesn't
+            // work try extracting it from the context URL.
+            XWikiRequest request = context.getRequest();
+            if (request != null) {
+                contextPath = request.getContextPath();
             }
+            if (contextPath == null) {
+                String path = context.getURL().getPath();
+                // Extract the context by getting the first path segment
+                contextPath = StringUtils.substringBetween(path, "/");
+            }
+        } else {
+            // Remove any leading or trailing slashes that would have been put by error by the user
+            contextPath = StringUtils.strip(contextPath, "/");
         }
 
-        return contextPath;
+        // TODO We're using URL parts in a wrong way, since contextPath and servletPath are returned with a leading /,
+        // while we need a trailing /. This code ensure we always have CONTEXTNAME + "/".
+        return contextPath + "/";
     }
 
     /**

@@ -531,6 +531,7 @@ public class PdfExportImpl implements PdfExport
 
         if (StringUtils.isNotEmpty(pdftemplate)) {
             templateReference = referenceResolver.resolve(pdftemplate);
+            classReference = new DocumentReference(templateReference.getWikiReference().getName(), "XWiki", "PDFClass");
         }
 
         String result = (String) dab.getProperty(templateReference, classReference, propertyName);

@@ -37,6 +37,9 @@ import org.xwiki.repository.Resources;
 @Singleton
 public class RepositoryRESTResource extends AbstractExtensionRESTResource
 {
+    /**
+     * @return the root repository informations
+     */
     @GET
     public Repository get()
     {

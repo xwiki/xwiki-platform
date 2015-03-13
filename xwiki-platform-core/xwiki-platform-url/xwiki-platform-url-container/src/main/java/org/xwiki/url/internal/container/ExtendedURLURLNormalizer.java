@@ -73,8 +73,9 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
             } else {
                 URL currentURL = context.getURL();
                 if (currentURL != null) {
-                    String path = currentURL.getPath();
-                    contextPath = StringUtils.substringBetween(path, URL_SEGMENT_DELIMITER);
+                    // Extract the context by getting the first path segment
+                    contextPath = StringUtils.substringBefore(
+                        StringUtils.stripStart(currentURL.getPath(), URL_SEGMENT_DELIMITER), URL_SEGMENT_DELIMITER);
                 } else {
                     throw new RuntimeException(String.format("Failed to normalize the URL [%s] since the "
                         + "application's Servlet context couldn't be computed.", partialURL));

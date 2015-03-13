@@ -4036,9 +4036,9 @@ public class XWiki implements EventListener
                 contextPath = request.getContextPath();
             }
             if (contextPath == null) {
-                String path = context.getURL().getPath();
                 // Extract the context by getting the first path segment
-                contextPath = StringUtils.substringBetween(path, "/");
+                contextPath = StringUtils.substringBefore(
+                    StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
             }
         } else {
             // Remove any leading or trailing slashes that would have been put by error by the user

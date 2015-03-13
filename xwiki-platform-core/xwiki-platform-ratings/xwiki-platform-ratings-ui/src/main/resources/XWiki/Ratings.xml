@@ -394,7 +394,7 @@ position: relative;
     <className>XWiki.UIExtensionClass</className>
     <guid>d2420ff0-a5b9-4fae-a798-fc623aac7a6b</guid>
     <property>
-      <content>{{include document='XWiki.RatingsMacros'/}}
+      <content>{{include reference='XWiki.RatingsMacros'/}}
 
 {{velocity}}
 #set($configClass     = 'XWiki.RatingsConfigClass')
@@ -431,7 +431,7 @@ icon=icon:star</parameters>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{include document="XWiki.RatingsMacros"/}}
+  <content>{{include reference="XWiki.RatingsMacros"/}}
 
 {{velocity}}
 #if("$!{request.xpage}" == "plain")

@@ -224,9 +224,11 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# For example:
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=
-#-# The name of the webapp to use in the generated URLs. The right value is taken from the request URL, so setting this
-#-# is not recommended in most cases. If set, the value should contain a trailing /, but not a leading one. For example:
-#-# xwiki.webapppath=xwiki/
+#-# The name of the webapp to use in the generated URLs. If not specified, the value is extracted from the request URL
+#-# and thus it's generally not required to set it. However if you're deploying XWiki as root in your Servlet Container
+#-# and you're using XWiki >= 6.1 and < 7.0 you must set it to an empty value as otherwise the code cannot guess it.
+#-# For example:
+#-# xwiki.webapppath=xwiki
 # xwiki.webapppath=
 #-# The default servlet mapping name to use in the generated URLs. The right value is taken from the request URL,
 #-# preserving the requested servlet mapping, so setting this is not recommended in most cases. If set, the value should

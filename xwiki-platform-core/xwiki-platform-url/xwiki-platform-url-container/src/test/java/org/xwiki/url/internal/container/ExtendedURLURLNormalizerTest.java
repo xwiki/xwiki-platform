@@ -52,7 +52,17 @@ public class ExtendedURLURLNormalizerTest
     public void normalizeWhenConfigurationPropertyDefined() throws Exception
     {
         ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        when(configurationSource.getProperty("xwiki.webapppath", "")).thenReturn("xwiki");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn("xwiki");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
+        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+    }
+
+    @Test
+    public void normalizeWhenConfigurationPropertyDefinedButWithLeadingAndTrailingSlash() throws Exception
+    {
+        ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn("/xwiki/");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
@@ -62,7 +72,7 @@ public class ExtendedURLURLNormalizerTest
     public void normalizeWhenNoConfigurationPropertyAndRequest() throws Exception
     {
         ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        when(configurationSource.getProperty("xwiki.webapppath", "")).thenReturn("");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn(null);
 
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
@@ -81,7 +91,7 @@ public class ExtendedURLURLNormalizerTest
     public void normalizeWhenNoConfigurationPropertyAndNoRequest() throws Exception
     {
         ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        when(configurationSource.getProperty("xwiki.webapppath", "")).thenReturn("");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn(null);
 
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
@@ -99,7 +109,7 @@ public class ExtendedURLURLNormalizerTest
     public void normalizeWhenNoConfigurationPropertyAndNoRequestAndNoURL() throws Exception
     {
         ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
-        when(configurationSource.getProperty("xwiki.webapppath", "")).thenReturn("");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn(null);
 
         Execution execution = this.mocker.getInstance(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);

@@ -76,7 +76,7 @@
     <!-- Need servlet api for getting HttpSession id and flushing captcha to HttpResponse -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- AbstractCaptchaAction extends org.apache.struts.action.Action -->
     <dependency>

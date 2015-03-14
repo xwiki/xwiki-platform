@@ -66,11 +66,10 @@
       <artifactId>xwiki-rendering-transformation-linkchecker</artifactId>
       <version>${rendering.version}</version>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Since we're mocking a class (PircBotX, see http://code.google.com/p/pircbotx/issues/detail?id=62) we need

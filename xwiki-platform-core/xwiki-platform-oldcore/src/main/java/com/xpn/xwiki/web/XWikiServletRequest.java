@@ -23,15 +23,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.struts.upload.MultipartRequestWrapper;
 
@@ -406,5 +415,78 @@ public class XWikiServletRequest implements XWikiRequest
     public int getLocalPort()
     {
         return this.request.getLocalPort();
+    }
+
+    @Override
+    public boolean authenticate(HttpServletResponse httpServletResponse) throws IOException, ServletException
+    {
+        return this.request.authenticate(httpServletResponse);
+    }
+
+    @Override
+    public void login(String s, String s1) throws ServletException
+    {
+        this.request.login(s, s1);
+    }
+
+    @Override
+    public void logout() throws ServletException
+    {
+        this.request.logout();
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException
+    {
+        return this.request.getParts();
+    }
+
+    @Override
+    public Part getPart(String s) throws IOException, ServletException
+    {
+        return this.request.getPart(s);
+    }
+
+    @Override
+    public ServletContext getServletContext()
+    {
+        return this.request.getServletContext();
+    }
+
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException
+    {
+        return this.request.startAsync();
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
+        throws IllegalStateException
+    {
+        return this.request.startAsync(servletRequest, servletResponse);
+    }
+
+    @Override
+    public boolean isAsyncStarted()
+    {
+        return this.request.isAsyncStarted();
+    }
+
+    @Override
+    public boolean isAsyncSupported()
+    {
+        return this.request.isAsyncSupported();
+    }
+
+    @Override
+    public AsyncContext getAsyncContext()
+    {
+        return this.request.getAsyncContext();
+    }
+
+    @Override
+    public DispatcherType getDispatcherType()
+    {
+        return this.request.getDispatcherType();
     }
 }

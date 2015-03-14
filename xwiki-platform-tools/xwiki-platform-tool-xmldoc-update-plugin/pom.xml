@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore. -->
       <scope>compile</scope>
     </dependency>

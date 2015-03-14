@@ -461,6 +461,16 @@
               <to>java.lang.String</to>
               <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</className>
+              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</className>
+              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

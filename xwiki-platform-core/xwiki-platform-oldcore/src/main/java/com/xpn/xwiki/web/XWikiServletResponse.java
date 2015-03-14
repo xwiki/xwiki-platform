@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -306,5 +307,23 @@ public class XWikiServletResponse implements XWikiResponse
     public String getContentType()
     {
         return this.response.getContentType();
+    }
+
+    @Override
+    public String getHeader(String s)
+    {
+        return this.response.getHeader(s);
+    }
+
+    @Override
+    public Collection<String> getHeaders(String s)
+    {
+        return this.response.getHeaders(s);
+    }
+
+    @Override
+    public Collection<String> getHeaderNames()
+    {
+        return this.response.getHeaderNames();
     }
 }

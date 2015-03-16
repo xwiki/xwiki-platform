@@ -34,7 +34,6 @@ import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
-import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionQuery;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
@@ -85,7 +84,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         this.baseAuthor = new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", "Author")));
         this.baseExtension.addAuthor(this.baseAuthor);
-        getUtil().createUser("Author", "password", null, "first_name", "User", "last_name", "Name");
 
         this.baseExtension.addDependency(new DefaultExtensionDependency("dependencyid1", new DefaultVersionConstraint(
             "1.0")));
@@ -106,6 +104,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         repositoryAdminPage.clickUpdateButton();
 
         // Create extension
+
+        getUtil().createUserAndLogin("Author", "password", null, "first_name", "User", "last_name", "Name");
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
@@ -178,7 +178,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("1.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -205,7 +206,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("2.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -232,7 +234,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -279,7 +282,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
 
         // TODO: add support for dependencies in XR search
@@ -300,7 +304,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
+        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
 
         // Wrong search pattern
@@ -334,29 +339,13 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertTrue(result.getTotalHits() >= 1);
         Assert.assertEquals(0, result.getOffset());
         Assert.assertEquals(0, result.getExtensions().size());
-
-        // //////////////////////////////////////////
-        // Advanced Search
-        // //////////////////////////////////////////
-
-        // TODO
-    }
-
-    @Test
-    public void testAdvancedSearch() throws Exception
-    {
-        // Empty search
-
-        ExtensionsSearchResult result = getUtil().postRESTResource(Resources.SEARCH, new ExtensionQuery());
-
-        Assert.assertTrue(result.getTotalHits() >= 0);
-        Assert.assertEquals(0, result.getOffset());
-        
     }
 
     @Test
     public void testImportExtension() throws Exception
     {
+        getUtil().createUser("Author", "password", null, "first_name", "User", "last_name", "Name");
+
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
         ExtensionImportPage importPage = extensionsPage.clickImport();

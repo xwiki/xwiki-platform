@@ -846,6 +846,8 @@
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_cz.txt" />
         <filter class="solr.CzechStemFilterFactory"/>       
+	<!-- Remove accents -->
+	<filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
     

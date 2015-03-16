@@ -187,7 +187,7 @@ public class RepositoryTestUtils
         InputStream is = extension.getFile().openStream();
         try {
             this.testUtils.attachFile(SPACENAME_EXTENSION, getPageName(extension), extension.getId().getId() + "-"
-                + extension.getId().getVersion() + "." + extension.getType(), is, true);
+                + extension.getId().getVersion() + "." + extension.getType(), is, true, credentials);
         } finally {
             is.close();
         }

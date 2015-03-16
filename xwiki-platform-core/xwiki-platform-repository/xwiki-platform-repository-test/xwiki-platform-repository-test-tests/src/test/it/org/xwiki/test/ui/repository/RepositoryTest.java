@@ -178,8 +178,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
         Assert.assertEquals("1.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -206,8 +205,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
         Assert.assertEquals("2.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -234,8 +232,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
         Assert.assertEquals("10.0", extension.getVersion());
 
         Assert.assertEquals(getUtil().getURL("Extension", this.baseExtension.getName()), extension.getWebsite());
@@ -282,8 +279,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
         Assert.assertEquals("10.0", extension.getVersion());
 
         // TODO: add support for dependencies in XR search
@@ -304,8 +300,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
         Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
-        Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
-        Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
+        Assert.assertEquals("XWiki.superadmin", extension.getAuthors().get(0).getName());
         Assert.assertEquals("10.0", extension.getVersion());
 
         // Wrong search pattern

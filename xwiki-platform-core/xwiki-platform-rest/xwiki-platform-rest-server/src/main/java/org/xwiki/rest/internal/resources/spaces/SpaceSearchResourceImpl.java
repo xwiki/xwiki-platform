@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -28,7 +30,8 @@ import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 
-@Component("org.xwiki.rest.internal.resources.spaces.SpaceSearchResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpaceSearchResourceImpl")
 public class SpaceSearchResourceImpl extends BaseSearchResult implements SpaceSearchResource
 {
     @Override

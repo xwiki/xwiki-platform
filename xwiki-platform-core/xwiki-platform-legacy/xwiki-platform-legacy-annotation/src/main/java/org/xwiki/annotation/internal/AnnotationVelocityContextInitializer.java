@@ -20,6 +20,7 @@
 package org.xwiki.annotation.internal;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
@@ -37,7 +38,8 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @since 2.3M1
  * @deprecated starting with 3.0RC1 use directly the Annotation Script Service from scripts
  */
-@Component("annotations")
+@Component
+@Named("annotations")
 @Singleton
 @Deprecated
 public class AnnotationVelocityContextInitializer implements VelocityContextInitializer

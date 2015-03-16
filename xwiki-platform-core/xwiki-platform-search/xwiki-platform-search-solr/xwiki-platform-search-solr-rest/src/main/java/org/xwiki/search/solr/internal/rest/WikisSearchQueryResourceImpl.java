@@ -35,7 +35,8 @@ import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
  * @version $Id$
  * @since 6.4M1
  */
-@Component("org.xwiki.search.solr.internal.rest.WikisSearchQueryResourceImpl")
+@Component
+@Named("org.xwiki.search.solr.internal.rest.WikisSearchQueryResourceImpl")
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
     private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =

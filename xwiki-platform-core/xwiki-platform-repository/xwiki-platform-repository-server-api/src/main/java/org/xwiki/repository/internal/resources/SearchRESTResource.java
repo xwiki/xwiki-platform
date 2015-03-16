@@ -23,6 +23,7 @@ package org.xwiki.repository.internal.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -49,7 +50,8 @@ import org.xwiki.repository.internal.XWikiRepositoryModel;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.repository.internal.resources.SearchRESTResource")
+@Component
+@Named("org.xwiki.repository.internal.resources.SearchRESTResource")
 @Path(Resources.SEARCH)
 @Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource

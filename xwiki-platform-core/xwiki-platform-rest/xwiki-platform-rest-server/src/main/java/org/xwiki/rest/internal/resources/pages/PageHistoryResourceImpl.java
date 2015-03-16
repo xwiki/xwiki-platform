@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -39,7 +41,8 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PageHistoryResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PageHistoryResourceImpl")
 public class PageHistoryResourceImpl extends XWikiResource implements PageHistoryResource
 {
     @Override

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -42,7 +43,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl")
 public class AttachmentHistoryResourceImpl extends XWikiResource implements AttachmentHistoryResource
 {
     @Override

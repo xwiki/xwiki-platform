@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,6 +55,9 @@ import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedTest;
  */
 public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 {
+    public static final UsernamePasswordCredentials USER_CREDENTIALS = new UsernamePasswordCredentials("Author",
+        "password");
+
     private static final String IDPREFIX = "prefix-";
 
     private TestExtension baseExtension;
@@ -82,7 +86,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         this.baseLicense = new ExtensionLicense("Do What The Fuck You Want To Public License 2", null);
         this.baseExtension.addLicense(this.baseLicense);
 
-        this.baseAuthor = new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", "Author")));
+        this.baseAuthor =
+            new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName())));
         this.baseExtension.addAuthor(this.baseAuthor);
 
         this.baseExtension.addDependency(new DefaultExtensionDependency("dependencyid1", new DefaultVersionConstraint(
@@ -105,7 +110,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Create extension
 
-        getUtil().createUserAndLogin("Author", "password", null, "first_name", "User", "last_name", "Name");
+        getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null,
+            "first_name", "User", "last_name", "Name");
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
@@ -123,8 +129,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         ExtensionPage extensionPage = extensionInline.clickSaveAndView();
 
         // Test summary
-        getDriver().findElementsWithoutWaiting(
-            By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
+        getDriver().findElementsWithoutWaiting(By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
 
         Assert.assertFalse(extensionPage.isValidExtension());
 
@@ -144,7 +149,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         getRepositoryTestUtils().addDependencies(this.baseExtension, "10.0");
 
         // Add attachment
-        getRepositoryTestUtils().attachFile(this.baseExtension);
+        getRepositoryTestUtils().attachFile(this.baseExtension, USER_CREDENTIALS);
 
         // Check livetable
 
@@ -344,7 +349,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
     @Test
     public void testImportExtension() throws Exception
     {
-        getUtil().createUser("Author", "password", null, "first_name", "User", "last_name", "Name");
+        getUtil().createUser(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null, "first_name",
+            "User", "last_name", "Name");
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 

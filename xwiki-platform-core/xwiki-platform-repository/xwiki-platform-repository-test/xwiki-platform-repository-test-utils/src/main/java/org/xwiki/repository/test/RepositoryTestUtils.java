@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
@@ -177,6 +178,11 @@ public class RepositoryTestUtils
     }
 
     public void attachFile(Extension extension) throws Exception
+    {
+        attachFile(extension, null);
+    }
+
+    public void attachFile(Extension extension, UsernamePasswordCredentials credentials) throws Exception
     {
         InputStream is = extension.getFile().openStream();
         try {

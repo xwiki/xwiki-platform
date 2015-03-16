@@ -94,6 +94,11 @@ public class RepositoryTestUtils
 
     public void addExtension(Extension extension) throws Exception
     {
+        addExtension(extension, null);
+    }
+
+    public void addExtension(Extension extension, UsernamePasswordCredentials credentials) throws Exception
+    {
         this.testUtils.deletePage("Extension", getPageName(extension));
 
         // Add the Extension object
@@ -129,7 +134,7 @@ public class RepositoryTestUtils
         addDependencies(extension);
 
         // Attach the file
-        attachFile(extension);
+        attachFile(extension, credentials);
     }
 
     public void addVersionObject(Extension extension)

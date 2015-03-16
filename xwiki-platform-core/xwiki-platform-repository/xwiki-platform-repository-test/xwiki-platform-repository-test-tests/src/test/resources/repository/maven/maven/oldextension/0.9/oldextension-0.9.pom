@@ -20,27 +20,33 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-repository</artifactId>
-  <name>XWiki Platform - Repository</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Repository</description>
-  <modules>
-    <module>xwiki-platform-repository-server-api</module>
-    <module>xwiki-platform-repository-server-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-repository-test</module>
-      </modules>
-    </profile>
-  </profiles>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>maven</groupId>
+	<artifactId>oldextension</artifactId>
+	<name>name</name>
+	<version>2.0</version>
+	<packaging>jar</packaging>
+	<description>summary2</description>
+	<url>http://website2</url>
+    <developers>
+      <developer>
+        <name>Old Name</name>
+        <url>http://profile2</url>
+      </developer>
+    </developers>
+    <licenses>
+      <license>
+        <name>LGPL 2.1</name>
+      </license>
+    </licenses>
+	<dependencies>
+	  <dependency>
+	    <groupId>oldmaven</groupId>
+	    <artifactId>olddependency</artifactId>
+	    <version>oldversion</version>
+	    <type>type</type>
+	  </dependency>
+	</dependencies>
 </project>

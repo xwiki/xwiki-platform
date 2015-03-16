@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
-  <name>XWiki Platform - Repository - Server API</name>
+  <name>XWiki Platform - Repository - Tests - Server API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Repository - Server API</description>
   <properties>

@@ -20,27 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-repository</artifactId>
-  <name>XWiki Platform - Repository</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Repository</description>
-  <modules>
-    <module>xwiki-platform-repository-server-api</module>
-    <module>xwiki-platform-repository-server-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-repository-test</module>
-      </modules>
-    </profile>
-  </profiles>
-</project>
+<metadata>
+  <groupId>groupid</groupId>
+  <artifactId>artifactid</artifactId>
+  <versioning>
+    <latest>2.0</latest>
+    <release>2.0</release>
+    <versions>
+      <version>2.0</version>
+      <version>1.0</version>
+    </versions>
+    <lastUpdated>20091103142109</lastUpdated>
+  </versioning>
+</metadata>

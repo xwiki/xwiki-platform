@@ -77,8 +77,8 @@ public class TestUtils
     /**
      * @since 5.0M2
      */
-    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("Admin",
-        "admin");
+    public static final UsernamePasswordCredentials ADMIN_CREDENTIALS = new UsernamePasswordCredentials("superadmin",
+        "pass");
 
     /**
      * @since 5.1M1
@@ -142,7 +142,7 @@ public class TestUtils
     public TestUtils()
     {
         this.adminHTTPClient = new HttpClient();
-        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, ADMIN_CREDENTIALS);
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
         this.adminHTTPClient.getParams().setAuthenticationPreemptive(true);
     }
 
@@ -1087,7 +1087,7 @@ public class TestUtils
 
     public <T> T postRESTResource(String resourceUri, Object entity, Object... elements) throws Exception
     {
-        return postRESTResource(resourceUri, entity, Collections.emptyMap(), elements);
+        return postRESTResource(resourceUri, entity, Collections.<String, Object[]>emptyMap(), elements);
     }
 
     public <T> T postRESTResource(String resourceUri, Object entity, Map<String, Object[]> queryParams,

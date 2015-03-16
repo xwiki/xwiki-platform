@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -39,7 +40,8 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.classes.ClassPropertiesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.classes.ClassPropertiesResourceImpl")
 public class ClassPropertiesResourceImpl extends XWikiResource implements ClassPropertiesResource
 {
     @Override

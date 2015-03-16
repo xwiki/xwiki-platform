@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.pages;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -46,7 +47,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PageTagsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PageTagsResourceImpl")
 public class PageTagsResourceImpl extends ModifiablePageResource implements PageTagsResource
 {
     @Override

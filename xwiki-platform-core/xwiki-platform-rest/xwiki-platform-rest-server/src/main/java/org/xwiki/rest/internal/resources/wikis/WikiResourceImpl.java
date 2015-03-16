@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -43,7 +44,8 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  *
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikiResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiResourceImpl")
 public class WikiResourceImpl extends XWikiResource implements WikiResource
 {
     /**

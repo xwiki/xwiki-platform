@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.DomainObjectFactory;
@@ -35,7 +37,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectsForClassNameResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectsForClassNameResourceImpl")
 public class ObjectsForClassNameResourceImpl extends BaseObjectsResource implements ObjectsForClassNameResource
 {
     @Override

@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
@@ -28,7 +30,8 @@ import org.xwiki.rest.internal.resources.BaseSearchResult;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 
-@Component("org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl")
 public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSearchResource
 {
     @Override

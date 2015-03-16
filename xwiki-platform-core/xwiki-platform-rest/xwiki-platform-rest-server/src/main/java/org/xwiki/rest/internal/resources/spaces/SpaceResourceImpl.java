@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.spaces;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -33,7 +35,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.spaces.SpaceResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpaceResourceImpl")
 public class SpaceResourceImpl extends XWikiResource implements SpaceResource
 {
     @Override

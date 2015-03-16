@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.attachments;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
@@ -31,7 +33,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.attachments.AttachmentsAtPageVersionResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.attachments.AttachmentsAtPageVersionResourceImpl")
 public class AttachmentsAtPageVersionResourceImpl extends BaseAttachmentsResource implements
         AttachmentsAtPageVersionResource
 {

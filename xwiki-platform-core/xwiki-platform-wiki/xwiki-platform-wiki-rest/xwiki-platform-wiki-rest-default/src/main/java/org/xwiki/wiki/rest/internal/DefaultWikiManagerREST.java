@@ -22,6 +22,7 @@ package org.xwiki.wiki.rest.internal;
 import java.net.URI;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -57,7 +58,8 @@ import com.xpn.xwiki.XWikiContext;
  * @since 5.4RC1
  * @version $Id$
  */
-@Component("org.xwiki.wiki.rest.internal.DefaultWikiManagerREST")
+@Component
+@Named("org.xwiki.wiki.rest.internal.DefaultWikiManagerREST")
 @Path("/wikimanager")
 public class DefaultWikiManagerREST extends XWikiResource implements WikiManagerREST
 {

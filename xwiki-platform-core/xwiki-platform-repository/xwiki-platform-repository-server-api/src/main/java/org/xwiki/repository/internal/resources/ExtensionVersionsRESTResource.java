@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -47,7 +48,8 @@ import org.xwiki.repository.Resources;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource")
+@Component
+@Named("org.xwiki.repository.internal.resources.ExtensionVersionsRESTResource")
 @Path(Resources.EXTENSION_VERSIONS)
 @Singleton
 public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource

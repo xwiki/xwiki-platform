@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.pages;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -37,7 +39,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PagesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PagesResourceImpl")
 public class PagesResourceImpl extends XWikiResource implements PagesResource
 {
     @Override

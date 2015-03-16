@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.tags;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -35,7 +37,8 @@ import org.xwiki.rest.resources.tags.PagesForTagsResource;
 
 import com.xpn.xwiki.api.Document;
 
-@Component("org.xwiki.rest.internal.resources.tags.PagesForTagsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.tags.PagesForTagsResourceImpl")
 public class PagesForTagsResourceImpl extends XWikiResource implements PagesForTagsResource
 {
     @Override

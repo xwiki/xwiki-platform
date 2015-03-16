@@ -19,6 +19,7 @@
  */
 package org.xwiki.captcha.internal.velocity;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -32,7 +33,8 @@ import org.xwiki.captcha.CaptchaVerifierNotFoundException;
  * @version $Id$
  * @since 2.2M2
  */
-@Component("velocity")
+@Component
+@Named("velocity")
 @Singleton
 public class VelocityXWikiCaptchaService extends DefaultXWikiCaptchaService
 {

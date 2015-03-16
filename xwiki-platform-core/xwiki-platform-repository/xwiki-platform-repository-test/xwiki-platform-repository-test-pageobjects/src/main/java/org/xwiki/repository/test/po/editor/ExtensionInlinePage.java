@@ -54,7 +54,8 @@ public class ExtensionInlinePage extends InlinePage
     @FindBy(id = "ExtensionCode.ExtensionClass_0_icon")
     private WebElement iconInput;
 
-    private final EditorElement descriptionEditor = new EditorElement("ExtensionCode.ExtensionClass_0_description");
+    @FindBy(id = "ExtensionCode.ExtensionClass_0_description")
+    private WebElement descriptionInput;
 
     @FindBy(id = "ExtensionCode.ExtensionClass_0_customInstallationOnly")
     private WebElement customInstallationOnlyCheckBox;
@@ -110,9 +111,8 @@ public class ExtensionInlinePage extends InlinePage
 
     public void setDescription(String description)
     {
-        RichTextAreaElement richTextArea = this.descriptionEditor.waitToLoad().getRichTextArea();
-        richTextArea.clear();
-        richTextArea.sendKeys(description);
+        this.descriptionInput.clear();
+        this.descriptionInput.sendKeys(description);
     }
 
     public void setCustomInstallationOnly(boolean customInstallationOnly)

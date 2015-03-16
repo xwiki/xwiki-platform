@@ -35,6 +35,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
+@Deprecated
 public class WatchListJobManager
 {
     /**

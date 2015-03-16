@@ -41,6 +41,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
+@Deprecated
 @SuppressWarnings("serial")
 public class WatchListStore implements EventListener
 {

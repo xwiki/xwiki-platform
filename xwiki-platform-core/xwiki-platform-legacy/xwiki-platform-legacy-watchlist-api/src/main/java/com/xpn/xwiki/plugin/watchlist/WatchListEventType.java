@@ -26,6 +26,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
  * 
  * @version $Id$
  */
+@Deprecated
 public interface WatchListEventType
 {
     /**

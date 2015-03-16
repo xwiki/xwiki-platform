@@ -44,6 +44,7 @@ import com.xpn.xwiki.plugin.diff.DiffPluginApi;
  * 
  * @version $Id$
  */
+@Deprecated
 public class WatchListEvent implements Comparable<WatchListEvent>
 {
     /**

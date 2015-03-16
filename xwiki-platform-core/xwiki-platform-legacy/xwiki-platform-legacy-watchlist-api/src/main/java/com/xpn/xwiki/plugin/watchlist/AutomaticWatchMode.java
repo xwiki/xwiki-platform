@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin.watchlist;
  * 
  * @version $Id$
  */
+@Deprecated
 public enum AutomaticWatchMode
 {
     /**

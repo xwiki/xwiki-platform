@@ -34,6 +34,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * 
  * @version $Id$
  */
+@Deprecated
 public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
     /**

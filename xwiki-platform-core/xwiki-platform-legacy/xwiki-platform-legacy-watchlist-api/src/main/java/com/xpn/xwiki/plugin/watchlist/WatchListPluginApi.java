@@ -37,6 +37,7 @@ import com.xpn.xwiki.plugin.watchlist.WatchListStore.ElementType;
  *
  * @version $Id$
  */
+@Deprecated
 public class WatchListPluginApi extends PluginApi<WatchListPlugin>
 {
     /**

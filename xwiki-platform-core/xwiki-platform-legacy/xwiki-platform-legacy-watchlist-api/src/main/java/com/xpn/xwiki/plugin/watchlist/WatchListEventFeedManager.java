@@ -29,6 +29,7 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
+@Deprecated
 public class WatchListEventFeedManager
 {
     /**

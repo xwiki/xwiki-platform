@@ -43,6 +43,7 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
  * 
  * @version $Id$
  */
+@Deprecated
 @SuppressWarnings("serial")
 public class WatchListEventMatcher
 {

@@ -20,16 +20,18 @@
 package com.xpn.xwiki.api;
 
 import org.xwiki.diff.Delta;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
- * Save version of {@link com.xpn.xwiki.doc.AttachmentDiff} that can be used by the scripts.
+ * Safe version of {@link com.xpn.xwiki.doc.AttachmentDiff} that can be used by the scripts.
  * 
  * @since 7.0RC1
  * @version $Id$
  */
+@Unstable
 public class AttachmentDiff
 {
     /**
@@ -92,6 +94,9 @@ public class AttachmentDiff
     }
 
     /**
+     * NOTE: We kept this method (despite being deprecated) in order to preserve backwards compatibility with existing
+     * scripts that were exposed to the unsafe {@link com.xpn.xwiki.doc.AttachmentDiff}.
+     * 
      * @return the original attachment version
      */
     @Deprecated
@@ -101,6 +106,9 @@ public class AttachmentDiff
     }
 
     /**
+     * NOTE: We kept this method (despite being deprecated) in order to preserve backwards compatibility with existing
+     * scripts that were exposed to the unsafe {@link com.xpn.xwiki.doc.AttachmentDiff}.
+     * 
      * @return the new attachment version
      */
     @Deprecated

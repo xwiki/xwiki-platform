@@ -157,12 +157,7 @@ public class BasePage extends BaseElement
      */
     protected void clickEditSubMenuEntry(String id)
     {
-        // Open the edit menu
-        getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
-        // Wait for the submenu entry to be visible
-        getDriver().waitUntilElementIsVisible(By.id(id));
-        // Click on the specified entry
-        getDriver().findElement(By.id(id)).click();
+        clickSubMenuEntryFromMenu(By.xpath("//div[@id='tmEdit']//button"), id);
     }
 
     /**
@@ -323,6 +318,28 @@ public class BasePage extends BaseElement
             wikiMenuId = "tmMainWiki";
         }
         toggleTopMenu(wikiMenuId);
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    public void clickMoreActionsSubMenuEntry(String id)
+    {
+        clickSubMenuEntryFromMenu(
+            By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]"), id);
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    private void clickSubMenuEntryFromMenu(By menuBy, String id)
+    {
+        // Open the parent Menu
+        getDriver().findElement(menuBy).click();
+        // Wait for the submenu entry to be visible
+        getDriver().waitUntilElementIsVisible(By.id(id));
+        // Click on the specified entry
+        getDriver().findElement(By.id(id)).click();
     }
 
     /**

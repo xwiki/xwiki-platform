@@ -117,7 +117,7 @@ public class DefaultUserBridge implements UserBridge
             // to have a cache depending on an other cache.
             //
             // TODO: use a proper component to retrieve the groups of a member without any cache
-            final int nb = 100;
+            final int nb = 1000;
             int i = 0;
             while (groupReferences.addAll(groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference,
                 nb, i * nb, xwikiContext))) {

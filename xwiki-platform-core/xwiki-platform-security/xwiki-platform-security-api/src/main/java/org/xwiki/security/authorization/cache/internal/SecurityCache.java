@@ -115,13 +115,14 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
         throws ParentEntryEvictedException, ConflictingInsertionException;
 
     /**
-     * Get all groups where the user/group is a member (directly, or indirectly).
+     * Get all groups where the user/group is a member (directly, or indirectly including relation due to global groups
+     * members of local ones).
      * 
      * If the user is global and entityWiki is not null:
-     *   - returns the local groups (from entityWiki) and the global groups where the user is
+     *   - returns the local groups (from entityWiki) and the global groups where the user is, directly or indirectly
      * If entityWiki is null:
-     *   - returns the groups from the wiki of the user where the user is
-     * If the cache is not fully loaded:
+     *   - returns the groups from the wiki of the user where the user is, directly or indirectly
+     * If the cache does not contain the needed information::
      *   - returns null
      *  
      * @param user reference to a user/group

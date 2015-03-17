@@ -854,9 +854,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         
         // Special case if the user is a shadow.
         if (entityWiki != null) {
-            addParentsWhenEntryIsAShadow(userEntry, user, groups, entriesToExplore);
+            // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
+            addParentsWhenEntryIsShadow(userEntry, user, groups, entriesToExplore);
         } else {
-            // We start by the current user
+            // We start with the current user
             entriesToExplore.add(userEntry);
         }
         
@@ -882,23 +883,16 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         return groups;
     }
     
-    private void addParentsWhenEntryIsAShadow(SecurityCacheEntry shadow, UserSecurityReference user,
+    private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
             Collection<GroupSecurityReference> groups,
             Deque<SecurityCacheEntry> entriesToExplore)
     {
-        for (SecurityCacheEntry parent : shadow.parents) {
-            SecurityReference parentRef = parent.getEntry().getReference();
-            // We add the parents of the original (but not the original, otherwise we could have the same group twice)
-            if (parentRef.equals(user)) {
-                addParentsToTheListOfEntriesToExplore(parent.parents, groups, entriesToExplore);
-                continue;
-            }
-            // Otherwise we add the parent group (if we have not seen it before)
-            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
-                // we add the parent group to the entries to explore
-                entriesToExplore.add(parent);
-            }
-        }
+        SecurityCacheEntry originalEntry = getEntry(user);
+
+        // We add the parents of the original (but not the original, otherwise we could have the same group twice)
+        addParentsToTheListOfEntriesToExplore(originalEntry.parents, groups, entriesToExplore);
+        // And we add the parent groups of the shadow
+        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, originalEntry);
     }
 
     /**

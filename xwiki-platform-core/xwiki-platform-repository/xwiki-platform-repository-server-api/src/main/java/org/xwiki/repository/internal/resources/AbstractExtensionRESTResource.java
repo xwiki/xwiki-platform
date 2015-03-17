@@ -133,13 +133,13 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         StringBuilder flBuilder = new StringBuilder("wiki,space,name");
         for (SolrField field : XWikiRepositoryModel.SOLR_FIELDS.values()) {
             // Boost
-            if (field.boost != null) {
+            if (field.boostValue != null) {
                 if (boostBuilder.length() > 0) {
                     boostBuilder.append(' ');
                 }
-                boostBuilder.append(field.name);
+                boostBuilder.append(field.boostName);
                 boostBuilder.append('^');
-                boostBuilder.append(field.boost);
+                boostBuilder.append(field.boostValue);
             }
 
             // Fields list

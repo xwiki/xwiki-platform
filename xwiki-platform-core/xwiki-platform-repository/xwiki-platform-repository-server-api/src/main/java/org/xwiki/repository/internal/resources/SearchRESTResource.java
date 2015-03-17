@@ -151,7 +151,6 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
                 builder.append(':');
 
                 if (fiter.getComparison() == COMPARISON.EQUAL) {
-                    // FIXME: depending on the field it might not be the expected behavior
                     builder.append(fiter.getValueString());
                 } else {
                     builder.append('*' + fiter.getValueString() + '*');

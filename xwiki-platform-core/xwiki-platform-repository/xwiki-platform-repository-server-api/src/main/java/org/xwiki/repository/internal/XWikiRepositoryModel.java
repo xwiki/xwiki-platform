@@ -126,9 +126,7 @@ public class XWikiRepositoryModel
     public static final String SOLRPROP_EXTENSION_VALIDEXTENSION = toExtensionClassSolrProperty(
         PROP_EXTENSION_VALIDEXTENSION, "boolean");
 
-    public static final String SOLR_LIST = "string";
-
-    public static final String SOLR_STRING = "_";
+    public static final String SOLR_STRING = "string";
 
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
 
@@ -146,44 +144,45 @@ public class XWikiRepositoryModel
     }
 
     static {
-        SOLR_FIELDS.put(Extension.FIELD_ID, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_ID, SOLR_STRING),
+        SOLR_FIELDS.put(Extension.FIELD_ID, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_ID),
             10.0f));
-        SOLR_FIELDS.put(Extension.FIELD_FEATURE,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_FEATURES, SOLR_LIST), 9.0f));
+        SOLR_FIELDS.put(Extension.FIELD_FEATURE, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_FEATURES),
+            9.0f));
         SOLR_FIELDS.put(Extension.FIELD_FEATURES, SOLR_FIELDS.get(Extension.FIELD_FEATURE));
-        SOLR_FIELDS.put(Extension.FIELD_NAME,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_NAME, SOLR_STRING), 8.0f));
-        SOLR_FIELDS.put(Extension.FIELD_TYPE, new SolrField(
-            toExtensionClassSolrProperty(PROP_EXTENSION_TYPE, SOLR_LIST), 8.0f));
-        SOLR_FIELDS.put(Extension.FIELD_CATEGORY,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_CATEGORY, SOLR_LIST), 7.0f));
-        SOLR_FIELDS.put(Extension.FIELD_SUMMARY,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SUMMARY, SOLR_STRING), 6.0f));
-        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_DESCRIPTION, SOLR_STRING), 5.0f));
+        SOLR_FIELDS.put(Extension.FIELD_NAME, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_NAME), 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_TYPE, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_TYPE), 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_CATEGORY, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_CATEGORY),
+            7.0f));
+        SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SUMMARY),
+            6.0f));
+        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(
+            toExtensionClassSolrProperty(PROP_EXTENSION_DESCRIPTION), 5.0f));
 
         // Not very interesting for fulltext search
-        SOLR_FIELDS.put(Extension.FIELD_AUTHOR,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_AUTHORS, SOLR_LIST), null));
+        SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_AUTHORS),
+            null));
         SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
-        SOLR_FIELDS.put(Extension.FIELD_VERSION,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_LASTVERSION, SOLR_STRING), null));
-        SOLR_FIELDS.put(Extension.FIELD_LICENSE,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_LICENSENAME, SOLR_LIST), null));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new SolrField(
+            toExtensionClassSolrProperty(PROP_EXTENSION_LASTVERSION), null));
+        SOLR_FIELDS.put(Extension.FIELD_LICENSE, new SolrField(
+            toExtensionClassSolrProperty(PROP_EXTENSION_LICENSENAME), null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
-        SOLR_FIELDS.put(Extension.FIELD_SCM,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMURL, SOLR_STRING), null));
-        SOLR_FIELDS.put(Extension.FIELD_SCM,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMURL, SOLR_STRING), null));
-        SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMCONNECTION, SOLR_STRING), null));
-        SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMDEVCONNECTION, SOLR_STRING), null));
-        SOLR_FIELDS.put(Extension.FIELD_WEBSITE,
-            new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_WEBSITE, SOLR_STRING), null));
+        SOLR_FIELDS.put(Extension.FIELD_SCM, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMURL), null));
+        SOLR_FIELDS.put(Extension.FIELD_SCM, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_SCMURL), null));
+        SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new SolrField(
+            toExtensionClassSolrProperty(PROP_EXTENSION_SCMCONNECTION), null));
+        SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new SolrField(
+            toExtensionClassSolrProperty(PROP_EXTENSION_SCMDEVCONNECTION), null));
+        SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new SolrField(toExtensionClassSolrProperty(PROP_EXTENSION_WEBSITE),
+            null));
 
         // Fields not stored
         // Extension.FIELD_REPOSITORY
+    }
+
+    public static String toExtensionClassSolrProperty(String propertyName)
+    {
+        return toExtensionClassSolrProperty(propertyName, SOLR_STRING);
     }
 
     public static String toExtensionClassSolrProperty(String propertyName, String type)

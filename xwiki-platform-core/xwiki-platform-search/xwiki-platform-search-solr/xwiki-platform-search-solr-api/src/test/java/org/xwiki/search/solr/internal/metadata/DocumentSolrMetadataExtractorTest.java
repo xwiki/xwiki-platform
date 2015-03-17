@@ -387,6 +387,7 @@ public class DocumentSolrMetadataExtractorTest
         assertSame(commentContent,
             solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.US)));
 
+        assertSame(commentContent, solrDocument.getFieldValue("property.space.commentsClass.comment_string"));
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
         assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_date"));
         assertEquals(commentList, solrDocument.getFieldValues("property.space.commentsClass.list_string"));
@@ -411,16 +412,17 @@ public class DocumentSolrMetadataExtractorTest
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
-            commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
-        assertEquals(7, objectProperties.size());
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentContent,
+            commentAuthor, commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
+        assertEquals(8, objectProperties.size());
 
         objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder("comment : " + commentContent,
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(
+            "comment : " + commentContent, "comment : " + commentContent,
             "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
             "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
-        assertEquals(7, objectProperties.size());
+        assertEquals(8, objectProperties.size());
     }
 
     /**

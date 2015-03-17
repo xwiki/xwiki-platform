@@ -382,6 +382,10 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // removed from an XClass but there are still objects that have a (large) value set for it (the property
             // class is null in this case). The 255 limit is defined in xwiki.hbm.xml for string properties.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue, TypedValue.TEXT), locale);
+
+            // Also index the raw value that is saved in the database. This provide a stable field name and also
+            // allows exact matching
+            setPropertyValue(solrDocument, property, new TypedValue(propertyValue), locale);
         } else if (propertyValue instanceof Collection) {
             // We iterate the collection instead of giving it to Solr because, although it supports passing collections,
             // it reuses the collection in some cases, when the value of a field is set for the first time for instance,

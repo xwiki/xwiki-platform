@@ -90,8 +90,6 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
     {
         ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
 
-        result.setOffset(query.getOffset());
-
         Query solrQuery = this.queryManager.createQuery(toSolrStatement(query.getQuery()), "solr");
 
         // /////////////////
@@ -173,8 +171,12 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         result.setOffset((int) documents.getStart());
         result.setTotalHits((int) documents.getNumFound());
 
-        for (SolrDocument document : documents) {
-            result.getExtensions().add(createExtensionVersionFromSolrDocument(document));
+        // O means unset for solr but we want it to be literally interpreted to be consistent with previous behavior and
+        // other searches behavior
+        if (query.getLimit() != 0) {
+            for (SolrDocument document : documents) {
+                result.getExtensions().add(createExtensionVersionFromSolrDocument(document));
+            }
         }
 
         return result;

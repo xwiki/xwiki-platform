@@ -601,12 +601,18 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         // Authors
-        for (String authorId : this.<String>getSolrValues(document, Extension.FIELD_AUTHORS)) {
-            extension.getAuthors().add(resolveExtensionAuthor(authorId));
+        Collection<String> authors = this.<String>getSolrValues(document, Extension.FIELD_AUTHORS);
+        if (authors != null) {
+            for (String authorId : authors) {
+                extension.getAuthors().add(resolveExtensionAuthor(authorId));
+            }
         }
 
         // Features
-        extension.getFeatures().addAll(this.<String>getSolrValues(document, Extension.FIELD_FEATURES));
+        Collection<String> features = this.<String>getSolrValues(document, Extension.FIELD_FEATURES);
+        if (features != null) {
+            extension.getFeatures().addAll(features);
+        }
 
         // License
         String licenseName = this.<String>getSolrValue(document, Extension.FIELD_LICENSE, true);

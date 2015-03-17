@@ -76,10 +76,14 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         return searchPost(query);
     }
 
+    // TODO: automatically replace Extension fields names with the actual Solr properties names (so that it's possible
+    // to write query like type:jar)
     private String toSolrStatement(String query)
     {
         if (StringUtils.isBlank(query)) {
             return "*";
+        } else if (StringUtils.containsNone(query, ' ', ':')) {
+            return "*" + query + "*";
         }
 
         return query;

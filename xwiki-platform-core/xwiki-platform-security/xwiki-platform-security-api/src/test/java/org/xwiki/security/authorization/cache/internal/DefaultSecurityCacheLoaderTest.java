@@ -114,11 +114,10 @@ public class DefaultSecurityCacheLoaderTest
         when(securityCache.get(entity.getParentSecurityReference())).thenReturn(spaceEntry);
         when(securityCache.get(entity.getParentSecurityReference().getParentSecurityReference())).thenReturn(wikiEntry);
 
-        UserBridge userBridge = mocker.getInstance(UserBridge.class);
         DocumentReference groupReference = new DocumentReference("wiki", "Groups", "AllGroup");
         Set<GroupSecurityReference> groups =
             Collections.singleton(securityReferenceFactory.newGroupReference(groupReference));
-        when(userBridge.getAllGroupsFor(user, userReference.getWikiReference())).thenReturn(groups);
+        when(securityCache.getGroupsFor(user, null)).thenReturn(groups);
 
         SecurityAccessEntry securityAccessEntry = mock(SecurityAccessEntry.class);
 

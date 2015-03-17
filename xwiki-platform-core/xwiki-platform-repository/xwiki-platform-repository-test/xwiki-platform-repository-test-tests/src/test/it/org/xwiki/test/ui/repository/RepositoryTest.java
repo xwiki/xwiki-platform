@@ -264,20 +264,14 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // //////////////////////////////////////////
 
         // Empty search
-
-        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
-        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
-
-        Assert.assertTrue(result.getTotalHits() >= 0);
-        Assert.assertEquals(0, result.getOffset());
-
-        extension = null;
-        for (ExtensionVersion extensionVersion : result.getExtensions()) {
-            if (extensionVersion.getId().equals(this.baseExtension.getId().getId())) {
-                extension = extensionVersion;
-                break;
-            }
+        extension = searchExtension(this.baseExtension.getId().getId());
+        if (extension == null) {
+            // Give more time to Solr to index the document
+            // FIXME: provide a helper to wait for Solr queue to be empty
+            Thread.sleep(10000);
+            extension = searchExtension(this.baseExtension.getId().getId());
         }
+
         if (extension == null) {
             Assert.fail("Count not find extension [" + this.baseExtension.getId().getId() + "]");
         }
@@ -295,10 +289,10 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Search pattern
 
-        queryParams.clear();
+        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"macro"});
 
-        result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
 
         Assert.assertEquals(1, result.getTotalHits());
         Assert.assertEquals(0, result.getOffset());
@@ -344,6 +338,25 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertTrue(result.getTotalHits() >= 1);
         Assert.assertEquals(0, result.getOffset());
         Assert.assertEquals(0, result.getExtensions().size());
+    }
+
+    private ExtensionVersion searchExtension(String id) throws Exception
+    {
+        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
+        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+
+        Assert.assertTrue(result.getTotalHits() >= 0);
+        Assert.assertEquals(0, result.getOffset());
+
+        ExtensionVersion extension = null;
+        for (ExtensionVersion extensionVersion : result.getExtensions()) {
+            if (extensionVersion.getId().equals(id)) {
+                extension = extensionVersion;
+                break;
+            }
+        }
+
+        return extension;
     }
 
     @Test

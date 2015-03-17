@@ -273,7 +273,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         }
 
         if (extension == null) {
-            Assert.fail("Count not find extension [" + this.baseExtension.getId().getId() + "]");
+            Assert.fail("Could not find extension [" + this.baseExtension.getId().getId() + "]");
         }
 
         Assert.assertEquals(this.baseExtension.getId().getId(), extension.getId());

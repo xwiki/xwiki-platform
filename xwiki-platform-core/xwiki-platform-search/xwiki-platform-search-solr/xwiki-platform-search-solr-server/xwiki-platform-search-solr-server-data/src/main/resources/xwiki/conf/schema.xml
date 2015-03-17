@@ -242,7 +242,7 @@
    <dynamicField name="*_ar"  type="text_ar"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_bg"  type="text_bg"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ca"  type="text_ca"    indexed="true"  stored="true" multiValued="true" />
-   <dynamicField name="*_cs"  type="text_cz"    indexed="true"  stored="true" multiValued="true" />
+   <dynamicField name="*_cs"  type="text_cs"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_da"  type="text_da"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_de"  type="text_de"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_en"  type="text_en"    indexed="true"  stored="true" multiValued="true" />
@@ -840,14 +840,14 @@
     </fieldType>
 
     <!-- Czech -->
-    <fieldType name="text_cz" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="text_cs" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_cz.txt" />
         <filter class="solr.CzechStemFilterFactory"/>       
-	<!-- Remove accents -->
-	<filter class="solr.ASCIIFoldingFilterFactory"/>
+        <!-- Remove accents -->
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
     

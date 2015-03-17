@@ -42,6 +42,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -511,6 +512,17 @@ public class Document extends Api
     public String getContent()
     {
         return this.doc.getContent();
+    }
+
+    /**
+     * NOTE: This method caches the XDOM and returns a clone that can be safely modified.
+     *
+     * @return the XDOM corresponding to the document's string content
+     * @since 7.0RC1
+     */
+    public XDOM getXDOM()
+    {
+        return this.doc.getXDOM();
     }
 
     /**
@@ -2211,6 +2223,16 @@ public class Document extends Api
     }
 
     public void setContent(String content)
+    {
+        getDoc().setContent(content);
+    }
+
+    /**
+     * @param content the content as XDOM
+     * @throws XWikiException when failing to convert the XDOM to String content
+     * @since 7.0RC1
+     */
+    public void setContent(XDOM content) throws XWikiException
     {
         getDoc().setContent(content);
     }

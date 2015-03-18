@@ -27,8 +27,7 @@ import org.junit.Test;
 import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link AddressesConverter}.
@@ -46,10 +45,26 @@ public class AddressConverterTest
     public void convert() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-
         assertEquals(address,
             this.mocker.getComponentUnderTest().convert(Address.class, "John Doe(comment) <john1@doe.com>"));
+    }
 
+    @Test
+    public void convertWhenNull() throws Exception
+    {
+        assertNull(this.mocker.getComponentUnderTest().convert(Address.class, null));
+    }
+
+    @Test
+    public void convertWhenTypeIsAlreadyAnAddress() throws Exception
+    {
+        InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        assertEquals(address, this.mocker.getComponentUnderTest().convert(Address.class, address));
+    }
+
+    @Test
+    public void convertWhenInvalid() throws Exception
+    {
         try {
             this.mocker.getComponentUnderTest().convert(Address.class, "invalid(");
             fail("Should have thrown an exception here");

@@ -48,10 +48,6 @@ public class AddressConverter extends AbstractConverter<Address>
             return null;
         }
 
-        if (value instanceof Address) {
-            return (Address) value;
-        }
-
         Address address;
 
         try {

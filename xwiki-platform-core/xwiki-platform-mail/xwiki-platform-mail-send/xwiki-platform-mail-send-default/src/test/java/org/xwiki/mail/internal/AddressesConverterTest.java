@@ -47,10 +47,29 @@ public class AddressesConverterTest
         InternetAddress[] addresses = new InternetAddress[2];
         addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
         addresses[1] = new InternetAddress("john2@doe.com");
-
         assertArrayEquals(addresses, (InternetAddress[]) this.mocker.getComponentUnderTest().convert(Address[].class,
             "John Doe(comment) <john1@doe.com>,john2@doe.com"));
+    }
 
+    @Test
+    public void convertWhenNull() throws Exception
+    {
+        assertNull(this.mocker.getComponentUnderTest().convert(Address.class, null));
+    }
+
+    @Test
+    public void convertWhenTypeIsAlreadyAnAddressArray() throws Exception
+    {
+        InternetAddress[] addresses = new InternetAddress[2];
+        addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        addresses[1] = new InternetAddress("john2@doe.com");
+        assertArrayEquals(addresses,
+            (InternetAddress[]) this.mocker.getComponentUnderTest().convert(Address.class, addresses));
+    }
+
+    @Test
+    public void convertWhenInvalid() throws Exception
+    {
         try {
             this.mocker.getComponentUnderTest().convert(Address[].class, "invalid(");
             fail("Should have thrown an exception here");

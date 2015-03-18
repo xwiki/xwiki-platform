@@ -19,13 +19,9 @@
  */
 package org.xwiki.localization.wiki.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Collections;
 import java.util.Locale;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +37,7 @@ import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -52,11 +49,18 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
+import org.junit.Assert;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 @AllComponents
 public class DocumentTranslationBundleFactoryTest
 {
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
+    private QueryManager mockQueryManager;
 
     private Query mockQuery;
 
@@ -77,13 +81,12 @@ public class DocumentTranslationBundleFactoryTest
         this.oldcore.getXWikiContext().setMainXWiki("xwiki");
         this.oldcore.getXWikiContext().setWikiId("xwiki");
 
-        when(
-            this.oldcore.getMockXWiki().getCurrentContentSyntaxId(Mockito.any(String.class),
-                Mockito.any(XWikiContext.class))).thenReturn("plain/1.0");
+        when(this.oldcore.getMockXWiki().getCurrentContentSyntaxId(Mockito.any(String.class),
+            Mockito.any(XWikiContext.class))).thenReturn("plain/1.0");
 
         this.mockQuery = mock(Query.class);
 
-        when(this.oldcore.getQueryManager().createQuery(Mockito.any(String.class),
+        when(this.mockQueryManager.createQuery(Mockito.any(String.class),
             Mockito.any(String.class))).thenReturn(this.mockQuery);
         when(this.mockQuery.execute()).thenReturn(Collections.EMPTY_LIST);
 
@@ -101,6 +104,7 @@ public class DocumentTranslationBundleFactoryTest
     @AfterComponent
     public void registerComponents() throws Exception
     {
+        this.mockQueryManager = this.oldcore.getMocker().registerMockComponent(QueryManager.class);
         this.mockWikiDescriptorManager = this.oldcore.getMocker().registerMockComponent(WikiDescriptorManager.class);
     }
 

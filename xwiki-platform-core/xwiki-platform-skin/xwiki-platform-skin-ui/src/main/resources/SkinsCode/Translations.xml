@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1426000188000</creationDate>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1426004665000</date>
+  <contentUpdateDate>1426004665000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>skin.sheet.title=Skin
+skin.sheet.properties=Skin Properties
+skin.sheet.deprecatedProperties=Deprecated properties
+skin.sheet.overridedTemplates=Overrided templates
+skin.sheet.addTemplate=Add a new overrided template
+skin.sheet.add=Add
+skin.sheet.overrideTemplateWarning=This section allows you to override a template of the skin. This is technical and you should be aware of the consequences.
+skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reason. You should use the 'overrided templates' mechanism above.
+skin.sheet.nojs=Without JavaScript, you cannot use this section. But you can use the {0}Object Editor{1} instead, and manually add {2} objects.
+
+skin.sheet.js.deleting=Deleting...
+skin.sheet.js.deletingDone=The template has been deleted!
+skin.sheet.js.error.csrf=CSRF validation failed when saving. Try to refresh your browser first.
+skin.sheet.js.error.rights=Failed to save the skins because you don't have the right to do it.
+skin.sheet.js.deleteConfirmationText=Are you sure you want to delete this template?
+skin.sheet.js.deleteConfirmationYes=Yes, delete it
+skin.sheet.js.deleteConfirmationNo=No, cancel
+skin.sheet.js.adding=Adding...
+skin.sheet.js.addingDone=The template has been added!
+</content>
+  <object>
+    <name>SkinsCode.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>60efd77f-fd6d-4c21-9d26-826226cd3e17</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>ON_DEMAND</scope>
+    </property>
+  </object>
+</xwikidoc>

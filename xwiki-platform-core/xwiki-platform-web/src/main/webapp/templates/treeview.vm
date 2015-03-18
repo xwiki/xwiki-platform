@@ -62,6 +62,12 @@
     tree${tviewid} = new YAHOO.widget.TreeView("treeview${tviewid}");
     var tree = tree${tviewid};
     var nodes = nodes${tviewid};
+
+    ## put the list of tree node ids in a list, to be able to check if the parent of a node is in there before trying to stuff it in, otherwise we'll have a JS error
+    #set($treeIDList = [])
+    #foreach($item in $treelist)
+      #set($discard = $treeIDList.add($item.id))
+    #end
     #foreach ($item in $treelist)
       #set ($checked = $selectlist.contains($item.getId()))
       #if ($item.value.length() > 80)
@@ -70,12 +76,16 @@
         #set ($title_item = $item.value)
       #end
       #set ($title_item = $title_item.replaceAll("[\r\n]"," "))
+      #set ($parentID = $item.parent)
+      #if(!$treeIDList.contains($parentID))
+        #set ($parentID = '')
+      #end
       #if ($mode == 'view')
         #if ($checked)
-          addTreeElementViewMode(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($item.parent)}")
+          addTreeElementViewMode(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($parentID)}")
         #end
       #else
-        addTreeElement(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($item.parent)}", #if($checked) true #else false #end)
+        addTreeElement(tree, nodes, "${escapetool.javascript($item.id)}", "${escapetool.javascript($title_item)}", "${escapetool.javascript($parentID)}", #if($checked) true #else false #end)
       #end
     #end
     tree.draw();

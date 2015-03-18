@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.Utils;
@@ -28,7 +30,8 @@ import org.xwiki.rest.resources.SyntaxesResource;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.SyntaxesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.SyntaxesResourceImpl")
 public class SyntaxesResourceImpl extends XWikiResource implements SyntaxesResource
 {
     @Override

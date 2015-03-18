@@ -48,9 +48,9 @@
 ##
 ## Build watched elements list
 ##
-#set ($wikis = $xwiki.watchlist.getWatchedWikis())
-#set ($spaces = $xwiki.watchlist.getWatchedSpaces())
-#set ($pages = $xwiki.watchlist.getWatchedDocuments())
+#set ($wikis = $services.watchlist.getWatchedElements("WIKI"))
+#set ($spaces = $services.watchlist.getWatchedElements("SPACE"))
+#set ($pages = $services.watchlist.getWatchedElements("DOCUMENT"))
 #set ($elements = [])
 ## Wikis
 #foreach ($wiki in $wikis)

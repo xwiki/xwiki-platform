@@ -24,13 +24,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
-import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -40,7 +37,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory}.
+ * Default implementation for {@link org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory}.
  *
  * @since 6.4M2
  * @version $Id$
@@ -57,6 +54,9 @@ public class DefaultColorThemeReferenceFactory implements ColorThemeReferenceFac
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
     public ColorThemeReference createReference(String colorThemeName) throws LESSCompilerException
@@ -79,7 +79,7 @@ public class DefaultColorThemeReferenceFactory implements ColorThemeReferenceFac
                     new DocumentReference(colorThemeDocRef.getWikiReference().getName(),
                             "ColorThemes", "ColorThemeClass");
                 if (colorThemeDoc.getXObjectSize(colorThemeClassRef) > 0) {
-                    return new DocumentColorThemeReference(colorThemeDocRef);
+                    return createReference(colorThemeDocRef);
                 }
 
                 // Is there any flamingo theme?
@@ -87,7 +87,7 @@ public class DefaultColorThemeReferenceFactory implements ColorThemeReferenceFac
                     new DocumentReference(colorThemeDocRef.getWikiReference().getName(),
                             "FlamingoThemesCode", "ThemeClass");
                 if (colorThemeDoc.getXObjectSize(flamingoThemeClassRef) > 0) {
-                    return new DocumentColorThemeReference(colorThemeDocRef);
+                    return createReference(colorThemeDocRef);
                 }
 
             } catch (XWikiException e) {
@@ -97,5 +97,11 @@ public class DefaultColorThemeReferenceFactory implements ColorThemeReferenceFac
 
         // Not an XWiki page so probably a file system color theme
         return new NamedColorThemeReference(colorThemeName);
+    }
+
+    @Override
+    public ColorThemeReference createReference(DocumentReference documentReference)
+    {
+        return new DocumentColorThemeReference(documentReference, entityReferenceSerializer);
     }
 }

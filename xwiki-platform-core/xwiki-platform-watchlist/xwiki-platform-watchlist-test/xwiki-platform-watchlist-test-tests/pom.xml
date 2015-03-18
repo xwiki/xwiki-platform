@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Tests for the Watchlist</description>
   <properties>
-    <!-- Override in order to add the WatchlistPlugin itself and its dependencies -->
+    <!-- Override in order to add the WatchlistPlugin's dependencies -->
     <xwikiCfgPlugins>\
       com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
@@ -42,8 +42,7 @@
       com.xpn.xwiki.plugin.diff.DiffPlugin,\
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
       com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-      com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin,\
-      com.xpn.xwiki.plugin.watchlist.WatchListPlugin
+      com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
@@ -67,6 +66,14 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- We need the mail UI as well, since we want to configure it in our tests and we need Mail.SendMailConfigClass for that. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-ui</artifactId>
+      <type>xar</type>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

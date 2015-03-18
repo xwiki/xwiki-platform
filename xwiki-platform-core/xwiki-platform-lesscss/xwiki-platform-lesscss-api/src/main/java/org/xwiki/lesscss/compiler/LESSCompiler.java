@@ -19,13 +19,13 @@
  */
 package org.xwiki.lesscss.compiler;
 
-import java.nio.file.Path;
-
 import org.xwiki.component.annotation.Role;
+import org.xwiki.lesscss.resources.LESSResourceReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * This component provides a LESS preprocessor (http://lesscss.org/) for CSS generation.
+ * The Integrated LESS Compiler is a LESS compiler that take care of the wiki context (skin and color themes) to
+ * generate the appropriate CSS output.
  *
  * @since 6.4M2
  * @version $Id$
@@ -35,19 +35,37 @@ import org.xwiki.stability.Unstable;
 public interface LESSCompiler
 {
     /**
-     * Compile LESS code to CSS.
-     * @param lessCode code to compile
+     * Compile a LESS resource.
+     * Velocity will also be parsed on the resource, but not on the files included via the @import directive.
+     * Since the result is cached, do not put velocity code that needs to be always executed, unless you use the force
+     * parameter.
+     *
+     * @param lessResourceReference reference of the LESS resource to compile
+     * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
+     * defined there
+     * @param useVelocity either or not the resource be parsed by Velocity before compiling it
+     * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the generated CSS
-     * @throws LESSCompilerException if problem occurs.
+     * @throws LESSCompilerException if problems occur
      */
-    String compile(String lessCode) throws LESSCompilerException;
+    String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        boolean force) throws LESSCompilerException;
 
     /**
-     * Compile LESS code to CSS.
-     * @param lessCode code to compile
-     * @param includePaths paths where LESS should look at when it performs imports.
+     * Compile a LESS resource.
+     * Velocity will also be parsed on the resource, but not on the files included via the @import directive.
+     * Since the result is cached, do not put velocity code that needs to be always executed, unless you use the force
+     * parameter.
+     *
+     * @param lessResourceReference reference of the LESS resource to compile
+     * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
+     * defined there
+     * @param skin name of the skin where the LESS file is located
+     * @param useVelocity either or not the resource be parsed by Velocity before compiling it
+     * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the generated CSS
-     * @throws LESSCompilerException if problem occurs.
+     * @throws LESSCompilerException if problems occur
      */
-    String compile(String lessCode, Path[] includePaths) throws LESSCompilerException;
+    String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
+        String skin, boolean force) throws LESSCompilerException;
 }

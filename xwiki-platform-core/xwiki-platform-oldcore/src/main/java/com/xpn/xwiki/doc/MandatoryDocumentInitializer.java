@@ -23,16 +23,27 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Provide a document that should be initialized at startup and when creating new wiki.
+ * Provide a document that should be initialized at startup and when creating a new wiki.
  * <p>
  * The role hint should be the local (or absolute if it's supposed to be used only for a specific wiki) reference of the
  * document so that I can easily be found.
+ * <p/>
+ * An additional {@link javax.annotation.Priority Priority} annotation can be added to affect the order in which the
+ * initializer will be executed when a wiki is initialized. If not specified, {@value #DEFAULT_PRIORITY} will be
+ * assumed.
  *
  * @version $Id$
  */
 @Role
 public interface MandatoryDocumentInitializer
 {
+    /**
+     * Default priority with which a document initializer will be executed along side other document initializers.
+     *
+     * @since 7.0RC1
+     */
+    int DEFAULT_PRIORITY = 1000;
+
     /**
      * @return the reference of the document to update. Can be either local or absolute depending if the document is
      *         associated to a specific wiki or not

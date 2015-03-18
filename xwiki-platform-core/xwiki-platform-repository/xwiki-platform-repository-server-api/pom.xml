@@ -28,7 +28,7 @@
     <version>7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
-  <name>XWiki Platform - Repository - Server API</name>
+  <name>XWiki Platform - Repository - Tests - Server API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Repository - Server API</description>
   <properties>
@@ -61,6 +61,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-query</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

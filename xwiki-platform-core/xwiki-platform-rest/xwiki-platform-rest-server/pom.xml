@@ -34,7 +34,7 @@
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
@@ -68,8 +68,7 @@
           <artifactId>stax-api</artifactId>
           <groupId>javax.xml.stream</groupId>
         </exclusion>
-        <!-- We use Servlet API 2.4 at the moment but org.restlet.ext.jaxrs requires version 2.5 so we need to exclude
-             it. Luckily it seems to work fine with 2.4. -->
+        <!-- Exclude Servlet API 2.5 which is not declared as provided. And we use a newer version too. -->
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>

@@ -49,6 +49,16 @@
   .text-right();
 }
 
+@media (min-width: @screen-sm-min) {
+  .navbar-nav > li > a {
+    /* When the page name is long, add ellipsis. */
+    max-width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 // Navbar avatar ==========================================================
 
 .navbar-avatar {
@@ -96,7 +106,7 @@
        * where the menu is displayed vertically) and the other has the caret for larger screens (where the menu is
        * displayed horizontally).
        */
-      display: inline-block;
+      float: left;
     }
     > .dropdown-split-left {
       /* Display it closer to the menu toggle. */

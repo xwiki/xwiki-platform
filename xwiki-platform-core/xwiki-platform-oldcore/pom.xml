@@ -160,7 +160,7 @@
     <!-- Web part -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.struts</groupId>
@@ -581,6 +581,13 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Used in to prioritize MandatoryDocumentInitializers -->
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
     <!-- Test dependencies -->
 
     <!-- Used to mock XWiki class -->

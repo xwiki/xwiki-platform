@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -40,7 +41,8 @@ import org.xwiki.rest.model.jaxb.Tags;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.representations.tags.TextPlainTagsReader")
+@Component
+@Named("org.xwiki.rest.internal.representations.tags.TextPlainTagsReader")
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 @Singleton

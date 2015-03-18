@@ -60,6 +60,8 @@ import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitiali
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
@@ -270,7 +272,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     /**
      * Restore the existing job, by looking up for such job in the database and re-scheduling those according to their
      * stored status. If a Job is stored with the status "Normal", it is just scheduled If a Job is stored with the
-     * status "Paused", then it is both scheduled and paused Jobs with other status (None, Complete) are not
+     * status "Paused", then it is both scheduled and paused. Jobs with other status (None, Complete) are not
      * rescheduled.
      * 
      * @param context The XWikiContext when initializing the plugin

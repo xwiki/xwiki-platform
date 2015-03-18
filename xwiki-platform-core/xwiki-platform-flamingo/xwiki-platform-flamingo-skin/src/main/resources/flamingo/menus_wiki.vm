@@ -33,7 +33,7 @@
       #if ($hasWatch)
         #set ($watchClasses = '')
         #set ($unwatchClasses = 'hidden')
-        #if ($xwiki.watchlist.isWikiWatched())
+        #if ($services.watchlist.isWatched("WIKI"))
           #set ($watchClasses = 'hidden')
           #set ($unwatchClasses = '')
         #end

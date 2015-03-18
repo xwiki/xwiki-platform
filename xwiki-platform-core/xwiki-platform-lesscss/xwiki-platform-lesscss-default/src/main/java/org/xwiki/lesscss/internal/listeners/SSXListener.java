@@ -30,9 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.observation.EventListener;
@@ -62,6 +63,9 @@ public class SSXListener implements EventListener
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    @Inject
+    private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
     @Override
     public String getName()
@@ -93,12 +97,12 @@ public class SSXListener implements EventListener
                     continue;
                 }
                 if ("LESS".equals(obj.getStringValue("contentType"))) {
-                    LESSObjectPropertyResourceReference
-                            lessObjectPropertyResourceReference = new LESSObjectPropertyResourceReference(
-                                new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, obj.getNumber(),
-                                    document.getDocumentReference())));
-                    lessResourcesCache.clearFromLESSResource(lessObjectPropertyResourceReference);
-                    colorThemeCache.clearFromLESSResource(lessObjectPropertyResourceReference);
+                    ObjectPropertyReference objectPropertyReference = new ObjectPropertyReference("code",
+                            new BaseObjectReference(ssxDocRef, obj.getNumber(), document.getDocumentReference()));
+                    LESSResourceReference lessResourceReference = 
+                            lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
+                    lessResourcesCache.clearFromLESSResource(lessResourceReference);
+                    colorThemeCache.clearFromLESSResource(lessResourceReference);
                 }
             }
         }

@@ -35,6 +35,17 @@ var SelectionManager = Class.create(widgets.SuggestPicker, {
   },
 
   // @Override
+  acceptSuggestion: function(suggestion) {
+    // We look for a suggestion that is already selected and has the same value. We don't rely on the suggestion id
+    // because the id is the user alias and we can have two users with the same alias but from different wikis.
+    // See XWIKI-11868: Cannot add an entity that has the same local and global name with the user/group picker
+    if (!this.list.down('input[value="' + suggestion.value + '"]')) {
+      this.addItem(suggestion);
+    }
+    this.input.value = '';
+  },
+
+  // @Override
   addItem: function($super, suggestion) {
     // Clear the previously selected user in single selection mode.
     this.input.hasClassName('multipleSelection') || this.list.update('');
@@ -46,6 +57,14 @@ var SelectionManager = Class.create(widgets.SuggestPicker, {
     var itemDisplay = this.suggest.createItemDisplay(suggestion, {});
     itemDisplay.down('.user-name').insert(this.createDeleteTool());
     return new Element('li').insert(itemDisplay).insert(this.createItemInput(suggestion));
+  },
+
+  // @Override
+  createItemInput: function(suggestion) {
+    // We don't have to set the input id because the input is hidden. At the same time the suggestion id is the user
+    // alias and we can have two users with the same alias but from different wikis (and thus we would get two hidden
+    // inputs with the same id).
+    return new Element('input', {type: 'hidden', name: this.inputName, value: suggestion.value});
   }
 });
 

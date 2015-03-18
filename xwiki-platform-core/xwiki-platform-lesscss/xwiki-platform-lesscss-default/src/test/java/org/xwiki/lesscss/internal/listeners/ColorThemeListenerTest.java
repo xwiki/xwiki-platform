@@ -29,9 +29,11 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.internal.colortheme.DocumentColorThemeReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -65,11 +67,14 @@ public class ColorThemeListenerTest
 
     private ColorThemeCache colorThemeCache;
 
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
+
     @Before
     public void setUp() throws Exception
     {
         lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
+        colorThemeReferenceFactory = mocker.getInstance(ColorThemeReferenceFactory.class);
     }
 
     @Test
@@ -106,12 +111,15 @@ public class ColorThemeListenerTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
 
+        ColorThemeReference colorThemeReference = new DocumentColorThemeReference(documentReference, null);
+        when(colorThemeReferenceFactory.createReference(eq(documentReference))).thenReturn(colorThemeReference);
+
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
-        verify(colorThemeCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
+        verify(lessResourcesCache).clearFromColorTheme(colorThemeReference);
+        verify(colorThemeCache).clearFromColorTheme(colorThemeReference);
     }
 
     @Test
@@ -131,12 +139,15 @@ public class ColorThemeListenerTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
 
+        ColorThemeReference colorThemeReference = new DocumentColorThemeReference(documentReference, null);
+        when(colorThemeReferenceFactory.createReference(eq(documentReference))).thenReturn(colorThemeReference);
+
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
-        verify(colorThemeCache).clearFromColorTheme(eq(new DocumentColorThemeReference(documentReference)));
+        verify(lessResourcesCache).clearFromColorTheme(colorThemeReference);
+        verify(colorThemeCache).clearFromColorTheme(colorThemeReference);
     }
 
     @Test

@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>SkinsCode</web>
+  <name>XWikiSkinsSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1364502208000</creationDate>
+  <parent>XWiki.XWikiSkins</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1426004715000</date>
+  <contentUpdateDate>1426004711000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('xe.admin.skin')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#####################################
+##      XWikiSkins Sheet
+#####################################
+#set($discard = $xwiki.ssx.use('SkinsCode.XWikiSkinsSheet'))
+#set($discard = $xwiki.jsx.use('SkinsCode.XWikiSkinsSheet'))
+#set($discard = $services.localization.use('document', 'SkinsCode.Translations'))
+#####################
+##   CONTROLLER
+#####################
+## Keep testing the inline action for backward compatibility with existing skin documents.
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #edit()
+#elseif ($xcontext.action == 'get')
+  #if($request.action == 'newObj')
+    #newObj()
+  #elseif($request.action == 'displayObj')
+    #set($obj = $doc.getObject('XWiki.XWikiSkinFileOverrideClass', $numbertool.toNumber($request.objNumber).intValue()))
+    #displayOverrideObject($obj)
+  #elseif($request.action == 'deleteObj')
+    #deleteObj()
+  #end
+#else
+  #view()
+#end
+#####################
+##      VIEW
+#####################
+#macro(view)
+  ## Call getDefaultEditMode() for backward compatibility with existing skins.
+  * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
+  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;$services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))||queryString="skin=${doc.fullName}"]]
+#end
+#####################
+##      EDIT
+#####################
+#macro(edit)
+  == {{translation key="skin.sheet.properties" /}} ==
+  ## Display the class properties
+  #set ($deprecatedProperties = [])
+  #set ($className = 'XWiki.XWikiSkins')
+  #set ($class = $doc.getObject($className).xWikiClass)
+  #foreach ($prop in $class.properties)
+    #if ($prop.classType != 'TextArea')
+    ; $prop.prettyName $prop.classType
+    : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif" displayImage="true"/}}#else $doc.display($prop.name)#end
+    
+    #else
+      #set($discard = $deprecatedProperties.add($prop))
+    #end
+  #end
+  (% id="overrideSection" %)
+  (((
+    == {{translation key="skin.sheet.overridedTemplates" /}} ==
+    
+    {{warning}}
+      {{translation key="skin.sheet.overrideTemplateWarning" /}}
+    {{/warning}}
+    
+    {{html}}
+    &lt;noscript&gt;
+      &lt;div class="box errormessage"&gt;
+        $services.localization.render('skin.sheet.nojs', ["&lt;a href='$doc.getURL('edit', 'editor=object')'&gt;", '&lt;/a&gt;', 'XWiki.XWikiSkinFileOverrideClass'])
+      &lt;/div&gt;
+    &lt;/noscript&gt;
+    {{/html}}
+    
+    {{html}}
+    &lt;div id="addOverride"&gt;
+      &lt;label for="newPath" class="newPathLabel"&gt;$services.icon.renderHTML('add') $services.localization.render("skin.sheet.addTemplate")&lt;/label&gt;
+      &lt;input placeholder="file.vm" id="newPath" name="newPath" value="file.vm" size="20" class="withTip" type="text" /&gt;
+      &lt;button class="btn btn-primary" id="newPathAdd"&gt;$services.localization.render("skin.sheet.add")&lt;/button&gt;
+    &lt;/div&gt;
+    {{/html}}
+    ## Display the XWiki.XWikiSkinFileOverrideClass objects
+    #foreach ($obj in $doc.getObjects('XWiki.XWikiSkinFileOverrideClass'))
+      #displayOverrideObject($obj)
+    #end
+  )))
+  
+  #if ($deprecatedProperties.size() &gt; 0)
+    (% class="deprecatedProperties" %)
+    (((
+      == {{translation key="skin.sheet.deprecatedProperties" /}} ==
+      
+      {{warning}}
+        {{translation key="skin.sheet.deprecatedPropertiesWarning" /}}
+      {{/warning}}
+      
+      #foreach ($prop in $deprecatedProperties)
+        #if ($prop.classType == 'TextArea')
+        ; $services.icon.render('file-white') $prop.prettyName
+        : $doc.display($prop.name)
+        
+        #end
+      #end
+    )))
+  #end
+#end
+###########################
+##  DISPLAY OVERRIDE OBJ
+###########################
+#macro(displayOverrideObject $obj)
+  (% class="overrideObject" %)
+  (((
+    (% class="overrideTitle" %)
+    === $services.icon.render('file-white') $obj.display('path', 'view') ===
+    (% class="overrideObjectDelete" %)
+    (((
+      {{html}}&lt;button class="btn btn-default btn-xs"&gt;$services.icon.renderHTML('cross')&lt;/button&gt;{{/html}}
+    )))
+    (% class="overrideProperties hidden" %)
+    (((
+      #set ($className = 'XWiki.XWikiSkinFileOverrideClass')
+      #set ($class = $doc.getObject($className).xWikiClass)
+      #foreach ($prop in $class.properties)
+        ; $prop.prettyName
+        : $obj.display($prop.name, 'edit')
+    
+      #end
+    )))
+    ----
+  )))
+#end
+###########################
+##     CHECK RIGHTS
+###########################
+#macro(checkRights $response)
+  #if(!$services.csrf.isTokenValid($request.form_token))
+    #set($discard = $response.put('status', 'fail'))
+    #set($discard = $response.put('cause', 'form_token'))
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullname))
+    #set($discard = $response.put('status', 'fail'))
+    #set($discard = $response.put('cause', 'rights'))
+  #end
+#end
+###########################
+##       NEW OBJ
+###########################
+#macro(newObj)
+  #set($response = {})
+  #checkRights($response)
+  #if("$!response.get('status')" != 'fail')
+    #set($obj = $doc.newObject('XWiki.XWikiSkinFileOverrideClass'))
+    #set($discard = $obj.set('path', $request.path))
+    #set($discard = $doc.save('Add a new XWiki.XWikiSkinFileOverrideClass object'))
+    #set($discard = $response.put('objNumber', $obj.number))
+    #set($discard = $response.put('status', 'success'))
+  #end
+  $jsontool.serialize($response)
+#end
+###########################
+##      DELETE OBJ
+###########################
+#macro(deleteObj)
+  #set($response = {})
+  #checkRights($response)
+  #if("$!response.get('status')" != 'fail')
+    #set($objNumber = $numbertool.toNumber($request.objNumber).intValue())
+    #set($obj = $doc.getObject('XWiki.XWikiSkinFileOverrideClass', $objNumber))
+    #set($discard = $doc.removeObject($obj))
+    #set($saveMessage = "Remove the object XWiki.XWikiSkinFileOverrideClass[" + $obj.getValue('path') + "]")
+    #set($discard = $doc.save($saveMessage))
+    #set($discard = $response.put('status', 'success'))
+  #end
+  $jsontool.serialize($response)
+#end
+{{/velocity}}
+</content>
+  <object>
+    <name>SkinsCode.XWikiSkinsSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>e262ce20-f28a-4fa0-89e2-c8413e10dce4</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>puretext</contenttype>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#set($discard = $services.localization.use('document', 'SkinsCode.Translations'))
+require(['jquery', 'xwiki-meta'], function($, xm) {
+
+  // The global variable that will hold the notification widget (wo we can use it in different functions without adding
+  // it to the parameters of these functions)
+  var notif = 0;
+
+  /**
+   * Function called when the user clicks on the 'delete' button of an object
+   */
+  var onDeleteObj = function() {
+    var obj = $(this).parents('.overrideObject');
+    // Getting the object number via the name of an input (eg: XWiki.XWikiSkinFileOverrideClass_3_path -&gt; 3).
+    var objNumber = obj.find('input').prop('name').split('_')[1];
+    // Called when the user confirm the deletion
+    var deleteObjOnConfirm = function() {
+      // Perform asynchronously the deletion
+      notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deleting'))', 'inprogress');
+      $.ajax({
+        'url'      : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+        'type'     : 'POST',
+        'dataType' : 'json',
+        'data' : {
+          'action'      : 'deleteObj'            ,
+          'objNumber'   : objNumber ,
+          'form_token'  : xm.form_token       ,
+          'outputSyntax': 'plain'
+        }
+      }).done(function(data){
+        if (data.status == 'success') {
+          obj.fadeOut();
+          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
+        } else if (data.status == 'fail') {
+          if (data.cause == 'form_token') {
+            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+          } else if (data.cause == 'rights') {
+            notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+          }
+        }
+      });
+    }
+    
+    var confirmationBoxParams = {
+      confirmationText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationText'))',
+      yesButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationYes'))',
+      noButtonText: '$escapetool.javascript($services.localization.render('skin.sheet.js.deleteConfirmationNo'))'
+    };
+    
+    // Display a confirmation box
+    new XWiki.widgets.ConfirmationBox({onYes: deleteObjOnConfirm}, confirmationBoxParams);
+    
+    // Do not perform the default action bound to the &lt;button&gt; element
+    return false;
+  }
+
+  /**
+   * Function called when an override object is clicked.
+   * It shows/hides the properties of the object.
+   */
+  var objTitleClicked = function() {
+    var properties = $(this).parent().find('.overrideProperties');
+    if (properties.hasClass('hidden')) {
+      // It is the first time we open the object
+      // So we remove our own 'hidden' property
+      properties.removeClass('hidden');
+      // Then we hide the object via jQuery
+      properties.hide();
+      // So now we can make it slide (not possible if it were not hidden by jQuery first)
+      properties.slideDown();
+    } else {
+      // The other time, we just use the toggle function
+      properties.slideToggle();
+    }
+  }
+  
+  /**
+   * Function that performs an ajax request to get the code that displays an object and inject it in the page.
+   */
+  var displayObj = function(objNumber) {
+    $.ajax({
+      'url'  : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+      'type' : 'GET',
+      'data' : {
+        'action'    : 'displayObj',
+        'objNumber' : objNumber
+      }
+    }).done(function(data) {
+      notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.addingDone'))', 'done'));
+      // Add the html code into the document
+      $('#overrideSection').append(data);
+      // Get the new object
+      var newObj = $('.overrideObject').last();
+      // Bind the events of the new objects
+      newObj.find('.overrideTitle').click(objTitleClicked);
+      newObj.find('button').click(onDeleteObj);
+      // Show the new object
+      // First we remove our own 'hidden' class
+      newObj.find('.overrideProperties').removeClass('hidden');
+      // Then we hide the object via the jQuery API
+      newObj.hide();
+      // So now we can make it fade (not possible if it were not hidden by jQuery first)
+      newObj.fadeIn();
+      // Scroll to the element
+      $('html, body').animate({scrollTop: newObj.offset().top}, 500);
+    });
+  }
+
+  /**
+   * Function called when the user add a new override object
+   */
+  $('#newPathAdd').click(function() {
+    $.ajax({
+      'url'      : (new XWiki.Document(xm.page, xm.space)).getURL('get'),
+      'type'     : 'POST',
+      'dataType' : 'json',
+      'data' : {
+        'action'      : 'newObj'            ,
+        'path'        : $('#newPath').val() ,
+        'form_token'  : xm.form_token       ,
+        'outputSyntax': 'plain'
+      }
+    }).done(function(data) {
+      notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
+      if (data.status == 'success') {
+        displayObj(data.objNumber);
+      } else if (data.status == 'fail') {
+        if (data.cause == 'form_token') {
+          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.csrf'))', 'error'));
+        } else if (data.cause == 'rights') {
+          notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.error.rights'))', 'error'));
+        }
+      }
+    });
+    
+    // Do not perform the default action bound to the &lt;button&gt; element
+    return false;
+  });
+  
+  var onDeprecatedPropertyClicked = function() {
+    $('.deprecatedProperties &gt; dl').slideToggle();
+  }
+  
+  /**
+   * Function that initialize the javascript events
+   */
+  var init = function() {
+    // Bind objTitleClicked to the existing objects
+    $('.overrideTitle').click(objTitleClicked);
+    // Bind onDeleteObj to the existing objects
+    $('.overrideObject button').click(onDeleteObj);
+    $('.deprecatedProperties &gt; dl').hide();
+    $('.deprecatedProperties &gt; h2').click(onDeprecatedPropertyClicked);
+  }
+  
+  init();
+
+});
+</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>SkinsCode.XWikiSkinsSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>1e4faabf-d1ba-4fff-806a-2b88c6688e92</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>puretext</contenttype>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.overrideTitle:hover, .deprecatedProperties h2:hover{
+  background-color: $theme.highlightColor;
+  cursor: pointer;
+}
+
+.overrideProperties {
+  margin-left: 25px;
+}
+
+.overrideObjectDelete {
+  position: relative;
+  text-align: right;
+  margin-top: -40px;
+  float: right;
+  font-size: 130%;
+}
+
+.skin-colibri .overrideObjectDelete {
+  margin-top: -55px;
+}
+
+.newPathLabel {
+  color: $theme.linkColor;
+  display: inline;
+  font-size: 100%;
+  font-style: italic;
+  font-weight: normal;
+  margin: 0px;
+  text-transform: none;
+}
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

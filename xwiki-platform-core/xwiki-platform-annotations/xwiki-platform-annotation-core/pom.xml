@@ -68,7 +68,6 @@
       <artifactId>xwiki-platform-configuration-default</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
@@ -84,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

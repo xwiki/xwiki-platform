@@ -46,6 +46,16 @@
       <artifactId>jetty-server</artifactId>
       <version>${jetty.version}</version>
     </dependency>
+    <!-- We need to bundle the Servlet API in the Jetty JARs. This is normally drawn transitively by the jetty-server
+         artifact above. However, since we declare the Servlet API dependency (javax.servlet:javax.servlet-api) with
+         a "provided" scope in our top level POM, the Assembly plugin doesn't include it by default. In addition
+         we need to specify the version so that it's the one that is required by the version of Jetty used. -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-xml</artifactId>

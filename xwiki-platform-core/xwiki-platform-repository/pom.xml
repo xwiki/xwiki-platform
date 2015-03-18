@@ -39,7 +39,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-repository-test-pageobjects</module>
+        <module>xwiki-platform-repository-test</module>
       </modules>
     </profile>
   </profiles>

@@ -672,8 +672,7 @@ public class Utils
         } catch (ComponentLookupException e) {
             // This means the Context Root CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
-
-            LOGGER.warn("Failed to find the [context/root] Component Manager. Cause: [{}]. Using the Root Component "
+            LOGGER.debug("Failed to find the [context/root] Component Manager. Cause: [{}]. Using the Root Component "
                 + "Manager", ExceptionUtils.getRootCauseMessage(e));
         }
 
@@ -697,9 +696,8 @@ public class Utils
         } catch (ComponentLookupException e) {
             // This means the Context CM doesn't exist, use the Root CM.
             contextComponentManager = rootComponentManager;
-
-            LOGGER.warn("Failed to find the [context] Component Manager. Cause: [{}]. Using the Root Component Manager",
-                ExceptionUtils.getRootCauseMessage(e));
+            LOGGER.debug("Failed to find the [context] Component Manager. Cause: [{}]. Using the Root Component "
+                + "Manager", ExceptionUtils.getRootCauseMessage(e));
         }
 
         return contextComponentManager;

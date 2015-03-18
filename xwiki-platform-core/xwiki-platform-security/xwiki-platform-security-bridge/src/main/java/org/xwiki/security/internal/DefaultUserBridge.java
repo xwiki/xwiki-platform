@@ -22,6 +22,7 @@ package org.xwiki.security.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -86,6 +87,7 @@ public class DefaultUserBridge implements UserBridge
 
     /**
      * Get all groups in a given wiki where a given user or group is a member of.
+     *
      * @param wiki the wiki to search groups containing the user/group
      * @param userOrGroupDocumentReference the user/group document reference
      * @return the list of group where the user/group is a member
@@ -103,9 +105,25 @@ public class DefaultUserBridge implements UserBridge
         }
 
         String currentWiki = xwikiContext.getWikiId();
+        Collection<DocumentReference> groupReferences = new HashSet<>();
         try {
-            xwikiContext.setWikiId(wiki.getName());
-            return groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, xwikiContext);
+            xwikiContext.setWikiId(wiki.getName());            
+            // We get the groups of the member via the group service but we make sure to not use the group service's
+            // cache by calling the method with a limit and an offset.
+            //
+            // We do not use the group service's cache because it might not have been refreshed yet (for example, it can
+            // happen when the security module is used inside a listener that reacts to the "SaveDocument" event just 
+            // before the XWikiGroupService listener is called). Because of this race condition, it is not a good idea
+            // to have a cache depending on an other cache.
+            //
+            // TODO: use a proper component to retrieve the groups of a member without any cache
+            final int nb = 1000;
+            int i = 0;
+            while (groupReferences.addAll(groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference,
+                nb, i * nb, xwikiContext))) {
+                i++;
+            }            
+            return groupReferences;
         } catch (Exception e) {
             throw new AuthorizationException(String.format("Failed to get groups for user or group [%s] in wiki [%s]",
                 userOrGroupDocumentReference, wiki), e);

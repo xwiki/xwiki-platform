@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.rest.XWikiResource;
@@ -38,7 +40,8 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.AllObjectsForClassNameResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.AllObjectsForClassNameResourceImpl")
 public class AllObjectsForClassNameResourceImpl extends XWikiResource implements AllObjectsForClassNameResource
 {
     @Override

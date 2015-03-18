@@ -45,15 +45,13 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
     @Rule
     public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
-    
+
     @Before
     public void setUp() throws Exception
     {
-        
         // Set the SMTP port to the default port used by Greenmail (3025)
-        getUtil().addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences");
-        getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, "smtp_port", 3025);
-        getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, "smtp_server", "localhost");
+        getUtil().updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
+            "3025", "sendWaitTime", "0");
 
         // Start GreenMail test server
         this.greenMail = new GreenMail();
@@ -81,6 +79,12 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
     {
         // Stop GreenMail test server
         this.greenMail.stop();
+
+        // Make sure we can restore the settings, so we log back with superadmin to finish the work
+        getUtil().loginAsSuperAdmin();
+
+        // Remove the previous version that the setup has created.
+        getUtil().deleteLatestVersion("Mail", "MailConfig");
     }
 
     @Test
@@ -117,14 +121,16 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
         // Trigger the notification for the Daily job
         schedulerHomePage.clickJobActionTrigger("WatchList daily notifier");
-        
+
         // Wait for the email with a timeout
         Assert.assertTrue("Mail not received", this.greenMail.waitForIncomingEmail(70000, 1));
 
         // Verify email content
         String messageFromXWiki = GreenMailUtil.getBody(this.greenMail.getReceivedMessages()[0]);
         Assert.assertFalse("should have no exception in " + messageFromXWiki, messageFromXWiki.contains("Exception"));
-        Assert.assertTrue("should have test page in message " + messageFromXWiki, messageFromXWiki.contains("TestWatchThisPage"));
-        Assert.assertTrue("should have test space in message " + messageFromXWiki, messageFromXWiki.contains("TestWatchWholeSpace"));
+        Assert.assertTrue("should have test page in message " + messageFromXWiki,
+            messageFromXWiki.contains("TestWatchThisPage"));
+        Assert.assertTrue("should have test space in message " + messageFromXWiki,
+            messageFromXWiki.contains("TestWatchWholeSpace"));
     }
 }

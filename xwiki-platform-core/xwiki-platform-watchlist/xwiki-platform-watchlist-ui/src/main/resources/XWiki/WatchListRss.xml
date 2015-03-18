@@ -20,30 +20,42 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>WatchListRss</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WatchListClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WatchListClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1251378776000</creationDate>
   <date>1251378776000</date>
   <contentUpdateDate>1251378776000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+## WatchList RSS.
+## This page must be called with the following query string: "?xpage=plain&amp;outputSyntax=plain"
+#if("$!request.xpage" != 'plain' &amp;&amp; "$!request.outputSyntax" != 'plain')
+WatchList RSS feed
+#else
+$!response.setContentType('application/rss+xml')##
+#set($feed = $services.watchlist.getFeed(20))##
+#set($discard = $feed.setPublishedDate($datetool.date))
+$xwiki.feed.getFeedOutput($feed, 'rss_2.0')##
+#end
+{{/velocity}}</content>
   <object>
+    <name>XWiki.WatchListRss</name>
+    <number>0</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>f529e671-576d-4070-b8c1-17a336856751</guid>
     <class>
       <name>XWiki.XWikiRights</name>
       <customClass/>
@@ -55,6 +67,7 @@
       <validationScript/>
       <allow>
         <defaultValue>1</defaultValue>
+        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>allow</displayType>
         <name>allow</name>
@@ -65,20 +78,22 @@
       </allow>
       <groups>
         <cache>0</cache>
-        <displayType>select</displayType>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>groups</name>
         <number>1</number>
+        <picker>1</picker>
         <prettyName>Groups</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
       </groups>
       <levels>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>1</multiSelect>
         <name>levels</name>
@@ -92,23 +107,20 @@
       </levels>
       <users>
         <cache>0</cache>
-        <displayType>select</displayType>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
         <multiSelect>1</multiSelect>
         <name>users</name>
         <number>3</number>
+        <picker>1</picker>
         <prettyName>Users</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <size>5</size>
         <unmodifiable>0</unmodifiable>
-        <usesList>1</usesList>
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
-    <name>XWiki.WatchListRss</name>
-    <number>0</number>
-    <className>XWiki.XWikiRights</className>
-    <guid>f529e671-576d-4070-b8c1-17a336856751</guid>
     <property>
       <allow>0</allow>
     </property>
@@ -119,16 +131,4 @@
       <users>XWiki.XWikiGuest</users>
     </property>
   </object>
-  <content>{{velocity}}
-## WatchList RSS.
-## This page must be called with the following query string: "?xpage=plain&amp;outputSyntax=plain"
-#if("$!request.xpage" != 'plain' &amp;&amp; "$!request.outputSyntax" != 'plain')
-WatchList RSS feed
-#else
-$!response.setContentType('application/rss+xml')##
-#set($feed = $xwiki.watchlist.getFeed(20))##
-#set($discard = $feed.setPublishedDate($datetool.date))
-$xwiki.feed.getFeedOutput($feed, 'rss_2.0')##
-#end
-{{/velocity}}</content>
 </xwikidoc>

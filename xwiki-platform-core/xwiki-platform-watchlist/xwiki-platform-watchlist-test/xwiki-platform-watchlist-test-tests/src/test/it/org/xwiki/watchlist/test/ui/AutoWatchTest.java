@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.watchlist.test.po.WatchlistUserProfilePage;
+import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 
 /**
  * Tests Watchlist application features.
@@ -34,35 +35,90 @@ import org.xwiki.watchlist.test.po.WatchlistUserProfilePage;
  */
 public class AutoWatchTest extends AbstractTest
 {
-    private WatchlistUserProfilePage watchlistPage;
-
     private String testSpace;
+
+    private String testUser;
+
+    private String existingPageName;
 
     @Before
     public void setUp()
     {
-        String userName = RandomStringUtils.randomAlphanumeric(5);
+        this.testUser = RandomStringUtils.randomAlphanumeric(5);
+        this.testSpace = this.testUser + "Test";
 
-        getUtil().createUserAndLogin(userName, "password");
-        WatchlistUserProfilePage profilePage = WatchlistUserProfilePage.gotoPage(userName);
+        this.existingPageName = "existingPage";
+        getUtil().loginAsSuperAdmin();
+        getUtil().createPage(this.testSpace, existingPageName, null, null);
 
-        this.watchlistPage = profilePage.switchToWatchlist();
-
-        this.testSpace = this.watchlistPage.getUsername() + "Test";
+        getUtil().createUserAndLogin(this.testUser, "password");
     }
 
     @Test
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See http://jira.xwiki.org/browse/XE-1177")
-    public void testAutomaticWatchNewPage()
+    public void testAutomaticWatchDefaultAndNone()
     {
-        // create a new page
-        getUtil().createPage(this.testSpace, "testpage", null, null);
+        /*
+         * Scenario 1: 'Default' autowatch mode should watch new and modified documents.
+         */
+        WatchlistUserProfilePage watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
 
-        // go back to watchlist profile
-        this.watchlistPage = WatchlistUserProfilePage.gotoPage(this.watchlistPage.getUsername());
+        String newPageName1 = "testpage";
 
-        // check if it's registered in the watchlist
-        Assert
-            .assertTrue("Newly created page is not watched", this.watchlistPage.getWatchlistMacro().isWatched(this.testSpace, "testpage"));
+        // Ensure the pages are not already watched.
+        Assert.assertFalse("The test page should not be already watched when just starting", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, newPageName1));
+        Assert.assertFalse("The test page should not be already watched when just starting", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, this.existingPageName));
+
+        // Set to 'default' automatic watch mode.
+        WatchlistPreferencesEditPage preferences = watchlistPage.editPreferences();
+        preferences.setAutomaticWatchDefault();
+        preferences.clickSaveAndContinue();
+
+        // Create the new page and modify the existing one.
+        getUtil().createPage(this.testSpace, newPageName1, null, null);
+        getUtil().gotoPage(this.testSpace, this.existingPageName, "save", "content", "Test content");
+
+        // Go back to watchlist profile.
+        watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
+
+        // Check if they are registered in the watchlist.
+        Assert.assertTrue("Newly created page is not watched",
+            watchlistPage.getWatchlistMacro().isWatched(this.testSpace, newPageName1));
+        Assert.assertTrue("Newly created page is not watched",
+            watchlistPage.getWatchlistMacro().isWatched(this.testSpace, this.existingPageName));
+
+        /*
+         * Scenario 2: 'None' autowatch mode should not watch new or modified documents.
+         */
+        String newPageName2 = "testpage2";
+
+        // Cleanup from the previous test. Assume the existing page is unwatched.
+        watchlistPage.getWatchlistMacro().unWatch(this.testSpace, this.existingPageName);
+
+        // Ensure the pages are not already watched.
+        Assert.assertFalse("The test page should not be already watched when just starting", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, newPageName2));
+        Assert.assertFalse("The test page should not be already watched when just starting", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, this.existingPageName));
+
+        // Set to 'none' automatic watch mode.
+        preferences = watchlistPage.editPreferences();
+        preferences.setAutomaticWatchNone();
+        preferences.clickSaveAndContinue();
+
+        // Create the new page and modify the existing one.
+        getUtil().createPage(this.testSpace, newPageName2, null, null);
+        getUtil().gotoPage(this.testSpace, this.existingPageName, "save", "content", "Test content");
+
+        // Go back to watchlist profile
+        watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
+
+        // Check if it's registered in the watchlist
+        Assert.assertFalse("Newly created page is watched even if autowatch is set to 'none'", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, newPageName2));
+        Assert.assertFalse("Modified page is watched even if autowatch is set to 'none'", watchlistPage
+            .getWatchlistMacro().isWatched(this.testSpace, this.existingPageName));
     }
 }

@@ -104,10 +104,9 @@ public class MockitoOldcoreRule implements MethodRule
 
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
 
-    private QueryManager mockQueryManager;
+    private QueryManager queryManager;
 
-    protected Map<DocumentReference, XWikiDocument> documents =
-        new ConcurrentHashMap<DocumentReference, XWikiDocument>();
+    protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
     private boolean notifyDocumentCreatedEvent;
 
@@ -208,7 +207,7 @@ public class MockitoOldcoreRule implements MethodRule
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
         if (this.componentManager.hasComponent(Environment.class)) {
-            ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
+            ServletEnvironment environment = this.componentManager.getInstance(Environment.class);
 
             ServletContext servletContextMock = mock(ServletContext.class);
             environment.setServletContext(servletContextMock);
@@ -570,8 +569,14 @@ public class MockitoOldcoreRule implements MethodRule
         });
 
         // Query Manager
-        this.mockQueryManager = getMocker().registerMockComponent(QueryManager.class);
-        when(getMockStore().getQueryManager()).thenReturn(this.mockQueryManager);
+        // If there's already a Query Manager registered, use it instead.
+        // This allows, for example, using @ComponentList to use the real Query Manager, in integration tests.
+        if (!this.componentManager.hasComponent(QueryManager.class)) {
+            this.queryManager = getMocker().registerMockComponent(QueryManager.class);
+        } else {
+            this.queryManager = this.componentManager.getInstance(QueryManager.class);
+        }
+        when(getMockStore().getQueryManager()).thenReturn(this.queryManager);
     }
 
     protected void after() throws Exception
@@ -641,6 +646,6 @@ public class MockitoOldcoreRule implements MethodRule
      */
     public QueryManager getQueryManager()
     {
-        return this.mockQueryManager;
+        return this.queryManager;
     }
 }

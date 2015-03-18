@@ -28,11 +28,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.colortheme.ColorTheme;
-import org.xwiki.lesscss.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.colortheme.ColorTheme;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.cache.ColorThemeCache}.
+ * Default implementation for {@link org.xwiki.lesscss.internal.cache.ColorThemeCache}.
  *
  * @since 6.4M2
  * @version $Id$

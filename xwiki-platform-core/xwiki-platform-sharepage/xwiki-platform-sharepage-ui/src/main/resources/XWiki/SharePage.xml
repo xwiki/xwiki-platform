@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>SharePage</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.Mail</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1364502211000</creationDate>
+  <date>1364571178000</date>
+  <contentUpdateDate>1289519863000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.SharePage</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>6a871119-c483-4cd8-aa24-f72c236c979b</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function(XWiki) {
+  /**
+   * Extends the SuggestPicker to customize the way the selected targets (users or email addresses) are displayed.
+   */
+  var TargetSelectionManager = Class.create(XWiki.widgets.SuggestPicker, {
+    // @Override
+    initialize: function($super, element, suggest, options) {
+      $super(element, suggest, options);
+      this.list.addClassName('targets-container');
+    },
+
+    // @Override
+    matchesSelectedValue: function(value, suggestion) {
+      // The given value can be a relative user reference. We need to parse it and match only the user alias.
+      return XWiki.Model.resolve(value, XWiki.EntityType.DOCUMENT).name == suggestion.id;
+    },
+
+    // @Override
+    displayItem: function(suggestion) {
+      var targetInfo = new Element('span').update(suggestion.info).insert(this.createDeleteTool());
+      var targetClass = 'target-item ' + (suggestion.value.indexOf('@') &gt; 0 ? 'target-email' : 'target-user');
+      return new Element('li', {'class': targetClass}).insert(targetInfo).insert(this.createItemInput(suggestion));
+    }
+  });
+
+  /**
+   * Extends the UserPicker to change the selection manager.
+   */
+  var UserAndEmailPicker = Class.create(XWiki.widgets.UserPicker, {
+    // @Override
+    _createSelectionManager: function(options) {
+      return new TargetSelectionManager(this.fld, this, options);
+    },
+
+    // @Override
+    setHighlightedValue: function ($super) {
+      if (!this.iHighlighted) {
+        // Select the current input value when there is no highlighted suggestion to allow the user to enter free
+        // text (e.g. an email address).
+        this.clearSuggestions();
+        typeof this.options.callback == "function" &amp;&amp; this.options.callback({
+          'id': this.fld.value,
+          'value': this.fld.value,
+          'info': this.fld.value,
+        });
+      } else {
+        $super();
+      }
+    },
+
+    // @Override
+    clearSuggestions: function($super) {
+      $super();
+      // Keep the picker active even after clearing the list of suggestions to force it to handle the Enter key. This
+      // way the user can enter free text (e.g. an email address) without submitting the form.
+      this.isActive = true;
+    }
+  });
+
+  XWiki.SharePage = Class.create({
+    initialize : function () {
+      this.input = $('shareTarget');
+      if (!this.input) {
+        return;
+      }
+
+      new UserAndEmailPicker(this.input, {
+        script: XWiki.currentDocument.getURL('get', 'xpage=uorgsuggest&amp;uorg=user&amp;'),
+        shownoresults : false
+      });
+      this.input.focus();
+
+      document.observe('xwiki:multisuggestpicker:selectionchanged', this._onSelectionChanged.bindAsEventListener(this));
+
+      this.form = this.input.up('form');
+      if (this.form) {
+        this.form.observe('submit', this._onSubmit.bindAsEventListener(this));
+        dialog &amp;&amp; this.form.down('.secondary').observe('click', function(event) {
+          event.stop();
+          dialog.closeDialog();
+        }.bindAsEventListener(this));
+      }
+    },
+
+    _onSubmit : function(event) {
+      event.stop();
+      if (!this.form.down('.target-item') &amp;&amp; this.input.value.strip().length == 0) {
+        this.input.addClassName('xErrorField');
+        this.input.insert({'after' : '&lt;div class="xErrorMsg"&gt;$services.localization.render('core.viewers.share.error.missingRecipient')&lt;/div&gt;'});
+        return;
+      }
+      var params = this.form.serialize();
+      this.form.up().update(loading);
+      new Ajax.Updater(loading.up(), XWiki.currentDocument.getURL('get', 'xpage=shareinline'), {
+        parameters: params,
+        onComplete : function() {
+          dialog &amp;&amp; dialog.dialog.down('.share-backlink').observe('click', dialog.closeDialog.bind(dialog));
+        }
+      });
+    },
+
+    _onSelectionChanged : function(event) {
+      if (event.memo.trigger == this.input) {
+        this.input.removeClassName('xErrorField');
+        var errorMessage = this.input.next('.xErrorMsg');
+        errorMessage &amp;&amp; errorMessage.remove();
+      }
+    }
+  });
+
+  var loading = new Element('div', {'class' : 'imgcenter'}).update("&lt;img src=\"$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')\"/&gt;");
+  var dialog;
+
+  document.observe('xwiki:dom:loaded', function() {
+    $('shareTarget') &amp;&amp; new XWiki.SharePage();
+    if ($('tmActionShare')) {
+      $('tmActionShare').observe('click', function(event) {
+        event.stop();
+        dialog = new XWiki.widgets.ModalPopup(
+          loading, {}, {
+            'verticalPosition' : 'top',
+            'title' : "$services.localization.render('core.viewers.share.dialogTitle')",
+            'removeOnClose' : true
+          }
+        );
+        dialog.showDialog();
+        loading.up().up().addClassName('share-dialog');
+        new Ajax.Updater(loading.up(), XWiki.currentDocument.getURL('get', 'xpage=shareinline'), {
+          onComplete : function() { new XWiki.SharePage(); }
+        });
+      });
+    }
+  });
+  return XWiki;
+}(XWiki || {}));</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <disabled>0</disabled>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <disabled>0</disabled>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <name>XWiki.SharePage</name>
+    <number>0</number>
+    <className>XWiki.Mail</className>
+    <guid>de72bc55-5b53-4659-a48d-27bb768146f5</guid>
+    <property>
+      <html>&lt;p&gt;Hello ${recipientName},&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;${xwiki.getUserName($xcontext.user)}&lt;/strong&gt; thought you might be interested in the document &lt;a href="${doc.getExternalURL()}"&gt;$!{escapetool.xml(${doc.displayTitle})}&lt;/a&gt; on &lt;a href="${xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).getExternalURL()}"&gt;${request.getServerName()}&lt;/a&gt;.&lt;/p&gt;
+
+#if ("$!{message}" != '')
+&lt;p&gt;Here is their message:&lt;/p&gt;
+
+&lt;pre style="border: 1px solid #000; padding: 10px; font-size: 130%;"&gt;
+$!{escapetool.xml($message)}
+&lt;/pre&gt;
+#end
+&lt;p&gt;To visit this document online, open &lt;a href="${doc.getExternalURL()}"&gt;${doc.getExternalURL()}&lt;/a&gt; in your browser.&lt;/p&gt;
+
+#if ($display == 'inline')
+
+&lt;p&gt;Here is the current version of the document:&lt;/p&gt;
+
+&lt;h1&gt;${doc.displayTitle}&lt;/h1&gt;
+&lt;div style="border: 1px solid #000; padding: 10px;"&gt;
+
+  $doc.getRenderedContent()
+&lt;/div&gt;
+
+#end
+
+&lt;hr /&gt;
+&lt;p&gt;This message was generated by XWiki at ${request.serverName} on behalf of ${xwiki.getUserName($xcontext.user)}.&lt;/p&gt;</html>
+    </property>
+    <property>
+      <language>en</language>
+    </property>
+    <property>
+      <subject>$xwiki.getUserName($xcontext.user, false) wants to share a document with you</subject>
+    </property>
+    <property>
+      <text>Hello ${recipientName},
+
+${xwiki.getUserName($xcontext.user, false)} thought you might be interested in the document "$!{escapetool.xml(${doc.displayTitle})}" (${doc.getExternalURL()}) on ${request.getServerName()}.
+
+#if ("$!{message}" != '')
+Here is their message:
+
+-----------------------------------------------------
+$!{escapetool.xml($message)}
+-----------------------------------------------------
+#end
+
+To visit this document online, open ${doc.getExternalURL()} in your browser.
+
+#if ($display == 'inline')
+
+Here is the current version of the document:
+
+-----------------------------------------------------
+$doc.getRenderedContent()
+
+#end
+
+-----------------------------------------------------
+This message was generated by XWiki at ${request.serverName} on behalf of ${xwiki.getUserName($xcontext.user, false)}.</text>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <disabled>0</disabled>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <disabled>0</disabled>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <name>XWiki.SharePage</name>
+    <number>1</number>
+    <className>XWiki.Mail</className>
+    <guid>3c186334-ece1-4caa-b452-651bbe106695</guid>
+    <property>
+      <html>&lt;p&gt;Bonjour ${recipientName},&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;${xwiki.getUserName($xcontext.user)}&lt;/strong&gt; a pensé que vous pourriez être intéressé par le document &lt;a href="${doc.getExternalURL()}"&gt;$!{escapetool.xml(${doc.displayTitle})}&lt;/a&gt; sur &lt;a href="${xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).getExternalURL()}"&gt;${request.getServerName()}&lt;/a&gt;.&lt;/p&gt;
+
+#if ("$!{message}" != '')
+&lt;p&gt;Voici son message :&lt;/p&gt;
+
+&lt;pre style="border: 1px solid #000; padding: 10px; font-size: 130%;"&gt;
+$!{escapetool.xml($message)}
+&lt;/pre&gt;
+#end
+&lt;p&gt;Pour consulter le document, cliquez sur ce lien &lt;a href="${doc.getExternalURL()}"&gt;${doc.getExternalURL()}&lt;/a&gt; (ou faites un copier / coller dans votre navigateur).&lt;/p&gt;
+
+#if ($display == 'inline')
+
+&lt;p&gt;Voici le contenu du document :&lt;/p&gt;
+
+&lt;h1&gt;${doc.displayTitle}&lt;/h1&gt;
+&lt;div style="border: 1px solid #000; padding: 10px;"&gt;
+
+  $doc.getRenderedContent()
+&lt;/div&gt;
+
+#end
+
+&lt;hr /&gt;
+&lt;p&gt;Ce message a été généré par XWiki depuis ${request.serverName} au nom de ${xwiki.getUserName($xcontext.user)}.&lt;/p&gt;</html>
+    </property>
+    <property>
+      <language>fr</language>
+    </property>
+    <property>
+      <subject>$xwiki.getUserName($xcontext.user, false) souhaite partager un document avec vous</subject>
+    </property>
+    <property>
+      <text>Bonjour ${recipientName},
+
+${xwiki.getUserName($xcontext.user, false)} a pensé que vous pourriez être intéressé par le document "$!{escapetool.xml(${doc.displayTitle})}" (${doc.getExternalURL()}) sur ${request.getServerName()}.
+
+#if ("$!{message}" != '')
+Voici son message :
+
+-----------------------------------------------------
+$!{escapetool.xml($message)}
+-----------------------------------------------------
+#end
+
+Pour consulter le document, cliquez sur ce lien ${doc.getExternalURL()} (ou faites un copier / coller dans votre navigateur).
+
+#if ($display == 'inline')
+
+Voici le contenu du document :
+
+-----------------------------------------------------
+$doc.getRenderedContent()
+
+#end
+
+-----------------------------------------------------
+Ce message a été généré par XWiki depuis ${request.serverName} au nom de ${xwiki.getUserName($xcontext.user, false)}.</text>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <disabled>0</disabled>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <disabled>0</disabled>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <name>XWiki.SharePage</name>
+    <number>2</number>
+    <className>XWiki.Mail</className>
+    <guid>3175e875-e079-4cd7-a667-1c8d0c7ff5e4</guid>
+    <property>
+      <html>&lt;p&gt;Guten Tag ${recipientName},&lt;/p&gt;
+
+		&lt;p&gt;&lt;strong&gt;${xwiki.getUserName($context.user)}&lt;/strong&gt; möchte Sie auf das Dokument &lt;a href="${doc.getExternalURL()}"&gt;$!{escapetool.xml(${doc.displayTitle})}&lt;/a&gt; hinweisen.&lt;/p&gt;
+
+		#if ("$!{message}" != '')
+		&lt;p&gt;Nachricht von $xwiki.getUserName($context.user, false):&lt;/p&gt;
+
+		&lt;pre style="border: 1px solid #000; padding: 10px; font-size: 130%;"&gt;
+		$!{escapetool.xml($message)}
+		&lt;/pre&gt;
+		#end
+		&lt;p&gt;Um das Dokument online zu sehen, öffnen Sie &lt;a href="${doc.getExternalURL()}"&gt;${doc.getExternalURL()}&lt;/a&gt; in Ihrem Browser.&lt;/p&gt;
+
+		#if ($display == 'inline')
+
+		&lt;p&gt;Inhalt des Dokumentes:&lt;/p&gt;
+
+		&lt;h1&gt;${doc.displayTitle}&lt;/h1&gt;
+		&lt;div style="border: 1px solid #000; padding: 10px;"&gt;
+
+		  $doc.getRenderedContent()
+		&lt;/div&gt;
+
+		#end
+
+		&lt;hr /&gt;
+		&lt;p&gt;Dies Nachricht ist generiert worden vom Wiki ${request.serverName} im Auftrag von ${xwiki.getUserName($context.user)}.&lt;/p&gt;</html>
+    </property>
+    <property>
+      <language>de</language>
+    </property>
+    <property>
+      <subject>$xwiki.getUserName($context.user, false) hat eine Seite mit Ihnen geteilt</subject>
+    </property>
+    <property>
+      <text>Guten Tag ${recipientName},
+
+		${xwiki.getUserName($context.user, false)} möchte Sie auf das Dokument "$!{escapetool.xml(${doc.displayTitle})}" (${doc.getExternalURL()}) hinweisen.
+
+		#if ("$!{message}" != '')
+		Nachricht von $xwiki.getUserName($context.user, false):
+
+		-----------------------------------------------------
+		$!{escapetool.xml($message)}
+		-----------------------------------------------------
+		#end
+
+		Um das Dokument online zu sehen, öffnen Sie ${doc.getExternalURL()} in Ihrem Browser.
+
+		#if ($display == 'inline')
+
+		Inhalt des Dokumentes:
+
+		-----------------------------------------------------
+		$doc.getRenderedContent()
+
+		#end
+
+		-----------------------------------------------------
+		Dies Nachricht ist generiert worden vom Wiki ${request.serverName} im Auftrag von ${xwiki.getUserName($context.user, false)}.</text>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>XWiki.SharePage</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>9a3e3cf0-3ae2-4321-8284-d14640ddcbd1</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template("colorThemeInit.vm")
+.share-dialog .mail-preview {
+  background-color: $theme.backgroundSecondaryColor;
+  border: 1px solid $theme.borderColor;
+  border-radius: 4px;
+  box-shadow: inset 0 0 7px $theme.borderColor;
+  padding: 0 10px;
+  max-height: 20em;
+  overflow: auto;
+}
+#shareTarget.withScope {
+  border-left-width: 25px;
+}
+.targets-container {
+  background: $theme.highlightColor;
+  border: 1px dotted $theme.borderColor;
+  margin: 4px 0;
+  max-height: 4em;
+  overflow: auto;
+}
+.target-item {
+  background: transparent none left center no-repeat;
+  display: inline-block;
+  margin-right: 1em;
+  padding: 0px 1px 0px 18px;
+}
+.targets-container .target-user {
+  background-image: url("$xwiki.getSkinFile('icons/silk/user.png')");
+}
+.targets-container .target-group {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
+}
+.targets-container .target-email {
+  background-image: url("$xwiki.getSkinFile('icons/silk/email.png')");
+}
+
+.target-item .delete, .target-item .delete:visited {
+  color: transparent; /*$theme.pageContentBackgroundColor;*/
+  cursor: pointer;
+  font-size: 70%;
+  font-weight: bold;
+  text-decoration: none !important;
+  vertical-align: super;
+}
+.target-item:hover .delete {
+  color: $theme.textPrimaryColor;
+}
+.target-item .delete:hover {
+  color: $theme.notificationErrorColor;
+}</code>
+    </property>
+    <property>
+      <name>Toolbox style</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

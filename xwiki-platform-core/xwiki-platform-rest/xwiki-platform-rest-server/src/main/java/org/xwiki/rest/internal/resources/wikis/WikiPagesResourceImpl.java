@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
@@ -46,7 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikiPagesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikiPagesResourceImpl")
 public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesResource
 {
     @Override

@@ -46,6 +46,15 @@
 
 {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
+#macro (getNotifierPrettyName $notifier)
+  #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
+  #set ($notifierDoc = $xwiki.getDocument($notifierReference))
+  #set ($notifierPrettyName = $notifierDoc.plainTitle)
+  #if ("$!notifierPrettyName" == '')
+    #set ($notifierPrettyName = $notifier)
+  #end##
+$notifierPrettyName##
+#end
 #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
@@ -57,22 +66,28 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
-        #set($notifierDocs = $xwiki.watchlist.getNotifiers())
+        #set($notifiers = $services.watchlist.getNotifiers())
         #set($currentNotifier = $watchOject.getProperty('interval').getValue())
         &lt;dd&gt;
           #if($xcontext.action=='view')
             #if("$!currentNotifier" != "")
-              #foreach($notifierDoc in $notifierDocs)
-                #if($notifierDoc.getFullName() == $currentNotifier)
-                  $notifierDoc.getPlainTitle()
+              #foreach($notifier in $notifiers)
+                #if($notifier == $currentNotifier)
+                  #getNotifierPrettyName($notifier)
                 #end
               #end
             #end
           #else
             &lt;select name="XWiki.WatchListClass_0_interval"&gt;
               &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
-              #foreach($notifierDoc in $notifierDocs)
-                &lt;option value="$notifierDoc.getFullName()"#if($notifierDoc.getFullName()==$currentNotifier) selected="selected"#end&gt;$notifierDoc.getPlainTitle()&lt;/option&gt;
+              #foreach($notifier in $notifiers)
+                #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
+                #set ($notifierDoc = $xwiki.getDocument($notifierReference))
+                #set ($notifierPrettyName = $notifierDoc.plainTitle)
+                #if ("$!notifierPrettyName" == '')
+                  #set ($notifierPrettyName = $notifier)
+                #end
+                &lt;option value="$notifier"#if($notifier == $currentNotifier) selected='selected'#end&gt;#getNotifierPrettyName($notifier)&lt;/option&gt;
               #end
             &lt;/select&gt;
           #end

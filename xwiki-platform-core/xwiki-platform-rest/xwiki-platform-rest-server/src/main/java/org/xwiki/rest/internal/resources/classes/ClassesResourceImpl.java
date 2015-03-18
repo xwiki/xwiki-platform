@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -36,7 +38,8 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
 public class ClassesResourceImpl extends XWikiResource implements ClassesResource
 {
     @Override

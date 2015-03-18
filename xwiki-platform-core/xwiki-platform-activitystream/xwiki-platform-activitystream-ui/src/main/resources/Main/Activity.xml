@@ -1015,9 +1015,10 @@ $xwiki.ssx.use('Main.Activity')##
     #set ($discard = $filterParameters.add("${currentUser}^XWiki.XWikiUsers"))
     ##
     ## A user should see personal messages from followed users
-    #if ($xwiki.watchlist.getWatchedUsers().size() &gt; 0)
+    #set ($followedUsers = $services.watchlist.getWatchedElements("USER"))
+    #if ($followedUsers.size() &gt; 0)
       #set ($messageFilter = "$messageFilter or (act.type = 'personalMessage' and act.user in (")
-      #foreach ($u in $xwiki.watchlist.getWatchedUsers())
+      #foreach ($u in $followedUsers)
         #if ($velocityCount &gt; 1)
           #set ($messageFilter = $messageFilter.concat(','))
         #end

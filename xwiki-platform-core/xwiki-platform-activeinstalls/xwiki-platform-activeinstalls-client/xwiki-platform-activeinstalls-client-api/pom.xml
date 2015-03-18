@@ -61,8 +61,7 @@
     <!-- We want to log the Servlet Container name/version in the ping -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

@@ -133,7 +133,7 @@
   #if ($hasWatch && $xcontext.isMainWiki())
     #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isWikiWatched())
+    #if ($services.watchlist.isWatched("WIKI"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end
@@ -203,7 +203,7 @@
     #if ($hasWatch)
       #set ($watchClasses = '')
       #set ($unwatchClasses = 'hidden')
-      #if ($xwiki.watchlist.isWikiWatched())
+      #if ($services.watchlist.isWatched("WIKI"))
         #set ($watchClasses = 'hidden')
         #set ($unwatchClasses = '')
       #end
@@ -253,7 +253,7 @@
   #if ($hasWatch)
     #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isSpaceWatched())
+    #if ($services.watchlist.isWatched("SPACE"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end
@@ -310,7 +310,7 @@
   #if ($canWatch)
    #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isDocumentWatched())
+    #if ($services.watchlist.isWatched("DOCUMENT"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end

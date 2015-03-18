@@ -48,6 +48,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Singleton
 public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
 {
+    private static final String URL_SEGMENT_DELIMITER = "/";
+
     @Inject
     private Execution execution;
 
@@ -58,10 +60,10 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     @Override
     public ExtendedURL normalize(ExtendedURL partialURL)
     {
-        String contextPath = this.configurationSource.getProperty("xwiki.webapppath", "");
+        String contextPath = this.configurationSource.getProperty("xwiki.webapppath");
 
         // If not defined by the user, extract it from the current Request
-        if (StringUtils.isEmpty(contextPath)) {
+        if (contextPath == null) {
             XWikiContext context = getXWikiContext();
 
             // Check if there's a Request and if not, extract the webapp context from the URL in the execution context
@@ -71,13 +73,17 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
             } else {
                 URL currentURL = context.getURL();
                 if (currentURL != null) {
-                    String path = currentURL.getPath();
-                    contextPath = StringUtils.substringBetween(path, "/");
+                    // Extract the context by getting the first path segment
+                    contextPath = StringUtils.substringBefore(
+                        StringUtils.stripStart(currentURL.getPath(), URL_SEGMENT_DELIMITER), URL_SEGMENT_DELIMITER);
                 } else {
                     throw new RuntimeException(String.format("Failed to normalize the URL [%s] since the "
                         + "application's Servlet context couldn't be computed.", partialURL));
                 }
             }
+        } else {
+            // Remove any leading or trailing slashes that would have been put by error by the user
+            contextPath = StringUtils.strip(contextPath, URL_SEGMENT_DELIMITER);
         }
 
         List<String> segments = new ArrayList<>();

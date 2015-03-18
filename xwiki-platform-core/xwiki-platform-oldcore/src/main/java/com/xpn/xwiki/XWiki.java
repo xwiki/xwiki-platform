@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.annotation.Priority;
 import javax.inject.Provider;
 import javax.mail.Message;
 import javax.mail.Session;
@@ -894,6 +896,25 @@ public class XWiki implements EventListener
             @SuppressWarnings("deprecation")
             List<MandatoryDocumentInitializer> initializers =
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
+
+            // Sort the initializers based on priority. Lower priority values are first.
+            Collections.sort(initializers, new Comparator<MandatoryDocumentInitializer>()
+            {
+                @Override
+                public int compare(MandatoryDocumentInitializer left, MandatoryDocumentInitializer right)
+                {
+                    Priority leftPriority = left.getClass().getAnnotation(Priority.class);
+                    int leftPriorityValue =
+                        leftPriority != null ? leftPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
+
+                    Priority rightPriority = right.getClass().getAnnotation(Priority.class);
+                    int rightPriorityValue =
+                        rightPriority != null ? rightPriority.value() : MandatoryDocumentInitializer.DEFAULT_PRIORITY;
+
+                    // Compare the two.
+                    return leftPriorityValue - rightPriorityValue;
+                }
+            });
 
             for (MandatoryDocumentInitializer initializer : initializers) {
                 initializeMandatoryDocument(initializer, context);
@@ -4092,24 +4113,27 @@ public class XWiki implements EventListener
 
     public String getWebAppPath(XWikiContext context)
     {
-        String path = context.getURL().getPath();
-        String contextPath = getConfiguration().getProperty("xwiki.webapppath", "");
-        if (contextPath.equals("")) {
-            try {
-                contextPath = context.getRequest().getContextPath();
-                // TODO We're using URL parts in a wrong way, since contextPath and servletPath are
-                // returned with a leading /, while we need a trailing /. This code moves the / from
-                // the beginning to the end.
-                // If the app is deployed as the ROOT ap, then there's no need to move the /.
-                if (contextPath.length() > 0) {
-                    contextPath = contextPath.substring(1) + "/";
-                }
-            } catch (Exception e) {
-                contextPath = path.substring(0, path.indexOf('/', 1) + 1);
+        String contextPath = getConfiguration().getProperty("xwiki.webapppath");
+        if (contextPath == null) {
+            // Try getting the context path by asking the request for it (if a request exists!) and if it doesn't
+            // work try extracting it from the context URL.
+            XWikiRequest request = context.getRequest();
+            if (request != null) {
+                contextPath = request.getContextPath();
             }
+            if (contextPath == null) {
+                // Extract the context by getting the first path segment
+                contextPath = StringUtils.substringBefore(
+                    StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
+            }
+        } else {
+            // Remove any leading or trailing slashes that would have been put by error by the user
+            contextPath = StringUtils.strip(contextPath, "/");
         }
 
-        return contextPath;
+        // TODO We're using URL parts in a wrong way, since contextPath and servletPath are returned with a leading /,
+        // while we need a trailing /. This code ensure we always have CONTEXTNAME + "/".
+        return contextPath + "/";
     }
 
     /**

@@ -461,11 +461,26 @@
               <to>java.lang.String</to>
               <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</className>
+              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</className>
+              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- The watchlist plugin has been moved to legacy and a component-based implementation has replaced it.
+                 Major refactoring has been performed. -->
+            <exclude>**/com/xpn/xwiki/plugin/watchlist/**</exclude>
+            <!-- Refactoring the LESS API. Make internal all the classes and interfaces that should never have been public. -->
+            <exclude>**/org/xwiki/lesscss/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -547,6 +562,7 @@
     <module>xwiki-platform-resource</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-sandbox</module>
+    <module>xwiki-platform-sharepage</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
     <module>xwiki-platform-security</module>
@@ -570,6 +586,7 @@
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
+    <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>

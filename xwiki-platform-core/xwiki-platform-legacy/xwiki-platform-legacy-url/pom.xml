@@ -46,7 +46,7 @@
          module executes the XWiki object has not been initialized yet and thus we cannot use XWiki.Param(). -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
 </project>

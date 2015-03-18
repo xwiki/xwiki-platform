@@ -45,6 +45,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -168,6 +169,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setAuthor("Albatross");
 
         this.xwiki.saveDocument(this.document, getContext());
+
+        Mock mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        mockWikiDescriptorManager.stubs().method("getMainWikiId").will(returnValue("xwiki"));
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException

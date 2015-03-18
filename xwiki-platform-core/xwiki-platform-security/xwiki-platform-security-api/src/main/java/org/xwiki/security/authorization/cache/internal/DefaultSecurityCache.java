@@ -19,9 +19,12 @@
  */
 package org.xwiki.security.authorization.cache.internal;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -89,7 +92,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
     /** The cache instance. */
     private Cache<SecurityCacheEntry> cache;
-
+   
     /**
      * @return a new configured security cache
      * @throws InitializationException if a CacheException arise during creation
@@ -141,6 +144,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * True if this entry has been removed.
          */
         private boolean disposed;
+
+        /**
+         * True if this entry is a user. 
+         */
+        private boolean isUser = false;
 
         /**
          * Create a new cache entry for a security rule, linking it to its parent.
@@ -256,6 +264,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             throws ParentEntryEvictedException
         {
             this.entry = entry;
+            this.isUser = true;
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
                 this.parents = new ArrayList<SecurityCacheEntry>(parentSize);
@@ -309,8 +318,15 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         void updateParentGroups(Collection<GroupSecurityReference> groups)
             throws ParentEntryEvictedException
-        {
-            if (groups == null || groups.isEmpty() || !(entry instanceof SecurityRuleEntry)) {
+        {            
+            if (isUser || !(entry instanceof SecurityRuleEntry)) {
+                return;
+            }
+
+            // Since we have parent groups, the entry is a user and her ancestry is fully loaded.
+            isUser = true;
+            
+            if (groups == null || groups.isEmpty()) {
                 // No group or not an appropriate entry, do nothing.
                 return;
             }
@@ -318,7 +334,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             if (this.parents == null) {
                 this.parents = new ArrayList<SecurityCacheEntry>(groups.size());
                 addParentGroups(groups, null);
-            } else if (this.parents.size() == 1) {
+            } else {
                 SecurityCacheEntry parent = this.parents.iterator().next();
                 this.parents = new ArrayList<SecurityCacheEntry>(groups.size() + 1);
                 this.parents.add(parent);
@@ -422,6 +438,14 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     logger.debug("Remove child [{}] from [{}].", entry.getKey(), getKey());
                 }
             }
+        }
+
+        /**
+         * @return true if the entity is a user.
+         */
+        public boolean isUser()
+        {
+            return isUser;
         }
     }
 
@@ -571,7 +595,9 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                 throw new ConflictingInsertionException();               
             }
             // Another thread have already inserted this entry, or it is a user/group that may be incomplete
+            // TODO: if oldEntry.isUser, compare the parents
             oldEntry.updateParentGroups(groups);
+            
             return true;
         }
         // The slot is available
@@ -644,11 +670,11 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         throws ConflictingInsertionException, ParentEntryEvictedException
     {
         if (entry instanceof SecurityRuleEntry) {
-            return (groups == null || groups.isEmpty())
+            return (groups == null)
                 ? new SecurityCacheEntry((SecurityRuleEntry) entry)
                 : new SecurityCacheEntry((SecurityRuleEntry) entry, groups);
         } else {
-            return (groups == null || groups.isEmpty())
+            return (groups == null)
                 ? new SecurityCacheEntry((SecurityShadowEntry) entry)
                 : new SecurityCacheEntry((SecurityShadowEntry) entry, groups);
         }
@@ -808,4 +834,111 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         {
         }
     }
+    
+    @Override
+    public Collection<GroupSecurityReference> getGroupsFor(UserSecurityReference user, SecurityReference entityWiki)
+    {
+        Collection<GroupSecurityReference> groups = new HashSet<>();
+        
+        SecurityCacheEntry userEntry = (entityWiki != null) ? getShadowEntry(user, entityWiki) : getEntry(user);
+        
+        // If the user is not in the cache, or if it is, but not as a user, but as a regular document
+        if (userEntry == null || !userEntry.isUser()) {
+            // In that case, the ancestors are not fully loaded
+            return null;
+        }
+
+        // We are going to get the parents of the security cache entry recursively, that is why we use a stack
+        // (instead of using the execution stack which would be more costly).
+        Deque<SecurityCacheEntry> entriesToExplore = new ArrayDeque<>();
+        
+        // Special case if the user is a shadow.
+        if (entityWiki != null) {
+            // We start with the parents of the original entry, and the parent of this shadow (excluding the original)
+            addParentsWhenEntryIsShadow(userEntry, user, groups, entriesToExplore);
+        } else {
+            // We start with the current user
+            entriesToExplore.add(userEntry);
+        }
+        
+        // Let's go
+        while (!entriesToExplore.isEmpty()) {
+            SecurityCacheEntry entry = entriesToExplore.pop();
+            
+            // We add the parents of the current entry
+            addParentsToTheListOfEntriesToExplore(entry.parents, groups, entriesToExplore);
+            
+            // If the entry has a shadow (in the concerned subwiki), we also add the parents of the shadow
+            if (entityWiki != null) {
+                GroupSecurityReference entryRef = (GroupSecurityReference) entry.getEntry().getReference();
+                if (entryRef.isGlobal()) {
+                    SecurityCacheEntry shadow = getShadowEntry(entryRef, entityWiki);
+                    if (shadow != null) {
+                        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, entry);
+                    }
+                }
+            }
+        }
+        
+        return groups;
+    }
+    
+    private void addParentsWhenEntryIsShadow(SecurityCacheEntry shadow, UserSecurityReference user,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore)
+    {
+        SecurityCacheEntry originalEntry = getEntry(user);
+
+        // We add the parents of the original (but not the original, otherwise we could have the same group twice)
+        addParentsToTheListOfEntriesToExplore(originalEntry.parents, groups, entriesToExplore);
+        // And we add the parent groups of the shadow
+        addParentsToTheListOfEntriesToExplore(shadow.parents, groups, entriesToExplore, originalEntry);
+    }
+
+    /**
+     * Add the parents of an entry to the list of entries to explore.
+     *
+     * @param parents the parents of the entry
+     * @param groups the collection where we store the found groups
+     * @param entriesToExplore the collection holding the entries we still have to explore
+     */
+    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore)
+    {
+        addParentsToTheListOfEntriesToExplore(parents, groups, entriesToExplore, null);
+    }
+
+    /**
+     * Add the parents of an entry to the list of entries to explore.
+     *
+     * @param parents the parents of the entry
+     * @param groups the collection where we store the found groups
+     * @param entriesToExplore the collection holding the entries we still have to explore
+     * @param originalEntry the original entry of the current entry (if the current entry is a shadow), null otherwise
+     */
+    private void addParentsToTheListOfEntriesToExplore(Collection<SecurityCacheEntry> parents,
+            Collection<GroupSecurityReference> groups,
+            Deque<SecurityCacheEntry> entriesToExplore, SecurityCacheEntry originalEntry)
+    {
+        if (parents == null) {
+            return;
+        }
+        
+        for (SecurityCacheEntry parent : parents) {            
+            // skip this parent if the entry is a shadow and the parent is the original entry
+            // (ie: don't explore the original entry)
+            if (originalEntry != null && parent == originalEntry) {
+                continue;
+            }
+            
+            // Add the parent group (if we have not already seen it)
+            SecurityReference parentRef = parent.getEntry().getReference();
+            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference)parentRef)) {
+                entriesToExplore.add(parent);
+            }
+        }
+    }
+
+    
 }

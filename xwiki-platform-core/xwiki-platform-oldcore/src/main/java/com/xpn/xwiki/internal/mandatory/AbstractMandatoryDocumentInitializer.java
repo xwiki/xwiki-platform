@@ -24,9 +24,12 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -49,6 +52,18 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Inject
     @Named("document")
     protected SheetBinder documentSheetBinder;
+
+    /**
+     * Used to get the main wiki.
+     */
+    @Inject
+    protected WikiDescriptorManager wikiDescriptorManager;
+
+    /**
+     * Used to get the default document name.
+     */
+    @Inject
+    protected ModelConfiguration modelConfiguration;
 
     /**
      * @see #getDocumentReference()
@@ -76,7 +91,33 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Override
     public EntityReference getDocumentReference()
     {
+        // If a local reference was specified but isMainWikiOnly() is true, then convert to a main wiki reference.
+        if (this.reference != null && this.reference.extractReference(EntityType.WIKI) == null && isMainWikiOnly()) {
+            synchronized (this) {
+                if (this.reference.extractReference(EntityType.WIKI) == null) {
+                    // Extract the information and use it to create a new main wiki document reference.
+                    String mainWikiId = this.wikiDescriptorManager.getMainWikiId();
+                    String spaceName = this.reference.extractReference(EntityType.SPACE).getName();
+                    String documentName = this.reference.extractReference(EntityType.DOCUMENT).getName();
+
+                    EntityReference mainWikiEntityReference =
+                        new DocumentReference(mainWikiId, spaceName, documentName);
+
+                    this.reference = mainWikiEntityReference;
+                }
+            }
+        }
+
         return this.reference;
+    }
+
+    /**
+     * @return true if the passed reference should be resolved to the main wiki instead of the local one. The default is
+     *         {@code false}. This is ignored if the passed reference already contains the wiki information.
+     */
+    protected boolean isMainWikiOnly()
+    {
+        return false;
     }
 
     /**
@@ -92,6 +133,37 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     {
         boolean needsUpdate = false;
 
+        // Set the parent since it is different from the current document's space homepage.
+        if (document.getParentReference() == null) {
+            needsUpdate = true;
+            document.setParentReference(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiClasses"));
+        }
+
+        needsUpdate |= setDocumentFields(document, title);
+
+        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
+        if (this.documentSheetBinder.getSheets(document).isEmpty()) {
+            String wikiName = document.getDocumentReference().getWikiReference().getName();
+            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "ClassSheet");
+            needsUpdate |= this.documentSheetBinder.bind(document, sheet);
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * Set the fields of the document passed as parameter. Can generate content for both XWiki Syntax 1.0 and XWiki
+     * Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax otherwise
+     * generate XWiki Syntax 2.0.
+     *
+     * @param document the document
+     * @param title the page title to set
+     * @return true if the document has been modified, false otherwise
+     */
+    protected boolean setDocumentFields(XWikiDocument document, String title)
+    {
+        boolean needsUpdate = false;
+
         if (document.getCreatorReference() == null) {
             needsUpdate = true;
             document.setCreator(XWikiRightService.SUPERADMIN_USER);
@@ -101,9 +173,14 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
             document.setAuthorReference(document.getCreatorReference());
         }
 
-        if (StringUtils.isBlank(document.getParent())) {
+        if (document.getParentReference() == null) {
             needsUpdate = true;
-            document.setParent("XWiki.XWikiClasses");
+            // Use the current document's space homepage.
+            EntityReference spaceReference = getDocumentReference().extractReference(EntityType.SPACE);
+            String spaceHomepageDocName = modelConfiguration.getDefaultReferenceValue(EntityType.DOCUMENT);
+            EntityReference parentReference =
+                new EntityReference(spaceHomepageDocName, EntityType.DOCUMENT, spaceReference);
+            document.setParentReference(parentReference);
         }
 
         if (StringUtils.isBlank(document.getTitle())) {
@@ -114,13 +191,6 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
         if (!document.isHidden()) {
             needsUpdate = true;
             document.setHidden(true);
-        }
-
-        // Use ClassSheet to display the class document if no other sheet is explicitly specified.
-        if (this.documentSheetBinder.getSheets(document).isEmpty()) {
-            String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "ClassSheet");
-            needsUpdate |= this.documentSheetBinder.bind(document, sheet);
         }
 
         return needsUpdate;

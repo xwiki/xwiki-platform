@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSkins</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiClasses</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303993396000</creationDate>
+  <date>1306878410000</date>
+  <contentUpdateDate>1306878410000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWiki Skin Class</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <class>
+    <name>XWiki.XWikiSkins</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <baseskin>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>baseskin</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>Base Skin</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </baseskin>
+    <edit.vm>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>edit.vm</name>
+      <number>9</number>
+      <picker>0</picker>
+      <prettyName>Edit</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </edit.vm>
+    <footer.vm>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>footer.vm</name>
+      <number>6</number>
+      <picker>0</picker>
+      <prettyName>Footer</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </footer.vm>
+    <header.vm>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>header.vm</name>
+      <number>5</number>
+      <picker>0</picker>
+      <prettyName>Header</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </header.vm>
+    <logo>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>logo</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>Logo</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </logo>
+    <name>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <name>name</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>Name</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </name>
+    <style.css>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>style.css</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>Style</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </style.css>
+    <view.vm>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>view.vm</name>
+      <number>8</number>
+      <picker>0</picker>
+      <prettyName>View</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </view.vm>
+    <viewheader.vm>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <editor>PureText</editor>
+      <name>viewheader.vm</name>
+      <number>7</number>
+      <picker>0</picker>
+      <prettyName>View Header</prettyName>
+      <rows>15</rows>
+      <size>80</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </viewheader.vm>
+  </class>
+  <object>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>XWiki.XWikiSkins</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>789667d7-b354-4446-ac50-c2d0d6fff0b4</guid>
+    <property>
+      <sheet>SkinsCode.XWikiSkinsSheet</sheet>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.DocumentSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <name>XWiki.XWikiSkins</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>17dcc34f-856a-47cc-9db6-c1c1656507c0</guid>
+    <property>
+      <sheet>XWiki.ClassSheet</sheet>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

@@ -53,7 +53,7 @@
     <!-- Quercus needs the servlet API to properly initialize -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

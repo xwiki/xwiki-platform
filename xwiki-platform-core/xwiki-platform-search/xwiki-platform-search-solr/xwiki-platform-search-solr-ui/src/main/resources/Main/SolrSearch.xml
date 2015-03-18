@@ -1467,6 +1467,11 @@ a.search-result-highlightAll:after {
 .paginationFilter .controlPagination,
 .paginationFilter .pagination {
   line-height: 22px;
+}
+
+.iconRSS {
+  background: url("$xwiki.getSkinFile('icons/silk/feed.png')") no-repeat scroll 0 0 transparent;
+  padding-left: 20px;
 }</code>
     </property>
     <property>

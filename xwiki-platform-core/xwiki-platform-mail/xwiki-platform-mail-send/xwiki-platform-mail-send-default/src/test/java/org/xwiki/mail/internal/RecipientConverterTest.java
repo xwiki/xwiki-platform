@@ -55,12 +55,23 @@ public class RecipientConverterTest
             this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "bcc"));
         assertEquals(MimeMessage.RecipientType.NEWSGROUPS,
             this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "newsgroups"));
+    }
 
+    @Test
+    public void convertWhenInvalidType() throws Exception
+    {
         try {
             this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, "something");
             fail("Should have thrown an exception here");
-        } catch (ConversionException e) {
-            assertEquals("Cannot convert [something] to [javax.mail.Message$RecipientType]", e.getMessage());
+        } catch (ConversionException expected) {
+            assertEquals("Cannot convert [something] to [javax.mail.Message$RecipientType]", expected.getMessage());
         }
+    }
+
+    @Test
+    public void convertWhenTypeIsAlreadyARecipientType() throws Exception
+    {
+        assertEquals(Message.RecipientType.TO,
+            this.mocker.getComponentUnderTest().convert(Message.RecipientType.class, Message.RecipientType.TO));
     }
 }

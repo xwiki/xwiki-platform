@@ -39,6 +39,8 @@ public interface UserBridge
     /**
      * Retrieve the collection of group reference for which the user is a member in the given wiki.
      *
+     * This method does not cache the results, so it should not be called too often.
+     *
      * @param user the user to be queried.
      * @param wikiReference the reference of the wiki where group are evaluated.
      * @return the collection of group reference for which the user is a member in the given wiki.

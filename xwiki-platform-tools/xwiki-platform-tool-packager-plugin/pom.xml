@@ -124,7 +124,7 @@
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any

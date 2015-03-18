@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Adds support for packaging web resources (JavaScript, CSS, images, fonts, etc.) using WebJars</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
   </properties>
@@ -87,7 +87,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <!-- Used by the Test -->

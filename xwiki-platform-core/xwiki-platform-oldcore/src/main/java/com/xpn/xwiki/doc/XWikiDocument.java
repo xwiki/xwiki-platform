@@ -3461,9 +3461,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Generate a map from the request parameters of the form '<spacename>.<classname>_<number>_<propertyname>' Keys of
      * this map will be the reference '<spacename>.<classname>' to the Class (for example, 'XWiki.XWikiRights'), the
      * content is a list where each element describe property for the object <number>. Element of the list is a map
-     * where key is <propertyname> and content is the array of corresponding values.
-     * 
-     * Example with a list of HTTP parameters:
+     * where key is <propertyname> and content is the array of corresponding values. Example with a list of HTTP
+     * parameters:
      * <ul>
      * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
      * <li>XWiki.XWikiRights_0_users=XWiki.Me</li>
@@ -3471,10 +3470,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
      * <li>XWiki.XWikiUsers_1_name=Spirou</li>
      * </ul>
-     * 
-     * will result in the following map
-     * 
-     * <code><pre>
+     * will result in the following map <code><pre>
      * {
      *   "XWiki.XWikiRights": {
      *     "0": {
@@ -3496,7 +3492,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param request The input HTTP request that provides the parameters
      * @return The map containing ordered data
      */
-    private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request, XWikiContext context)
+    private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
+        XWikiContext context)
     {
         Map<String, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
         @SuppressWarnings("unchecked")
@@ -3549,14 +3546,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     /**
      * Create and/or update objects in a document given a list of HTTP parameters of the form
-     * '<spacename>.<classname>_<number>_<propertyname>'.
-     * 
-     * If the object already exists, the field is replace by the given value.
-     * If the object doesn't exist in the document, it is created then the property <propertyname> is initialized with the given value.
-     * 
-     * An object is only created if the given '<number>' is 'one-more' than the existing number of objects.
-     * For example, if the document already has 2 objects of type 'Space.Class', then it will create a new object only with 'Space.Class_2_prop=something'.
-     * Every other parameter like 'Space.Class_42_prop=foobar' for example, will be ignore.
+     * '<spacename>.<classname>_<number>_<propertyname>'. If the object already exists, the field is replace by the
+     * given value. If the object doesn't exist in the document, it is created then the property <propertyname> is
+     * initialized with the given value. An object is only created if the given '<number>' is 'one-more' than the
+     * existing number of objects. For example, if the document already has 2 objects of type 'Space.Class', then it
+     * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
+     * 'Space.Class_42_prop=foobar' for example, will be ignore.
      * 
      * @param eform Form information that contains all the query parameters
      * @param context
@@ -3579,8 +3574,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (oldObject == null) {
                     // Create the object only if it has been numbered one more than the number of existing objects
                     if (requestObjectPropertyMap != null
-                        && requestObjectNumber == getXObjectSize(requestClassReference))
-                    {
+                        && requestObjectNumber == getXObjectSize(requestClassReference)) {
                         oldObject = newXObject(requestClassReference, context);
                     } else {
                         break;

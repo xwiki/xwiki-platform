@@ -233,7 +233,7 @@ public class TestUtils
             // Also recache the CSRF token
             getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
             recacheSecretTokenWhenOnRegisterPage();
-            if (pageURL == null) {
+            if (pageURL != null) {
                 // Go to the page asked
                 getDriver().get(pageURL);
             } else {

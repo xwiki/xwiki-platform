@@ -21,19 +21,19 @@
 -->
 
 <xwikidoc>
-  <web>ExtensionCode</web>
-  <name>Translations</name>
-  <language>es</language>
+  <web>Main</web>
+  <name>ActivityTranslations</name>
+  <language>tr</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Extension.WebHome</parent>
+  <parent>Main.Activity</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1319458064000</creationDate>
-  <date>1426674360000</date>
-  <contentUpdateDate>1426674360000</contentUpdateDate>
+  <creationDate>1390416042000</creationDate>
+  <date>1390416053000</date>
+  <contentUpdateDate>1390416047000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -41,12 +41,10 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-extension.repository.authors=Autores
-extension.repository.name=Nombre
-extension.repository.summary=Resumen
-extension.repository.type=Tipo
+  <content>## XWiki Translation for language tr generated from http://www.l10n.xwiki.org
+activity.rss.feed.tagsAndSpaces.description=RSS ile etiketlendi belgeler için besleme " {0} " Uzayda ( ler ) " {1} "
+activity.rss.pages.modified=Değiştirilmiş Sayfa RSS Feed
 </content>
 </xwikidoc>

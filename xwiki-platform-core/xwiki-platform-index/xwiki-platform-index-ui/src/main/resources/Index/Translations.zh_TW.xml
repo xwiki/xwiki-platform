@@ -21,19 +21,19 @@
 -->
 
 <xwikidoc>
-  <web>ExtensionCode</web>
+  <web>Index</web>
   <name>Translations</name>
-  <language>es</language>
+  <language>zh_TW</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Extension.WebHome</parent>
+  <parent>Index.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1319458064000</creationDate>
-  <date>1426674360000</date>
-  <contentUpdateDate>1426674360000</contentUpdateDate>
+  <creationDate>1425563685000</creationDate>
+  <date>1425564037000</date>
+  <contentUpdateDate>1425564037000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -43,10 +43,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-extension.repository.authors=Autores
-extension.repository.name=Nombre
-extension.repository.summary=Resumen
-extension.repository.type=Tipo
+  <content>## XWiki Translation for language zh_TW generated from http://www.l10n.xwiki.org
+index.spacesMacro.createSpace.defaultSpaceName=空間名稱
+index.spacesMacro.createSpace.link=新增空間
+index.spacesMacro.createSpace.submit=新增
+index.spacesMacro.spaceAdministration.alt=管理員空間
+index.spacesMacro.spaceAdministration.title=空間管理
+index.spacesMacro.spaceIndex.alt=空間列表
+index.spacesMacro.spaceIndex.title=空間索引
+index.spacesMacro.title=空間
 </content>
 </xwikidoc>

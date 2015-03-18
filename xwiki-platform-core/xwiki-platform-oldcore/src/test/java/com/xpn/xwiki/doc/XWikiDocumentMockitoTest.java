@@ -84,8 +84,7 @@ public class XWikiDocumentMockitoTest
         this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
         this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
-        // Activate programming rights in order to be able to call
-        // com.xpn.xwiki.api.Document#getDocument().
+        // Activate programming rights in order to be able to call com.xpn.xwiki.api.Document#getDocument().
         when(this.oldcore.getMockRightService().hasProgrammingRights(this.oldcore.getXWikiContext())).thenReturn(true);
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
@@ -102,11 +101,11 @@ public class XWikiDocumentMockitoTest
 
         when(query.setLimit(7)).thenReturn(query);
 
-        List<Object[]> result = Arrays.asList(new Object[] {"X", "y"}, new Object[] {"A", "b"});
-        when(query.<Object[]>execute()).thenReturn(result);
+        List<Object[]> result = Arrays.asList(new Object[]{ "X", "y" }, new Object[]{ "A", "b" });
+        when(query.<Object[]> execute()).thenReturn(result);
 
-        List<DocumentReference> childrenReferences =
-            document.getChildrenReferences(7, 3, this.oldcore.getXWikiContext());
+        List<DocumentReference> childrenReferences = document.getChildrenReferences(7, 3,
+            this.oldcore.getXWikiContext());
 
         verify(query).addFilter(hiddenFilter);
         verify(query).setLimit(7);
@@ -149,9 +148,8 @@ public class XWikiDocumentMockitoTest
 
         this.document.setLocale(Locale.US);
         XWikiDocument defaultTranslation = new XWikiDocument(this.document.getDocumentReference());
-        when(
-            this.oldcore.getMockXWiki().getDocument(this.document.getDocumentReference(),
-                this.oldcore.getXWikiContext())).thenReturn(defaultTranslation);
+        when(this.oldcore.getMockXWiki().getDocument(this.document.getDocumentReference(),
+            this.oldcore.getXWikiContext())).thenReturn(defaultTranslation);
 
         this.document.setAsContextDoc(this.oldcore.getXWikiContext());
 

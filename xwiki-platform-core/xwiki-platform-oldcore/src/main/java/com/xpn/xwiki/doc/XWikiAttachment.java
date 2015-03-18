@@ -33,6 +33,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MediaType;
 import org.dom4j.Document;
@@ -684,10 +685,49 @@ public class XWikiAttachment implements Cloneable
     public InputStream getContentInputStream(XWikiContext context) throws XWikiException
     {
         if (this.attachment_content == null && context != null) {
-            this.doc.loadAttachmentContent(this, context);
+            if (Objects.equals(this.getVersion(), this.getLatestStoredVersion(context))) {
+                // Load the attachment content from the xwikiattachment_content table.
+                this.doc.loadAttachmentContent(this, context);
+            } else {
+                // Load the attachment content from the xwikiattachment_archive table.
+                // We don't use #getAttachmentRevision() because it checks if the requested version equals the version
+                // of the target attachment (XWIKI-1938).
+                XWikiAttachment archivedVersion =
+                    this.loadArchive(context).getRevision(this, this.getVersion(), context);
+                XWikiAttachmentContent content =
+                    archivedVersion != null ? archivedVersion.getAttachment_content() : null;
+                if (content != null) {
+                    this.setAttachment_content(content);
+                } else {
+                    // Fall back on the version of the content stored in the xwikiattachment_content table.
+                    this.doc.loadAttachmentContent(this, context);
+                }
+            }
         }
 
         return this.attachment_content.getContentInputStream();
+    }
+
+    /**
+     * The {@code xwikiattachment_content} table stores only the latest version of an attachment (which is identified by
+     * the attachment file name and the owner document reference). The rest of the attachment versions are stored in
+     * {@code xwikiattachment_archive} table. This method can be used to determine from where to load the attachment
+     * content.
+     * 
+     * @param context the XWiki context
+     * @return the latest stored version of this attachment
+     */
+    private String getLatestStoredVersion(XWikiContext context)
+    {
+        try {
+            XWikiDocument ownerDocumentLastestVersion =
+                context.getWiki().getDocument(this.doc.getDocumentReference(), context);
+            XWikiAttachment latestStoredVersion = ownerDocumentLastestVersion.getAttachment(this.filename);
+            return latestStoredVersion != null ? latestStoredVersion.getVersion() : null;
+        } catch (XWikiException e) {
+            LOGGER.warn(ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
     }
 
     /**

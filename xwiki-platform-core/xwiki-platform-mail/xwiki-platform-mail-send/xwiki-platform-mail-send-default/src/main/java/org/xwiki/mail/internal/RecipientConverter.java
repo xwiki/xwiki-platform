@@ -47,10 +47,6 @@ public class RecipientConverter extends AbstractConverter<Message.RecipientType>
             return null;
         }
 
-        if (value instanceof Message.RecipientType[]) {
-            return (G) value;
-        }
-
         Message.RecipientType recipientType;
 
         String valueAsString = value.toString();

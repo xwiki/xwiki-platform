@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.internal.DomainObjectFactory;
@@ -29,7 +31,8 @@ import org.xwiki.rest.resources.RootResource;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.RootResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.RootResourceImpl")
 public class RootResourceImpl extends XWikiResource implements RootResource
 {
     @Override

@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.XWikiResource;
@@ -36,7 +38,8 @@ import com.xpn.xwiki.api.XWiki;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
 public class SpacesResourceImpl extends XWikiResource implements SpacesResource
 {
     @Override

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +35,6 @@ import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionLicense;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
-import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionQuery;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersion;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionsSearchResult;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
@@ -55,6 +55,9 @@ import org.xwiki.test.ui.AbstractExtensionAdminAuthenticatedTest;
  */
 public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 {
+    public static final UsernamePasswordCredentials USER_CREDENTIALS = new UsernamePasswordCredentials("Author",
+        "password");
+
     private static final String IDPREFIX = "prefix-";
 
     private TestExtension baseExtension;
@@ -83,9 +86,9 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         this.baseLicense = new ExtensionLicense("Do What The Fuck You Want To Public License 2", null);
         this.baseExtension.addLicense(this.baseLicense);
 
-        this.baseAuthor = new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", "Author")));
+        this.baseAuthor =
+            new DefaultExtensionAuthor("User Name", new URL(getUtil().getURL("XWiki", USER_CREDENTIALS.getUserName())));
         this.baseExtension.addAuthor(this.baseAuthor);
-        getUtil().createUser("Author", "password", null, "first_name", "User", "last_name", "Name");
 
         this.baseExtension.addDependency(new DefaultExtensionDependency("dependencyid1", new DefaultVersionConstraint(
             "1.0")));
@@ -107,6 +110,9 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Create extension
 
+        getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null,
+            "first_name", "User", "last_name", "Name");
+
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
         ExtensionInlinePage extensionInline = extensionsPage.contributeExtension(this.baseExtension.getName());
@@ -123,8 +129,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         ExtensionPage extensionPage = extensionInline.clickSaveAndView();
 
         // Test summary
-        getDriver().findElementsWithoutWaiting(
-            By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
+        getDriver().findElementsWithoutWaiting(By.xpath("//tt[text()=\"" + this.baseExtension.getSummary() + "\"]"));
 
         Assert.assertFalse(extensionPage.isValidExtension());
 
@@ -144,7 +149,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         getRepositoryTestUtils().addDependencies(this.baseExtension, "10.0");
 
         // Add attachment
-        getRepositoryTestUtils().attachFile(this.baseExtension);
+        getRepositoryTestUtils().attachFile(this.baseExtension, USER_CREDENTIALS);
 
         // Check livetable
 
@@ -259,22 +264,16 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         // //////////////////////////////////////////
 
         // Empty search
-
-        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
-        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
-
-        Assert.assertTrue(result.getTotalHits() >= 0);
-        Assert.assertEquals(0, result.getOffset());
-
-        extension = null;
-        for (ExtensionVersion extensionVersion : result.getExtensions()) {
-            if (extensionVersion.getId().equals(this.baseExtension.getId().getId())) {
-                extension = extensionVersion;
-                break;
-            }
-        }
+        extension = searchExtension(this.baseExtension.getId().getId());
         if (extension == null) {
-            Assert.fail("Count not find extension [" + this.baseExtension.getId().getId() + "]");
+            // Give more time to Solr to index the document
+            // FIXME: provide a helper to wait for Solr queue to be empty
+            Thread.sleep(10000);
+            extension = searchExtension(this.baseExtension.getId().getId());
+        }
+
+        if (extension == null) {
+            Assert.fail("Could not find extension [" + this.baseExtension.getId().getId() + "]");
         }
 
         Assert.assertEquals(this.baseExtension.getId().getId(), extension.getId());
@@ -290,10 +289,10 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Search pattern
 
-        queryParams.clear();
+        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
         queryParams.put(Resources.QPARAM_SEARCH_QUERY, new Object[] {"macro"});
 
-        result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
+        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
 
         Assert.assertEquals(1, result.getTotalHits());
         Assert.assertEquals(0, result.getOffset());
@@ -339,29 +338,33 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertTrue(result.getTotalHits() >= 1);
         Assert.assertEquals(0, result.getOffset());
         Assert.assertEquals(0, result.getExtensions().size());
-
-        // //////////////////////////////////////////
-        // Advanced Search
-        // //////////////////////////////////////////
-
-        // TODO
     }
 
-    @Test
-    public void testAdvancedSearch() throws Exception
+    private ExtensionVersion searchExtension(String id) throws Exception
     {
-        // Empty search
-
-        ExtensionsSearchResult result = getUtil().postRESTResource(Resources.SEARCH, new ExtensionQuery());
+        Map<String, Object[]> queryParams = new HashMap<String, Object[]>();
+        ExtensionsSearchResult result = getUtil().getRESTResource(Resources.SEARCH, queryParams);
 
         Assert.assertTrue(result.getTotalHits() >= 0);
         Assert.assertEquals(0, result.getOffset());
-        
+
+        ExtensionVersion extension = null;
+        for (ExtensionVersion extensionVersion : result.getExtensions()) {
+            if (extensionVersion.getId().equals(id)) {
+                extension = extensionVersion;
+                break;
+            }
+        }
+
+        return extension;
     }
 
     @Test
     public void testImportExtension() throws Exception
     {
+        getUtil().createUser(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null, "first_name",
+            "User", "last_name", "Name");
+
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 
         ExtensionImportPage importPage = extensionsPage.clickImport();

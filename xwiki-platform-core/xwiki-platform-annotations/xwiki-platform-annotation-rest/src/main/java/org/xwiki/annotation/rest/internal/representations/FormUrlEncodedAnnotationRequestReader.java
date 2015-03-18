@@ -22,6 +22,7 @@ package org.xwiki.annotation.rest.internal.representations;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
@@ -35,7 +36,8 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationRequestReader")
+@Component
+@Named("org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationRequestReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @Singleton

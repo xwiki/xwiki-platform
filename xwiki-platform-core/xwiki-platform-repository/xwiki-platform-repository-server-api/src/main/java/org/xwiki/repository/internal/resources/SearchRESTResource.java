@@ -23,6 +23,7 @@ package org.xwiki.repository.internal.resources;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -49,7 +50,8 @@ import org.xwiki.repository.internal.XWikiRepositoryModel;
  * @version $Id$
  * @since 3.2M3
  */
-@Component("org.xwiki.repository.internal.resources.SearchRESTResource")
+@Component
+@Named("org.xwiki.repository.internal.resources.SearchRESTResource")
 @Path(Resources.SEARCH)
 @Singleton
 public class SearchRESTResource extends AbstractExtensionRESTResource
@@ -74,10 +76,14 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         return searchPost(query);
     }
 
+    // TODO: automatically replace Extension fields names with the actual Solr properties names (so that it's possible
+    // to write query like type:jar)
     private String toSolrStatement(String query)
     {
         if (StringUtils.isBlank(query)) {
             return "*";
+        } else if (StringUtils.containsNone(query, ' ', ':')) {
+            return "*" + query + "*";
         }
 
         return query;
@@ -87,8 +93,6 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
     public ExtensionsSearchResult searchPost(ExtensionQuery query) throws QueryException
     {
         ExtensionsSearchResult result = this.extensionObjectFactory.createExtensionsSearchResult();
-
-        result.setOffset(query.getOffset());
 
         Query solrQuery = this.queryManager.createQuery(toSolrStatement(query.getQuery()), "solr");
 
@@ -149,7 +153,6 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
                 builder.append(':');
 
                 if (fiter.getComparison() == COMPARISON.EQUAL) {
-                    // FIXME: depending on the field it might not be the expected behavior
                     builder.append(fiter.getValueString());
                 } else {
                     builder.append('*' + fiter.getValueString() + '*');
@@ -172,8 +175,12 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
         result.setOffset((int) documents.getStart());
         result.setTotalHits((int) documents.getNumFound());
 
-        for (SolrDocument document : documents) {
-            result.getExtensions().add(createExtensionVersionFromSolrDocument(document));
+        // O means unset for solr but we want it to be literally interpreted to be consistent with previous behavior and
+        // other searches behavior
+        if (query.getLimit() != 0) {
+            for (SolrDocument document : documents) {
+                result.getExtensions().add(createExtensionVersionFromSolrDocument(document));
+            }
         }
 
         return result;

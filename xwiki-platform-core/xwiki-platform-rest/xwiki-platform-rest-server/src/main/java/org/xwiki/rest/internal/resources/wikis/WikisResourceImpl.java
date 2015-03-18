@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.wikis;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
@@ -45,7 +46,8 @@ import org.xwiki.wiki.user.WikiUserManager;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.wikis.WikisResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.wikis.WikisResourceImpl")
 public class WikisResourceImpl extends XWikiResource implements WikisResource
 {
     @Inject

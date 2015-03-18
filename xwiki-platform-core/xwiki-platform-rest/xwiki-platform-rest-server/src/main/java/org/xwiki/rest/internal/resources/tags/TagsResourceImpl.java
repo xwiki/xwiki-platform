@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.tags;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -35,7 +37,8 @@ import org.xwiki.rest.model.jaxb.Tags;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
 import org.xwiki.rest.resources.tags.TagsResource;
 
-@Component("org.xwiki.rest.internal.resources.tags.TagsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.tags.TagsResourceImpl")
 public class TagsResourceImpl extends XWikiResource implements TagsResource
 {
     @Override

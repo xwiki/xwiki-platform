@@ -74,6 +74,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
@@ -314,6 +315,13 @@ public class DocumentSolrMetadataExtractorTest
         when(contentField.getObject()).thenReturn(comment);
         commentFields.add(contentField);
 
+        String commentSummary = "summary";
+        BaseProperty<EntityReference> summaryField = mock(BaseProperty.class);
+        when(summaryField.getName()).thenReturn("summary");
+        when(summaryField.getValue()).thenReturn(commentSummary);
+        when(summaryField.getObject()).thenReturn(comment);
+        commentFields.add(summaryField);
+
         String commentAuthor = "wiki:space.commentAuthor";
         BaseProperty<EntityReference> authorField = mock(BaseProperty.class);
         when(authorField.getName()).thenReturn("author");
@@ -370,6 +378,7 @@ public class DocumentSolrMetadataExtractorTest
             commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
         when(xclass.get("comment")).thenReturn(mock(TextAreaClass.class));
+        when(xclass.get("summary")).thenReturn(mock(StringClass.class));
         when(xclass.get("password")).thenReturn(mock(PasswordClass.class));
         when(xclass.get("enabled")).thenReturn(mock(BooleanClass.class));
 
@@ -386,7 +395,9 @@ public class DocumentSolrMetadataExtractorTest
         // A TextArea property must be indexed as a localized text.
         assertSame(commentContent,
             solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.US)));
+        assertNull(solrDocument.getFieldValue("property.space.commentsClass.comment_string"));
 
+        assertSame(commentSummary, solrDocument.getFieldValue("property.space.commentsClass.summary_string"));
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
         assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_date"));
         assertEquals(commentList, solrDocument.getFieldValues("property.space.commentsClass.list_string"));
@@ -411,16 +422,17 @@ public class DocumentSolrMetadataExtractorTest
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
-            commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
-        assertEquals(7, objectProperties.size());
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentSummary,
+            commentAuthor, commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
+        assertEquals(8, objectProperties.size());
 
         objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder("comment : " + commentContent,
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(
+            "comment : " + commentContent, "summary : " + commentSummary,
             "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
             "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
-        assertEquals(7, objectProperties.size());
+        assertEquals(8, objectProperties.size());
     }
 
     /**

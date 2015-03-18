@@ -42,6 +42,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -59,7 +60,6 @@ import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.criteria.impl.ScopeFactory;
-import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -512,6 +512,17 @@ public class Document extends Api
     public String getContent()
     {
         return this.doc.getContent();
+    }
+
+    /**
+     * NOTE: This method caches the XDOM and returns a clone that can be safely modified.
+     *
+     * @return the XDOM corresponding to the document's string content
+     * @since 7.0RC1
+     */
+    public XDOM getXDOM()
+    {
+        return this.doc.getXDOM();
     }
 
     /**
@@ -1826,15 +1837,15 @@ public class Document extends Api
                 return Collections.emptyList();
             }
             if (origdoc == null) {
-                return this.doc.getAttachmentDiff(new XWikiDocument(newdoc.getDocumentReference()), newdoc.doc,
-                    getXWikiContext());
+                return wrapAttachmentDiff(this.doc.getAttachmentDiff(new XWikiDocument(newdoc.getDocumentReference()),
+                    newdoc.doc, getXWikiContext()));
             }
             if (newdoc == null) {
-                return this.doc.getAttachmentDiff(origdoc.doc, new XWikiDocument(origdoc.getDocumentReference()),
-                    getXWikiContext());
+                return wrapAttachmentDiff(this.doc.getAttachmentDiff(origdoc.doc,
+                    new XWikiDocument(origdoc.getDocumentReference()), getXWikiContext()));
             }
 
-            return this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
+            return wrapAttachmentDiff(this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext()));
         } catch (Exception e) {
             java.lang.Object[] args =
                 { (origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
@@ -1847,6 +1858,15 @@ public class Document extends Api
             list.add(errormsg);
             return list;
         }
+    }
+
+    private List<AttachmentDiff> wrapAttachmentDiff(List<com.xpn.xwiki.doc.AttachmentDiff> diffs)
+    {
+        List<AttachmentDiff> safeAttachmentDiffs = new ArrayList<>();
+        for (com.xpn.xwiki.doc.AttachmentDiff diff : diffs) {
+            safeAttachmentDiffs.add(new AttachmentDiff(diff, getXWikiContext()));
+        }
+        return safeAttachmentDiffs;
     }
 
     public List<Delta> getLastChanges() throws XWikiException, DifferentiationFailedException
@@ -2203,6 +2223,16 @@ public class Document extends Api
     }
 
     public void setContent(String content)
+    {
+        getDoc().setContent(content);
+    }
+
+    /**
+     * @param content the content as XDOM
+     * @throws XWikiException when failing to convert the XDOM to String content
+     * @since 7.0RC1
+     */
+    public void setContent(XDOM content) throws XWikiException
     {
         getDoc().setContent(content);
     }

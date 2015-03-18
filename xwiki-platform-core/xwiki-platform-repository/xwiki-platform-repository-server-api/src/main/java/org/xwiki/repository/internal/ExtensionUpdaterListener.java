@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -37,7 +38,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-@Component("ExtensionUpdaterListener")
+@Component
+@Named("ExtensionUpdaterListener")
 @Singleton
 public class ExtensionUpdaterListener implements EventListener
 {

@@ -24,8 +24,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.repository.test.po.ExtensionPage;
 import org.xwiki.test.ui.po.InlinePage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
-import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
 /**
  * @version $Id$
@@ -60,7 +58,8 @@ public class ExtensionInlinePage extends InlinePage
     @FindBy(id = "ExtensionCode.ExtensionClass_0_customInstallationOnly")
     private WebElement customInstallationOnlyCheckBox;
 
-    private final EditorElement installationEditor = new EditorElement("ExtensionCode.ExtensionClass_0_installation");
+    @FindBy(id = "ExtensionCode.ExtensionClass_0_installation")
+    private WebElement installationInput;
 
     public void setName(String name)
     {
@@ -123,9 +122,8 @@ public class ExtensionInlinePage extends InlinePage
 
     public void setInstallation(String installation)
     {
-        RichTextAreaElement richTextArea = this.installationEditor.waitToLoad().getRichTextArea();
-        richTextArea.clear();
-        richTextArea.sendKeys(installation);
+        this.installationInput.clear();
+        this.installationInput.sendKeys(installation);
     }
 
     @Override

@@ -19,7 +19,6 @@
  */
 package org.xwiki.faq.test.ui;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.faq.test.po.FAQEntryEditPage;
@@ -48,16 +47,12 @@ public class FAQTest extends AbstractTest
     // verify encoding.
     private static final String FAQ_TEST_PAGE = "Test.entrée de FAQ";
 
-    @Before
-    public void setUp()
-    {
-        // Delete pages that we create in the test
-        getUtil().deletePage(getTestClassName(), FAQ_TEST_PAGE);
-    }
-
     @Test
     public void testFAQ()
     {
+        // Delete pages that we create in the test
+        getUtil().deletePage(getTestClassName(), FAQ_TEST_PAGE);
+
         // Navigate to the FAQ app by clicking in the Application Panel.
         // This verifies that the FAQ application is registered in the Applications Panel.
         // It also verifies that the Translation is registered properly.

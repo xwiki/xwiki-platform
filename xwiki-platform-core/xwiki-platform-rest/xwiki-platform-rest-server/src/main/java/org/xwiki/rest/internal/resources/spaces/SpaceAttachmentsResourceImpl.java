@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.spaces;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
@@ -28,7 +30,8 @@ import org.xwiki.rest.resources.spaces.SpaceAttachmentsResource;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.spaces.SpaceAttachmentsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpaceAttachmentsResourceImpl")
 public class SpaceAttachmentsResourceImpl extends BaseAttachmentsResource implements SpaceAttachmentsResource
 {
     @Override

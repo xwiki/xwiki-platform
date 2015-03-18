@@ -36,4 +36,11 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Share Page Application</xwiki.extension.name>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mailsender</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

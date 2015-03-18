@@ -60,7 +60,7 @@ public interface IntegratedLESSCompiler
      * @param lessResourceReference reference of the LESS resource to compile
      * @param includeSkinStyle include the main LESS file of the skin in order to have variables and mix-ins
      * defined there
-     * @param skin includeSkinStyle of the skin where the LESS file is located
+     * @param skin name of the skin where the LESS file is located
      * @param useVelocity either or not the resource be parsed by Velocity before compiling it
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the generated CSS

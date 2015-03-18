@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionAuthor;
 import org.xwiki.extension.ExtensionDependency;
@@ -93,6 +94,11 @@ public class RepositoryTestUtils
 
     public void addExtension(Extension extension) throws Exception
     {
+        addExtension(extension, null);
+    }
+
+    public void addExtension(Extension extension, UsernamePasswordCredentials credentials) throws Exception
+    {
         this.testUtils.deletePage("Extension", getPageName(extension));
 
         // Add the Extension object
@@ -128,7 +134,7 @@ public class RepositoryTestUtils
         addDependencies(extension);
 
         // Attach the file
-        attachFile(extension);
+        attachFile(extension, credentials);
     }
 
     public void addVersionObject(Extension extension)
@@ -178,10 +184,15 @@ public class RepositoryTestUtils
 
     public void attachFile(Extension extension) throws Exception
     {
+        attachFile(extension, null);
+    }
+
+    public void attachFile(Extension extension, UsernamePasswordCredentials credentials) throws Exception
+    {
         InputStream is = extension.getFile().openStream();
         try {
             this.testUtils.attachFile(SPACENAME_EXTENSION, getPageName(extension), extension.getId().getId() + "-"
-                + extension.getId().getVersion() + "." + extension.getType(), is, true);
+                + extension.getId().getVersion() + "." + extension.getType(), is, true, credentials);
         } finally {
             is.close();
         }

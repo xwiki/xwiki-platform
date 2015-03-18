@@ -25,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -48,7 +49,8 @@ import org.xwiki.rest.model.jaxb.Property;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.representations.objects.FormUrlEncodedObjectReader")
+@Component
+@Named("org.xwiki.rest.internal.representations.objects.FormUrlEncodedObjectReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 @Singleton

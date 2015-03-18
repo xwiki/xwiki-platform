@@ -19,8 +19,6 @@
  */
 package org.xwiki.lesscss.internal.compiler.less4j;
 
-import java.io.File;
-
 import org.xwiki.lesscss.internal.compiler.CachedIntegratedLESSCompiler;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
@@ -35,8 +33,10 @@ import org.xwiki.template.TemplateManager;
  */
 public class TemplateLESSSource extends AbstractLESSSource
 {
+    private static final String FILE_SEPATATOR = "/";
+    
     private String templateName;
-
+    
     /**
      * Default constructor.
      * @param templateManager the template manager component
@@ -45,8 +45,22 @@ public class TemplateLESSSource extends AbstractLESSSource
      */
     public TemplateLESSSource(TemplateManager templateManager, Skin skin, String templateName)
     {
-        super(templateManager, skin, new File(templateName).getParent());
+        super(templateManager, skin, getParentFolder(templateName));
         this.templateName = templateName;
+    }
+
+    /**
+     * Get the parent folder of a path using "/" as file separator.
+     * @param templateName name of the template
+     * @return the parent folder path
+     */
+    private static String getParentFolder(String templateName)
+    {
+        int index = templateName.lastIndexOf(FILE_SEPATATOR);
+        if (index > 0 && index < templateName.length()) {
+            return templateName.substring(0, index);
+        }
+        return templateName;
     }
 
     @Override

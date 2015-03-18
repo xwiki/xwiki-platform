@@ -24,7 +24,7 @@
 #end
 
 #macro (unifiedDiffLine $line)
-${line.type.symbol}##
+#if($line.type.symbol == ' ')&nbsp;#else$line.type.symbol#end##
 #if ($line.chunks)##
 #inlineDiffLine($line.chunks)##
 #else##

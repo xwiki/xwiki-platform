@@ -73,8 +73,8 @@ public class AddressesConverterTest
         try {
             this.mocker.getComponentUnderTest().convert(Address[].class, "invalid(");
             fail("Should have thrown an exception here");
-        } catch (ConversionException e) {
-            assertEquals("Failed to convert [invalid(] to an array of [javax.mail.Address]", e.getMessage());
+        } catch (ConversionException expected) {
+            assertEquals("Failed to convert [invalid(] to an array of [javax.mail.Address]", expected.getMessage());
         }
     }
 }

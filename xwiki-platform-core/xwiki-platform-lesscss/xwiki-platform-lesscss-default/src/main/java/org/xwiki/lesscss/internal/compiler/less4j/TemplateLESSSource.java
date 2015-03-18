@@ -19,7 +19,7 @@
  */
 package org.xwiki.lesscss.internal.compiler.less4j;
 
-import org.xwiki.lesscss.internal.compiler.CachedIntegratedLESSCompiler;
+import org.xwiki.lesscss.internal.compiler.CachedLESSCompiler;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
@@ -77,7 +77,7 @@ public class TemplateLESSSource extends AbstractLESSSource
             // skin might have. Actually we have no way to know which .less.vm are included, without running LESS.
             //
             // That is why we do not execute Velocity on any ".less.vm" file but only on the main skin template.
-            String mainSkinTemplate = "less/" + CachedIntegratedLESSCompiler.MAIN_SKIN_STYLE_FILENAME;
+            String mainSkinTemplate = "less/" + CachedLESSCompiler.MAIN_SKIN_STYLE_FILENAME;
             if (mainSkinTemplate.equals(templateName)) {
                 return templateManager.renderFromSkin(templateName, skin);
             } 

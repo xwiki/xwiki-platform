@@ -17,39 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.resources;
+package org.xwiki.lesscss.internal.cache;
 
-import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * A reference to a LESS resource.
+ * Component to cache already computed LESS resources.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
+@Role
 @Unstable
-public interface LESSResourceReference
+public interface LESSResourcesCache extends LESSCache<String>
 {
-    @Override
-    boolean equals(Object o);
 
-    @Override
-    int hashCode();
-
-    /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
-     * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
-     */
-    String getContent(String skin) throws LESSCompilerException;
-
-    /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
-     */
-    String serialize();
 }

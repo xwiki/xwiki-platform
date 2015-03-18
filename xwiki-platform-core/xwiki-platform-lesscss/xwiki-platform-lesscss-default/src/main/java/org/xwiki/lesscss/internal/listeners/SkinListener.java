@@ -30,9 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.skin.DocumentSkinReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -59,6 +60,9 @@ public class SkinListener implements EventListener
 
     @Inject
     private ColorThemeCache colorThemeCache;
+    
+    @Inject
+    private SkinReferenceFactory skinReferenceFactory;
 
     @Override
     public String getName()
@@ -89,7 +93,7 @@ public class SkinListener implements EventListener
 
     private void clearCacheFromSkin(XWikiDocument document)
     {
-        DocumentSkinReference skinReference = new DocumentSkinReference(document.getDocumentReference());
+        SkinReference skinReference = skinReferenceFactory.createReference(document.getDocumentReference());
         lessResourcesCache.clearFromSkin(skinReference);
         colorThemeCache.clearFromSkin(skinReference);
     }

@@ -17,39 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.resources;
+package org.xwiki.lesscss.internal.skin;
 
-import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.stability.Unstable;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * A reference to a LESS resource.
- *
- * @since 6.4M2
+ * Test class for {@link FSSkinReference}.
+ *  
+ * @since 7.0RC1
  * @version $Id$
  */
-@Unstable
-public interface LESSResourceReference
+public class FSSkinReferenceTest
 {
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
-
-    /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
-     * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
-     */
-    String getContent(String skin) throws LESSCompilerException;
-
-    /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
-     */
-    String serialize();
+    @Test
+    public void serialize() throws Exception
+    {
+        assertEquals("SkinFS[skin]", new FSSkinReference("skin").serialize());
+    }
 }

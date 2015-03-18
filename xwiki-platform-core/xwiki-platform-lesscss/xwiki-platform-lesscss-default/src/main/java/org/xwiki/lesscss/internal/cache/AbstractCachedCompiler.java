@@ -22,16 +22,15 @@ package org.xwiki.lesscss.internal.cache;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.xwiki.lesscss.cache.LESSCache;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.LESSContext;
 import org.xwiki.lesscss.internal.colortheme.CurrentColorThemeGetter;
-import org.xwiki.lesscss.internal.compiler.DefaultIntegratedLESSCompiler;
+import org.xwiki.lesscss.internal.compiler.DefaultLESSCompiler;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.lesscss.skin.SkinReference;
-import org.xwiki.lesscss.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -122,7 +121,7 @@ public abstract class AbstractCachedCompiler<T>
                     // So we need to execute the velocity again, even if the LESS file is cached.
                     // To perform this quickly, we do not recompile the LESS code (which would be useless anyway), but
                     // we only do the Velocity Execution step.
-                    if (lessContext.isHtmlExport() && useVelocity && this instanceof DefaultIntegratedLESSCompiler) {
+                    if (lessContext.isHtmlExport() && useVelocity && this instanceof DefaultLESSCompiler) {
                         compiler.compute(lessResourceReference, includeSkinStyle, true, false, skin);
                     }
                     return cloneResult(result);

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal.compiler;
+package org.xwiki.lesscss.internal.colortheme.converter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,54 +25,57 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
-import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.lesscss.internal.cache.AbstractCachedCompiler;
-import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.colortheme.ColorTheme;
+import org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.compiler.LESSCompiler}. It uses the CachedIntegratedLESSCompiler
- * through the AbstractCachedCompiler to cache the result of the compilation.
+ * Default implementation of {@link org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter}.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultLESSCompiler extends AbstractCachedCompiler<String> implements LESSCompiler,
-    Initializable
+public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
+        implements LESSColorThemeConverter, Initializable
 {
     @Inject
-    private LESSResourcesCache cache;
+    private ColorThemeCache cache;
 
     @Inject
-    private CachedLESSCompiler cachedLESSCompiler;
+    private CachedLESSColorThemeConverter cachedLESSColorThemeConverter;
+    
+    @Inject
+    private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
     @Override
     public void initialize() throws InitializationException
     {
         super.cache = cache;
-        super.compiler = cachedLESSCompiler;
+        super.compiler = cachedLESSColorThemeConverter;
     }
 
     @Override
-    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
-        boolean force) throws LESSCompilerException
+    public ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
-        return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, force);
+        return super.getResult(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true, force);
     }
 
     @Override
-    public String compile(LESSResourceReference lessResourceReference, boolean includeSkinStyle, boolean useVelocity,
-        String skin, boolean force) throws LESSCompilerException
+    public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
+        throws LESSCompilerException
     {
-        return super.getResult(lessResourceReference, includeSkinStyle, useVelocity, skin, force);
+        return super.getResult(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true, skin,
+            force);
     }
 
     @Override
-    protected String cloneResult(String toClone)
+    protected ColorTheme cloneResult(ColorTheme toClone)
     {
-        return new String(toClone);
+        return new ColorTheme(toClone);
     }
 }

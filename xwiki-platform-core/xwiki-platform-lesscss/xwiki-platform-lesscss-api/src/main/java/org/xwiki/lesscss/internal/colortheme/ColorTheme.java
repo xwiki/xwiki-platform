@@ -17,39 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.resources;
+package org.xwiki.lesscss.internal.colortheme;
 
-import org.xwiki.lesscss.compiler.LESSCompilerException;
+import java.util.HashMap;
+
 import org.xwiki.stability.Unstable;
 
 /**
- * A reference to a LESS resource.
+ * Map containing color theme variables and their values.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
 @Unstable
-public interface LESSResourceReference
+public class ColorTheme extends HashMap<String, String>
 {
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
+    /**
+     * Construct a new color theme.
+     */
+    public ColorTheme()
+    {
+        super();
+    }
 
     /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
-     * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
+     * Construct a copy of a color theme.
+     * @param colorTheme the color theme to copy
      */
-    String getContent(String skin) throws LESSCompilerException;
-
-    /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
-     */
-    String serialize();
+    public ColorTheme(ColorTheme colorTheme)
+    {
+        super(colorTheme);
+    }
 }

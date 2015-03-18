@@ -17,39 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.resources;
+package org.xwiki.lesscss.internal.colortheme;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * A reference to a LESS resource.
+ * Factory to create the appropriate reference depending on a color theme name.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
+@Role
 @Unstable
-public interface LESSResourceReference
+public interface ColorThemeReferenceFactory
 {
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
-
     /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
+     * @param colorThemeName name of the color theme
+     * @return the appropriate reference depending on the color theme name
      * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
      */
-    String getContent(String skin) throws LESSCompilerException;
+    ColorThemeReference createReference(String colorThemeName) throws LESSCompilerException;
 
     /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
+     * @param documentReference reference to the document holding the color theme
+     * @return the appropriate reference depending on the color theme name
      */
-    String serialize();
+    ColorThemeReference createReference(DocumentReference documentReference);
 }

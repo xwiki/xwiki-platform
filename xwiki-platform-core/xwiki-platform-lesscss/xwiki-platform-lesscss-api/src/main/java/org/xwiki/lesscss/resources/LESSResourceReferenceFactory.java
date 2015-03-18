@@ -19,37 +19,29 @@
  */
 package org.xwiki.lesscss.resources;
 
-import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.ObjectPropertyReference;
 
 /**
- * A reference to a LESS resource.
- *
- * @since 6.4M2
+ * Create references for LESS resources.
+ *  
  * @version $Id$
+ * @since 7.0RC1
  */
-@Unstable
-public interface LESSResourceReference
+@Role
+public interface LESSResourceReferenceFactory
 {
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
+    /**
+     * Create a LESSResourceReference pointing to a skin file. 
+     * @param fileName name of the skin file
+     * @return a LESSResourceReference pointing to the skin file.
+     */
+    LESSResourceReference createReferenceForSkinFile(String fileName);
 
     /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
-     * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
+     * Create a LESSResourceReference pointing to an XObject property. 
+     * @param objectPropertyReference reference to an XObject property
+     * @return a LESSResourceReference pointing to the XObject property
      */
-    String getContent(String skin) throws LESSCompilerException;
-
-    /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
-     */
-    String serialize();
+    LESSResourceReference createReferenceForXObjectProperty(ObjectPropertyReference objectPropertyReference);
 }

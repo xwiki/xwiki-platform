@@ -29,9 +29,10 @@ import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.skin.DocumentSkinReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.skin.DocumentSkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -42,7 +43,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -64,11 +64,14 @@ public class SkinListenerTest
 
     private ColorThemeCache colorThemeCache;
 
+    private SkinReferenceFactory skinReferenceFactory;
+
     @Before
     public void setUp() throws Exception
     {
         lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
+        skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
     }
 
     @Test
@@ -104,13 +107,16 @@ public class SkinListenerTest
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
+        
+        DocumentSkinReference skinReference = new DocumentSkinReference(documentReference, null);
+        when(skinReferenceFactory.createReference(documentReference)).thenReturn(skinReference);
 
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessResourcesCache).clearFromSkin(eq(new DocumentSkinReference(documentReference)));
-        verify(colorThemeCache).clearFromSkin(eq(new DocumentSkinReference(documentReference)));
+        verify(lessResourcesCache).clearFromSkin(skinReference);
+        verify(colorThemeCache).clearFromSkin(skinReference);
     }
 
     @Test

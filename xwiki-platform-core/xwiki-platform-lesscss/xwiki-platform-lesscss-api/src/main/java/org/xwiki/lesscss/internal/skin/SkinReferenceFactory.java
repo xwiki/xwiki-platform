@@ -17,39 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.resources;
+package org.xwiki.lesscss.internal.skin;
 
+import org.xwiki.component.annotation.Role;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * A reference to a LESS resource.
+ * Constructs the appropriate reference for a given skin.
  *
- * @since 6.4M2
+ * @since 7.0RC1
  * @version $Id$
  */
+@Role
 @Unstable
-public interface LESSResourceReference
+public interface SkinReferenceFactory
 {
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    int hashCode();
-
     /**
-     * @param skin skin from which the content should be get
-     * @return the content holding by the resources pointed by the reference
+     * Constructs the appropriate reference for a given skin.
+     * @param skinName name of the skin
+     * @return the reference to the skin
      * @throws LESSCompilerException if problem occurs
-     * 
-     * @since 7.0RC1
      */
-    String getContent(String skin) throws LESSCompilerException;
+    SkinReference createReference(String skinName) throws LESSCompilerException;
 
     /**
-     * @return a serialized form of the resource
-     * 
-     * @since 7.0RC1
+     * Constructs the appropriate reference for a given skin.
+     * @param documentReference reference of a document holding a skin
+     * @return the reference to the skin
      */
-    String serialize();
+    SkinReference createReference(DocumentReference documentReference);
 }

@@ -27,9 +27,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.lesscss.compiler.IntegratedLESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -131,14 +132,16 @@ public class SxDocumentSource implements SxSource
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
                 if ("LESS".equals(sxObj.getStringValue(CONTENT_TYPE_PROPERTY_NAME))) {
-                    IntegratedLESSCompiler lessCompiler = Utils.getComponent(IntegratedLESSCompiler.class);
+                    LESSCompiler lessCompiler = Utils.getComponent(LESSCompiler.class);
+                    LESSResourceReferenceFactory lessResourceReferenceFactory
+                            = Utils.getComponent(LESSResourceReferenceFactory.class);
                     ObjectPropertyReference objectPropertyReference =
                             new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
                                     sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
+                    LESSResourceReference lessResourceReference
+                            = lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
                     try {
-                        sxContent = lessCompiler.compile(
-                                new LESSObjectPropertyResourceReference(objectPropertyReference), true, (parse == 1),
-                                false);
+                        sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1), false);
                     } catch (LESSCompilerException e) {
                         // Set the error message in a CSS comment to help the developer understand why its SSX is not
                         // working (it will work only if the CSS minifier is not used).

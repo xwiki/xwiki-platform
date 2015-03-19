@@ -55,6 +55,11 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultWatchListNotificationCache implements WatchListNotificationCache, Initializable
 {
     /**
+     * The realtime interval ID.
+     */
+    public static final String REALTIME_INTERVAL_ID = "realtime";
+
+    /**
      * Context provider.
      */
     @Inject
@@ -79,14 +84,14 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     private Logger logger;
 
     /**
-     * List of subscribers in the wiki farm.
+     * Map of subscribers in the wiki farm.
      */
-    private Map<String, Set<String>> jobToSubscribersMap = new HashMap<>();
+    private Map<String, Set<String>> intervalToSubscribersMap = new HashMap<>();
 
     /**
-     * Watchlist jobs document names in the main wiki.
+     * Watchlist notification intervals.
      */
-    private List<String> jobDocumentNames = new ArrayList<>();
+    private List<String> intervals;
 
     /**
      * Lock for the subscribers map.
@@ -94,12 +99,12 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     private ReentrantReadWriteLock subscribersLock = new ReentrantReadWriteLock();
 
     /**
-     * Lock for the job documents list.
+     * Lock for the intervals list.
      */
-    private ReentrantReadWriteLock jobDocumentsLock = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock intervalsLock = new ReentrantReadWriteLock();
 
     /**
-     * Init watchlist store. Get all the jobs present in the wiki. Create the list of subscribers.
+     * Init watchlist store. Get all the intervals/jobs present in the wiki. Create the list of subscribers.
      * 
      * @throws InitializationException if problems occur
      */
@@ -107,19 +112,27 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     {
         XWikiContext context = contextProvider.get();
 
-        // Initialize the job documents cache.
+        // Initialize the intervals cache.
         try {
+            intervals = new ArrayList<String>();
+            intervals.add(REALTIME_INTERVAL_ID);
+
+            // Get all the watchlist job documents from the main wiki.
             Query jobDocumentsQuery = queryManager.getNamedQuery("getWatchlistJobDocuments");
             // Make double sure we run the query on the main wiki, since that is where the jobs are defined.
             jobDocumentsQuery.setWiki(context.getWikiId());
+            List<String> jobDocumentNames = (List<String>) (List) jobDocumentsQuery.execute();
 
-            jobDocumentNames.addAll((List<String>) (List) jobDocumentsQuery.execute());
+            // TODO: Sort them by cron expression.
+
+            // Add them to the list of intervals.
+            intervals.addAll(jobDocumentNames);
         } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the cache of watchlist jobs.", e);
+            throw new InitializationException("Failed to initialize the cache of watchlist intervals.", e);
         }
 
-        // Initialize the job subscribers cache.
-        for (String jobDocumentName : jobDocumentNames) {
+        // Initialize the subscribers cache.
+        for (String jobDocumentName : intervals) {
             initSubscribersCache(jobDocumentName);
         }
     }
@@ -127,15 +140,15 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     /**
      * Retrieves all the users from all the wikis with a WatchList object in their profile.
      * 
-     * @param jobName name of the job to init the cache for
+     * @param intervalId name of the interval to init the cache for
      * @param context the XWiki context
      */
-    private void initSubscribersCache(String jobName)
+    private void initSubscribersCache(String intervalId)
     {
         // init subscribers cache
         List<Object> queryParams = new ArrayList<Object>();
         queryParams.add(WatchListClassDocumentInitializer.DOCUMENT_FULL_NAME);
-        queryParams.add(jobName);
+        queryParams.add(intervalId);
         queryParams.add(DefaultWatchListStore.USERS_CLASS);
 
         Set<String> subscribersForJob =
@@ -145,7 +158,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
         subscribersLock.writeLock().lock();
         try {
-            jobToSubscribersMap.put(jobName, subscribersForJob);
+            intervalToSubscribersMap.put(intervalId, subscribersForJob);
         } finally {
             subscribersLock.writeLock().unlock();
         }
@@ -204,14 +217,14 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     /**
      * Destroy subscribers cache for the given job.
      * 
-     * @param jobName name of the job for which the cache must be destroyed
+     * @param intervalId ID of the interval for which the cache must be destroyed
      * @param context the XWiki context
      */
-    private void destroySubscribersCache(String jobName)
+    private void destroySubscribersCache(String intervalId)
     {
         subscribersLock.writeLock().lock();
         try {
-            jobToSubscribersMap.remove(jobName);
+            intervalToSubscribersMap.remove(intervalId);
         } finally {
             subscribersLock.writeLock().unlock();
         }
@@ -224,7 +237,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
 
         subscribersLock.readLock().lock();
         try {
-            result = jobToSubscribersMap.get(intervalId);
+            result = intervalToSubscribersMap.get(intervalId);
         } finally {
             subscribersLock.readLock().unlock();
         }
@@ -241,7 +254,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     {
         subscribersLock.writeLock().lock();
         try {
-            Set<String> subscribersForJob = jobToSubscribersMap.get(jobId);
+            Set<String> subscribersForJob = intervalToSubscribersMap.get(jobId);
 
             if (subscribersForJob != null) {
                 return subscribersForJob.add(user);
@@ -274,7 +287,7 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     {
         subscribersLock.writeLock().lock();
         try {
-            Set<String> subscribersForJob = jobToSubscribersMap.get(intervalId);
+            Set<String> subscribersForJob = intervalToSubscribersMap.get(intervalId);
 
             if (subscribersForJob != null) {
                 return subscribersForJob.remove(user);
@@ -287,26 +300,26 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     }
 
     @Override
-    public Collection<String> getJobDocumentNames()
+    public List<String> getIntervals()
     {
-        jobDocumentsLock.readLock().lock();
+        intervalsLock.readLock().lock();
         try {
             // Do not return the internal reference, but copy it.
-            return new ArrayList<String>(jobDocumentNames);
+            return new ArrayList<String>(intervals);
         } finally {
-            jobDocumentsLock.readLock().unlock();
+            intervalsLock.readLock().unlock();
         }
     }
 
     @Override
-    public boolean removeJobDocument(String jobDocument)
+    public boolean removeInterval(String intervalId)
     {
         // Atomic operation
-        jobDocumentsLock.writeLock().lock();
+        intervalsLock.writeLock().lock();
         subscribersLock.writeLock().lock();
         try {
-            if (jobDocumentNames.remove(jobDocument)) {
-                destroySubscribersCache(jobDocument);
+            if (intervals.remove(intervalId)) {
+                destroySubscribersCache(intervalId);
 
                 return true;
             }
@@ -314,27 +327,29 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
             return false;
         } finally {
             subscribersLock.writeLock().unlock();
-            jobDocumentsLock.writeLock().unlock();
+            intervalsLock.writeLock().unlock();
         }
     }
 
     @Override
-    public boolean addJobDocument(String jobDocument)
+    public boolean addInterval(String jobDocument)
     {
         // Atomic operation
-        jobDocumentsLock.writeLock().lock();
+        intervalsLock.writeLock().lock();
         subscribersLock.writeLock().lock();
         try {
-            if (jobDocumentNames.add(jobDocument)) {
+            if (intervals.add(jobDocument)) {
                 initSubscribersCache(jobDocument);
 
+                // TODO: Re-sort the intervals by cron expression
+
                 return true;
             }
 
             return false;
         } finally {
             subscribersLock.writeLock().unlock();
-            jobDocumentsLock.writeLock().unlock();
+            intervalsLock.writeLock().unlock();
         }
     }
 }

@@ -74,8 +74,8 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
-        #set($notifiers = $services.watchlist.getNotifiers())
-        #set($currentNotifier = $watchOject.getProperty('interval').getValue())
+        #set($notifiers = $services.watchlist.getIntervals())
+        #set($currentNotifier = $services.watchlist.getInterval($xcontext.user))
         &lt;dd&gt;
           #if($xcontext.action=='view')
             #if("$!currentNotifier" != "")

@@ -20,6 +20,7 @@
 package org.xwiki.watchlist.internal;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 
@@ -67,23 +68,23 @@ public interface WatchListNotificationCache
     boolean removeSubscriber(String intervalId, String user);
 
     /**
-     * @return names of documents which contain a watchlist job object
+     * @return the list of notification intervals, sorted by size
      */
-    Collection<String> getJobDocumentNames();
+    List<String> getIntervals();
 
     /**
-     * Add a document containing a watchlist job object.
+     * Add a new notification interval.
      * 
-     * @param jobDocument the document to add
-     * @return true if the document was added, false otherwise
+     * @param intervalId ID of the interval to add
+     * @return true if the interval was added, false otherwise
      */
-    boolean addJobDocument(String jobDocument);
+    boolean addInterval(String intervalId);
 
     /**
-     * Remove a document containing a watchlist job object.
+     * Removes an existing notification interval.
      * 
-     * @param jobDocument the document to add
-     * @return true if the document was removed, false otherwise
+     * @param intervalId ID of the interval to remove
+     * @return true if the interval was removed, false otherwise
      */
-    boolean removeJobDocument(String jobDocument);
+    boolean removeInterval(String intervalId);
 }

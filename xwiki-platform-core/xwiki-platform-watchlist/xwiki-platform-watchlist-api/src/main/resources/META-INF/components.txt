@@ -1,9 +1,13 @@
+org.xwiki.watchlist.internal.ActivityEventWatchListEventConverter
 org.xwiki.watchlist.internal.AutomaticWatchModeListener
 org.xwiki.watchlist.internal.DefaultWatchList
 org.xwiki.watchlist.internal.DefaultWatchListEventFeedManager
+org.xwiki.watchlist.internal.DefaultWatchListEventHTMLDiffExtractor
+org.xwiki.watchlist.internal.DefaultWatchListEventMatcher
 org.xwiki.watchlist.internal.DefaultWatchListNotificationCache
 org.xwiki.watchlist.internal.DefaultWatchListNotifier
 org.xwiki.watchlist.internal.DefaultWatchListStore
+org.xwiki.watchlist.internal.RealtimeNotificationGenerator
 org.xwiki.watchlist.internal.WatchListNotificationCacheListener
 org.xwiki.watchlist.internal.documents.DailyWatchListJobDocumentInitializer
 org.xwiki.watchlist.internal.documents.HourlyWatchListJobDocumentInitializer

@@ -19,150 +19,65 @@
  */
 package org.xwiki.watchlist.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xwiki.watchlist.internal.api.WatchList;
+import org.xwiki.component.annotation.Role;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
-import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
-import com.xpn.xwiki.web.Utils;
-
 /**
- * Matcher for WatchList events. This class stores all the events fired during a given interval. It also allows to
- * perform a match between events and elements watched by a user.
+ * Matcher for WatchList events. It can also retrieve all the events fired during a given interval. It also allows to
+ * perform a match between events and the elements watched by a user.
  * 
  * @version $Id$
  */
-@SuppressWarnings("serial")
-public class WatchListEventMatcher
+@Role
+public interface WatchListEventMatcher
 {
     /**
-     * Logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(WatchListEventMatcher.class);
-
-    /**
-     * Events to match.
-     */
-    private static final List<String> MATCHING_EVENT_TYPES = new ArrayList<String>()
-    {
-        {
-            add(ActivityEventType.CREATE);
-            add(ActivityEventType.UPDATE);
-            add(ActivityEventType.DELETE);
-        }
-    };
-
-    /**
-     * List of events which have occurred between the start date and the current time.
-     */
-    private final List<WatchListEvent> events = new ArrayList<WatchListEvent>();
-
-    /**
-     * Constructor. Gets all the events fired during the interval between the given date and the current date.
+     * Gets all the events fired during the interval between the given date and the current date.
      * 
-     * @param context the XWiki context
      * @param start start date to use for document matching
+     * @return the list of events after the given start date
      */
-    public WatchListEventMatcher(Date start, XWikiContext context)
-    {
-        ActivityStream actStream =
-            ((ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context))
-                .getActivityStream();
-        List<Object> parameters = new ArrayList<Object>();
-        List<ActivityEvent> rawEvents;
-
-        parameters.add(start);
-
-        try {
-            // FIXME: Watch out for memory usage here, since the list of events could be huge in some cases.
-            rawEvents =
-                actStream.searchEvents(
-                    "act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','") + "')", false,
-                    true, 0, 0, parameters, context);
-
-            // If the page has been modified several times we want to display only one diff, if the page has been
-            // delete after update events we want to discard the update events since we won't be able to display
-            // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and
-            // WatchListEvent#equals(WatchListEvent).
-            for (ActivityEvent rawEvent : rawEvents) {
-                WatchListEvent event = new WatchListEvent(rawEvent, context);
-                if (!events.contains(event)) {
-                    events.add(new WatchListEvent(rawEvent, context));
-                } else {
-                    WatchListEvent existingCompositeEvent = events.get(events.indexOf(event));
-                    existingCompositeEvent.addEvent(event);
-                }
-            }
-
-        } catch (ActivityStreamException e) {
-            LOGGER.error("Failed to retrieve updated documents from activity stream");
-            e.printStackTrace();
-        }
-    }
+    List<WatchListEvent> getEventsSince(Date start);
 
     /**
-     * @return the number of events the matcher will work with.
+     * @param events the events to filter
+     * @param subscriber the subscriber whose watched elements to check against
+     * @return a sublist of events matching the given user's watched elements and that occurred on documents that are
+     *         visible to the given user
      */
-    public int getEventNumber()
-    {
-        return events.size();
-    }
+    List<WatchListEvent> getMatchingVisibleEvents(List<WatchListEvent> events, String subscriber);
 
     /**
-     * Get the events matching criteria.
+     * Checks if an event matches a subscriber's watched elements.
      * 
-     * @param wikis the wikis from which events should match
-     * @param spaces the spaces from which events should match
-     * @param documents the documents from which events should match
-     * @param users the users from which events should match
-     * @param userName notification recipient
-     * @param context the XWiki context
-     * @return a list of events matching the given scopes
+     * @param event the event to check
+     * @param subscriber the subscriber to check
+     * @return true if the given event matches the given subscriber's watched elements, false otherwise. In addition,
+     *         view rights of the subscriber on the event's documents are checked and events on certain internal
+     *         documents (e.g. watchlist scheduler jobs) are also skipped to avoid noise.
      */
-    public List<WatchListEvent> getMatchingEvents(Collection<String> wikis, Collection<String> spaces,
-        Collection<String> documents, Collection<String> users, String userName, XWikiContext context)
-    {
-        List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();
-        WatchList watchlist = Utils.getComponent(WatchList.class);
-        Collection<String> jobDocumentNames = watchlist.getStore().getJobDocumentNames();
+    boolean isEventMatching(WatchListEvent event, String subscriber);
 
-        for (WatchListEvent event : events) {
-            if (wikis.contains(event.getWiki()) || spaces.contains(event.getPrefixedSpace())
-                || documents.contains(event.getPrefixedFullName())
-                || CollectionUtils.intersection(users, event.getAuthors()).size() > 0) {
-                try {
-                    // We exclude watchlist jobs from notifications since they are modified each time they are fired,
-                    // producing useless noise. We also ensure that users have the right to view documents we send
-                    // notifications for.
-                    if (!jobDocumentNames.contains(event.getFullName())
-                        && context.getWiki().getRightService()
-                            .hasAccessLevel("view", userName, event.getPrefixedFullName(), context)) {
-                        matchingEvents.add(event);
-                    }
-                } catch (XWikiException e) {
-                    // We're in a job, we don't throw exceptions
-                    e.printStackTrace();
-                }
-            }
-        }
+    /**
+     * Checks if an event should be skipped for various reasons (performance, security, etc.).
+     * <p/>
+     * Example: Watchlist job documents that are updated on each trigger should be skipped.
+     * 
+     * @param event the event to check
+     * @return true if the event should be skipped, false otherwise
+     */
+    boolean isEventSkipped(WatchListEvent event);
 
-        Collections.sort(matchingEvents);
-
-        return matchingEvents;
-    }
+    /**
+     * Checks if the document of an event is viewable by a given subscriber. If it is not, then we can also say that the
+     * event is not visible to the subscriber.
+     * 
+     * @param event the event to check
+     * @param subscriber the subscriber to check
+     * @return true if the event is visible, false otherwise
+     */
+    boolean isEventViewable(WatchListEvent event, String subscriber);
 }

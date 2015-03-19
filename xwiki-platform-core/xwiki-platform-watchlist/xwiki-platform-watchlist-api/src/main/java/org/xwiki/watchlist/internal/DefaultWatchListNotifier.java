@@ -164,14 +164,16 @@ public class DefaultWatchListNotifier implements WatchListNotifier
      */
     private String getTemplateDocument(String templateDocument, XWikiContext context)
     {
-        String template = "";
-        if (context.getWiki().exists(templateDocument, context)) {
-            template = templateDocument;
+        String result = null;
+
+        if (templateDocument != null && context.getWiki().exists(templateDocument, context)) {
+            result = templateDocument;
         } else if (context.getWiki().exists(DEFAULT_EMAIL_TEMPLATE, context)) {
-            template = DEFAULT_EMAIL_TEMPLATE;
+            result = DEFAULT_EMAIL_TEMPLATE;
         } else {
-            template = context.getMainXWiki() + ":" + DEFAULT_EMAIL_TEMPLATE;
+            result = context.getMainXWiki() + ":" + DEFAULT_EMAIL_TEMPLATE;
         }
-        return template;
+
+        return result;
     }
 }

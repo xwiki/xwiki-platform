@@ -399,7 +399,7 @@ $services.localization.render('watchlist.notification.email.multipleUpdates.intr
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$prefixedFullName" href="$event.getUrl()"&gt;&lt;span&gt;$currentDoc.getDisplayTitle()&lt;/span&gt;&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"&gt;&lt;img src="cid:arrowup.gif" style="border:0;" width="16px" height="16px"/&gt;&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$prefixedFullName" href="$currentDoc.getExternalURL()"&gt;&lt;span&gt;$currentDoc.getDisplayTitle()&lt;/span&gt;&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"&gt;&lt;img src="cid:arrowup.gif" style="border:0;" width="16px" height="16px"/&gt;&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;
@@ -508,7 +508,7 @@ $services.localization.render('watchlist.notification.email.multipleUpdates.intr
 | |
 #end
 #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-| | + $currentDoc.getDisplayTitle() ($event.getFullName()): $event.getUrl()
+| | + $currentDoc.getDisplayTitle() ($event.getFullName()): $currentDoc.getExternalURL()
 | | |
 #end
 #if(!$event.isComposite())

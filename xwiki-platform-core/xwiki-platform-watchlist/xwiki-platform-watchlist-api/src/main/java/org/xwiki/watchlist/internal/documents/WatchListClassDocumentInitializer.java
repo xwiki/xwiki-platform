@@ -35,7 +35,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.watchlist.internal.WatchListNotificationCache;
 import org.xwiki.watchlist.internal.api.AutomaticWatchMode;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -103,10 +102,9 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
     public static final String AUTOMATICWATCH_PROPERTY = "automaticwatch";
 
     /**
-     * Used to get the main wiki id.
+     * Value for the {@value #AUTOMATICWATCH_PROPERTY} property to use the default behavior.
      */
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    public static final String AUTOMATICWATCH_DEFAULT_VALUE = "default";
 
     /**
      * Used to get the list of possible values for {@value #INTERVAL_PROPERTY}.
@@ -129,30 +127,30 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
         BaseClass bclass = document.getXClass();
 
         // Interval property
-        needsUpdate |= bclass.addStaticListField(INTERVAL_PROPERTY, "Email notifications interval", "");
+        needsUpdate |= bclass.addStaticListField(INTERVAL_PROPERTY, "Email Notifications Interval", "");
 
-        // Check that the interval property contains all the available jobs
+        // Check that the interval property contains all the available intervals
         StaticListClass intervalClass = (StaticListClass) bclass.get(INTERVAL_PROPERTY);
         List<String> intervalValues = ListClass.getListFromString(intervalClass.getValues());
 
-        // Look for missing or outdated jobs in the interval list
-        Collection<String> jobDocumentNames = notificationCacheProvider.get().getJobDocumentNames();
-        if (!CollectionUtils.disjunction(jobDocumentNames, intervalValues).isEmpty()) {
+        // Look for missing or outdated intervals in the interval list
+        Collection<String> availableIntervals = notificationCacheProvider.get().getIntervals();
+        if (!CollectionUtils.disjunction(availableIntervals, intervalValues).isEmpty()) {
             needsUpdate = true;
-            // TODO: Sort them by cron expression?
-            intervalClass.setValues(StringUtils.join(jobDocumentNames, ListClass.DEFAULT_SEPARATOR));
+            intervalClass.setValues(StringUtils.join(availableIntervals, ListClass.DEFAULT_SEPARATOR));
         }
 
         // Watched elements properties
-        needsUpdate |= this.addWatchedElementField(bclass, WIKIS_PROPERTY, "Wiki list");
-        needsUpdate |= this.addWatchedElementField(bclass, SPACES_PROPERTY, "Space list");
-        needsUpdate |= this.addWatchedElementField(bclass, DOCUMENTS_PROPERTY, "Document list");
-        needsUpdate |= this.addWatchedElementField(bclass, USERS_PROPERTY, "User list");
+        needsUpdate |= this.addWatchedElementField(bclass, WIKIS_PROPERTY, "Wiki List");
+        needsUpdate |= this.addWatchedElementField(bclass, SPACES_PROPERTY, "Space List");
+        needsUpdate |= this.addWatchedElementField(bclass, DOCUMENTS_PROPERTY, "Document List");
+        needsUpdate |= this.addWatchedElementField(bclass, USERS_PROPERTY, "User List");
 
         // Automatic watching property
-        needsUpdate |=
-            bclass.addStaticListField(AUTOMATICWATCH_PROPERTY, "Automatic watching",
-                "default|" + StringUtils.join(AutomaticWatchMode.values(), "|"));
+        String automaticWatchValues =
+            String.format("%s%s%s", AUTOMATICWATCH_DEFAULT_VALUE, ListClass.DEFAULT_SEPARATOR,
+                StringUtils.join(AutomaticWatchMode.values(), ListClass.DEFAULT_SEPARATOR));
+        needsUpdate |= bclass.addStaticListField(AUTOMATICWATCH_PROPERTY, "Automatic Watching", automaticWatchValues);
 
         // Handle the fields and the sheet of the document containing the class.
         needsUpdate |= setClassDocumentFields(document, "XWiki WatchList Notification Rules Class");

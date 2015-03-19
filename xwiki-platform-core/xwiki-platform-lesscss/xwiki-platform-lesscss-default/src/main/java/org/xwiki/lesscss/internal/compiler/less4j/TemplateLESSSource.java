@@ -19,6 +19,7 @@
  */
 package org.xwiki.lesscss.internal.compiler.less4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.lesscss.internal.compiler.CachedLESSCompiler;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
@@ -33,7 +34,7 @@ import org.xwiki.template.TemplateManager;
  */
 public class TemplateLESSSource extends AbstractLESSSource
 {
-    private static final String FILE_SEPATATOR = "/";
+    private static final String FILE_SEPARATOR = "/";
     
     private String templateName;
     
@@ -56,11 +57,7 @@ public class TemplateLESSSource extends AbstractLESSSource
      */
     private static String getParentFolder(String templateName)
     {
-        int index = templateName.lastIndexOf(FILE_SEPATATOR);
-        if (index > 0 && index < templateName.length()) {
-            return templateName.substring(0, index);
-        }
-        return templateName;
+        return StringUtils.substringBeforeLast(templateName, FILE_SEPARATOR);
     }
 
     @Override

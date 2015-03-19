@@ -41,7 +41,12 @@
   <hidden>true</hidden>
   <content>### Macro "watchlist"
 rendering.macro.watchlist.name=Watch List
-rendering.macro.watchlist.description=Show the content of your current watchlist.</content>
+rendering.macro.watchlist.description=Show the content of your current watchlist.
+
+### XWiki.WatchListClass
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly</content>
   <object>
     <name>XWiki.WatchListTranslations</name>
     <number>0</number>

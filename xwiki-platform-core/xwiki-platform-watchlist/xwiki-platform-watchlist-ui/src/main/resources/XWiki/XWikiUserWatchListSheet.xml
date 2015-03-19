@@ -47,11 +47,19 @@
 {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
 #else
 #macro (getNotifierPrettyName $notifier)
-  #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
-  #set ($notifierDoc = $xwiki.getDocument($notifierReference))
-  #set ($notifierPrettyName = $notifierDoc.plainTitle)
-  #if ("$!notifierPrettyName" == '')
-    #set ($notifierPrettyName = $notifier)
+  #set ($translationKey = "XWiki.WatchListClass_interval_${notifier}")
+  ## Look for a translation
+  #if ($services.localization.get($translationKey))
+    #set ($notifierPrettyName = $services.localization.render($translationKey))
+  #else
+    ## Look for a document's title
+    #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
+    #set ($notifierDoc = $xwiki.getDocument($notifierReference))
+    #set ($notifierPrettyName = $notifierDoc.plainTitle)
+    #if ("$!notifierPrettyName" == '')
+      ## Fallback on the actual value
+      #set ($notifierPrettyName = $notifier)
+    #end
   #end##
 $notifierPrettyName##
 #end
@@ -81,12 +89,6 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             &lt;select name="XWiki.WatchListClass_0_interval"&gt;
               &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
               #foreach($notifier in $notifiers)
-                #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
-                #set ($notifierDoc = $xwiki.getDocument($notifierReference))
-                #set ($notifierPrettyName = $notifierDoc.plainTitle)
-                #if ("$!notifierPrettyName" == '')
-                  #set ($notifierPrettyName = $notifier)
-                #end
                 &lt;option value="$notifier"#if($notifier == $currentNotifier) selected='selected'#end&gt;#getNotifierPrettyName($notifier)&lt;/option&gt;
               #end
             &lt;/select&gt;

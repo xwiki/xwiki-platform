@@ -66,7 +66,7 @@ public class BaseStringProperty extends BaseProperty
         String otherValue = ((BaseStringProperty) obj).getValue();
 
         if (getValue() == null) {
-            // They are equals if the are both null
+            // They are equals if they are both null
             return otherValue == null;
         }
 

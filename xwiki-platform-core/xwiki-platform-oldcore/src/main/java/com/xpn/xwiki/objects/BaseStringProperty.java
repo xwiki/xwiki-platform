@@ -63,11 +63,14 @@ public class BaseStringProperty extends BaseProperty
             return false;
         }
 
-        if ((getValue() == null) && (((BaseStringProperty) obj).getValue() == null)) {
-            return true;
+        String otherValue = ((BaseStringProperty) obj).getValue();
+
+        if (getValue() == null) {
+            // They are equals if the are both null
+            return otherValue == null;
         }
 
-        return getValue().equals(((BaseStringProperty) obj).getValue());
+        return getValue().equals(otherValue);
     }
 
     @Override

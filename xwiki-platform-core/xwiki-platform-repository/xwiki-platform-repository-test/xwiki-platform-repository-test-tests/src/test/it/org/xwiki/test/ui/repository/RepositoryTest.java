@@ -100,7 +100,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
     @Test
     public void testAddExtension() throws Exception
-    {
+    {   
         // Set id prefix
 
         RepositoryAdminPage repositoryAdminPage = RepositoryAdminPage.gotoPage();
@@ -150,6 +150,9 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Add attachment
         getRepositoryTestUtils().attachFile(this.baseExtension);
+
+        // Wait until all asynchronous tasks are done
+        getRepositoryTestUtils().waitUntilReady();
 
         // Check livetable
 
@@ -264,12 +267,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Empty search
         extension = searchExtension(this.baseExtension.getId().getId());
-        if (extension == null) {
-            // Give more time to Solr to index the document
-            // FIXME: provide a helper to wait for Solr queue to be empty
-            Thread.sleep(60000);
-            extension = searchExtension(this.baseExtension.getId().getId());
-        }
 
         if (extension == null) {
             Assert.fail("Could not find extension [" + this.baseExtension.getId().getId() + "]");

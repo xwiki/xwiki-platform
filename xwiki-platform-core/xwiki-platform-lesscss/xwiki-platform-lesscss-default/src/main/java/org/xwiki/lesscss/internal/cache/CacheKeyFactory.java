@@ -23,12 +23,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceSerializer;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.skin.SkinReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.lesscss.resources.LESSResourceReferenceSerializer;
-import org.xwiki.lesscss.skin.SkinReference;
-import org.xwiki.lesscss.skin.SkinReferenceSerializer;
 
 /**
  * Factory to create a cache key.
@@ -42,15 +39,6 @@ public class CacheKeyFactory
 {
     private static final String CACHE_KEY_SEPARATOR = "_";
 
-    @Inject
-    private LESSResourceReferenceSerializer lessResourceReferenceSerializer;
-
-    @Inject
-    private SkinReferenceSerializer skinReferenceSerializer;
-
-    @Inject
-    private ColorThemeReferenceSerializer colorThemeReferenceSerializer;
-    
     @Inject
     private XWikiContextCacheKeyFactory xcontextCacheKeyFactory;
 
@@ -67,9 +55,9 @@ public class CacheKeyFactory
     public String getCacheKey(LESSResourceReference lessResourceReference, SkinReference skinReference,
             ColorThemeReference colorThemeReference, boolean withContext)
     {
-        String lessResource  = lessResourceReferenceSerializer.serialize(lessResourceReference);
-        String skin          = skinReferenceSerializer.serialize(skinReference);
-        String colorTheme    = colorThemeReferenceSerializer.serialize(colorThemeReference);
+        String lessResource  = lessResourceReference.serialize();
+        String skin          = skinReference.serialize();
+        String colorTheme    = colorThemeReference.serialize();
         
         String result = lessResource.length()  + CACHE_KEY_SEPARATOR + lessResource + CACHE_KEY_SEPARATOR
                      +  skin.length()          + CACHE_KEY_SEPARATOR + skin         + CACHE_KEY_SEPARATOR

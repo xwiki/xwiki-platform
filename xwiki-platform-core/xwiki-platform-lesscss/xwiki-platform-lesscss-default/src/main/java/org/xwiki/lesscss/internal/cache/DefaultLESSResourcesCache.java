@@ -30,10 +30,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.cache.LESSResourcesCache}.
+ * Default implementation for {@link org.xwiki.lesscss.internal.cache.LESSResourcesCache}.
  *
  * @since 6.4M2
  * @version $Id$

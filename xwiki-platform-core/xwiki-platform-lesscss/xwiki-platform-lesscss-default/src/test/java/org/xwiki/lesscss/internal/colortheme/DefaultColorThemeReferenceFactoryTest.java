@@ -25,8 +25,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -93,8 +91,8 @@ public class DefaultColorThemeReferenceFactoryTest
                 thenReturn(1);
 
         // Test
-        assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme")),
-                mocker.getComponentUnderTest().createReference("colorTheme"));
+        assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme"),
+                        null), mocker.getComponentUnderTest().createReference("colorTheme"));
     }
 
     @Test
@@ -113,8 +111,8 @@ public class DefaultColorThemeReferenceFactoryTest
                 thenReturn(1);
 
         // Test
-        assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme")),
-                mocker.getComponentUnderTest().createReference("colorTheme"));
+        assertEquals(new DocumentColorThemeReference(new DocumentReference("otherWiki", "ColorThemes", "colorTheme"),
+                        null), mocker.getComponentUnderTest().createReference("colorTheme"));
     }
 
     @Test

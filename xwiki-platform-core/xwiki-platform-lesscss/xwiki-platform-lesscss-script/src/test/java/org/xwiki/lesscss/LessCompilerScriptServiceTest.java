@@ -24,16 +24,18 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.ColorTheme;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
-import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
-import org.xwiki.lesscss.colortheme.NamedColorThemeReference;
+import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
-import org.xwiki.lesscss.skin.FSSkinReference;
-import org.xwiki.lesscss.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.colortheme.ColorTheme;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -45,7 +47,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -63,7 +64,9 @@ public class LessCompilerScriptServiceTest
     public MockitoComponentMockingRule<LessCompilerScriptService> mocker =
             new MockitoComponentMockingRule<>(LessCompilerScriptService.class);
 
-    private LESSSkinFileCompiler lessCompiler;
+    private LESSCompiler lessCompiler;
+
+    private LESSResourceReferenceFactory lessResourceReferenceFactory;
 
     private LESSResourcesCache lessCache;
 
@@ -84,9 +87,10 @@ public class LessCompilerScriptServiceTest
     @Before
     public void setUp() throws Exception
     {
-        lessCompiler = mocker.getInstance(LESSSkinFileCompiler.class);
+        lessCompiler = mocker.getInstance(LESSCompiler.class);
         lessColorThemeConverter = mocker.getInstance(LESSColorThemeConverter.class);
         lessCache = mocker.getInstance(LESSResourcesCache.class);
+        lessResourceReferenceFactory = mocker.getInstance(LESSResourceReferenceFactory.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         skinReferenceFactory = mocker.getInstance(SkinReferenceFactory.class);
@@ -99,52 +103,68 @@ public class LessCompilerScriptServiceTest
     @Test
     public void compileSkinFile() throws Exception
     {
+        // Mock
+        LESSResourceReference style = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style.less")).thenReturn(style);
         // Test
         mocker.getComponentUnderTest().compileSkinFile("style.less");
         // Verify
-        verify(lessCompiler).compileSkinFile("style.less", false);
+        verify(lessCompiler).compile(style, false, true, false);
 
+        // Mock
+        LESSResourceReference style2 = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style2.less")).thenReturn(style2);
         // Test
         mocker.getComponentUnderTest().compileSkinFile("style2.less", true);
         // Verify
-        verify(lessCompiler).compileSkinFile("style2.less", true);
+        verify(lessCompiler).compile(style2, false, true, true);
 
+        // Mock
+        LESSResourceReference style3 = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style3.less")).thenReturn(style3);
         // Test
         mocker.getComponentUnderTest().compileSkinFile("style3.less", false);
         // Verify
-        verify(lessCompiler).compileSkinFile("style3.less", false);
+        verify(lessCompiler).compile(style3, false, true, false);
     }
 
     @Test
     public void compileSkinFileWithOtherSkin() throws Exception
     {
+        // Mock
+        LESSResourceReference style = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style.less")).thenReturn(style);
+        
         // Test
-        mocker.getComponentUnderTest().compileSkinFile("style4.less", "skin1");
+        mocker.getComponentUnderTest().compileSkinFile("style.less", "skin1");
         // Verify
-        verify(lessCompiler).compileSkinFile("style4.less", "skin1", false);
+        verify(lessCompiler).compile(style, false, true, "skin1", false);
 
         // Test
-        mocker.getComponentUnderTest().compileSkinFile("style4.less", "skin2");
+        mocker.getComponentUnderTest().compileSkinFile("style.less", "skin2");
         // Verify
-        verify(lessCompiler).compileSkinFile("style4.less", "skin2", false);
-
+        verify(lessCompiler).compile(style, false, true, "skin2", false);
+        
         // Test
         mocker.getComponentUnderTest().compileSkinFile("style.less", "skin3", false);
         // Verify
-        verify(lessCompiler).compileSkinFile("style.less", "skin3", false);
+        verify(lessCompiler).compile(style, false, true, "skin3", false);
 
         // Test
         mocker.getComponentUnderTest().compileSkinFile("style.less", "skin4", true);
         // Verify
-        verify(lessCompiler).compileSkinFile("style.less", "skin4", true);
+        verify(lessCompiler).compile(style, false, true, "skin4", true);
     }
 
     @Test
     public void compileSkinFileWhenException() throws Exception
     {
         // Mocks
+        LESSResourceReference style = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style.less")).thenReturn(style);
+        
         Exception exception = new LESSCompilerException("Exception with LESS", null);
-        when(lessCompiler.compileSkinFile("style.less", false)).thenThrow(exception);
+        when(lessCompiler.compile(style, false, true, false)).thenThrow(exception);
 
         // Test
         String result = mocker.getComponentUnderTest().compileSkinFile("style.less", false);
@@ -157,8 +177,11 @@ public class LessCompilerScriptServiceTest
     public void compileSkinFileWithOtherSkinWhenException() throws Exception
     {
         // Mocks
+        LESSResourceReference style = mock(LESSResourceReference.class);
+        when(lessResourceReferenceFactory.createReferenceForSkinFile("style.less")).thenReturn(style);
+        
         Exception exception = new LESSCompilerException("Exception with LESS", null);
-        when(lessCompiler.compileSkinFile("style.less", "flamingo", false)).thenThrow(exception);
+        when(lessCompiler.compile(style, false, true, "flamingo", false)).thenThrow(exception);
 
         // Test
         String result = mocker.getComponentUnderTest().compileSkinFile("style.less", "flamingo", false);
@@ -268,15 +291,15 @@ public class LessCompilerScriptServiceTest
 
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
 
-        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(
-                new NamedColorThemeReference("colorTheme"));
+        ColorThemeReference colorThemeReference = mock(ColorThemeReference.class);
+        when(colorThemeReferenceFactory.createReference("colorTheme")).thenReturn(colorThemeReference);
 
         // Tests
         assertTrue(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
-        verify(lessCache).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
-        verify(colorThemeCache).clearFromColorTheme(eq(new NamedColorThemeReference("colorTheme")));
+        verify(lessCache).clearFromColorTheme(colorThemeReference);
+        verify(colorThemeCache).clearFromColorTheme(colorThemeReference);
     }
 
     @Test
@@ -312,14 +335,16 @@ public class LessCompilerScriptServiceTest
         when(doc.getDocumentReference()).thenReturn(currentDocReference);
 
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
-        when(skinReferenceFactory.createReference("skin")).thenReturn(new FSSkinReference("skin"));
+
+        SkinReference skinReference = mock(SkinReference.class);
+        when(skinReferenceFactory.createReference("skin")).thenReturn(skinReference);
 
         // Tests
         assertTrue(mocker.getComponentUnderTest().clearCacheFromSkin("skin"));
 
         // Verify
-        verify(lessCache).clearFromSkin(eq(new FSSkinReference("skin")));
-        verify(colorThemeCache).clearFromSkin(eq(new FSSkinReference("skin")));
+        verify(lessCache).clearFromSkin(skinReference);
+        verify(colorThemeCache).clearFromSkin(skinReference);
     }
 
     @Test

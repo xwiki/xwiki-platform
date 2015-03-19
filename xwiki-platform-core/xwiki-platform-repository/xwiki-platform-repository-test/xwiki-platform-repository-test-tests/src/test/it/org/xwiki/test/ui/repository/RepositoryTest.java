@@ -149,7 +149,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         getRepositoryTestUtils().addDependencies(this.baseExtension, "10.0");
 
         // Add attachment
-        getRepositoryTestUtils().attachFile(this.baseExtension, USER_CREDENTIALS);
+        getRepositoryTestUtils().attachFile(this.baseExtension);
 
         // Check livetable
 

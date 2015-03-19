@@ -28,13 +28,12 @@ import javax.inject.Inject;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.lesscss.cache.LESSCache;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
 import org.xwiki.lesscss.resources.LESSResourceReference;
-import org.xwiki.lesscss.skin.SkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReference;
 
 /**
- * Default and abstract implementation of {@link org.xwiki.lesscss.cache.LESSCache}.
+ * Default and abstract implementation of {@link org.xwiki.lesscss.internal.cache.LESSCache}.
  *
  * @param <T> class of the object to cache
  *

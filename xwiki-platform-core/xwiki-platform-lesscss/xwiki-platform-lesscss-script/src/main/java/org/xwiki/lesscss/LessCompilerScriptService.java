@@ -26,16 +26,17 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.ColorTheme;
-import org.xwiki.lesscss.colortheme.ColorThemeReference;
-import org.xwiki.lesscss.colortheme.ColorThemeReferenceFactory;
-import org.xwiki.lesscss.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.compiler.LESSCompiler;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.compiler.LESSSkinFileCompiler;
-import org.xwiki.lesscss.skin.SkinReference;
-import org.xwiki.lesscss.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.colortheme.ColorTheme;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
+import org.xwiki.lesscss.internal.colortheme.LESSColorThemeConverter;
+import org.xwiki.lesscss.internal.skin.SkinReference;
+import org.xwiki.lesscss.internal.skin.SkinReferenceFactory;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -56,8 +57,11 @@ import com.xpn.xwiki.XWikiContext;
 public class LessCompilerScriptService implements ScriptService
 {
     @Inject
-    private LESSSkinFileCompiler lessCompiler;
-
+    private LESSCompiler lessCompiler;
+    
+    @Inject
+    private LESSResourceReferenceFactory lessResourceReferenceFactory;
+    
     @Inject
     private LESSResourcesCache lessCache;
 
@@ -104,7 +108,8 @@ public class LessCompilerScriptService implements ScriptService
     public String compileSkinFile(String fileName, boolean force)
     {
         try {
-            return lessCompiler.compileSkinFile(fileName, force);
+            return lessCompiler.compile(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true, 
+                force);
         } catch (LESSCompilerException e) {
             return ExceptionUtils.getRootCauseMessage(e);
         }
@@ -137,7 +142,8 @@ public class LessCompilerScriptService implements ScriptService
     public String compileSkinFile(String fileName, String skin, boolean force)
     {
         try {
-            return lessCompiler.compileSkinFile(fileName, skin, force);
+            return lessCompiler.compile(lessResourceReferenceFactory.createReferenceForSkinFile(fileName), false, true,
+                    skin, force);
         } catch (LESSCompilerException e) {
             return ExceptionUtils.getRootCauseMessage(e);
         }

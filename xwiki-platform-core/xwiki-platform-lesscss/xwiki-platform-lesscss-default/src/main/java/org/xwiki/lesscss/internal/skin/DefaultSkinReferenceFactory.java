@@ -25,12 +25,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.skin.DocumentSkinReference;
-import org.xwiki.lesscss.skin.FSSkinReference;
-import org.xwiki.lesscss.skin.SkinReference;
-import org.xwiki.lesscss.skin.SkinReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -40,7 +37,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.skin.SkinReferenceFactory}.
+ * Default implementation for {@link org.xwiki.lesscss.internal.skin.SkinReferenceFactory}.
  *
  * @since 6.4M2
  * @version $Id$
@@ -57,6 +54,9 @@ public class DefaultSkinReferenceFactory implements SkinReferenceFactory
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
     public SkinReference createReference(String skinName) throws LESSCompilerException
@@ -76,7 +76,7 @@ public class DefaultSkinReferenceFactory implements SkinReferenceFactory
                         "XWiki", "XWikiSkins");
 
                 if (skinDoc.getXObjectSize(skinClassDocRef) > 0) {
-                    return new DocumentSkinReference(skinDocRef);
+                    return createReference(skinDocRef);
                 }
 
             } catch (XWikiException e) {
@@ -85,5 +85,11 @@ public class DefaultSkinReferenceFactory implements SkinReferenceFactory
         }
 
         return new FSSkinReference(skinName);
+    }
+
+    @Override
+    public SkinReference createReference(DocumentReference documentReference)
+    {
+        return new DocumentSkinReference(documentReference, entityReferenceSerializer);
     }
 }

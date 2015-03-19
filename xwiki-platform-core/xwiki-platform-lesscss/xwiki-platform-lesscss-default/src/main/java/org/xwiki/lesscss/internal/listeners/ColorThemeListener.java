@@ -30,9 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.colortheme.DocumentColorThemeReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReference;
+import org.xwiki.lesscss.internal.colortheme.ColorThemeReferenceFactory;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -62,6 +63,9 @@ public class ColorThemeListener implements EventListener
 
     @Inject
     private ColorThemeCache colorThemeCache;
+    
+    @Inject
+    private ColorThemeReferenceFactory colorThemeReferenceFactory;
 
     @Override
     public String getName()
@@ -98,8 +102,8 @@ public class ColorThemeListener implements EventListener
 
     private void clearCacheFromColorTheme(XWikiDocument document)
     {
-        DocumentColorThemeReference colorThemeReference =
-            new DocumentColorThemeReference(document.getDocumentReference());
+        ColorThemeReference colorThemeReference = 
+                colorThemeReferenceFactory.createReference(document.getDocumentReference());
         lessResourcesCache.clearFromColorTheme(colorThemeReference);
         colorThemeCache.clearFromColorTheme(colorThemeReference);
     }

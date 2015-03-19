@@ -178,6 +178,28 @@ public class TestUtils
         }
     }
 
+    /**
+     * @since 7.0RC1
+     */
+    public void setDefaultCredentials(String username, String password)
+    {
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(username, password));
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    public void setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
+    {
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+    }
+
+    public UsernamePasswordCredentials getDefaultCredentials()
+    {
+        return (UsernamePasswordCredentials) this.adminHTTPClient.getState().getCredentials(AuthScope.ANY);
+    }
+
     public void loginAsSuperAdmin()
     {
         login(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
@@ -200,14 +222,7 @@ public class TestUtils
 
     public void login(String username, String password)
     {
-        if (!username.equals(getLoggedInUserName())) {
-            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
-            // going to the home page for example.
-            // Also recache the CSRF token
-            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
-            recacheSecretTokenWhenOnRegisterPage();
-            getDriver().get(getURLToNonExistentPage());
-        }
+        loginAndGotoPage(username, password, null);
     }
 
     public void loginAndGotoPage(String username, String password, String pageURL)
@@ -218,8 +233,14 @@ public class TestUtils
             // Also recache the CSRF token
             getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
             recacheSecretTokenWhenOnRegisterPage();
-            // Go to the page asked
-            getDriver().get(pageURL);
+            if (pageURL != null) {
+                // Go to the page asked
+                getDriver().get(pageURL);
+            } else {
+                getDriver().get(getURLToNonExistentPage());
+            }
+
+            setDefaultCredentials(username, password);
         }
     }
 
@@ -332,6 +353,8 @@ public class TestUtils
         Object... properties)
     {
         createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+
+        setDefaultCredentials(username, password);
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
@@ -976,10 +999,16 @@ public class TestUtils
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
         UsernamePasswordCredentials credentials) throws Exception
     {
-        if (credentials != null) {
-            this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, credentials);
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+
+        try {
+            if (credentials != null) {
+                setDefaultCredentials(credentials);
+            }
+            attachFile(space, page, name, is, failIfExists);
+        } finally {
+            setDefaultCredentials(currentCredentials);
         }
-        attachFile(space, page, name, is, failIfExists);
     }
 
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)

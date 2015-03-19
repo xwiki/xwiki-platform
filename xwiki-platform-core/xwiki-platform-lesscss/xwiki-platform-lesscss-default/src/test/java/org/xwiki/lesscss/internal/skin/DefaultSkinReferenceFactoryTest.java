@@ -26,9 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.compiler.LESSCompilerException;
-import org.xwiki.lesscss.skin.DocumentSkinReference;
-import org.xwiki.lesscss.skin.FSSkinReference;
-import org.xwiki.lesscss.skin.SkinReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -100,7 +97,6 @@ public class DefaultSkinReferenceFactoryTest
         assertTrue(skinReference instanceof DocumentSkinReference);
         DocumentSkinReference docSkinRef = (DocumentSkinReference) skinReference;
         assertEquals(skinDocRef, docSkinRef.getSkinDocument());
-        assertEquals("SkinDocument[wikiId:XWiki.MySkin]", docSkinRef.toString());
     }
 
     @Test

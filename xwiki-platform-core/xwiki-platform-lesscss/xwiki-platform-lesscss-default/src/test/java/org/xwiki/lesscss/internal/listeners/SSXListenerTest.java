@@ -30,9 +30,10 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.lesscss.cache.ColorThemeCache;
-import org.xwiki.lesscss.cache.LESSResourcesCache;
-import org.xwiki.lesscss.resources.LESSObjectPropertyResourceReference;
+import org.xwiki.lesscss.internal.cache.ColorThemeCache;
+import org.xwiki.lesscss.internal.cache.LESSResourcesCache;
+import org.xwiki.lesscss.internal.resources.LESSObjectPropertyResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -72,12 +73,15 @@ public class SSXListenerTest
 
     private WikiDescriptorManager wikiDescriptorManager;
 
+    private LESSResourceReferenceFactory lessResourceReferenceFactory;
+
     @Before
     public void setUp() throws Exception
     {
         lessResourcesCache = mocker.getInstance(LESSResourcesCache.class);
         colorThemeCache = mocker.getInstance(ColorThemeCache.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        lessResourceReferenceFactory = mocker.getInstance(LESSResourceReferenceFactory.class);
     }
 
     @Test
@@ -135,13 +139,20 @@ public class SSXListenerTest
             .thenReturn(documentReferenceResolver);
         when(documentReferenceResolver.resolve(anyString())).thenReturn(new DocumentReference("a", "b", "c"));
 
+        
+        ObjectPropertyReference objPropertyReference = 
+                new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference));
+        LESSObjectPropertyResourceReference lessObjectPropertyResourceReference = 
+                new LESSObjectPropertyResourceReference(objPropertyReference, null, null);
+        when(lessResourceReferenceFactory.createReferenceForXObjectProperty(eq(objPropertyReference)))
+                .thenReturn(lessObjectPropertyResourceReference);
+
         // Test
         mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(), doc, new Object());
 
         // Verify
-        LESSObjectPropertyResourceReference resourceRef = new LESSObjectPropertyResourceReference(
-            new ObjectPropertyReference("code", new BaseObjectReference(ssxDocRef, 2, documentReference)));
-        verify(lessResourcesCache, atLeastOnce()).clearFromLESSResource(eq(resourceRef));
-        verify(colorThemeCache, atLeastOnce()).clearFromLESSResource(eq(resourceRef));
+        
+        verify(lessResourcesCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
+        verify(colorThemeCache, atLeastOnce()).clearFromLESSResource(lessObjectPropertyResourceReference);
     }
 }

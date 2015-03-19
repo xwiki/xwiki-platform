@@ -19,6 +19,7 @@
  */
 package org.xwiki.lesscss.resources;
 
+import org.xwiki.lesscss.compiler.LESSCompilerException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -35,4 +36,20 @@ public interface LESSResourceReference
 
     @Override
     int hashCode();
+
+    /**
+     * @param skin skin from which the content should be get
+     * @return the content holding by the resources pointed by the reference
+     * @throws LESSCompilerException if problem occurs
+     * 
+     * @since 7.0RC1
+     */
+    String getContent(String skin) throws LESSCompilerException;
+
+    /**
+     * @return a serialized form of the resource
+     * 
+     * @since 7.0RC1
+     */
+    String serialize();
 }

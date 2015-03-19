@@ -71,6 +71,7 @@ public class AllTests
             context.getDriver().get(
                 context.getUtil().getURLToLoginAsAdminAndGotoPage(context.getUtil().getURLToNonExistentPage()));
             context.getUtil().recacheSecretToken();
+            context.getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
             context.getUtil().importXar(new File("target/dependency/xwiki-platform-repository-server-ui.xar"));
         }
 

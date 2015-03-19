@@ -268,7 +268,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         if (extension == null) {
             // Give more time to Solr to index the document
             // FIXME: provide a helper to wait for Solr queue to be empty
-            Thread.sleep(10000);
+            Thread.sleep(60000);
             extension = searchExtension(this.baseExtension.getId().getId());
         }
 

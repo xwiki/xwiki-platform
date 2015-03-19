@@ -574,7 +574,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
-        extension.setDescription(this.<String>getSolrValue(document, Extension.FIELD_DESCRIPTION, false));
 
         // SCM
         ExtensionScm scm = new ExtensionScm();

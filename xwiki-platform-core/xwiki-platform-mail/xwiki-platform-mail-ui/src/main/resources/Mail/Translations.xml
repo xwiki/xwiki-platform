@@ -57,10 +57,10 @@ Mail.SendMailConfigClass_host=Email Server
 Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "localhost"
 Mail.SendMailConfigClass_port=Email Server Port
 Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
-Mail.SendMailConfigClass_username=Email Server Username (optional)
-Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, for authenticating servers
-Mail.SendMailConfigClass_password=Email Server Password (optional)
-Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, for authenticating servers
+Mail.SendMailConfigClass_username=Email Server Username
+Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
+Mail.SendMailConfigClass_password=Email Server Password
+Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
 Mail.SendMailConfigClass_properties=Additional Properties
 Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
 Mail.SendMailConfigClass_sendWaitTime=Send Wait Time

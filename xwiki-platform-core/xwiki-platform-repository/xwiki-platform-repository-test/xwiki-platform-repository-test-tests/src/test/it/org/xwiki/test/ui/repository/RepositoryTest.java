@@ -238,7 +238,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
@@ -280,7 +279,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
@@ -302,7 +300,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());

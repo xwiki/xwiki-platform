@@ -158,7 +158,7 @@ public class WatchListStore implements EventListener
      */
     public List<String> getJobDocumentNames()
     {
-        return new ArrayList<>(this.store.getJobDocumentNames());
+        return new ArrayList<>(this.store.getIntervals());
     }
 
     /**

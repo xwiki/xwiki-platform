@@ -58,6 +58,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
+import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
@@ -183,9 +184,12 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         try {
             this.farmDistributionJob = this.componentManager.getInstance(Job.class, "distribution");
 
+            XWikiContext xcontext = this.xcontextProvider.get();
+
             final DistributionRequest request = new DistributionRequest();
             request.setId(getFarmJobId());
-            request.setWiki(this.xcontextProvider.get().getMainXWiki());
+            request.setWiki(xcontext.getMainXWiki());
+            request.setUserReference(xcontext.getUserReference());
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -236,6 +240,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             final DistributionRequest request = new DistributionRequest();
             request.setId(getWikiJobId(wiki));
             request.setWiki(wiki);
+            request.setUserReference(this.xcontextProvider.get().getUserReference());
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -272,7 +277,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         return null;
     }
 
-    private DistributionState getDistributionState(DistributionJobStatus< ? > previousStatus)
+    private DistributionState getDistributionState(DistributionJobStatus<?> previousStatus)
     {
         return DistributionJobStatus.getDistributionState(
             previousStatus != null ? previousStatus.getDistributionExtension() : null,
@@ -368,15 +373,25 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public boolean canDisplayDistributionWizard()
     {
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         DocumentReference currentUser = xcontext.getUserReference();
 
+        // Check if its the user that started the DW (this avoid loosing all access to the DW during an install/upgrade)
+        DistributionJob job = getCurrentDistributionJob();
+        if (job != null && Objects.equal(currentUser, job.getRequest().getUserReference())) {
+            this.logger.debug("The user [{}] started the DW so he can access it", currentUser);
+
+            return true;
+        }
+
+        // If not guest make sure the user has admin right
         if (currentUser != null) {
             return this.authorizationManager.hasAccess(Right.ADMIN, currentUser,
                 new WikiReference(xcontext.getWikiId()));
         }
 
+        // Give guess access if there is no other user already registered
         if (xcontext.isMainWiki()) {
             // If there is no user on main wiki let guest access distribution wizard
             try {

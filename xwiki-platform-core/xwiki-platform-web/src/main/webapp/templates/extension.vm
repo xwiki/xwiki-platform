@@ -140,6 +140,12 @@
     ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
     #extensionActionButtons($installedExtension 'uninstall' true)
+    #if ($installedExtension && $installedExtension.type == 'xar'
+        && $installedExtension.isInstalled($extensionNamespace))
+      ## Add the button that can be used to compute the differences between the documents from the XAR and the documents
+      ## from the database.
+      #extensionActionButton('diffXAR' true)
+    #end
   #elseif ($extensionStatus == 'remote')
     ## Installable extension.
     #if ($xcontext.action == 'distribution' && $showRepairXARButton)
@@ -219,6 +225,9 @@
 #end
 ##
 #if ($jobStatus)
+#if ($jobState == 'FINISHED' && $jobStatus.documentDiffs)
+<li>#displayExtensionDetails_menuLink('changes')</li>##
+#end
 #set ($selected = $jobState != 'FINISHED' || $request.extensionSection == 'progress')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
@@ -479,6 +488,21 @@ $namespace##
       #displayExtensionDetails_dependencies_upstream($extension)
       #displayExtensionDetails_dependencies_downstream($backwardDependencies)
     </dl>
+  #end
+#end
+
+#macro (displayExtensionDetails_changes $extension)
+  #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #set ($documentDiffs = $jobStatus.documentDiffs)
+  #if ($jobState == 'FINISHED' && $documentDiffs)
+    <div id="extension-body-changes-$extensionIdHashCode"></div>
+    <div class="extension-body-changes extension-body-section">
+      #template('diff_macros.vm')
+      #displayDocumentUnifiedDiffs($documentDiffs)
+    </div>
   #end
 #end
 
@@ -789,6 +813,7 @@ $namespace##
 
     #displayExtensionDetails_description($extension)
     #displayExtensionDetails_dependencies($extension $backwardDependencies)
+    #displayExtensionDetails_changes($extension)
     #displayExtensionDetails_progress($extension)
   </div>
 #end
@@ -863,6 +888,8 @@ $namespace##
     #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
   #elseif ($request.extensionAction == 'uninstallGlobally')
     #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
+  #elseif ($request.extensionAction == 'diffXAR')
+    #diffXarExtension($request.extensionId $request.extensionVersion)
   #elseif ($request.extensionVersionConstraint)
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
     #displayDependency($dependency $extensionNamespace true)
@@ -1022,6 +1049,16 @@ $namespace##
   #end
   #set ($discard = $services.extension.xar.repairInstalledExtension($extensionId, $extensionVersion, $wikiName))
   #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.extension.xar)
+#end
+
+#macro (diffXarExtension $extensionId $extensionVersion)
+  #if ($extensionNamespace.startsWith('wiki:'))
+    #set ($wikiName = $extensionNamespace.substring(5))
+  #else
+    #set ($wikiName = $xcontext.database)
+  #end
+  #set ($discard = $services.extension.xar.diff($extensionId, $wikiName))
+  #handleExtensionJobStartFailure('extensions.install.error.diffXarFailure' $services.extension.xar)
 #end
 
 #macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)

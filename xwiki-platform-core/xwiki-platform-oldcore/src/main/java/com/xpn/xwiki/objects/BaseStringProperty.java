@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects;
 
+import com.google.common.base.Objects;
+
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
  */
@@ -54,23 +56,15 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public boolean equals(Object obj)
     {
-        // Same Java object, they sure are equal
-        if (this == obj) {
-            return true;
-        }
-
         if (!super.equals(obj)) {
             return false;
         }
-
-        String otherValue = ((BaseStringProperty) obj).getValue();
-
-        if (getValue() == null) {
-            // They are equals if they are both null
-            return otherValue == null;
+        
+        if (!(obj instanceof BaseStringProperty)) {
+            return false;
         }
-
-        return getValue().equals(otherValue);
+        
+        return Objects.equal(this.getValue(), ((BaseStringProperty) obj).getValue());
     }
 
     @Override

@@ -37,39 +37,41 @@ import org.xwiki.wiki.user.UserScope;
 public class WikiCreationRequest extends AbstractRequest
 {
     private static final long serialVersionUID = -1887940302223327347L;
+    
+    private static final String PROPERTY_PREFIX = "wikicreationrequest.";
+    
+    private static final String PROPERTY_WIKI_ID = PROPERTY_PREFIX + "wikiId";
 
-    private String wikiId;
+    private static final String PROPERTY_PRETTY_NAME = PROPERTY_PREFIX + "prettyName";
 
-    private String prettyName;
+    private static final String PROPERTY_ALIAS = PROPERTY_PREFIX + "alias";
 
-    private String alias;
+    private static final String PROPERTY_DESCRIPTION = PROPERTY_PREFIX + "description";
 
-    private String description;
+    private static final String PROPERTY_IS_TEMPLATE = PROPERTY_PREFIX + "isTemplate";
 
-    private boolean isTemplate;
+    private static final String PROPERTY_TEMPLATE_ID = PROPERTY_PREFIX + "templateId";
 
-    private String templateId;
+    private static final String PROPERTY_EXTENSION_ID = PROPERTY_PREFIX + "extensionId";
 
-    private ExtensionId extensionId;
+    private static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerId";
 
-    private String ownerId;
+    private static final String PROPERTY_USER_SCOPE = PROPERTY_PREFIX + "userScope";
 
-    private UserScope userScope;
+    private static final String PROPERTY_MEMBERSHIP_TYPE = PROPERTY_PREFIX + "membershipType";
 
-    private MembershipType membershipType;
+    private static final String PROPERTY_MEMBERS = PROPERTY_PREFIX + "members";
 
-    private List<String> members;
+    private static final String PROPERTY_FAIL_ON_EXISTS = PROPERTY_PREFIX + "failOnExist";
 
-    private boolean failOnExist;
-
-    private WikiSource wikiSource;
+    private static final String PROPERTY_WIKI_SOURCE = PROPERTY_PREFIX + "wikiSource";
 
     /**
      * @return id of the wiki to create
      */
     public String getWikiId()
     {
-        return wikiId;
+        return getProperty(PROPERTY_WIKI_ID);
     }
 
     /**
@@ -77,7 +79,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setWikiId(String wikiId)
     {
-        this.wikiId = wikiId;
+        setProperty(PROPERTY_WIKI_ID, wikiId);
     }
 
     /**
@@ -85,7 +87,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public String getPrettyName()
     {
-        return prettyName;
+        return getProperty(PROPERTY_PRETTY_NAME);
     }
 
     /**
@@ -93,7 +95,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setPrettyName(String prettyName)
     {
-        this.prettyName = prettyName;
+        setProperty(PROPERTY_PRETTY_NAME, prettyName);
     }
 
     /**
@@ -101,7 +103,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public String getAlias()
     {
-        return alias;
+        return getProperty(PROPERTY_ALIAS);
     }
 
     /**
@@ -109,7 +111,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setAlias(String alias)
     {
-        this.alias = alias;
+        setProperty(PROPERTY_ALIAS, alias);
     }
 
     /**
@@ -117,7 +119,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public String getDescription()
     {
-        return description;
+        return getProperty(PROPERTY_DESCRIPTION);
     }
 
     /**
@@ -125,7 +127,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setDescription(String description)
     {
-        this.description = description;
+        setProperty(PROPERTY_DESCRIPTION, description);
     }
 
     /**
@@ -133,7 +135,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public boolean isTemplate()
     {
-        return isTemplate;
+        return getProperty(PROPERTY_IS_TEMPLATE);
     }
 
     /**
@@ -141,7 +143,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setTemplate(boolean isTemplate)
     {
-        this.isTemplate = isTemplate;
+        setProperty(PROPERTY_IS_TEMPLATE, isTemplate);
     }
 
     /**
@@ -149,7 +151,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public String getTemplateId()
     {
-        return templateId;
+        return getProperty(PROPERTY_TEMPLATE_ID);
     }
 
     /**
@@ -158,7 +160,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setTemplateId(String templateId)
     {
-        this.templateId = templateId;
+        setProperty(PROPERTY_TEMPLATE_ID, templateId);
     }
 
     /**
@@ -166,7 +168,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public ExtensionId getExtensionId()
     {
-        return extensionId;
+        return getProperty(PROPERTY_EXTENSION_ID);
     }
 
     /**
@@ -175,7 +177,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setExtensionId(ExtensionId extensionId)
     {
-        this.extensionId = extensionId;
+        setProperty(PROPERTY_EXTENSION_ID, extensionId);
     }
 
     /**
@@ -184,8 +186,8 @@ public class WikiCreationRequest extends AbstractRequest
      * @param version version of the extension
      */
     public void setExtensionId(String extensionId, String version)
-    {
-        this.extensionId = new ExtensionId(extensionId, version);
+    { 
+        setProperty(PROPERTY_EXTENSION_ID, new ExtensionId(extensionId, version));
     }
 
     /**
@@ -193,7 +195,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public String getOwnerId()
     {
-        return ownerId;
+        return getProperty(PROPERTY_OWNER_ID);
     }
 
     /**
@@ -201,7 +203,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setOwnerId(String ownerId)
     {
-        this.ownerId = ownerId;
+        setProperty(PROPERTY_OWNER_ID, ownerId);
     }
 
     /**
@@ -209,7 +211,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public UserScope getUserScope()
     {
-        return userScope;
+        return getProperty(PROPERTY_USER_SCOPE);
     }
 
     /**
@@ -217,7 +219,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setUserScope(UserScope userScope)
     {
-        this.userScope = userScope;
+        setProperty(PROPERTY_USER_SCOPE, userScope);
     }
 
     /**
@@ -225,7 +227,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public MembershipType getMembershipType()
     {
-        return membershipType;
+        return getProperty(PROPERTY_MEMBERSHIP_TYPE);
     }
 
     /**
@@ -233,7 +235,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setMembershipType(MembershipType membershipType)
     {
-        this.membershipType = membershipType;
+        setProperty(PROPERTY_MEMBERSHIP_TYPE, membershipType);
     }
 
     /**
@@ -241,7 +243,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public List<String> getMembers()
     {
-        return members;
+        return getProperty(PROPERTY_MEMBERS);
     }
 
     /**
@@ -249,7 +251,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setMembers(List<String> members)
     {
-        this.members = members;
+        setProperty(PROPERTY_MEMBERS, members);
     }
 
     /**
@@ -257,7 +259,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public boolean isFailOnExist()
     {
-        return failOnExist;
+        return getProperty(PROPERTY_FAIL_ON_EXISTS);
     }
 
     /**
@@ -265,7 +267,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setFailOnExist(boolean failOnExist)
     {
-        this.failOnExist = failOnExist;
+        setProperty(PROPERTY_FAIL_ON_EXISTS, failOnExist);
     }
 
     /**
@@ -273,7 +275,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public WikiSource getWikiSource()
     {
-        return wikiSource;
+        return getProperty(PROPERTY_WIKI_SOURCE);
     }
 
     /**
@@ -281,6 +283,7 @@ public class WikiCreationRequest extends AbstractRequest
      */
     public void setWikiSource(WikiSource wikiSource)
     {
-        this.wikiSource = wikiSource;
+        setProperty(PROPERTY_WIKI_SOURCE, wikiSource);
     }
 }
+

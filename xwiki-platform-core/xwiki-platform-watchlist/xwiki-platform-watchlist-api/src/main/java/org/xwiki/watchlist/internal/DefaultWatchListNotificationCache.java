@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer;
@@ -104,6 +106,13 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
     private ReentrantReadWriteLock intervalsLock = new ReentrantReadWriteLock();
 
     /**
+     * Used to access xwiki.properties.
+     */
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiProperties;
+
+    /**
      * Init watchlist store. Get all the intervals/jobs present in the wiki. Create the list of subscribers.
      * 
      * @throws InitializationException if problems occur
@@ -115,7 +124,12 @@ public class DefaultWatchListNotificationCache implements WatchListNotificationC
         // Initialize the intervals cache.
         try {
             intervals = new ArrayList<String>();
-            intervals.add(REALTIME_INTERVAL_ID);
+
+            if ("true".equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
+                // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then
+                // propose/use it as possible notification interval option.
+                intervals.add(REALTIME_INTERVAL_ID);
+            }
 
             // Get all the watchlist job documents from the main wiki.
             Query jobDocumentsQuery = queryManager.getNamedQuery("getWatchlistJobDocuments");

@@ -21,6 +21,7 @@ package org.xwiki.watchlist.internal;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.AbstractEventListener;
@@ -105,11 +107,31 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     private DocumentReferenceResolver<String> resolver;
 
     /**
+     * Used to access xwiki.properties.
+     */
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource xwikiProperties;
+
+    /**
      * Default constructor.
      */
     public RealtimeNotificationGenerator()
     {
         super(LISTENER_NAME, EVENTS);
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        if ("true".equals(xwikiProperties.getProperty("watchlist.realtime.enabled"))) {
+            // If the realtime notification feature is explicitly enabled (temporarily disabled by default), then enable
+            // this event listener.
+            return super.getEvents();
+        } else {
+            // Otherwise disabled this event listener from being notified.
+            return Collections.emptyList();
+        }
     }
 
     @Override

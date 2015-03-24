@@ -68,6 +68,11 @@ public abstract class AbstractWatchListJobDocumentInitializer extends AbstractMa
     protected static final String SCHEDULER_SPACE = "Scheduler";
 
     /**
+     * Name of the jobClass property in the Scheduler job class.
+     */
+    protected static final String SCHEDULER_JOB_CLASS_PROPERTY = "jobClass";
+
+    /**
      * Used to access the XWiki model.
      */
     @Inject
@@ -161,12 +166,20 @@ public abstract class AbstractWatchListJobDocumentInitializer extends AbstractMa
             needsUpdate = true;
             job = document.newXObject(SchedulerPlugin.XWIKI_JOB_CLASSREFERENCE, context);
             job.setStringValue("jobName", jobName);
-            job.setStringValue("jobClass", WatchListJob.class.getName());
+            job.setStringValue(SCHEDULER_JOB_CLASS_PROPERTY, WatchListJob.class.getName());
             job.setStringValue("cron", cron);
             job.setStringValue("contextUser", XWikiRightService.SUPERADMIN_USER_FULLNAME);
             job.setStringValue("contextLang", "en");
             job.setStringValue("contextDatabase", "xwiki");
             job.setStringValue("status", JobState.STATE_NORMAL);
+        } else {
+            // Make sure we are using the proper job class.
+            String jobClass = job.getStringValue(SCHEDULER_JOB_CLASS_PROPERTY);
+            if (!WatchListJob.class.getName().equals(jobClass)) {
+                job.setStringValue(SCHEDULER_JOB_CLASS_PROPERTY, WatchListJob.class.getName());
+
+                needsUpdate = true;
+            }
         }
 
         return needsUpdate;

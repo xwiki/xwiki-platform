@@ -82,7 +82,7 @@ public class ImageConfigDOMWriter implements ConfigDOMWriter<ImageConfig, ImageE
     {
         Document document = (Document) image.getOwnerDocument();
         DocumentFragment metaData = document.createDocumentFragment();
-        metaData.appendChild(document.createComment("startimage:" + EscapeUtils.escapeComment(reference)));
+        metaData.appendChild(document.createComment(EscapeUtils.escapeComment("startimage:" + reference)));
         metaData.appendChild(document.createTextNode(Element.INNER_HTML_PLACEHOLDER));
         metaData.appendChild(document.createComment("stopimage"));
         Element.as(image).setMetaData(metaData);

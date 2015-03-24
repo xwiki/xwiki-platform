@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
+import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -121,8 +122,8 @@ public class ImageFilter extends AbstractHTMLFilter
 
                 ResourceReference imageReference = new ResourceReference(src, ResourceType.ATTACHMENT);
                 imageReference.setTyped(false);
-                Comment beforeComment =
-                    htmlDocument.createComment("startimage:" + this.xhtmlMarkerSerializer.serialize(imageReference));
+                Comment beforeComment = htmlDocument.createComment(
+                    XMLUtils.escapeXMLComment("startimage:" + this.xhtmlMarkerSerializer.serialize(imageReference)));
                 Comment afterComment = htmlDocument.createComment("stopimage");
                 image.getParentNode().insertBefore(beforeComment, image);
                 image.getParentNode().insertBefore(afterComment, image.getNextSibling());

@@ -252,8 +252,14 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 && ((List< ? >) scriptResult).get(0) instanceof Block) {
                 result = (List<Block>) scriptResult;
             } else {
-                // Run the wiki syntax parser on the script-rendered content
-                result = parseScriptResult(stringWriter.toString(), parameters, context);
+                // If the Script Context writer is empty and the Script Result isn't then convert the String Result
+                // to String and fisplay it!
+                String contentToParse = stringWriter.toString();
+                if (StringUtils.isEmpty(contentToParse)) {
+                    contentToParse = scriptResult.toString();
+                }
+                // Run the wiki syntax parser on the Script returned content
+                result = parseScriptResult(contentToParse, parameters, context);
             }
         } finally {
             // restore current writer

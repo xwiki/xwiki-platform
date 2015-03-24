@@ -23,7 +23,7 @@
   <web>SkinsCode</web>
   <name>Translations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1426000188000</creationDate>

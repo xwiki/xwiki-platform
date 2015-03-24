@@ -170,4 +170,33 @@ public class ImageOfficeCleaningTest extends AbstractHTMLCleaningTest
         Element image = (Element) nodes.item(0);
         Assert.assertEquals(DEFAULT_ATTACHMENT_URL, image.getAttribute("src"));
     }
+
+    /**
+     * Added comments for images should be escaped properly.
+     */
+    @org.junit.Test
+    public void testImageCommentEscaping()
+    {
+        String html = header + "<img src=\"-foo--bar.png-\"/>" + footer;
+        HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
+        configuration.setParameters(Collections.singletonMap(TARGET_DOCUMENT_KEY, TARGET_DOCUMENT_VALUE));
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockDocumentReferenceResolver).resolve(TARGET_DOCUMENT_VALUE);
+                will(returnValue(TARGET_DOCUMENT_REFERENCE));
+
+                oneOf(mockDocumentAccessBridge).getAttachmentURL(
+                    new AttachmentReference("-foo--bar.png-", TARGET_DOCUMENT_REFERENCE), false);
+                will(returnValue(DEFAULT_ATTACHMENT_URL));
+            }
+        });
+
+        Document doc = officeHTMLCleaner.clean(new StringReader(html), configuration);
+
+        NodeList nodes = doc.getElementsByTagName("img");
+        Node startComment = nodes.item(0).getPreviousSibling();
+        Assert.assertEquals("startimage:false|-|attach|-|-foo-\\-bar.png-\\", startComment.getNodeValue());
+    }
 }

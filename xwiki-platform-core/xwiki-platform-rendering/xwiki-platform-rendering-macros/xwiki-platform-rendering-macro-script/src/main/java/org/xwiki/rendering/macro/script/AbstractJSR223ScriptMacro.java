@@ -38,6 +38,7 @@ import javax.script.ScriptException;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
@@ -85,6 +86,9 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      */
     @Inject
     private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private ConverterManager converterManager;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -244,23 +248,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
             Object scriptResult = eval(content, engine, scriptContext);
 
-            if (scriptResult instanceof XDOM) {
-                result = ((XDOM) scriptResult).getChildren();
-            } else if (scriptResult instanceof Block) {
-                result = Collections.singletonList((Block) scriptResult);
-            } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
-                && ((List< ? >) scriptResult).get(0) instanceof Block) {
-                result = (List<Block>) scriptResult;
-            } else {
-                // If the Script Context writer is empty and the Script Result isn't then convert the String Result
-                // to String and fisplay it!
-                String contentToParse = stringWriter.toString();
-                if (StringUtils.isEmpty(contentToParse) && scriptResult != null) {
-                    contentToParse = scriptResult.toString();
-                }
-                // Run the wiki syntax parser on the Script returned content
-                result = parseScriptResult(contentToParse, parameters, context);
-            }
+            result = convertScriptExecution(scriptResult, stringWriter, parameters, context);
         } finally {
             // restore current writer
             scriptContext.setWriter(currentWriter);
@@ -272,6 +260,33 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             scriptContext.setAttribute(ScriptEngine.FILENAME, currentFilename, ScriptContext.ENGINE_SCOPE);
             // restore "out" binding
             scriptContext.setAttribute(BINDING_OUT, currentOut, ScriptContext.ENGINE_SCOPE);
+        }
+
+        return result;
+    }
+
+    private List<Block> convertScriptExecution(Object scriptResult, StringWriter scriptContextWriter, P parameters,
+        MacroTransformationContext context) throws MacroExecutionException
+    {
+        List<Block> result;
+
+        if (scriptResult instanceof XDOM) {
+            result = ((XDOM) scriptResult).getChildren();
+        } else if (scriptResult instanceof Block) {
+            result = Collections.singletonList((Block) scriptResult);
+        } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
+            && ((List< ? >) scriptResult).get(0) instanceof Block) {
+            result = (List<Block>) scriptResult;
+        } else {
+            // If the Script Context writer is empty and the Script Result isn't, then convert the String Result
+            // to String and fisplay it!
+            String contentToParse = scriptContextWriter.toString();
+            if (StringUtils.isEmpty(contentToParse) && scriptResult != null) {
+                // Convert the returned value into a String.
+                contentToParse = this.converterManager.convert(String.class, scriptResult);
+            }
+            // Run the wiki syntax parser on the Script returned content
+            result = parseScriptResult(contentToParse, parameters, context);
         }
 
         return result;

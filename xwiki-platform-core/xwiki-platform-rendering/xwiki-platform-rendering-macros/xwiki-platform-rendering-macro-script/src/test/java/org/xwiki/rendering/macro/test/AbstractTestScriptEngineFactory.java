@@ -31,18 +31,24 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 
 /**
+ * For writing test engines.
+ *
  * @version $Id$
- * @since 6.1
+ * @since 7.1M1
  */
-public class TestScriptEngineFactory implements ScriptEngineFactory, ScriptEngine
+public abstract class AbstractTestScriptEngineFactory implements ScriptEngineFactory, ScriptEngine
 {
     private static final String VERSION = "1.0";
 
-    private static final String SHORT_NAME = "test";
+    private String shortName;
 
-    private static final String LANGUAGE_NAME = "Test";
+    private String languageName;
 
-    private static final List<String> NAMES = Arrays.asList(SHORT_NAME, LANGUAGE_NAME);
+    public AbstractTestScriptEngineFactory(String shortName, String languageName)
+    {
+        this.shortName = shortName;
+        this.languageName = languageName;
+    }
 
     @Override
     public String getEngineName()
@@ -71,13 +77,13 @@ public class TestScriptEngineFactory implements ScriptEngineFactory, ScriptEngin
     @Override
     public List<String> getNames()
     {
-        return NAMES;
+        return Arrays.asList(this.shortName, this.languageName);
     }
 
     @Override
     public String getLanguageName()
     {
-        return LANGUAGE_NAME;
+        return this.languageName;
     }
 
     @Override
@@ -114,18 +120,6 @@ public class TestScriptEngineFactory implements ScriptEngineFactory, ScriptEngin
     public ScriptEngine getScriptEngine()
     {
         return this;
-    }
-
-    @Override
-    public Object eval(String script, ScriptContext context) throws ScriptException
-    {
-        try {
-            context.getWriter().write("Test " + script);
-        } catch (IOException e) {
-            throw new ScriptException("Failed to write");
-        }
-
-        return null;
     }
 
     @Override

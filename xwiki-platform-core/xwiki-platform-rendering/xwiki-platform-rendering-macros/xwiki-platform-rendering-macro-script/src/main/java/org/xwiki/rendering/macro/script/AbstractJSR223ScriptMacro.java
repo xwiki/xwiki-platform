@@ -279,7 +279,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             result = (List<Block>) scriptResult;
         } else {
             // If the Script Context writer is empty and the Script Result isn't, then convert the String Result
-            // to String and fisplay it!
+            // to String and display it!
             String contentToParse = scriptContextWriter.toString();
             if (StringUtils.isEmpty(contentToParse) && scriptResult != null) {
                 // Convert the returned value into a String.

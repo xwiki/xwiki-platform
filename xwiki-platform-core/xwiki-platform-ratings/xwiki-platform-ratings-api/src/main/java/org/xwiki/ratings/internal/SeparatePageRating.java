@@ -290,6 +290,7 @@ public class SeparatePageRating implements Rating
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(pageRef, context);
             doc.setParent(parentDocName);
+            doc.setHidden(true);
             BaseObject obj = doc.newXObject(RatingsManager.RATINGS_CLASSREFERENCE, context);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
                 ratingsManager.entityReferenceSerializer.serialize(author));

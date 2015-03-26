@@ -22,6 +22,7 @@ package org.xwiki.wiki.internal.descriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -102,7 +103,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 throw new WikiManagerException("Failed to get wiki ids", e);
             }
 
-            wikiIds = new ArrayList<String>(documentNames.size());
+            wikiIds = new HashSet<String>(documentNames.size());
 
             boolean foundMainWiki = false;
 
@@ -152,7 +153,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             }
         }
 
-        return descriptor != DefaultWikiDescriptor.VOID ? descriptor : null;
+        return descriptor != DefaultWikiDescriptor.VOID && descriptor != null ? descriptor.clone() : null;
     }
 
     @Override
@@ -178,13 +179,13 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             }
         }
 
-        return descriptor != DefaultWikiDescriptor.VOID ? descriptor : null;
+        return descriptor != DefaultWikiDescriptor.VOID && descriptor != null ? descriptor.clone() : null;
     }
 
     @Override
     public boolean exists(String wikiId) throws WikiManagerException
     {
-        return getById(wikiId) != null;
+        return getAllIds().contains(wikiId);
     }
 
     @Override

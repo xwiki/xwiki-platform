@@ -63,5 +63,4 @@ public class WikiTemplatePropertyGroup extends WikiPropertyGroup
     {
         this.set(IS_TEMPLATE_PROPERTY, template);
     }
-
 }

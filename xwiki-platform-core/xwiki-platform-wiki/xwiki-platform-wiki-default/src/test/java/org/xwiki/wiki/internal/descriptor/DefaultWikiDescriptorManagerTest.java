@@ -28,13 +28,17 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
+import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,8 +66,8 @@ import static org.mockito.Mockito.when;
 public class DefaultWikiDescriptorManagerTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultWikiDescriptorManager> mocker =
-            new MockitoComponentMockingRule(DefaultWikiDescriptorManager.class);
+    public MockitoComponentMockingRule<WikiDescriptorManager> mocker =
+        new MockitoComponentMockingRule<WikiDescriptorManager>(DefaultWikiDescriptorManager.class);
 
     private Provider<XWikiContext> xcontextProvider;
 
@@ -241,17 +245,12 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void exists() throws Exception
     {
-        // When the wiki exists
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
-        when(cache.getFromId("wikiid1")).thenReturn(descriptor);
+        when(cache.getWikiIds()).thenReturn(Arrays.asList("wikiid1"));
 
+        // When the wiki exists
         assertTrue(mocker.getComponentUnderTest().exists("wikiid1"));
 
         // When the wiki does not exists
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid2")).thenReturn(document);
-        when(document.isNew()).thenReturn(true);
-
         assertFalse(mocker.getComponentUnderTest().exists("wikiid2"));
     }
 
@@ -268,5 +267,36 @@ public class DefaultWikiDescriptorManagerTest
         when(cache.getFromId("xwiki")).thenReturn(descriptor);
 
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getMainWikiDescriptor());
+    }
+
+    public void testCacheProtection() throws WikiManagerException, ComponentLookupException
+    {
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("xwiki", "xwiki");
+        descriptor.setPrettyName("pretty name");
+        WikiPropertyGroup propertyGroup = new WikiPropertyGroup("group");
+        propertyGroup.set("property", "value");
+        descriptor.addPropertyGroup(propertyGroup);
+        when(cache.getFromId("xwiki")).thenReturn(descriptor);
+        when(cache.getFromAlias("xwiki")).thenReturn(descriptor);
+
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getComponentUnderTest();
+
+        // Modify the descriptor without saving it
+        wikiDescriptorManager.getById("xwiki").setPrettyName("changed pretty name");
+        assertEquals("pretty name", wikiDescriptorManager.getById("xwiki").getPrettyName());
+        wikiDescriptorManager.getById("xwiki").getPropertyGroup("group").set("property", "modified value");
+        assertEquals("value", wikiDescriptorManager.getById("xwiki").getPropertyGroup("group").get("property"));
+
+        // Modify the descriptor without saving it
+        wikiDescriptorManager.getByAlias("xwiki").setPrettyName("changed pretty name");
+        assertEquals("pretty name", wikiDescriptorManager.getByAlias("xwiki").getPrettyName());
+        wikiDescriptorManager.getByAlias("xwiki").getPropertyGroup("group").set("property", "modified value");
+        assertEquals("value", wikiDescriptorManager.getByAlias("xwiki").getPropertyGroup("group").get("property"));
+
+        // Modify the descriptor without saving it
+        wikiDescriptorManager.getMainWikiDescriptor().setPrettyName("changed pretty name");
+        assertEquals("pretty name", wikiDescriptorManager.getMainWikiDescriptor().getPrettyName());
+        wikiDescriptorManager.getMainWikiDescriptor().getPropertyGroup("group").set("property", "modified value");
+        assertEquals("value", wikiDescriptorManager.getMainWikiDescriptor().getPropertyGroup("group").get("property"));
     }
 }

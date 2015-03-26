@@ -408,6 +408,7 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 }
 
 .icon-manageg {
+  box-sizing: content-box; /* Needed by IE */
   padding-right: 10px;
 }
 

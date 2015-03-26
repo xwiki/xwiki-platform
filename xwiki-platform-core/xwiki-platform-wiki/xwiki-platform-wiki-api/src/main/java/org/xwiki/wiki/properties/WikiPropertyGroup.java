@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Property group is a place where modules can store their own properties concerning a wiki. This group is then
- * attached to the WikiDescriptor. Each module is responsible for the persistent storage of its properties.
+ * Property group is a place where modules can store their own properties concerning a wiki. This group is then attached
+ * to the WikiDescriptor. Each module is responsible for the persistent storage of its properties.
  *
  * @version $Id$
  * @since 5.3M2
  */
-public class WikiPropertyGroup
+public class WikiPropertyGroup implements Cloneable
 {
     /**
      * Unique identifier of the property group.
@@ -80,5 +80,22 @@ public class WikiPropertyGroup
     public void set(String propertyId, Object value)
     {
         properties.put(propertyId, value);
+    }
+
+    @Override
+    public WikiPropertyGroup clone()
+    {
+        WikiPropertyGroup group;
+        try {
+            group = (WikiPropertyGroup) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Supposed to be impossible
+            return new WikiPropertyGroup(getId());
+        }
+
+        // Clone the map
+        group.properties = new HashMap<>(this.properties);
+
+        return group;
     }
 }

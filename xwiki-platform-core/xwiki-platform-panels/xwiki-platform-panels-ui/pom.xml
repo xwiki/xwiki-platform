@@ -120,4 +120,18 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <!-- The EditTranslations page is not a Translation page and thus not a content page! -->
+          <technicalPages>
+            <technicalPage>EditTranslations\.xml</technicalPage>
+          </technicalPages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

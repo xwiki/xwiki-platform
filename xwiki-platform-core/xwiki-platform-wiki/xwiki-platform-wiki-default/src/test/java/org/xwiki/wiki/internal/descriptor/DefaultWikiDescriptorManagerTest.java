@@ -269,6 +269,7 @@ public class DefaultWikiDescriptorManagerTest
         assertEquals(descriptor, this.mocker.getComponentUnderTest().getMainWikiDescriptor());
     }
 
+    @Test
     public void testCacheProtection() throws WikiManagerException, ComponentLookupException
     {
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("xwiki", "xwiki");

@@ -300,7 +300,7 @@ public class WikiDescriptor implements Cloneable
         // Clone properties
         descriptor.propertyGroups = new HashMap<>(this.propertyGroups.size());
         for (WikiPropertyGroup group : this.propertyGroups.values()) {
-            propertyGroups.put(group.getId(), group.clone());
+            descriptor.propertyGroups.put(group.getId(), group.clone());
         }
 
         return descriptor;

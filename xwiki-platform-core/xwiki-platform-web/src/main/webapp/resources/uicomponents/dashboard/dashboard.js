@@ -254,9 +254,7 @@ XWiki.Dashboard = Class.create( {
       wiki: document.documentElement.getAttribute('data-xwiki-wiki'),
       space: document.documentElement.getAttribute('data-xwiki-space'),
       page: document.documentElement.getAttribute('data-xwiki-page'),
-      // FIXME: Read this from the current document, when the API is available (in 'xwiki-meta' or in the document
-      // attributes), instead of hardcoding it here.
-      syntax: "xwiki/2.0",
+      syntax: XWiki.docsyntax,
       soureceWiki: this.sourceWiki,
       sourceSpace: this.sourceSpace,
       sourcePage: this.sourcePage

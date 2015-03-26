@@ -229,8 +229,8 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     }
 
     @Override
-    public Map<String, Map<Date, DeletedAttachmentFileProvider>>
-    deletedAttachmentsForDocument(final DocumentReference docRef)
+    public Map<String, Map<Date, DeletedAttachmentFileProvider>> deletedAttachmentsForDocument(
+        final DocumentReference docRef)
     {
         final File docDir = getDocumentDir(docRef, this.storageDir, this.pathSerializer);
         final File deletedAttachmentsDir = new File(docDir, DELETED_ATTACHMENT_DIR_NAME);

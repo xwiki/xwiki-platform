@@ -1,0 +1,80 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{template name="distribution/macros.vm" output="false"/}}
+
+{{velocity output="false"}}
+#macro (displayDefaultUIExtension $distributionUIId)
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.flavorStepFlavorLabel"/}}
+
+  #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
+  {{html}}#maybeRepairPreviousUI($xcontext.database $distributionUIExtension){{/html}}
+  (% class="recommendedUI" %)(((
+    (% class="xHint" %)
+    {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
+
+    #if ($distributionUIExtension)
+      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
+
+      ## Allow the user to install, upgrade or downgrade the UI.
+      {{html}}#displayExtensionAndUpdateStepButtons($distributionUIExtension){{/html}}
+    #else
+      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+        ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}
+    #end
+  )))
+  #set ($showCompleteStepButton = $services.extension.installed.getInstalledExtension($distributionUIId.id,
+    $extensionNamespace).isValid($extensionNamespace))
+#end
+
+#macro (displayFlavorStep)
+  #set ($distributionState = $services.distribution.state)
+  {{translation key="platform.extension.distributionWizard.flavorStepDescription"/}}
+
+  ########################################
+  ## Display the distribution
+  ########################################
+
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.flavorStepDistributionLabel"/}}
+
+  (% class="xHint" %)
+  {{translation key="platform.extension.distributionWizard.flavorStepDistributionHint"/}}
+
+  #set ($distributionExtension = $services.distribution.distributionExtension)
+  #if ($distributionExtension)
+    ## Wrap the extension in a DIV so that its bottom border is displayed.
+    ((({{html}}#displayExtension($distributionExtension){{/html}})))
+  #else
+    {{info}}$services.localization.render('extensions.advancedSearch.noResults',
+      ["**$!escapetool.xml($distributionExtension.id.id)**",
+      "**$!escapetool.xml($distributionExtension.id.version)**"]){{/info}}
+  #end
+
+  ########################################
+  ## Install or upgrade the flavor
+  ########################################
+
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.flavorStepCurrentFlavorLabel"/}}
+
+  #set($currentFlavor = $services.distribution.currentFlavor)
+  #if ($currentFlavor)
+    ## Display the current flavor
+    {{html}}#displayExtensionAndUpdateStepButtons($currentFlavor){{/html}}
+  #end
+
+  (% class="xLabel" %)
+  {{translation key="platform.extension.distributionWizard.flavorStepNewFlavorLabel"/}}
+
+  ## Allow installing a new flavor (and uninstall the current one)
+  {{html}}#displayFlavorInstaller($currentFlavor){{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.action" == '')
+  #displayFlavorStep()
+#end
+{{/velocity}}

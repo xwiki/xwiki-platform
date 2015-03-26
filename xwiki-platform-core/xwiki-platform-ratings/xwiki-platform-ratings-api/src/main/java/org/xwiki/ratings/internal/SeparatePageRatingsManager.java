@@ -67,7 +67,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     protected DocumentReferenceResolver<String> userReferenceResolver;
 
     @Inject
-    @Named("local")
+    @Named("compactwiki")
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**

@@ -55,7 +55,7 @@ public class DefaultRatingsManager extends AbstractRatingsManager
     protected DocumentReferenceResolver<String> userReferenceResolver;
 
     @Inject
-    @Named("local")
+    @Named("compactwiki")
     protected EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject

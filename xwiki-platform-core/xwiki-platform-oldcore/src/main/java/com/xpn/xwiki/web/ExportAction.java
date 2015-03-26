@@ -57,7 +57,7 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
 /**
- * Exports in XAR, PDF, RTF or HTML formats.
+ * Exports in XAR, PDF, HTML and all output formats supported by *Office (when an *Office Server is running).
  *
  * @version $Id$
  */

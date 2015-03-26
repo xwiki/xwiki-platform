@@ -33,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
@@ -86,6 +87,8 @@ public class DefaultIconSetManagerTest
     private QueryManager queryManager;
 
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    private ConfigurationSource configurationSource;
 
     private XWikiContext xcontext;
 
@@ -107,13 +110,14 @@ public class DefaultIconSetManagerTest
         queryManager = mocker.getInstance(QueryManager.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
+        configurationSource = mocker.getInstance(ConfigurationSource.class, "all");
     }
 
     @Test
     public void getCurrentIconSet() throws Exception
     {
         String currentIconTheme = "IconThemes.SilkTheme";
-        when(xwiki.getXWikiPreference("iconTheme", xcontext)).thenReturn(currentIconTheme);
+        when(configurationSource.getProperty("iconTheme")).thenReturn(currentIconTheme);
         DocumentReference iconThemeRef = new DocumentReference("xwiki", "IconThemes", "SilkTheme");
         when(documentReferenceResolver.resolve(currentIconTheme)).thenReturn(iconThemeRef);
         when(documentAccessBridge.exists(iconThemeRef)).thenReturn(true);
@@ -134,7 +138,7 @@ public class DefaultIconSetManagerTest
     public void getCurrentIconSetWhenInCache() throws Exception
     {
         String currentIconTheme = "IconThemes.SilkTheme";
-        when(xwiki.getXWikiPreference("iconTheme", xcontext)).thenReturn(currentIconTheme);
+        when(configurationSource.getProperty("iconTheme")).thenReturn(currentIconTheme);
         DocumentReference iconThemeRef = new DocumentReference("xwiki", "IconThemes", "SilkTheme");
         when(documentReferenceResolver.resolve(currentIconTheme)).thenReturn(iconThemeRef);
         when(documentAccessBridge.exists(iconThemeRef)).thenReturn(true);
@@ -154,7 +158,7 @@ public class DefaultIconSetManagerTest
     public void getCurrentIconSetWhenItDoesNotExist() throws Exception
     {
         String currentIconTheme = "xwiki:IconThemes.SilkTheme";
-        when(xwiki.getXWikiPreference("iconTheme", xcontext)).thenReturn(currentIconTheme);
+        when(configurationSource.getProperty("iconTheme")).thenReturn(currentIconTheme);
         DocumentReference iconThemeRef = new DocumentReference("xwiki", "IconThemes", "SilkTheme");
         when(documentReferenceResolver.resolve(currentIconTheme)).thenReturn(iconThemeRef);
         when(documentAccessBridge.exists(iconThemeRef)).thenReturn(false);

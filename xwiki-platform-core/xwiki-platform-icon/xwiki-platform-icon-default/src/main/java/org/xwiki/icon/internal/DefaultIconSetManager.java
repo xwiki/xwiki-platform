@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.icon.IconSetCache;
@@ -79,16 +80,16 @@ public class DefaultIconSetManager implements IconSetManager
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+    
+    @Inject
+    @Named("all")
+    private ConfigurationSource configurationSource;
 
     @Override
     public IconSet getCurrentIconSet() throws IconException
     {
         // Get the current icon theme
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        // Load the icon theme
-        String iconTheme = xwiki.getXWikiPreference("iconTheme", xcontext);
+        String iconTheme = configurationSource.getProperty("iconTheme");
 
         // Get the icon set
         IconSet iconSet = null;

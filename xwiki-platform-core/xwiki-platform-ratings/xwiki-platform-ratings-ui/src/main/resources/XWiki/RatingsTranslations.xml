@@ -86,7 +86,6 @@ admin.ratings.uninstallratings=Uninstalling the ratings application will delete 
 admin.ratings.ratingsactivated=Ratings have been activated
 admin.ratings.ratingsdeactivated=Ratings have been deactivated
 admin.ratings.illegalrequest=Illegal request
-rating.saveComment=Set user rating
 rating.rate=Rate!
 rating.yourvote=Your vote
 rating.logintorate=Login to rate

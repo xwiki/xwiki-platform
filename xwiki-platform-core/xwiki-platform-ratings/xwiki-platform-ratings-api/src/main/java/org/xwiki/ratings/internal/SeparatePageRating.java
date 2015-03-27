@@ -212,7 +212,7 @@ public class SeparatePageRating implements Rating
             document.setContentDirty(false);
             document.setCreatorReference(superadmin);
             document.setAuthorReference(superadmin);
-            context.getWiki().saveDocument(getDocument(), context);
+            context.getWiki().saveDocument(getDocument(), context.getMessageTool().get("rating.saveComment"), true, context);
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }

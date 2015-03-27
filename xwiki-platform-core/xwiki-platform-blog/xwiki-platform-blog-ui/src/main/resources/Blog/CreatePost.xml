@@ -62,7 +62,7 @@
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="entrySpace" value="$!{escapetool.xml($space)}"/&gt;
     #if($doc.getObject($blogCategoryClassname))
-      &lt;input type="hidden" name="category" value="$escapetool.xwiki(${escapetool.xml(${doc.fullName})})"/&gt;
+      &lt;input type="hidden" name="category" value="$escapetool.xwiki(${escapetool.xml(${doc.fullName})}, $doc.syntax.toIdString())"/&gt;
     #end
     &lt;label class="createPost" for="entryTitle"&gt;$services.localization.render('xe.blog.post.createpost') &lt;/label&gt;&lt;input type="text" id="entryTitle" name="entryTitle" value="$services.localization.render('xe.blog.post.title')" class="withTip" size="30" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="${escapetool.xml($services.localization.render('xe.blog.post.create'))}" class="btn btn-success button"/&gt;&lt;/span&gt;
   &lt;/div&gt;

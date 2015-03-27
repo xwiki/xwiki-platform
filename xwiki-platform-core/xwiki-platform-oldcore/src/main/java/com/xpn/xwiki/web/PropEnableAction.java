@@ -47,7 +47,9 @@ public class PropEnableAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.enableField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.enableClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(
+            doc,
+            localizePlainOrKey("core.model.xclass.enableClassProperty.versionSummary",
+                Collections.singletonList(propertyName)), true, context);
     }
 }

@@ -432,7 +432,7 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     doc.setSyntax(Syntax.XWIKI_1_0);
                 }
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
-                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);
+                context.getWiki().saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
                 context.getWiki().setUserDefaultGroup(fullwikiname, context);
                 return true;
             }

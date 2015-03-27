@@ -35,7 +35,6 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.web.XWikiMessageTool;
 
 public class BooleanClass extends PropertyClass
 {
@@ -352,16 +351,14 @@ public class BooleanClass extends PropertyClass
     private String getDisplayValue(XWikiContext context, int value)
     {
         try {
-            XWikiMessageTool msg = context.getMessageTool();
-
             // <classname>_<property>_<value>
             String key = getFieldFullName() + "_" + value;
-            String result = msg.get(key);
-            if (key.equals(result)) {
+            String result = localizePlain(key);
+            if (result == null) {
                 // <display type>_<value>
                 key = getDisplayType() + "_" + value;
-                result = msg.get(key);
-                if (key.equals(result)) {
+                result = localizePlain(key);
+                if (result == null) {
                     // Just return the value
                     if (value == 2) {
                         result = "---";

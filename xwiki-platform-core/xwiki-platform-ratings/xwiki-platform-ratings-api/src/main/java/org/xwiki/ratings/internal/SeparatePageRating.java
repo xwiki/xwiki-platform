@@ -21,6 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
@@ -33,6 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -212,7 +214,8 @@ public class SeparatePageRating implements Rating
             document.setContentDirty(false);
             document.setCreatorReference(superadmin);
             document.setAuthorReference(superadmin);
-            context.getWiki().saveDocument(getDocument(), context.getMessageTool().get("rating.saveComment"), true,
+            ContextualLocalizationManager localization = Utils.getComponent(ContextualLocalizationManager.class);
+            context.getWiki().saveDocument(getDocument(), localization.getTranslationPlain("rating.saveComment"), true,
                 context);
         } catch (XWikiException e) {
             throw new RatingsException(e);

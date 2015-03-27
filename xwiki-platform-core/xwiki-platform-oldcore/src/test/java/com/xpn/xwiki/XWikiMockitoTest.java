@@ -19,15 +19,6 @@
  */
 package com.xpn.xwiki;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,6 +33,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -62,7 +54,15 @@ import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWiki}.
@@ -181,7 +181,7 @@ public class XWikiMockitoTest
         String revision = "3.5";
         when(xwiki.getVersioningStore().loadXWikiDoc(document, revision, context)).thenReturn(result);
 
-        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+        this.mocker.registerMockComponent(ContextualLocalizationManager.class);
 
         xwiki.rollback(document, revision, context);
 
@@ -231,7 +231,7 @@ public class XWikiMockitoTest
         xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
 
         DocumentReference reference = document.getDocumentReference();
-        when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+        this.mocker.registerMockComponent(ContextualLocalizationManager.class);
         when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(
             new XWikiDocument(reference));
 

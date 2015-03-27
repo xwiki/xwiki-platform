@@ -523,14 +523,14 @@ public abstract class ListClass extends PropertyClass
             return displayValue;
         }
         String msgname = getFieldFullName() + "_" + value;
-        String newresult = context.getMessageTool().get(msgname);
-        if (msgname.equals(newresult)) {
+        String newresult = localizePlain(msgname);
+        if (newresult == null) {
             msgname = "option_" + name + "_" + value;
-            newresult = context.getMessageTool().get(msgname);
-            if (msgname.equals(newresult)) {
+            newresult = localizePlain(msgname);
+            if (newresult == null) {
                 msgname = "option_" + value;
-                newresult = context.getMessageTool().get(msgname);
-                if (msgname.equals(newresult)) {
+                newresult = localizePlain(msgname);
+                if (newresult == null) {
                     newresult = displayValue;
                 }
             }

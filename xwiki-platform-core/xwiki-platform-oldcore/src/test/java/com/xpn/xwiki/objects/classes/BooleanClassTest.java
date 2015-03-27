@@ -19,44 +19,55 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import org.junit.Rule;
+import org.junit.Test;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
-import org.jmock.Mock;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link BooleanClass} class.
  * 
  * @version $Id$
  */
-public class BooleanClassTest extends AbstractBridgedXWikiComponentTestCase
+public class BooleanClassTest
 {
+    @Rule
+    public MockitoOldcoreRule mocker = new MockitoOldcoreRule();
+
     /** Test localization. */
-    public void testLocalization()
+    @Test
+    public void testLocalization() throws Exception
     {
         // Setup
-        ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale("en"));
-        Mock mockXWiki = mock(XWiki.class);
-        mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
-        mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
-        mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Fake.Translations"));
-        mockXWiki.stubs().method("Param").will(returnValue(null));
-        XWikiDocument translationDoc = new XWikiDocument();
-        translationDoc.setContent("Some.Class_prop_0=Nay\nSome.Class_prop_1=Aye\nSome.Class_prop_2=Dunno\n");
-        translationDoc.setLanguage("en");
-        translationDoc.setDefaultLanguage("en");
-        translationDoc.setNew(false);
-        mockXWiki.stubs().method("getDocument").will(returnValue(translationDoc));
+        ContextualLocalizationManager contextualLocalizationManager =
+            this.mocker.getMocker().registerMockComponent(ContextualLocalizationManager.class);
+        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_0")).thenReturn("Nay");
+        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_1")).thenReturn("Aye");
+        when(contextualLocalizationManager.getTranslationPlain("Some.Class_prop_2")).thenReturn("Dunno");
+        when(contextualLocalizationManager.getTranslationPlain("yesno_0")).thenReturn("No");
+        when(contextualLocalizationManager.getTranslationPlain("yesno_1")).thenReturn("Yes");
+        when(contextualLocalizationManager.getTranslationPlain("truefalse_0")).thenReturn("False");
+        when(contextualLocalizationManager.getTranslationPlain("truefalse_1")).thenReturn("True");
+        when(contextualLocalizationManager.getTranslationPlain("active_0")).thenReturn("Inactive");
+        when(contextualLocalizationManager.getTranslationPlain("active_1")).thenReturn("Active");
+        when(contextualLocalizationManager.getTranslationPlain("allow_0")).thenReturn("Deny");
+        when(contextualLocalizationManager.getTranslationPlain("allow_1")).thenReturn("Allow");
+        
 
-        this.getContext().setWiki((XWiki) mockXWiki.proxy());
-        this.getContext().put("msg", new XWikiMessageTool(bundle, this.getContext()));
+        DocumentReference classReference =
+            new DocumentReference(this.mocker.getXWikiContext().getWikiId(), "Some", "Class");
+
+        EntityReferenceSerializer<String> entityReferenceSerializer =
+            this.mocker.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(entityReferenceSerializer.serialize(classReference)).thenReturn("Some.Class");
 
         // Create a Boolean meta-property and an associated object with a property instance
         BooleanClass metaProperty = new BooleanClass();
@@ -65,74 +76,74 @@ public class BooleanClassTest extends AbstractBridgedXWikiComponentTestCase
         IntegerProperty prop = new IntegerProperty();
         prop.setValue(0);
         obj.safeput("prop", prop);
-        cls.setName("Some.Class");
+        cls.setDocumentReference(classReference);
         metaProperty.setObject(cls);
 
         StringBuffer out = new StringBuffer();
 
         // Test the default translations, should be the default "yesno" display type
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("No", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Yes", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations when display type is "active"
         metaProperty.setDisplayType("active");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Inactive", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Active", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations when display type is the non-existing "blacktive"
         metaProperty.setDisplayType("blacktive");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("0", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("1", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("---", out.toString());
 
         // Test translations with the full classname_prop_value format
         metaProperty.setName("prop");
         out.setLength(0);
         prop.setValue(0);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Nay", out.toString());
 
         out.setLength(0);
         prop.setValue(1);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Aye", out.toString());
 
         out.setLength(0);
         prop.setValue(2);
-        metaProperty.displayView(out, "prop", "", obj, this.getContext());
+        metaProperty.displayView(out, "prop", "", obj, this.mocker.getXWikiContext());
         assertEquals("Dunno", out.toString());
     }
 }

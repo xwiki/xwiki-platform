@@ -411,6 +411,8 @@ public class XWiki implements EventListener
 
     private Provider<XWikiContext> xcontextProvider;
 
+    private ContextualLocalizationManager localization;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -500,6 +502,20 @@ public class XWiki implements EventListener
         }
 
         return this.xcontextProvider.get();
+    }
+
+    private ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    private String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -3256,7 +3272,7 @@ public class XWiki implements EventListener
 
             protectUserPage(doc.getFullName(), userRights, doc, context);
 
-            saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);
+            saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(doc.getFullName(), context);
@@ -3304,7 +3320,7 @@ public class XWiki implements EventListener
 
         memberObject.setStringValue("member", userName);
 
-        this.saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
+        this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
 
         try {
             XWikiGroupService gservice = getGroupService(context);
@@ -4805,7 +4821,7 @@ public class XWiki implements EventListener
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
         if (StringUtils.isBlank(user)) {
-            return context.getMessageTool().get("core.users.unknownUser");
+            return localizePlainOrKey("core.users.unknownUser");
         }
 
         DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
@@ -4828,7 +4844,7 @@ public class XWiki implements EventListener
         XWikiContext context)
     {
         if (userReference == null) {
-            return context.getMessageTool().get("core.users.unknownUser");
+            return localizePlainOrKey("core.users.unknownUser");
         }
 
         XWikiDocument userdoc = null;
@@ -6114,7 +6130,7 @@ public class XWiki implements EventListener
             om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
         }
 
-        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", Arrays.asList(rev)), context);
+        saveDocument(rolledbackDoc, localizePlainOrKey("core.comment.rollback", Arrays.asList(rev)), context);
 
         // Since the the store resets the original document, we need to temporarily put it back to send notifications.
         XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();

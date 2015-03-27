@@ -47,7 +47,9 @@ public class PropDeleteAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.removeField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.deleteClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(
+            doc,
+            localizePlainOrKey("core.model.xclass.deleteClassProperty.versionSummary",
+                Collections.singletonList(propertyName)), true, context);
     }
 }

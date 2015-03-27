@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -80,6 +81,8 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
      * Used to build uid string for the getId() hash.
      */
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
+
+    private ContextualLocalizationManager localization;
 
     @Override
     public R getReference()
@@ -188,6 +191,25 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         }
 
         return this.localEntityReferenceSerializer;
+    }
+
+    protected ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    protected String localizePlain(String key, Object... parameters)
+    {
+        return getLocalization().getTranslationPlain(key, parameters);
+    }
+
+    protected String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**

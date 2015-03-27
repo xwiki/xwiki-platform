@@ -33,7 +33,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -81,6 +80,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -171,7 +171,6 @@ import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument implements DocumentModelBridge, Cloneable
@@ -540,6 +539,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private SyntaxFactory syntaxFactory;
 
+    private ContextualLocalizationManager localization;
+
     /**
      * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
      * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
@@ -725,6 +726,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.syntaxFactory;
+    }
+
+    private ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    private String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -6215,8 +6230,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
                 String compactReference = getCompactEntityReferenceSerializer().serialize(newDocumentReference);
                 childDocument.setParent(compactReference);
-                String saveMessage =
-                    context.getMessageTool().get("core.comment.renameParent", Arrays.asList(compactReference));
+                String saveMessage = localizePlainOrKey("core.comment.renameParent", compactReference);
                 childDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
@@ -6319,7 +6333,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Save if content changed
         if (backlinkDocument.isContentDirty()) {
             String saveMessage =
-                context.getMessageTool().get("core.comment.renameLink",
+                localizePlainOrKey("core.comment.renameLink",
                     getCompactEntityReferenceSerializer().serialize(newDocumentReference));
             backlinkDocument.setAuthorReference(context.getUserReference());
             context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
@@ -7668,10 +7682,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public static String getInternalPropertyName(String propname, XWikiContext context)
     {
-        XWikiMessageTool msg = context.getMessageTool();
+        ContextualLocalizationManager localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
         String cpropname = StringUtils.capitalize(propname);
 
-        return (msg == null) ? cpropname : msg.get(cpropname);
+        return localizationManager == null ? cpropname : localizationManager.getTranslationPlain(cpropname);
     }
 
     public String getInternalProperty(String propname)

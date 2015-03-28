@@ -64,13 +64,14 @@ public class UsersAndGroupsMimeMessageFactory extends AbstractIteratorMimeMessag
         Map<String, Object> parameters) throws MessagingException
     {
         Map<String, Object> source = getTypedSource(sourceObject, Map.class);
+
+        // We verify that we have both a Factory hint specified but also the source for the Factory.
         validateParameters(parameters, HINT, SOURCE);
 
         // Extract from the passed parameters the MimeMessageFactory to use to create a single mail
         String factoryHint = (String) parameters.get(HINT);
-        Object factorySource = parameters.get(SOURCE);
 
-        MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint, factorySource);
+        MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
         UsersAndGroupsMimeMessageIterator iterator = new UsersAndGroupsMimeMessageIterator(source, factory, parameters,
             this.explicitDocumentReferenceResolver, this.execution);

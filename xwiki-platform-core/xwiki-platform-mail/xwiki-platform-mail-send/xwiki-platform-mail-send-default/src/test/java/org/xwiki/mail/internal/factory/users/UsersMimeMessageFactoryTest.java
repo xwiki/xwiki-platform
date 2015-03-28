@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4.1
  */
+@Deprecated
 public class UsersMimeMessageFactoryTest
 {
     @Rule
@@ -112,7 +113,7 @@ public class UsersMimeMessageFactoryTest
             this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference), parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
-            assertEquals("Failed to find a [MimeMessageFactory<String, MimeMessage>] for hint [factoryHint]",
+            assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
                 expected.getMessage());
         }
     }

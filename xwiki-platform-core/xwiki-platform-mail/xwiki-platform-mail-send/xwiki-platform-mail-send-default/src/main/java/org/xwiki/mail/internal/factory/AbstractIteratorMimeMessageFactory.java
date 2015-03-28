@@ -48,15 +48,14 @@ public abstract class AbstractIteratorMimeMessageFactory extends AbstractMimeMes
     @Named("context")
     protected Provider<ComponentManager> componentManagerProvider;
 
-    protected MimeMessageFactory getInternalMimeMessageFactory(String hint, Object source)
-        throws MessagingException
+    protected MimeMessageFactory getInternalMimeMessageFactory(String hint) throws MessagingException
     {
         try {
             return this.componentManagerProvider.get().getInstance(new DefaultParameterizedType(null,
                 MimeMessageFactory.class, MimeMessage.class), hint);
         } catch (ComponentLookupException e) {
-            throw new MessagingException(String.format("Failed to find a [%s<%s, MimeMessage>] for hint [%s]",
-                MimeMessageFactory.class.getSimpleName(), source.getClass().getSimpleName(), hint));
+            throw new MessagingException(String.format("Failed to find a [%s<MimeMessage>] for hint [%s]",
+                MimeMessageFactory.class.getSimpleName(), hint));
         }
     }
 

@@ -187,7 +187,7 @@ public class BlogPostInlinePage extends InlinePage
     }
 
     /**
-     * Wait for the WYSIWIG editors used to edit the blog content and summary to load.
+     * Wait for the WYSIWYG editors used to edit the blog content and summary to load.
      */
     public void waitToLoad()
     {

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,28 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
+ */
+package org.xwiki.blog.test.ui;
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
-    <version>7.1-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-blog</artifactId>
-  <name>XWiki Platform - Blog</name>
-  <packaging>pom</packaging>
-  <description>Blog application for XWiki</description>
-  <modules>
-    <module>xwiki-platform-blog-ui</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-blog-test</module>
-      </modules>
-    </profile>
-  </profiles>
-</project>
+import org.junit.runner.RunWith;
+import org.xwiki.test.ui.PageObjectSuite;
+
+/**
+ * Runs all functional tests found in the classpath. This allows to start/stop XWiki only once.
+ * 
+ * @version $Id$
+ * @since 7.1M1
+ */
+@RunWith(PageObjectSuite.class)
+public class AllTests
+{
+}

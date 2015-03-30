@@ -44,6 +44,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+activity.link.title=Atrodas {0} » {1} » {2}
 activity.rss.feed.description=Dokumentu izmaiņu RSS barotne
 activity.rss.feed.spaces.description=RSS barotne vietas dokumentiem ir "{0}"
 activity.rss.feed.tags.description=RSS barotne dokumentiem  ar tagu ir "{0}"

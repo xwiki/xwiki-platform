@@ -102,18 +102,6 @@
           </excludes>
         </configuration>
       </plugin>
-      <!-- Don't run Jacoco on com/steadystate/css/parser/SACParserCSS21TokenManager since it generates an error,
-           see http://stackoverflow.com/questions/14559117/how-do-i-disable-jacoco-agent-after-jacocoreport
-           TODO: remove when https://sourceforge.net/p/cssparser/bugs/53/ is fixed -->
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**com.steadystate.css.parser.SACParserCSS21TokenManager</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>

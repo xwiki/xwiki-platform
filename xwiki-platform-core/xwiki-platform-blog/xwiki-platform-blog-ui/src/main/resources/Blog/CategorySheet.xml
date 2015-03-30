@@ -47,7 +47,7 @@
 #set ($obj = $doc.getObject($blogCategoryClassname))
 #if ($obj)
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
-  = Category: $escapetool.xwiki($obj.getValue('name'), $doc.syntax.toIdString()) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
+  = Category: $services.rendering.escape($obj.getValue('name'), $doc.syntax) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
   {{html wiki=true}}
   ## Keep testing the inline action for backward compatibility with older categories.
   #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')

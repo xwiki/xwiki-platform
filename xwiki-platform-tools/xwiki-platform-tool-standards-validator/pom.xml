@@ -51,8 +51,18 @@
     </dependency>
     <dependency>
       <groupId>nu.validator</groupId>
-      <artifactId>vnu-lite</artifactId>
-      <version>20141020-xwiki</version>
+      <artifactId>validator</artifactId>
+      <version>15.3.28</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jsoup</groupId>

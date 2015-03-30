@@ -224,7 +224,7 @@ public class RenderingScriptServiceTest
     @Test
     public void escapeWithUnsupportedSyntax() throws Exception
     {
-        Assert.assertNull("Unexpected non-null output for unsuported syntax", this.mocker.getComponentUnderTest()
-            .escape("unsuported", Syntax.XHTML_1_0));
+        Assert.assertNull("Unexpected non-null output for unsupported syntax", this.mocker.getComponentUnderTest()
+            .escape("unsupported", Syntax.XHTML_1_0));
     }
 }

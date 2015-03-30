@@ -237,6 +237,6 @@ public class RenderingScriptService implements ScriptService
             return '~';
         }
 
-        throw new IllegalArgumentException("Unsupported syntax ID");
+        throw new IllegalArgumentException(String.format("Escaping is not supported for Syntax [%s]", syntax));
     }
 }

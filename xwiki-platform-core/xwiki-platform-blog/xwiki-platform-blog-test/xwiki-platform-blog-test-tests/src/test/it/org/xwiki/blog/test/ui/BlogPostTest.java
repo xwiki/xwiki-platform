@@ -23,10 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.blog.test.po.BlogHomePage;
@@ -42,9 +40,6 @@ import org.xwiki.blog.test.po.CreateBlogPostPane;
  */
 public class BlogPostTest extends AbstractTest
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     /**
      * Tests how a blog post is created and then edited.
      */
@@ -55,7 +50,14 @@ public class BlogPostTest extends AbstractTest
     })
     public void testCreateAndEditBlogPost()
     {
-        getUtil().deletePage("Blog", getTestMethodName());
+        getUtil().deletePage(getTestClassName(), getTestMethodName());
+        getUtil().deletePage("XWiki", getTestClassName() + "_" + getTestMethodName());
+        // Login as superadmin to create a new user.
+        getUtil().loginAsSuperAdmin();
+        // Now login as a simple user to verify normal users can create blog posts. Since the Blog PO consider that
+        // WYISWYG is enable, we need to force our user to use the WYSIWYG editor (since there's no
+        // XWiki.XWikiPreferences set that would set it in our minimal instance).
+        getUtil().createUserAndLogin(getTestClassName() + "_" + getTestMethodName(), "password", "editor", "Wysiwyg");
 
         // Create the blog post.
         CreateBlogPostPane createBlogPostPane = BlogHomePage.gotoPage().getCreateBlogPostPane();

@@ -41,7 +41,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 /**
@@ -95,11 +94,8 @@ public class RenderingScriptServiceTest
         when(parser.parse(new StringReader("some [[TODO]] stuff"))).thenReturn(
                 new XDOM(Collections.<Block>emptyList()));
 
-        BlockRenderer blockRenderer = this.mocker.registerMockComponent(BlockRenderer.class, "xwiki/2.0");
-        doThrow(new RuntimeException("error")).when(blockRenderer).render(any(XDOM.class), any(WikiPrinter.class));
-
         XDOM xdom = this.mocker.getComponentUnderTest().parse("some [[TODO]] stuff", "plain/1.0");
-        Assert.assertNull(this.mocker.getComponentUnderTest().render(xdom, "xwiki/2.0"));
+        Assert.assertNull(this.mocker.getComponentUnderTest().render(xdom, "unknown"));
     }
 
     @Test

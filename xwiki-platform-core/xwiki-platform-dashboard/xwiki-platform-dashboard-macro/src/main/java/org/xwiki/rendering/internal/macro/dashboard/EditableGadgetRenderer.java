@@ -59,6 +59,8 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
      * holds the rest of the metadata).
      */
     protected static final String METADATA = "metadata";
+    
+    private static final String ANNOTATED_SYNTAXES_PREFIX = "annotated";
 
     /**
      * The macro content renderer, to render the macro as annotated XHTML to be editable.
@@ -67,6 +69,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
     @Named("annotatedxhtml/1.0")
     protected BlockRenderer defaultGadgetContentRenderer;
     
+    @Inject
     protected ComponentManager componentManager;
     
     @Inject
@@ -89,8 +92,8 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
 
         // Get the annotated syntax corresponding to the current target syntax
         String annotatedTargetSyntax = currentTargetSyntax.toIdString();
-        if (!StringUtils.startsWith(annotatedTargetSyntax, "annotated")) {
-            annotatedTargetSyntax = "annotated" + annotatedTargetSyntax;
+        if (!StringUtils.startsWith(annotatedTargetSyntax, ANNOTATED_SYNTAXES_PREFIX)) {
+            annotatedTargetSyntax = ANNOTATED_SYNTAXES_PREFIX + annotatedTargetSyntax;
         }
         
         try {
@@ -130,7 +133,10 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
             renderedContentBlock.setParameter(CLASS, "content");
             WikiPrinter printer = new DefaultWikiPrinter();
             gadgetContentRenderer.render(gadget.getContent(), printer);
-            RawBlock rawBlock = new RawBlock(printer.toString(), renderingContext.getTargetSyntax());
+            // If we use the fallback (defaultGadgetContentRenderer), we set the raw block syntax to XHTML 1.0.
+            Syntax rawBlockSyntax = gadgetContentRenderer == defaultGadgetContentRenderer
+                    ? Syntax.XHTML_1_0 : renderingContext.getTargetSyntax();
+            RawBlock rawBlock = new RawBlock(printer.toString(), rawBlockSyntax);
             renderedContentBlock.addChild(rawBlock);
 
             // render the title in the page as well, to be edited as source

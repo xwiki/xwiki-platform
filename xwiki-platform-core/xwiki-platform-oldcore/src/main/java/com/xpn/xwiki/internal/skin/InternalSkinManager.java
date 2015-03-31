@@ -41,8 +41,6 @@ import org.xwiki.environment.Environment;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -146,9 +144,10 @@ public class InternalSkinManager implements Initializable
         Skin skin;
 
         if (this.wikiSkinUtils.isWikiSkin(id)) {
-            skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils);
+            skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils, this.logger, this.syntaxFactory);
         } else {
-            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.environment, this.xcontextProvider);
+            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.syntaxFactory, 
+                this.environment, this.xcontextProvider);
         }
 
         return skin;
@@ -327,17 +326,5 @@ public class InternalSkinManager implements Initializable
         }
 
         return skin;
-    }
-    
-    public Syntax parseSyntax(Skin skin, String syntax)
-    {
-        try {
-            return syntaxFactory.createSyntaxFromIdString(syntax);
-        } catch (ParseException e) {
-            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}].",
-                    syntax, skin.getId());
-        }
-        
-        return null;
     }
 }

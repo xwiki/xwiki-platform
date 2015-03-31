@@ -37,5 +37,5 @@ public interface Skin extends ResourceRepository
     /**
      * @return the syntax used by the skin
      */
-    Syntax getTargetSyntax();
+    Syntax getOutputSyntax();
 }

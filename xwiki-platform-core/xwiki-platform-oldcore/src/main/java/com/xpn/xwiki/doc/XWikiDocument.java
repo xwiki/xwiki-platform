@@ -1104,7 +1104,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.documentDisplayer;
     }
     
-    private Syntax getTargetSyntax()
+    private Syntax getOutputSyntax()
     {
         return getRenderingContext().getTargetSyntax();
     }
@@ -1143,7 +1143,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        return getRenderedContent(getTargetSyntax(), context);
+        return getRenderedContent(getOutputSyntax(), context);
     }
 
     /**
@@ -1155,7 +1155,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public String getRenderedContent(String text, String syntaxId, XWikiContext context)
     {
-        return getRenderedContent(text, syntaxId, getTargetSyntax().toIdString(), context);
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(), context);
     }
 
     /**
@@ -1169,7 +1169,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String syntaxId, boolean restrictedTransformationContext,
         XWikiContext context)
     {
-        return getRenderedContent(text, syntaxId, getTargetSyntax().toIdString(),
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(),
                 restrictedTransformationContext, context);
     }
 
@@ -1440,14 +1440,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
      * the title from the document content. If this fails then the document name is used as title. The Velocity code
-     * from the title is evaluated if the title is specified or if it is extracted from the document content.
+     * from the title is evaluated if the title is specified or if it is extracted from the document content. The title
+     * is rendered in the current target syntax.
      *
      * @param context the XWiki context
-     * @return the rendered version of the document title
+     * @return the rendered version of the document title in the current target syntax
      */
     public String getRenderedTitle(XWikiContext context)
     {
-        return getRenderedTitle(getTargetSyntax(), context);
+        return getRenderedTitle(getOutputSyntax(), context);
     }
 
     public void setTitle(String title)

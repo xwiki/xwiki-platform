@@ -32,12 +32,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Represents a skin stored in the file system.
+ *
  * @version $Id$
  * @since 6.4M1
  */
@@ -52,9 +55,9 @@ public class EnvironmentSkin extends AbstractSkin
     private Provider<XWikiContext> xcontextProvider;
 
     public EnvironmentSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
-        Environment environment, Provider<XWikiContext> xcontextProvider)
+        Logger logger, SyntaxFactory syntaxFactory, Environment environment, Provider<XWikiContext> xcontextProvider)
     {
-        super(id, skinManager, configuration);
+        super(id, skinManager, configuration, logger, syntaxFactory);
 
         this.environment = environment;
         this.xcontextProvider = xcontextProvider;
@@ -148,8 +151,8 @@ public class EnvironmentSkin extends AbstractSkin
     }
 
     @Override
-    public String getTargetSyntaxString()
+    public String getOutputSyntaxString()
     {                
-        return getProperties().getString("targetSyntax");
+        return getProperties().getString("outputSyntax");
     }
 }

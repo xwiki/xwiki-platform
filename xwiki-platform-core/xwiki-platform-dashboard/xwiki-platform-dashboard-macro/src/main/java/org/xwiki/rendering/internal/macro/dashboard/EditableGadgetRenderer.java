@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -38,6 +39,7 @@ import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
@@ -69,6 +71,36 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
     
     @Inject
     protected RenderingContext renderingContext;
+    
+    @Inject
+    protected Logger logger;
+
+    /** 
+     * @return the renderer corresponding to the current target syntax
+     */
+    protected BlockRenderer getGadgetContentRenderer()
+    {
+        // Get the current syntax
+        Syntax currentTargetSyntax = renderingContext.getTargetSyntax();
+        if (currentTargetSyntax == null) {
+            // (it should never happen actually)
+            return defaultGadgetContentRenderer;
+        }
+
+        // Get the annotated syntax corresponding to the current target syntax
+        String annotatedTargetSyntax = currentTargetSyntax.toIdString();
+        if (!StringUtils.startsWith(annotatedTargetSyntax, "annotated")) {
+            annotatedTargetSyntax = "annotated" + annotatedTargetSyntax;
+        }
+        
+        try {
+            return componentManager.getInstance(BlockRenderer.class, annotatedTargetSyntax);
+        } catch (ComponentLookupException e) {
+            logger.warn("Failed to load the syntax [{}].", annotatedTargetSyntax);
+            // Failback to the default renderer
+            return defaultGadgetContentRenderer;
+        }
+    }
 
     /**
      * @param gadget the gadget to decorate
@@ -89,16 +121,7 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
 
         if (isMacro) {
             // Get the renderer corresponding to the current target syntax
-            BlockRenderer gadgetContentRenderer;
-            try {
-                String targetSyntax = renderingContext.getTargetSyntax().toIdString();
-                if (!StringUtils.startsWith(targetSyntax, "annotated")) {
-                    targetSyntax = "annotated" + targetSyntax;
-                }
-                gadgetContentRenderer = componentManager.getInstance(BlockRenderer.class, targetSyntax);
-            } catch (ComponentLookupException e) {
-                gadgetContentRenderer = defaultGadgetContentRenderer;
-            }
+            BlockRenderer gadgetContentRenderer = getGadgetContentRenderer();
 
             // render the annotated macro call in the page, to be able to edit it. Only the macro call comments will be
             // rendered, since transformations are not ran, so there is no content in the macro. But annotation is

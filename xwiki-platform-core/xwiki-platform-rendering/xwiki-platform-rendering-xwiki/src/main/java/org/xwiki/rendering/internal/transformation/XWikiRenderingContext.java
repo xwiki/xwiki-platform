@@ -128,7 +128,7 @@ public class XWikiRenderingContext extends DefaultRenderingContext
         
         if (targetSyntax == null) {
             // Fallback to the skin syntax
-            targetSyntax = skinManagerProvider.get().getCurrentSkin(true).getTargetSyntax();
+            targetSyntax = skinManagerProvider.get().getCurrentSkin(true).getOutputSyntax();
         }
         
         return targetSyntax;

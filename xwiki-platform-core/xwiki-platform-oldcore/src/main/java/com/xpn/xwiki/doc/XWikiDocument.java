@@ -1411,9 +1411,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
-     * the title from the document content. If this fails then the document name is used as title. The Velocity code
-     * from the title is evaluated if the title is specified or if it is extracted from the document content.
+     * Get the rendered version of the document title. The title is extracted and then Velocity is applied on it and
+     * it's then rendered using the passed Syntax. The following logic is used to extract the title:
+     * <ul>
+     *   <li>If the title is specified then it's used</li>
+     *   <li>If the title compatibility mode is turned on ({@code xwiki.title.compatibility=1} in {@code xwiki.cfg})
+     *       then an attempt is made to extract the title from the first heading found in the document's content</li>
+     *   <li>At last resort the page name is returned</li>
+     * </ul>
      *
      * @param outputSyntax the syntax to render to; this is not taken into account for XWiki 1.0 syntax
      * @param context the XWiki context
@@ -1438,13 +1443,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
-     * the title from the document content. If this fails then the document name is used as title. The Velocity code
-     * from the title is evaluated if the title is specified or if it is extracted from the document content. The title
-     * is rendered in the current target syntax.
+     * Similar to {@link #getRenderedTitle(Syntax, XWikiContext)} but the Syntax used is XHTML 1.0 unless the current
+     * skin defines another output Syntax in which case it's the one used.
      *
      * @param context the XWiki context
-     * @return the rendered version of the document title in the current target syntax
+     * @return the rendered version of the document title
      */
     public String getRenderedTitle(XWikiContext context)
     {

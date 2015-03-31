@@ -3492,10 +3492,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param request The input HTTP request that provides the parameters
      * @return The map containing ordered data
      */
-    private Map<String, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
+    private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
         XWikiContext context)
     {
-        Map<String, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
+        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = request.getParameterMap();
         for (Entry<String, String[]> parameter : allParameters.entrySet()) {
@@ -3525,10 +3525,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     parameter.getKey());
                 continue;
             }
-            SortedMap<Integer, Map<String, String[]>> objectMap = result.get(className);
+            SortedMap<Integer, Map<String, String[]>> objectMap = result.get(classReference);
             if (objectMap == null) {
                 objectMap = new TreeMap<>();
-                result.put(className, objectMap);
+                result.put(classReference, objectMap);
             }
             // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
             Map<String, String[]> object = objectMap.get(classNumber);
@@ -3557,11 +3557,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {
-        Map<String, SortedMap<Integer, Map<String, String[]>>> fromRequest =
+        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> fromRequest =
             parseRequestUpdateOrCreate(eform.getRequest(), context);
-        for (Entry<String, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest.entrySet()) {
-            DocumentReference requestClassReference =
-                getCurrentDocumentReferenceResolver().resolve(requestClassEntries.getKey());
+        for (Entry<DocumentReference, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest
+            .entrySet()) {
+            DocumentReference requestClassReference = requestClassEntries.getKey();
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
             List<BaseObject> newObjects = new ArrayList<>();
             for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {

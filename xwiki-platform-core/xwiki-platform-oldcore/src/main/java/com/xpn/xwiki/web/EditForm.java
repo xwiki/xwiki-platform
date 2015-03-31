@@ -286,7 +286,7 @@ public class EditForm extends XWikiForm
      * Return the object policy given in the HTTP request. See {@link com.xpn.xwiki.web.ObjectPolicyType
      * ObjectPolicyType} for more information about what is an object policy.
      *
-     * @return Return the Object Policy type
+     * @return the Object Policy type
      * @since 7.0RC1
      */
     public ObjectPolicyType getObjectPolicy() {

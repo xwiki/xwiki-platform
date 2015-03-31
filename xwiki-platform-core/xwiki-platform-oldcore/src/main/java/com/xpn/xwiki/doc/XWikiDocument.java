@@ -3503,13 +3503,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             if (matcher.matches() == false) {
                 continue;
             }
-            String className;
-            String classNumberAsString;
             Integer classNumber;
-            String classPropertyName;
-            className = matcher.group(1);
-            classNumberAsString = matcher.group(2);
-            classPropertyName = matcher.group(3);
+            String className= matcher.group(1);
+            String classNumberAsString = matcher.group(2);
+            String classPropertyName = matcher.group(3);
             DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
             try {
                 BaseClass xClass = context.getWiki().getDocument(classReference, context).getXClass();

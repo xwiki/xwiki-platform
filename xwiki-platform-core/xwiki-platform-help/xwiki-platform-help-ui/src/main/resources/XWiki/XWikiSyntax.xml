@@ -277,7 +277,7 @@ $syntaxMenu.add($cat)
     #set ($crtSelection = "$extraParams")
   #end
 {{html}}
-  &lt;form id="change-context" class="xformInline" action=""&gt;
+  &lt;form id="change-context" class="xformInline" action="$doc.getURL()"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       #if ($request.language)

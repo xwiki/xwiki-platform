@@ -55,7 +55,7 @@
 = Create Release =
 
 {{html}}
-&lt;form action="" id="newrelease"&gt;
+&lt;form action="$doc.getURL()" id="newrelease"&gt;
   &lt;input type="hidden" name="parent" value="Release.WebHome" /&gt;
   &lt;input type="hidden" name="template" value="ReleaseCode.ReleaseTemplate" /&gt;
   &lt;input type="hidden" name="sheet" value="1" /&gt;

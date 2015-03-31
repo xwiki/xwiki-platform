@@ -388,7 +388,7 @@ search=Main.SolrSearch</parameters>
   <content>{{velocity output='false'}}
 #macro (displaySolrIndexForm)
   {{html}}
-  &lt;form class="xform half" action="" method="post"&gt;
+  &lt;form class="xform half" action="$doc.getURL()" method="post"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
     &lt;/div&gt;

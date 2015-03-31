@@ -165,7 +165,7 @@
     #end
 
     {{html}}
-      &lt;form action="" id="newdoc" method="post"&gt;
+      &lt;form action="$doc.getURL()" id="newdoc" method="post"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="parent" value="${defaultParent}"/&gt;

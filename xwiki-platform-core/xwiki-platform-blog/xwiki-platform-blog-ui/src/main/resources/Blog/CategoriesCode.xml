@@ -399,7 +399,7 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
  *       This "form" should be created from javascript.
  *###
 #macro(showCreateCategoryBoxWithForm $tree)
-  &lt;form action="" method="post"&gt;
+  &lt;form action="$doc.getURL()" method="post"&gt;
   #showCreateCategoryBox($tree)
   &lt;/form&gt;
 #end

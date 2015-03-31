@@ -261,7 +261,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;}
      * (e.g. {@code XWiki.XWikiRights_0_member}).
      */
-    private static final Pattern XPROPERTY_URL_REFERENCE = Pattern.compile("(.+?)_([0-9]+)_(.+)");
+    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("(.+?)_([0-9]+)_(.+)");
 
     public static final EntityReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiComments");
 
@@ -3499,7 +3499,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = request.getParameterMap();
         for (Entry<String, String[]> parameter : allParameters.entrySet()) {
-            Matcher matcher = XPROPERTY_URL_REFERENCE.matcher(parameter.getKey());
+            Matcher matcher = XPROPERTY_REFERENCE_PATTERN.matcher(parameter.getKey());
             if (matcher.matches() == false) {
                 continue;
             }

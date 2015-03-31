@@ -1414,10 +1414,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Get the rendered version of the document title. The title is extracted and then Velocity is applied on it and
      * it's then rendered using the passed Syntax. The following logic is used to extract the title:
      * <ul>
-     *   <li>If the title is specified then it's used</li>
-     *   <li>If the title compatibility mode is turned on ({@code xwiki.title.compatibility=1} in {@code xwiki.cfg})
-     *       then an attempt is made to extract the title from the first heading found in the document's content</li>
-     *   <li>At last resort the page name is returned</li>
+     *   <li>If a Sheet is specified for the document and this Sheet document contains a non empty title then it's used
+     *   </li>
+     *   <li>If not and the document's title is specified then it's used</li>
+     *   <li>If not and if the title compatibility mode is turned on ({@code xwiki.title.compatibility=1} in
+     *       {@code xwiki.cfg}) then an attempt is made to extract the title from the first heading found in the
+     *       document's content</li>
+     *   <li>If not, then at last resort the page name is returned</li>
      * </ul>
      *
      * @param outputSyntax the syntax to render to; this is not taken into account for XWiki 1.0 syntax

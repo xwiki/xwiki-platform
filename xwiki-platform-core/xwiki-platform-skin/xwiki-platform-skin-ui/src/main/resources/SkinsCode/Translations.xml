@@ -42,11 +42,11 @@
   <content>skin.sheet.title=Skin
 skin.sheet.properties=Skin Properties
 skin.sheet.deprecatedProperties=Deprecated properties
-skin.sheet.overridedTemplates=Overrided templates
-skin.sheet.addTemplate=Add a new overrided template
+skin.sheet.overriddenTemplates=Overridden templates
+skin.sheet.addTemplate=Add a new overriding template
 skin.sheet.add=Add
 skin.sheet.overrideTemplateWarning=This section allows you to override a template of the skin. This is technical and you should be aware of the consequences.
-skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reason. You should use the 'overrided templates' mechanism above.
+skin.sheet.deprecatedPropertiesWarning=This section is here for retro-compatibility reason. You should use the 'overridden templates' mechanism above.
 skin.sheet.nojs=Without JavaScript, you cannot use this section. But you can use the {0}Object Editor{1} instead, and manually add {2} objects.
 
 skin.sheet.js.deleting=Deleting...
@@ -58,6 +58,22 @@ skin.sheet.js.deleteConfirmationYes=Yes, delete it
 skin.sheet.js.deleteConfirmationNo=No, cancel
 skin.sheet.js.adding=Adding...
 skin.sheet.js.addingDone=The template has been added!
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+skin.sheet.overridedTemplates=Overridden templates
+
+## Used to indicate where deprecated keys end
+#@deprecatedend
 </content>
   <object>
     <name>SkinsCode.Translations</name>

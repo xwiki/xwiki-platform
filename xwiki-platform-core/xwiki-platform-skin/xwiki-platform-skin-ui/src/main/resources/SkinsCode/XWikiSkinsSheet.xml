@@ -83,7 +83,7 @@
   #set ($class = $doc.getObject($className).xWikiClass)
   #foreach ($prop in $class.properties)
     #if ($prop.classType != 'TextArea')
-    ; $prop.prettyName $prop.classType
+    ; $prop.prettyName
     : #if($prop.name == 'logo'){{attachmentSelector classname="${className}" property="${prop.name}" filter="png,jpg,gif" displayImage="true"/}}#else $doc.display($prop.name)#end
     
     #else
@@ -92,7 +92,7 @@
   #end
   (% id="overrideSection" %)
   (((
-    == {{translation key="skin.sheet.overridedTemplates" /}} ==
+    == {{translation key="skin.sheet.overriddenTemplates" /}} ==
     
     {{warning}}
       {{translation key="skin.sheet.overrideTemplateWarning" /}}

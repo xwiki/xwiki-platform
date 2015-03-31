@@ -81,10 +81,10 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
                         + "application's Servlet context couldn't be computed.", partialURL));
                 }
             }
-        } else {
-            // Remove any leading or trailing slashes that would have been put by error by the user
-            contextPath = StringUtils.strip(contextPath, URL_SEGMENT_DELIMITER);
         }
+
+        // Remove any leading or trailing slashes
+        contextPath = StringUtils.strip(contextPath, URL_SEGMENT_DELIMITER);
 
         List<String> segments = new ArrayList<>();
         segments.add(contextPath);

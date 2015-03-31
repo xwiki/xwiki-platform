@@ -81,7 +81,7 @@ public class ExtendedURLURLNormalizerTest
         when(executionContext.getProperty("xwikicontext")).thenReturn(xwikiContext);
         XWikiRequest xwikiRequest = mock(XWikiRequest.class);
         when(xwikiContext.getRequest()).thenReturn(xwikiRequest);
-        when(xwikiRequest.getContextPath()).thenReturn("xwiki");
+        when(xwikiRequest.getContextPath()).thenReturn("/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
         assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());

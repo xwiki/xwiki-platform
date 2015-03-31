@@ -4135,10 +4135,10 @@ public class XWiki implements EventListener
                 contextPath = StringUtils.substringBefore(
                     StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
             }
-        } else {
-            // Remove any leading or trailing slashes that would have been put by error by the user
-            contextPath = StringUtils.strip(contextPath, "/");
         }
+
+        // Remove any leading or trailing slashes
+        contextPath = StringUtils.strip(contextPath, "/");
 
         // TODO We're using URL parts in a wrong way, since contextPath and servletPath are returned with a leading /,
         // while we need a trailing /. This code ensure we always have CONTEXTNAME + "/".

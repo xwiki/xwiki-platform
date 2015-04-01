@@ -124,11 +124,14 @@
 #panelhiddenheader($services.localization.render('panels.search.title'))
 {{html}}
   &lt;form action="$xwiki.getURL('Main.Search')" class='xformInline'&gt;
-    &lt;div class="globalsearch"&gt;
+    &lt;div class="globalsearch input-group"&gt;
       &lt;label for="globalsearchinput" class="hidden"&gt;$services.localization.render('panels.search.query')&lt;/label&gt;
       &lt;input id="globalsearchinput" class="globalsearchinput" type="text" name="text" value="$services.localization.render('panels.search.inputText')" size="15" onfocus="if (this.value == '$services.localization.render('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$services.localization.render('panels.search.inputText')'; this.blur()"/&gt;
-&amp;nbsp;
-      &lt;input class="button" value="$services.localization.render('panels.search.submit')" type="image" src="$xwiki.getSkinFile('icons/xwiki/search.png')" alt="$services.localization.render('panels.search.submit')"/&gt;
+      &lt;span class="input-group-btn buttonwrapper"&gt;
+        &lt;button type="submit" class="btn btn-primary"&gt;
+          $services.icon.renderHTML('search')&lt;span class="hidden"&gt;$services.localization.render('panels.search.submit')&lt;/span&gt;
+        &lt;/button&gt;
+      &lt;/span&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

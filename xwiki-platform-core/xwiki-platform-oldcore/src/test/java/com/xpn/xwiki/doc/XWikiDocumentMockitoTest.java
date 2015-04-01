@@ -174,16 +174,16 @@ public class XWikiDocumentMockitoTest
     {
         Map<String, String[]> parameters = new HashMap<>();
         // Testing update of values in existing object with existing properties
-        String[] string1 = {"string1"};
+        String[] string1 = {"bloublou"};
         parameters.put("space.page_0_string", string1);
         String[] int1 = {"7"};
         parameters.put("space.page_1_int", int1);
         // Testing creation and update of an object's properties when object
         // doesn't exist
-        String[] string2 = {"string2"};
+        String[] string2 = {"blabla"};
         String[] int2 = {"13"};
-        parameters.put("space.page_2_string", string2);
-        parameters.put("space.page_2_int", int2);
+        parameters.put("space.page_3_string", string2);
+        parameters.put("space.page_3_int", int2);
         // Testing that objects with non-following number is not created
         parameters.put("space.page_42_string", string1);
         parameters.put("space.page_42_int", int1);
@@ -227,10 +227,12 @@ public class XWikiDocumentMockitoTest
      */
     private void generateFakeObjects()
     {
-        BaseObject baseObject = null, baseObject2 = null;
+        BaseObject baseObject = null, baseObject2 = null, baseObject3 = null;
         try {
             baseObject = this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
             baseObject2 =
+                this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
+            baseObject3 =
                 this.document.newXObject(this.document.getDocumentReference(), this.oldcore.getXWikiContext());
         } catch (XWikiException e) {
             // TODO Auto-generated catch block
@@ -239,8 +241,10 @@ public class XWikiDocumentMockitoTest
         }
         baseObject.setStringValue("string", "string");
         baseObject.setIntValue("int", 42);
-        baseObject2.setStringValue("string", "string");
+        baseObject2.setStringValue("string", "string2");
         baseObject2.setIntValue("int", 42);
+        baseObject3.setStringValue("string", "string3");
+        baseObject3.setIntValue("int", 42);
     }
 
     /**
@@ -279,12 +283,14 @@ public class XWikiDocumentMockitoTest
         eform.setRequest(request);
         document.readObjectsFromForm(eform, context);
 
-        assertEquals(2, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals(3, this.document.getXObjectSize(baseClass.getDocumentReference()));
         assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
-        assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
+        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
+        assertEquals("string3", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 2).getIntValue("int"));
+        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
     }
 
@@ -322,14 +328,16 @@ public class XWikiDocumentMockitoTest
         eform.setRequest(request);
         this.document.readObjectsFromFormUpdateOrCreate(eform, context);
 
-        assertEquals(3, this.document.getXObjectSize(baseClass.getDocumentReference()));
-        assertEquals("string1", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(4, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals("bloublou", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
-        assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
+        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
-        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
-        assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));
-        assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 2).getIntValue("int"));
+        assertEquals("string3", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 2).getIntValue("int"));
+        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
+        assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
+        assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
     }
 }

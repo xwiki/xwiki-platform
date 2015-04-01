@@ -281,6 +281,8 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(2, this.document.getXObjectSize(baseClass.getDocumentReference()));
         assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
+        assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
         assertNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
@@ -322,6 +324,8 @@ public class XWikiDocumentMockitoTest
 
         assertEquals(3, this.document.getXObjectSize(baseClass.getDocumentReference()));
         assertEquals("string1", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
+        assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
+        assertEquals("string", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
         assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 1).getIntValue("int"));
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 2));
         assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 2).getStringValue("string"));

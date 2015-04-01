@@ -47,7 +47,7 @@
 
 #macro (displaySearchForm)
   {{html}}
-  &lt;form class="search-form half" action=""&gt;
+  &lt;form class="search-form half" action="$doc.getURL()"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;

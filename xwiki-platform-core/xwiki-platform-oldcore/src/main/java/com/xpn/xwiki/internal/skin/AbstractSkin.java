@@ -22,6 +22,11 @@ package com.xpn.xwiki.internal.skin;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
@@ -57,6 +62,12 @@ public abstract class AbstractSkin implements Skin
         {
             return null;
         }
+
+        @Override
+        public Syntax getOutputSyntax()
+        {
+            return null;
+        }
     };
 
     protected InternalSkinManager skinManager;
@@ -67,11 +78,18 @@ public abstract class AbstractSkin implements Skin
 
     protected Skin parent;
 
-    public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration)
+    private Logger logger;
+    
+    private SyntaxFactory syntaxFactory;
+    
+    public AbstractSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration,
+        Logger logger, SyntaxFactory syntaxFactory)
     {
         this.id = id;
         this.skinManager = skinManager;
         this.configuration = configuration;
+        this.logger = logger;
+        this.syntaxFactory = syntaxFactory;
     }
 
     @Override
@@ -114,4 +132,43 @@ public abstract class AbstractSkin implements Skin
     }
 
     protected abstract Skin createParent();
+
+    @Override
+    public Syntax getOutputSyntax()
+    {
+        Syntax targetSyntax = null;
+        String targetSyntaxString = getOutputSyntaxString();
+        if (StringUtils.isNotEmpty(targetSyntaxString)) {
+            targetSyntax = parseSyntax(this, targetSyntaxString);
+            if (targetSyntax != null) {
+                return targetSyntax;
+            }
+        }
+        
+        Skin parent = getParent();
+        if (parent != null) {
+            targetSyntax = parent.getOutputSyntax();
+        }
+        
+        // Fallback to the XHTML 1.0 syntax for backward compatibility
+        return targetSyntax != null ? targetSyntax : Syntax.XHTML_1_0;
+    }
+
+    /**
+     * @return the id of the syntax to use for this skin
+     */
+    protected abstract String getOutputSyntaxString();
+
+    private Syntax parseSyntax(Skin skin, String syntax)
+    {
+        try {
+            return syntaxFactory.createSyntaxFromIdString(syntax);
+        } catch (ParseException e) {
+            logger.warn("Failed to parse the syntax [{}] configured by the skin [{}].",
+                    syntax, skin.getId());
+        }
+        
+        // let getOutputSyntax() do the proper fallback
+        return null;
+    }
 }

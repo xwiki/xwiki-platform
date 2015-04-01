@@ -47,7 +47,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Provides Rendering-specific Scripting APIs.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -85,7 +85,7 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManagerProvider.get().<Parser> getInstanceList(Parser.class)) {
+            for (Parser parser : this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
@@ -127,7 +127,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Parses a text written in the passed syntax.
-     * 
+     *
      * @param text the text to parse
      * @param syntaxId the id of the syntax in which the text is written in
      * @return the XDOM representing the AST of the parsed text or null if an error occurred
@@ -147,7 +147,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Render a list of Blocks into the passed syntax.
-     * 
+     *
      * @param block the block to render
      * @param outputSyntaxId the syntax in which to render the blocks
      * @return the string representing the passed blocks in the passed syntax or null if an error occurred
@@ -170,7 +170,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Converts a Syntax specified as a String into a proper Syntax object.
-     * 
+     *
      * @param syntaxId the syntax as a string (eg "xwiki/2.0", "html/4.01", etc)
      * @return the proper Syntax object representing the passed syntax
      */
@@ -183,5 +183,60 @@ public class RenderingScriptService implements ScriptService
             syntax = null;
         }
         return syntax;
+    }
+
+    /**
+     * Escapes a give text using the escaping method specific to the given syntax.
+     * <p/>
+     * One example of escaping method is using escape characters like {@code ~} for the {@link Syntax#XWIKI_2_1} syntax
+     * on all or just some characters of the given text.
+     * <p/>
+     * The current implementation only escapes XWiki 1.0, 2.0 and 2.1 syntaxes.
+     *
+     * @param content the text to escape
+     * @param syntax the syntax to escape the content in (e.g. {@link Syntax#XWIKI_1_0}, {@link Syntax#XWIKI_2_0},
+     *            {@link Syntax#XWIKI_2_1}, etc.). This is the syntax where the output will be used and not necessarily
+     *            the same syntax of the input content
+     * @return the escaped text or {@code null} if the given content or the given syntax are {@code null}, or if the
+     *         syntax is not supported
+     * @since 7.1M1
+     */
+    public String escape(String content, Syntax syntax)
+    {
+        if (content == null || syntax == null) {
+            return null;
+        }
+        String input = String.valueOf(content);
+
+        // Determine the escape character for the syntax.
+        char escapeChar;
+        try {
+            escapeChar = getEscapeCharacter(syntax);
+        } catch (Exception e) {
+            // We don`t know how to proceed, so we just return null.
+            return null;
+        }
+
+        // Since we prefix all characters, the result size will be double the input's, so we can just use char[].
+        char[] result = new char[input.length() * 2];
+
+        // Escape the content.
+        for (int i = 0; i < input.length(); i++) {
+            result[2 * i] = escapeChar;
+            result[2 * i + 1] = input.charAt(i);
+        }
+
+        return String.valueOf(result);
+    }
+
+    private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException
+    {
+        if (Syntax.XWIKI_1_0.equals(syntax)) {
+            return '\\';
+        } else if (Syntax.XWIKI_2_0.equals(syntax) || Syntax.XWIKI_2_1.equals(syntax)) {
+            return '~';
+        }
+
+        throw new IllegalArgumentException(String.format("Escaping is not supported for Syntax [%s]", syntax));
     }
 }

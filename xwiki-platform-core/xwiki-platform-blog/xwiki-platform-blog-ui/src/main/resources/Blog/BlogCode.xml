@@ -657,10 +657,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   (% class="#if($onlyExtract)entry-summary#{else}entry-content#end" %)(((
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
-  $xcontext.dropPermissions()
-  ## FIXME: This is fragile to malformed blogpost contents that have a closed content macro, without previously opening it, i.e. "{{/content}}"
-  ##        However, we considered this acceptable for now, as opposed to the doc.getRenderedContent() alternative that spits out HTML.
-  {{content syntax="$entryDoc.syntax.toIdString()"}}$entryContent{{/content}}
+  ## FIXME: This causes the blog's content to not be annotatable. See http://jira.xwiki.org/browse/XWIKI-6328
+  ##        Should probably be replaced by a display macro call with a reference to the object property holding the post's content
+  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
   ))) ## entry-content
   (% class="clearfloats" %)((()))
 #end

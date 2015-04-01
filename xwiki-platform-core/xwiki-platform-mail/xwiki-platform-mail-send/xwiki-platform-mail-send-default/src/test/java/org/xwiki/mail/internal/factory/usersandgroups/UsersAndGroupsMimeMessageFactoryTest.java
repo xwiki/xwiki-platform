@@ -112,7 +112,7 @@ public class UsersAndGroupsMimeMessageFactoryTest
                 parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
-            assertEquals("Failed to find a [MimeMessageFactory<String, MimeMessage>] for hint [factoryHint]",
+            assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
                 expected.getMessage());
         }
     }

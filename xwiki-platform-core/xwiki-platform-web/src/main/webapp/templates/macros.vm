@@ -1552,7 +1552,7 @@ ${Msz}Mb##
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>

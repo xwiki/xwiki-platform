@@ -49,15 +49,13 @@ public class RepositoryTestUtils
 
     private RepositoryUtils repositoryUtil;
 
-    public RepositoryTestUtils(TestUtils testUtils)
-    {
-        this(testUtils, null);
-    }
+    private SolrTestUtils solrUtils;
 
-    public RepositoryTestUtils(TestUtils testUtils, RepositoryUtils repositoryUtil)
+    public RepositoryTestUtils(TestUtils testUtils, RepositoryUtils repositoryUtil, SolrTestUtils solrUtils)
     {
         this.testUtils = testUtils;
         this.repositoryUtil = repositoryUtil != null ? repositoryUtil : new RepositoryUtils();
+        this.solrUtils = solrUtils;
     }
 
     public RepositoryUtils getRepositoryUtil()
@@ -196,5 +194,14 @@ public class RepositoryTestUtils
         } finally {
             is.close();
         }
+    }
+
+    /**
+     * Make sure any change done in extension has been taken into account by Solr.
+     */
+    public void waitUntilReady() throws Exception
+    {
+        // Make sure Solr queue is empty
+        this.solrUtils.waitEmpyQueue();
     }
 }

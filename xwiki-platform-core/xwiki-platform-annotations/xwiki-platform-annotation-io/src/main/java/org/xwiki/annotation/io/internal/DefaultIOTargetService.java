@@ -40,8 +40,8 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -86,6 +86,9 @@ public class DefaultIOTargetService implements IOTargetService
      */
     @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     @Override
     public String getSource(String reference) throws IOServiceException
@@ -161,7 +164,7 @@ public class DefaultIOTargetService implements IOTargetService
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setExecutionContextIsolated(true);
         parameters.setContentTranslated(true);
-        parameters.setTargetSyntax(Syntax.XHTML_1_0);
+        parameters.setTargetSyntax(renderingContext.getTargetSyntax());
         return documentDisplayer.display(dab.getDocument(reference), parameters);
     }
 

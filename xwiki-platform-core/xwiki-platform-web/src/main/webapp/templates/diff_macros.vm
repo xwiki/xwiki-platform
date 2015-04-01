@@ -521,3 +521,99 @@ diff$id.hashCode()##
     </ul>
   #end
 #end
+
+##
+## New macros used to display differences, in unified format, between two versions of an XWiki entity.
+##
+
+#macro (displayDocumentUnifiedDiffs $documentDiffs)
+  #if ($documentDiffs.isEmpty())
+    #info($services.localization.render('web.history.changes.noChanges'))
+  #else
+    #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+    #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
+    #foreach ($documentDiff in $documentDiffs)
+      <h3>
+        #diffIcon('page' $documentDiff.type)
+        $escapetool.xml($services.model.serialize($documentDiff.reference, 'local'))
+      </h3>
+      #displayDocumentUnifiedDiff($documentDiff)
+    #end
+  #end
+#end
+
+#macro (displayDocumentUnifiedDiff $documentDiff)
+  #if ($documentDiff.size() > 0)
+    #displayEntityUnifiedDiffs([$documentDiff], 'file-text')
+  #end
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.attachmentDiffs 'attach')
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.objectDiffs 'cubes')
+  #maybeDisplayEntityUnifiedDiffs($documentDiff.classPropertyDiffs 'cube')
+#end
+
+#macro (maybeDisplayEntityUnifiedDiffs $entityDiffs $icon)
+  #if ($entityDiffs && $entityDiffs.size() > 0)
+    #displayEntityUnifiedDiffs($entityDiffs $icon)
+  #end
+#end
+
+#macro (displayEntityUnifiedDiffs $entityDiffs $icon)
+  <dl class="diff-group">
+    #foreach ($entityDiff in $entityDiffs)
+      #set ($entityReference = $entityDiff.reference)
+      <dt id="#diffAnchor($entityReference)">
+        #diffIcon($icon $entityDiff.type)
+        #if ($entityReference.type == 'DOCUMENT')
+          $services.localization.render('web.history.changes.summary.documentProperties')
+        #elseif ($entityReference.type == 'OBJECT')
+          $escapetool.xml($services.model.serialize($entityReference.xClassReference, 'local'))
+          [$entityReference.objectNumber]
+        #else
+          $escapetool.xml($entityReference.name)
+        #end
+      </dt>
+      <dd>#displayEntityUnifiedDiff($entityDiff)</dd>
+    #end
+  </dl>
+#end
+
+#macro (displayEntityUnifiedDiff $entityDiff)
+  <dl>
+    #foreach ($entry in $entityDiff.entrySet())
+      <dt class="diff-header">
+        $escapetool.xml($entry.key)
+        #if ($entry.value.isEmpty())
+          <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+            $services.icon.renderHTML('info')
+          </span>
+        #end
+      </dt>
+      #if ($entry.value.size() > 0)
+        <dd>#displayUnifiedDiff($entry.value)</dd>
+      #end
+    #end
+  </dl>
+#end
+
+#macro (displayUnifiedDiff $blocks)
+  <div class="diff-container">
+    <table>
+    #foreach ($block in $blocks)
+      <tr>
+        <td class="diff-line-number">...</td>
+        <td class="diff-line-number">...</td>
+        <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
+          +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
+      </tr>
+      #foreach ($line in $block)
+      <tr>
+        #set ($lineNumber = $line.index + 1)
+        <td class="diff-line-number">#if (!$line.added)$lineNumber#end</td>
+        <td class="diff-line-number">#if (!$line.deleted)$lineNumber#end</td>
+        <td class="diff-line diff-line-$line.type.toString().toLowerCase()">#unifiedDiffLine($line)</td>
+      </tr>
+      #end
+    #end
+    </table>
+  </div>
+#end

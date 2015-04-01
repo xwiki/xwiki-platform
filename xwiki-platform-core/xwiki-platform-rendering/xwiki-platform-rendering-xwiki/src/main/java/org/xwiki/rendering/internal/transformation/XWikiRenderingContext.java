@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.transformation;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.skin.SkinManager;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -43,6 +45,9 @@ public class XWikiRenderingContext extends DefaultRenderingContext
 {
     @Inject
     private ComponentManager componentManager;
+    
+    @Inject
+    private Provider<SkinManager> skinManagerProvider;
 
     @Inject
     private Logger logger;
@@ -114,5 +119,18 @@ public class XWikiRenderingContext extends DefaultRenderingContext
                     namespace, e.getMessage());
             }
         }
+    }
+    
+    @Override
+    public Syntax getTargetSyntax()
+    {
+        Syntax targetSyntax = super.getTargetSyntax();
+        
+        if (targetSyntax == null) {
+            // Fallback to the skin syntax
+            targetSyntax = skinManagerProvider.get().getCurrentSkin(true).getOutputSyntax();
+        }
+        
+        return targetSyntax;
     }
 }

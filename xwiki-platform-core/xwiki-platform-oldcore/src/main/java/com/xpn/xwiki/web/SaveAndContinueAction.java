@@ -85,8 +85,7 @@ public class SaveAndContinueAction extends XWikiAction
 
             if (pua.propUpdate(context)) {
                 if (isAjaxRequest) {
-                    String errorMessage = context.getMessageTool()
-                        .get((String) context.get("message"));
+                    String errorMessage = localizePlainOrKey((String) context.get("message"));
                     writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
                 } else {
                     context.put(WRAPPED_ACTION_CONTEXT_KEY, pua);
@@ -98,8 +97,8 @@ public class SaveAndContinueAction extends XWikiAction
             SaveAction sa = new SaveAction();
             if (sa.save(context)) {
                 if (isAjaxRequest) {
-                    String errorMessage = context.getMessageTool()
-                        .get("core.editors.saveandcontinue.theDocumentWasNotSaved");
+                    String errorMessage =
+                        localizePlainOrKey("core.editors.saveandcontinue.theDocumentWasNotSaved");
                     // This should not happen. SaveAction.save(context) should normally throw an
                     // exception when failing during save and continue.
                     LOGGER.error("SaveAction.save(context) returned true while using save & continue");
@@ -126,8 +125,7 @@ public class SaveAndContinueAction extends XWikiAction
     private void handleCSRFValidationFailure(boolean isAjaxRequest, XWikiContext context)
         throws XWikiException
     {
-        final String csrfCheckFailedMessage =
-            context.getMessageTool().get("core.editors.saveandcontinue.csrfCheckFailed");
+        final String csrfCheckFailedMessage = localizePlainOrKey("core.editors.saveandcontinue.csrfCheckFailed");
         if (isAjaxRequest) {
             writeAjaxErrorResponse(HttpServletResponse.SC_FORBIDDEN,
                 csrfCheckFailedMessage,
@@ -149,10 +147,8 @@ public class SaveAndContinueAction extends XWikiAction
         throws XWikiException
     {
         if (isAjaxRequest) {
-
-            String errorMessage = context.getMessageTool()
-                .get("core.editors.saveandcontinue.exceptionWhileSaving",
-                    exception.getMessage());
+            String errorMessage =
+                localizePlainOrKey("core.editors.saveandcontinue.exceptionWhileSaving", exception.getMessage());
 
             writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
 

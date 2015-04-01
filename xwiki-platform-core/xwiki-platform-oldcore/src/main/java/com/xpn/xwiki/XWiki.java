@@ -411,6 +411,8 @@ public class XWiki implements EventListener
 
     private Provider<XWikiContext> xcontextProvider;
 
+    private ContextualLocalizationManager localization;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -500,6 +502,20 @@ public class XWiki implements EventListener
         }
 
         return this.xcontextProvider.get();
+    }
+
+    private ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    private String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -1757,13 +1773,7 @@ public class XWiki implements EventListener
     @Deprecated
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
-        MutableRenderingContext mutableRenderingContext = getMutableRenderingContext();
-
-        Syntax currentTargetSyntax = mutableRenderingContext.getTargetSyntax();
         try {
-            // Force rendering with XHTML 1.0 syntax for retro-compatibility
-            mutableRenderingContext.setTargetSyntax(Syntax.XHTML_1_0);
-
             return getTemplateManager().render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
@@ -1775,8 +1785,6 @@ public class XWiki implements EventListener
                     "Error while evaluating velocity template {0}", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
-        } finally {
-            mutableRenderingContext.setTargetSyntax(currentTargetSyntax);
         }
     }
 
@@ -3256,7 +3264,7 @@ public class XWiki implements EventListener
 
             protectUserPage(doc.getFullName(), userRights, doc, context);
 
-            saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);
+            saveDocument(doc, localizePlainOrKey("core.comment.createdUser"), context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(doc.getFullName(), context);
@@ -3304,7 +3312,7 @@ public class XWiki implements EventListener
 
         memberObject.setStringValue("member", userName);
 
-        this.saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
+        this.saveDocument(groupDoc, localizePlainOrKey("core.comment.addedUserToGroup"), context);
 
         try {
             XWikiGroupService gservice = getGroupService(context);
@@ -3555,7 +3563,8 @@ public class XWiki implements EventListener
         context.put("idoc", includingDoc);
         context.put("sdoc", includedDoc);
         try {
-            result = includedDoc.getRenderedContent(Syntax.XHTML_1_0, false, context);
+            result = includedDoc.getRenderedContent(Utils.getComponent(RenderingContext.class).getTargetSyntax(), false,
+                context);
         } finally {
             // Remove including doc or set the previous one
             if (idoc == null) {
@@ -4126,10 +4135,10 @@ public class XWiki implements EventListener
                 contextPath = StringUtils.substringBefore(
                     StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
             }
-        } else {
-            // Remove any leading or trailing slashes that would have been put by error by the user
-            contextPath = StringUtils.strip(contextPath, "/");
         }
+
+        // Remove any leading or trailing slashes
+        contextPath = StringUtils.strip(contextPath, "/");
 
         // TODO We're using URL parts in a wrong way, since contextPath and servletPath are returned with a leading /,
         // while we need a trailing /. This code ensure we always have CONTEXTNAME + "/".
@@ -4805,7 +4814,7 @@ public class XWiki implements EventListener
     public String getUserName(String user, String format, boolean link, XWikiContext context)
     {
         if (StringUtils.isBlank(user)) {
-            return context.getMessageTool().get("core.users.unknownUser");
+            return localizePlainOrKey("core.users.unknownUser");
         }
 
         DocumentReference userReference = this.currentMixedDocumentReferenceResolver.resolve(user);
@@ -4828,7 +4837,7 @@ public class XWiki implements EventListener
         XWikiContext context)
     {
         if (userReference == null) {
-            return context.getMessageTool().get("core.users.unknownUser");
+            return localizePlainOrKey("core.users.unknownUser");
         }
 
         XWikiDocument userdoc = null;
@@ -6114,7 +6123,7 @@ public class XWiki implements EventListener
             om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
         }
 
-        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", Arrays.asList(rev)), context);
+        saveDocument(rolledbackDoc, localizePlainOrKey("core.comment.rollback", Arrays.asList(rev)), context);
 
         // Since the the store resets the original document, we need to temporarily put it back to send notifications.
         XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();

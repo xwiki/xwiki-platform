@@ -62,20 +62,9 @@ public class AutomaticWatchModeListener extends AbstractEventListener
     public static final String LISTENER_NAME = "AutomaticWatchModeListener";
 
     /**
-     * The events to match.
-     */
-    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentCreatedEvent());
-            add(new DocumentUpdatedEvent());
-        }
-    };
-
-    /**
      * The skipped events group matcher.
      */
-    private static final BeginEvent SKIPPED_EVENTS = new BeginEvent()
+    public static final BeginEvent SKIPPED_EVENTS = new BeginEvent()
     {
         @Override
         public boolean matches(Object otherEvent)
@@ -88,6 +77,17 @@ public class AutomaticWatchModeListener extends AbstractEventListener
 
             return otherEvent instanceof WikiCreatingEvent || otherEvent instanceof XARImportingEvent
                 || otherEvent instanceof JobEvent;
+        }
+    };
+
+    /**
+     * The events to match.
+     */
+    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentCreatedEvent());
+            add(new DocumentUpdatedEvent());
         }
     };
 
@@ -124,8 +124,7 @@ public class AutomaticWatchModeListener extends AbstractEventListener
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 
-        // Does not auto-watch updated or created documents when they are in the context of a XAR import or a Wiki
-        // creation.
+        // Does not auto-watch updated or created documents when they are in the context of other events.
         if (!observationContext.isIn(SKIPPED_EVENTS)) {
             documentModifiedHandler(event, currentDoc, context);
         }

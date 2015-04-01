@@ -130,14 +130,14 @@ public class WatchListNotificationCacheListener extends AbstractEventListener
         if (originalJob != null && currentJob == null) {
             String deletedJobDocument = originalDoc.getFullName();
 
-            reinitWatchListClass |= notificationCacheProvider.get().removeJobDocument(deletedJobDocument);
+            reinitWatchListClass |= notificationCacheProvider.get().removeInterval(deletedJobDocument);
         }
 
         // WatchListJob created
         if (originalJob == null && currentJob != null) {
             String newJobDocument = currentDoc.getFullName();
 
-            reinitWatchListClass |= notificationCacheProvider.get().addJobDocument(newJobDocument);
+            reinitWatchListClass |= notificationCacheProvider.get().addInterval(newJobDocument);
         }
 
         // If the list of WatchListJob documents was altered, the WatchListClass "interval" property needs to be updated

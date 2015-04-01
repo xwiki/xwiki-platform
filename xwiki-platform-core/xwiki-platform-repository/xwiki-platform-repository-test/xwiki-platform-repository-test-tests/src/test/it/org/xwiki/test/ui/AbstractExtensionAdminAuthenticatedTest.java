@@ -39,6 +39,9 @@ public abstract class AbstractExtensionAdminAuthenticatedTest extends AbstractTe
     {
         // Make sure to have the proper token
         getUtil().recacheSecretToken();
+
+        // Save admin credentials
+        getUtil().setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
     }
 
     @BeforeClass

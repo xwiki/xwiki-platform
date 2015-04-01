@@ -41,6 +41,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.ResourceRepository;
@@ -88,6 +89,9 @@ public class InternalSkinManager implements Initializable
 
     @Inject
     private Logger logger;
+    
+    @Inject
+    private SyntaxFactory syntaxFactory;
 
     private Cache<Skin> cache;
 
@@ -140,9 +144,10 @@ public class InternalSkinManager implements Initializable
         Skin skin;
 
         if (this.wikiSkinUtils.isWikiSkin(id)) {
-            skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils);
+            skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils, this.logger, this.syntaxFactory);
         } else {
-            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.environment, this.xcontextProvider);
+            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.logger, this.syntaxFactory, 
+                this.environment, this.xcontextProvider);
         }
 
         return skin;

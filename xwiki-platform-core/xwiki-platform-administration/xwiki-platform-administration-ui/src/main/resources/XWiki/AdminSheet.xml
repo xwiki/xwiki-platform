@@ -285,20 +285,20 @@
  *#
 #macro (admin_spaceSwitch)
 {{html clean="false"}}
-  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action, $request.queryString)"&gt;
+  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action)"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       &lt;select id="goto-select" name="target"&gt;
         #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
           &lt;optgroup label="$services.localization.render('admin.gotoglobaladministration')"&gt;
-            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$services.localization.render('admin.globaladministration')&lt;/option&gt;
+            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$services.localization.render('admin.globaladministration')&lt;/option&gt;
           &lt;/optgroup&gt;
         #end
         &lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
         #foreach($spaceitem in $xwiki.spaces)
           #set ($spacePreferencesDocument = $services.model.createDocumentReference('', $spaceitem, 'WebPreferences'))
           #if ($xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocument, 'default')))
-            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', '')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
+            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
           #end
         #end
         &lt;/optgroup&gt;

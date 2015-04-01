@@ -37,7 +37,7 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
  * @version $Id$
  * @since 5.3M2
  */
-public class WikiDescriptor
+public class WikiDescriptor implements Cloneable
 {
     /**
      * Default alias index.
@@ -93,8 +93,8 @@ public class WikiDescriptor
     public WikiDescriptor(String id, String defaultAlias)
     {
         this.id = id;
-        this.aliases = new ArrayList<String>();
-        this.propertyGroups = new HashMap<String, WikiPropertyGroup>();
+        this.aliases = new ArrayList<>();
+        this.propertyGroups = new HashMap<>();
         setDefaultAlias(defaultAlias);
     }
 
@@ -281,5 +281,28 @@ public class WikiDescriptor
                 .append(getDefaultAlias(), rhs.getDefaultAlias())
                 .append(getId(), rhs.getId())
                 .isEquals();
+    }
+
+    @Override
+    public WikiDescriptor clone()
+    {
+        WikiDescriptor descriptor;
+        try {
+            descriptor = (WikiDescriptor) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Supposed to be impossible
+            descriptor = new WikiDescriptor(getDescription(), getDefaultAlias());
+        }
+
+        // Clone aliases
+        descriptor.aliases = new ArrayList<>(this.aliases);
+
+        // Clone properties
+        descriptor.propertyGroups = new HashMap<>(this.propertyGroups.size());
+        for (WikiPropertyGroup group : this.propertyGroups.values()) {
+            descriptor.propertyGroups.put(group.getId(), group.clone());
+        }
+
+        return descriptor;
     }
 }

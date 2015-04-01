@@ -722,4 +722,14 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # mail.sender.database.discardSuccessStatuses = true
 
+#-------------------------------------------------------------------------------------
+# WatchList
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.0RC1]
+#-# Controls if the realtime notifications feature is enabled. Default value is false.
+#-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause performance issues.
+#-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
+# watchlist.realtime.enabled = false
+
 $!xwikiPropertiesAdditionalProperties

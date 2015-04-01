@@ -54,7 +54,7 @@ public class PropAddAction extends XWikiAction
         if (!Util.isValidXMLElementName(propName)) {
             context.put("message", "action.addClassProperty.error.invalidName");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                context.getMessageTool().get("action.addClassProperty.error.invalidName"));
+                localizePlainOrKey("action.addClassProperty.error.invalidName"));
             return true;
         }
 
@@ -67,7 +67,7 @@ public class PropAddAction extends XWikiAction
             parameters.add(propName);
             context.put("messageParameters", parameters);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST,
-                context.getMessageTool().get("action.addClassProperty.error.alreadyExists", parameters));
+                localizePlainOrKey("action.addClassProperty.error.alreadyExists", parameters));
             return true;
         } else {
             MetaClass mclass = xwiki.getMetaclass();
@@ -83,7 +83,7 @@ public class PropAddAction extends XWikiAction
                     doc.setCreatorReference(context.getUserReference());
                 }
                 doc.setMetaDataDirty(true);
-                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addClassProperty"), true, context);
+                xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addClassProperty"), true, context);
             }
         }
         // forward to edit

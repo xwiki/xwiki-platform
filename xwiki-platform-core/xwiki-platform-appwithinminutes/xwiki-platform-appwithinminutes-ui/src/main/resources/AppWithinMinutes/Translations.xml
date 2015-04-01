@@ -24,7 +24,7 @@
   <web>AppWithinMinutes</web>
   <name>Translations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <parent>AppWithinMinutes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

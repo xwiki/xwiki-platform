@@ -104,9 +104,9 @@ public class DefaultWatchListStore implements WatchListStore
     }
 
     /**
-     * Gets the WatchList XWiki Object from user's profile's page.
+     * Gets the WatchList XWiki Object from a user's profile's page.
      * 
-     * @param user XWiki User
+     * @param user the user to check
      * @return the WatchList XWiki BaseObject
      * @throws XWikiException if BaseObject creation fails or if user does not exists
      */
@@ -265,11 +265,13 @@ public class DefaultWatchListStore implements WatchListStore
 
             String value = watchObject.getStringValue(WatchListClassDocumentInitializer.AUTOMATICWATCH_PROPERTY);
 
-            if (value != null && !value.equals("default")) {
+            if (StringUtils.isNotBlank(value)
+                && !WatchListClassDocumentInitializer.AUTOMATICWATCH_DEFAULT_VALUE.equals(value)) {
                 mode = AutomaticWatchMode.valueOf(value);
             }
         } catch (Exception e) {
             // Failed for some reason, now try getting it from xwiki.cfg
+            logger.error("Failed to get automatic watch mode for user [{}], using fallbacks", user, e);
         }
 
         if (mode == null) {
@@ -288,9 +290,26 @@ public class DefaultWatchListStore implements WatchListStore
     }
 
     @Override
-    public Collection<String> getJobDocumentNames()
+    public List<String> getIntervals()
     {
-        return notificationCache.get().getJobDocumentNames();
+        return notificationCache.get().getIntervals();
+    }
+
+    @Override
+    public String getInterval(String user)
+    {
+        String result = "";
+
+        try {
+            BaseObject watchObject = getWatchListObject(user);
+
+            result = watchObject.getStringValue(WatchListClassDocumentInitializer.INTERVAL_PROPERTY);
+        } catch (Exception e) {
+            // Failed for some reason, now try getting it from xwiki.cfg
+            logger.error("Failed to get notification interval for user [{}], using fallbacks", user, e);
+        }
+
+        return result;
     }
 
     @Override
@@ -298,5 +317,4 @@ public class DefaultWatchListStore implements WatchListStore
     {
         return notificationCache.get().getSubscribers(intervalId);
     }
-
 }

@@ -23,21 +23,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Provider;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ecs.html.Div;
-import org.apache.ecs.html.Span;
-import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.watchlist.internal.DefaultWatchListStore;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.watchlist.internal.WatchListEventHTMLDiffExtractor;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.AttachmentDiff;
-import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.ObjectDiff;
-import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
-import com.xpn.xwiki.plugin.diff.DiffPluginApi;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * The class representing an event in the WatchList. The current implementation is a wrapper for one or more
@@ -47,26 +47,6 @@ import com.xpn.xwiki.plugin.diff.DiffPluginApi;
  */
 public class WatchListEvent implements Comparable<WatchListEvent>
 {
-    /**
-     * Prefix used in inline style we put in HTML diffs.
-     */
-    private static final String HTML_STYLE_PLACEHOLDER_PREFIX = "WATCHLIST_STYLE_DIFF_";
-
-    /**
-     * Suffix used to insert images later in HTML diffs.
-     */
-    private static final String HTML_IMG_PLACEHOLDER_SUFFIX = "_WATCHLIST_IMG_PLACEHOLDER";
-
-    /**
-     * Prefix used to insert the metadata icon later in HTML diffs.
-     */
-    private static final String HTML_IMG_METADATA_PREFIX = "metadata";
-
-    /**
-     * Prefix used to insert the attachment icon later in HTML diffs.
-     */
-    private static final String HTML_IMG_ATTACHMENT_PREFIX = "attach";
-
     /**
      * Default document version on creation.
      */
@@ -78,49 +58,14 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     private static final String PREINITIAL_DOCUMENT_VERSION = "1.0";
 
     /**
-     * Value to display in diffs for hidden properties (email, password, etc).
-     */
-    private static final String HIDDEN_PROPERTIES_OBFUSCATED_VALUE = "******************";
-
-    /**
-     * Name of the password class.
-     */
-    private static final String PASSWORD_CLASS_NAME = "Password";
-
-    /**
-     * Name of email property.
-     */
-    private static final String EMAIL_PROPERTY_NAME = "email";
-
-    /**
      * Event hashcode.
      */
     private final int hashCode;
 
     /**
-     * Prefixed space in which the event happened.
-     */
-    private final String prefixedSpace;
-
-    /**
-     * Prefixed document fullName in which the event happened.
-     */
-    private final String prefixedFullName;
-
-    /**
-     * The XWiki context.
-     */
-    private final XWikiContext context;
-
-    /**
      * Type of the event (example: "update").
      */
     private String type;
-
-    /**
-     * Wrapped events.
-     */
-    private List<ActivityEvent> activityEvents = new ArrayList<ActivityEvent>();
 
     /**
      * Version of the document before the event happened.
@@ -147,49 +92,46 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     private String htmlDiff;
 
+    private DocumentReference documentReference;
+
+    private DocumentReference authorReference;
+
+    private String version;
+
+    private Date date;
+
+    private List<WatchListEvent> events;
+
+    private EntityReferenceSerializer<String> serializer;
+
+    private EntityReferenceSerializer<String> localSerializer;
+
     /**
-     * Constructor for a non-composite event.
+     * Constructor.
      * 
-     * @param eventData the event data to use. At the moment, it should be an {@link ActivityEvent} instance.
-     * @param context the XWiki context
+     * @param documentReference the document on which the event happened
+     * @param type the type of event
+     * @param userReference the user that triggered the event
+     * @param version the version of the document after the event happened on it
+     * @param date the date of the event
      */
-    public WatchListEvent(Object eventData, XWikiContext context)
+    public WatchListEvent(DocumentReference documentReference, String type, DocumentReference userReference,
+        String version, Date date)
     {
-        this.context = context;
+        this.documentReference = documentReference;
+        this.type = type;
+        this.authorReference = userReference;
+        this.version = version;
+        this.date = date;
 
-        // FIXME: This should be better handled!
-        ActivityEvent activityEvent = (ActivityEvent) eventData;
-
-        this.activityEvents.add(activityEvent);
-        type = activityEvent.getType();
-        prefixedSpace = activityEvent.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + activityEvent.getSpace();
-        prefixedFullName = activityEvent.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + activityEvent.getPage();
+        this.events = new ArrayList<>();
+        this.events.add(this);
 
         int hash = 3;
-        if (ActivityEventType.UPDATE.equals(activityEvent)) {
-            hashCode = 42 * hash + prefixedFullName.hashCode() + activityEvent.getType().hashCode();
+        if (ActivityEventType.UPDATE.equals(type)) {
+            hashCode = 42 * hash + documentReference.hashCode() + type.hashCode();
         } else {
-            hashCode =
-                42 * hash + prefixedFullName.hashCode() + activityEvent.getType().hashCode()
-                    + activityEvent.getDate().hashCode();
-        }
-
-    }
-
-    /**
-     * Constructor for a composite event.
-     * 
-     * @param eventData the list of data corresponding to the associated events. At the moment, they should be
-     *            {@link ActivityEvent} instances.
-     * @param context the XWiki context
-     */
-    public WatchListEvent(List<Object> eventData, XWikiContext context)
-    {
-        this(eventData.get(0), context);
-
-        for (int i = 1; i < eventData.size(); i++) {
-            WatchListEvent associatedEvent = new WatchListEvent(eventData.get(i), context);
-            this.addEvent(associatedEvent);
+            hashCode = 42 * hash + documentReference.hashCode() + type.hashCode() + date.hashCode();
         }
     }
 
@@ -202,11 +144,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         if (ActivityEventType.DELETE.equals(event.getType())) {
             // If the document has been deleted, reset this event
-            activityEvents.clear();
             type = event.getType();
-            versions.clear();
             versions = null;
-            authors.clear();
             authors = null;
             previousVersion = null;
             htmlDiff = null;
@@ -215,7 +154,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
             return;
         }
 
-        activityEvents.add(event.getActivityEvent());
+        events.add(event);
     }
 
     /**
@@ -223,7 +162,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getWiki()
     {
-        return getActivityEvent().getWiki();
+        return getDocumentReference().getWikiReference().getName();
     }
 
     /**
@@ -231,7 +170,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getSpace()
     {
-        return getActivityEvent().getSpace();
+        return getDocumentReference().getLastSpaceReference().getName();
     }
 
     /**
@@ -239,7 +178,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getPrefixedSpace()
     {
-        return prefixedSpace;
+        EntityReference spaceReference = getDocumentReference().extractReference(EntityType.SPACE);
+        return getSerializer().serialize(spaceReference);
     }
 
     /**
@@ -247,7 +187,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getFullName()
     {
-        return getActivityEvent().getPage();
+        return getLocalSerializer().serialize(getDocumentReference());
     }
 
     /**
@@ -256,18 +196,22 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getPrefixedFullName()
     {
-        return prefixedFullName;
+        return getSerializer().serialize(getDocumentReference());
     }
 
     /**
-     * @return The URL of the document which has fired the event
+     * @return The external URL of the document which has fired the event
+     * @deprecated use the XWiki API to get the internal/external URL of the document, using
+     *             {@link #getDocumentReference()}.
      */
+    @Deprecated
     public String getUrl()
     {
         String url = "";
 
         try {
-            url = context.getWiki().getDocument(getPrefixedFullName(), context).getExternalURL("view", context);
+            XWikiContext context = getXWikiContext();
+            url = context.getWiki().getDocument(getDocumentReference(), context).getExternalURL("view", context);
         } catch (Exception e) {
             // Do nothing, we don't want to throw exceptions in notification emails.
         }
@@ -280,7 +224,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public Date getDate()
     {
-        return getActivityEvent().getDate();
+        return this.date;
     }
 
     /**
@@ -292,12 +236,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         if (dates == null) {
             dates = new ArrayList<Date>();
 
-            if (!isComposite()) {
-                dates.add(getDate());
-            } else {
-                for (ActivityEvent event : activityEvents) {
-                    dates.add(event.getDate());
-                }
+            for (WatchListEvent event : events) {
+                dates.add(event.getDate());
             }
         }
 
@@ -313,19 +253,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
-     * @return The underlying ActivityEvent.
-     */
-    private ActivityEvent getActivityEvent()
-    {
-        return activityEvents.get(0);
-    }
-
-    /**
      * @return The user who generated the event.
      */
     public String getAuthor()
     {
-        return getActivityEvent().getUser();
+        return getSerializer().serialize(authorReference);
     }
 
     /**
@@ -337,14 +269,10 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         if (authors == null) {
             authors = new ArrayList<String>();
 
-            if (!isComposite()) {
-                authors.add(getAuthor());
-            } else {
-                for (ActivityEvent event : activityEvents) {
-                    String prefixedAuthor = event.getWiki() + DefaultWatchListStore.WIKI_SPACE_SEP + event.getUser();
-                    if (!authors.contains(prefixedAuthor)) {
-                        authors.add(prefixedAuthor);
-                    }
+            for (WatchListEvent event : events) {
+                String author = event.getAuthor();
+                if (!authors.contains(author)) {
+                    authors.add(author);
                 }
             }
         }
@@ -353,11 +281,19 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
+     * @return the user who generated the event
+     */
+    public DocumentReference getAuthorReference()
+    {
+        return authorReference;
+    }
+
+    /**
      * @return The version of the document at the time it has generated the event.
      */
     public String getVersion()
     {
-        return getActivityEvent().getVersion();
+        return version;
     }
 
     /**
@@ -369,15 +305,9 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         if (versions == null) {
             versions = new ArrayList<String>();
 
-            if (!isComposite()) {
-                if (!StringUtils.isBlank(getActivityEvent().getVersion())) {
-                    versions.add(getActivityEvent().getVersion());
-                }
-            } else {
-                for (ActivityEvent event : activityEvents) {
-                    if (!StringUtils.isBlank(event.getVersion()) && !versions.contains(event.getVersion())) {
-                        versions.add(event.getVersion());
-                    }
+            for (WatchListEvent event : events) {
+                if (!StringUtils.isBlank(event.getVersion()) && !versions.contains(event.getVersion())) {
+                    versions.add(event.getVersion());
                 }
             }
         }
@@ -391,30 +321,24 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     public String getPreviousVersion()
     {
         if (previousVersion == null) {
-            String currentVersion = "";
+            String initialVersion = "";
             previousVersion = "";
 
             try {
-                if (!isComposite()) {
-                    currentVersion = getActivityEvent().getVersion();
-                } else {
-                    List<String> allVersions = getVersions();
-                    if (allVersions.size() > 1) {
-                        currentVersion = allVersions.get(allVersions.size() - 1);
-                    }
-                }
+                List<String> allVersions = getVersions();
+                initialVersion = allVersions.get(allVersions.size() - 1);
 
-                if (currentVersion.equals(INITIAL_DOCUMENT_VERSION)) {
+                if (initialVersion.equals(INITIAL_DOCUMENT_VERSION)) {
                     previousVersion = PREINITIAL_DOCUMENT_VERSION;
-                }
+                } else if (!StringUtils.isBlank(initialVersion)) {
+                    // Retrieve the previous version from the document archive.
+                    XWikiContext context = getXWikiContext();
 
-                if (!StringUtils.isBlank(currentVersion) && StringUtils.isBlank(previousVersion)) {
-                    XWikiDocument doc = context.getWiki().getDocument(prefixedFullName, context);
-                    XWikiDocument docRev = context.getWiki().getDocument(doc, currentVersion, context);
-                    doc.loadArchive(context);
-                    Version version = doc.getDocumentArchive().getPrevVersion(docRev.getRCSVersion());
-                    if (version != null) {
-                        previousVersion = version.toString();
+                    XWikiDocument doc = context.getWiki().getDocument(getDocumentReference(), context);
+                    XWikiDocument initialDoc = context.getWiki().getDocument(doc, initialVersion, context);
+                    String docPreviousVersion = initialDoc.getPreviousVersion();
+                    if (docPreviousVersion != null) {
+                        this.previousVersion = docPreviousVersion;
                     }
                 }
             } catch (XWikiException e) {
@@ -431,113 +355,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public boolean isComposite()
     {
-        return activityEvents.size() > 1;
-    }
-
-    /**
-     * @param classAttr The class of the div to create
-     * @return a HTML div element
-     */
-    private Div createDiffDiv(String classAttr)
-    {
-        Div div = new Div();
-        div.setClass(classAttr);
-        div.setStyle(HTML_STYLE_PLACEHOLDER_PREFIX + classAttr);
-
-        return div;
-    }
-
-    /**
-     * @param classAttr The class of the span to create
-     * @return an opening span markup
-     */
-    private Span createDiffSpan(String classAttr)
-    {
-        Span span = new Span();
-        span.setClass(classAttr);
-        span.setStyle(HTML_STYLE_PLACEHOLDER_PREFIX + classAttr);
-
-        return span;
-    }
-
-    /**
-     * Compute the HTML diff for a given property.
-     * 
-     * @param objectDiff object diff object
-     * @param diff the diff plugin API
-     * @return the HTML diff
-     * @throws XWikiException if the diff plugin fails to compute the HTML diff
-     */
-    private String getPropertyHTMLDiff(ObjectDiff objectDiff, DiffPluginApi diff) throws XWikiException
-    {
-        String propDiff =
-            diff.getDifferencesAsHTML(objectDiff.getPrevValue().toString(), objectDiff.getNewValue().toString(), false);
-
-        // We hide PasswordClass properties and properties named "email" from notifications for security reasons.
-        if ((objectDiff.getPropType().equals(PASSWORD_CLASS_NAME) || objectDiff.getPropName().equals(
-            EMAIL_PROPERTY_NAME))
-            && !StringUtils.isBlank(propDiff)) {
-            propDiff = HIDDEN_PROPERTIES_OBFUSCATED_VALUE;
-        }
-
-        return propDiff;
-    }
-
-    /**
-     * @param objectDiffs List of object diff
-     * @param isXWikiClass is the diff to compute the diff for a xwiki class, the other possibility being a plain xwiki
-     *            object
-     * @param documentFullName full name of the document the diff is computed for
-     * @param diff the diff plugin API
-     * @return The HTML diff
-     */
-    private String getObjectsHTMLDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass,
-        String documentFullName, DiffPluginApi diff)
-    {
-        StringBuffer result = new StringBuffer();
-        String propSeparator = ": ";
-        String prefix = (isXWikiClass) ? "class" : "object";
-
-        try {
-            for (List<ObjectDiff> oList : objectDiffs) {
-                if (oList.size() > 0) {
-                    Div mainDiv = createDiffDiv(prefix + "Diff");
-                    Span objectName = createDiffSpan(prefix + "ClassName");
-                    if (isXWikiClass) {
-                        objectName.addElement(getFullName());
-                    } else {
-                        objectName.addElement(oList.get(0).getClassName());
-                    }
-                    mainDiv.addElement(prefix + HTML_IMG_PLACEHOLDER_SUFFIX);
-                    mainDiv.addElement(objectName);
-                    for (ObjectDiff oDiff : oList) {
-                        String propDiff = getPropertyHTMLDiff(oDiff, diff);
-                        if (!StringUtils.isBlank(oDiff.getPropName()) && !StringUtils.isBlank(propDiff)) {
-                            Div propDiv = createDiffDiv("propDiffContainer");
-                            Span propNameSpan = createDiffSpan("propName");
-                            propNameSpan.addElement(oDiff.getPropName() + propSeparator);
-                            String shortPropType = StringUtils.removeEnd(oDiff.getPropType(), "Class").toLowerCase();
-                            if (StringUtils.isBlank(shortPropType)) {
-                                // When the diff shows a property that has been deleted, its type is not available.
-                                shortPropType = HTML_IMG_METADATA_PREFIX;
-                            }
-                            propDiv.addElement(shortPropType + HTML_IMG_PLACEHOLDER_SUFFIX);
-                            propDiv.addElement(propNameSpan);
-                            Div propDiffDiv = createDiffDiv("propDiff");
-                            propDiffDiv.addElement(propDiff);
-                            propDiv.addElement(propDiffDiv);
-                            mainDiv.addElement(propDiv);
-                        }
-                    }
-                    result.append(mainDiv);
-                }
-            }
-        } catch (XWikiException e) {
-            // Catch the exception to be sure we won't send emails containing stacktraces to users.
-            e.printStackTrace();
-        }
-
-        return result.toString();
+        return events.size() > 1;
     }
 
     /**
@@ -546,48 +364,12 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getHTMLDiff()
     {
+        // TODO: Deprecate this method and offer an alternative to compute it from a script service that accesses the
+        // WatchListEventHTMLDiffExtractor component.
         if (htmlDiff == null) {
             try {
-                DiffPluginApi diff = (DiffPluginApi) context.getWiki().getPluginApi("diff", context);
-                StringBuffer result = new StringBuffer();
-                XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
-
-                if (getType().equals(WatchListEventType.CREATE)) {
-                    d2 = context.getWiki().getDocument(d2, INITIAL_DOCUMENT_VERSION, context);
-                }
-
-                XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(), context);
-                List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);
-                List<List<ObjectDiff>> objectDiffs = d2.getObjectDiff(d1, d2, context);
-                List<List<ObjectDiff>> classDiffs = d2.getClassDiff(d1, d2, context);
-                List<MetaDataDiff> metaDiffs = d2.getMetaDataDiff(d1, d2, context);
-
-                if (!d1.getContent().equals(d2.getContent())) {
-                    Div contentDiv = createDiffDiv("contentDiff");
-                    String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent(), false);
-                    contentDiv.addElement(contentDiff);
-                    result.append(contentDiv);
-                }
-
-                for (AttachmentDiff aDiff : attachDiffs) {
-                    Div attachmentDiv = createDiffDiv("attachmentDiff");
-                    attachmentDiv.addElement(HTML_IMG_ATTACHMENT_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
-                    attachmentDiv.addElement(aDiff.toString());
-                    result.append(attachmentDiv);
-                }
-
-                result.append(getObjectsHTMLDiff(objectDiffs, false, getFullName(), diff));
-                result.append(getObjectsHTMLDiff(classDiffs, true, getFullName(), diff));
-
-                for (MetaDataDiff mDiff : metaDiffs) {
-                    Div metaDiv = createDiffDiv("metaDiff");
-                    metaDiv.addElement(HTML_IMG_METADATA_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
-                    metaDiv.addElement(mDiff.toString());
-                    result.append(metaDiv);
-                }
-
-                htmlDiff = result.toString();
-            } catch (XWikiException e) {
+                htmlDiff = Utils.getComponent(WatchListEventHTMLDiffExtractor.class).getHTMLDiff(this);
+            } catch (Exception e) {
                 // Catch the exception to be sure we won't send emails containing stacktraces to users.
                 e.printStackTrace();
             }
@@ -604,12 +386,17 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public int compareTo(WatchListEvent event)
     {
-        return getPrefixedFullName().compareTo(event.getPrefixedFullName());
+        return getDocumentReference().compareTo(event.getDocumentReference());
     }
 
     /**
-     * {@inheritDoc}
+     * @return the document on which the event happened
      */
+    public DocumentReference getDocumentReference()
+    {
+        return this.documentReference;
+    }
+
     @Override
     public int hashCode()
     {
@@ -639,7 +426,33 @@ public class WatchListEvent implements Comparable<WatchListEvent>
         // and 'this' is an update event. See WatchListEventManager#WatchListEventManager(Date, XWikiContext).
         // TODO: refactoring.
         WatchListEvent event = ((WatchListEvent) obj);
-        return prefixedFullName.equals(event.getPrefixedFullName()) && WatchListEventType.UPDATE.equals(getType())
+        return this.documentReference.equals(event.getDocumentReference())
+            && WatchListEventType.UPDATE.equals(getType())
             && (WatchListEventType.UPDATE.equals(event.getType()) || WatchListEventType.DELETE.equals(event.getType()));
+    }
+
+    private EntityReferenceSerializer<String> getSerializer()
+    {
+        if (this.serializer == null) {
+            this.serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        }
+
+        return this.serializer;
+    }
+
+    private EntityReferenceSerializer<String> getLocalSerializer()
+    {
+        if (this.localSerializer == null) {
+            this.localSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+
+        return this.localSerializer;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        Provider<XWikiContext> provider =
+            Utils.getComponent(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        return provider.get();
     }
 }

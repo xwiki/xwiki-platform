@@ -39,7 +39,6 @@ public class PropUpdateAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
-        XWikiMessageTool msg = context.getMessageTool();
 
         // Prepare new class
         BaseClass bclass = doc.getXClass();
@@ -79,7 +78,8 @@ public class PropUpdateAction extends XWikiAction
             doc.setCreator(context.getUser());
         }
         doc.setAuthor(context.getUser());
-        xwiki.saveDocument(doc, msg.get("core.comment.updateClassProperty"), true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.updateClassProperty"), true,
+            context);
 
         // We need to load all documents that use this property and rename it
         if (fieldsToRename.size() > 0) {
@@ -91,7 +91,7 @@ public class PropUpdateAction extends XWikiAction
             for (String docName : list) {
                 XWikiDocument doc2 = xwiki.getDocument(docName, context);
                 doc2.renameProperties(bclass.getName(), fieldsToRename);
-                xwiki.saveDocument(doc2, msg.get("core.comment.updateClassPropertyName"), true, context);
+                xwiki.saveDocument(doc2, localizePlainOrKey("core.comment.updateClassPropertyName"), true, context);
             }
         }
         xwiki.flushCache(context);

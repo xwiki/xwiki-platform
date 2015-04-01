@@ -3,9 +3,13 @@ org.xwiki.extension.xar.internal.handler.WikiEventListener
 org.xwiki.extension.xar.internal.handler.XarExtensionJobFinishedListener
 org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter
 org.xwiki.extension.xar.internal.handler.packager.Packager
+org.xwiki.extension.xar.internal.job.diff.AttachmentUnifiedDiffBuilder
+org.xwiki.extension.xar.internal.job.diff.DocumentUnifiedDiffBuilder
+org.xwiki.extension.xar.internal.job.DiffXarJob
 org.xwiki.extension.xar.internal.job.RepairXarJob
 org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
 org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
+org.xwiki.extension.xar.internal.script.DiffXarJobStatusScriptSafeProvider
 org.xwiki.extension.xar.internal.script.DocumentScriptSafeProvider
 org.xwiki.extension.xar.script.DeprecatedXarExtensionScriptService
 org.xwiki.extension.xar.script.XarExtensionScriptService

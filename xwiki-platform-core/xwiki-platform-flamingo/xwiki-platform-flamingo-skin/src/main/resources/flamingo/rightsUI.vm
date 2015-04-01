@@ -74,7 +74,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 <div id="xwikieditcontent">
   <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor" != '') $editor#end">
     <tr>
-      <td class="xwiki-livetable-pagination" colspan="2">
+      <td class="xwiki-livetable-pagination">
         <span id="usersandgroupstable-limits" class="xwiki-livetable-limits"></span>
         <span id="usersandgroupstable-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />$services.localization.render('platform.livetable.loading')</span>
         <span class="pagination">

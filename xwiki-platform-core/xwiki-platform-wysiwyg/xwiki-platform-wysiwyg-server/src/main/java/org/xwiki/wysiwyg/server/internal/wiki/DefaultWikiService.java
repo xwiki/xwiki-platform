@@ -35,7 +35,6 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -107,7 +106,7 @@ public class DefaultWikiService extends AbstractWikiService
                 WikiPage wikiPage = new WikiPage();
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
                 wikiPage.setReference(entityReferenceConverter.convert(documentReference).getEntityReference());
-                wikiPage.setTitle(document.getRenderedTitle(Syntax.XHTML_1_0, context));
+                wikiPage.setTitle(document.getRenderedTitle(context));
                 wikiPage.setUrl(document.getURL("view", context));
                 wikiPages.add(wikiPage);
             } catch (Exception e) {

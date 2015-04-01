@@ -95,7 +95,7 @@
       #set($register = ${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))})
       $services.localization.render('platform.faq.need', ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
     #else
-      &lt;form action="" id="newfaq" class="xformInline"&gt;
+      &lt;form action="$doc.getURL()" id="newfaq" class="xformInline"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
           &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;

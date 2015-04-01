@@ -20,6 +20,7 @@
 package org.xwiki.watchlist.internal.api;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 
@@ -34,17 +35,17 @@ import com.xpn.xwiki.XWikiException;
 public interface WatchListStore
 {
     /**
-     * @param user user to match
-     * @param type element type to match
-     * @return watched elements for the given element type by the given user
+     * @param user the user to match
+     * @param type the element type to match
+     * @return the watched elements for the given element type by the given user
      * @throws XWikiException if retrieval of elements fails
      */
     Collection<String> getWatchedElements(String user, WatchedElementType type) throws XWikiException;
 
     /**
      * @param element the element to look for
-     * @param user user to check
-     * @param type type of the element
+     * @param user the user to check
+     * @param type the type of the element
      * @return true if the element is watched by the user, false otherwise
      * @throws XWikiException if the retrieval of watched elements fails
      */
@@ -53,9 +54,9 @@ public interface WatchListStore
     /**
      * Add the specified element (document or space) to the corresponding list in the user's WatchList.
      * 
-     * @param user the reference to the user
-     * @param newWatchedElement The name of the element to add (document, space, wiki, user)
-     * @param type type of the element to remove
+     * @param user the user to which to add the watched element
+     * @param newWatchedElement the name of the element to add (document, space, wiki, user)
+     * @param type the type of the element to add
      * @return true if the element wasn't already in watched list or false otherwise
      * @throws XWikiException if the modification hasn't been saved
      */
@@ -64,26 +65,36 @@ public interface WatchListStore
     /**
      * Remove the specified element (document or space) from the corresponding list in the user's WatchList.
      * 
-     * @param user XWiki User
-     * @param watchedElement The name of the element to remove (document or space)
-     * @param type type of the element to remove
+     * @param user the user from which to removed the watched element
+     * @param watchedElement the name of the element to remove (document or space)
+     * @param type the type of the element to remove
      * @return true if the element was in list and has been removed, false if the element wasn't in the list
-     * @throws XWikiException If the WatchList Object cannot be retrieved or if the user's profile cannot be saved
+     * @throws XWikiException if the WatchList Object cannot be retrieved or if the user's profile cannot be saved
      */
     boolean removeWatchedElement(String user, String watchedElement, WatchedElementType type) throws XWikiException;
 
     /**
      * Get the automatic document watching mode preference of a user.
      * 
-     * @param user the user
+     * @param user the user to check
      * @return the mode, if not set return the default one which is {@link AutomaticWatchMode#MAJOR}
      */
     AutomaticWatchMode getAutomaticWatchMode(String user);
 
     /**
-     * @return names of documents which contain a watchlist job object
+     * Get the notification interval preference of a user.
+     * 
+     * @param user the user to check
+     * @return the notification interval ID, which can be either an ID or a scheduler job document name
      */
-    Collection<String> getJobDocumentNames();
+    String getInterval(String user);
+
+    /**
+     * Get the list of all the possible notification intervals that a user can choose from.
+     * 
+     * @return the list of interval IDs
+     */
+    List<String> getIntervals();
 
     /**
      * @param intervalId ID of the interval

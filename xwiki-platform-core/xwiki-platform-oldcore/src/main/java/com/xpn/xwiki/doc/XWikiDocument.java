@@ -33,7 +33,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -84,6 +83,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -121,6 +121,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -175,7 +176,6 @@ import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument implements DocumentModelBridge, Cloneable
@@ -551,6 +551,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private SyntaxFactory syntaxFactory;
 
+    private ContextualLocalizationManager localization;
+
     /**
      * The document structure expressed as a tree of Block objects. We store it for performance reasons since parsing is
      * a costly operation that we don't want to repeat whenever some code ask for the XDOM information.
@@ -579,6 +581,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @see #getLocalKey()
      */
     private String localKeyCache;
+    
+    private RenderingContext renderingContext;
 
     /**
      * @since 2.2M1
@@ -738,6 +742,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return this.syntaxFactory;
     }
 
+    private ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    private String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+    }
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -761,6 +779,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setStore(XWikiStoreInterface store)
     {
         this.store = store;
+    }
+    
+    private RenderingContext getRenderingContext()
+    {
+        if (this.renderingContext == null) {
+            this.renderingContext = Utils.getComponent(RenderingContext.class);
+        }
+        
+        return this.renderingContext;
     }
 
     /**
@@ -1087,6 +1114,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         return this.documentDisplayer;
     }
+    
+    private Syntax getOutputSyntax()
+    {
+        return getRenderingContext().getTargetSyntax();
+    }
 
     public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
@@ -1122,7 +1154,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        return getRenderedContent(Syntax.XHTML_1_0, context);
+        return getRenderedContent(getOutputSyntax(), context);
     }
 
     /**
@@ -1134,7 +1166,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public String getRenderedContent(String text, String syntaxId, XWikiContext context)
     {
-        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), context);
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(), context);
     }
 
     /**
@@ -1148,8 +1180,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String syntaxId, boolean restrictedTransformationContext,
         XWikiContext context)
     {
-        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), restrictedTransformationContext,
-            context);
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(),
+                restrictedTransformationContext, context);
     }
 
     /**
@@ -1390,9 +1422,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Get the rendered version of the document title. If the title is not specified then an attempt is made to extract
-     * the title from the document content. If this fails then the document name is used as title. The Velocity code
-     * from the title is evaluated if the title is specified or if it is extracted from the document content.
+     * Get the rendered version of the document title. The title is extracted and then Velocity is applied on it and
+     * it's then rendered using the passed Syntax. The following logic is used to extract the title:
+     * <ul>
+     *   <li>If a Sheet is specified for the document and this Sheet document contains a non empty title then it's used
+     *   </li>
+     *   <li>If not and the document's title is specified then it's used</li>
+     *   <li>If not and if the title compatibility mode is turned on ({@code xwiki.title.compatibility=1} in
+     *       {@code xwiki.cfg}) then an attempt is made to extract the title from the first heading found in the
+     *       document's content</li>
+     *   <li>If not, then at last resort the page name is returned</li>
+     * </ul>
      *
      * @param outputSyntax the syntax to render to; this is not taken into account for XWiki 1.0 syntax
      * @param context the XWiki context
@@ -1414,6 +1454,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             LOGGER.error("Failed to render title for [{}]", getDocumentReference(), e);
             return getDocumentReference().getName();
         }
+    }
+
+    /**
+     * Similar to {@link #getRenderedTitle(Syntax, XWikiContext)} but the Syntax used is XHTML 1.0 unless the current
+     * skin defines another output Syntax in which case it's the one used.
+     *
+     * @param context the XWiki context
+     * @return the rendered version of the document title
+     */
+    public String getRenderedTitle(XWikiContext context)
+    {
+        return getRenderedTitle(getOutputSyntax(), context);
     }
 
     public void setTitle(String title)
@@ -6369,8 +6421,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
                 String compactReference = getCompactEntityReferenceSerializer().serialize(newDocumentReference);
                 childDocument.setParent(compactReference);
-                String saveMessage =
-                    context.getMessageTool().get("core.comment.renameParent", Arrays.asList(compactReference));
+                String saveMessage = localizePlainOrKey("core.comment.renameParent", compactReference);
                 childDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
@@ -6473,7 +6524,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Save if content changed
         if (backlinkDocument.isContentDirty()) {
             String saveMessage =
-                context.getMessageTool().get("core.comment.renameLink",
+                localizePlainOrKey("core.comment.renameLink",
                     getCompactEntityReferenceSerializer().serialize(newDocumentReference));
             backlinkDocument.setAuthorReference(context.getUserReference());
             context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
@@ -7822,10 +7873,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public static String getInternalPropertyName(String propname, XWikiContext context)
     {
-        XWikiMessageTool msg = context.getMessageTool();
+        ContextualLocalizationManager localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
         String cpropname = StringUtils.capitalize(propname);
 
-        return (msg == null) ? cpropname : msg.get(cpropname);
+        return localizationManager == null ? cpropname : localizationManager.getTranslationPlain(cpropname);
     }
 
     public String getInternalProperty(String propname)

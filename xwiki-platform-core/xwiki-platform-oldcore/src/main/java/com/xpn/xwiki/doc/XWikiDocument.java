@@ -3489,8 +3489,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * }
      * </pre></code>
      * 
-     * @param request The input HTTP request that provides the parameters
-     * @return The map containing ordered data
+     * @param request is the input HTTP request that provides the parameters
+     * @param context
+     * @return a map containing ordered data
      */
     private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
         XWikiContext context)
@@ -3550,7 +3551,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
      * 'Space.Class_42_prop=foobar' for example, will be ignore.
      * 
-     * @param eform Form information that contains all the query parameters
+     * @param eform is form information that contains all the query parameters
      * @param context
      * @throws XWikiException
      * @since 7.0RC1

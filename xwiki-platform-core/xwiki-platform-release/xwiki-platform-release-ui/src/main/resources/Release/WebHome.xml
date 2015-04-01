@@ -50,8 +50,6 @@
   #set ($shortVersion = $shortVersion.replace('MILESTONE', 'M'))
   $response.sendRedirect($xwiki.getURL("Release.Release${shortVersion}", "inline", "$!{request.queryString}&amp;title=New Release for version $shortVersion&amp;version=${request.version}"))
 #end
-{{/velocity}}
-
 = Create Release =
 
 {{html}}
@@ -68,8 +66,6 @@
 {{/html}}
 
 = Existing Releases =
-
-{{velocity}}
 #set($columns = ["version", "releaseManagers", "releaseDate", "releaseNotes"])
 #set($columnsProperties = {
     "version" : { "type" : "text" , "link" : "view"},

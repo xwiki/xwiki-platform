@@ -3572,8 +3572,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (oldObject == null) {
                     // Create the object only if it has been numbered one more than the number of existing objects
                     int objectNumberInPage = getXObjectSize(requestClassReference);
-                    if (requestObjectPropertyMap != null
-                        && requestObjectNumber == objectNumberInPage) {
+                    if (requestObjectPropertyMap != null) {
                         while(newObjects.size() < objectNumberInPage) {
                             newObjects.add(getXObject(requestClassReference, newObjects.size()));
                         }
@@ -3587,6 +3586,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 newObject.setNumber(oldObject.getNumber());
                 newObject.setGuid(oldObject.getGuid());
                 newObject.setOwnerDocument(this);
+                while(newObjects.size() < requestObjectNumber) {
+                    newObjects.add(null);
+                }
                 newObjects.add(newObject);
             }
             getXObjects().put(requestClassReference, newObjects);

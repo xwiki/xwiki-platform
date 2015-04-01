@@ -328,7 +328,7 @@ public class XWikiDocumentMockitoTest
         eform.setRequest(request);
         this.document.readObjectsFromFormUpdateOrCreate(eform, context);
 
-        assertEquals(4, this.document.getXObjectSize(baseClass.getDocumentReference()));
+        assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));
         assertEquals("bloublou", this.document.getXObject(baseClass.getDocumentReference(), 0).getStringValue("string"));
         assertEquals(42, this.document.getXObject(baseClass.getDocumentReference(), 0).getIntValue("int"));
         assertEquals("string2", this.document.getXObject(baseClass.getDocumentReference(), 1).getStringValue("string"));
@@ -338,6 +338,8 @@ public class XWikiDocumentMockitoTest
         assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 3));
         assertEquals("blabla", this.document.getXObject(baseClass.getDocumentReference(), 3).getStringValue("string"));
         assertEquals(13, this.document.getXObject(baseClass.getDocumentReference(), 3).getIntValue("int"));
-        assertNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
+        assertNotNull(this.document.getXObject(baseClass.getDocumentReference(), 42));
+        assertEquals("bloublou", this.document.getXObject(baseClass.getDocumentReference(), 42).getStringValue("string"));
+        assertEquals(7, this.document.getXObject(baseClass.getDocumentReference(), 42).getIntValue("int"));
     }
 }

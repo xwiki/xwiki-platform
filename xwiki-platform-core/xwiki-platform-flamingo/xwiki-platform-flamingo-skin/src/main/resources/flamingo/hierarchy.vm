@@ -5,10 +5,10 @@
   #set($parent = $doc.parent)
   #if(($parent != '') && ($level < 6) && (!$parents.contains($parent)))
     #set($discard = $parents.add($parent))
-    #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
+    #set($pdoc = $xwiki.getDocument($parent))
     #if ($pdoc)
       #set ($pdocurl = $pdoc.getURL('view'))
-      #set ($nstring = "<li><a href='$pdocurl'>$escapetool.xml(${pdoc.getPlainTitle()})</a></li>$result")
+      #set ($nstring = "<li><a href='$pdocurl'>$escapetool.xml(${pdoc.translatedDocument.plainTitle})</a></li>$result")
       #set ($level = $level + 1)
       #computeHierarchy($pdoc $nstring $level)
     #else

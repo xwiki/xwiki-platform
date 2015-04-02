@@ -2278,7 +2278,28 @@ public class Document extends Api
     public void saveWithProgrammingRights(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasProgrammingRights()) {
-            saveDocument(comment, minorEdit);
+            // The rights check above is generic, but the current method is a save operation, thus it should not be
+            // performed if the document's wiki is in read only mode.
+            XWikiContext context = getXWikiContext();
+            String currentWikiId = context.getWikiId();
+            try {
+                // Make sure we check the current document's wiki and not the current context's wiki.
+                context.setWikiId(getWiki());
+
+                if (!context.getWiki().isReadOnly()) {
+                    saveDocument(comment, minorEdit);
+                } else {
+                    java.lang.Object[] args =
+                        {getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki()};
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "Access denied in edit mode on document [{0}]. The wiki [{1}] is in read only mode.", null,
+                        args);
+                }
+            } finally {
+                // Restore the context wiki.
+                context.setWikiId(currentWikiId);
+            }
         } else {
             java.lang.Object[] args = { this.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,

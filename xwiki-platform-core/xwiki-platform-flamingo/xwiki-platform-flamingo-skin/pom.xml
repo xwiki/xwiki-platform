@@ -38,6 +38,12 @@
     <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- HTML5 renderer since this skin outputs html5. See src/main/resources/flamingo/skin.properties -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-html5</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
     <!-- LESS Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

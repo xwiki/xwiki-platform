@@ -44,7 +44,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -57,6 +59,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -171,6 +174,7 @@ import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -251,6 +255,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private static final Pattern HTML_TAG_PATTERN =
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
+
+    /**
+     * Format for passing xproperties references in URLs. General format:
+     * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;}
+     * (e.g. {@code XWiki.XWikiRights_0_member}).
+     */
+    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("(.+?)_([0-9]+)_(.+)");
 
     public static final EntityReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiComments");
 
@@ -3498,11 +3509,154 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Generate a map from the request parameters of the form '<spacename>.<classname>_<number>_<propertyname>' Keys of
+     * this map will be the reference '<spacename>.<classname>' to the Class (for example, 'XWiki.XWikiRights'), the
+     * content is a list where each element describe property for the object <number>. Element of the list is a map
+     * where key is <propertyname> and content is the array of corresponding values. Example with a list of HTTP
+     * parameters:
+     * <ul>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Admin</li>
+     * <li>XWiki.XWikiRights_0_users=XWiki.Me</li>
+     * <li>XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup</li>
+     * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
+     * <li>XWiki.XWikiUsers_1_name=Spirou</li>
+     * </ul>
+     * will result in the following map <code><pre>
+     * {
+     *   "XWiki.XWikiRights": {
+     *     "0": {
+     *       "users": ["XWiki.Admin", "XWiki.Me"],
+     *       "groups": ["XWiki.XWikiAllGroup"]
+     *     },
+     *     "1": {
+     *       "users": ["XWiki.Admin"]
+     *     }
+     *   ],
+     *   "XWiki.XWikiUsers": 
+     *     "1": {
+     *       "name": ["Spirou"]
+     *     }
+     *   ]
+     * }
+     * </pre></code>
+     * 
+     * @param request is the input HTTP request that provides the parameters
+     * @param context
+     * @return a map containing ordered data
+     */
+    private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
+        XWikiContext context)
+    {
+        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
+        @SuppressWarnings("unchecked")
+        Map<String, String[]> allParameters = request.getParameterMap();
+        for (Entry<String, String[]> parameter : allParameters.entrySet()) {
+            Matcher matcher = XPROPERTY_REFERENCE_PATTERN.matcher(parameter.getKey());
+            if (matcher.matches() == false) {
+                continue;
+            }
+            Integer classNumber;
+            String className= matcher.group(1);
+            String classNumberAsString = matcher.group(2);
+            String classPropertyName = matcher.group(3);
+            DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
+            try {
+                BaseClass xClass = context.getWiki().getDocument(classReference, context).getXClass();
+                if (xClass.getPropertyList().contains(classPropertyName) == false) {
+                    continue;
+                }
+                classNumber = Integer.parseInt(classNumberAsString);
+            } catch (XWikiException e) {
+                // If the class page cannot be found, skip the property update
+                LOGGER.warn("Failed to load document [{}], ignoring property update [{}]. Reason: [{}]",
+                    classReference, parameter.getKey(), ExceptionUtils.getRootCauseMessage(e));
+                continue;
+            } catch (NumberFormatException e) {
+                // If the numner isn't valid, skip the property update
+                LOGGER.warn("Invalid xobject number [{}], ignoring property update [{}].", classNumberAsString,
+                    parameter.getKey());
+                continue;
+            }
+            SortedMap<Integer, Map<String, String[]>> objectMap = result.get(classReference);
+            if (objectMap == null) {
+                objectMap = new TreeMap<>();
+                result.put(classReference, objectMap);
+            }
+            // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
+            Map<String, String[]> object = objectMap.get(classNumber);
+            if (object == null) {
+                object = new HashMap<>();
+                objectMap.put(classNumber, object);
+            }
+            object.put(classPropertyName, parameter.getValue());
+        }
+        return result;
+    }
+
+    /**
+     * Create and/or update objects in a document given a list of HTTP parameters of the form
+     * '<spacename>.<classname>_<number>_<propertyname>'. If the object already exists, the field is replace by the
+     * given value. If the object doesn't exist in the document, it is created then the property <propertyname> is
+     * initialized with the given value. An object is only created if the given '<number>' is 'one-more' than the
+     * existing number of objects. For example, if the document already has 2 objects of type 'Space.Class', then it
+     * will create a new object only with 'Space.Class_2_prop=something'. Every other parameter like
+     * 'Space.Class_42_prop=foobar' for example, will be ignore.
+     * 
+     * @param eform is form information that contains all the query parameters
+     * @param context
+     * @throws XWikiException
+     * @since 7.0RC1
+     */
+    public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
+    {
+        Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> fromRequest =
+            parseRequestUpdateOrCreate(eform.getRequest(), context);
+        for (Entry<DocumentReference, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest
+            .entrySet()) {
+            DocumentReference requestClassReference = requestClassEntries.getKey();
+            SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
+            List<BaseObject> newObjects = new ArrayList<>();
+            for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {
+                Integer requestObjectNumber = requestObjectEntry.getKey();
+                Map<String, String[]> requestObjectPropertyMap = requestObjectEntry.getValue();
+                BaseObject oldObject = getXObject(requestClassReference, requestObjectNumber);
+                if (oldObject == null) {
+                    // Create the object only if it has been numbered one more than the number of existing objects
+                    int objectNumberInPage = getXObjectSize(requestClassReference);
+                    if (requestObjectPropertyMap != null) {
+                        while(newObjects.size() < objectNumberInPage) {
+                            newObjects.add(getXObject(requestClassReference, newObjects.size()));
+                        }
+                        oldObject = newXObject(requestClassReference, context);
+                    } else {
+                        break;
+                    }
+                }
+                BaseClass baseClass = oldObject.getXClass(context);
+                BaseObject newObject = (BaseObject) baseClass.fromMap(requestObjectPropertyMap, oldObject);
+                newObject.setNumber(oldObject.getNumber());
+                newObject.setGuid(oldObject.getGuid());
+                newObject.setOwnerDocument(this);
+                while(newObjects.size() < requestObjectNumber) {
+                    newObjects.add(null);
+                }
+                newObjects.add(newObject);
+            }
+            getXObjects().put(requestClassReference, newObjects);
+        }
+    }
+
     public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
-        readObjectsFromForm(eform, context);
+        ObjectPolicyType objectPolicy = eform.getObjectPolicy();
+        if (objectPolicy == null || objectPolicy.equals(ObjectPolicyType.UPDATE)) {
+            readObjectsFromForm(eform, context);
+        } else if (objectPolicy.equals(ObjectPolicyType.UPDATE_OR_CREATE)) {
+            readObjectsFromFormUpdateOrCreate(eform, context);
+        }
     }
 
     public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException

@@ -56,7 +56,8 @@
   'showClassProperties': false,
   'showChildDocuments': true,
   'showOnlyViewable': true,
-  'filterByClass': ''
+  'filterByClass': '',
+  'root': ''
 })
 
 #macro (updateDocTreeConfigFromRequest)
@@ -790,9 +791,31 @@
     #set ($nodeId = $parts[1])
     #set ($path = [])
     #evaluate("${escapetool.h}get$stringtool.capitalize($nodeType)Path(${escapetool.d}nodeId ${escapetool.d}path)")
+    #if ("$!docTreeConfig.root" != '')
+      ## The path needs to be relative to the specified root because only a sub-tree is displayed.
+      #getRelativePath($path $docTreeConfig.root)
+    #end
   #end
   #set ($return = $NULL)
   #setVariable("$return" $path)
+#end
+
+#macro (getRelativePath $path $rootId)
+  #set ($index = -1)
+  #foreach ($node in $path)
+    #if ($node.id == $rootId)
+      #set ($index = $foreach.index)
+      #break
+    #end
+  #end
+  #if ($index &gt;= 0)
+    ## Return the path suffix that starts from the specified root.
+    #set ($path = $path.subList($mathtool.add($index, 1), $path.size()))
+  #else
+    ## The target node is not in the specified sub-tree. We return an empty path in this case, which prevents the node
+    ## from being opened or added to the tree (in case the root node has pagination).
+    #set ($path = [])
+  #end
 #end
 
 #macro (getWikiPath $wikiRefOrId $path)

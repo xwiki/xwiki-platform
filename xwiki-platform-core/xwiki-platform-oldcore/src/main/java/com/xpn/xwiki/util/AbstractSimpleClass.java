@@ -29,8 +29,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @version $Id$
  * @since 1.2M1
- * @deprecated extending this abstract is a very bad idea since reflection based equals/hashCode/toString is at best very
- *             bad for performances and can ends up including things you were not expecting
+ * @deprecated extending this abstract is a very bad idea since reflection based equals/hashCode/toString is at best
+ *             very bad for performances and can ends up including things you were not expecting
  */
 @Deprecated
 public abstract class AbstractSimpleClass

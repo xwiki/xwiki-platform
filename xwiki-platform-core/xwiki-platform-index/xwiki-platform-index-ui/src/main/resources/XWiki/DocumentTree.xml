@@ -200,7 +200,8 @@
   'showClassProperties': false,
   'showChildDocuments': true,
   'showOnlyViewable': true,
-  'filterByClass': ''
+  'filterByClass': '',
+  'root': ''
 })
 #set ($resourceParams = {'outputSyntax': 'plain'})
 #foreach ($entry in $docTreeConfig.entrySet())

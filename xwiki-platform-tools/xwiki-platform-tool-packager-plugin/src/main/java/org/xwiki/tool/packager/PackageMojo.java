@@ -266,15 +266,8 @@ public class PackageMojo extends AbstractMojo
         // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Flamingo skin only.
         getLog().info("Copying Skins ...");
         File skinsDirectory = new File(xwikiWebappDirectory, "skins");
-        if (this.skinArtifactItems != null) {
-            for (SkinArtifactItem skinArtifactItem : this.skinArtifactItems) {
-                Artifact skinArtifact = resolveArtifactItem(skinArtifactItem);
-                unzip(skinArtifact.getFile(), skinsDirectory);
-            }
-        } else {
-            Artifact flamingoArtifact =
-                resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin", getXWikiPlatformVersion(), "zip");
-            unzip(flamingoArtifact.getFile(), skinsDirectory);
+        for (Artifact skinArtifact : getSkinArtifacts()) {
+            unzip(skinArtifact.getFile(), skinsDirectory);
         }
 
         // Step 8: Import specified XAR files into the database
@@ -602,10 +595,32 @@ public class PackageMojo extends AbstractMojo
         return this.contextPathMapping;
     }
 
+    private Collection<Artifact> getSkinArtifacts() throws MojoExecutionException
+    {
+        Collection<Artifact> skinArtifacts = new HashSet<>();
+
+        if (this.skinArtifactItems != null) {
+            for (SkinArtifactItem skinArtifactItem : this.skinArtifactItems) {
+                skinArtifacts.add(resolveArtifactItem(skinArtifactItem));
+            }
+        } else {
+            Artifact defaultSkin =
+                resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin", getXWikiPlatformVersion(), "zip");
+            skinArtifacts.add(defaultSkin);
+        }
+
+        return skinArtifacts;
+    }
+
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
-        // Resolve mandatory dependencies if they're not explicitly specified
-        Set<Artifact> resolvedArtifacts = resolveTransitively(getMandatoryJarArtifacts());
+        // Get the mandatory jars
+        Set<Artifact> artifacts = getMandatoryJarArtifacts();
+        // But also the skins artifacts, that may have JAR dependencies
+        artifacts.addAll(getSkinArtifacts());
+        
+        // Now resolve mandatory dependencies if they're not explicitly specified
+        Set<Artifact> resolvedArtifacts = resolveTransitively(artifacts);
 
         // Maven is already taking care of resolving project dependencies before the plugin is executed
         resolvedArtifacts.addAll(this.project.getArtifacts());

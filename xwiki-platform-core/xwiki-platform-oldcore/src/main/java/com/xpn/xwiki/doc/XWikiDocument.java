@@ -3616,18 +3616,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             .entrySet()) {
             DocumentReference requestClassReference = requestClassEntries.getKey();
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
-            List<BaseObject> newObjects = new ArrayList<>();
             for (Entry<Integer, Map<String, String[]>> requestObjectEntry : requestObjectMap.entrySet()) {
                 Integer requestObjectNumber = requestObjectEntry.getKey();
                 Map<String, String[]> requestObjectPropertyMap = requestObjectEntry.getValue();
                 BaseObject oldObject = getXObject(requestClassReference, requestObjectNumber);
                 if (oldObject == null) {
                     // Create the object only if it has been numbered one more than the number of existing objects
-                    int objectNumberInPage = getXObjectSize(requestClassReference);
                     if (requestObjectPropertyMap != null) {
-                        while(newObjects.size() < objectNumberInPage) {
-                            newObjects.add(getXObject(requestClassReference, newObjects.size()));
-                        }
                         oldObject = newXObject(requestClassReference, context);
                     } else {
                         break;
@@ -3638,12 +3633,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 newObject.setNumber(oldObject.getNumber());
                 newObject.setGuid(oldObject.getGuid());
                 newObject.setOwnerDocument(this);
-                while(newObjects.size() < requestObjectNumber) {
-                    newObjects.add(null);
-                }
-                newObjects.add(newObject);
+                setXObject(requestObjectNumber, newObject);
             }
-            getXObjects().put(requestClassReference, newObjects);
         }
     }
 

@@ -1377,7 +1377,10 @@ ${Msz}Mb##
   #if($tagcloud || $hasTopFilters)
   </div>
   #end
-  <table id="${divid}" class="xwiki-livetable"#if("$!options.description" != '') summary="$options.description"#end>
+  <table id="${divid}" class="xwiki-livetable">
+    #if("$!options.description" != '')
+      <caption class="sr-only">$options.description</caption>
+    #end
     <tr>
       <td class="xwiki-livetable-pagination">
         <span id="${divid}-limits" class="xwiki-livetable-limits"></span>

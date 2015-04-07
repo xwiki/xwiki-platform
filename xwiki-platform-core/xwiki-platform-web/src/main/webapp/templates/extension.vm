@@ -26,7 +26,7 @@
 #macro (displayExtensionSearchBar)
   <div class="extension-search-bar">
     ## Simple search form.
-    <form action="" id="extension-search-simple">
+    <form action="$xwiki.relativeRequestURL" id="extension-search-simple">
       <div>
         #if ($request.section)
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
@@ -48,7 +48,7 @@
       </div>
     </form>
     ## Advanced search form.
-    <form action="" class="xform">
+    <form action="$xwiki.relativeRequestURL" class="xform">
       <fieldset id="extension-search-advanced">
         <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
         <div id="extension-search-advanced-body"></div>
@@ -823,7 +823,7 @@ $namespace##
   #set ($jobStatus = $NULL)
   #isShowingExtensionDetails($extension $showExtensionDetails)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-  <form action="" method="post" class="extension-item extension-item-${extensionStatus}">
+  <form action="$xwiki.relativeRequestURL" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">
       <input name="extensionId" value="$!escapetool.xml($extension.id.id)" type="hidden" />
       <input name="extensionVersion" value="$!escapetool.xml($extension.id.version.value)" type="hidden" />
@@ -1537,7 +1537,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (displayExtensionUpdaterTrigger $plan)
-  <form action="" method="post">
+  <form action="$xwiki.relativeRequestURL" method="post">
     <div class="hidden">
       #if ($xcontext.action == 'view' || $xcontext.action == 'admin')
         #set ($docAction = 'get')

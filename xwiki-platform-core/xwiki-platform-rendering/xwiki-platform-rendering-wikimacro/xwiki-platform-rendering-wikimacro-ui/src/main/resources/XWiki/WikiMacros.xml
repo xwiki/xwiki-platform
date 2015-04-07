@@ -46,7 +46,7 @@
   <content>{{velocity}}
 #set($wikiMacroDocuments = $services.query.xwql("from doc.object(XWiki.WikiMacroClass) as macros").execute())
 #if($wikiMacroDocuments.size() &gt; 0)
-|=$services.localization.render('xe.wikimacrobridge.macroName') {{html}}&lt;tt&gt;($services.localization.render('xe.wikimacrobridge.macroId'))&lt;/tt&gt;{{/html}}|=$services.localization.render('xe.wikimacrobridge.macroDescription')|=$services.localization.render('xe.wikimacrobridge.macroVisibility')|=$services.localization.render('xe.wikimacrobridge.macroPage')
+|=$services.localization.render('xe.wikimacrobridge.macroName') {{{($services.localization.render('xe.wikimacrobridge.macroId'))}}}|=$services.localization.render('xe.wikimacrobridge.macroDescription')|=$services.localization.render('xe.wikimacrobridge.macroVisibility')|=$services.localization.render('xe.wikimacrobridge.macroPage')
   #foreach($macroDocumentName in $wikiMacroDocuments)
     #set($macroDocument = $xwiki.getDocument($macroDocumentName))
     #set($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))

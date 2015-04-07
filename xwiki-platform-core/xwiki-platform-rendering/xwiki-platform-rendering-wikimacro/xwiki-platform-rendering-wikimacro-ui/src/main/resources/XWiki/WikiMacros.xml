@@ -50,7 +50,7 @@
   #foreach($macroDocumentName in $wikiMacroDocuments)
     #set($macroDocument = $xwiki.getDocument($macroDocumentName))
     #set($macroObject = $macroDocument.getObject("XWiki.WikiMacroClass"))
-|$macroObject.get('name') {{html}}&lt;tt&gt;($macroObject.id)&lt;/tt&gt;{{/html}}|$macroObject.description|$macroObject.visibility|[[$macroDocument.getDisplayTitle()&gt;&gt;$macroDocument.fullName]]
+|$macroObject.get('name') {{{($macroObject.id)}}}|$macroObject.description|$macroObject.visibility|[[$macroDocument.getDisplayTitle()&gt;&gt;$macroDocument.fullName]]
   #end
 #else
 {{warning}}$services.localization.render('xe.wikimacrobridge.noWikiMacro'){{/warning}}

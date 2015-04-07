@@ -658,7 +658,7 @@
   #if(!$registrationDone)
     $welcomeMessage
 
-    {{html clean=false wiki=false}}
+    {{html wiki=false}}
       &lt;form id="register" action="$doc.getURL()" method="post" class="xform half"&gt;
       &lt;div&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;

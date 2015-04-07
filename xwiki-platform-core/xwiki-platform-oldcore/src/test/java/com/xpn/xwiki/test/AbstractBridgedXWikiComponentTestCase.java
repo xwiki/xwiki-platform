@@ -62,7 +62,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         // Make sure response.encodeURL() calls don't fail
@@ -94,8 +94,8 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
         Mock mockServletContext = mock(ServletContext.class); 
         environment.setServletContext((ServletContext) mockServletContext.proxy());
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
-            .will(returnValue(null));
+        mockServletContext.stubs().method("getResourceAsStream").will(returnValue(null));
+        mockServletContext.stubs().method("getResource").will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
 

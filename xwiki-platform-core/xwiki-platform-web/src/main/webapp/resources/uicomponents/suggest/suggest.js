@@ -49,6 +49,9 @@ var XWiki = (function(XWiki){
     resultIcon: "icon",
     // The name of the JSON parameter or XML attribute holding a potential result hint (displayed next to the value).
     resultHint: "hint",
+    // The name of the JSON field or XML attribute holding the result type. The value of the specified field/attribute is
+    // used as a CSS class name. This is useful if you need to style suggestions differently based on some property.
+    resultType: "type",
     // The id of the element that will hold the suggest element
     parentContainer : "body",
     // Should results fragments be highlighted when matching typed input
@@ -72,11 +75,15 @@ var XWiki = (function(XWiki){
     unifiedLoader: false,
     // The DOM node to use to display the loading indicator when in mode unified loader (it will receive a "loading" class name for the time of the loading)
     // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
-    loaderNode: null
+    loaderNode: null,
+    // A list of key codes for which to propagate the keyboard event.
+    // Useful when another keyboard event listener exists on the input field, even if it may be registered at a diferent level.
+    // By default, the handled key events do not propagate, the rest do. See #onKeyPress
+    propagateEventKeyCodes : []
   },
   sInput : "",
   nInputChars : 0,
-  aSuggestions : [],
+  aSuggestions : {},
   iHighlighted : null,
   isActive : false,
 
@@ -96,7 +103,9 @@ var XWiki = (function(XWiki){
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
     if (typeof this.options.sources == 'object') {
-      // We are in multi-sources mode
+      // We are in multi-source mode. The display is different in this mode even if there is only one source. We need to
+      // set a flag to know that we are in this mode because we flatten the list of sources below.
+      this.isInMultiSourceMode = true;
       this.sources = this.options.sources;
     } else {
       // We are in mono-source mode
@@ -105,6 +114,13 @@ var XWiki = (function(XWiki){
 
     // Flatten sources
     this.sources = [ this.sources ].flatten().compact();
+
+    if (this.sources.length == 0) {
+      // We still need an empty (fake) source so that we display at least the 'No results' message.
+      this.sources.push({
+        script: function(value, callback) {callback([])}
+      });
+    }
 
     // Reset the container if the configured parameter is not valid
     if (!$(this.options.parentContainer)) {
@@ -138,7 +154,7 @@ var XWiki = (function(XWiki){
     this.onKeyUp = this.onKeyUp.bindAsEventListener(this);
     this.fld.observe("keyup", this.onKeyUp);
     this.onKeyPress = this.onKeyPress.bindAsEventListener(this);
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
       this.fld.observe("keydown", this.onKeyPress);
     } else {
       this.fld.observe("keypress", this.onKeyPress);
@@ -202,29 +218,32 @@ var XWiki = (function(XWiki){
       return;
     }
     var key = event.keyCode;
+    var checkPropagation = true;
 
     switch(key) {
       case Event.KEY_RETURN:
-        if (!this.iHighlighted && this.aSuggestions.length == 1) {
+        if (!this.iHighlighted && (Object.keys(this.aSuggestions).length == 1 && this.aSuggestions[Object.keys(this.aSuggestions)[0]].length == 1)) {
           this.highlightFirst();
         }
-        this.setHighlightedValue();
-        Event.stop(event);
+        this.setHighlightedValue(event);
         break;
       case Event.KEY_ESC:
         this.clearSuggestions();
-        Event.stop(event);
         break;
       case Event.KEY_UP:
         this.changeHighlight(key);
-        Event.stop(event);
         break;
       case Event.KEY_DOWN:
         this.changeHighlight(key);
-        Event.stop(event);
         break;
       default:
+        checkPropagation = false;
         break;
+    }
+
+    // Stop propagation for the keys we have handled, unless otherwise specified in the options.
+    if (checkPropagation && this.options.propagateEventKeyCodes && this.options.propagateEventKeyCodes.indexOf(key) == -1) {
+      Event.stop(event);
     }
   },
 
@@ -252,20 +271,39 @@ var XWiki = (function(XWiki){
     // if caching enabled, and user is typing (ie. length of input is increasing)
     // filter results out of aSuggestions from last request
     //
-    if (val.length>this.nInputChars && this.aSuggestions.length && this.options.cache)
+    if (val.length>this.nInputChars && Object.keys(this.aSuggestions).length && this.options.cache)
     {
-      var arr = [];
-      for (var i=0;i<this.aSuggestions.length;i++) {
-        if (this.aSuggestions[i].value.substr(0,val.length).toLowerCase() == val) {
-          arr.push( this.aSuggestions[i] );
+      var filteredSuggestions = {};
+      for (var i=0; i < Object.keys(this.aSuggestions).length; i++) {
+        var sourceId = Object.keys(this.aSuggestions)[i];
+        var filteredSourceSuggestions = [];
+        for (var j=0; j<this.aSuggestions[sourceId].length; j++) {
+          var existingSuggestion = this.aSuggestions[sourceId][j];
+          // Note: This is assuming that all suggestions are prefixed with the value. Does not apply in all cases, so
+          // the use of options.cache is limited to only those scenarios.
+          if (existingSuggestion.value.substr(0, val.length).toLowerCase() == val) {
+            filteredSourceSuggestions.push(existingSuggestion);
+          }
+        }
+
+        // Only set this source if it has at least one suggestion.
+        if (filteredSourceSuggestions.length) {
+          filteredSuggestions[sourceId] = sourceSuggestions;
         }
       }
 
       this.sInput = val;
       this.nInputChars = val.length;
-      this.aSuggestions = arr;
+      this.aSuggestions = filteredSuggestions;
 
-      this.createList(this.aSuggestions);
+      // Display the just filtered suggestions.
+      for (var i=0; i < sources.length; i++) {
+        var source = sources[i];
+        var sourceSuggestions = this.aSuggestions[source.id];
+        if (sourceSuggestions) {
+          this.createList(sourceSuggestions, source);
+        }
+      }
 
       return false;
     } else  {
@@ -300,32 +338,54 @@ var XWiki = (function(XWiki){
 
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
-
-      var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
-      var method = source.method || "get";
-      var headers = {};
-      if (source.json) {
-        headers.Accept = "application/json";
+      if (typeof source.script == 'function') {
+        this.fld.addClassName('loading');
+        source.script(this.fld.value.strip(), function(suggestions) {
+          if (requestId == this.latestRequest) {
+            this.aSuggestions[source.id] = suggestions || [];
+            suggestions && this.createList(this.aSuggestions[source.id], source);
+            this.fld.removeClassName('loading');
+          }
+        }.bind(this));
       } else {
-        headers.Accept = "application/xml";
+        this.doAjaxRequest(source, requestId, ajaxRequestParameters);
       }
-
-      // Allow the default request parameters to be overwritten.
-      var defaultAjaxRequestParameters = {
-        method: method,
-        requestHeaders: headers,
-        onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
-        onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
-        onFailure: function (response) {
-          new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
-        },
-        onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
-      }
-      // Inject a reference to the (cloned) default AJAX request parameters to be able
-      // to access the defaults even when they are overwritten by the provided values.
-      defaultAjaxRequestParameters.defaultValues = Object.clone(defaultAjaxRequestParameters);
-      new Ajax.Request(url, Object.extend(defaultAjaxRequestParameters, ajaxRequestParameters || {}));
     }
+  },
+
+  /**
+   * Fire the AJAX request that will get the suggestions from the specified source.
+   *
+   * @param source the source to get the suggestions from
+   * @param requestId request identifier, used to ensure that only the latest request is handled, for improved performance
+   * @param ajaxRequestParameters optional AJAX request parameters, in case you need to overwrite the defaults
+   */
+  doAjaxRequest: function (source, requestId, ajaxRequestParameters)
+  {
+    var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
+    var method = source.method || "get";
+    var headers = {};
+    if (source.json) {
+      headers.Accept = "application/json";
+    } else {
+      headers.Accept = "application/xml";
+    }
+
+    // Allow the default request parameters to be overwritten.
+    var defaultAjaxRequestParameters = {
+      method: method,
+      requestHeaders: headers,
+      onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
+      onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
+      onFailure: function (response) {
+        new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
+      },
+      onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
+    }
+    // Inject a reference to the (cloned) default AJAX request parameters to be able
+    // to access the defaults even when they are overwritten by the provided values.
+    defaultAjaxRequestParameters.defaultValues = Object.clone(defaultAjaxRequestParameters);
+    new Ajax.Request(url, Object.extend(defaultAjaxRequestParameters, ajaxRequestParameters || {}));
   },
 
   /**
@@ -345,8 +405,14 @@ var XWiki = (function(XWiki){
     }
 
     var suggestions = this.parseResponse(req, source);
-    this.aSuggestions = suggestions || [];
-    suggestions && this.createList(this.aSuggestions, source);
+    this.aSuggestions[source.id] = suggestions || [];
+    suggestions && this.createList(this.aSuggestions[source.id], source);
+  },
+
+  _getNestedProperty: function(obj, path) {
+    var properties = path.split('.');
+    while (properties.length && (obj = obj[properties.shift()]));
+    return properties.length > 0 ? null : obj;
   },
 
   /**
@@ -359,14 +425,20 @@ var XWiki = (function(XWiki){
       if (!jsondata) {
         return null;
       }
-      var results = jsondata[source.resultsParameter || this.options.resultsParameter];
+      if (Object.isArray(jsondata)) {
+        var results = jsondata;
+      } else {
+        var results = this._getNestedProperty(jsondata, source.resultsParameter || this.options.resultsParameter);
+      }
       for (var i = 0; i < results.length; i++) {
+        var result = results[i];
         suggestions.push({
-           'id': results[i][source.resultId || this.options.resultId],
-           'value': results[i][source.resultValue || this.options.resultValue],
-           'info': results[i][source.resultInfo || this.options.resultInfo],
-           'icon' : results[i][source.resultIcon || this.options.resultIcon],
-           'hint' : results[i][source.resultHint || this.options.resultHint]
+          'id': this._getNestedProperty(result, source.resultId || this.options.resultId),
+          'value': this._getNestedProperty(result, source.resultValue || this.options.resultValue),
+          'info': this._getNestedProperty(result, source.resultInfo || this.options.resultInfo),
+          'icon' : this._getNestedProperty(result, source.resultIcon || this.options.resultIcon),
+          'hint' : this._getNestedProperty(result, source.resultHint || this.options.resultHint),
+          'type' : this._getNestedProperty(result, source.resultType || this.options.resultType)
         });
       }
     } else {
@@ -378,10 +450,11 @@ var XWiki = (function(XWiki){
         if (results[i].hasChildNodes()) {
           suggestions.push({
             'id': results[i].getAttribute('id'),
-            'value':results[i].childNodes[0].nodeValue,
-            'info':results[i].getAttribute('info'),
-            'icon':results[i].getAttribute('icon'),
-            'hint':results[i].getAttribute('hint')
+            'value': results[i].childNodes[0].nodeValue,
+            'info': results[i].getAttribute('info'),
+            'icon': results[i].getAttribute('icon'),
+            'hint': results[i].getAttribute('hint'),
+            'type': results[i].getAttribute('type')
           });
         }
       }
@@ -408,8 +481,11 @@ var XWiki = (function(XWiki){
       // FIXME this should be computed instead, since border might not always be 1px.
       var fieldWidth = this.fld.offsetWidth - 2;
       var containerWidth = this.options.width || fieldWidth;
+      var inputPositionLeft = this.fld.viewportOffset().left;
+      var browserWidth = $('body').getWidth();
 
-      if (this.options.align == 'left') {
+      // if the option is 'auto', we make sure that we have enough place to display it on the left. If not, it will go on the right.
+      if (this.options.align == 'left' || (this.options.align == 'auto' && inputPositionLeft + this.options.width < browserWidth)) {
         // Align the box on the left
         div.style.left = pos.left + "px";
       } else if (this.options.align == "center") {
@@ -450,12 +526,12 @@ var XWiki = (function(XWiki){
       });
     }
 
-    if (this.sources.length > 1) {
+    if (this.isInMultiSourceMode) {
       // If we are in multi-source mode, we need to prepare a sub-container for each of the suggestion source
       for (var i=0;i<this.sources.length;i++) {
 
         var source = this.sources[i];
-        source.id = i
+        source.id = source.id || i;
 
         if(this.resultContainer.down('.results' + source.id)) {
           // If the sub-container for this source is already present, we just re-initialize it :
@@ -551,7 +627,7 @@ var XWiki = (function(XWiki){
   {
     this._createList(arr, source);
 
-    if (this.sources.length == 1 || !this.resultContainer.down('.results.loading')) {
+    if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,
         'suggest' : this
@@ -573,7 +649,7 @@ var XWiki = (function(XWiki){
     this.killTimeout();
 
     // Determine the source container.
-    if (this.sources.length > 1) {
+    if (this.isInMultiSourceMode) {
       var sourceContainer = this.resultContainer.down('.results' + source.id);
       sourceContainer.removeClassName('loading');
       sourceContainer.down('.sourceContent').removeClassName('loading');
@@ -604,7 +680,7 @@ var XWiki = (function(XWiki){
        icon: this.options.icon,
        classes: 'suggestList',
        eventListeners: {
-          'click' : function () { pointer.setHighlightedValue(); return false; },
+          'click' : function (event) { pointer.setHighlightedValue(event); return false; },
           'mouseover' : function () { pointer.setHighlight( this.getElement() ); }
        }
     });
@@ -623,7 +699,7 @@ var XWiki = (function(XWiki){
             .insert(new Element('span', {'class':'suggestInfo'}).update(escapeHTML(arr[i].info)));
 
       var item = new XWiki.widgets.XListItem( this.createItemDisplay(arr[i], source) , {
-        containerClasses: 'suggestItem',
+        containerClasses: 'suggestItem ' + (arr[i].type || ''),
         value: valueNode,
         noHighlight: true // we do the highlighting ourselves
       });
@@ -674,8 +750,14 @@ var XWiki = (function(XWiki){
     }
     // If the search result contains an icon information, we insert this icon in the result entry.
     if (data.icon) {
-      var iconImage = new Element("img", {'src' : data.icon, 'class' : 'icon' });
-      displayNode.insert({top: iconImage});
+      if (data.icon.indexOf('.') >= 0 || data.icon.indexOf('/') >= 0) {
+        // The icon is specified as a file path.
+        var iconElement = new Element('img', {'src': data.icon, 'class': 'icon'});
+      } else {
+        // The icon is specified as a CSS class name.
+        var iconElement = new Element('i', {'class': 'icon ' + data.icon});
+      }
+      displayNode.insert({top: iconElement});
     }
     return displayNode;
   },
@@ -844,7 +926,7 @@ var XWiki = (function(XWiki){
     return this.iHighlighted;
   },
 
-  setHighlightedValue: function ()
+  setHighlightedValue: function (event)
   {
     if (this.iHighlighted && !this.iHighlighted.hasClassName('noSuggestion'))
     {
@@ -857,7 +939,8 @@ var XWiki = (function(XWiki){
         'id': text(this.iHighlighted.down(".suggestId")),
         'value': text(this.iHighlighted.down(".suggestValue")),
         'info': text(this.iHighlighted.down(".suggestInfo")),
-        'icon' : icon ? icon.src : ''
+        'icon' : icon ? icon.src : '',
+        'originalEvent' : event
       }
 
       var selection, newFieldValue;

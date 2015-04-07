@@ -50,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Formateringstyp|=XWiki syntax 1.0|=(% style="width:20%" %)Resultat
 |Länk till sida i aktuellt rum|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Länk med etikett|{{{[etikett&gt;WebHome]}}}|[[etikett&gt;&gt;WebHome]]
@@ -97,7 +96,6 @@ Det fullständiga formatet för en länk är **##[etikett {| eller &gt;}]+(resur
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Formateringstyp|=XWiki syntax 2.0|=(% style="width:20%" %)Resultat
 |Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
 |Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
@@ -145,8 +143,7 @@ Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [@in
 
 === 2.1 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Formateringstyp|=XWiki syntax 2.1|=(% style="width:20%" %)Resultat
+|=Formateringstyp|=XWiki syntax 2.1|=Resultat
 |Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
 |Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
 |Länk med wikisyntax i etikett|{{{[[**fetstilad etikett**&gt;&gt;WebHome]]}}}|[[**fetstilad etikett**&gt;&gt;WebHome]]

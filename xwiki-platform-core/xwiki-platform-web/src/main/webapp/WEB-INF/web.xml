@@ -20,21 +20,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:web="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4">
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
 
   <display-name>XWiki</display-name>
   <description>XWiki Application</description>
-  
+
   <!-- Main Restlet Application using Restlet's JAX-RS extension. -->
   <context-param>
     <param-name>org.restlet.application</param-name>
     <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
-  </context-param> 
-  
+  </context-param>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -104,6 +103,35 @@
     </init-param>
   </filter>
 
+  <!-- This filter is used to add the 'Content-Type-Script' header to the HTTP response. -->
+  <filter>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Content-Script-Type</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>text/javascript</param-value>
+    </init-param>
+  </filter>
+  
+  <!-- We need this filter because cross domain request for fonts are not allowed if some headers are not set.
+       See http://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
+  <filter>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Access-Control-Allow-Origin</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>*</param-value>
+    </init-param>
+  </filter>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
   <filter-mapping>
@@ -158,7 +186,7 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>    
+  </filter-mapping>
 
   <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
        "XWikiXmlRpcContextInitializationFilter" points to
@@ -169,6 +197,33 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- We set the CORS policy globally for webjars because the <url-pattern> option does not filter on query strings 
+       TODO: Remove this when http://jira.xwiki.org/browse/XWIKI-10881 is fixed -->
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>/bin/webjars/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.woff</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.eot</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.ttf</url-pattern>
   </filter-mapping>
 
   <!-- Initializes XWiki -->
@@ -266,12 +321,12 @@
     <servlet-name>RestletServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/wiki/*</url-pattern>

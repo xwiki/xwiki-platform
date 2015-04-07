@@ -5,6 +5,8 @@
   #set($pdfdoc = $tdoc)
 #end
 #set($pdfobj = $pdfdoc.getObject('XWiki.PDFClass'))
+## put the current doc being exported in a variable, to allow accessing it from the pdftemplate properties (header, footer, etc).
+#set($pdfExportedDoc = $tdoc)
 #template("pdfhtmlheader.vm")
 #set ($withPageBreaks = false)
 #if ("$!{request.pagebreaks}" == '1')

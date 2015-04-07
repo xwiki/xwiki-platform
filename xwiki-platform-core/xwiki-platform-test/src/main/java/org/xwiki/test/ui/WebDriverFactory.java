@@ -30,6 +30,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 /**
  * Create specific {@link WebDriver} instances for various Browsers.
@@ -39,7 +40,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  */
 public class WebDriverFactory
 {
-    public WebDriver createWebDriver(String browserName)
+    public XWikiWebDriver createWebDriver(String browserName)
     {
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
@@ -58,6 +59,8 @@ public class WebDriverFactory
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can
             // prevent buttons or links from being clicked when they are beneath it and native events are used.
             // See https://groups.google.com/forum/#!msg/selenium-users/gBozOynEjs8/XDxxQNmUSCsJ
+            // We need to load a page before sending the keys otherwise WebDriver throws ElementNotVisible exception.
+            driver.get("data:text/plain;charset=utf-8,XWiki");
             driver.switchTo().activeElement().sendKeys(Keys.chord(Keys.CONTROL, "/"));
         } else if (browserName.startsWith("*iexplore")) {
             driver = new InternetExplorerDriver();
@@ -81,6 +84,6 @@ public class WebDriverFactory
         // and buttons and so on).
         driver.manage().window().maximize();
 
-        return driver;
+        return new XWikiWebDriver((RemoteWebDriver) driver);
     }
 }

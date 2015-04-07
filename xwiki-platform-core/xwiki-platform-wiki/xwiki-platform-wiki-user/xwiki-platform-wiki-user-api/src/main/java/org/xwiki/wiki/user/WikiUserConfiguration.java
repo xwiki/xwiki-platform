@@ -21,7 +21,6 @@ package org.xwiki.wiki.user;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.xwiki.stability.Unstable;
 
 /**
  * Configuration about the user management in a wiki.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.3M2
  * @version $Id$
  */
-@Unstable
 public class WikiUserConfiguration
 {
     private UserScope userScope;

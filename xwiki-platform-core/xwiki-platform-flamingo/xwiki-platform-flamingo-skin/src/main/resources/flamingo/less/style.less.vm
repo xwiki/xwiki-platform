@@ -1,0 +1,46 @@
+//
+// Flamingo main LESS file
+// --------------------------------------------------
+
+// Imports ====================================================================
+@import "before-bootstrap"; // Fixes that must be included BEFORE bootstrap
+@import "bootstrap/bootstrap.less"; // Bootstrap
+@import "variables"; // Bootstrap variables overrided by flamingo
+@import "accordion";
+@import "action-menus";
+@import "admin";
+@import "annotations";
+@import "buttons";
+@import "edit";
+@import "forms";
+@import "general";
+@import "grid";
+@import "headers";
+@import "layout";
+@import "livetable";
+@import "messages";
+@import "misc";
+@import "panels";
+@import "tables";
+@import "tree";
+@import "type";
+@import "vertical-menus";
+@import "xlist";
+
+// Velocity Content =============================================================
+//
+// As the main LESS file for this skin, we can use Velocity.
+// ------------------------------------------------------------------------------
+
+// Here we initialize some variables that can be used in other LESS files
+#template('less/variablesInit.vm')
+
+// Now we can inject the content of the 'lessCode' field of the flamingo theme
+#if("$!themeObj.getValue('lessCode')" != '')
+  $themeObj.getValue('lessCode')
+#end
+
+// ==============================================================================
+// NOT SENT TO THE BROWSER FROM THIS POINT
+// ==============================================================================
+#template('less/colorThemeMappingOutput.vm')

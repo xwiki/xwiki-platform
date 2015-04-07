@@ -296,10 +296,9 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 ## List all the wikis.
 ##
-#set($discard = $xwiki.ssx.use('WikiManager.WikisMacros'))
+#set($discard = $xwiki.ssx.use('WikiManager.WikisMacro'))
 ##
-#set ($wikis = $services.wiki.getAll())
-##set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))
+#set ($wikis = $services.wiki.all)
 ##
 #if (!$wikis || $wikis.size() == 0 )
 {{translation key="platform.wiki.macro.noWikis"/}}
@@ -311,17 +310,20 @@ ul.xlist li.xitem div.xshowonhover img {
   ## List wikis.
   ##
   #foreach($wiki in $wikis)
+    ## We check that we have the view right on the wiki
+    #if ($xwiki.hasAccessLevel('view', $xcontext.userReference, $wiki.mainPageReference))
       &lt;li class='xitem xunderline xhighlight workspace spWorkspaceItem'&gt;
         &lt;div class='xitemcontainer'&gt;
           &lt;div class='spWorkspaceName'&gt;{{html}}&lt;a href="${xwiki.getURL($wiki.mainPageReference)}"&gt;${wiki.prettyName}&lt;/a&gt;{{/html}}&lt;/div&gt;  
           &lt;div class='xspacer'&gt;&amp;nbsp;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/li&gt;
+    #end
   #end
   ## Wiki creation.
   ##
   ## Only if the current action is not inline. If it's inline, then there is already a form, and if we render the second, nested one, the DOM is messed up in IE.
-  #if(!$isGuest &amp;&amp; "$!xcontext.action" != 'inline')
+  #if(!$isGuest &amp;&amp; $hasCreateWiki &amp;&amp; "$!xcontext.action" != 'inline')
     &lt;li id='spWorkspaceCreateItem' class='xitem workspace'&gt;
       &lt;div class='xitemcontainer'&gt;
         #set ($createWikiDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'CreateWiki'))

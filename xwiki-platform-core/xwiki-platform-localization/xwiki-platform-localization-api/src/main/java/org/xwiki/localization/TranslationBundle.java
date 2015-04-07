@@ -22,7 +22,6 @@ package org.xwiki.localization;
 import java.util.Locale;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * A collection of translations in various Locales.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @since 4.3M2
  */
 @Role
-@Unstable
 public interface TranslationBundle extends Comparable<TranslationBundle>
 {
     /**

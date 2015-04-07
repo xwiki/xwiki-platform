@@ -64,7 +64,7 @@
       #error($services.localization.render('xapp.errorexportapp', [$appname, $result]))
     #end
   #else
-    &lt;form id="exportForm" action="" method="get"&gt;
+    &lt;form id="exportForm" action="$doc.getURL()" method="get"&gt;
       #xwikimessageboxstart($services.localization.render('xapp.answer.exportapp.title', [$appname]) '')
         &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
         &lt;input type="hidden" id="confirm" name="confirm" value="1" /&gt;

@@ -50,7 +50,7 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
     /**
      * The key associated to the list of bundles in the {@link ExecutionContext}.
      */
-    private static final String CKEY_BUNDLES = "localization.bundles";
+    public static final String CKEY_BUNDLES = "localization.bundles";
 
     /**
      * Used to access the current context.
@@ -104,7 +104,7 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
 
             if (bundles == null) {
                 bundles = initializeContextBundle();
-                context.setProperty(CKEY_BUNDLES, bundles);
+                context.newProperty(CKEY_BUNDLES).inherited().cloneValue().initial(bundles).declare();
             }
         } else {
             bundles = initializeContextBundle();

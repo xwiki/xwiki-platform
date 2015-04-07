@@ -19,21 +19,26 @@
  */
 package org.xwiki.tools.jetty.listener;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.Logger;
 
 /**
- * Jetty lifecycle listener that prints a message to open a browser when the server is started.
- * This is to provide information to newbies so that they know what to do after the server is started.
- * 
+ * Jetty lifecycle listener that prints a message to open a browser when the server is started. This is to provide
+ * information to newbies so that they know what to do after the server is started.
+ *
  * @version $Id$
  * @since 3.5M1
  */
 public class NotifyListener extends AbstractLifeCycleListener
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = Log.getLogger(NotifyListener.class);
+
     /**
      * Delimiter to print to make the message stand out in the console/logs.
      */
@@ -42,14 +47,28 @@ public class NotifyListener extends AbstractLifeCycleListener
     @Override
     public void lifeCycleStarted(LifeCycle event)
     {
-        Log.info(DELIMITER);
+        LOGGER.info(DELIMITER);
         try {
-            String serverUrl = "http://" + java.net.Inet4Address.getLocalHost().getCanonicalHostName() + ":"
+            String serverUrl = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":"
                 + System.getProperty("jetty.port", "8080") + "/";
-            Log.info(Messages.getString("jetty.startup.notification"), serverUrl);
+            LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available
+            LOGGER.ignore(ex);
         }
-        Log.info(DELIMITER);
+        LOGGER.info(DELIMITER);
+    }
+
+    @Override
+    public void lifeCycleStopping(LifeCycle event)
+    {
+        LOGGER.info(DELIMITER);
+        LOGGER.info(Messages.getString("jetty.stopping.notification"));
+    }
+
+    @Override
+    public void lifeCycleStopped(LifeCycle event)
+    {
+        LOGGER.info(Messages.getString("jetty.stopped.notification"));
     }
 }

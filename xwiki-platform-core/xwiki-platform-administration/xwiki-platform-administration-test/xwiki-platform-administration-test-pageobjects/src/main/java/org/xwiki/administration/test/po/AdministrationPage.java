@@ -60,13 +60,31 @@ public class AdministrationPage extends ViewPage
     @FindBy(xpath = "//a[contains(@href, 'section=Elements')]")
     private WebElement pageElementsLink;
 
+    @FindBy(xpath = "//a[contains(@href, 'section=Presentation')]")
+    private WebElement presentationLink;
+
     @FindBy(id = "goto-select")
     WebElement spaceAdminSelect;
 
     public static AdministrationPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "XWikiPreferences", "admin");
+        getUtil().gotoPage(getSpace(), getPage(), "admin");
         return new AdministrationPage();
+    }
+
+    public static String getURL()
+    {
+        return getUtil().getURL(getSpace(), getPage());
+    }
+
+    public static String getSpace()
+    {
+        return "XWiki";
+    }
+
+    public static String getPage()
+    {
+        return "XWikiPreferences";
     }
 
     public LocalizationAdministrationSectionPage clickLocalizationSection()
@@ -112,6 +130,15 @@ public class AdministrationPage extends ViewPage
     }
 
     /**
+     * @since 6.3M1
+     */
+    public PresentationAdministrationSectionPage clickPresentationSection()
+    {
+        this.presentationLink.click();
+        return new PresentationAdministrationSectionPage();
+    }
+
+    /**
      * Opens the "Page Elements" administration section.
      * 
      * @return the "Page Elements" administration section
@@ -122,15 +149,49 @@ public class AdministrationPage extends ViewPage
         return new PageElementsAdministrationSectionPage();
     }
 
+    /**
+     * @since 6.4M2
+     */
+    public ViewPage clickSection(String categoryName, String sectionName)
+    {
+        getDriver().findElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).click();
+        return new ViewPage();
+    }
+
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasSection(String categoryName, String sectionName)
+    {
+        return getDriver().hasElement(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']"));
+    }
+
     public boolean hasSection(String sectionName)
     {
-        return getUtil().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
+        return getDriver().hasElement(By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
             + sectionName + "')]"));
+    }
+
+    /**
+     * @since 6.4M2
+     */
+    public boolean hasNotSection(String categoryName, String sectionName)
+    {
+        return getDriver().findElementsWithoutWaiting(By.xpath(
+            "//div[contains(@class, 'admin-menu')]"
+            + "/ul/li/span/a[text() = '" + categoryName + "']"
+            + "/../../ul/li/span/a[text() = '" + sectionName + "']")).size() == 0;
     }
 
     public boolean hasNotSection(String sectionName)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
+        return getDriver().findElementsWithoutWaiting(
             By.xpath("//*[contains(@class, 'admin-menu')]//a[contains(@href, 'section="
                 + sectionName + "')]")).size() == 0;
     }

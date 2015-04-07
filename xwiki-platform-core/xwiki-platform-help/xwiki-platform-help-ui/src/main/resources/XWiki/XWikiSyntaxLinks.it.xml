@@ -50,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Caratteristica|=Sintassi XWiki 1.0|=(% style="width:20%" %)Risultato
 |Link ad una pagina nello Spazio corrente|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Link con etichetta|{{{[etichetta&gt;WebHome]}}}|[[etichetta&gt;&gt;WebHome]]
@@ -103,7 +102,6 @@ Il formato completo di un link è **##[etichetta {&gt; o |}] (risorsa) [@interWi
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Caratteristica|=Sintassi XWiki 2.0|=(% style="width:20%" %)Risultato
 |Link ad una pagina nello Spazio corrente|{{{[[WebHome]]}}}|[[WebHome]]
 |Link con etichetta|(((
@@ -163,8 +161,7 @@ Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [@interWikiA
 
 === 2.1 Links ===
 
-(% style="overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Caratteristica|=Sintassi XWiki 2.1|=(% style="width:20%" %)Risultato
+|=Caratteristica|=Sintassi XWiki 2.1|=Risultato
 |Link ad una pagina nello Spazio corrente|{{{[[WebHome]]}}}|[[WebHome]]
 |Link con etichetta|(((
 {{{[[etichetta&gt;&gt;WebHome]]}}}

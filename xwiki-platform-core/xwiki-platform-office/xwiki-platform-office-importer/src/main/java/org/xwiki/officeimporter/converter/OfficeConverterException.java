@@ -19,15 +19,12 @@
  */
 package org.xwiki.officeimporter.converter;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents an exception that can be thrown during office document conversion operations.
  * 
  * @version $Id$
  * @since 5.0M2
  */
-@Unstable
 public class OfficeConverterException extends Exception
 {
     /**

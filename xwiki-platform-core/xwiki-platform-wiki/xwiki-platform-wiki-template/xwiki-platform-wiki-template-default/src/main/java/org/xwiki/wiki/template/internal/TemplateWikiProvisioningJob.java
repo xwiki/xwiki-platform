@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
-import org.xwiki.wiki.internal.manager.WikiCopier;
+import org.xwiki.wiki.provisioning.WikiCopier;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.XWikiContext;
  * Component that createAndExecuteJob a wiki with the content of a template wiki.
  *
  * @since 5.3M2
- * @version $Id :$
+ * @version $Id$
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -73,6 +73,9 @@ public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJob
         XWikiContext xcontext = xcontextProvider.get();
         String wikiId = request.getWikiId();
         String templateId = (String) request.getProvisioningJobParameter();
+
+        // Set the user actually doing the action in the context
+        xcontext.setUserReference(request.getProvisioningUser());
 
         try {
             observationManager.notify(new WikiProvisioningEvent(wikiId), wikiId, xcontext);

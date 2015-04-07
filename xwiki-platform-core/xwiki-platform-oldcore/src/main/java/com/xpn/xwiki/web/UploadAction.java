@@ -45,7 +45,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 /**
  * Action that handles uploading document attachments. It saves all the uploaded files whose fieldname start with
  * {@code filepath}.
- * 
+ *
  * @version $Id$
  */
 public class UploadAction extends XWikiAction
@@ -156,7 +156,7 @@ public class UploadAction extends XWikiAction
 
     /**
      * Attach a file to the current document.
-     * 
+     *
      * @param fieldName the target file field
      * @param filename
      * @param fileupload the {@link FileUploadPlugin} holding the form data
@@ -204,9 +204,9 @@ public class UploadAction extends XWikiAction
         params.add(filename);
         params.add(doc.getAttachmentRevisionURL(filename, nextRev, context));
         if (attachment.isImage(context)) {
-            comment = context.getMessageTool().get("core.comment.uploadImageComment", params);
+            comment = localizePlainOrKey("core.comment.uploadImageComment", params);
         } else {
-            comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params);
         }
 
         // Save the document.
@@ -227,7 +227,7 @@ public class UploadAction extends XWikiAction
     /**
      * Extract the corresponding attachment name for a given file field. It can either be specified in a separate form
      * input field, or it is extracted from the original filename.
-     * 
+     *
      * @param fieldName the target file field
      * @param fileupload the {@link FileUploadPlugin} holding the form data
      * @param context the current request context
@@ -279,7 +279,7 @@ public class UploadAction extends XWikiAction
         if (ajax) {
             try {
                 context.getResponse().getOutputStream()
-                    .println("error: " + context.getMessageTool().get((String) context.get("message")));
+                    .println("error: " + localizePlainOrKey((String) context.get("message")));
             } catch (IOException ex) {
                 LOGGER.error("Unhandled exception writing output:", ex);
             }

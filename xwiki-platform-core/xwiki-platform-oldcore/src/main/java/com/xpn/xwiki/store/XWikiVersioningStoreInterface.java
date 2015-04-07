@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 
 /**
  * Interface for manipulate document history.
- * 
+ *
  * @version $Id$
  */
 @Role
@@ -55,7 +55,7 @@ public interface XWikiVersioningStoreInterface
 
     /**
      * Delete all history for a document.
-     * 
+     *
      * @param doc the document for which to delete all the history
      */
     void deleteArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException;
@@ -63,7 +63,7 @@ public interface XWikiVersioningStoreInterface
     /**
      * Load {@link XWikiRCSNodeContent} on demand. Used in
      * {@link com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo#getContent(XWikiContext)} for example.
-     * 
+     *
      * @return the RCS node content for the passed node id
      * @param id the node id (see {@link XWikiRCSNodeContent#getId()})
      */

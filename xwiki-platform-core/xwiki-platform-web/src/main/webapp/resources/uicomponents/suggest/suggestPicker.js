@@ -168,6 +168,7 @@ var XWiki = (function (XWiki) {
    * @param event the click event fired by the browser
    */
   removeItem : function(event) {
+    if (this.input.readOnly || this.input.disabled) return;
     var item = event.findElement('li');
     item.remove();
     this.notifySelectionChange(item);
@@ -203,7 +204,7 @@ var XWiki = (function (XWiki) {
    * @return true if the item existed and has been re-enabled, false otherwise
    */
   acceptAlreadyAddedItem : function (key) {
-    var input = $(this.getInputId(key));
+    var input = this.list ? this.list.down('input[id="' + this.getInputId(key).replace(/[^a-zA-Z0-9_-]/g, '\\$&') + '"]') : $(this.getInputId(key));
     if (input) {
       input.checked = true;
       this.notifySelectionChange(input.up('li') || input);
@@ -287,16 +288,17 @@ var XWiki = (function (XWiki) {
    * Meta-maintenance of the accepted items list: show/hide the "delete all" button, refresh the Sortable behavior.
    */
   updateListTools : function () {
+    var enabled = !this.input.readOnly && !this.input.disabled;
     // Show/hide the "delete all" button
     if (this.clearTool) {
-      if (this.list.childElements().length > 1) {
+      if (enabled && this.list.childElements().length > 1) {
         this.clearTool.show();
       } else {
         this.clearTool.hide();
       }
     }
     // Refresh the Sortable behavior to take into account the new items
-    if (this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
+    if (enabled && this.options.enableSort && this.list.childElements().length > 1 && typeof(Sortable) != "undefined") {
       Sortable.create(this.list);
       this.list.addClassName('sortable');
     }

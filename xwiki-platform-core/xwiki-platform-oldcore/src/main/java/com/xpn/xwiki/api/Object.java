@@ -65,7 +65,8 @@ public class Object extends Collection
         try {
             XWikiDocument doc = getBaseObject().getOwnerDocument();
             if (doc == null) {
-                doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
+                doc =
+                    getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
             }
 
             return doc.display(name, this.getBaseObject(), getXWikiContext());

@@ -639,7 +639,8 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         // remove group A from the cache => this should also remove all members of groupA
         securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
 
-        // check that userA was seen as a member of groupA by the cache => implies document userA is now a user
+        // check that userA was seen as a member of groupA by the cache => implies document userA was considered as a 
+        // user (and not simply a document) after the second check.
         assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
     }
 

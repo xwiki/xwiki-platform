@@ -35,7 +35,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Default implementation of {@link RenderingCacheConfiguration}.
- * 
+ *
  * @version $Id$
  * @since 2.4M1
  */
@@ -166,7 +166,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
 
     /**
      * Indicate if the provided document's rendering result should be cached according to farm configuration.
-     * 
+     *
      * @param documentReference the reference of the document
      * @return true if the document should be cached, false otherwise
      */
@@ -185,7 +185,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
 
     /**
      * Indicate if the provided document's rendering result should be cached according to wiki configuration.
-     * 
+     *
      * @param documentReference the reference of the document
      * @return true if the document should be cached, false otherwise
      */
@@ -228,7 +228,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
 
     /**
      * Convert a list of String patterns into one {@link Pattern} object.
-     * 
+     *
      * @param configuration the {@link String} to convert to one {@link Pattern}
      * @return {@link Pattern} version of the provided list of {@link String}.
      */

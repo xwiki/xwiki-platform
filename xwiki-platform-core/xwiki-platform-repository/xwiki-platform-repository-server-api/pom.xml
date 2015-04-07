@@ -25,10 +25,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-repository</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-repository-server-api</artifactId>
-  <name>XWiki Platform - Repository - Server API</name>
+  <name>XWiki Platform - Repository - Tests - Server API</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Repository - Server API</description>
   <properties>
@@ -42,7 +42,7 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>   
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-repository-api</artifactId>
@@ -55,7 +55,17 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-ratings-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-query</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -92,7 +92,7 @@ ul.commentreplies, .reply {
 .commenttools {
   display: block;
   float: right;
-  margin-top: -1.2em;
+  margin-top: -1.5em;
 }
 .commenttool a {
   background: transparent left top no-repeat;
@@ -118,7 +118,7 @@ ul.commentreplies, .reply {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
 }
 /* Form */
-#AddComment {
+.skin-colibri #AddComment {
   border-top: 1px solid $theme.borderColor;
 }
 #AddComment fieldset {
@@ -202,4 +202,14 @@ form.edit-xcomment .commentcontent textarea {
 *+html form.edit-xcomment .commentcontent textarea {
   /* fix for IE7 */
   width: 98%;
+}
+@media (max-width: 480px) {
+  .commentdate {
+    display: block;
+  }
+  .commenttools {
+    display: inline-block;
+    float: none;
+    margin: 0;
+  }
 }

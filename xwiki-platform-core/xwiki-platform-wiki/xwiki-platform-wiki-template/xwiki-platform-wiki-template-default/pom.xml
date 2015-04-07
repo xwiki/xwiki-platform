@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-template</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-template-default</artifactId>
   <name>XWiki Platform - Wiki - Template - Default</name>
   <description>Default implementation for XWiki Platform - Wiki - Template</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.27</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -58,7 +58,7 @@
     <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

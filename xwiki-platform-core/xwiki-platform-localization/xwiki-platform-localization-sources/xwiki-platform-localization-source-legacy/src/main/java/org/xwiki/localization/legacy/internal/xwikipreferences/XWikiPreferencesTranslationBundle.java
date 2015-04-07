@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
@@ -39,11 +40,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.localization.wiki.internal.DefaultDocumentTranslationBundle;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Bundle corresponding to global (at the wiki level) localization documents.
@@ -65,12 +65,6 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      * The prefix to use when generating documents bundles unique ids.
      */
     protected static final String IDPREFIX = "XWikiPreferences:";
-
-    /**
-     * Used to access current wiki.
-     */
-    @Inject
-    private ModelContext modelContext;
 
     /**
      * Used to create a cache.
@@ -98,6 +92,9 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     @Named("uid")
     private EntityReferenceSerializer<String> uidSerializer;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * The cache of bundles by wiki.
      */
@@ -107,7 +104,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     /**
      * The cache of bundles by document id.
      */
-    private Cache<DefaultDocumentTranslationBundle> documentBundlesCache;
+    private Cache<XWikiPreferencesDocumentTranslationBundle> documentBundlesCache;
 
     /**
      * Default constructor.
@@ -133,7 +130,10 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     @Override
     public Translation getTranslation(String key, Locale locale)
     {
-        return getBundle().getTranslation(key, locale);
+        XWikiContext xcontext = this.contextProvider.get();
+
+        // Don't do anything when XWiki is not ready
+        return xcontext != null && xcontext.getWiki() != null ? getBundle().getTranslation(key, locale) : null;
     }
 
     /**
@@ -141,7 +141,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      */
     private XWikiPreferencesWikiTranslationBundle getBundle()
     {
-        String currentWiki = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
+        String currentWiki = this.contextProvider.get().getWikiId();
 
         return getBundle(currentWiki);
     }
@@ -197,11 +197,11 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      * @param document the document reference
      * @return the document bundle
      */
-    protected DefaultDocumentTranslationBundle getDocumentTranslationBundle(DocumentReference document)
+    protected XWikiPreferencesDocumentTranslationBundle getDocumentTranslationBundle(DocumentReference document)
     {
         String uid = this.uidSerializer.serialize(document);
 
-        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        XWikiPreferencesDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
             documentBundle = getDocumentTranslationBundleSynchronized(uid, document);
         }
@@ -216,14 +216,14 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      * @param document the document reference
      * @return the document bundle
      */
-    private synchronized DefaultDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
+    private synchronized XWikiPreferencesDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
         DocumentReference document)
     {
-        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        XWikiPreferencesDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
             try {
                 documentBundle =
-                    new DefaultDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
+                    new XWikiPreferencesDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
                         this.translationMessageParser);
                 this.documentBundlesCache.set(uid, documentBundle);
             } catch (ComponentLookupException e) {

@@ -49,6 +49,8 @@ public class WikiUIExtensionParameters
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtensionParameters.class);
 
+    private String id;
+
     /**
      * @see #WikiUIExtensionParameters(String, org.xwiki.component.manager.ComponentManager)
      */
@@ -89,13 +91,15 @@ public class WikiUIExtensionParameters
     /**
      * Default constructor.
      *
+     * @param id the unique identifier of this set of parameters, mostly used to isolate parameters value execution
      * @param rawParameters raw parameters, their values can contain velocity directives
      * @param cm the XWiki component manager
      * @throws WikiComponentException if some required components can't be found in the Component Manager
      */
-    public WikiUIExtensionParameters(String rawParameters, ComponentManager cm)
+    public WikiUIExtensionParameters(String id, String rawParameters, ComponentManager cm)
         throws WikiComponentException
     {
+        this.id = id;
         this.parameters = parseParameters(rawParameters);
 
         try {
@@ -157,7 +161,9 @@ public class WikiUIExtensionParameters
                     for (Map.Entry<String, String> entry : this.parameters.entrySet()) {
                         StringWriter writer = new StringWriter();
                         try {
-                            velocityEngine.evaluate(velocityContext, writer, "", entry.getValue());
+                            String namespace = this.id + ':' + entry.getKey();
+                            velocityEngine.evaluate(new VelocityContext(velocityContext), writer, namespace,
+                                entry.getValue());
                             this.evaluatedParameters.put(entry.getKey(), writer.toString());
                         } catch (XWikiVelocityException e) {
                             LOGGER.warn(String.format(

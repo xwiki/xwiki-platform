@@ -112,8 +112,9 @@ public class InsertExecutable extends InsertHTMLExecutable
             // return immediately because the macro descriptor was cached before this code is executed (the insert macro
             // wizard requires the macro descriptor).
             final boolean[] success = new boolean[] {true};
+            String currentWikiId = config.getParameter("wiki");
             macroService.getMacroDescriptor(new MacroCall(param).getName(), config.getParameter("syntax"),
-                new AsyncCallback<MacroDescriptor>()
+                currentWikiId, new AsyncCallback<MacroDescriptor>()
                 {
                     @Override
                     public void onFailure(Throwable caught)

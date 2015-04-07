@@ -5,20 +5,28 @@
 ## Compute the content to display 
 ## -------------------------------
 ## Honor the syntax if it's passed in the request.
-#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
-#if ($outputSyntax)
-  ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be 
-  ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
-  ## panels on the side, header, etc).
-  #set($syntaxType = $outputSyntax.type.toIdString())
-  #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
-    #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
+#try()
+  #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be
+    ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
+    ## panels on the side, header, etc).
+    #set($syntaxType = $outputSyntax.type.toIdString())
+    #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
+      #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
+    #else
+      ## Make sure to print correctly the result when it's not HTML
+      #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
+    #end
   #else
-    ## Make sure to print correctly the result when it's not HTML
-    #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
+    #set ($renderedContent = $tdoc.getRenderedContent())
   #end
-#else
-  #set ($renderedContent = $tdoc.getRenderedContent())
+#end
+## ----------------------------------------------------------------------------
+## Display UI Extensions before the title element
+## ----------------------------------------------------------------------------
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
+  $services.rendering.render($uix.execute(), 'xhtml/1.0')
 #end
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
@@ -43,7 +51,11 @@ $xcontext.dropPermissions()
 ## Display the rendered content
 ## ----------------------------
 <div id="xwikicontent">
-$renderedContent
+  #if ("$!exception" != '')
+    #displayUnhandledException($exception)
+  #else
+    $renderedContent
+  #end
 </div>
 ## -----------------------------------------------------------------------------------
 ## Display the footnotes if the document is in 1.0 syntax and if there are any defined

@@ -22,7 +22,6 @@ package com.xpn.xwiki.api;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseElement;
 
-
 /**
  * Element is a superclass for any XWiki Class, Object, or Property which might be stored in the database.
  *
@@ -34,8 +33,7 @@ public class Element extends Api
     protected BaseElement element;
 
     /**
-     * The Constructor.
-     * Create a new element wrapping the given internal BaseElement.
+     * The Constructor. Create a new element wrapping the given internal BaseElement.
      *
      * @param element the internal BaseElement to wrap.
      * @param context the XWikiContext which may be used to get information about the current request.

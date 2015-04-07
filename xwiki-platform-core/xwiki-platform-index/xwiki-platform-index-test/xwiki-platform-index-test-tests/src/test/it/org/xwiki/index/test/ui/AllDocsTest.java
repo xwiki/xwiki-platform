@@ -22,20 +22,20 @@ package org.xwiki.index.test.ui;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.xwiki.index.test.po.AllDocsPage;
+import org.xwiki.index.test.po.DocumentTreeElement;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.EntityTreeElement;
 import org.xwiki.test.ui.po.LiveTableElement;
+import org.xwiki.tree.test.po.TreeNodeElement;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests for the AllDocs page.
@@ -50,32 +50,37 @@ public class AllDocsTest extends AbstractTest
     {
         // Test 1: Verify that the Action column is displayed only for logged in users
         // Create a test user
-        getUtil().createUserAndLogin(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
+        getUtil().createUserAndLogin(getTestClassName() + "_" + getTestMethodName(), "password");
         AllDocsPage page = AllDocsPage.gotoPage();
         LiveTableElement livetable = page.clickIndexTab();
         assertTrue("No Actions column found", livetable.hasColumn("Actions"));
-        // Logs out to be guest
-        page.logout();
+
+        // Logs out to be guest to verify that the Action columns is no longer displayed
+        getUtil().forceGuestUser();
+
+        page = AllDocsPage.gotoPage();
         livetable = page.clickIndexTab();
         assertFalse("Actions column shouldn't be visible for guests", livetable.hasColumn("Actions"));
 
         // Test 2: Verify filtering works by filtering on the document name
         livetable = page.clickIndexTab();
-        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", "XWikiAllGroup");
-        assertTrue(livetable.hasRow("Page", "XWikiAllGroup"));
+        livetable.filterColumn("xwiki-livetable-alldocs-filter-1", getTestMethodName());
+        // We get one result for the user we've created
+        assertEquals(1, livetable.getRowCount());
+        assertTrue(livetable.hasRow("Page", getTestClassName() + "_" + getTestMethodName()));
     }
 
     @Test
     public void recycleBinTab() throws Exception
     {
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
-        AllDocsPage page = AllDocsPage.gotoPage();
+        getUtil().loginAsSuperAdminAndGotoPage(AllDocsPage.getURL());
+        AllDocsPage page = new AllDocsPage();
         assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
         assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
-        // Logs out to be guest
-        page.logout();
+
+        // Logs out to be guest to verify that Deleted attachments/documents are not visible to guests
+        getUtil().forceGuestUser();
+
         assertFalse("Deleted documents shouldn't be visible to guests", page.hasDeletedDocsTab());
         assertFalse("Deleted attachments shouldn't be visible to guests", page.hasDeletedAttachmentsTab());
 
@@ -94,33 +99,28 @@ public class AllDocsTest extends AbstractTest
         getUtil().createPageWithAttachment(spaceName, "Child", null, "Child Page", null, spaceName + ".Parent",
             "file.txt", getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
-        EntityTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
 
-        tree.waitForSpace(spaceName);
-        assertFalse(tree.hasPage(spaceName, "WebHome", "Grandparent Page"));
-        assertFalse(tree.hasPage(spaceName, "Parent", "Parent Page"));
-        assertFalse(tree.hasPage(spaceName, "Child", "Child Page"));
+        assertFalse(tree.hasDocument(spaceName, "WebHome"));
+        tree.getSpaceNode(spaceName).open().waitForIt();
+        TreeNodeElement grandParent = tree.getDocumentNode(spaceName, "WebHome");
+        assertEquals("Grandparent Page", grandParent.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "Parent"));
+        grandParent.open().waitForIt();
+        TreeNodeElement parent = tree.getDocumentNode(spaceName, "Parent");
+        assertEquals("Parent Page", parent.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "Child"));
+        parent.open().waitForIt();
+        TreeNodeElement child = tree.getDocumentNode(spaceName, "Child");
+        assertEquals("Child Page", child.getLabel());
+
         assertFalse(tree.hasAttachment(spaceName, "Child", "file.txt"));
-
-        tree.lookupEntity(spaceName + ".Child@file.txt");
-        tree.waitForAttachment(spaceName, "Child", "file.txt", true);
-        assertTrue(tree.hasPage(spaceName, "WebHome", "Grandparent Page"));
-        assertTrue(tree.hasPage(spaceName, "Parent", "Parent Page"));
-        assertTrue(tree.hasPage(spaceName, "Child", "Child Page"));
-
-        if (getDriver() instanceof JavascriptExecutor) {
-            JavascriptExecutor driver = (JavascriptExecutor) getDriver();
-
-            // The "Treeview" JavaScript object is specific to the document index page.
-            assertEquals("xwiki", driver.executeScript("return window.Treeview.getSelectedResourceProperty('wiki')"));
-            assertEquals(spaceName, driver.executeScript("return window.Treeview.getSelectedResourceProperty('space')"));
-            assertEquals("Child", driver.executeScript("return window.Treeview.getSelectedResourceProperty('name')"));
-            assertEquals("file.txt",
-                driver.executeScript("return window.Treeview.getSelectedResourceProperty('attachment')"));
-            // The anchor is undefined in this case.
-            assertNull(driver.executeScript("return window.Treeview.getSelectedResourceProperty('anchor')"));
-            assertEquals(spaceName + ".Child@file.txt", driver.executeScript("return window.Treeview.getValue()"));
-        }
+        // Open the Attachments node.
+        child.open().waitForIt().getChildren().get(0).open().waitForIt();
+        TreeNodeElement file = tree.getAttachmentNode(spaceName, "Child", "file.txt");
+        assertEquals("file.txt", file.getLabel());
     }
 
     /**
@@ -139,14 +139,12 @@ public class AllDocsTest extends AbstractTest
         getUtil().createPage(spaceName, "Level@3", null, null, null, spaceRef + ".Level{[(2)]}");
         getUtil().createPage(spaceName, "End", null, null, null, spaceRef + ".Level@3");
 
-        EntityTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
-        tree.lookupEntity(spaceRef + ".End");
-        tree.waitForPage(spaceName, "End", true);
-        assertTrue(tree.hasPage(spaceName, "Level.1"));
-        // The curly open bracket '{' is encoded in the rendered title (for security reasons?..).
-        // See http://jira.xwiki.org/browse/XWIKI-7815
-        assertTrue(tree.hasPage(spaceName, "Level{[(2)]}", "Level&#123;[(2)]}"));
-        assertTrue(tree.hasPage(spaceName, "Level@3"));
+        DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
+        tree.openToDocument(spaceName, "End");
+
+        assertTrue(tree.hasDocument(spaceName, "Level.1"));
+        assertTrue(tree.hasDocument(spaceName, "Level{[(2)]}"));
+        assertTrue(tree.hasDocument(spaceName, "Level@3"));
     }
 
     /**

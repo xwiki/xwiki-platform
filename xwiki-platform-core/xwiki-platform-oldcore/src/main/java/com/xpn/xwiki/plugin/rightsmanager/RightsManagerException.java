@@ -24,7 +24,7 @@ import com.xpn.xwiki.plugin.PluginException;
 
 /**
  * Rights Manager plugin base exception.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -39,7 +39,7 @@ public class RightsManagerException extends PluginException
 
     /**
      * Create an RightsManagerException.
-     * 
+     *
      * @param code the error code.
      * @param message a literal message about this error.
      */
@@ -51,7 +51,7 @@ public class RightsManagerException extends PluginException
     /**
      * Create an RightsManagerException. Replace any parameters found in the <code>message</code> by the passed
      * <code>args</code> parameters. The format is the one used by {@link java.text.MessageFormat}.
-     * 
+     *
      * @param code the error code.
      * @param message a literal message about this error.
      * @param e the exception this exception wrap.
@@ -65,7 +65,7 @@ public class RightsManagerException extends PluginException
 
     /**
      * Create an RightsManagerException.
-     * 
+     *
      * @param code the error code.
      * @param message a literal message about this error.
      * @param e the exception this exception wrap.

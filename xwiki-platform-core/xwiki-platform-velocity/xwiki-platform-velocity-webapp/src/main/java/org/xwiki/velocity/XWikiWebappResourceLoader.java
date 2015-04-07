@@ -20,7 +20,7 @@
 package org.xwiki.velocity;
 
 import org.apache.commons.collections.ExtendedProperties;
-import org.apache.velocity.tools.view.servlet.WebappLoader;
+import org.apache.velocity.tools.view.WebappResourceLoader;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
@@ -35,7 +35,7 @@ import org.xwiki.environment.internal.ServletEnvironment;
  * @version $Id$
  * @since 3.0M3
  */
-public class XWikiWebappResourceLoader extends WebappLoader
+public class XWikiWebappResourceLoader extends WebappResourceLoader
 {
     @Override
     public void init(ExtendedProperties configuration)

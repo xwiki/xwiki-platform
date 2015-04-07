@@ -1,0 +1,75 @@
+###
+### Display document contents in "view" mode.
+###
+## -------------------------------
+## Compute the content to display 
+## -------------------------------
+## Honor the syntax if it's passed in the request.
+#try()
+  #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+  #if ($outputSyntax)
+    ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be
+    ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
+    ## panels on the side, header, etc).
+    #set($syntaxType = $outputSyntax.type.toIdString())
+    #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
+      #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
+    #else
+      ## Make sure to print correctly the result when it's not HTML
+      #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
+    #end
+  #else
+    #set ($renderedContent = $tdoc.getRenderedContent())
+  #end
+#end
+## ----------------------------------------------------------------------------
+## Compute title to display and modify rendered content accordingly.
+## ----------------------------------------------------------------------------
+#template("titlevars.vm")
+## ----------------------------
+## Display the title
+## ----------------------------
+<div class="xcontent">
+  <div class="row document-header">
+    <div class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end">
+      ## --------------------------------------------------------
+      ## Display UI Extensions before the title element
+      ## --------------------------------------------------------
+      #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.title.before'))
+        $services.rendering.render($uix.execute(), 'xhtml/1.0')
+      #end
+      <div id="document-title"><h1>$titleToDisplay</h1></div>
+      <div class="xdocLastModification">
+        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+      </div>
+    </div>
+    #if($displayContentMenu)
+      <div class="document-menu col-xs-12 col-md-5">
+        #template("menus_content.vm")
+      </div>
+    #end
+  </div>
+  <hr/>
+  ## --------------------------------------------------------------------------
+  ## Drop permissions as they are no longer needed. This allows us not to have
+  ## to review the code below for security holes since nothing bad can happen.
+  ## --------------------------------------------------------------------------
+  $xcontext.dropPermissions()
+  ## ----------------------------
+  ## Display the rendered content
+  ## ----------------------------
+  <div class="row">
+    <div id="xwikicontent" class="col-xs-12">
+      #if ("$!exception" != '')
+        #displayUnhandledException($exception)
+      #else
+        $renderedContent
+      #end
+    </div>
+  </div>
+</div>
+## -----------------------------------------------------------------------------------
+## Display the footnotes if the document is in 1.0 syntax and if there are any defined
+## -----------------------------------------------------------------------------------
+#set($footnotes = "#putFootnotes()")
+$xwiki.renderText($footnotes, $doc)

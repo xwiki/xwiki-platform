@@ -25,14 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-captcha</artifactId>
   <name>XWiki Platform - Captcha</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Captcha</description>
+  <description>Offers API to generate Captchas</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Captcha Module</xwiki.extension.name>
   </properties>
   <dependencies>
     <!-- CaptchaActions are components -->
@@ -74,7 +76,7 @@
     <!-- Need servlet api for getting HttpSession id and flushing captcha to HttpResponse -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <!-- AbstractCaptchaAction extends org.apache.struts.action.Action -->
     <dependency>

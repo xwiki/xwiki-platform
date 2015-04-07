@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -39,19 +41,20 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PageTranslationHistoryResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PageTranslationHistoryResourceImpl")
 public class PageTranslationHistoryResourceImpl extends XWikiResource implements PageTranslationHistoryResource
 {
     @Override
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         History history = new History();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
@@ -80,7 +83,7 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return history;

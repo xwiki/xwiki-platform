@@ -37,7 +37,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 
 /**
  * API for managing users.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -60,7 +60,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Create an instance of RightsManageRightsApi.
-     * 
+     *
      * @param context the XWiki context.
      */
     public RightsManagerUsersApi(XWikiContext context)
@@ -70,7 +70,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Log error and register {@link #CONTEXT_LASTERRORCODE} and {@link #CONTEXT_LASTEXCEPTION}.
-     * 
+     *
      * @param comment the comment to use with {@link #LOGGER}.
      * @param e the exception.
      */
@@ -102,7 +102,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the current wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedUsers(Map< ? , ? > matchFields) throws XWikiException
+    public int countAllMatchedUsers(Map<?, ?> matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -119,7 +119,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get the number of users in the provided wiki.
-     * 
+     *
      * @param wikiName the name of the wiki where to search for users.
      * @return the number of users in the provided wiki.
      * @throws XWikiException error when getting number of users.
@@ -131,7 +131,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get the number of users in the provided wiki.
-     * 
+     *
      * @param wikiName the name of the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -141,7 +141,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the provided wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields) throws XWikiException
+    public int countAllMatchedWikiUsers(String wikiName, Map<?, ?> matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -150,7 +150,7 @@ public class RightsManagerUsersApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(true, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to count all users in wiki [{0}]", new Object[] {wikiName}), e);
+            logError(MessageFormat.format("Try to count all users in wiki [{0}]", new Object[] { wikiName }), e);
         }
 
         return count;
@@ -174,7 +174,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the main wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedGlobalUsers(Map< ? , ? > matchFields) throws XWikiException
+    public int countAllMatchedGlobalUsers(Map<?, ?> matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -207,7 +207,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the current wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedLocalUsers(Map< ? , ? > matchFields) throws XWikiException
+    public int countAllMatchedLocalUsers(Map<?, ?> matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -224,7 +224,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki and the current wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
@@ -237,7 +237,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki and the current wiki.
-     * 
+     *
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
@@ -248,7 +248,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -257,14 +257,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields) throws XWikiException
+    public List<String> getAllMatchedUsersNames(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedUsersNames(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users names in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -275,14 +275,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
+    public List<String> getAllMatchedUsersNames(Map<?, ?> matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedUsersNames(matchFields, nb, start, null);
     }
 
     /**
      * Get all users names in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -298,7 +298,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<String> getAllMatchedUsersNames(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<String> userList;
@@ -319,7 +319,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
@@ -332,7 +332,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki.
-     * 
+     *
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
@@ -343,7 +343,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -352,14 +352,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields) throws XWikiException
+    public List<String> getAllMatchedGlobalUsersNames(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users names in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -370,7 +370,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields, int nb, int start)
+    public List<String> getAllMatchedGlobalUsersNames(Map<?, ?> matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(matchFields, nb, start, null);
@@ -378,7 +378,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -394,7 +394,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<String> getAllMatchedGlobalUsersNames(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<String> userList;
@@ -415,7 +415,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -429,7 +429,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
@@ -441,7 +441,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -451,14 +451,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields) throws XWikiException
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, matchFields, 0, 0, null);
     }
 
     /**
      * Get all users names in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -470,7 +470,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields, int nb, int start)
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map<?, ?> matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start, null);
@@ -478,7 +478,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -495,8 +495,8 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields, int nb, int start,
-        List< ? > order) throws XWikiException
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map<?, ?> matchFields, int nb, int start,
+        List<?> order) throws XWikiException
     {
         List<String> userList;
 
@@ -516,7 +516,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the current wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
@@ -529,7 +529,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the current wiki.
-     * 
+     *
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
@@ -540,7 +540,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users names in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -549,14 +549,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields) throws XWikiException
+    public List<String> getAllMatchedLocalUsersNames(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedLocalUsersNames(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users names in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -567,14 +567,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
+    public List<String> getAllMatchedLocalUsersNames(Map<?, ?> matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsersNames(matchFields, nb, start, null);
     }
 
     /**
      * Get all users names in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -591,7 +591,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<String> getAllMatchedLocalUsersNames(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<String> userList;
@@ -612,7 +612,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki and the current wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link Document} containing user.
@@ -625,7 +625,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki and the current wiki.
-     * 
+     *
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
@@ -636,7 +636,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -645,14 +645,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields) throws XWikiException
+    public List<Document> getAllMatchedUsers(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedUsers(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -663,14 +663,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedUsers(Map<?, ?> matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedUsers(matchFields, nb, start, null);
     }
 
     /**
      * Get all users in the main wiki and the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -686,7 +686,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<Document> getAllMatchedUsers(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<Document> userList;
@@ -709,7 +709,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link Document} containing user.
@@ -722,7 +722,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki.
-     * 
+     *
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
@@ -733,7 +733,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -742,14 +742,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields) throws XWikiException
+    public List<Document> getAllMatchedGlobalUsers(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedGlobalUsers(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -760,14 +760,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedGlobalUsers(Map<?, ?> matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalUsers(matchFields, nb, start, null);
     }
 
     /**
      * Get all users in the main wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -783,7 +783,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<Document> getAllMatchedGlobalUsers(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<Document> userList;
@@ -806,7 +806,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -820,7 +820,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
@@ -832,7 +832,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -842,14 +842,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields) throws XWikiException
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, matchFields, 0, 0, null);
     }
 
     /**
      * Get all users in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -861,7 +861,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields, int nb, int start)
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map<?, ?> matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, matchFields, nb, start, null);
@@ -869,7 +869,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the provided wiki.
-     * 
+     *
      * @param wikiName the wiki where to search for users.
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
@@ -886,8 +886,8 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields, int nb, int start,
-        List< ? > order) throws XWikiException
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map<?, ?> matchFields, int nb, int start,
+        List<?> order) throws XWikiException
     {
         List<Document> userList;
 
@@ -909,7 +909,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the current wiki.
-     * 
+     *
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link Document} containing user.
@@ -922,7 +922,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the current wiki.
-     * 
+     *
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
@@ -933,7 +933,7 @@ public class RightsManagerUsersApi extends Api
 
     /**
      * Get all users in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -942,14 +942,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields) throws XWikiException
+    public List<Document> getAllMatchedLocalUsers(Map<?, ?> matchFields) throws XWikiException
     {
         return getAllMatchedLocalUsers(matchFields, 0, 0, null);
     }
 
     /**
      * Get all users in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -960,14 +960,14 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedLocalUsers(Map<?, ?> matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsers(matchFields, nb, start, null);
     }
 
     /**
      * Get all users in the current wiki.
-     * 
+     *
      * @param matchFields the fields to match. It is a Map with field name as key and for value :
      *            <ul>
      *            <li>"matching string" for document fields</li>
@@ -983,7 +983,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
+    public List<Document> getAllMatchedLocalUsers(Map<?, ?> matchFields, int nb, int start, List<?> order)
         throws XWikiException
     {
         List<Document> userList;

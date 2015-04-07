@@ -51,7 +51,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Abstract {@link SheetBinder} implementation that binds a sheet to a XWiki document by adding an object to the
  * document. The object has a property named "sheet" that holds a reference to the sheet. Concrete extension of this
  * class must specify the type of object to be used for binding.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -78,7 +78,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Inject
     @Named("relative")
     private EntityReferenceResolver<String> relativeReferenceResolver;
-    
+
     /**
      * The component used to serialize entity references as absolute string references.
      */
@@ -113,7 +113,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     public List<DocumentReference> getSheets(DocumentModelBridge document)
     {
         DocumentReference sheetBindingClassReference =
-            documentReferenceResolver.resolve(getSheetBindingClass(), document.getDocumentReference());
+            this.documentReferenceResolver.resolve(getSheetBindingClass(), document.getDocumentReference());
         List<BaseObject> sheetBindingObjects = ((XWikiDocument) document).getXObjects(sheetBindingClassReference);
         if (sheetBindingObjects == null) {
             return Collections.emptyList();
@@ -124,7 +124,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             if (sheetBindingObject != null) {
                 String sheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
                 DocumentReference sheetReference =
-                    documentReferenceResolver.resolve(sheetStringRef, document.getDocumentReference());
+                    this.documentReferenceResolver.resolve(sheetStringRef, document.getDocumentReference());
                 sheets.add(sheetReference);
             }
         }
@@ -134,21 +134,21 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Override
     public List<DocumentReference> getDocuments(DocumentReference expectedSheetRef)
     {
-        sheetBindingsQuery.setWiki(expectedSheetRef.getWikiReference().getName());
+        this.sheetBindingsQuery.setWiki(expectedSheetRef.getWikiReference().getName());
         try {
-            List<Object[]> sheetBindings = sheetBindingsQuery.execute();
+            List<Object[]> sheetBindings = this.sheetBindingsQuery.execute();
             List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
             for (Object[] sheetBinding : sheetBindings) {
                 DocumentReference docRef =
-                    documentReferenceResolver.resolve((String) sheetBinding[0], expectedSheetRef);
-                DocumentReference sheetRef = documentReferenceResolver.resolve((String) sheetBinding[1], docRef);
+                    this.documentReferenceResolver.resolve((String) sheetBinding[0], expectedSheetRef);
+                DocumentReference sheetRef = this.documentReferenceResolver.resolve((String) sheetBinding[1], docRef);
                 if (sheetRef.equals(expectedSheetRef)) {
                     documentReferences.add(docRef);
                 }
             }
             return documentReferences;
         } catch (QueryException e) {
-            logger.warn("Failed to query sheet bindings.", e);
+            this.logger.warn("Failed to query sheet bindings.", e);
             return Collections.emptyList();
         }
     }
@@ -165,7 +165,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 if (sheetBindingObject != null) {
                     String boundSheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
                     DocumentReference boundSheetReference =
-                        documentReferenceResolver.resolve(boundSheetStringRef, document.getDocumentReference());
+                        this.documentReferenceResolver.resolve(boundSheetStringRef, document.getDocumentReference());
                     if (boundSheetReference.equals(sheetReference)) {
                         return false;
                     }
@@ -173,15 +173,16 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             }
         }
         String relativeSheetStringReference =
-            compactEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference());
+            this.compactEntityReferenceSerializer.serialize(sheetReference, document.getDocumentReference());
         try {
             BaseObject sheetBindingObject =
                 ((XWikiDocument) document).newXObject(sheetBindingClassReference, getXWikiContext());
             sheetBindingObject.setStringValue(SHEET_PROPERTY, relativeSheetStringReference);
         } catch (XWikiException e) {
-            String docStringReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-            String sheetStringReference = defaultEntityReferenceSerializer.serialize(sheetReference);
-            logger.warn("Failed to bind sheet [{}] to document [{}].", sheetStringReference, docStringReference);
+            String docStringReference =
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+            String sheetStringReference = this.defaultEntityReferenceSerializer.serialize(sheetReference);
+            this.logger.warn("Failed to bind sheet [{}] to document [{}].", sheetStringReference, docStringReference);
             return false;
         }
         return true;
@@ -191,7 +192,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     public boolean unbind(DocumentModelBridge document, DocumentReference sheetReference)
     {
         DocumentReference sheetBindingClassReference =
-            documentReferenceResolver.resolve(getSheetBindingClass(), document.getDocumentReference());
+            this.documentReferenceResolver.resolve(getSheetBindingClass(), document.getDocumentReference());
         List<BaseObject> sheetBindingObjects = ((XWikiDocument) document).getXObjects(sheetBindingClassReference);
         if (sheetBindingObjects == null) {
             return false;
@@ -201,7 +202,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
             if (sheetBindingObject != null) {
                 String boundSheetStringRef = sheetBindingObject.getStringValue(SHEET_PROPERTY);
                 DocumentReference boundSheetReference =
-                    documentReferenceResolver.resolve(boundSheetStringRef, document.getDocumentReference());
+                    this.documentReferenceResolver.resolve(boundSheetStringRef, document.getDocumentReference());
                 if (boundSheetReference.equals(sheetReference)) {
                     return ((XWikiDocument) document).removeXObject(sheetBindingObject);
                 }
@@ -217,7 +218,7 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
     @Deprecated
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 
     /**
@@ -233,9 +234,9 @@ public abstract class AbstractSheetBinder implements SheetBinder, Initializable
                 "select doc.fullName, prop.value from XWikiDocument doc, BaseObject obj, StringProperty prop where "
                     + "obj.className=:sheetBindingClass and obj.name=doc.fullName and obj.id=prop.id.id and "
                     + "prop.id.name=:sheetProperty order by doc.fullName";
-            sheetBindingsQuery = queryManager.createQuery(statement, Query.HQL);
-            sheetBindingsQuery.bindValue("sheetBindingClass", getSheetBindingClass());
-            sheetBindingsQuery.bindValue("sheetProperty", SHEET_PROPERTY);
+            this.sheetBindingsQuery = this.queryManager.createQuery(statement, Query.HQL);
+            this.sheetBindingsQuery.bindValue("sheetBindingClass", getSheetBindingClass());
+            this.sheetBindingsQuery.bindValue("sheetProperty", SHEET_PROPERTY);
         } catch (QueryException e) {
             throw new InitializationException("Failed to create query for retrieving the list of sheet bindings.", e);
         }

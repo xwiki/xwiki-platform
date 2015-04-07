@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogPostTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.BlogPostClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.BlogPostClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1226490231000</creationDate>
   <date>1226817819000</date>
   <contentUpdateDate>1226817819000</contentUpdateDate>
   <version>1.1</version>
   <title>Template for blog entries</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Blog.BlogPostTemplate</name>
+    <number>0</number>
+    <className>Blog.BlogPostClass</className>
+    <guid>150b08a7-8d34-4d98-ac35-f4d2c10b4afe</guid>
     <class>
       <name>Blog.BlogPostClass</name>
       <customClass/>
@@ -57,6 +58,7 @@
         <cache>0</cache>
         <classname>Blog.CategoryClass</classname>
         <customDisplay/>
+        <disabled>0</disabled>
         <displayType>checkbox</displayType>
         <idField>doc.fullName</idField>
         <multiSelect>1</multiSelect>
@@ -81,6 +83,7 @@
       <content>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
+        <disabled>0</disabled>
         <editor>---</editor>
         <name>content</name>
         <number>2</number>
@@ -97,6 +100,7 @@
       <extract>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
+        <disabled>0</disabled>
         <editor>---</editor>
         <name>extract</name>
         <number>3</number>
@@ -113,6 +117,7 @@
       <hidden>
         <customDisplay/>
         <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
         <name>hidden</name>
@@ -127,6 +132,7 @@
       <publishDate>
         <customDisplay/>
         <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+        <disabled>0</disabled>
         <emptyIsToday>1</emptyIsToday>
         <name>publishDate</name>
         <number>7</number>
@@ -142,6 +148,7 @@
       <published>
         <customDisplay/>
         <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
         <name>published</name>
@@ -155,6 +162,7 @@
       </published>
       <title>
         <customDisplay/>
+        <disabled>0</disabled>
         <name>title</name>
         <number>1</number>
         <picker>0</picker>
@@ -167,10 +175,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </title>
     </class>
-    <name>Blog.BlogPostTemplate</name>
-    <number>0</number>
-    <className>Blog.BlogPostClass</className>
-    <guid>150b08a7-8d34-4d98-ac35-f4d2c10b4afe</guid>
     <property>
       <category/>
     </property>
@@ -193,5 +197,4 @@
       <title>Enter your title here</title>
     </property>
   </object>
-  <content/>
 </xwikidoc>

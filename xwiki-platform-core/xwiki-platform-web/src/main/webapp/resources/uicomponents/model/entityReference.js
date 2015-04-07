@@ -10,7 +10,30 @@ XWiki.EntityType = {
   OBJECT: ordinal++,
   OBJECT_PROPERTY: ordinal++,
   CLASS_PROPERTY: ordinal++
+};
+
+var entityTypeNames = [];
+for(var entityType in XWiki.EntityType) {
+  if (XWiki.EntityType.hasOwnProperty(entityType)) {
+    var index = XWiki.EntityType[entityType];
+    var parts = entityType.toLowerCase().split('_');
+    for (var i = 1; i < parts.length; i++) {
+      parts[i] = parts[i].substr(0, 1).toUpperCase() + parts[i].substr(1);
+    }
+    entityTypeNames[index] = parts.join('');
+  }
 }
+XWiki.EntityType.getName = function(entityType) {
+  return entityTypeNames[entityType];
+};
+XWiki.EntityType.byName = function(name) {
+  for(var index = 0; index < entityTypeNames.length; index++) {
+    if (entityTypeNames[index] === name) {
+      return index;
+    }
+  }
+  return -1;
+};
 
 XWiki.EntityReference = Class.create({
   initialize: function(name, type, parent) {

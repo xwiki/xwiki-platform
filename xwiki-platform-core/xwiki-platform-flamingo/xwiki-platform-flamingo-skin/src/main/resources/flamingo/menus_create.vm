@@ -1,0 +1,36 @@
+##################################
+##         CREATE MENU
+##################################
+#if($displayCreateMenu)
+## $displayCreateWiki is determined by:
+## - the wiki app is installed
+## - and the user has the right to create a wiki
+## - and the wiki application has been installed.
+## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
+#set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
+#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $displayCreateWiki)
+#if ($displayCreateSubmenu)
+  <li><div class="navbar-form navbar-left">
+  #xwikisplitbuttonentrystart($doc.getURL('create') $services.localization.render('core.menu.create') 'tmCreate' 'btn-success' 'plus')
+  #if ($hasCreatePage)
+    #submenuitem($doc.getURL('create') $services.localization.render('core.menu.create.page') 'tmCreatePage', '', 'file')
+  #end
+  #if ($hasCreateSpace)
+    #submenuitem($doc.getURL('create', 'tocreate=space') $services.localization.render('core.menu.create.space') 'tmCreateSpace', '', 'folder-open')
+  #end
+  #if ($displayCreateWiki)
+    #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
+    #submenuitem($xwiki.getURL($createWikiDocReference) $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '', 'globe')
+  #end
+  #if ($hasCreatePage)
+    ## Only display the Office Importer menu action if the Office Importer application is installed
+    #set ($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
+    #if ("$!{officeImporterMainDocument.isNew()}" == 'false')
+      #submenuseparator()
+      #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $services.localization.render('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '', 'import')
+    #end
+  #end
+  #xwikibuttonentryend()
+  </div></li>
+#end
+#end

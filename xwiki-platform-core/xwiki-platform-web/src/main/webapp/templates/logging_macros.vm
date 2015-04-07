@@ -1,0 +1,131 @@
+#set ($discard = $xwiki.ssfx.use('uicomponents/logging/logging.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/logging/logging.js', true))
+
+#macro (getThrowableRootCauseMessage $throwable)
+  #if ($throwable.cause)
+    #getThrowableRootCauseMessage($throwable.cause)
+  #else
+    $!{throwable.message}##
+  #end
+#end
+
+#macro (printThrowable $throwable $isCause)
+#if (!$isCause)
+  <div class="stacktrace">##
+#end
+$escapetool.xml($throwable.class): #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
+
+#foreach($stackTraceElement in $throwable.stackTrace)
+    at $escapetool.xml($stackTraceElement)
+#end
+#if ($throwable.cause)
+Caused by: #printThrowable($throwable.cause true)
+#end
+#if (!$isCause)</div>#end
+#end
+
+#macro (displayDocumentReference $documentReference)
+  #set ($path = [])
+  #set($wikiReference = $documentReference.extractReference("WIKI"))
+  #set($wikiId = $wikiReference.name)
+  #if(!$wikiId)
+    #set($wikiId = $doc.wiki)
+    #set($wikiReference = $services.model.createEntityReference($wikiId, 'WIKI'))
+  #end
+  #set ($wikiPrettyName = $services.wiki.getById($wikiId).prettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $wikiId)
+  #end
+  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
+  #set ($discard = $path.add("<a href=""$xwiki.getURL($wikiHomeDocRef)"">$escapetool.xml($wikiPrettyName)</a>"))
+  ##
+  #foreach ($spaceReference in $documentReference.spaceReferences)
+    #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
+    #set ($discard = $path.add("<a href=""$xwiki.getURL($spaceHomeDocRef)"">$escapetool.xml($spaceReference.name)</a>"))
+  #end
+  ##
+  #set ($discard = $path.add("<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($documentReference.name)</a>"))
+  $stringtool.join($path, ' &raquo; ')
+#end
+
+#macro (printLogMessage $log)
+  #set ($message = '')
+  #set ($messageElements = $log.messageElements)
+  #foreach ($messageElement in $messageElements)
+    #if ($velocityCount == $messageElements.size())
+      ## Skip the last message element because we always have more message elements than arguments.
+      #break
+    #end
+    #set ($argument = $log.argumentArray.get($foreach.index))
+    #set ($message = "$message$escapetool.xml($messageElement)")
+    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
+    ## We will display a link to that entity, so we need to extract the document from it.
+    #set ($documentReference = $argument.extractReference("DOCUMENT"))
+    #if ($documentReference)
+      #set ($documentReferenceDisplay = "#displayDocumentReference($documentReference)")
+      #set ($message = "$message$documentReferenceDisplay.trim()")
+    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
+      ## Search for the extension/dependency only in the core and local repositories.
+      #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
+      #if (!$_extension)
+        #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
+      #end
+      #if ($_extension)
+        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
+        #set ($_extensionName = "#displayExtensionName($_extension)")
+        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
+      #else
+        #set ($version = $argument.version)
+        #if (!$version)
+          #set ($version = $argument.versionConstraint)
+        #end
+        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
+        #set ($_extensionName = $argument)
+      #end
+      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
+    #elseif ($argument.listIterator())
+      ## Assume the argument is a job id.
+      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
+    #elseif ($argument.startsWith('wiki:'))
+      #set ($message = "$message#wikiHomePageLink($argument)")
+    #elseif ($argument.previous && $argument.next)
+      ## Assume the argument is a diff Delta.
+      #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
+    #else
+      #set ($message = "$message$!escapetool.xml($argument)")
+    #end
+  #end
+  ## Add the last message element.
+  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
+#end
+
+#macro (printLog $log)
+  #if ($log.throwable)
+    #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
+    #if ("$!message.trim()" != '')
+      <div>$escapetool.xml($message)</div>
+    #else
+      <div>#printLogMessage($log)</div>
+    #end
+    #printThrowable($log.throwable)
+  #else
+    <div>#printLogMessage($log)</div>
+  #end
+#end
+
+#macro (printLogs $logs $loading)
+  #if ($logs.size() > 0)
+  <ul class="log">
+  #foreach ($log in $logs)
+    #set ($logLevel = $log.level.toString().toLowerCase())
+    #if ($loading && !$foreach.hasNext)
+      ## Display the last log item as loading if the associated task is not finished.
+      #set ($logLevel = 'loading')
+    #end
+    <li class="log-item log-item-$logLevel">
+      #printLog($log)
+    </li>
+  #end
+  </ul>
+  #end
+#end

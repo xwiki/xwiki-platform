@@ -37,9 +37,11 @@ import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -85,12 +87,6 @@ public class WikiIRCBotScriptService implements ScriptService
     private EntityReferenceValueProvider valueProvider;
 
     /**
-     * Used to serialize references because of old APIs taking only Strings.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
      * Used to get the XWiki Context.
      */
     @Inject
@@ -101,6 +97,9 @@ public class WikiIRCBotScriptService implements ScriptService
      */
     @Inject
     private Execution execution;
+
+    @Inject
+    private AuthorizationManager authorization;
 
     /**
      * @param updateBotStatus see {@link WikiIRCBotManager#startBot(boolean)}
@@ -200,8 +199,8 @@ public class WikiIRCBotScriptService implements ScriptService
     }
 
     /**
-     * @return true if the user is allowed to start/stop the Bot ie if the user is logged on the main wiki and has
-     *         Admin rights on the main wiki
+     * @return true if the user is allowed to start/stop the Bot ie if the user is logged on the main wiki and has Admin
+     *         rights on the main wiki
      */
     public boolean hasPermission()
     {
@@ -215,15 +214,10 @@ public class WikiIRCBotScriptService implements ScriptService
                 String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
 
                 // Check if the current user is logged on the main wiki.
-                if (userReference.getWikiReference().getName().equals(mainWiki))
-                {
-                    DocumentReference mainXWikiPreferencesReference =
-                        new DocumentReference(mainWiki, "XWiki", "XWikiPreferences");
-
+                if (userReference.getWikiReference().getName().equals(mainWiki)) {
                     // Check if the user has Admin rights on the main wiki
-                    hasPermission = context.getWiki().getRightService().hasAccessLevel("admin",
-                        this.entityReferenceSerializer.serialize(userReference),
-                        this.entityReferenceSerializer.serialize(mainXWikiPreferencesReference), context);
+                    hasPermission =
+                        this.authorization.hasAccess(Right.ADMIN, userReference, new WikiReference(mainWiki));
                 }
             }
         } catch (Exception e) {

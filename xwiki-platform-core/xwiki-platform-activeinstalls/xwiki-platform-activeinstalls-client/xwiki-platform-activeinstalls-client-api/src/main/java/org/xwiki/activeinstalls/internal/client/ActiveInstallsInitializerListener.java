@@ -100,7 +100,7 @@ public class ActiveInstallsInitializerListener implements EventListener
         this.instanceIdManagerProvider.get().initializeInstanceId();
 
         // Start a thread to regularly send pings to the active installs server.
-        Thread pingThread = new ActiveInstallsPingThread(this.configuration, this.pingSenderProvider.get());
+        Thread pingThread = new Thread(new ActiveInstallsPingThread(this.configuration, this.pingSenderProvider.get()));
         pingThread.setName("Active Installs Ping Thread");
         pingThread.start();
     }

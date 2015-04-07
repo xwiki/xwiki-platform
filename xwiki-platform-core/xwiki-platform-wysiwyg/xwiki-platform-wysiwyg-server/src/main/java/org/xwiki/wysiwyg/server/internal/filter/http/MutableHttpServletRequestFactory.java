@@ -19,6 +19,7 @@
  */
 package org.xwiki.wysiwyg.server.internal.filter.http;
 
+import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +33,7 @@ import org.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
  * @version $Id$
  */
 @Component(hints = {"HTTP/1.1", "HTTP/1.0" })
+@Singleton
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
     @Override

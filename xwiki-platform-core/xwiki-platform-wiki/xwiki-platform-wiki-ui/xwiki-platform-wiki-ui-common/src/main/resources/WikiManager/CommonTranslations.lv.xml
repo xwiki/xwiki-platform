@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>CommonTranslations</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1418662042000</creationDate>
+  <date>1418727446000</date>
+  <contentUpdateDate>1418727379000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+admin.wiki.description=Aprakstiet savu viki (skaistu nosaukumu un aprakstu) un norādiet tā īpašnieku un sākuma lapu.
+admin.wikis=Visi viki
+admin.wikis.descriptor=Apraksts
+platform.wiki.admin.wiki.csrfInvalidError=Nepareizs CSRF drošības marķieris. Lūdzu atjaunojiet lapas saturu un mēģiniet vēlreiz.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Jaunais īpašnieks nepastāv vai arī ir reģistrēts citā viki.\\nVai tiešām vēlaties turpināt saglabāšanu?
+platform.wiki.admin.wiki.ownerWarning=Brīdinājums\: Kad jūs apstiprināsiet izmaiņas, iepriekšējais viki īpašnieks zaudēs savas tiesības. Ja tas esat jūs, pārliecinieties, ka neizslēgsit sevi no šī viki. Ja tā tomēr gadīsies, jums būs jāsazinās ar viki galveno superadministratoru, kurš pārvalda visus viki.
+platform.wiki.admin.wiki.requiredFieldsError=Īpašnieks un mājas lapa ir obligāti lauki
+</content>
+</xwikidoc>

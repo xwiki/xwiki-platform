@@ -1,0 +1,283 @@
+//
+// Layout
+// --------------------------------------------------
+#xwikimaincontainer {
+  .container-fluid();
+}
+
+#menuview, #headerglobal, #contentcontainer, #xwikieditor, #footerglobal {
+  .make-row();
+}
+
+@main-padding: @grid-gutter-width * 2;
+
+#body {
+  // Both left and right panels are displayed
+  &.content {
+    // Left panels are small
+    &.panel-left-width-Small {
+      .main {
+        .make-md-column-push(1);
+      }
+      // Left panels are small and right panels are small
+      &.panel-right-width-Small {
+        .main {
+          .make-md-column(10, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(10);
+        }
+      }
+      // Left panels are small and right panels are medium
+      &.panel-right-width-Medium {
+        .main {
+          .make-md-column(9, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(9);
+        }
+      }
+      // Left panels are small and right panels are large
+      &.panel-right-width-Large {
+        .main {
+          .make-md-column(8, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(8);
+        }
+      }
+    }
+    // Left panels are medium
+    &.panel-left-width-Medium {
+      .main {
+        .make-md-column-push(2);
+      }
+      // Left panels are medium and right panels are small
+      &.panel-right-width-Small {
+        .main {
+          .make-md-column(9, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(9);
+        }
+      }
+      // Left panels are medium and right panels are medium
+      &.panel-right-width-Medium {
+        .main {
+          .make-md-column(8, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(8);
+        }
+      }
+      // Left panels are medium and right panels are large
+      &.panel-right-width-Large {
+        .main {
+          .make-md-column(7, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(7);
+        }
+      }
+    }
+    // // Left panels are large
+    &.panel-left-width-Large {
+      .main {
+        .make-md-column-push(3);
+      }
+      // Left panels are large and right panels are small
+      &.panel-right-width-Small {
+        .main {
+          .make-md-column(8, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(8);
+        }
+      }
+      // Left panels are large and right panels are medium
+      &.panel-right-width-Medium {
+        .main {
+          .make-md-column(7, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(7);
+        }
+      }
+      // Left panels are large and right panels are large
+      &.panel-right-width-Large {
+        .main {
+          .make-md-column(6, @main-padding);
+        }
+        #leftPanels {
+          .make-md-column-pull(6);
+        }
+      }
+    }
+  }
+  
+  // Only right panels
+  &.hideleft {
+    &.panel-right-width-Small {
+      .main {
+        .make-md-column(11, @main-padding);
+      }
+    }
+    &.panel-right-width-Medium {
+      .main {
+        .make-md-column(10, @main-padding);
+      }
+    }
+    &.panel-right-width-Large {
+      .main {
+        .make-md-column(9, @main-padding);
+      }
+    }
+  }
+
+  // Only left panels
+  &.hideright {
+    &.panel-left-width-Small {
+      .main {
+        .make-md-column(11, @main-padding);
+        .make-md-column-push(1);
+      }
+      #leftPanels {
+        .make-md-column-pull(11);
+      }
+    }
+    &.panel-left-width-Medium {
+      .main {
+        .make-md-column(10, @main-padding);
+        .make-md-column-push(2);
+      }
+      #leftPanels {
+        .make-md-column-pull(10);
+      }
+    }
+    &.panel-left-width-Large {
+      .main {
+        .make-md-column(9, @main-padding);
+        .make-md-column-push(3);
+      }
+      #leftPanels {
+        .make-md-column-pull(9);
+      }
+    }
+  }
+  
+  // No Panels
+  &.hidelefthideright {
+    .main {
+      .make-md-column(12, @main-padding);
+    }
+  }
+  
+  &.panel-left-width-Small {
+    #leftPanels {
+      .make-md-column(1);
+    }
+  }
+  &.panel-left-width-Medium {
+    #leftPanels {
+      .make-md-column(2);
+    }
+  }
+  &.panel-left-width-Large {
+    #leftPanels {
+      .make-md-column(3);
+    }
+  }
+  &.panel-right-width-Small {
+    #rightPanels, #editPanels {
+      .make-md-column(1);
+    }
+  }
+  &.panel-right-width-Medium {
+    #rightPanels, #editPanels {
+      .make-md-column(2);
+    }
+  }
+  &.panel-right-width-Large {
+    #rightPanels, #editPanels {
+      .make-md-column(3);
+    }
+  }
+}
+
+#leftPanels, #rightPanels {
+  .make-xs-column(12);
+}
+
+.rightmenu {
+  display: inline;
+}
+
+// Layout Styling =============================================================
+
+#headerglobal {
+  background: @xwiki-page-header-bg-color @xwiki-page-header-bg-image @xwiki-page-header-bg-position;
+}
+
+.main {
+  background-color: @xwiki-page-content-bg;
+   div& { // Do not apply on WYSIWYG body.main
+    box-shadow: 0 1px 2px @xwiki-border-color;
+  }
+}
+
+.main,
+#leftPanels, #rightPanels, #editPanels,
+#docextrapanes {
+  padding-top: (@grid-gutter-width / 2);
+  padding-bottom: (@grid-gutter-width / 2);
+}
+
+#mainContentArea > .xcontent {
+  margin-top: @line-height-computed / 2;
+}
+
+#xwikicontent {
+  overflow: auto;
+}
+
+.document-header {
+  margin-top: -@line-height-computed;
+  margin-bottom: @line-height-computed;
+  #document-title h1 {
+    margin-top: 0;
+    word-wrap: break-word;
+  }
+  .document-menu, .document-info {
+    margin-top: @line-height-computed;
+  }
+}
+
+#xdocFooter {
+  .clearfix;
+  border-bottom-left-radius: @border-radius-base;
+  border-bottom-right-radius: @border-radius-base;
+  box-shadow: 0px 1px 1px @xwiki-border-color;
+  margin: (@grid-gutter-width / 2) 0;
+  padding: @breadcrumb-padding-vertical @breadcrumb-padding-horizontal;
+}
+
+#xdocAuthors {
+  text-align: right;
+}
+
+#footerglobal {
+  background-color: @navbar-default-bg;
+  color: @navbar-default-brand-color;
+  padding: @padding-large-vertical @padding-large-horizontal;
+  .text-smaller;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  
+  a {
+    color: @navbar-default-link-color;
+    &:hover {
+      color: @navbar-default-link-hover-color;
+    }
+  }
+}

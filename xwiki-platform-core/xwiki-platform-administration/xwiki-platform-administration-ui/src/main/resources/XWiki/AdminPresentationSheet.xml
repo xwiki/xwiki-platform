@@ -125,7 +125,7 @@
     <property>
       <code>document.observe('xwiki:dom:loaded', function() {
   $$('label.skin a, label.colorTheme a').each(function(button) {
-    button.__action = button.up('label').hasClassName('skin') ? 'view' : 'inline';
+    button.__action = button.up('label').hasClassName('skin') ? 'view' : 'edit';
     var input = button.up('dt').next('dd').down('input,select');
     input.observe('change', function() {
       var dotPosition = input.value.indexOf('.');
@@ -155,7 +155,8 @@ $xwiki.jsx.use('XWiki.AdminPresentationSheet')
 ### Change the skin and color theme, at global or space level
 #set ($params = {
   'skin': ['skin', 'stylesheet', 'stylesheets'],
-  'colortheme': ['colorTheme']
+  'colortheme': ['colorTheme'],
+  'icontheme' : ['iconTheme']
 })
 {{/velocity}}
 

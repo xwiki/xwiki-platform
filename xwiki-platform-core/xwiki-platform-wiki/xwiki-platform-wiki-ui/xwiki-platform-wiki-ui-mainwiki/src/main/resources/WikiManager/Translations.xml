@@ -20,66 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>WikiManager</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1293832800000</creationDate>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1307189790000</date>
   <contentUpdateDate>1307189790000</contentUpdateDate>
   <version>1.1</version>
   <title>Translations</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.TranslationDocumentClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>1</number>
-        <prettyName>Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>WikiManager.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
-    <property>
-      <scope>GLOBAL</scope>
-    </property>
-  </object>
   <content>###############################################################################
 # WikiManager Manager translation page
+#
+# The translations contained in this document are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this document is GLOBAL.
 #
 # This contains the translations of the module in the default language
 # (generally English).
@@ -118,7 +82,6 @@ platform.wiki.menu.userwikis=Wikis
 platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
 ## Create
 platform.wiki.create.title=Create a new wiki
@@ -190,13 +153,21 @@ platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
 platform.wiki.users.profile.activity.show=show activity
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}?
-platform.wiki.delete.confirmation.yes=Yes
-platform.wiki.delete.confirmation.no=No
+platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}? This action cannot be reverted!
+platform.wiki.delete.confirmation.retypeWikiId=Please repeat the identifier of the wiki here:
+platform.wiki.delete.confirmation.yes=Yes, please delete this wiki!
+platform.wiki.delete.confirmation.no=No, take me back!
+platform.wiki.delete.error.wikiIdDoesNotMatch=You must type in the exact Wiki Identifier of the wiki that should be deleted.
 platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
 
 ## Wiki macro
 platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
+rendering.macro.wikis.name=Wikis
+rendering.macro.wikis.description=List all wikis
+
+## LegacyWorkspaces macro
+rendering.macro.workspaces.name=Workspaces (Legacy)
+rendering.macro.workspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
 
 ## Browse
 platform.wiki.browse=Browse Wikis
@@ -223,6 +194,7 @@ WikiManager.WikiUserClass_userScope_global_only=Only global users are available 
 WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
 platform.wiki.prop.wikiname=Wiki Identifier
 platform.wiki.prop.wikiprettyname=Pretty Name
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Description
 platform.wiki.prop.owner=Owner
 platform.wiki.prop.membershipType.label=Membership Type
@@ -231,20 +203,16 @@ platform.wiki.prop.membershipType.hint=The way users can join this wiki.
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
 platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all documents will be cloned).
 platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-platform.wiki.create.wizard.desc.owner=A user who will have all the rights on the wiki.
+platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independently of the rights configured in the Administration.
 platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
 platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
 platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Step 2 — Choose members
 platform.wiki.create.wizard.step.users.shortname=Users
 platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
-platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
-platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete the wiki
 platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
 platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
@@ -255,12 +223,21 @@ platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope
 platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
 platform.wiki.create.wizard.template.label=Template
-platform.wiki.create.wizard.step.dw=After clicking on "create", the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
+platform.wiki.create.wizard.step.dw=After clicking on the "Create" button, the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
+platform.wiki.create.wizard.step.previous=Previous Step
+platform.wiki.create.wizard.step.next=Go to next step
+platform.wiki.create.wizard.step.create=Create
+
+platform.wiki.create.wizard.step.creation=Wiki creation
+platform.wiki.create.wizard.step.creation.wait=Please wait until the wiki is created.
+platform.wiki.create.wizard.step.creation.complete=The wiki {0} has been successfully created. You can now access it.
+platform.wiki.create.wizard.step.creation.error=The wiki {0} has been created but some documents have not been installed. In consequence, the wiki might behave erroneously and you should probably delete it.
+platform.wiki.create.wizard.step.creation.go=Go to the wiki
 
 ## Admin
-admin.wikis=Wikis
-admin.wikis.template=Wiki Template
-admin.wikis.rights=Wiki Creation Right
+admin.wikis.description=Wikis management.
+admin.wikis.templates=Templates
+admin.wikis.rights=Creation Right
 
 ## XWikiServer Sheet
 platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
@@ -295,7 +272,62 @@ platform.wiki.sheet.aliases=An alias is an other name for the wiki. You can add 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
 
+#######################################
+## until 6.1
+#######################################
+platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
+
+#######################################
+## until 6.4RC1
+#######################################
+admin.wikis=Wikis
+admin.wikis.template=Wiki Template
+
+#######################################
+## until 7.0M2
+#######################################
+platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalize
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>
+  <object>
+    <name>WikiManager.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>GLOBAL</scope>
+    </property>
+  </object>
 </xwikidoc>

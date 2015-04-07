@@ -25,13 +25,25 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
+    <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
+         Jenkins and you have the following directory structure:
+             workspace/xwiki-commons
+             workspace/xwiki-platform_Quality_Checks
+         When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
+         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
+         date with the latest code from the SCM, thus causing build failures that are hard to track.
+
+         By using an empty value we force Maven to resolve the parent from the Maven repositories,
+         see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
+    -->
+    <relativePath />
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>6.0-SNAPSHOT</version>
+  <version>7.1-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -40,6 +52,8 @@
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
     <hsqldb.version>2.3.1</hsqldb.version>
+    <!-- By default check that unit tests don't output anything to the console -->
+    <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -124,7 +138,29 @@
             <include>**/*Test.java</include>
             <include>**/*IntegrationTests.java</include>
           </includes>
+          <!-- Verify that unit tests don't output anything to stdout/stderr -->
+          <systemProperties combine.children="append">
+            <!-- This property makes it simple for some module to exclude the check (for example for functional
+                 tests) -->
+            <property>
+              <name>xwiki.surefire.captureconsole.skip</name>
+              <value>${xwiki.surefire.captureconsole.skip}</value>
+            </property>
+          </systemProperties>
+          <properties>
+            <property>
+              <name>listener</name>
+              <value>org.xwiki.test.CaptureConsoleRunListener</value>
+            </property>
+          </properties>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-test-simple</artifactId>
+            <version>${project.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

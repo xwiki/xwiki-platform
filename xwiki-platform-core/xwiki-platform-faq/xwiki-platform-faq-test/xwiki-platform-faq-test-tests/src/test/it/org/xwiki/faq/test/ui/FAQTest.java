@@ -19,12 +19,13 @@
  */
 package org.xwiki.faq.test.ui;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.faq.test.po.FAQEntryEditPage;
 import org.xwiki.faq.test.po.FAQHomePage;
 import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -38,24 +39,20 @@ import org.junit.Assert;
  */
 public class FAQTest extends AbstractTest
 {
+    // Login as superadmin to have delete rights.
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
     // Note: we use a dot in the page name to verify it's supported by the FAQ application and we use an accent to
     // verify encoding.
     private static final String FAQ_TEST_PAGE = "Test.entrée de FAQ";
 
-    @Before
-    public void setUp()
-    {
-        // Login as superadmin to have delete rights.
-        getDriver().get(getUtil().getURLToLoginAs("superadmin", "pass"));
-        getUtil().recacheSecretToken();
-
-        // Delete pages that we create in the test
-        getUtil().deletePage(getTestClassName(), FAQ_TEST_PAGE);
-    }
-
     @Test
     public void testFAQ()
     {
+        // Delete pages that we create in the test
+        getUtil().deletePage(getTestClassName(), FAQ_TEST_PAGE);
+
         // Navigate to the FAQ app by clicking in the Application Panel.
         // This verifies that the FAQ application is registered in the Applications Panel.
         // It also verifies that the Translation is registered properly.

@@ -27,7 +27,6 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.gitective.core.stat.UserCommitActivity;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides services to access a Git repository.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface GitManager
 {
     /**

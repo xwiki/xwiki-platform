@@ -19,6 +19,8 @@
  */
 package org.xwiki.test.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -31,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -46,6 +47,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
@@ -57,8 +59,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Wait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.test.integration.XWikiExecutor;
@@ -68,7 +68,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -134,11 +134,6 @@ public class TestUtils
         }
     }
 
-    /**
-     * How long to wait before failing a test because an element cannot be found. Can be overridden with setTimeout.
-     */
-    private int timeout = 10;
-
     /** Cached secret token. TODO cache for each user. */
     private String secretToken = null;
 
@@ -147,7 +142,7 @@ public class TestUtils
     public TestUtils()
     {
         this.adminHTTPClient = new HttpClient();
-        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, ADMIN_CREDENTIALS);
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
         this.adminHTTPClient.getParams().setAuthenticationPreemptive(true);
     }
 
@@ -157,7 +152,7 @@ public class TestUtils
         TestUtils.context = context;
     }
 
-    protected WebDriver getDriver()
+    protected XWikiWebDriver getDriver()
     {
         return context.getDriver();
     }
@@ -180,6 +175,72 @@ public class TestUtils
             this.secretToken = session.getSecretToken();
         } else {
             recacheSecretToken();
+        }
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    public void setDefaultCredentials(String username, String password)
+    {
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(username, password));
+    }
+
+    /**
+     * @since 7.0RC1
+     */
+    public void setDefaultCredentials(UsernamePasswordCredentials defaultCredentials)
+    {
+        this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+    }
+
+    public UsernamePasswordCredentials getDefaultCredentials()
+    {
+        return (UsernamePasswordCredentials) this.adminHTTPClient.getState().getCredentials(AuthScope.ANY);
+    }
+
+    public void loginAsSuperAdmin()
+    {
+        login(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsSuperAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(SUPER_ADMIN_CREDENTIALS.getUserName(), SUPER_ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void loginAsAdmin()
+    {
+        login(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword());
+    }
+
+    public void loginAsAdminAndGotoPage(String pageURL)
+    {
+        loginAndGotoPage(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), pageURL);
+    }
+
+    public void login(String username, String password)
+    {
+        loginAndGotoPage(username, password, null);
+    }
+
+    public void loginAndGotoPage(String username, String password, String pageURL)
+    {
+        if (!username.equals(getLoggedInUserName())) {
+            // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
+            // going to the home page for example.
+            // Also recache the CSRF token
+            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            recacheSecretTokenWhenOnRegisterPage();
+            if (pageURL != null) {
+                // Go to the page asked
+                getDriver().get(pageURL);
+            } else {
+                getDriver().get(getURLToNonExistentPage());
+            }
+
+            setDefaultCredentials(username, password);
         }
     }
 
@@ -258,13 +319,11 @@ public class TestUtils
     /**
      * After successful completion of this function, you are guaranteed to be logged in as the given user and on the
      * page passed in pageURL.
-     * 
-     * @param pageURL
      */
     public void assertOnPage(final String pageURL)
     {
         final String pageURI = pageURL.replaceAll("\\?.*", "");
-        waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -274,24 +333,10 @@ public class TestUtils
         });
     }
 
-    public <T> void waitUntilCondition(ExpectedCondition<T> condition)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        getDriver().manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-
-        Wait<WebDriver> wait = new WebDriverWait(getDriver(), getTimeout());
-        try {
-            wait.until(condition);
-        } finally {
-            // Reset timeout
-            setDriverImplicitWait(getDriver());
-        }
-    }
-
     public String getLoggedInUserName()
     {
         String loggedInUserName = null;
-        List<WebElement> elements = findElementsWithoutWaiting(getDriver(), By.xpath("//div[@id='tmUser']/span/a"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.xpath("(//.[@id='tmUser']//a)[1]"));
         if (!elements.isEmpty()) {
             String href = elements.get(0).getAttribute("href");
             loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
@@ -308,6 +353,8 @@ public class TestUtils
         Object... properties)
     {
         createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+
+        setDefaultCredentials(username, password);
     }
 
     public void createUser(final String username, final String password, String redirectURL, Object... properties)
@@ -325,16 +372,6 @@ public class TestUtils
         if (properties.length > 0) {
             updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
         }
-    }
-
-    /**
-     * @deprecated starting with 5.0M2 use {@link #createUserAndLogin(String, String, Object...)} instead
-     */
-    @Deprecated
-    public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
-    {
-        createUserAndLogin(username, password);
-        getDriver().get(pageURL);
     }
 
     public ViewPage gotoPage(String space, String page)
@@ -356,7 +393,7 @@ public class TestUtils
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
-    public void gotoPage(String space, String page, String action, Map<String, ? > queryParameters)
+    public void gotoPage(String space, String page, String action, Map<String, ?> queryParameters)
     {
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
@@ -469,7 +506,7 @@ public class TestUtils
 
     /**
      * Accesses the URL to delete the specified space.
-     * 
+     *
      * @param space the name of the space to delete
      * @since 4.5
      */
@@ -493,7 +530,7 @@ public class TestUtils
 
     /**
      * Get the URL to view a page.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      */
@@ -504,7 +541,7 @@ public class TestUtils
 
     /**
      * Get the URL of an action on a page.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
@@ -516,7 +553,7 @@ public class TestUtils
 
     /**
      * Get the URL of an action on a page with a specified query string.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
@@ -532,8 +569,8 @@ public class TestUtils
         StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
         builder.append(action);
-        for (int i = 0; i < path.length; i++) {
-            builder.append('/').append(escapeURL(path[i]));
+        for (String element : path) {
+            builder.append('/').append(escapeURL(element));
         }
 
         boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
@@ -554,13 +591,13 @@ public class TestUtils
     /**
      * Get the URL of an action on a page with specified parameters. If you need to pass multiple parameters with the
      * same key, this function will not work.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
      * @param queryParameters the parameters to pass in the URL, these will be automatically URL encoded.
      */
-    public String getURL(String space, String page, String action, Map<String, ? > queryParameters)
+    public String getURL(String space, String page, String action, Map<String, ?> queryParameters)
     {
         return getURL(space, page, action, toQueryString(queryParameters));
     }
@@ -604,7 +641,7 @@ public class TestUtils
     /**
      * (Re)-cache the secret token used for CSRF protection. A user with edit rights on Main.WebHome must be logged in.
      * This method must be called before {@link #getSecretToken()} is called and after each re-login.
-     * 
+     *
      * @see #getSecretToken()
      */
     public void recacheSecretToken()
@@ -616,6 +653,13 @@ public class TestUtils
         String previousURL = getDriver().getCurrentUrl();
         // Go to the registration page because the registration form uses secret token.
         gotoPage("XWiki", "Register", "register");
+        recacheSecretTokenWhenOnRegisterPage();
+        // Return to the previous page.
+        getDriver().get(previousURL);
+    }
+
+    private void recacheSecretTokenWhenOnRegisterPage()
+    {
         try {
             WebElement tokenInput = getDriver().findElement(By.xpath("//input[@name='form_token']"));
             this.secretToken = tokenInput.getAttribute("value");
@@ -624,13 +668,11 @@ public class TestUtils
             System.out.println("Warning: Failed to cache anti-CSRF secret token, some tests might fail!");
             exception.printStackTrace();
         }
-        // Return to the previous page.
-        getDriver().get(previousURL);
     }
 
     /**
      * Get the secret token used for CSRF protection. Remember to call {@link #recacheSecretToken()} first.
-     * 
+     *
      * @return anti-CSRF secret token, or empty string if the token was not cached
      * @see #recacheSecretToken()
      */
@@ -648,7 +690,7 @@ public class TestUtils
      * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
      * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
      * to hexadecimal, and spaces are substituted by '+'.
-     * 
+     *
      * @param s
      */
     public String escapeURL(String s)
@@ -692,38 +734,15 @@ public class TestUtils
         }
     }
 
-    public int getTimeout()
-    {
-        return this.timeout;
-    }
-
-    /**
-     * @param timeout the number of seconds after which we consider the action to have failed
-     */
-    public void setTimeout(int timeout)
-    {
-        this.timeout = timeout;
-    }
-
-    /**
-     * Forces the passed driver to wait for a {@link #getTimeout()} number of seconds when looking up page elements
-     * before declaring that it cannot find them.
-     */
-    public void setDriverImplicitWait(WebDriver driver)
-    {
-        driver.manage().timeouts().implicitlyWait(getTimeout(), TimeUnit.SECONDS);
-    }
-
     public boolean isInWYSIWYGEditMode()
     {
-        return getDriver()
-            .findElements(By.xpath("//div[@id='tmCurrentEditor']//a/strong[contains(text(), 'WYSIWYG')]")).size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]"))
+            .size() > 0;
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='tmCurrentEditor']//a/strong[contains(text(), 'Wiki')]"))
-            .size() > 0;
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]")).size() > 0;
     }
 
     public boolean isInViewMode()
@@ -786,7 +805,7 @@ public class TestUtils
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
 
-    public void addObject(String space, String page, String className, Map<String, ? > properties)
+    public void addObject(String space, String page, String className, Map<String, ?> properties)
     {
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
@@ -804,7 +823,7 @@ public class TestUtils
         gotoPage(space, page, "objectremove", queryString.toString());
     }
 
-    public void updateObject(String space, String page, String className, int objectNumber, Map<String, ? > properties)
+    public void updateObject(String space, String page, String className, int objectNumber, Map<String, ?> properties)
     {
         gotoPage(space, page, "save", toQueryParameters(className, objectNumber, properties));
     }
@@ -832,11 +851,11 @@ public class TestUtils
     /**
      * @since 3.5M1
      */
-    public String toQueryString(Map<String, ? > queryParameters)
+    public String toQueryString(Map<String, ?> queryParameters)
     {
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
+        for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
             addQueryStringEntry(builder, entry.getKey(), entry.getValue());
             builder.append('&');
         }
@@ -851,7 +870,7 @@ public class TestUtils
     {
         if (value != null) {
             if (value instanceof Iterable) {
-                for (Object element : (Iterable< ? >) value) {
+                for (Object element : (Iterable<?>) value) {
                     addQueryStringEntry(builder, key, element.toString());
                     builder.append('&');
                 }
@@ -878,12 +897,12 @@ public class TestUtils
     /**
      * @since 3.5M1
      */
-    public Map<String, ? > toQueryParameters(Object... properties)
+    public Map<String, ?> toQueryParameters(Object... properties)
     {
         return toQueryParameters(null, null, properties);
     }
 
-    public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Object... properties)
+    public Map<String, ?> toQueryParameters(String className, Integer objectNumber, Object... properties)
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -898,7 +917,7 @@ public class TestUtils
         return queryParameters;
     }
 
-    public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Map<String, ? > properties)
+    public Map<String, ?> toQueryParameters(String className, Integer objectNumber, Map<String, ?> properties)
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -906,7 +925,7 @@ public class TestUtils
             queryParameters.put("classname", className);
         }
 
-        for (Map.Entry<String, ? > entry : properties.entrySet()) {
+        for (Map.Entry<String, ?> entry : properties.entrySet()) {
             queryParameters.put(toQueryParameterKey(className, objectNumber, entry.getKey()), entry.getValue());
         }
 
@@ -930,76 +949,6 @@ public class TestUtils
             keyBuilder.append(key);
 
             return keyBuilder.toString();
-        }
-    }
-
-    public WebElement findElementWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return driver.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public WebElement findElementWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElement(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    public List<WebElement> findElementsWithoutWaiting(WebDriver driver, WebElement element, By by)
-    {
-        // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-        try {
-            return element.findElements(by);
-        } finally {
-            setDriverImplicitWait(driver);
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(By by)
-    {
-        try {
-            getDriver().findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
-     */
-    public boolean hasElement(WebElement element, By by)
-    {
-        try {
-            element.findElement(by);
-            return true;
-        } catch (NoSuchElementException e) {
-            return false;
         }
     }
 
@@ -1050,10 +999,16 @@ public class TestUtils
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists,
         UsernamePasswordCredentials credentials) throws Exception
     {
-        if (credentials != null) {
-            this.adminHTTPClient.getState().setCredentials(AuthScope.ANY, credentials);
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+
+        try {
+            if (credentials != null) {
+                setDefaultCredentials(credentials);
+            }
+            attachFile(space, page, name, is, failIfExists);
+        } finally {
+            setDefaultCredentials(currentCredentials);
         }
-        attachFile(space, page, name, is, failIfExists);
     }
 
     public void attachFile(String space, String page, String name, InputStream is, boolean failIfExists)
@@ -1093,8 +1048,51 @@ public class TestUtils
                 + escapeURL(file.getName()), Status.OK.getStatusCode());
     }
 
-    public InputStream getRESTInputStream(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
+    public InputStream getRESTInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
         throws Exception
+    {
+        return getInputStream(BASE_REST_URL, resourceUri, queryParams, elements);
+    }
+
+    public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
+    {
+        return getInputStream(BASE_URL, path, queryParams);
+    }
+
+    public String getString(String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(BASE_URL, path, queryParams)) {
+            return IOUtils.toString(inputStream);
+        }
+    }
+
+    public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
+        throws Exception
+    {
+        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+        if (path.startsWith(cleanPrefix)) {
+            cleanPrefix = "";
+        }
+
+        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
+
+        if (queryParams != null) {
+            for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
+                if (entry.getValue() instanceof Object[]) {
+                    builder.queryParam(entry.getKey(), (Object[]) entry.getValue());
+                } else {
+                    builder.queryParam(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        String url = builder.build(elements).toString();
+
+        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
+    }
+
+    public InputStream postRESTInputStream(String resourceUri, Object restObject, Map<String, Object[]> queryParams,
+        Object... elements) throws Exception
     {
         UriBuilder builder =
             UriBuilder.fromUri(BASE_REST_URL.substring(0, BASE_REST_URL.length() - 1)).path(
@@ -1108,7 +1106,11 @@ public class TestUtils
 
         String url = builder.build(elements).toString();
 
-        return executeGet(url, Status.OK.getStatusCode()).getResponseBodyAsStream();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        marshaller.marshal(restObject, stream);
+
+        return executePost(url, new ByteArrayInputStream(stream.toByteArray()), MediaType.APPLICATION_XML,
+            Status.OK.getStatusCode()).getResponseBodyAsStream();
     }
 
     public byte[] getRESTBuffer(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
@@ -1129,13 +1131,25 @@ public class TestUtils
     public <T> T getRESTResource(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
         throws Exception
     {
-        InputStream is = getRESTInputStream(resourceUri, queryParams, elements);
-
         T resource;
-        try {
+        try (InputStream is = getRESTInputStream(resourceUri, queryParams, elements)) {
             resource = (T) unmarshaller.unmarshal(is);
-        } finally {
-            is.close();
+        }
+
+        return resource;
+    }
+
+    public <T> T postRESTResource(String resourceUri, Object entity, Object... elements) throws Exception
+    {
+        return postRESTResource(resourceUri, entity, Collections.<String, Object[]>emptyMap(), elements);
+    }
+
+    public <T> T postRESTResource(String resourceUri, Object entity, Map<String, Object[]> queryParams,
+        Object... elements) throws Exception
+    {
+        T resource;
+        try (InputStream is = postRESTInputStream(resourceUri, entity, queryParams, elements)) {
+            resource = (T) unmarshaller.unmarshal(is);
         }
 
         return resource;
@@ -1153,6 +1167,21 @@ public class TestUtils
         return getMethod;
     }
 
+    protected PostMethod executePost(String uri, InputStream content, String mediaType, int... expectedCodes)
+        throws Exception
+    {
+        PostMethod putMethod = new PostMethod(uri);
+        RequestEntity entity = new InputStreamRequestEntity(content, mediaType);
+        putMethod.setRequestEntity(entity);
+
+        int code = this.adminHTTPClient.executeMethod(putMethod);
+        if (!ArrayUtils.contains(expectedCodes, code)) {
+            throw new Exception("Failed to execute post [" + uri + "] with code [" + code + "]");
+        }
+
+        return putMethod;
+    }
+
     protected PutMethod executePut(String uri, InputStream content, String mediaType, int... expectedCodes)
         throws Exception
     {
@@ -1166,5 +1195,69 @@ public class TestUtils
         }
 
         return putMethod;
+    }
+
+    /**
+     * Delete the latest version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void deleteLatestVersion(String space, String page)
+    {
+        deleteVersion(space, page, "latest");
+    }
+
+    /**
+     * Delete a specific version from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersion(String space, String page, String version)
+    {
+        deleteVersions(space, page, version, version);
+    }
+
+    /**
+     * Delete an interval of versions from the history of a page, using the {@code /deleteversions/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param v1 the starting version to delete
+     * @param v2 the ending version to delete
+     * @since 7.0M2
+     */
+    public void deleteVersions(String space, String page, String v1, String v2)
+    {
+        gotoPage(space, page, "deleteversions", "rev1", v1, "rev2", v2, "confirm", "1");
+    }
+
+    /**
+     * Roll back a page to the previous version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @since 7.0M2
+     */
+    public void rollbackToPreviousVersion(String space, String page)
+    {
+        rollBackTo(space, page, "previous");
+    }
+
+    /**
+     * Roll back a page to the specified version, using the {@code /rollback/} action.
+     * 
+     * @param space the space name of the page
+     * @param page the name of the page
+     * @param version the version to rollback to
+     * @since 7.0M2
+     */
+    public void rollBackTo(String space, String page, String version)
+    {
+        gotoPage(space, page, "rollback", "rev", version, "confirm", "1");
     }
 }

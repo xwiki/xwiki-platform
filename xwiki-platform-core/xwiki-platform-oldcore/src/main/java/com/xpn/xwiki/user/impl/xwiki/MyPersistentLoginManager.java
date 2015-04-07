@@ -54,11 +54,13 @@ import org.slf4j.LoggerFactory;
  * computer). This binding is enabled by the parameter xwiki.authentication.useip . The secret parameter is specified in
  * xwiki.authentication.validationKey</dd>
  * </dl>
- * 
+ *
  * @version $Id$
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 {
+    private static final long serialVersionUID = -8454351828032103173L;
+
     /**
      * The string used to separate the fields in the hashed validation message.
      */
@@ -136,9 +138,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setter for the {@link #cookieDomains} parameter.
-     * 
+     *
      * @param cdlist The new value for {@link #cookieDomains}. The list is processed, so that any value not starting
-     *               with a dot is prefixed with one, to respect the RFC 2109.
+     *            with a dot is prefixed with one, to respect the RFC 2109.
      * @see #cookieDomains
      */
     public void setCookieDomains(String[] cdlist)
@@ -155,7 +157,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setter for the {@link #cookiePath} parameter.
-     * 
+     *
      * @param cp The new value for {@link #cookiePath}.
      * @see #cookiePath
      */
@@ -166,17 +168,36 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setup a cookie: expiration date, path, domain + send it to the response.
-     * 
+     *
      * @param cookie The cookie to setup.
      * @param sessionCookie Whether the cookie is only for this session, or for a longer period.
      * @param cookieDomain The domain for which the cookie is set.
      * @param response The servlet response.
+     * @deprecated this shouldn't have been public, use
+     *             {@link #setupCookie(Cookie, boolean, boolean, String, HttpServletResponse)}
      */
+    @Deprecated
     public void setupCookie(Cookie cookie, boolean sessionCookie, String cookieDomain, HttpServletResponse response)
+    {
+        setupCookie(cookie, sessionCookie, false, cookieDomain, response);
+    }
+
+    /**
+     * Setup a cookie: expiration date, path, domain + send it to the response.
+     *
+     * @param cookie the cookie to setup
+     * @param sessionCookie whether the cookie is only for this session, or for a longer period
+     * @param secureCookie whether the cookie should be marked as secure or not
+     * @param cookieDomain the domain for which the cookie is set
+     * @param response the servlet response
+     */
+    private void setupCookie(Cookie cookie, boolean sessionCookie, boolean secureCookie, String cookieDomain,
+        HttpServletResponse response)
     {
         if (!sessionCookie) {
             setMaxAge(cookie);
         }
+        cookie.setSecure(secureCookie);
         cookie.setPath(this.cookiePath);
         if (cookieDomain != null) {
             cookie.setDomain(cookieDomain);
@@ -186,7 +207,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Remember a specific login using cookies.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @param username The username that's being remembered.
@@ -210,28 +231,29 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
         // Let's check if the cookies should be session cookies or persistent ones.
         boolean sessionCookie = !(isTrue(request.getParameter("j_rememberme")));
+        boolean secureCookie = request.isSecure();
         String cookieDomain = getCookieDomain(request);
 
         // Create client cookies to remember the login information.
 
         // Username
         Cookie usernameCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME, protectedUsername);
-        setupCookie(usernameCookie, sessionCookie, cookieDomain, response);
+        setupCookie(usernameCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         // Password
         Cookie passwdCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD, protectedPassword);
-        setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
+        setupCookie(passwdCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         // Remember me
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
-        setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
+        setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
-                setupCookie(validationCookie, sessionCookie, cookieDomain, response);
+                setupCookie(validationCookie, sessionCookie, secureCookie, cookieDomain, response);
             } else {
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("WARNING!!! WARNING!!!");
@@ -247,7 +269,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Sets the maximum age for cookies. The maximum age is configured in xwiki.cfg using the
      * xwiki.authentication.cookielife parameter (number of days). The default age is 14 days.
-     * 
+     *
      * @param cookie The cookie for which the expiration date is configured.
      */
     private void setMaxAge(Cookie cookie)
@@ -263,7 +285,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Adds a cookie to the response.
-     * 
+     *
      * @param response The servlet response.
      * @param cookie The cookie to be sent.
      */
@@ -302,6 +324,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         }
         // Protect cookies from being used from JavaScript, see http://www.owasp.org/index.php/HttpOnly
         cookieValue.append("; HttpOnly");
+        // Only send this cookie on HTTPS connections coming from a page in the same domain
+        if (cookie.getSecure()) {
+            cookieValue.append("; Secure");
+        }
 
         // Session cookies should be discarded.
         // FIXME Safari 5 can't handle properly "Discard", as it really discards all the response header data after the
@@ -318,7 +344,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Compute the actual domain the cookie is supposed to be set for. Search through the list of generalized domains
      * for a partial match. If no match is found, then no specific domain is used, which means that the cookie will be
      * valid only for the requested host.
-     * 
+     *
      * @param request The servlet request.
      * @return The configured domain generalization that matches the request, or null if no match is found.
      */
@@ -347,7 +373,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Get validation hash for the specified parameters. The hash includes a secret password, and optionally binds the
      * cookie to the requester's IP. The hash secret is configured using the xwiki.authentication.validationKey
      * parameter. The IP binding is enabled using the xwiki.authentication.useip parameter.
-     * 
+     *
      * @param username The remembered username.
      * @param password The remembered password.
      * @param clientIP The client IP of the request.
@@ -383,8 +409,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             byte[] array = md5.digest();
             StringBuffer sb = new StringBuffer();
-            for (int j = 0; j < array.length; ++j) {
-                int b = array[j] & 0xFF;
+            for (byte element : array) {
+                int b = element & 0xFF;
                 if (b < 0x10) {
                     sb.append('0');
                 }
@@ -401,7 +427,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Encrypt a string. The encryption is password-based. The password can be configured using the
      * xwiki.authentication.encryptionKey parameter.
-     * 
+     *
      * @param clearText The text to be encrypted.
      * @return clearText, encrypted.
      * @todo Optimize this code by creating the Cipher only once.
@@ -436,7 +462,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Forget a login by removing the authentication cookies.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      */
@@ -454,7 +480,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Given an array of cookies and a name, this method tries to find and return the cookie from the array that has the
      * given name. If there is no cookie matching the name in the array, null is returned.
-     * 
+     *
      * @param cookies The list of cookies sent by the client.
      * @param cookieName The name of the cookie to be retrieved.
      * @return The requested cookie, or null if no cookie with the given name was found.
@@ -462,8 +488,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static Cookie getCookie(Cookie[] cookies, String cookieName)
     {
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     return (cookie);
                 }
@@ -474,7 +499,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Remove a cookie.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @param cookieName The name of the cookie that must be removed.
@@ -484,6 +509,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie cookie = getCookie(request.getCookies(), cookieName);
         if (cookie != null) {
             cookie.setMaxAge(0);
+            cookie.setValue("");
             cookie.setPath(this.cookiePath);
             addCookie(response, cookie);
             String cookieDomain = getCookieDomain(request);
@@ -496,7 +522,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Check if a text is supposed to be an affirmative value ("true", "yes" or "1").
-     * 
+     *
      * @param text The text to check.
      * @return true if the text is one of "true", "yes" or "1", false otherwise.
      */
@@ -508,7 +534,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Given an array of Cookies, a name, and a default value, this method tries to find the value of the cookie with
      * the given name. If there is no cookie matching the name in the array, then the default value is returned instead.
-     * 
+     *
      * @param cookies The list of cookies to search.
      * @param cookieName The name of the cookie whose value should be returned.
      * @param defaultValue The default value that should be returned when no cookie with the given name was found.
@@ -518,8 +544,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String value = defaultValue;
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     value = cookie.getValue();
                 }
@@ -530,7 +555,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Checks if the cookies are valid.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @return True if the validation cookie holds a valid value or is not present, false otherwise.
@@ -557,7 +582,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Get the username stored (in a cookie) in the request. Also checks the validity of the cookie.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @return The username value, or <tt>null</tt> if not found or the cookie isn't valid.
@@ -581,7 +606,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Get the password stored (in a cookie) in the request. Also checks the validity of the cookie.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @return The password value, or <tt>null</tt> if not found or the cookie isn't valid.
@@ -614,7 +639,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Decrypt a string.
-     * 
+     *
      * @param encryptedText The encrypted value.
      * @return encryptedText, decrypted
      */
@@ -643,7 +668,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Returns the original client IP. Needed because request.getRemoteAddr returns the address of the last requesting
      * host, which can be either the real client, or a proxy. The original method prevents logging in when using a
      * cluster of reverse proxies in front of XWiki.
-     * 
+     *
      * @param request The servlet request.
      * @return The IP of the actual client.
      */
@@ -660,7 +685,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setter for the {@link #cookiePrefix} parameter.
-     * 
+     *
      * @param prefix The new value for {@link #cookiePrefix}.
      * @see #cookiePrefix
      */
@@ -671,7 +696,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Getter for the {@link #cookiePrefix} parameter.
-     * 
+     *
      * @return The value for {@link #cookiePrefix}.
      * @see #cookiePrefix
      */

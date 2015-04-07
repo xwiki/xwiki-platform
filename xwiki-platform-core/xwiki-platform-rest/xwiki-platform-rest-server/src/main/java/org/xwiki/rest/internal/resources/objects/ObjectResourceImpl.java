@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.objects;
 
+import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -37,7 +38,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.objects.ObjectResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.objects.ObjectResourceImpl")
 public class ObjectResourceImpl extends BaseObjectsResource implements ObjectResource
 {
     @Override

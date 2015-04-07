@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.mandatory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -28,14 +29,16 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Update XWiki.XWikiPreferences document with all required informations.
- * 
+ *
  * @version $Id$
  * @since 4.3M1
  */
@@ -50,6 +53,9 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
     @Inject
     @Named("class")
     protected SheetBinder classSheetBinder;
+
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
 
     /**
      * Default constructor.
@@ -71,6 +77,8 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
             bclass.setCustomMapping("internal");
         }
 
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         needsUpdate |= bclass.addTextField("parent", "Parent Space", 30);
         needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
@@ -82,14 +90,23 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |=
             bclass.addDBListField("colorTheme", "Color theme",
                 "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
+                    + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
+                    + "or theme.className='FlamingoThemesCode.ThemeClass') "
+                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate' "
+                    + "and doc.fullName<>'FlamingoThemesCode.ThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {
             bclass.removeField("baseskin");
             needsUpdate = true;
         }
+        needsUpdate |=
+            bclass.addDBListField("iconTheme", "Icon theme",
+                "select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, "
+                    + "StringProperty propName "
+                    + "where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' "
+                    + "and doc.fullName<>'IconThemesCode.IconThemeTemplate' "
+                    + "and theme.id = propName.id and propName.name = 'name'");
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");
@@ -113,6 +130,7 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
+        needsUpdate |= bclass.addBooleanField("obfuscateEmailAddresses", "Obfuscate Email Addresses", "yesno");
 
         needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
@@ -143,8 +161,39 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
+        needsUpdate |= bclass.addStaticListField("leftPanelsWidth", "Width of the left panel column",
+            "---|Small|Medium|Large");
+        needsUpdate |= bclass.addStaticListField("rightPanelsWidth", "Width of the right panel column",
+            "---|Small|Medium|Large");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+        needsUpdate |= bclass.addTextField("timezone", "Timezone", 30);
+        PropertyClass timezoneProperty = (PropertyClass) bclass.get("timezone");
+        if (!timezoneProperty.isCustomDisplayed(xcontext)) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("{{velocity}}\n");
+            builder.append("#if ($xcontext.action == 'inline' || $xcontext.action == 'edit')\n");
+            builder.append("  {{html}}\n");
+            builder.append("    #if($xwiki.jodatime)\n");
+            builder.append("      <select id='$prefix$name' name='$prefix$name'>\n");
+            builder.append("        <option value=\"\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$services.localization.render('XWiki.XWikiPreferences_timezone_default')</option>\n");
+            builder.append("        #foreach($tz in $xwiki.jodatime.getServerTimezone().getAvailableIDs())\n");
+            builder.append("          <option value=\"$tz\" #if($value == $tz)selected=\"selected\"#end>"
+                + "$tz</option>\n");
+            builder.append("        #end\n");
+            builder.append("      </select>\n");
+            builder.append("    #else\n");
+            builder.append("      <input id='$prefix$name' name='$prefix$name' type=\"text\" value=\"$!value\"/>\n");
+            builder.append("    #end\n");
+            builder.append("  {{/html}}\n");
+            builder.append("#else\n");
+            builder.append("  $!value\n");
+            builder.append("#end\n");
+            builder.append("{{/velocity}}\n");
+            timezoneProperty.setCustomDisplay(builder.toString());
+            needsUpdate = true;
+        }
 
         // Only used by LDAP authentication service
 

@@ -1,0 +1,136 @@
+##
+## In admin mode, Panels.PanelWizard must display the layout for the requested space
+##
+#set($spaceprefs = "")
+#set($globalprefs = false)
+
+#if($doc.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
+  #set($spaceprefs = $request.space)
+  #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $request.space))
+  #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $request.space))
+  #set($leftPanelsWidth =  $xwiki.getSpacePreferenceFor("leftPanelsWidth", $request.space))
+  #set($rightPanelsWidth =  $xwiki.getSpacePreferenceFor("rightPanelsWidth", $request.space))
+#elseif($doc.fullName == "XWiki.XWikiPreferences" || "$!request.editor" == "globaladmin")
+  #set($globalprefs = true)
+  #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
+  #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
+  #set($leftPanelsWidth = $xwiki.getXWikiPreference("leftPanelsWidth"))
+  #set($rightPanelsWidth = $xwiki.getXWikiPreference("rightPanelsWidth"))
+#else
+  #set($showLeftPanels = $xwiki.getSpacePreference("showLeftPanels"))
+  #set($showRightPanels = $xwiki.getSpacePreference("showRightPanels"))
+  #set($leftPanelsWidth = $xwiki.getSpacePreference("leftPanelsWidth"))
+  #set($rightPanelsWidth = $xwiki.getSpacePreference("rightPanelsWidth"))
+#end
+
+#if(!$showLeftPanels || $showLeftPanels == "" || $showLeftPanels == "default")
+  #set($showLeftPanels = "1")
+#end
+#if($showLeftPanels == "yes")
+  #set($showLeftPanels = "1")
+#end
+#if($showLeftPanels == "no" || !$isInServletMode)
+  #set($showLeftPanels = "0")
+#end
+
+#if(!$showRightPanels || $showRightPanels == "" || $showRightPanels == "default")
+  #set($showRightPanels = "1")
+#end
+#if($showRightPanels == "yes")
+  #set($showRightPanels = "1")
+#end
+#if($showRightPanels == "no" || !$isInServletMode)
+  #set($showRightPanels = "0")
+#end
+
+#if(!$leftPanelsWidth || $leftPanelsWidth == "" || $leftPanelsWidth == "---")
+  #set($leftPanelsWidth = "Medium")
+#end
+#if(!$rightPanelsWidth || $rightPanelsWidth == "" || $rightPanelsWidth == "---")
+  #set($rightPanelsWidth = "Medium")
+#end
+
+#if($showLeftPanels)
+  #if($globalprefs == true)
+     #set($leftPanels = $xwiki.getXWikiPreference("leftPanels"))
+  #elseif($spaceprefs != "")
+     #set($leftPanels = $xwiki.getSpacePreferenceFor("leftPanels", $spaceprefs))
+  #else
+    #set($leftPanels = $xwiki.getUserPreference("leftPanels"))
+    #if($leftPanels == "")
+       #set($leftPanels = $xwiki.getSpacePreference("leftPanels"))
+    #end
+  #end
+  #if($leftPanels == "")
+      #set($showLeftPanels = "0")
+  #end
+#end
+
+#if($showRightPanels)
+  #if($globalprefs == true)
+    #set($rightPanels = $xwiki.getXWikiPreference("rightPanels"))
+  #elseif($spaceprefs != "")
+    #set($rightPanels = $xwiki.getSpacePreferenceFor("rightPanels", $spaceprefs))
+  #else
+    #set($rightPanels = $xwiki.getUserPreference("rightPanels"))
+    #if($rightPanels == "")
+      #set($rightPanels = $xwiki.getSpacePreference("rightPanels"))
+    #end
+  #end
+  #if($rightPanels == "")
+      #set($showRightPanels = "0")
+  #end
+#end
+
+#if($showLeftPanels == "yes")
+ #if($showRightPanels == "yes")
+  #set($colsclass = "show-all")
+ #else
+  #set($colsclass = "hide-right")
+ #end
+#else
+ #if($showRightPanels == "yes")
+  #set($colsclass = "hide-left")
+ #else
+  #set($colsclass = "hide-all")
+ #end
+#end
+
+#set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
+#set($displayCreateMenu = true) ## create menu
+#set($displayEditMenu = true) ## edit menu
+#set($displayMoreActionsMenu = true) ## more actions menu
+#set($displayMainMenu = true)
+#set($displayDocExtra = true)
+#set($displayShortcuts = true)
+#set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
+#set ($displayQuickSearch = true)
+#set ($displayLanguageChoice = true)
+
+#if ($xcontext.action=='preview')
+  #set($displayContentMenu = false)
+#end
+
+#if ($request.xpage == "print")
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
+  #set($displayContentMenu = false)
+#end
+
+#if($xcontext.action == 'edit' && $editor != 'inline')
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '1')
+#end
+
+#if($xcontext.action == 'edit' && ($editor == 'object' || $editor == 'rights' || $editor == 'class'))
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
+#end
+
+#if (($xcontext.action == 'login') || ($xcontext.action == 'loginsubmit'))
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
+#end
+
+## To let custom skins easily override layout variables, we evaluate a template that is empty by default.
+#template("layoutExtraVars.vm")

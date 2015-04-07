@@ -31,11 +31,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.xwiki.annotation.TestDocumentFactory;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.test.MockWikiModel;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
@@ -144,6 +146,7 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         addFileToTest("renderer/verbatim/Verbatim8.test");
         addFileToTest("renderer/verbatim/Verbatim9.test");
         addFileToTest("renderer/verbatim/Verbatim10.test");
+        addFileToTest("renderer/verbatim/Verbatim11.test");
 
         // tests where annotations start and/or end in the middle of a word rather than at the beginning or end
         addFileToTest("renderer/partialwords/PartialWords1.test");
@@ -191,8 +194,11 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
         // register wiki model mock so that we can use documents / attachments information
         getComponentManager().registerComponent(MockWikiModel.getComponentDescriptor());
+        // make sure to use the default link label generator
+        registerComponent(DefaultLinkLabelGenerator.class);
     }
 
     @Override
@@ -217,8 +223,10 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
-        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
+        TransformationContext context = new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
+        context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
+        transformationManager.performTransformations(xdom, context);
 
         AnnotationPrintRenderer renderer =
             getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
@@ -247,8 +255,10 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
-        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
+        TransformationContext context = new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
+        context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
+        transformationManager.performTransformations(xdom, context);
 
         AnnotationPrintRenderer renderer =
             getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);

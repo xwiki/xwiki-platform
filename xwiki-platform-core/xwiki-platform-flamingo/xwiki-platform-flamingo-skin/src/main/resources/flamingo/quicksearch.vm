@@ -1,0 +1,17 @@
+################################
+##       QUICK SEARCH
+################################
+#if ($displayQuickSearch && ($xwiki.exists('Main.Search') || $xwiki.exists('Main.WebSearch')))
+  <li>
+  <form class="navbar-form navbar-left globalsearch" role="search" action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end">
+    <div class="input-group">
+      <input type="text" name="text" class="form-control" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" />
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary">
+          <span class="glyphicon glyphicon-search"></span><span class="sr-only">$services.localization.render('panels.search.submit')</span>
+        </button>
+      </span>
+    </div>
+  </form>
+  </li>
+#end

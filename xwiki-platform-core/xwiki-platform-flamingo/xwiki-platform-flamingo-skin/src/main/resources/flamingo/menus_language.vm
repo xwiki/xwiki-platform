@@ -1,0 +1,38 @@
+##################################
+##        LANGUAGE MENU
+##################################
+#if ($displayLanguageChoice && $xwiki.isMultiLingual())
+  #set($currentLanguage = "$!{tdoc.realLanguage}")
+  #set($originalLanguage = "$!{doc.realLanguage}")
+  #if($currentLanguage != '')
+    #set ($availtrans = $doc.translationList)
+    #set ($discard = $availtrans.add($originalLanguage))
+    #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+    #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+    #set ($additionallangs = [])
+    #foreach($lang in $availtrans)
+      #if((!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang)) && $currentLanguage != $lang)
+        #set ($discard = $additionallangs.add($lang))
+      #end
+    #end
+    ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
+    #set($queryStringMap = {})
+    #set($discard = $queryStringMap.putAll($request.parameterMap))
+    #if($additionallangs.size() > 0)
+      #set($discard = $queryStringMap.put('language', $currentLanguage))
+      #xwikitopmenuentrystart ($doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
+      #foreach($lang in $additionallangs)
+        #set($discard = $queryStringMap.put('language', $lang))
+        #submenuitem($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($lang)", '', '', '')
+      #end
+      #xwikitopmenuentryend()
+    #else
+      #set($discard = $queryStringMap.put('language', $currentLanguage))
+      #xwikitopmenuentry($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
+    #end
+  #end
+#end
+##########################################
+## Display the pretty name of a language
+##########################################
+#macro(displayLanguagePrettyName $language)#set($languageLocale = $services.localization.toLocale($language))$stringtool.capitalize($languageLocale.getDisplayName($languageLocale))#end

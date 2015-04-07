@@ -55,16 +55,6 @@ public class InvitationGuestActionsPage extends BasePage
     public InvitationGuestActionsPage(String messageContent, Action action)
     {
         confirm = new InvitationActionConfirmationElement();
-        int start = messageContent.indexOf(getUtil().getURL("Invitation",
-                                                            "InvitationGuestActions",
-                                                            "view",
-                                                            "doAction_" + action.toString().toLowerCase()));
-        int end = messageContent.indexOf("\"", start);
-        getDriver().get(messageContent.substring(start, end).replaceAll("&amp;", "&"));
-        // Make sure the right messages is displayed otherwise we can't continue.
-        if(action.label != null && !confirm.getLabel().equalsIgnoreCase(action.label)) {
-            throw new WebDriverException("Not on correct page, expecting memo label to say \"" + action.label + "\"");
-        }
     }
 
     // Constructor for when the page is manually accessed.
@@ -81,8 +71,7 @@ public class InvitationGuestActionsPage extends BasePage
 
     public String getMessage()
     {
-        List<WebElement> elements =
-            getUtil().findElementsWithoutWaiting(getDriver(), By.id("invitation-action-message"));
+        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.id("invitation-action-message"));
         if (elements.size() > 0) {
             return elements.get(0).getText();
         }
@@ -96,5 +85,38 @@ public class InvitationGuestActionsPage extends BasePage
     {
         confirm.confirm();
         return getDriver().findElement(By.id("invitation-action-message")).getText();
+    }
+
+    /**
+     * @return the InvitationActionConfirmationElement on this page.
+     * @since 6.3M1
+     */
+    public InvitationActionConfirmationElement getConfirmation()
+    {
+        return confirm;
+    }
+
+    /**
+     * @param htmlMessageContent the html message received by the guest containing the link to the accept page
+     * @param action the action to be performed by the guest
+     * @return the corresponding page object
+     * @since 6.3M1
+     */
+    public static InvitationGuestActionsPage gotoPage(String htmlMessageContent, Action action)
+    {
+        int start =
+            htmlMessageContent.indexOf(getUtil().getURL("Invitation", "InvitationGuestActions", "view",
+                "doAction_" + action.toString().toLowerCase()));
+        int end = htmlMessageContent.indexOf("\"", start);
+        getUtil().gotoPage(htmlMessageContent.substring(start, end).replaceAll("&amp;", "&"));
+
+        InvitationGuestActionsPage page = new InvitationGuestActionsPage();
+
+        // Make sure the right messages is displayed otherwise we can't continue.
+        if (action.label != null && !page.getConfirmation().getLabel().equalsIgnoreCase(action.label)) {
+            throw new WebDriverException("Not on correct page, expecting memo label to say \"" + action.label + "\"");
+        }
+
+        return new InvitationGuestActionsPage();
     }
 }

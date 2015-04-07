@@ -20,7 +20,7 @@
 package org.xwiki.wiki.test.ui;
 
 import org.junit.runner.RunWith;
-import org.xwiki.test.integration.XWikiExecutorSuite;
+import org.xwiki.test.ui.PageObjectSuite;
 
 /**
  * Runs all functional tests found in the classpath.
@@ -28,7 +28,7 @@ import org.xwiki.test.integration.XWikiExecutorSuite;
  * @version $Id$
  * @since 5.4RC1
  */
-@RunWith(XWikiExecutorSuite.class)
+@RunWith(PageObjectSuite.class)
 public class AllTests
 {
 }

@@ -100,7 +100,10 @@
 
 = $services.localization.render('xe.statistics.alltime') =
 
-#set($period = $xwiki.criteriaService.periodFactory.createPeriod('20060101', '20130101'))
+#set ($currentYear = $xwiki.criteriaService.periodFactory.currentYear)
+#set ($periodStart = $xwiki.jodatime.getDateTime($currentYear.start).minusYears(5))
+#set ($periodEnd = $xwiki.jodatime.getDateTime($currentYear.end))
+#set($period = $xwiki.criteriaService.periodFactory.createPeriod($periodStart.getMillis(), $periodEnd.getMillis()))
 #set($step = $xwiki.criteriaService.durationFactory.YEAR)
 #set($myviews = $xwiki.statsService.getActionStatistics('view', $scope, $period, $step))
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))

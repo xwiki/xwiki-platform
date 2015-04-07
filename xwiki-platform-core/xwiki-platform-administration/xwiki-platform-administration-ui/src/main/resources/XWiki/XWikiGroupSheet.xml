@@ -20,29 +20,98 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>XWikiGroupSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiGroups</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.XWikiGroups</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1364502206000</creationDate>
   <date>1364565696000</date>
   <contentUpdateDate>1364565664000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#set($groupDoc = $doc)
+#if($doc.fullName == 'Main.UserDirectory')
+  #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+#end
+#macro(hasGroupRight $right $hasGroupRight)
+  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
+  #set($hasGroupRight = $NULL)
+  #setVariable("$hasGroupRight" $result)
+#end
+#hasGroupRight('edit' $hasEditGroupRight)
+{{/velocity}}
+
+{{velocity}}
+## Keep testing the inline action for backward compatibility with existing groups.
+#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
+  {{html}}
+  #if ($request.xpage == 'plain')
+    ## AJAX request.
+    #set ($wrapperTag = 'form')
+    &lt;form class="xform" action="$doc.getURL('preview')"&gt;
+      &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
+  #else
+    #userPicker_import()
+    #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
+    ## The form is generated in the edit template.
+    &lt;div class="xform"&gt;
+    #set ($wrapperTag = 'div')
+  #end
+    &lt;dl&gt;
+      &lt;dt&gt;&lt;label for="userInput"&gt;$services.localization.render('xe.admin.groups.addUser')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input id="userInput" type="text" name="name" class="suggestUsers#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
+      &lt;/dd&gt;
+      &lt;dt&gt;&lt;label for="groupInput"&gt;$services.localization.render('xe.admin.groups.addGroup')&lt;/label&gt;&lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input id="groupInput" type="text" name="name" class="suggestGroups#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;div class="buttons"&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;button type="submit" id="addMembers" name="xpage" value="adduorg"&gt;$services.localization.render('xe.admin.groups.addUser.submit')&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/$wrapperTag&gt;
+  {{/html}}##
+#end
+#set($columnOptions = {
+  "member" : {'link': 'auto', 'type': 'text'},
+  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
+  "_actions" : {
+    'actions': ['delete'],
+    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
+    'ajaxActions': {'delete': true}
+   }
+})
+## Keep testing the inline action for backward compatibility with existing groups.
+#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
+  #set($columns = ['_avatar', 'member', '_actions'])
+#else
+  #set($columns = ['_avatar', 'member'])
+#end
+#livetable('groupusers', $columns, $columnOptions, {
+  'url' : $groupDoc.getURL('view', 'xpage=getgroupmembers'),
+  'translationPrefix' : 'xe.admin.groups.',
+  'javascriptName' : 'editgrouptable'
+})
+{{/velocity}}</content>
   <object>
+    <name>XWiki.XWikiGroupSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>6e43f145-6962-4b17-a268-f85890a2c00c</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -110,14 +179,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.XWikiGroupSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>6e43f145-6962-4b17-a268-f85890a2c00c</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -172,73 +237,4 @@
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity output="false"}}
-#set($groupDoc = $doc)
-#if($doc.fullName == 'Main.UserDirectory')
-  #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
-#end
-#macro(hasGroupRight $right $hasGroupRight)
-  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $doc.fullName) &amp;&amp; $doc.getObject('XWiki.XWikiGroups', false))
-  #set($hasGroupRight = $NULL)
-  #setVariable("$hasGroupRight" $result)
-#end
-#hasGroupRight('edit' $hasEditGroupRight)
-#hasGroupRight('delete' $hasDeleteGroupRight)
-{{/velocity}}
-
-{{velocity}}
-## Keep testing the inline action for backward compatibility with existing groups.
-#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasEditGroupRight)
-  {{html}}
-  #if ($request.xpage == 'plain')
-    ## AJAX request.
-    #set ($wrapperTag = 'form')
-    &lt;form class="xform" action="$doc.getURL('preview')"&gt;
-      &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
-  #else
-    #userPicker_import()
-    #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
-    ## The form is generated in the edit template.
-    &lt;div class="xform"&gt;
-    #set ($wrapperTag = 'div')
-  #end
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="userInput"&gt;$services.localization.render('xe.admin.groups.addUser')&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="userInput" type="text" name="name" class="suggestUsers#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
-      &lt;/dd&gt;
-      &lt;dt&gt;&lt;label for="groupInput"&gt;$services.localization.render('xe.admin.groups.addGroup')&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="groupInput" type="text" name="name" class="suggestGroups#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;div class="buttons"&gt;
-      &lt;span class="buttonwrapper"&gt;
-        &lt;button type="submit" id="addMembers" name="xpage" value="adduorg"&gt;$services.localization.render('xe.admin.groups.addUser.submit')&lt;/button&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/$wrapperTag&gt;
-  {{/html}}##
-#end
-#set($columnOptions = {
-  "member" : {'link': 'auto', 'type': 'text'},
-  '_avatar' : { 'type' : 'none', 'link' : 'field', 'html' : 'true', 'sortable' : false },
-  "_actions" : {
-    'actions': ['delete'],
-    'actionCallbacks': {'delete': 'table.deleteRow(i);'},
-    'ajaxActions': {'delete': true}
-   }
-})
-## Keep testing the inline action for backward compatibility with existing groups.
-#if(($xcontext.action == 'edit' || $xcontext.action == 'inline') &amp;&amp; $hasDeleteGroupRight)
-  #set($columns = ['_avatar', 'member', '_actions'])
-#else
-  #set($columns = ['_avatar', 'member'])
-#end
-#livetable('groupusers', $columns, $columnOptions, {
-  'url' : $groupDoc.getURL('view', 'xpage=getgroupmembers'),
-  'translationPrefix' : 'xe.admin.groups.',
-  'javascriptName' : 'editgrouptable'
-})
-{{/velocity}}</content>
 </xwikidoc>

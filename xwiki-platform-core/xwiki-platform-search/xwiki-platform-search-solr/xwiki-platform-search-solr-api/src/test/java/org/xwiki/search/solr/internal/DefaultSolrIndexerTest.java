@@ -19,7 +19,10 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.net.URL;
 
@@ -33,6 +36,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -67,6 +71,8 @@ public class DefaultSolrIndexerTest
 
     private XWiki xwiki;
 
+    private SolrConfiguration mockConfig;
+
     @Before
     public void configure() throws Exception
     {
@@ -79,11 +85,15 @@ public class DefaultSolrIndexerTest
         // XWikiContext
 
         this.xcontext = new XWikiContext();
-        this.xcontext.setDatabase("xwiki");
+        this.xcontext.setWikiId("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
+        // Solr configuration
+
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+        this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
+        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), anyString()))
+            .thenReturn(url.getPath());
     }
 
     @Test

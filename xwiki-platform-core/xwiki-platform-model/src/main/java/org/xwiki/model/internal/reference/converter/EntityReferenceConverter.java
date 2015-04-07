@@ -87,6 +87,6 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
             return null;
         }
 
-        return value.getType().toString().toLowerCase() + ':' + this.serialier.serialize(value);
+        return value.getType().getLowerCase() + ':' + this.serialier.serialize(value);
     }
 }

@@ -32,7 +32,7 @@ import org.xwiki.observation.remote.converter.AbstractEventConverter;
 /**
  * Default implementation of {@link org.xwiki.observation.remote.converter.LocalEventConverter}. Support any
  * serializable event.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -84,7 +84,7 @@ public class SerializableEventConverter extends AbstractEventConverter
 
     /**
      * Indicate if a local event is fully serializable.
-     * 
+     *
      * @param localEvent the local event
      * @return true is the local event is fully serializable, false otherwise.
      */
@@ -96,7 +96,7 @@ public class SerializableEventConverter extends AbstractEventConverter
 
     /**
      * Indicate if an object is serializable.
-     * 
+     *
      * @param obj the object to test
      * @return true is the object is serializable, false otherwise.
      */

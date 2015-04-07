@@ -41,7 +41,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.search.solr.script.SolrIndexScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -80,15 +79,11 @@ public class SolrIndexScriptServiceTest
     @Before
     public void setUp() throws Exception
     {
-        this.service = mocker.getComponentUnderTest();
-
-        this.logger = mocker.getMockedLogger();
-
         this.userReference = new DocumentReference("wiki", "space", "user");
 
         // Context
         this.mockContext = mock(XWikiContext.class);
-        Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.mockContext);
 
         // XWiki
@@ -98,7 +93,7 @@ public class SolrIndexScriptServiceTest
         this.mockCurrentDocument = mock(XWikiDocument.class);
         when(mockContext.getDoc()).thenReturn(this.mockCurrentDocument);
 
-        when(mockContext.getDatabase()).thenReturn("currentWiki");
+        when(mockContext.getWikiId()).thenReturn("currentWiki");
         when(mockContext.getUserReference()).thenReturn(userReference);
 
         // RightService
@@ -107,7 +102,10 @@ public class SolrIndexScriptServiceTest
         when(mockAuthorization.hasAccess(any(Right.class), any(DocumentReference.class), any(EntityReference.class)))
             .thenReturn(true);
 
+        this.service = mocker.getComponentUnderTest();
+
         // Rights check success. By default we are allowed (no error is thrown)
+        this.logger = mocker.getMockedLogger();
         verify(this.logger, never()).error(anyString(), any(IllegalAccessException.class));
     }
 

@@ -1,0 +1,52 @@
+//
+// Messages
+// --------------------------------------------------
+
+.successmessage, .errormessage, .warningmessage, .infomessage,
+span.successmessage, span.errormessage, span.warningmessage, span.infomessage, 
+span.box { // Used by: Inline boxes and messages
+  padding: floor(@font-size-base * 0.2);
+}
+
+.box, .plainmessage, // Used by: Code Macro, Success Macro, etc.
+fieldset.xwikimessage { // Used by: Login form, Delete messages
+  .well;
+  overflow-x: auto;
+}
+
+.plainmessage {
+  background-repeat: no-repeat;
+}
+
+.successmessage {
+  .alert-success;
+}
+
+.errormessage {
+  .alert-danger;
+}
+
+.warningmessage {
+  .alert-warning;
+}
+
+.infomessage {
+  .alert-info;
+}
+
+.xwikirenderingerror {
+  .box;
+  .alert-danger;
+  display: block;
+  margin-bottom: 0;
+}
+
+.xwikirenderingerrordescription {
+  .box;
+  .border-top-radius(0);
+  border-color: @alert-danger-border;
+  border-style: solid;
+  display: block;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}

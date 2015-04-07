@@ -1,0 +1,14 @@
+############################################################################
+## Display  current document content with a possible URL parameter:
+## 
+## * htmlHeaderAndFooter: if true, display the HTML headers and footers
+## 
+############################################################################
+#if($request.htmlHeaderAndFooter == 'true')
+  #template("htmlheader.vm")
+  #template("header.vm")
+#end
+#template('rendercontent.vm')
+#if($request.htmlHeaderAndFooter == 'true')
+  #template("htmlfooter.vm")
+#end

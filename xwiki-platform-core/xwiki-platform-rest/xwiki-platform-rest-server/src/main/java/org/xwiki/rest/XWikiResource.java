@@ -24,6 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -78,7 +80,11 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * The XWiki component manager that is used to lookup XWiki components and context.
      */
     @Inject
+    @Named("context")
     protected ComponentManager componentManager;
+
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
 
     /**
      * The query manager to be used to perform low-level queries for retrieving information about wiki content.
@@ -196,8 +202,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
-                            new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
-                    xwikiDocument.setLocale(locale);
+                        new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName), locale);
                     doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;
@@ -252,6 +257,6 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     protected XWikiContext getXWikiContext()
     {
-        return Utils.getXWikiContext(this.componentManager);
+        return this.xcontextProvider.get();
     }
 }

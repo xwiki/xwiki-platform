@@ -33,7 +33,7 @@ import com.xpn.xwiki.util.Util;
 /**
  * Returns rendered mathematical formulae to the client. The formulae are images rendered by the
  * {@link org.xwiki.formula.FormulaRenderer} component, and stored inside an {@link ImageStorage}.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

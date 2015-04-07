@@ -33,10 +33,14 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.extension.script.ExtensionManagerScriptService;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -50,16 +54,18 @@ import org.xwiki.job.JobManager;
 public class XarExtensionScriptService extends AbstractExtensionScriptService
 {
     /**
+     * The install request property that specifies which user triggered the XAR repair job.
+     */
+    private static final String PROPERTY_USER_REFERENCE = "user.reference";
+
+    /**
      * Needed for checking programming rights.
      */
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * Handles and provides status feedback on extension operations (installation, upgrade, removal).
-     */
     @Inject
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
 
     /**
      * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -81,10 +87,18 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
             return null;
         }
 
-        String namespace = "wiki:" + wiki;
+        String namespace = getWikiNamespace(wiki);
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, id, namespace));
+        DocumentReference currentUserReference = this.documentAccessBridge.getCurrentUserReference();
+        if (currentUserReference != null) {
+            installRequest.setProperty(PROPERTY_USER_REFERENCE, currentUserReference);
+            // We set the string value because the extension repository doesn't know how to serialize/parse an extension
+            // property whose value is a DocumentReference, and adding support for it requires considerable refactoring
+            // because ExtensionPropertySerializers are not components (they are currently hard-coded).
+            installRequest.setExtensionProperty(PROPERTY_USER_REFERENCE, currentUserReference.toString());
+        }
         installRequest.addExtension(new ExtensionId(id, version));
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
@@ -92,12 +106,48 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(RepairXarJob.JOBTYPE, installRequest);
+            job = this.jobExecutor.execute(RepairXarJob.JOBTYPE, installRequest);
         } catch (Exception e) {
             setError(e);
         }
 
         return job;
+    }
+
+    /**
+     * Computes the differences, in unified format, between the documents of an installed XAR extension and the document
+     * from the wiki.
+     * 
+     * @param feature the identifier of a XAR extension (or one of its features)
+     * @param wiki the wiki where the XAR extension is installed
+     * @return the {@link Job} object which can be used to monitor the progress while the differences are being
+     *         computed, or {@code null} in case of failure
+     * @since 7.0RC1
+     */
+    @Unstable
+    public Job diff(String feature, String wiki)
+    {
+        setError(null);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(new ExtensionId(feature, (Version) null));
+        if (StringUtils.isNotBlank(wiki)) {
+            installRequest.addNamespace(getWikiNamespace(wiki));
+        }
+        installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, feature,
+            installRequest.hasNamespaces() ? installRequest.getNamespaces().iterator().next() : null));
+
+        try {
+            return this.jobExecutor.execute(DiffXarJob.JOB_TYPE, installRequest);
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    private String getWikiNamespace(String wiki)
+    {
+        return "wiki:" + wiki;
     }
 
     /**

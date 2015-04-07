@@ -23,32 +23,31 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
-import org.xwiki.diff.DiffManager;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
-    /**
-     * Used to do the actual merge.
-     */
-    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
-
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */
     protected transient List<String> list;
 
-    private String formStringSeparator = "|";
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
+    private String formStringSeparator = ListClass.DEFAULT_SEPARATOR;
 
     /**
      * This is the actual list. It will be used during serialization/deserialization.
@@ -59,11 +58,23 @@ public class ListProperty extends BaseProperty implements Cloneable
         this.list = new NotifyList(this.actualList, this);
     }
 
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
     public String getFormStringSeparator()
     {
         return this.formStringSeparator;
     }
 
+    /**
+     * @deprecated since 7.0M2. This was never used, since it is not the right place to handle separators. They are
+     *             defined in {@link ListClass} and that is where they are now handled through
+     *             {@link ListClass#toFormString(BaseProperty)}.
+     */
+    @Deprecated
     public void setFormStringSeparator(String formStringSeparator)
     {
         this.formStringSeparator = formStringSeparator;
@@ -83,7 +94,7 @@ public class ListProperty extends BaseProperty implements Cloneable
 
     /**
      * This method is called by Hibernate to get the raw value to store in the database. Check the xwiki.hbm.xml file.
-     * 
+     *
      * @return the string value that is saved in the database
      */
     public String getTextValue()
@@ -94,17 +105,17 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public String toText()
     {
-        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
-            return "";
-        }
-
-        List<String> escapedValues = new ArrayList<String>();
-        for (String value : getList()) {
-            escapedValues.add(value.replace(this.formStringSeparator, "\\" + this.formStringSeparator));
-        }
-        return StringUtils.join(escapedValues, this.formStringSeparator);
+        // Always use the default separator because this is the value that is stored in the database (for non-relational
+        // lists).
+        String result = ListClass.getStringFromList(this.getList(), ListClass.DEFAULT_SEPARATOR);
+        return result;
     }
 
+    /**
+     * @deprecated Since 7.0M2. This method is here for a long time but it does not seem to have ever been used and it
+     *             does not bring any value compared to the existing {@link #toFormString()} method.
+     */
+    @Deprecated
     public String toSingleFormString()
     {
         return super.toFormString();
@@ -184,7 +195,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     /**
      * Starting from 4.3M2, this method will copy the list passed as parameter. Due to XWIKI-8398 we must be able to
      * detect when the values in the list changes, so we cannot store the values in any type of list.
-     * 
+     *
      * @param list The list to copy.
      */
     public void setList(List<String> list)
@@ -248,7 +259,7 @@ public class ListProperty extends BaseProperty implements Cloneable
      * {@inheritDoc}
      * <p>
      * This is important.. Otherwise we can get a stackoverflow calling toXML()
-     * 
+     *
      * @see com.xpn.xwiki.objects.BaseProperty#toString()
      */
     @Override
@@ -268,9 +279,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     /**
-     * List implementation for updating dirty flag when updated.
-     *
-     * This will be accessed from ListPropertyUserType.
+     * List implementation for updating dirty flag when updated. This will be accessed from ListPropertyUserType.
      */
     public static class NotifyList extends AbstractNotifyOnUpdateList<String>
     {

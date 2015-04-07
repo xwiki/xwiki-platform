@@ -21,6 +21,9 @@ package org.xwiki.rendering.internal.macro.velocity.filter;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
@@ -31,7 +34,9 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
  * @version $Id$
  * @since 1.9.1
  */
-@Component("indent")
+@Component
+@Named("indent")
+@Singleton
 public class IndentVelocityMacroFilter implements VelocityMacroFilter
 {
     /**

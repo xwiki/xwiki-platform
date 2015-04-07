@@ -31,7 +31,7 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
 
 /**
  * Extensions of AbstractSoundCaptchaAction create wav audio captchas.
- * 
+ *
  * @version $Id$
  * @since 2.2M2
  */
@@ -39,15 +39,15 @@ public abstract class AbstractSoundCaptchaAction extends AbstractCaptchaAction<S
 {
     @Override
     public ActionForward execute(ActionMapping actionMapping, ActionForm actionForm,
-                                 HttpServletRequest request, HttpServletResponse response)
+        HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
         SoundToWavHelper.flushNewCaptchaToResponse(request,
-                                                   response,
-                                                   null,
-                                                   getCaptchaService(),
-                                                   getUserId(request),
-                                                   request.getLocale());
+            response,
+            null,
+            getCaptchaService(),
+            getUserId(request),
+            request.getLocale());
         return null;
     }
 }

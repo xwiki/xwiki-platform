@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -36,14 +37,14 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.
- * 
+ *
  * @version $Id$
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
     /**
      * Full reference of this element.
-     * 
+     *
      * @since 3.2M1
      */
     protected R referenceCache;
@@ -51,13 +52,14 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Reference to the document in which this element is defined (for elements where this make sense, for example for
      * an XClass or a XObject).
+     *
      * @since 5.3M1
-     * 
      */
     protected DocumentReference documentReference;
 
     /**
      * The owner document, if this element was obtained from a document.
+     *
      * @since 5.3M1
      */
     protected transient XWikiDocument ownerDocument;
@@ -73,13 +75,14 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    protected EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     /**
      * Used to build uid string for the getId() hash.
      */
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
+
+    private ContextualLocalizationManager localization;
 
     @Override
     public R getReference()
@@ -113,7 +116,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Note that this method is used by Hibernate for saving an element. {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#getName()
      */
     @Override
@@ -121,7 +124,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     {
         // If the name is null then serialize the reference as a string.
         if (this.name == null && this.documentReference != null) {
-            this.name = this.localEntityReferenceSerializer.serialize(this.documentReference);
+            this.name = getLocalEntityReferenceSerializer().serialize(this.documentReference);
         }
 
         return this.name;
@@ -138,7 +141,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Note that this method is used by Hibernate for loading an element. {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
      */
     @Override
@@ -164,7 +167,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     }
 
     /**
-     * @return return the LocalUidStringEntityReferenceSerializer to compute ids.
+     * @return the component used to build uid string for the getId() hash
      * @since 4.0M1
      */
     protected EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer()
@@ -175,6 +178,38 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         }
 
         return this.localUidStringEntityReferenceSerializer;
+    }
+
+    /**
+     * @return the component used to convert a proper Document Reference to a string but without the wiki name.
+     * @since 6.3M1
+     */
+    protected EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    {
+        if (this.localEntityReferenceSerializer == null) {
+            this.localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+
+        return this.localEntityReferenceSerializer;
+    }
+
+    protected ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    protected String localizePlain(String key, Object... parameters)
+    {
+        return getLocalization().getTranslationPlain(key, parameters);
+    }
+
+    protected String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**
@@ -189,7 +224,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Return an truncated MD5 hash of the local key computed in {@link #getLocalKey()}.
-     * 
+     *
      * @return the identifier used by hibernate for storage.
      * @since 4.0M1
      */
@@ -208,7 +243,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Dummy function, do hibernate is always happy.
-     * 
+     *
      * @param id the identifier assigned by hibernate.
      * @since 4.0M1
      */
@@ -293,7 +328,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeOject(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
     }
 
@@ -315,7 +350,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
 
     /**
      * Set the owner document of this element.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 5.3M1
      */

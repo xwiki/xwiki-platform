@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>Applications</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1346768961000</creationDate>
-  <date>1346768961000</date>
-  <contentUpdateDate>1346768961000</contentUpdateDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1416392687000</date>
+  <contentUpdateDate>1416392687000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -76,7 +77,7 @@
         <number>4</number>
         <prettyName>Content</prettyName>
         <rows>25</rows>
-        <size>60</size>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
@@ -117,44 +118,72 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <property>
       <category>Information</category>
     </property>
     <property>
-      <content>{{velocity}}
-#set($discard = $xwiki.ssx.use('Panels.Applications'))
-#set($discard = $xwiki.jsx.use('Panels.Applications'))
+      <content>{{velocity output="false"}}
+#macro (displayAppPanelEntry $params)
+  #if ($params.icon.startsWith('icon:'))
+    #set ($icon = $services.icon.renderHTML($params.icon.substring(5)))
+  #else
+    #set ($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'),
+      'xhtml/1.0'))
+  #end
+  &lt;li&gt;
+    &lt;a href="$xwiki.getURL($params.target, 'view', "$!params.targetQueryString")" title="$escapetool.xml($params.label)"&gt;
+      &lt;span class="application-img"&gt;$icon&lt;/span&gt;
+      &lt;span class="application-label"&gt;$escapetool.xml($params.label)&lt;/span&gt;
+    &lt;/a&gt;
+  &lt;/li&gt;
+#end
+
+#macro (maybeDisplayAppPanelEntry $uix $configDoc)
+  #set ($params = $uix.getParameters())
+  #set ($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id))
+  #set ($targetReference = $services.model.resolveDocument($params.target))
+  #if (!$blackListObj &amp;&amp; "$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != ''
+      &amp;&amp; $services.security.authorization.hasAccess('view', $targetReference))
+    #displayAppPanelEntry($params)
+  #end
+#end
+
+#macro (displayAppPanelEntries $extensionPointId $configDoc)
+  #foreach ($uix in $services.uix.getExtensions($extensionPointId, {'sortByParameter': 'label'}))
+    #maybeDisplayAppPanelEntry($uix $configDoc)
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#set ($discard = $xwiki.ssx.use('Panels.Applications'))
+#set ($discard = $xwiki.jsx.use('Panels.Applications'))
+
 #panelheader($services.localization.render('panels.applications.title'))
-#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
-  #set($params = $uix.getParameters())
-  #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-(% class="applicationsPanel" %)
-* [[image:$params.icon $params.label&gt;&gt;$params.target]]
-  #end
-#end
-#if($xwiki.hasWikiAdminRights())
-## We need the 3 newlines below to have a separation between the lists
 
+{{html}}
+&lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+  ## Get the blacklist configuration
+  #set ($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode',
+    'ApplicationsPanelConfiguration')))
+  #displayAppPanelEntries('org.xwiki.platform.panels.Applications' $configDoc)
+&lt;/ul&gt;
+&lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
+  &lt;li&gt;
+    &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin',
+        'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton" title="$services.localization.render('panels.applications.more')"&gt;
+      &lt;span class="application-img"&gt;$services.icon.renderHTML('add')&lt;/span&gt;
+      &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;
+    &lt;/a&gt;
+    &lt;div class="applicationPanelMoreContainer hidden"&gt;
+      &lt;ul class="nav nav-pills nav-stacked"&gt;
+        #displayAppPanelEntries('org.xwiki.platform.panels.Applications.more')
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+{{/html}}
 
-
-(% class="applicationsPanel" %)
-* [[image:icon:add $services.localization.render('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]
-
-(% class="applicationPanelMoreContainer hidden" %)(((
-(% class="applicationsPanel" %)
-#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
-  #set($params = $uix.getParameters())
-  #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
-(% class="applicationsPanel" %)
-* [[image:$params.icon $params.label&gt;&gt;$params.target]]
-  #end
-#end
-)))
-#end
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -169,6 +198,10 @@
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -236,14 +269,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -255,16 +284,21 @@ var panels = XWiki.panels = XWiki.panels || {};
 panels.MoreApplicationsButtonListener = Class.create({
   initialize: function(button) {
     this.button = button;
-    this.container = button.up('div').down('.applicationPanelMoreContainer');
-    this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
-    this.isToggling = false;
+    this.container = button.up('.applicationsPanelMoreList').down('.applicationPanelMoreContainer');
 
-    this.button.observe('click', function(e) {
-      e.stop();
-      if (!this.isToggling) {
-        this.toggle();
-      }
-    }.bindAsEventListener(this));
+    var moreAppsCount = this.container.select('.application-label').length;
+    if (moreAppsCount &gt; 0) {
+      this.container.id = 'applicationPanelMoreContainer' + Math.floor(Math.random()*101);
+      this.isToggling = false;
+      this.button.observe('click', function(e) {
+        e.stop();
+        if (!this.isToggling) {
+          this.toggle();
+        }
+      }.bindAsEventListener(this));
+    } else {
+      button.up('.applicationsPanelMoreList').hide();
+    }
 
     return this;
   },
@@ -314,6 +348,10 @@ document.observe('xwiki:dom:loaded', function(e) {
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -381,20 +419,38 @@ document.observe('xwiki:dom:loaded', function(e) {
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
-      <code>ul.applicationsPanel li img {
-  float:left;
+      <code>#template('colorThemeInit.vm')
+
+.applicationsPanelMoreList {
+  margin-top: 1em;
+}
+
+ul.applicationsPanel li img {
+  float: left; 
+  width: 16px;
+  height: 16px;
+}
+
+.panel-width-Medium ul.applicationsPanel li .application-img, .panel-width-Large ul.applicationsPanel li .application-img {
+  display: block;
+  float: left;
+  width: 16px;
+}
+
+ul.applicationsPanel li .application-label {
+  margin-left: 0.5em;
+}
+
+div.applicationPanelMoreContainer ul {
+  margin-left: 0;
 }
 
 div.applicationPanelMoreContainer li a {
@@ -403,19 +459,132 @@ div.applicationPanelMoreContainer li a {
   font-weight: bold;
 }
 
+.panel-width-Small .panel.Applications{
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
 
+.panel-width-Small .applicationsPanel li {
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+}
 
+.panel-width-Small .applicationsPanel li a {
+  padding: 0.7em 0;
+}
+
+.panel-width-Small .applicationsPanel .application-label {
+  display: inline-block; /* Needed by IE for ellipsis */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%; /* Needed by IE for ellipsis */
+}
+
+.panel-width-Small .applicationsPanel li img {
+  float: none;
+}
+
+.panel-width-Small .applicationsPanel li .application-img {
+  display: block;
+}
+
+.panel-width-Small .applicationsPanel li .application-label {
+  margin-left: 0;
+}
+
+.panel-width-Small .panel.Applications .xwikipaneltitle {
+  display: none;
+}
+
+.panel-width-Small .panel.Applications .xwikipanelcontents {
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul {
+  padding: 0;
+  background-color: $theme.pageContentBackgroundColor;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul li:hover {
+  background-color: $theme.highlightColor;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul li:hover a {
+  color: $theme.textPrimaryColor;
+}
+
+.panel-width-Small .application-img {
+  font-size: 24px;
+}
+.panel-width-Small .application-img img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Phone case */
+@media (max-width: 768px) {
+  .panel-width-Small .applicationsPanel li {
+    float: left;
+    width: 33%;
+  }
+  
+  /* no responsive design for colibri */
+  .skin-colibri .panel-width-Small .applicationsPanel li {
+    float: none;
+    width: inherit;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  .panel-width-Small .applicationsPanel li{
+    float: left;
+    width: 20%;
+  }
+  
+  /* no responsive design for colibri */
+  .skin-colibri .panel-width-Small .applicationsPanel li {
+    float: none;
+    width: inherit;
+  }
+}
+
+/* for colibri */
+.skin-colibri .panel-width-Small .applicationsPanel {
+  margin: 0;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li{
+  padding: 15px 0;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li.active {
+  background-color: $theme.buttonPrimaryBackgroundColor;  
+}
+.skin-colibri .panel-width-Small .applicationsPanel li.active a {
+  color: $theme.buttonPrimaryTextColor
+}
+.skin-colibri .panel-width-Small .applicationsPanel li:hover {
+  background-color: $theme.highlightColor;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li:hover a {
+  color: $theme.textPrimaryColor; 
+}
 </code>
     </property>
     <property>
       <name>Applications Panel</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

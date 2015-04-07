@@ -33,7 +33,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Store document statistics into the database.
- * 
+ *
  * @version $Id$
  * @since 1.4M2
  */
@@ -56,7 +56,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
 
     /**
      * Create new instance of {@link DocumentStatsStoreItem}.
-     * 
+     *
      * @param name can be:
      *            <ul>
      *            <li>"" for the entire wiki.</li>
@@ -89,7 +89,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
     {
         DocumentStatsStoreItem lastItem = (DocumentStatsStoreItem) stats.get(stats.size() - 1);
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
+        XWikiHibernateStore store = this.context.getWiki().getHibernateStore();
         if (store == null) {
             return;
         }
@@ -100,7 +100,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
         // Load old statistics object from database
         try {
             // TODO Fix use of deprecated call.
-            store.loadXWikiCollection(documentStat, context, true);
+            store.loadXWikiCollection(documentStat, this.context, true);
         } catch (XWikiException e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Failed to load document statistics object [{}]", getId(), e);
@@ -120,7 +120,7 @@ public class DocumentStatsStoreItem extends AbstractStatsStoreItem
         // Re-save statistics object
         try {
             // TODO Fix use of deprecated call.
-            store.saveXWikiCollection(documentStat, context, true);
+            store.saveXWikiCollection(documentStat, this.context, true);
         } catch (XWikiException e) {
             LOGGER.error("Failed to save document statistics object [{}]", getId(), e);
         }

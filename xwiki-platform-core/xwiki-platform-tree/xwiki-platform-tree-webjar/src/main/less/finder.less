@@ -1,0 +1,39 @@
+input[type="text"].xtree-finder {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/search.png')");
+  background-repeat: no-repeat;
+  margin: .5em 0;
+  width: 100%;
+}
+
+input[type="text"].xtree-finder,
+input[type="text"].xtree-finder.loading {
+  background-position: 2px center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+div.suggestItems.xtree-finder-suggestions {
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+  margin: 2px 0 0;
+  padding: 5px 0;
+
+  .suggestItem, .noSuggestion {
+    margin: 0;
+    padding: 3px 20px;
+    white-space: nowrap;
+  }
+
+  .suggestItem {
+    .icon {
+      margin-right: .3em;
+    }
+
+    .info {
+      padding-left: 0;
+    }
+  }
+}
+

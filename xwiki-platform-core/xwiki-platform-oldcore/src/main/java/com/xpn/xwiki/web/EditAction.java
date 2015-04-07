@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 
 /**
  * Initializes a document before it is edited.
- * 
+ *
  * @version $Id$
  */
 public class EditAction extends XWikiAction
@@ -42,6 +42,14 @@ public class EditAction extends XWikiAction
      * The object used for logging.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
+
+    /**
+     * Default constructor.
+     */
+    public EditAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
 
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -69,7 +77,7 @@ public class EditAction extends XWikiAction
     /**
      * Determines the edited document (translation) and updates it based on the template specified on the request and
      * any additional request parameters that overwrite the default values from the template.
-     * 
+     *
      * @param context the XWiki context
      * @return the edited document
      * @throws XWikiException if something goes wrong
@@ -102,7 +110,7 @@ public class EditAction extends XWikiAction
      * </ul>
      * Most of the code deals with the really bad way the default language can be specified (empty string, 'default' or
      * a real language code).
-     * 
+     *
      * @param context the XWiki context
      * @return the edited document translation based on the language specified on the request
      * @throws XWikiException if something goes wrong
@@ -160,7 +168,6 @@ public class EditAction extends XWikiAction
             // Mark the translation. It's important to know whether a document is a translation or not, especially
             // for the sheet manager which needs to access the objects using the default document not one of its
             // translations.
-            tdoc.setTranslation(1);
             tdoc.setTitle(doc.getTitle());
             tdoc.setContent(doc.getContent());
             tdoc.setSyntax(doc.getSyntax());
@@ -178,7 +185,7 @@ public class EditAction extends XWikiAction
     /**
      * Updates the title and content of the given document with values taken from the 'title' and 'content' request
      * parameters or based on the document section specified on the request.
-     * 
+     *
      * @param document the document whose title and content should be updated
      * @param context the XWiki context
      * @throws XWikiException if something goes wrong
@@ -208,7 +215,7 @@ public class EditAction extends XWikiAction
             // In both cases the document content is currently having one section, so we can take its title.
             String sectionTitle = document.getDocumentSection(1).getSectionTitle();
             if (StringUtils.isNotBlank(sectionTitle)) {
-                document.setTitle(context.getMessageTool().get("core.editors.content.titleField.sectionEditingFormat",
+                document.setTitle(localizePlainOrKey("core.editors.content.titleField.sectionEditingFormat",
                     document.getRenderedTitle(Syntax.PLAIN_1_0, context), sectionNumber, sectionTitle));
             }
         }
@@ -216,7 +223,7 @@ public class EditAction extends XWikiAction
 
     /**
      * Exposes the given document in the XWiki context and the Velocity context under the 'tdoc' and 'cdoc' keys.
-     * 
+     *
      * @param document the document to expose
      * @param context the XWiki context
      */
@@ -235,7 +242,7 @@ public class EditAction extends XWikiAction
     /**
      * Locks the given document unless it is already locked by a different user and the current user didn't request to
      * force the lock.
-     * 
+     *
      * @param document the document to lock
      * @param context the XWiki context
      */

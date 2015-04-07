@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.classes;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -36,16 +38,17 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.classes.ClassesResourceImpl")
 public class ClassesResourceImpl extends XWikiResource implements ClassesResource
 {
     @Override
     public Classes getClasses(String wikiName, Integer start, Integer number) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
@@ -64,7 +67,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>Navigation</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1165426047000</creationDate>
-  <date>1184168629000</date>
-  <contentUpdateDate>1184168629000</contentUpdateDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1415013363000</date>
+  <contentUpdateDate>1415013363000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Panels.Navigation</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>32f141e5-f3c5-4e97-8d0a-cdca33a8a451</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -76,7 +77,7 @@
         <number>4</number>
         <prettyName>Content</prettyName>
         <rows>25</rows>
-        <size>60</size>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
@@ -117,64 +118,16 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
-    <name>Panels.Navigation</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>32f141e5-f3c5-4e97-8d0a-cdca33a8a451</guid>
     <property>
       <category>Navigation</category>
     </property>
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.navigation'))
-#set ($hiddenPages = ['Main.WebRss', 'Main.DatabaseSearch', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
-#set ($blacklistedPages = ['WebPreferences'])
-#set ($spaces = $xwiki.spaces)
-#set ($spacecount = 0)
-(% id="xwikinavcontainer" %)
-(((
-(% id="xwikinav" class="accordion" %)
-(((
-#foreach ($space in $spaces)
-  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))
-    #if ($doc.space == $space)
-      #set ($spacecount = $foreach.index)
-    #end
-    (% id="xwikinav${space}" %)
-    (((
-    (% id="xwikinav${space}Header" class="accordionTabTitleBar" %)
-    (((=${space}=)))
-    (% id="xwikinav${space}Content" class="accordionTabContentBox" %)
-    (((
-    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').addFilter('hidden').bindValue(1, $space).execute())
-    #foreach ($page in $spaceDocs)
-      #if (!$hiddenPages.contains($page) || $hasAdmin)
-        #set($dotIndex = $page.indexOf('.')+1)
-        #set($pageName = $page.substring($dotIndex))
-        #if (!$blacklistedPages.contains($pageName) || $hasAdmin)
-          #if ($doc.fullName == $page)
-            * **${doc.name}**
-          #else
-            * [[$page]]
-          #end
-        #end
-      #end
-    #end
-    )))## xwikinav${space}Content
-    )))## xwikinav${space}
-  #end
-#end
-)))## xwikinav
-)))## xwikinavcontainer
-$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
-{{html clean="false"}}
-&lt;script type="text/javascript"&gt;
-document.observe('xwiki:dom:loaded', function() {
-  var obj = {div:'xwikinav', no:$spacecount, height:250};
-  var acc = createAccordion(obj);
-});
-&lt;/script&gt;
-{{/html}}
+## Escape special characters in macro parameter values.
+#set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
+{{documentTree showSpaces="true" showTranslations="false" showAttachments="false"
+  showChildDocuments="false" compact="true" openTo="document:$openToDoc" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -188,5 +141,4 @@ document.observe('xwiki:dom:loaded', function() {
       <type>view</type>
     </property>
   </object>
-  <content/>
 </xwikidoc>

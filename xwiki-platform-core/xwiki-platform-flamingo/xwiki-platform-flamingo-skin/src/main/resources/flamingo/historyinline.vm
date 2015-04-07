@@ -1,0 +1,148 @@
+###
+### Document history table
+###
+### Displays a paged list of document versions, with the possiblity to view a version, compare two
+### versions, delete one or a range of versions, restore a version as the current document.
+###
+##
+## Settings, compute what versions should be displayed.
+##
+#if ($xcontext.action == 'edit')
+  #set ($viewer = 'editor=history')
+#else
+  #set ($viewer = 'viewer=history')
+#end
+#set ($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
+## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
+#set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
+#set ($versions = $tdoc.getRevisions($criteria))
+#set ($discard = $collectionstool.reverse($versions))
+#set ($totalVersions = $versions.size())
+#if ($totalVersions == 0)
+  #warning ($services.localization.render('thispagedoesnotexist'))
+#else
+  #set ($paginationParameters = {'url' : "?${viewer}&amp;showminor=${minorVersions}", 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
+  #pagination ($paginationParameters)
+## Since we're displaying revisions starting from the last one, we need to mirror the range inside
+## the total versions range.
+  #set ($startAt = $totalVersions - ${paginationParameters.firstItem})
+  #set ($endAt = 0 - ${paginationParameters.itemsPerPage})
+  #set ($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
+## Reuse the old object, just add the range.
+  $criteria.setRange($range)
+  #set ($versions = $tdoc.getRevisions($criteria))
+  #set ($discard = $collectionstool.reverse($versions))
+  #if ($tdoc.realLanguage != '')
+    #set ($lang = "&amp;language=${tdoc.realLanguage}")
+  #else
+    #set ($lang = '')
+  #end
+##
+## Pagination style
+$xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+##
+## Preamble, output some HTML.
+##
+  <div id="historycontent" class="xwikiintracontent">
+##
+##
+    #set ($formname = 'historyform')
+    <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="post">
+      <div id="_history">
+      ## CSRF prevention
+      <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+      <input type="hidden" name="language" value="$!xcontext.language" />
+      <table class="table table-striped table-hover responsive-table" summary="$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
+## Print the table header
+        <thead>
+          <tr>
+          #if ($totalVersions > 1)
+            <th scope="col">$services.localization.render('core.viewers.history.from')</th>
+            <th scope="col">$services.localization.render('core.viewers.history.to')</th>
+          #end
+            <th scope="col">$services.localization.render('core.viewers.history.version')</th>
+            <th scope="col">$services.localization.render('core.viewers.history.author')</th>
+            <th scope="col">$services.localization.render('core.viewers.history.date')</th>
+  ## Might be disabled in certain wikis.
+          #if($xwiki.hasEditComment())
+            <th scope="col">$services.localization.render('core.viewers.history.comment')</th>
+          #end
+  ## Editors see the Revert button.
+          #if($hasEdit && !$hasAdmin)
+            <th scope="col"></th>
+  ## Admins see the Revert and Delete buttons.
+          #elseif($hasAdmin)
+            <th scope="col" colspan="2"></th>
+          #end
+          </tr>
+        </thead>
+##
+## Display, loop over the extracted revisions and print them in the table.
+##
+  <tbody>
+  #foreach ($version in $versions)
+    #set ($revinfo = $tdoc.getRevisionInfo($version))
+    #if ($tdoc.getRCSVersion() == $version)
+      <tr class="currentversion odd">
+    #else
+       <tr class="#if($velocityCount % 2 == 0) even #else odd #end">
+    #end
+    #if ($totalVersions > 1)
+      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))"><input type="radio" name="rev1" value="$version" #if ($velocityCount==2) checked="checked" #end/></td>
+      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))"><input type="radio" name="rev2" value="$version" #if ($velocityCount==1) checked="checked" #end/></td>
+    #end
+    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('viewrev',"rev=$version")">$version</a></td>
+    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.author'))">$xwiki.getUserName($revinfo.author)</td>
+    <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.date'))">$xwiki.formatDate($revinfo.date)</td>
+    #if ($xwiki.hasEditComment())
+      <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.comment'))">$!{escapetool.xml($revinfo.comment)}</td>
+    #end
+    #if ($hasEdit || $hasAdmin)
+      #if ($tdoc.getRCSVersion()==$version)
+        <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><span class="currentversionlabel">$services.localization.render('core.viewers.history.currentVersion')</span></td>
+      #else
+        <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.rollback'))"><a href="$tdoc.getURL('rollback', "form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmRollback', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.rollback')</a></td>
+      #end
+    #end
+    #if ($hasAdmin)
+      <td class="xwikibuttonlink" data-title="$escapetool.xml($services.localization.render('core.viewers.history.deleteSingle'))"><a href="$tdoc.getURL('deleteversions',"form_token=$!{services.csrf.getToken()}&amp;rev=$version$lang")" onclick="if (confirm('$services.localization.render('core.viewers.history.confirmDeleteSingle', [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$services.localization.render('core.viewers.history.deleteSingle')</a></td>
+    #end
+    </tr>
+  #end ## foreach
+  </tbody>
+##
+## Footer, print some more HTML.
+##
+      </table>
+## Print the page navigation links, if needed.
+## Since the history can be viewed both in edit and view mode, and these modes use a different parameter name, detect
+## and set the right parameter here.
+#if ($xcontext.action == 'view')
+  #set ($viewer = 'viewer=history')
+#else
+  #set ($viewer = 'editor=history')
+#end
+    #set ($discard = $paginationParameters.put('position', 'bottom'))
+    #pagination ($paginationParameters)
+      <div class="form-inline">
+        #if ($totalVersions > 1)
+          <input type="submit" accesskey="c" value="$services.localization.render('core.viewers.history.compare')" class="btn btn-primary"/>
+          #if ($hasAdmin)
+            <input class="btn btn-default" type="submit" name="deleteversions" value="$services.localization.render('core.viewers.history.deleteRange')"
+              onclick="var rev1 = ''; var rev2 = ''; $$('[name=rev1], [name=rev2]').each(function(item) {if(item.getValue()) { if(item.name == 'rev1') rev1 = item.getValue(); else rev2 = item.getValue(); }}); if (!confirm('$services.localization.render('core.viewers.history.confirmDeleteRange')'.replace('__rev1__', rev1).replace('__rev2__', rev2))){ return false; } document.forms.${formname}.action='$doc.getURL('deleteversions', 'confirm=1')'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+          #end
+        #end
+        #if ($xwiki.hasMinorEdit())
+          #if ("$!request.showminor" != 'true')
+            <input class="btn btn-default" type="submit" name="viewminorversions" value="$services.localization.render('core.viewers.history.showMinorEdits')"
+              onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+          #else
+            <input class="btn btn-default" type="submit" name="hideminorversions" value="$services.localization.render('core.viewers.history.hideMinorEdits')"
+              onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
+          #end
+        #end
+      </div>
+    </div>
+  </form>
+  </div>
+#end ## versions.size

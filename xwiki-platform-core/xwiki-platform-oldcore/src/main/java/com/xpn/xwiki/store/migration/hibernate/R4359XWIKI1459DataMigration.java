@@ -47,7 +47,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI1459: keep document history in a separate table.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -80,12 +80,12 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
     private XWikiHibernateVersioningStore getVersioningStore() throws XWikiException
     {
         try {
-            return (XWikiHibernateVersioningStore) componentManager
+            return (XWikiHibernateVersioningStore) this.componentManager
                 .getInstance(XWikiVersioningStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                String.format("Unable to reach the versioning store for database %s", getXWikiContext().getDatabase()),
+                String.format("Unable to reach the versioning store for database %s", getXWikiContext().getWikiId()),
                 e);
         }
     }
@@ -129,8 +129,8 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                         session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     while (rs.next()) {
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Updating document [{}]...", rs.getString(3));
+                        if (R4359XWIKI1459DataMigration.this.logger.isInfoEnabled()) {
+                            R4359XWIKI1459DataMigration.this.logger.info("Updating document [{}]...", rs.getString(3));
                         }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
@@ -143,14 +143,15 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
                             try {
                                 docArchive.setArchive(sArchive);
                             } catch (XWikiException e) {
-                                logger.warn(
+                                R4359XWIKI1459DataMigration.this.logger.warn(
                                     "The RCS archive for [{}] is broken. Internal error [{}]."
                                     + " The history for this document has been reset.",
                                     rs.getString(3), e.getMessage());
                             }
                             getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
                         } else {
-                            logger.warn("Empty revision found for document [{}]. Ignoring non-fatal error.",
+                            R4359XWIKI1459DataMigration.this.logger.warn(
+                                "Empty revision found for document [{}]. Ignoring non-fatal error.",
                                 rs.getString(3));
                         }
                         deleteStatement.setLong(1, docId);

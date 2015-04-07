@@ -21,6 +21,7 @@ package org.xwiki.query.solr;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.inject.Provider;
 
@@ -32,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
@@ -43,22 +45,23 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Basic test for the {@link SolrQueryExecutor}.
  * 
  * @version $Id$
  */
-@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class})
+@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class})
 public class SolrQueryExecutorTest
 {
-
     private static final String   ITERABLE_PARAM_NAME = "multiParam";
     private static final String[] ITERABLE_PARAM_EXPECTED = {"value1", "value2"};
-    private static final Iterable ITERABLE_PARAM_VALUE = Arrays.asList(ITERABLE_PARAM_EXPECTED);
+    private static final Iterable<String> ITERABLE_PARAM_VALUE = Arrays.asList(ITERABLE_PARAM_EXPECTED);
 
     private static final String   INT_ARR_PARAM_NAME = "intArrayParam";
     private static final String[] INT_ARR_PARAM_EXPECTED = {"-42", "4711"};
@@ -72,9 +75,11 @@ public class SolrQueryExecutorTest
     private static final Object SINGLE_PARAM_VALUE = new Object();
     private static final Object SINGLE_PARAM_EXPECTED = SINGLE_PARAM_VALUE.toString();
 
-    @Rule
     public final MockitoComponentMockingRule<QueryExecutor> componentManager =
         new MockitoComponentMockingRule<QueryExecutor>(SolrQueryExecutor.class);
+
+    @Rule
+    public final MockitoOldcoreRule oldCore = new MockitoOldcoreRule(this.componentManager);
 
     @Test
     public void testExecutorRegistration() throws Exception
@@ -98,6 +103,9 @@ public class SolrQueryExecutorTest
                 Assert.assertArrayEquals(STR_ARR_PARAM_EXPECTED,  solrQuery.getParams(STR_ARR_PARAM_NAME));
                 Assert.assertEquals(SINGLE_PARAM_EXPECTED, solrQuery.get(SINGLE_PARAM_NAME));
 
+                // Check that the default list of supported locales is taken from the wiki configuration.
+                Assert.assertEquals("en,fr,de", solrQuery.get("xwiki.supportedLocales"));
+
                 QueryResponse r = mock(QueryResponse.class);
                 when(r.getResults()).thenReturn(new SolrDocumentList());
                 return r;
@@ -105,7 +113,7 @@ public class SolrQueryExecutorTest
         });
 
         ParameterizedType solrProviderType = new DefaultParameterizedType(null, Provider.class, SolrInstance.class);
-        Provider<SolrInstance> provider = componentManager.getInstance(solrProviderType);
+        Provider<SolrInstance> provider = componentManager.registerMockComponent(solrProviderType);
         when(provider.get()).thenReturn(solr);
 
         DefaultQuery query = new DefaultQuery("TestQuery", null);
@@ -113,6 +121,11 @@ public class SolrQueryExecutorTest
         query.bindValue(INT_ARR_PARAM_NAME,  INT_ARR_PARAM_VALUE);
         query.bindValue(STR_ARR_PARAM_NAME,  STR_ARR_PARAM_VALUE);
         query.bindValue(SINGLE_PARAM_NAME,   SINGLE_PARAM_VALUE);
+
+        // The default list of supported locales should be taken from the wiki configuration.
+        XWikiContext xcontext = this.oldCore.getXWikiContext();
+        when(this.oldCore.getMockXWiki().getAvailableLocales(xcontext)).thenReturn(
+            Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN));
 
         componentManager.getComponentUnderTest().execute(query);
     }

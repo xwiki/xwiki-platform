@@ -50,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Piemērs|=XWiki 1.0 sintakse|=(% style="width:20%" %)Rezultāts
 |Saite uz lapu tekošajā vietā|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Saite ar nosaukumu|{{{[nosaukums&gt;WebHome]}}}|[[nosaukums&gt;&gt;WebHome]]
@@ -85,7 +84,6 @@ Pilnais saites formāts ir: ##(nosaukums[|&gt;])+(saite)(@citaVikiAliase)+([|&gt
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Piemērs|=XWiki 2.0 sintakse|=(% style="width:20%" %)Rezultāts
 |Saite uz lapu tekošajā vietā|{{{[[WebHome]]}}}|[[WebHome]]
 |Saite ar nosaukumu|{{{[[nosaukums&gt;&gt;WebHome]]}}}|[[nosaukums&gt;&gt;WebHome]]
@@ -114,8 +112,7 @@ Pilnais saites formāts ir: ##(nosaukums&gt;&gt;)?(saite)(||parametri)*##
 
 === 2.1 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Piemērs|=XWiki 2.1 sintakse|=(% style="width:20%" %)Rezultāts
+|=Piemērs|=XWiki 2.1 sintakse|=Rezultāts
 |Saite uz lapu tekošajā vietā|{{{[[WebHome]]}}}|[[WebHome]]
 |Saite ar nosaukumu|{{{[[nosaukums&gt;&gt;WebHome]]}}}|[[nosaukums&gt;&gt;WebHome]]
 |Saite uz lapu norādītā vietā|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]

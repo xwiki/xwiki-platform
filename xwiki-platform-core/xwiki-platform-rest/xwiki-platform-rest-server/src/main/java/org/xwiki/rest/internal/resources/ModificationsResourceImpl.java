@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -39,19 +41,20 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.ModificationsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.ModificationsResourceImpl")
 public class ModificationsResourceImpl extends XWikiResource implements ModificationsResource
 {
     @Override
     public History getModifications(String wikiName, Integer start, Integer number, String order, Long ts,
             Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
             History history = new History();
 
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             String query = String.format("select doc.space, doc.name, doc.language, rcs.id, rcs.date, rcs.author,"
                 + " rcs.comment from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
@@ -88,7 +91,7 @@ public class ModificationsResourceImpl extends XWikiResource implements Modifica
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

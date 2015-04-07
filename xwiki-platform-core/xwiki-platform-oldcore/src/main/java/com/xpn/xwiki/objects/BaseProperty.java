@@ -22,6 +22,7 @@ package com.xpn.xwiki.objects;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.util.Objects;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.dom4j.Document;
@@ -37,7 +38,6 @@ import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
@@ -142,7 +142,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
-    public BaseProperty clone()
+    public BaseProperty<R> clone()
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 
@@ -150,8 +150,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
         cloneInternal(property);
 
-        property.isValueDirty = isValueDirty;
-        property.ownerDocument = ownerDocument;
+        property.isValueDirty = this.isValueDirty;
+        property.ownerDocument = this.ownerDocument;
 
         property.setObject(getObject());
 
@@ -242,27 +242,27 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
                 if (getValue() == null) {
                     setValue(newValue);
                 } else {
-                    // XXX: collision between current and new
-                    mergeResult.error(new CollisionException("Collision found on property [" + getName()
-                        + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+                    // collision between current and new
+                    mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
+                        getName(), getValue(), newValue);
                 }
             }
         } else if (newValue == null) {
-            if (ObjectUtils.equals(previousValue, getValue())) {
+            if (Objects.equals(previousValue, getValue())) {
                 setValue(null);
             } else {
-                // XXX: collision between current and new
-                mergeResult.error(new CollisionException("Collision found on property [" + getName()
-                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
+                // collision between current and new
+                mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]",
+                    getName(), getValue(), newValue);
             }
         } else {
-            if (ObjectUtils.equals(previousValue, getValue())) {
+            if (Objects.equals(previousValue, getValue())) {
                 setValue(newValue);
             } else if (previousValue.getClass() != newValue.getClass()) {
-                // XXX: collision between current and new
-                mergeResult.error(new CollisionException("Collision found on property [" + getName()
-                    + "] between from value [" + getValue() + "] and to [" + newValue + "]"));
-            } else if (!ObjectUtils.equals(newValue, getValue())) {
+                // collision between current and new
+                mergeResult.getLog().error("Collision found on property [{}] between from value [] and to []",
+                    getName(), getValue(), newValue);
+            } else if (!Objects.equals(newValue, getValue())) {
                 mergeValue(previousValue, newValue, mergeResult);
             }
         }
@@ -270,7 +270,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
 
     /**
      * Try to apply 3 ways merge on property value.
-     * 
+     *
      * @param previousValue the previous version of the value
      * @param newValue the new version of the value
      * @param mergeResult merge report
@@ -278,9 +278,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        // XXX: collision between current and new: don't know how to apply 3 way merge on unknown type
-        mergeResult.error(new CollisionException("Collision found on property [" + getName() + "] between from value ["
-            + getValue() + "] and to [" + newValue + "]"));
+        // collision between current and new: don't know how to apply 3 way merge on unknown type
+        mergeResult.getLog().error("Collision found on property [{}] between from value [{}] and to [{}]", getName(),
+            getValue(), newValue);
     }
 
     @Override
@@ -305,7 +305,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public boolean isValueDirty()
     {
-        return isValueDirty;
+        return this.isValueDirty;
     }
 
     /**
@@ -315,7 +315,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     protected void setValueDirty(Object newValue)
     {
-        if (!isValueDirty && !ObjectUtils.equals(newValue, getValue())) {
+        if (!this.isValueDirty && !Objects.equals(newValue, getValue())) {
             setValueDirty(true);
         }
     }
@@ -326,9 +326,9 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public void setValueDirty(boolean valueDirty)
     {
-        isValueDirty = valueDirty;
-        if (valueDirty && ownerDocument != null) {
-            ownerDocument.setMetaDataDirty(true);
+        this.isValueDirty = valueDirty;
+        if (valueDirty && this.ownerDocument != null) {
+            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 
@@ -338,11 +338,12 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      * @param ownerDocument The owner document.
      * @since 4.3M2
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);
 
-        if (ownerDocument != null && isValueDirty) {
+        if (ownerDocument != null && this.isValueDirty) {
             ownerDocument.setMetaDataDirty(true);
         }
     }

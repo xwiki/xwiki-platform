@@ -67,7 +67,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return a list of Delta objects representing line differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -104,7 +104,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return a list of Delta objects representing word differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -123,7 +123,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing word diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -133,7 +133,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
         text1 = "~~PLACEHOLDER~~" + text1 + "~~PLACEHOLDER~~";
         text2 = "~~PLACEHOLDER~~" + text2 + "~~PLACEHOLDER~~";
 
-        StringBuffer html = new StringBuffer("<div class=\"diffmodifiedline\">");
+        StringBuilder html = new StringBuilder("<div class=\"diffmodifiedline\">");
         List list = getWordDifferencesAsList(text1, text2);
         String[] words = StringUtils.splitPreserveAllTokens(text1, ' ');
         int cursor = 0;
@@ -201,7 +201,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
@@ -213,7 +213,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @param allDoc show all document
@@ -221,7 +221,7 @@ public class DiffPlugin extends XWikiDefaultPlugin
      */
     public String getDifferencesAsHTML(String text1, String text2, boolean allDoc) throws XWikiException
     {
-        StringBuffer html = new StringBuffer("<div class=\"diff\">");
+        StringBuilder html = new StringBuilder("<div class=\"diff\">");
         if (text1 == null) {
             text1 = "";
         }

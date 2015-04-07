@@ -47,7 +47,7 @@ public interface XWikiStoreInterface
 
     /**
      * API allowing to count the total number of documents that would be returned by a query.
-     * 
+     *
      * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String, XWikiContext)}. It
      *            should not contain <code>order by</code> or <code>group</code> clauses, since this kind of queries are
      *            not portable.
@@ -101,7 +101,7 @@ public interface XWikiStoreInterface
      * <p>
      * Example
      * </p>
-     * 
+     *
      * <pre>
      * &lt;code&gt;
      * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
@@ -109,7 +109,7 @@ public interface XWikiStoreInterface
      *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * &lt;/code&gt;
      * </pre>
-     * 
+     *
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
@@ -121,34 +121,34 @@ public interface XWikiStoreInterface
      * @since 2.2M1
      */
     List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException;
+        List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
      */
     @Deprecated
-    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues,
+    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
      * Same as {@link #searchDocumentReferences(String, int, int, List, XWikiContext)} but returns all rows.
-     * 
+     *
      * @see #searchDocumentReferences(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      * @since 2.2M2
      */
-    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
+    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
      */
     @Deprecated
-    List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
      * API allowing to count the total number of documents that would be returned by a parameterized query.
-     * 
+     *
      * @param parametrizedSqlClause Parameterized query to use, similar to the ones accepted by
      *            {@link #searchDocuments(String, List, XWikiContext)}. It should not contain <code>order by</code> or
      *            <code>group</code> clauses, since this kind of queries are not portable.
@@ -157,12 +157,12 @@ public interface XWikiStoreInterface
      * @param context The current request context.
      * @throws XWikiException if there was a problem executing the query.
      */
-    int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -176,7 +176,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -189,7 +189,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -204,7 +204,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -220,7 +220,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -234,11 +234,11 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException;
+        List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -255,7 +255,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param context the XWiki context required for getting information about the execution context.
@@ -266,7 +266,7 @@ public interface XWikiStoreInterface
 
     /**
      * Search documents in the storing system.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -289,7 +289,7 @@ public interface XWikiStoreInterface
      * will automatically encode the passed values (like escaping single quotes). This API is recommended to be used
      * over the other similar methods where the values are passed inside the where clause and for which you'll need to
      * do the encoding/escpaing yourself before calling them.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param parameterValues the where clause values that replace the question marks (?).
@@ -298,7 +298,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
+    List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -308,7 +308,7 @@ public interface XWikiStoreInterface
      * will automatically encode the passed values (like escaping single quotes). This API is recommended to be used
      * over the other similar methods where the values are passed inside the where clause and for which you'll need to
      * do the encoding/escpaing yourself before calling them.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -323,7 +323,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, int nb,
-        int start, List< ? > parameterValues, XWikiContext context) throws XWikiException;
+        int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents in the storing system.
@@ -332,7 +332,7 @@ public interface XWikiStoreInterface
      * will automatically encode the passed values (like escaping single quotes). This API is recommended to be used
      * over the other similar methods where the values are passed inside the where clause and for which you'll need to
      * do the encoding/escpaing yourself before calling them.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -343,7 +343,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
+    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -353,7 +353,7 @@ public interface XWikiStoreInterface
      * will automatically encode the passed values (like escaping single quotes). This API is recommended to be used
      * over the other similar methods where the values are passed inside the where clause and for which you'll need to
      * do the encoding/escpaing yourself before calling them.
-     * 
+     *
      * @param wheresql the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -369,7 +369,7 @@ public interface XWikiStoreInterface
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException;
+        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
     XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
@@ -397,7 +397,7 @@ public interface XWikiStoreInterface
 
     /**
      * Execute a reading request and return result.
-     * 
+     *
      * @param sql the HQL request clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -415,7 +415,7 @@ public interface XWikiStoreInterface
      * automatically encode the passed values (like escaping single quotes). This API is recommended to be used over the
      * other similar methods where the values are passed inside the where clause and for which you'll need to do the
      * encoding/escaping yourself before calling them.
-     * 
+     *
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
@@ -425,12 +425,12 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+    <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
      * Execute a reading request and return result.
-     * 
+     *
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
@@ -450,7 +450,7 @@ public interface XWikiStoreInterface
      * automatically encode the passed values (like escaping single quotes). This API is recommended to be used over the
      * other similar methods where the values are passed inside the where clause and for which you'll need to do the
      * encoding/escaping yourself before calling them.
-     * 
+     *
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
@@ -462,14 +462,14 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+    <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     void cleanUp(XWikiContext context);
 
     /**
      * Indicate if the provided wiki name could be used to create a new wiki.
-     * 
+     *
      * @param wikiName the name of the wiki.
      * @param context the XWiki context.
      * @return true if the name is already used, false otherwise.
@@ -479,7 +479,7 @@ public interface XWikiStoreInterface
 
     /**
      * Allows to create a new wiki database and initialize the default tables.
-     * 
+     *
      * @param wikiName the name of the new wiki.
      * @param context the XWiki context.
      * @throws XWikiException error when creating new wiki.
@@ -488,7 +488,7 @@ public interface XWikiStoreInterface
 
     /**
      * Delete a wiki database.
-     * 
+     *
      * @param wikiName the name of the wiki.
      * @param context the XWiki context.
      * @throws XWikiException error when deleting wiki database.

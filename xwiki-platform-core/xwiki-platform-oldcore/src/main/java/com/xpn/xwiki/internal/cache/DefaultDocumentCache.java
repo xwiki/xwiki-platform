@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.xwiki.bridge.event.AbstractDocumentEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -43,11 +42,13 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * Specialized cache component related to documents. It automatically clean the cache when the document is related.
  * <p>
  * TODO: add support for dependencies
- * 
+ *
  * @param <C> the type of the data stored in the cache
  * @version $Id$
  * @since 2.4M1
@@ -59,12 +60,12 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
     /**
      * Event listened by the component.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentCreatedEvent(),
         new DocumentUpdatedEvent(), new DocumentDeletedEvent());
 
     /**
      * Used to listen to document modification events.
-     * 
+     *
      * @version $Id$
      */
     protected class Listener implements EventListener
@@ -72,7 +73,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         @Override
         public String getName()
         {
-            return name;
+            return DefaultDocumentCache.this.name;
         }
 
         @Override
@@ -84,17 +85,8 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         @Override
         public void onEvent(Event event, Object source, Object data)
         {
-            String documentReferenceString = ((AbstractDocumentEvent) event).getEventFilter().getFilter();
-
-            Collection<String> keys = mappingCache.get(documentReferenceString);
-
-            if (keys != null) {
-                for (String key : keys) {
-                    cache.remove(key);
-                }
-
-                mappingCache.remove(documentReferenceString);
-            }
+            XWikiDocument doc = (XWikiDocument) source;
+            removeAll(doc.getDocumentReference());
         }
     }
 
@@ -179,14 +171,14 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
 
     /**
      * Generate a key based on the provided document reference and extensions.
-     * 
+     *
      * @param documentReference the reference of the document
      * @param extensions the extensions to the document reference
      * @return the value
      */
     protected String getKey(DocumentReference documentReference, Object... extensions)
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (extensions.length > 0) {
             buffer.append(escape(this.serializer.serialize(documentReference)));
@@ -203,7 +195,7 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
 
     /**
      * Escape each element of the key.
-     * 
+     *
      * @param str the element of the key to escape
      * @return the escaped key element
      */
@@ -218,9 +210,9 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         String key = getKey(documentReference, extensions);
         this.cache.remove(key);
 
-        String documentReferenceString = serializer.serialize(documentReference);
+        String documentReferenceString = this.serializer.serialize(documentReference);
 
-        Collection<String> keys = mappingCache.get(documentReferenceString);
+        Collection<String> keys = this.mappingCache.get(documentReferenceString);
 
         if (keys != null) {
             keys.remove(key);
@@ -232,6 +224,22 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
     {
         this.cache.removeAll();
         this.mappingCache.removeAll();
+    }
+
+    @Override
+    public void removeAll(DocumentReference documentReference)
+    {
+        String documentReferenceString = this.serializer.serialize(documentReference);
+
+        Collection<String> keys = this.mappingCache.get(documentReferenceString);
+
+        if (keys != null) {
+            for (String key : keys) {
+                this.cache.remove(key);
+            }
+
+            this.mappingCache.remove(documentReferenceString);
+        }
     }
 
     @Override

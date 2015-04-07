@@ -1,0 +1,75 @@
+#if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
+### Determine attachment sorting
+#set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+#set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
+#if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
+  ### Default to sorting by filename, sort not requested.
+  #set($sortAttachmentsBy = 'filename')
+#end
+### Set attachment sorting direction
+#if($sortAttachmentsBy == 'date')
+  ### Sort the date descending
+  #set($sortAttachmentsBy = 'date:desc')
+#else
+  ### Sort everthing else ascending
+  #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
+#end
+## Determine the redirect.
+#set ($redirect = "$!request.xredirect")
+#if ($redirect == '')
+  #if ("$!request.viewer" == 'attachments')
+    #set ($redirect = $doc.getURL('view', 'viewer=attachments'))
+  #else
+    #set ($redirect = "$doc.getURL()#Attachments")
+  #end
+#end
+#set($attachments = $sorttool.sort($doc.attachmentList, "$sortAttachmentsBy"))
+#if($attachments.size() > 0)
+  #foreach ($attach in $attachments)
+    <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
+    <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
+    <div class="information">
+    <span class="name"><a href="$doc.getAttachmentURL(${attach.filename}, 'download')"
+      title="$services.localization.render('core.viewers.attachments.download')">$escapetool.xml($attach.filename)</a></span>
+    <div class="btn-group xwikibuttonlinks">
+    #if("$!{services.officemanager.serverState}" == "Connected" && $services.officeviewer.isMimeTypeSupported($attach.getMimeType().toLowerCase()))
+      <a class="viewlink btn btn-xs btn-default" title="$services.localization.render('core.viewers.attachments.officeView.title')"
+        href="${doc.getURL('view', "xpage=office&attachment=$escapetool.url($attach.filename)")}"
+        target="_blank">#glyphicon('eye-open')</a>
+    #end
+    #if($hasEdit || $hasAdmin)
+      ## Delete attachment link
+      <a class="btn btn-default btn-xs deletelink" href="$doc.getAttachmentURL($attach.filename, 'delattachment', "form_token=$!{services.csrf.getToken()}&amp;xredirect=$escapetool.url($redirect)")"
+        title="$services.localization.render('core.viewers.attachments.delete.title', [$escapetool.xml($attach.filename)])">#glyphicon('remove')</a>
+        #*
+      ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
+      ## the browser supports Dav Edit.
+      ## TODO: We need an API (script service) to create WebDAV URLs.
+      #set ($davURL = "$request.contextPath/webdav/spaces/$escapetool.url($doc.space)/$escapetool.url($doc.name)/$escapetool.url($attach.filename)")
+      ## The WebDAV servlet doesn't like when spaces are encoded using + in the URL. We need to investigate why.
+      #set ($davURL = $davURL.replace('+', '%20'))
+      <a title="$services.localization.render('core.viewers.attachments.webdavEdit.title')" class="btn editlink hidden" href="$davURL"
+        onclick="if (XWiki && XWiki.WebDAV) {XWiki.WebDAV.davEdit('$davURL')}; return false;">
+        $services.localization.render('core.viewers.attachments.webdavEdit')
+      </a>*#
+    #end ## hasEdit
+    </div> ## xwikibuttonlinks
+    <span class="version"><a href="$doc.getAttachmentURL(${attach.filename}, 'viewattachrev')"
+      title="$services.localization.render('core.viewers.attachments.showHistory')">$attach.version</a></span>
+    <div class="meta">
+    <span class="publisher">$services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attach.author)}])</span>
+    <span class="date">$services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attach.date)}])</span>
+    <span class="size">(#dynamicsize($attach.filesize))</span>
+    </div>
+    </div>
+    </div> ## row
+  #end ## foreach
+<script type="text/javascript">
+// <![CDATA[
+// Let XWiki.WebDAV JS display links only if the browser support WebDAV.
+if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
+// ]]>
+</script>
+#else ## No attachments
+  <p class="noitems">$services.localization.render('core.viewers.attachments.noAttachments')</p>
+#end

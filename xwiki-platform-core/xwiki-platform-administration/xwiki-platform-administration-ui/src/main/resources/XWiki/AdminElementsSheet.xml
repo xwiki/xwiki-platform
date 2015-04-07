@@ -47,7 +47,7 @@
 ### Choose the page elements to display, globally and at space level.
 #set ($params = {
   'header': ['title', 'meta'],
-  'panels': ['showLeftPanels', 'leftPanels', 'showRightPanels', 'rightPanels'],
+  'panels': ['showLeftPanels', 'leftPanelsWidth', 'leftPanels', 'showRightPanels', 'rightPanelsWidth',  'rightPanels'],
   'docextra': ['showannotations', 'showcomments', 'showattachments', 'showhistory', 'showinformation']
 })
 #if ("$!editor" == 'globaladmin')

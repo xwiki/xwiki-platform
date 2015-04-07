@@ -43,7 +43,7 @@ public class DiffPluginApi extends Api
     public DiffPlugin getPlugin()
     {
         if (hasProgrammingRights()) {
-            return plugin;
+            return this.plugin;
         }
         return null;
     }
@@ -55,31 +55,31 @@ public class DiffPluginApi extends Api
 
     /**
      * Return a list of Delta objects representing line differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
      */
     public List getDifferencesAsList(String text1, String text2) throws XWikiException
     {
-        return plugin.getDifferencesAsList(text1, text2);
+        return this.plugin.getDifferencesAsList(text1, text2);
     }
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
      */
     public String getDifferencesAsHTML(String text1, String text2) throws XWikiException
     {
-        return plugin.getDifferencesAsHTML(text1, text2);
+        return this.plugin.getDifferencesAsHTML(text1, text2);
     }
 
     /**
      * Return an html blocks representing line diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @param allDoc view all document or only changes
@@ -87,31 +87,31 @@ public class DiffPluginApi extends Api
      */
     public String getDifferencesAsHTML(String text1, String text2, boolean allDoc) throws XWikiException
     {
-        return plugin.getDifferencesAsHTML(text1, text2, allDoc);
+        return this.plugin.getDifferencesAsHTML(text1, text2, allDoc);
     }
 
     /**
      * Return a list of Delta objects representing word differences in text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
      */
     public List getWordDifferencesAsList(String text1, String text2) throws XWikiException
     {
-        return plugin.getWordDifferencesAsList(text1, text2);
+        return this.plugin.getWordDifferencesAsList(text1, text2);
     }
 
     /**
      * Return an html blocks representing word diffs between text1 and text2
-     * 
+     *
      * @param text1 original content
      * @param text2 revised content
      * @return list of Delta objects
      */
     public String getWordDifferencesAsHTML(String text1, String text2) throws XWikiException
     {
-        return plugin.getWordDifferencesAsHTML(text1, text2);
+        return this.plugin.getWordDifferencesAsHTML(text1, text2);
     }
 
 }

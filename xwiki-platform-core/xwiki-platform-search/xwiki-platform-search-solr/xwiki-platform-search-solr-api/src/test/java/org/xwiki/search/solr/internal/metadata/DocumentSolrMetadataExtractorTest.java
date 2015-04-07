@@ -74,6 +74,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
@@ -179,8 +180,7 @@ public class DocumentSolrMetadataExtractorTest
         when(entityReferenceSerializer.serialize(creatorReference)).thenReturn(creatorStringReference);
 
         String creatorDisplayName = "Crea Tor";
-        when(this.xcontext.getWiki().getUserName(creatorStringReference, null, false, this.xcontext)).thenReturn(
-            creatorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(creatorReference, this.xcontext)).thenReturn(creatorDisplayName);
 
         // Author.
         DocumentReference authorReference = new DocumentReference("wiki", "Space", "Author");
@@ -190,8 +190,7 @@ public class DocumentSolrMetadataExtractorTest
         when(entityReferenceSerializer.serialize(authorReference)).thenReturn(authorStringReference);
 
         String authorDisplayName = "Au Thor";
-        when(this.xcontext.getWiki().getUserName(authorStringReference, null, false, this.xcontext)).thenReturn(
-            authorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
         // Creation Date
         Date creationDate = new Date();
@@ -316,6 +315,13 @@ public class DocumentSolrMetadataExtractorTest
         when(contentField.getObject()).thenReturn(comment);
         commentFields.add(contentField);
 
+        String commentSummary = "summary";
+        BaseProperty<EntityReference> summaryField = mock(BaseProperty.class);
+        when(summaryField.getName()).thenReturn("summary");
+        when(summaryField.getValue()).thenReturn(commentSummary);
+        when(summaryField.getObject()).thenReturn(comment);
+        commentFields.add(summaryField);
+
         String commentAuthor = "wiki:space.commentAuthor";
         BaseProperty<EntityReference> authorField = mock(BaseProperty.class);
         when(authorField.getName()).thenReturn("author");
@@ -372,6 +378,7 @@ public class DocumentSolrMetadataExtractorTest
             commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
         when(xclass.get("comment")).thenReturn(mock(TextAreaClass.class));
+        when(xclass.get("summary")).thenReturn(mock(StringClass.class));
         when(xclass.get("password")).thenReturn(mock(PasswordClass.class));
         when(xclass.get("enabled")).thenReturn(mock(BooleanClass.class));
 
@@ -388,7 +395,9 @@ public class DocumentSolrMetadataExtractorTest
         // A TextArea property must be indexed as a localized text.
         assertSame(commentContent,
             solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.US)));
+        assertNull(solrDocument.getFieldValue("property.space.commentsClass.comment_string"));
 
+        assertSame(commentSummary, solrDocument.getFieldValue("property.space.commentsClass.summary_string"));
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
         assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_date"));
         assertEquals(commentList, solrDocument.getFieldValues("property.space.commentsClass.list_string"));
@@ -413,16 +422,17 @@ public class DocumentSolrMetadataExtractorTest
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
-            commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
-        assertEquals(7, objectProperties.size());
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentSummary,
+            commentAuthor, commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
+        assertEquals(8, objectProperties.size());
 
         objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, Locale.US));
-        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder("comment : " + commentContent,
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder(
+            "comment : " + commentContent, "summary : " + commentSummary,
             "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
             "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
-        assertEquals(7, objectProperties.size());
+        assertEquals(8, objectProperties.size());
     }
 
     /**
@@ -501,18 +511,17 @@ public class DocumentSolrMetadataExtractorTest
         when(attachment.getContentInputStream(this.xcontext)).thenReturn(new ByteArrayInputStream(content.getBytes()));
 
         String authorFullName = "XWiki." + authorAlias;
-        when(attachment.getAuthor()).thenReturn(authorFullName);
+        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
+        when(attachment.getAuthorReference()).thenReturn(authorReference);
 
         DocumentReferenceResolver<String> resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
         when(resolver.resolve(authorFullName, attachment.getReference())).thenReturn(authorReference);
 
         EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         String authorStringReference = "wiki:" + authorFullName;
         when(serializer.serialize(authorReference)).thenReturn(authorStringReference);
 
-        when(this.xcontext.getWiki().getUserName(authorStringReference, null, false, this.xcontext)).thenReturn(
-            authorDisplayName);
+        when(this.xcontext.getWiki().getPlainUserName(authorReference, this.xcontext)).thenReturn(authorDisplayName);
 
         return attachment;
     }

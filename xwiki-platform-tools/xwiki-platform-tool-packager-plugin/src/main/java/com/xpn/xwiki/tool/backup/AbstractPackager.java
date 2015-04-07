@@ -38,11 +38,12 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
+import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Common code for importing and exporting.
- * 
+ *
  * @version $Id$
  */
 public abstract class AbstractPackager
@@ -77,11 +78,13 @@ public abstract class AbstractPackager
             throw new Exception("Failed to initialize Execution Context.", e);
         }
 
-        xcontext.setDatabase(databaseName);
+        xcontext.setWikiId(databaseName);
         xcontext.setMainXWiki(databaseName);
 
-        // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
+        // Use a dummy Request/Response even in daemon mode so that XWiki's initialization can create a Servlet URL
+        // Factory and any code requiring those objects will work.
         xcontext.setRequest(new XWikiServletRequestStub());
+        xcontext.setResponse(new XWikiServletResponseStub());
 
         // Use a dummy URL so that XWiki's initialization can create a Servlet URL Factory. We could also have
         // registered a custom XWikiURLFactory against XWikiURLFactoryService but it's more work.
@@ -125,13 +128,13 @@ public abstract class AbstractPackager
 
     /**
      * Free resources initialized by {@link #createXWikiContext(String, File)}.
-     * 
+     *
      * @param xcontext the XWiki context
      * @throws ComponentLookupException when failing to dispose component manager
      */
     public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
     {
-        ComponentManager componentManager = Utils.getComponentManager();
+        ComponentManager componentManager = Utils.getRootComponentManager();
 
         // Remove ExecutionContext
         Execution execution = componentManager.getInstance(Execution.class);

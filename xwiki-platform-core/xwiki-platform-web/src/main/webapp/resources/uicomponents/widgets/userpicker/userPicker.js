@@ -1,6 +1,17 @@
-var XWiki = (function(XWiki) {
+var XWiki = (function defineUserPicker(XWiki) {
+
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+var widgets = XWiki.widgets;
+// TODO: Use require.js here when we move away from Prototype.js
+if (!widgets || !widgets.SuggestPicker) {
+  var tryCount = arguments[1] || 0;
+  if (tryCount > 5) {
+    console.error('Failed to define the UserPicker module: required dependency SuggestPicker is missing.');
+  } else {
+    setTimeout(defineUserPicker.bind(window, XWiki, tryCount + 1), 0);
+  }
+  return XWiki;
+}
 
 /**
  * Extends the SuggestPicker to customize the way the selected users are displayed.
@@ -24,6 +35,17 @@ var SelectionManager = Class.create(widgets.SuggestPicker, {
   },
 
   // @Override
+  acceptSuggestion: function(suggestion) {
+    // We look for a suggestion that is already selected and has the same value. We don't rely on the suggestion id
+    // because the id is the user alias and we can have two users with the same alias but from different wikis.
+    // See XWIKI-11868: Cannot add an entity that has the same local and global name with the user/group picker
+    if (!this.list.down('input[value="' + suggestion.value + '"]')) {
+      this.addItem(suggestion);
+    }
+    this.input.value = '';
+  },
+
+  // @Override
   addItem: function($super, suggestion) {
     // Clear the previously selected user in single selection mode.
     this.input.hasClassName('multipleSelection') || this.list.update('');
@@ -35,6 +57,14 @@ var SelectionManager = Class.create(widgets.SuggestPicker, {
     var itemDisplay = this.suggest.createItemDisplay(suggestion, {});
     itemDisplay.down('.user-name').insert(this.createDeleteTool());
     return new Element('li').insert(itemDisplay).insert(this.createItemInput(suggestion));
+  },
+
+  // @Override
+  createItemInput: function(suggestion) {
+    // We don't have to set the input id because the input is hidden. At the same time the suggestion id is the user
+    // alias and we can have two users with the same alias but from different wikis (and thus we would get two hidden
+    // inputs with the same id).
+    return new Element('input', {type: 'hidden', name: this.inputName, value: suggestion.value});
   }
 });
 
@@ -75,10 +105,18 @@ widgets.UserPicker = Class.create(widgets.Suggest, {
     var avatarWrapper = new Element('div', {'class': 'user-avatar-wrapper'});
     avatarWrapper.insert(new Element('img', {src: data.icon, alt: data.info, 'class': 'icon'}));
     container.insert(avatarWrapper);
-    var userName = source.highlight ? this.emphasizeMatches(this.sInput, data.info) : data.info;
+    var userName = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.info.escapeHTML()) : data.info.escapeHTML();
     container.insert(new Element('div', {'class': 'user-name'}).update(userName));
-    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput, data.id) : data.id;
-    container.insert(new Element('div', {'class': 'user-alias'}).update(userAlias));
+    var referenceWrapper = new Element('div');
+    var userAlias = source.highlight ? this.emphasizeMatches(this.sInput.escapeHTML(), data.id.escapeHTML()) : data.id.escapeHTML();
+    referenceWrapper.insert(new Element('span', {'class': 'user-alias'}).update(userAlias));
+    var userReference = XWiki.Model.resolve(data.value, XWiki.EntityType.DOCUMENT);
+    var wiki = userReference.extractReferenceValue(XWiki.EntityType.WIKI) || XWiki.currentWiki;
+    // Display the wiki only for local users (in order to be consistent with the display in view mode).
+    if (wiki !== '$xcontext.mainWikiName') {
+      referenceWrapper.insert(new Element('span', {'class': 'user-wiki'}).update(wiki.escapeHTML()));
+    }
+    container.insert(referenceWrapper);
     return container;
   },
 

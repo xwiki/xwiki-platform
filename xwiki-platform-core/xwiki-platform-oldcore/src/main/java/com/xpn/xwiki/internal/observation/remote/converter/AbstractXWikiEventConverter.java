@@ -38,7 +38,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.
- * 
+ *
  * @version $Id$
  * @since 2.0M4
  */
@@ -84,7 +84,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
 
-        remoteDataMap.put(CONTEXT_WIKI, context.getDatabase());
+        remoteDataMap.put(CONTEXT_WIKI, context.getWikiId());
         remoteDataMap.put(CONTEXT_USER, context.getUser());
 
         return remoteDataMap;
@@ -120,7 +120,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         if (xcontext != null) {
-            xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
+            xcontext.setWikiId((String) remoteDataMap.get(CONTEXT_WIKI));
             xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
         } else {
             this.logger.warn("Can't get a proper XWikiContext."

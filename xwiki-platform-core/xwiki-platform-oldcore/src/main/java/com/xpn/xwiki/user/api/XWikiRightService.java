@@ -60,7 +60,7 @@ public interface XWikiRightService
     /**
      * Checks if the wiki current user has the right to execute (@code action} on the document {@code doc}, along with
      * redirecting to the login if it's not the case and there is no logged in user (the user is the guest user).
-     * 
+     *
      * @param action the action to be executed on the document
      * @param doc the document to perform action on
      * @param context the xwiki context in which to perform the verification (from which to get the user, for example)
@@ -74,53 +74,73 @@ public interface XWikiRightService
     /**
      * Verifies if the user identified by {@code username} has the access level identified by {@code right} on the
      * document with the name {@code docname}.
-     * 
+     *
      * @param right the access level to check (for example, 'view' or 'edit' or 'comment').
      * @param username the name of the user to check the right for
      * @param docname the document on which to check the right
      * @param context the xwiki context in which to perform the verification
      * @return {@code true} if the user has the specified right on the document, {@code false} otherwise
      * @throws XWikiException if something goes wrong during the rights checking process
+     * @deprecated since 4.0M2, use
+     *             {@link org.xwiki.security.authorization.AuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.EntityReference)}
+     *             instead
      */
+    @Deprecated
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
         throws XWikiException;
 
     /**
      * Checks if the author of the context document (last editor of the content of the document) has programming rights
      * (used to determine if the protected calls in the script contained in the document should be executed or not).
-     * 
+     *
      * @param context the xwiki context of this request
      * @return {@code true} if the author of the context document has programming rights, {@code false} otherwise.
+     * @deprecated since 6.1RC1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
+     *             instead
      */
+    @Deprecated
     public boolean hasProgrammingRights(XWikiContext context);
 
     /**
      * Checks if the author of the passed document (last editor of the content of the document) has programming rights
      * (used to determine if the protected calls in the script contained in the document should be executed or not).
-     * 
+     *
      * @param doc the document to check programming rights for
      * @param context the xwiki context of this request
      * @return {@code true} if the author of {@code doc} has programming rights, {@code false} otherwise.
+     * @deprecated since 6.1RC1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
+     *             instead
      */
+    @Deprecated
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
     /**
      * Checks that the current user in the context (the currently authenticated user) has administration rights either
      * on the current wiki or on the current space.
-     * 
+     *
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
+     * @deprecated since 6.1RC1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
+     *             instead
      */
+    @Deprecated
     public boolean hasAdminRights(XWikiContext context);
 
     /**
      * Checks that the current user in the context (the currently authenticated user) has administration rights on the
      * current wiki, regardless of any space admin rights that might also be available.
-     * 
+     *
      * @param context the xwiki context of this request
      * @return {@code true} if the current user in the context has the {@code admin} right, {@code false} otherwise
      * @since 3.2M3
+     * @deprecated since 6.1RC1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
+     *             instead
      */
+    @Deprecated
     public boolean hasWikiAdminRights(XWikiContext context);
 
     /**

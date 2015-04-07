@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * Import a set of XWiki documents into an existing database.
- * 
+ *
  * @version $Id$
  */
 public class Importer extends AbstractPackager
@@ -52,7 +52,7 @@ public class Importer extends AbstractPackager
      * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
      * allowed for method names though.
      * </p>
-     * 
+     *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param databaseName some database name (TODO: find out what this name is really)
@@ -73,7 +73,7 @@ public class Importer extends AbstractPackager
      * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
      * allowed for method names though.
      * </p>
-     * 
+     *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param databaseName some database name (TODO: find out what this name is really)
@@ -144,7 +144,7 @@ public class Importer extends AbstractPackager
 
     /**
      * Install a Package as a backup pack or with the passed user (if any).
-     * 
+     *
      * @param importUser the user to import with or null if it should be imported as a backup pack
      * @param pack the Package instance performing the import
      * @param context the XWiki Context
@@ -174,7 +174,7 @@ public class Importer extends AbstractPackager
 
     /**
      * Shutdowns HSQLDB.
-     * 
+     *
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */

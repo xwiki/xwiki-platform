@@ -19,8 +19,7 @@
  */
 package org.xwiki.search.solr.internal.api;
 
-import java.net.URL;
-import java.util.Map;
+import java.io.InputStream;
 
 import org.xwiki.component.annotation.Role;
 
@@ -52,7 +51,7 @@ public interface SolrConfiguration
      * 
      * @return a map of (fileName, fileURL) to be used to initialize the Solr instance.
      */
-    Map<String, URL> getHomeDirectoryConfiguration();
+    InputStream getHomeDirectoryConfiguration();
 
     // Indexer
 
@@ -73,4 +72,10 @@ public interface SolrConfiguration
      * @since 5.1M2
      */
     int getIndexerQueueCapacity();
+
+    /**
+     * @return true if a full synchronization job between the database and SOLR index should be run when XWiki starts
+     * @since 6.1M2
+     */
+    boolean synchronizeAtStartup();
 }

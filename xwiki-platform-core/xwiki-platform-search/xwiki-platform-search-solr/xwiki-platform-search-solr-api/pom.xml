@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -33,7 +33,9 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.59</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -59,13 +61,6 @@
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>woodstox-core-asl</artifactId>
-      <exclusions>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>javax.xml.stream</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Embedded Solr instance. -->
     <dependency>
@@ -82,83 +77,16 @@
       <groupId>org.restlet.jee</groupId>
       <artifactId>org.restlet.ext.servlet</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.solr</groupId>
-      <artifactId>solr-cell</artifactId>
-      <version>${solr.version}</version>
-      <exclusions>
-        <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
-             module -->
-        <exclusion>
-          <groupId>org.codehaus.woodstox</groupId>
-          <artifactId>wstx-asl</artifactId>
-        </exclusion>
-        <!-- We use a newer version of jdom that has a different group/artefact id. -->
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-        <!-- Our REST module uses a different version of Restlet. -->
-        <exclusion>
-          <groupId>org.restlet.jee</groupId>
-          <artifactId>org.restlet</artifactId>
-        </exclusion>
-        <!-- The wrong asm artifact is pulled as transitive dependency. -->
-        <exclusion>
-          <groupId>asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-        <!-- Solr Cell depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
-          require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcprov-jdk15</artifactId>
-        </exclusion>
-        <!-- Solr Cell depends on bcmail-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
-          require bcmail-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcmail-jdk15</artifactId>
-        </exclusion>
-        <!-- XWiki uses SLF4J for logging. -->
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Use the right version of jdom (we excluded the wrong version above) -->
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
-    </dependency>
-    <!-- Use the right asm artifact (we excluded the wrong version above). -->
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-    </dependency>
-     <!-- Replace a runtime transitive dependency of solr-cell because it includes old bcprov/bcmail classes. -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk15on</artifactId>
-    </dependency>
-
     <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-
     <!-- Apache xalan used for Solr's internal XML operations. -->
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
     </dependency>
-
     <!-- XWiki dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -190,26 +118,24 @@
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Embedded in the JAR to be used as default SOLR configuration -->
     <dependency>
-      <!-- This is needed at runtime by solrconfig.xml. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-plugin</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-data</artifactId>
       <version>${project.version}</version>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
-
     <!-- Testing dependencies -->
-
     <!-- Since we're mocking a class (XWiki) we need those -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -225,6 +151,32 @@
             **/AbstractSolrMetadataExtractor.java
           </excludes>
         </configuration>
+      </plugin>
+      <!-- Attach default configuration package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-default-configuration</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xwiki.platform</groupId>
+                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 /**
  * Represents a remote event with all its datas.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

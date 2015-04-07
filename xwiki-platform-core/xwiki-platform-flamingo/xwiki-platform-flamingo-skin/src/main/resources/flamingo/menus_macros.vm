@@ -1,0 +1,194 @@
+###
+###    GLOBALS
+###
+#set ($mainWikiId = $services.wiki.mainWikiId)
+#set ($mainWikiHomeDocumentReference = $services.wiki.getById($mainWikiId).mainPageReference)
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($isWikiAPIAvailable = ("$!services.wiki" != '' && "$!services.wiki.user" != ''))
+#set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
+#set ($isAdminAppInstalled = $xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'AdminSheet')))
+###
+###    Toplevel Menu
+###
+#macro(xwikitopmenustart)
+  <nav class="navbar navbar-default actionmenu" role="navigation">
+    <div class="container-fluid">
+      ## Brand and toggle get grouped for better mobile display
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#xwikimainmenu">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        #if (!$displayPageHeader)
+          #template("companylogo.vm")
+        #end
+      </div>
+      ## Collect the nav links, forms, and other content for toggling
+      <div class="collapse navbar-collapse" id="xwikimainmenu">
+#end
+
+###
+###    Toplevel Menu
+###
+#macro(xwikitopmenuend)
+      </div>## /.navbar-collapse
+    </div> ## / container-fluid
+  </nav>
+#end
+
+###
+###    Toplevel Left Menu
+###
+#macro(xwikitopmenuleftstart)
+  <ul class="nav navbar-nav">
+    #submenuseparator()
+#end
+
+###
+###    Toplevel Left Menu
+###
+#macro(xwikitopmenuleftend)
+  </ul>
+#end
+
+###
+###    Toplevel Right Menu
+###
+#macro(xwikitopmenurightstart)
+  <ul class="nav navbar-nav navbar-right">
+#end
+
+###
+###    Toplevel Right Menu
+###
+#macro(xwikitopmenurightend)
+  </ul>
+#end
+
+###
+###    Toplevel Menu entry with subitems
+###
+### Generate a menu entry and start the subitem section
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentrystart $actionurl $linktext $id $class $icon $iconImg)
+  #set($sep = '__SEPARATOR__')
+  #set($linkName = $linktext)
+  #set($linkTitle = $linktext) 
+  #if ($linktext.contains($sep))
+    #set($linkWords = $linktext.split($sep, 2))
+    #set($linkName = $linkWords.get(1))
+    #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
+  #end
+  <li class="dropdown dropdown-split text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+    ## The menu label. On large screens (tablet and desktop) the label is a link that triggers the default menu action
+    ## (e.g. navigation) and the menu is opened using a separated caret. On extra small screens (phones) the label opens
+    ## the menu and the default menu action is the first item in the menu.
+    <a href="$actionurl" class="dropdown-split-left dropdown-toggle $!class" data-toggle="dropdown" title="$linkTitle">
+      ## This caret is displayed only on extra small screens to indicate that the label toggles the menu.
+      #glyphicon($icon)$!{iconImg} $linkName <b class="caret"></b>
+    ## Don't leave any space between the anchors because they have display:inline-block on large screens.
+    </a><a href="#" class="dropdown-split-right dropdown-toggle hidden-xs $!class" data-toggle="dropdown">
+      ## This caret is used to toggle the menu on large screens (tablet and desktop).
+      <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu">
+#end
+
+###
+###    Toplevel Menu entry without subitems
+###
+### Generate a menu entry withut subitems
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentry $actionurl $linktext $id $class $icon $extraAttributes)
+  #submenuitem($actionurl $linktext $id $class $icon $extraAttributes)
+#end
+
+###
+###    Menu subitem entry
+###
+### Generate a submenu entry
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(submenuitem $actionurl $linktext $linkid $class $icon $extraAttributes)
+  #set($sep = '__SEPARATOR__')
+  #set($linkName = $linktext)
+  #set($linkTitle = $linktext) 
+  #if ($linktext.contains($sep))
+    #set($linkWords = $linktext.split($sep))
+    #set($linkName = $linkWords.get(1))
+    #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
+  #end
+  <li class="$!class"><a href="$actionurl" #if(!$stringtool.isBlank($linkid))id="$linkid"#end title="$linkTitle" $!extraAttributes>#glyphicon($icon) $linkName</a></li>
+#end
+
+###
+###    Menu disabled subitem entry
+###
+### Generate a disabled submenu entry
+###
+### @param text The menu item text
+###
+#macro(submenuitemdisabled $text)
+<span class="submenuitem disable">$text</span>
+#end
+
+###
+###    Toplevel Menu entry separator
+###
+#macro(xwikitopmenuseparator)
+  <li class="divider"></li>
+#end
+
+###
+###    Menu submenu separator
+###
+#macro(submenuseparator)
+  <li class="divider"></li>
+#end
+
+###
+###    Toplevel Menu entry end
+###
+### End the subitem section
+###
+#macro(xwikitopmenuentryend)
+    </ul>
+  </li>
+#end
+
+#macro(xwikibutton $actionurl $linktext $id $class $icon)
+  <a href="$actionurl" class="btn $!class" role="button" #if(!$stringtool.isBlank($id))id="$id"#end>#glyphicon($icon) $linktext</a>
+#end
+
+#macro(xwikibuttonentrystart $actionurl $linktext $id $class $icon)
+  <div class="btn-group text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+    <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown">#glyphicon($icon) $linktext <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+#end
+
+#macro(xwikisplitbuttonentrystart $actionurl $linktext $id $class $icon)
+  <div class="btn-group text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+    <a href="$actionurl" class="btn $!class">#glyphicon($icon) $linktext</a>
+    <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown">
+      <span class="caret"></span>
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+#end
+
+#macro(xwikibuttonentryend $actionurl $linktext $id $class $icon)
+    </ul>
+  </div>
+#end

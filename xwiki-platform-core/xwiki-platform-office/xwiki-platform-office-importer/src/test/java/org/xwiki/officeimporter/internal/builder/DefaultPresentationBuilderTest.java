@@ -164,7 +164,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
             + "<html><p><!--startimage:false|-|attach|-|office-slide0.jpg-->"
-            + "<img src=\"/xwiki/bin/download/Main/Test/office-slide0.jpg\"></img><!--stopimage--></p></html>\n",
+            + "<img src=\"/xwiki/bin/download/Main/Test/office-slide0.jpg\" /><!--stopimage--></p></html>\n",
             presentationBuilder.cleanPresentationHTML("<p><img src=\"office-slide0.jpg\"/></p>", reference));
     }
 

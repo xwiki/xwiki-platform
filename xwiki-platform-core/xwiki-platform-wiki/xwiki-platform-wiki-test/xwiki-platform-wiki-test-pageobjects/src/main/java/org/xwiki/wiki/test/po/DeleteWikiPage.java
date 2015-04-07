@@ -29,12 +29,20 @@ public class DeleteWikiPage extends ExtendedViewPage
 {
     @FindBy(id = "confirmButton")
     private WebElement confirmButton;
+    
+    @FindBy(id = "wikiDeleteConfirmation")
+    private WebElement wikiDeleteConfirmationInputField;
+
+    @FindBy(xpath = "//*[@id=\"xwikicontent\"]/div[@class=\"box errormessage\"]")
+    private WebElement errorMessage;
 
     @FindBy(xpath = "//*[@id=\"xwikicontent\"]/div[@class=\"box successmessage\"]")
     private WebElement successMessage;
 
-    public DeleteWikiPage confirm()
+    public DeleteWikiPage confirm(String wikiId)
     {
+        wikiDeleteConfirmationInputField.clear();
+        wikiDeleteConfirmationInputField.sendKeys(wikiId);
         confirmButton.click();
         return new DeleteWikiPage();
     }
@@ -42,6 +50,16 @@ public class DeleteWikiPage extends ExtendedViewPage
     public boolean hasSuccessMessage()
     {
         return successMessage.isDisplayed();
+    }
+
+    public boolean hasUserErrorMessage()
+    {
+        return errorMessage.isDisplayed() && errorMessage.getText().contains("You must type in");
+    }
+
+    public boolean hasWikiDeleteConfirmationInput(String value)
+    {
+        return value.equals(wikiDeleteConfirmationInputField.getAttribute("value"));
     }
 
 }

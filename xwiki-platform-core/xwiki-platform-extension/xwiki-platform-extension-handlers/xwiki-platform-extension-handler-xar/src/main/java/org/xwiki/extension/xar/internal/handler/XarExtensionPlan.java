@@ -43,7 +43,7 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.filter.FilterException;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 import org.xwiki.xar.XarPackage;
@@ -223,7 +223,7 @@ public class XarExtensionPlan implements Closeable
     }
 
     public XWikiDocument getPreviousXWikiDocument(DocumentReference documentReference, Packager packager)
-        throws WikiStreamException, ComponentLookupException, IOException
+        throws FilterException, ComponentLookupException, IOException
     {
         WikiReference wikiReference = documentReference.getWikiReference();
         LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
@@ -232,7 +232,7 @@ public class XarExtensionPlan implements Closeable
     }
 
     public XWikiDocument getPreviousXWikiDocument(WikiReference wikiReference, LocalDocumentReference localReference,
-        Packager packager) throws WikiStreamException, ComponentLookupException, IOException
+        Packager packager) throws FilterException, ComponentLookupException, IOException
     {
         XarExtensionPlanEntry xarPlanEntry = getPreviousXarExtensionPlanEntry(wikiReference.getName(), localReference);
 

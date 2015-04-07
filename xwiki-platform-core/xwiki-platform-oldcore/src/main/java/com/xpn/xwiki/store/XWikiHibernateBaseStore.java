@@ -21,6 +21,7 @@ package com.xpn.xwiki.store;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -104,7 +105,7 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
-     * 
+     *
      * @param xwiki
      * @param context
      * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
@@ -119,7 +120,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
-     * 
+     *
      * @param hibpath
      * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
      */
@@ -153,7 +154,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to set the current hibernate config file path
-     * 
+     *
      * @param hibpath
      */
     public void setPath(String hibpath)
@@ -162,35 +163,64 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Retrieve the current database product name. If no current session is available, obtains a connection from the
-     * Hibernate connection provider attached to the current Session Factory.
+     * Retrieve metadata about the database used (name, version, etc).
+     * <p>
+     * Note that the database metadata is not cached and it's retrieved at each call. If all you need is the database
+     * product name you should use {@link #getDatabaseProductName()} instead, which is cached.
+     * </p>
+     *
+     * @return the database meta data or null if an error occurred
+     * @since 6.1M1
+     */
+    public DatabaseMetaData getDatabaseMetaData()
+    {
+        DatabaseMetaData result;
+        Connection connection = null;
+        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+        // See http://bit.ly/QAJXlr
+        ConnectionProvider connectionProvider =
+            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+        try {
+            connection = connectionProvider.getConnection();
+            result = connection.getMetaData();
+        } catch (SQLException ignored) {
+            result = null;
+        } finally {
+            if (connection != null) {
+                try {
+                    connectionProvider.closeConnection(connection);
+                } catch (SQLException ignored) {
+                    // Ignore
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieve the current database product name.
+     * <p>
+     * Note that the database product name is cached for improved performances.
+     * </p>
      *
      * @return the database product name, see {@link DatabaseProduct}
      * @since 4.0M1
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        Connection connection = null;
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-            // See http://bit.ly/QAJXlr
-            ConnectionProvider connectionProvider =
-                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            try {
-                connection = connectionProvider.getConnection();
-                product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());
-            } catch (SQLException ignored) {
-                // do not care, return UNKNOWN
-            } finally {
-                if (connection != null) {
-                    try {
-                        connectionProvider.closeConnection(connection);
-                    } catch (SQLException ignored) {
-                        // do not care, return UNKNOWN
-                    }
+            DatabaseMetaData metaData = getDatabaseMetaData();
+            if (metaData != null) {
+                try {
+                    product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                } catch (SQLException ignored) {
+                    // do not care, return UNKNOWN
                 }
+            } else {
+                // do not care, return UNKNOWN
             }
         }
 
@@ -209,7 +239,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to init the hibernate configuration
-     * 
+     *
      * @throws org.hibernate.HibernateException
      */
     private synchronized void initHibernate(XWikiContext context) throws HibernateException
@@ -225,7 +255,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * This get's the current session. This is set in beginTransaction
-     * 
+     *
      * @param context
      */
     public Session getSession(XWikiContext context)
@@ -245,7 +275,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to set the current session in the context This is set in beginTransaction
-     * 
+     *
      * @param session
      * @param context
      */
@@ -260,7 +290,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to get the current transaction from the context This is set in beginTransaction
-     * 
+     *
      * @param context
      */
     public Transaction getTransaction(XWikiContext context)
@@ -271,7 +301,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to set the current transaction This is set in beginTransaction
-     * 
+     *
      * @param transaction
      * @param context
      */
@@ -286,7 +316,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to shut down the hibernate configuration Closing all pools and connections
-     * 
+     *
      * @param context
      * @throws HibernateException
      */
@@ -308,7 +338,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to update the schema to match the hibernate mapping
-     * 
+     *
      * @param context
      * @throws HibernateException
      */
@@ -319,7 +349,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Allows to update the schema to match the hibernate mapping
-     * 
+     *
      * @param context
      * @param force defines wether or not to force the update despite the xwiki.cfg settings
      * @throws HibernateException
@@ -330,23 +360,23 @@ public class XWikiHibernateBaseStore implements Initializable
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
         {
-            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getDatabase());
+            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
             return;
         }
 
-        LOGGER.info("Updating schema for wiki [{}]...", context.getDatabase());
+        LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
 
         try {
             String[] sql = getSchemaUpdateScript(getConfiguration(), context);
             updateSchema(sql, context);
         } finally {
-            LOGGER.info("Schema update for wiki [{}] done", context.getDatabase());
+            LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
         }
     }
 
     /**
      * Convert wiki name in database/schema name.
-     * 
+     *
      * @param wikiName the wiki name to convert.
      * @param databaseProduct the database engine type.
      * @param context the XWiki context.
@@ -397,7 +427,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * Convert wiki name in database/schema name.
      * <p>
      * Need hibernate to be initialized.
-     * 
+     *
      * @param wikiName the wiki name to convert.
      * @param context the XWiki context.
      * @return the database/schema name.
@@ -420,20 +450,20 @@ public class XWikiHibernateBaseStore implements Initializable
      * Convert context's database in real database/schema name.
      * <p>
      * Need hibernate to be initialized.
-     * 
+     *
      * @param context the XWiki context.
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return getSchemaFromWikiName(context.getDatabase(), context);
+        return getSchemaFromWikiName(context.getWikiId(), context);
     }
 
     /**
      * This function gets the schema update scripts generated by comparing the current database with the current
      * hibernate mapping config.
-     * 
+     *
      * @param config
      * @param context
      * @throws HibernateException
@@ -479,7 +509,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
             // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
             // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            createHibernateSequenceIfRequired(contextSchema, session);
+            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
 
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
@@ -501,44 +531,56 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and
-     * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
-     * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
-     * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
-     * a Sequence Generator which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
-     * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
-     * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
-     * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
-     * first the sequence named "hibernate_sequence" will be put in this cache, thus preventing subwikis to
-     * automatically create sequence with the same name (see also
+     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and deleted
+     * attachments for example - The reason we use generated ids and not custom computed ones is because we don't need
+     * to address rows from these tables). For a lot of database the Dialect uses an Identity Generator (when the DB
+     * supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to a Sequence Generator which uses a
+     * sequence named "hibernate_sequence" by default. Hibernate will normally create such a sequence automatically when
+     * updating the schema (see #getSchemaUpdateScript). However the problem is that Hibernate maintains a cache of
+     * sequence names per catalog and will only generate the sequence creation SQL if the sequence is not in this cache.
+     * Since the main wiki is updated first the sequence named "hibernate_sequence" will be put in this cache, thus
+     * preventing subwikis to automatically create sequence with the same name (see also
      * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
      *
+     * @param schemaSQL the list of SQL commands to execute to update the schema, possibly containing the
+     *            "hibernate_sequence" sequence creation
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.2RC1
      */
-    protected void createHibernateSequenceIfRequired(String schemaName, Session session)
+    protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
             Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
             if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
-                // Check if the sequence exists for the current schema. Since there's no way to do that in a generic
-                // way that would work on all DBs and since calling dialect.getQuerySequencesString() will get the
-                // native SQL query to find out all sequences BUT only for the default schema, we need to find another
-                // way. The solution we're implementing is to try to create the sequence and if it fails then we
-                // consider it already exists.
+                // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
+                // error that the sequence already exists ("relation "hibernate_sequence" already exists").
+                boolean hasSequence = false;
                 String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
-                try {
-                    // Ignore errors in the log during the creation of the sequence since we know it can fail and we
-                    // don't want to show false positives to the user.
-                    this.loggerManager.pushLogListener(null);
-                    session.createSQLQuery(sequenceSQL).executeUpdate();
-                } catch(HibernateException e) {
-                    // Sequence failed to be created, we assume it already exists and that's why an exception was
-                    // raised!
-                } finally {
-                    this.loggerManager.popLogListener();
+                for (String sql : schemaSQL) {
+                    if (sequenceSQL.equals(sql)) {
+                        hasSequence = true;
+                        break;
+                    }
+                }
+                if (!hasSequence) {
+                    // Ideally we would need to check if the sequence exists for the current schema.
+                    // Since there's no way to do that in a generic way that would work on all DBs and since calling
+                    // dialect.getQuerySequencesString() will get the native SQL query to find out all sequences BUT
+                    // only for the default schema, we need to find another way. The solution we're implementing is to
+                    // try to create the sequence and if it fails then we consider it already exists.
+                    try {
+                        // Ignore errors in the log during the creation of the sequence since we know it can fail and we
+                        // don't want to show false positives to the user.
+                        this.loggerManager.pushLogListener(null);
+                        session.createSQLQuery(sequenceSQL).executeUpdate();
+                    } catch (HibernateException e) {
+                        // Sequence failed to be created, we assume it already exists and that's why an exception was
+                        // raised!
+                    } finally {
+                        this.loggerManager.popLogListener();
+                    }
                 }
             }
         }
@@ -546,7 +588,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Runs the update script on the current database
-     * 
+     *
      * @param createSQL
      * @param context
      */
@@ -571,8 +613,8 @@ public class XWikiHibernateBaseStore implements Initializable
             if (monitor != null) {
                 monitor.startTimer("sqlupgrade");
             }
-            for (int j = 0; j < createSQL.length; j++) {
-                sql = createSQL[j];
+            for (String element : createSQL) {
+                sql = element;
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Update Schema sql: [" + sql + "]");
                 }
@@ -604,7 +646,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Custom Mapping This function update the schema based on the dynamic custom mapping provided by the class
-     * 
+     *
      * @param bclass
      * @param context
      * @throws com.xpn.xwiki.XWikiException
@@ -629,7 +671,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Initializes hibernate
-     * 
+     *
      * @param context
      * @throws HibernateException
      */
@@ -642,7 +684,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the same database pool
-     * 
+     *
      * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
@@ -655,7 +697,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Virtual Wikis Allows to switch database connection
-     * 
+     *
      * @param session
      * @param context
      * @throws XWikiException
@@ -664,10 +706,10 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Switch database to [{}]", context.getDatabase());
+                LOGGER.debug("Switch database to [{}]", context.getWikiId());
             }
 
-            if (context.getDatabase() != null) {
+            if (context.getWikiId() != null) {
                 String schemaName = getSchemaFromWikiName(context);
                 String escapedSchemaName = escapeSchema(schemaName, context);
 
@@ -686,13 +728,13 @@ public class XWikiHibernateBaseStore implements Initializable
                         session.connection().setCatalog(schemaName);
                     }
                 }
-                setCurrentDatabase(context, context.getDatabase());
+                setCurrentDatabase(context, context.getWikiId());
             }
 
             this.dataMigrationManager.checkDatabase();
         } catch (Exception e) {
             endTransaction(context, false); // close session with rollback to avoid further usage
-            Object[] args = {context.getDatabase()};
+            Object[] args = { context.getWikiId() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
                 "Exception while switching to database {0}", e, args);
@@ -707,7 +749,8 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private void executeSQL(final String sql, Session session)
     {
-        session.doWork(new Work() {
+        session.doWork(new Work()
+        {
             @Override
             public void execute(Connection connection) throws SQLException
             {
@@ -729,7 +772,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Escape schema name depending of the database engine.
-     * 
+     *
      * @param schema the schema name to escape
      * @param context the XWiki context to get database engine identifier
      * @return the escaped version
@@ -758,7 +801,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Begins a transaction if the context does not contains any.
-     * 
+     *
      * @param context the current XWikiContext
      * @return true if a new transaction has been created, false otherwise.
      * @throws XWikiException if an error occurs while retrieving or creating a new session and transaction.
@@ -770,7 +813,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Begins a transaction
-     * 
+     *
      * @param withTransaction this argument is unused
      * @param context the current XWikiContext
      * @return true if a new transaction has been created, false otherwise.
@@ -785,7 +828,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Begins a transaction with a specific SessionFactory.
-     * 
+     *
      * @param sfactory the session factory used to begin a new session if none are available
      * @param withTransaction this argument is unused
      * @param context the current XWikiContext
@@ -872,7 +915,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Adding a connection to the Monitor module
-     * 
+     *
      * @param connection
      * @param context
      * @todo This function is temporarily deactivated because of an error that causes memory leaks.
@@ -908,7 +951,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Remove a connection to the Monitor module
-     * 
+     *
      * @param connection
      * @todo This function is temporarily deactivated because of an error that causes memory leaks.
      */
@@ -932,7 +975,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Ends a transaction and close the session.
-     * 
+     *
      * @param context the current XWikiContext
      * @param commit should we commit or not
      * @param withTransaction
@@ -1011,7 +1054,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Closes the hibernate session
-     * 
+     *
      * @param session
      * @throws HibernateException
      */
@@ -1024,7 +1067,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Closes the hibernate session
-     * 
+     *
      * @param session
      * @throws HibernateException
      */
@@ -1063,7 +1106,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Cleanup all sessions Used at the shutdown time
-     * 
+     *
      * @param context
      */
     public void cleanUp(XWikiContext context)
@@ -1112,7 +1155,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Return the name generated for a dynamic mapped object.
-     * 
+     *
      * @param className the classname of the object.
      * @return a name in the form xwikicustom_space_class
      * @since 4.0M1
@@ -1123,10 +1166,9 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Build a {@link Configuration} containing the provide mapping.
-     * Before 4.0M1, this function was called makeMapping. In 4.0M1, it enter in conflict with 
-     * {@link #makeMapping(String, String)}
-     * 
+     * Build a {@link Configuration} containing the provide mapping. Before 4.0M1, this function was called makeMapping.
+     * In 4.0M1, it enter in conflict with {@link #makeMapping(String, String)}
+     *
      * @param className the classname of the class to map.
      * @param customMapping the custom mapping
      * @return a new {@link Configuration} containing this mapping alone.
@@ -1143,8 +1185,8 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Build a new XML string to define the provided mapping.
-     * Since 4.0M1, the ids are longs, and a confitionnal mapping is made for Oracle.
+     * Build a new XML string to define the provided mapping. Since 4.0M1, the ids are longs, and a confitionnal mapping
+     * is made for Oracle.
      *
      * @param className the name of the class to map.
      * @param customMapping the custom mapping
@@ -1175,7 +1217,7 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         /**
          * method executed by {@link XWikiHibernateBaseStore} and pass open session to it.
-         * 
+         *
          * @param session - open hibernate session
          * @return any you need be returned by
          *         {@link XWikiHibernateBaseStore#execute(XWikiContext, boolean, boolean, HibernateCallback)}
@@ -1187,7 +1229,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Execute method for operations in hibernate. spring like.
-     * 
+     *
      * @param context - used everywhere.
      * @param bTransaction - should store use old transaction(false) or create new (true)
      * @param doCommit - should store commit changes(if any), or rollback it.
@@ -1195,7 +1237,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @return {@link HibernateCallback#doInHibernate(Session)}
      * @throws XWikiException if any error
      * @deprecated since 4.0M1, use {@link #execute(XWikiContext, boolean, HibernateCallback)} or
-     *                          {@link #failSafeExecute(XWikiContext, boolean, HibernateCallback)}
+     *             {@link #failSafeExecute(XWikiContext, boolean, HibernateCallback)}
      */
     @Deprecated
     public <T> T execute(XWikiContext context, boolean bTransaction, boolean doCommit, HibernateCallback<T> cb)
@@ -1288,7 +1330,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @throws XWikiException if any error
      * @see #execute(XWikiContext, boolean, HibernateCallback)
      * @deprecated since 4.0M1, use {@link #executeRead(XWikiContext, HibernateCallback)} or
-     *                          {@link #failSafeExecuteRead(XWikiContext, HibernateCallback)}
+     *             {@link #failSafeExecuteRead(XWikiContext, HibernateCallback)}
      */
     @Deprecated
     public <T> T executeRead(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb) throws XWikiException
@@ -1297,8 +1339,8 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Execute hibernate read-only operation in a independent session (but not closing the current one if any).
-     * Never throw any error, but there is no warranty that the operation has been completed successfully.
+     * Execute hibernate read-only operation in a independent session (but not closing the current one if any). Never
+     * throw any error, but there is no warranty that the operation has been completed successfully.
      *
      * @param context the current XWikiContext
      * @param cb the callback to execute
@@ -1334,7 +1376,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * @throws XWikiException if any error
      * @see #execute(XWikiContext, boolean, HibernateCallback)
      * @deprecated since 4.0M1, use {@link #executeWrite(XWikiContext, HibernateCallback)} or
-     *                          {@link #failSafeExecuteWrite(XWikiContext, HibernateCallback)}
+     *             {@link #failSafeExecuteWrite(XWikiContext, HibernateCallback)}
      */
     @Deprecated
     public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
@@ -1344,8 +1386,8 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Execute hibernate read-only operation in a independent session (but not closing the current one if any).
-     * Never throw any error, but there is no warranty that the operation has been completed successfully.
+     * Execute hibernate read-only operation in a independent session (but not closing the current one if any). Never
+     * throw any error, but there is no warranty that the operation has been completed successfully.
      *
      * @param context the current XWikiContext
      * @param cb the callback to execute
@@ -1359,7 +1401,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     /**
      * Execute method for read-write operations in hibernate. spring like.
-     * 
+     *
      * @param context the current XWikiContext
      * @param cb the callback to execute
      * @return {@link HibernateCallback#doInHibernate(Session)}
@@ -1405,12 +1447,12 @@ public class XWikiHibernateBaseStore implements Initializable
     /**
      * We had to add this method because the Component Manager doesn't inject a field in the base class if a derived
      * class defines a field with the same name.
-     * 
+     *
      * @return the execution
      * @since 5.1M1
      */
     protected Execution getExecution()
     {
-        return execution;
+        return this.execution;
     }
 }

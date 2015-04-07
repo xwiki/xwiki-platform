@@ -165,7 +165,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
 ## ---------------
 #if(!$rssmode)
 {{html}}
-&lt;form action="" id="searchBar"&gt;
+&lt;form action="$doc.getURL()" id="searchBar"&gt;
   &lt;div class="centered"&gt;
     &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
     &lt;input type="text" id="text" name="text" class="searchQuery #if($text == '') withTip#end" #if($text == '') value="$services.localization.render('search.page.bar.query.tip')" #else value="${escapetool.xml($text)}" #end title="$services.localization.render('search.page.bar.query.title')"/&gt;

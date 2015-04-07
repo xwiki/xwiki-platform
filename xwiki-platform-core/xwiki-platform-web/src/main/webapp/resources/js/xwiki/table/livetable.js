@@ -43,10 +43,15 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Nodes under which all forms controls (input, selects, etc.) will be filters for this table
     this.filtersNodes = [
-          options.filterNodes     // Option API to precise filter nodes (single node or array of nodes)
+          options.filterNodes     // Option that specifies an array of filter nodes. Each item is either a reference to a
+                                  // DOM element or a String that is either the identifier of an element or a CSS selector.
        || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
        || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
     ].flatten().compact();
+    this.filtersNodes = this.filtersNodes.collect(function(item) {
+      // If it's a String then the item must be either the identifier of an element or a CSS selector.
+      return typeof item === 'string' ? ($(item) || $(document.body).down(item)) : item;
+    });
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
@@ -98,7 +103,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
-    this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
+    this.limitsDisplays = $(this.domNodeName).select('.xwiki-livetable-limits') || [];
     this.filters = "";
     this.handler = handler || function(){};
     this.totalRows = -1;
@@ -272,7 +277,9 @@ XWiki.widgets.LiveTable = Class.create({
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    this.limitsDisplays.each(function(limitsDisplay) {
+      limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    });
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
@@ -442,7 +449,17 @@ XWiki.widgets.LiveTable = Class.create({
     if (!a) {
       return null;
     }
-    return a.getAttribute('rel');
+    return this.getColumnNameAttribute(a);
+  },
+  
+  /**
+   * Return the attribute of a link element where the name of the column is stored. The "data-rel" attribute is
+   * normally used, but for compatibility reason with skins using the XHTML1.0 syntax, it could end-up in the "rel"
+   * attribute ('data-*' attributes are not valid in XHTML 1.0).
+   */
+  getColumnNameAttribute: function(element)
+  {
+    return element.hasAttribute('data-rel') ? element.getAttribute('data-rel') : element.getAttribute('rel');
   },
 
   /**
@@ -475,7 +492,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     var self = this;
     $(this.domNodeName).select('th.sortable').each(function(el) {
-      var colname = el.down("a") ? el.down("a").getAttribute("rel") : null;
+      var colname = el.down("a") ? self.getColumnNameAttribute(el.down("a")) : null;
       if (colname == column) {
         self.selectedColumn = el;
         el.addClassName('selected');
@@ -937,23 +954,27 @@ var LiveTableFilter = Class.create({
 
   attachEventHandlers: function()
   {
-    for(var i = 0; i < this.inputs.length; i++) {
-      if (this.inputs[i].type == "text") {
-        Event.observe(this.inputs[i], 'keyup', this.refreshHandler.bind(this));
-        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
+    var refreshHandler = this.refreshHandler.bind(this);
+    for (var i = 0; i < this.inputs.length; ++i) {
+      var input = this.inputs[i];
+      var events = ['change'];
+      if (input.type == "text") {
+        events.push('keyup');
       } else {
         //IE is buggy on "change" events for checkboxes and radios
-        Event.observe(this.inputs[i], 'click', this.refreshHandler.bind(this));
-        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
+        events.push('click');
       }
+      events.each(function(event) {
+        Event.observe(input, event, refreshHandler);
+      });
     }
 
-    for(var i = 0; i < this.selects.length; i++) {
-      Event.observe(this.selects[i], 'change', this.refreshHandler.bind(this));
+    for (var i = 0; i < this.selects.length; ++i) {
+      Event.observe(this.selects[i], 'change', refreshHandler);
     }
 
     // Allow custom filters to trigger filter change from non-native events
-    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", this.refreshHandler.bind(this));
+    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", refreshHandler);
   },
 
   /**

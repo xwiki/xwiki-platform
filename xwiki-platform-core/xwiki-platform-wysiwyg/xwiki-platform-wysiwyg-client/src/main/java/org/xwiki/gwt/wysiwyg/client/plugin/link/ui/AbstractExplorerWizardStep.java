@@ -26,8 +26,9 @@ import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirectio
 import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
 import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
 import org.xwiki.gwt.wysiwyg.client.plugin.link.LinkConfig;
+import org.xwiki.gwt.wysiwyg.client.widget.explorer.DoubleClickNodeEvent;
+import org.xwiki.gwt.wysiwyg.client.widget.explorer.DoubleClickNodeHandler;
 import org.xwiki.gwt.wysiwyg.client.widget.explorer.XWikiExplorer;
-import org.xwiki.gwt.wysiwyg.client.widget.explorer.ds.WikiDataSource;
 import org.xwiki.gwt.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 import org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.EntityLink;
@@ -36,10 +37,6 @@ import org.xwiki.gwt.wysiwyg.client.wiki.ResourceReference.ResourceType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.smartgwt.client.widgets.events.KeyPressEvent;
-import com.smartgwt.client.widgets.events.KeyPressHandler;
-import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 
 /**
  * Wizard step to provide an interface to selecting a wiki resource, using an {@link XWikiExplorer}.
@@ -47,7 +44,7 @@ import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
  * @version $Id$
  */
 public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<EntityLink<LinkConfig>> implements
-    SourcesNavigationEvents, RecordDoubleClickHandler, KeyPressHandler
+    SourcesNavigationEvents, DoubleClickNodeHandler
 {
     /**
      * The style of the fields under error.
@@ -55,9 +52,9 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
-     * The xwiki tree explorer, used to select the page or file to link to.
+     * The XWiki tree explorer, used to select the page or file to link to.
      */
-    private final XWikiExplorer explorer = new XWikiExplorer();
+    private final XWikiExplorer explorer;
 
     /**
      * The label to display the error on submission of the wizard step form.
@@ -78,53 +75,32 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings.
      * 
-     * @param addPage specifies whether the wiki explorer should show the option to add a page
-     * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
-     * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
+     * @param treeURL the URL of the resource that represents the tree
      */
-    public AbstractExplorerWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments)
+    public AbstractExplorerWizardStep(String treeURL)
     {
-        this(addPage, showAttachments, addAttachments, 455, 305);
+        this(treeURL, 455, 305);
     }
 
     /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings, with parameters for size. <br />
      * FIXME: remove the size parameters when the explorer will be correctly sizable from CSS.
      * 
-     * @param addPage specifies whether the wiki explorer should show the option to add a page
-     * @param showAttachments specifies whether the wiki explorer should show the attached files for pages
-     * @param addAttachments specifies whether the wiki explorer should show the option to add an attachment
+     * @param treeURL the URL of the resource that represents the tree
      * @param width explorer width in pixels
      * @param height explorer height in pixels
      */
-    protected AbstractExplorerWizardStep(boolean addPage, boolean showAttachments, boolean addAttachments, int width,
-        int height)
+    protected AbstractExplorerWizardStep(String treeURL, int width, int height)
     {
         super(new VerticalResizePanel());
 
-        explorer.setDisplayLinks(false);
-        // display the new page option
-        explorer.setDisplayAddPage(addPage);
-        explorer.setDisplayAddPageOnTop(true);
-        // no attachments here
-        explorer.setDisplayAttachments(showAttachments);
-        explorer.setDisplayAddAttachment(showAttachments && addAttachments);
-        explorer.setDisplayAddAttachmentOnTop(true);
-        explorer.setDisplayAttachmentsWhenEmpty(showAttachments && addAttachments);
+        explorer = new XWikiExplorer(treeURL);
         String sizeUnit = "px";
         explorer.setWidth(width + sizeUnit);
         explorer.setHeight(height + sizeUnit);
-        WikiDataSource ds = new WikiDataSource();
-        explorer.setDataSource(ds);
-        // Select nothing by default.
-        explorer.setDefaultValue("");
-        // FIXME: this is somewhat implementation specific, explorer.getElement returns the explorer wrapper while
-        // explorer.addStyleName() actually sets the style on the inner tree. We need the style applied on the outer
-        // wrapper.
-        explorer.getElement().setClassName(explorer.getElement().getClassName() + " xExplorer");
+        explorer.addStyleName("xExplorer");
 
-        explorer.addRecordDoubleClickHandler(this);
-        explorer.addKeyPressHandler(this);
+        explorer.addDoubleClickNodeHandler(this);
 
         helpLabel.addStyleName("xHelpLabel");
         display().add(helpLabel);
@@ -134,11 +110,8 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         display().add(errorLabel);
 
         display().addStyleName("xExplorerPanel");
-        // we need to add the explorer in a wrapper, since the explorer creates its own wrapper around and adds the
-        // input to that wrapper. We use this panel to have a reference to the _whole_ generated UI, since the explorer
-        // reference would point only to the grid inside.
         display().add(explorer);
-        display().setExpandingWidget(explorer, true);
+        display().setExpandingWidget(explorer, false);
     }
 
     /**
@@ -149,20 +122,6 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     public void setHelpLabelText(String helpLabelText)
     {
         helpLabel.setText(helpLabelText);
-    }
-
-    /**
-     * Invalidates the cache on the explorer, so that it will be reloaded on next display. To be used to request an
-     * update of the tree when new data is added to it.
-     */
-    protected void invalidateExplorerData()
-    {
-        // let's be silently safe about it, no calling function should fail because of this, at least for the moment
-        try {
-            explorer.invalidateCache();
-        } catch (Exception e) {
-            // nothing
-        }
     }
 
     /**
@@ -185,7 +144,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      * {@inheritDoc}
      */
     @Override
-    public void init(Object data, AsyncCallback< ? > cb)
+    public void init(Object data, AsyncCallback<?> cb)
     {
         hideError();
         super.init(data, cb);
@@ -197,11 +156,11 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      * @see AbstractSelectorWizardStep#initializeSelection(AsyncCallback)
      */
     @Override
-    protected void initializeSelection(AsyncCallback< ? > initCallback)
+    protected void initializeSelection(AsyncCallback<?> initCallback)
     {
         EntityReference targetEntityReference = getData().getDestination().getEntityReference();
         // If we don't have something selected or something was explicitly selected.
-        if (StringUtils.isEmpty(getExplorer().getValue()) || !getData().getOrigin().equals(targetEntityReference)) {
+        if (!getExplorer().hasSelectedNode() || !getData().getOrigin().equals(targetEntityReference)) {
             boolean isAttachment = getData().getDestination().getType() == ResourceType.ATTACHMENT;
             String fileName = new AttachmentReference(targetEntityReference).getFileName();
             String anchor = isAttachment && StringUtils.isEmpty(fileName) ? "Attachments" : null;
@@ -257,23 +216,10 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         listeners.remove(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void onRecordDoubleClick(RecordDoubleClickEvent event)
+    @Override
+    public void onDoubleClickNode(DoubleClickNodeEvent event)
     {
         listeners.fireNavigationEvent(NavigationDirection.NEXT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyPress(KeyPressEvent event)
-    {
-        // :)
-        if ("Enter".equals(event.getKeyName())) {
-            listeners.fireNavigationEvent(NavigationDirection.NEXT);
-        }
     }
 
     /**

@@ -1,0 +1,152 @@
+/*! #template('colorThemeInit.vm') */
+
+@theme-name: xwiki;
+@text-color: $theme.textColor;
+@hovered-bg-color: $theme.highlightColor;
+@hovered-shadow-color: #cccccc;
+@disabled-color: #666666;
+@disabled-bg-color: #efefef;
+@clicked-bg-color: #beebff;
+@clicked-shadow-color: #999999;
+@clicked-gradient-color-1: #beebff;
+@clicked-gradient-color-2: #a8e4ff;
+@search-result-color: #8b0000;
+@mobile-wholerow-bg-color: #ebebeb;
+@mobile-wholerow-shadow: #666666;
+@mobile-wholerow-bordert: rgba(255,255,255,0.7);
+@mobile-wholerow-borderb: rgba(64,64,64,0.2);
+@responsive: true;
+@image-path: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', '')";
+@base-height: 40px;
+
+// We use FontAwesome for the open/close/leaf icons.
+@font-face {
+  font-family: 'FontAwesome';
+  src: url("$!services.webjars.url('font-awesome', 'fonts/fontawesome-webfont.eot')");
+  src: url("$!services.webjars.url('font-awesome', 'fonts/fontawesome-webfont.eot')#iefix") format('embedded-opentype'), url("$!services.webjars.url('font-awesome', 'fonts/fontawesome-webfont.woff')") format('woff'), url("$!services.webjars.url('font-awesome', 'fonts/fontawesome-webfont.ttf')") format('truetype'), url("$!services.webjars.url('font-awesome', 'fonts/fontawesome-webfont.svg')#fontawesomeregular") format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+.fontAwesome() {
+  color: $theme.textSecondaryColor;
+  display: inline-block;
+  font-family: FontAwesome;
+  font-size: inherit;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  text-rendering: auto;
+  -moz-font-feature-settings: normal;
+  -moz-font-language-override: normal;
+}
+
+@import "jstree/mixins.less";
+@import "jstree/base.less";
+@import "jstree/main.less";
+
+/**
+ * Narrow Tree (no icons and no edges)
+ */
+@narrow-icon-width: 12px;
+.jstree-xwiki > .jstree-no-dots.jstree-no-icons {
+  /* Reduce a bit the font size. */
+  font-size: 95%;
+
+  .jstree-node {
+    /* Leave some space for the open/close icon. */
+    margin-left: 0;
+    padding-left: @narrow-icon-width;
+  }
+
+  .jstree-node,
+  .jstree-anchor {
+    /* Allow the label to be split on multiple lines. */
+    white-space: normal;
+  }
+
+  .jstree-anchor {
+    /* The node label can be split on multiple lines. */
+    height: auto;
+  }
+
+  .jstree-ocl {
+    // Use FontAwesome for the open/close/leaf icons.
+    .fontAwesome();
+    background-image: none;
+
+    /* Position the open/close icon in the parent left padding in order for the node label to be properly aligned when
+      split on multiple lines. */
+    margin-left: -@narrow-icon-width;
+    width: @narrow-icon-width;
+  }
+
+  .jstree-closed > .jstree-ocl:before {
+    /* fa-angle-right */
+    content: '\f105';
+  }
+
+  .jstree-open > .jstree-ocl:before {
+    /* fa-angle-down */
+    content: '\f107';
+  }
+
+  .jstree-leaf > .jstree-ocl {
+    font-size: @narrow-icon-width / 2;
+
+    &:before {
+      /* fa-circle */
+      content: '\f111';
+    }
+  }
+
+  .jstree-closed.jstree-loading > .jstree-ocl:before,
+  .jstree-open.jstree-loading > .jstree-ocl:before,
+  .jstree-leaf.jstree-loading > .jstree-ocl:before {
+    /* Hide the open/close/leaf icon while the node is in loading state. */
+    content: normal;
+  }
+}
+@media (max-width: 768px) {
+  .jstree-xwiki-responsive > .jstree-no-dots.jstree-no-icons {
+    .jstree-node {
+      /* The icons are bigger on small screens. */
+      padding-left: @narrow-icon-width * 2;
+    }
+    .jstree-ocl {
+      font-size: @narrow-icon-width * 2;
+      margin-left: -@narrow-icon-width * 2;
+      width: @narrow-icon-width * 2;
+    }
+    .jstree-closed > .jstree-ocl:before {
+      /* fa-chevron-right */
+      content: '\f054';
+    }
+    .jstree-open > .jstree-ocl:before {
+      /* fa-chevron-down */
+      content: '\f078';
+    }
+  }
+}
+
+/**
+ * Custom styles for XWiki
+ */
+.jstree-xwiki > .jstree-container-ul .jstree-loading > .jstree-ocl {
+  background-image: url("$!xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-position: center center !important;
+  background-size: 16px;
+}
+.jstree ul.jstree-children {
+  /* Overwrite the margin and padding from the XWiki skin. */
+  margin: 0;
+  padding: 0;
+}
+.jstree-contextmenu {
+  z-index: 100;
+  a * {
+    /* Overwrite the line height from the XWiki skin. */
+    line-height: inherit;
+  }
+}

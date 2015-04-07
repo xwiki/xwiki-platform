@@ -3,3 +3,5 @@ org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroFactory
 org.xwiki.rendering.wikimacro.internal.DefaultWikiMacroInitializer
 org.xwiki.rendering.wikimacro.internal.WikiMacroExecutionEventListener
 org.xwiki.rendering.wikimacro.internal.RegisterMacrosOnImportListener
+org.xwiki.rendering.wikimacro.internal.WikiMacroClassDocumentInitializer
+org.xwiki.rendering.wikimacro.internal.WikiMacroParameterClassDocumentInitializer

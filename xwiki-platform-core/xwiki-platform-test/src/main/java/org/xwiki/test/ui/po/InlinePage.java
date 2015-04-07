@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -30,6 +31,11 @@ import org.openqa.selenium.support.FindBy;
  */
 public class InlinePage extends ViewPage
 {
+    /**
+     * The XPath that locates a form field.
+     */
+    private static final String FIELD_XPATH_FORMAT = "//*[substring(@name, string-length(@name) - %s - 2) = '_0_%s']";
+
     @FindBy(name = "action_preview")
     private WebElement preview;
 
@@ -90,5 +96,37 @@ public class InlinePage extends ViewPage
     public WebElement getForm()
     {
         return form;
+    }
+
+    /**
+     * Retrieves the value of the specified form field
+     *
+     * @param fieldName the name of a form field
+     * @return the value of the specified form field
+     * @since 7.0RC1
+     */
+    public String getValue(String fieldName)
+    {
+        String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
+        return new FormElement(getForm()).getFieldValue(By.xpath(xpath));
+    }
+
+    /**
+     * Sets the value of the specified form field
+     *
+     * @param fieldName the name of a form field
+     * @param fieldValue the new value for the specified form field
+     * @since 7.0RC1
+     */
+    public void setValue(String fieldName, String fieldValue)
+    {
+        String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
+        WebElement field = getForm().findElement(By.xpath(xpath));
+        if (field.getAttribute("name").equals(field.getAttribute("id"))) {
+            new FormElement(getForm()).setFieldValue(field, fieldValue);
+        } else {
+            xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
+            new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
+        }
     }
 }

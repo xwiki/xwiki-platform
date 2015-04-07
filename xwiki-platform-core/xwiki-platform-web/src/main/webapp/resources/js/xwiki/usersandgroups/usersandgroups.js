@@ -207,6 +207,8 @@ function displayUsers(row, i, table, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.username'))");
   if (wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -219,14 +221,20 @@ function displayUsers(row, i, table, form_token)
   tr.appendChild(username);
 
   var firstname = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  firstname.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.firstname'))");
   firstname.appendChild(document.createTextNode(row.firstname) );
   tr.appendChild(firstname);
 
   var lastname = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  lastname.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.lastname'))");
   lastname.appendChild(document.createTextNode(row.lastname) );
   tr.appendChild(lastname);
 
   var manage = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  manage.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.users.manage'))");
   manage.className = "manage";
 
   if (wikiname == "local") {
@@ -269,6 +277,8 @@ function displayGroups(row, i, table, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.groupname'))");
   if (wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -281,6 +291,8 @@ function displayGroups(row, i, table, form_token)
   tr.appendChild(username);
 
   var members = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  members.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.members'))");
   if (wikiname == "local") {
     members.appendChild(document.createTextNode(row.members));
   } else {
@@ -289,6 +301,8 @@ function displayGroups(row, i, table, form_token)
   tr.appendChild(members);
 
   var manage = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  manage.setAttribute('data-title', "$escapetool.javascript($services.localization.render('xe.admin.groups.manage'))");
   manage.className = "manage";
 
   if (wikiname == "local") {
@@ -368,7 +382,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var allows = row.allows;
   var denys = row.denys;
 
-  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
+  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + encodeURIComponent(row.fullname) + "&uorg=" + uorg;
   if (form_token != undefined) {
       saveUrl += "&form_token=" + form_token;
   }
@@ -376,6 +390,12 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
+  // Set a data-title attribute for the responsive livetable (since Flamingo).
+  if (uorg == 'groups') {
+    username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.groupname'))");
+  } else {
+    username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.username'))");
+  }
   if (row.wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
@@ -385,6 +405,19 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
     username.appendChild(document.createTextNode(row.username));
   }
 
+  // We set this map manually because we cannot use foreach loops with yuicompressor, that forbids the '#' character,
+  // since it has nothing to do in javascript.
+  var translatedRights = {
+    'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
+    'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
+    'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
+    'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
+    'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin'))",
+    'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",
+    'programming' : "$escapetool.javascript($services.localization.render('rightsmanager.programming'))",
+    'createwiki'  : "$escapetool.javascript($services.localization.render('rightsmanager.createwiki'))"
+  };
+
   username.className = "username";
   tr.appendChild(username);
   window.activeRights.each(function(right) {
@@ -392,6 +425,8 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
     {
       var td = document.createElement('td');
       td.className = "rights";
+      // Set a data-title attribute for the responsive livetable (since Flamingo).
+      td.setAttribute("data-title", translatedRights[right]);
       var r = 0;
       if (allows.match("\\b" + right + "\\b")) {
         r = 1;
@@ -420,28 +455,22 @@ function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
 function deleteUserOrGroup(i, table, docname, uorg, form_token)
 {
   return function() {
-    var url = "?xpage=deleteuorg&docname=" + docname;
-    if (form_token != undefined) {
-        url += "&form_token=" + form_token;
-    }
+    var message = "$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletegroup'))";
     if (uorg == "user") {
-      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeleteuser'))".replace('__name__', docname))) {
-        new Ajax.Request(url, {
-          method: 'get',
-          onSuccess: function(transport) {
-            table.deleteRow(i);
-          }
-        });
-      }
-    } else {
-      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletegroup'))".replace('__name__', docname))) {
-        new Ajax.Request(url, {
-          method: 'get',
-          onSuccess: function(transport) {
-            table.deleteRow(i);
-          }
-        });
-      }
+      message = "$escapetool.javascript($services.localization.render('rightsmanager.confirmdeleteuser'))";
+    }
+    if (confirm(message.replace('__name__', docname))) {
+      new Ajax.Request('', {
+        method: 'get',
+        parameters: {
+          xpage: 'deleteuorg',
+          docname: docname,
+          form_token: form_token
+        },
+        onSuccess: function(transport) {
+          table.deleteRow(i);
+        }
+      });
     }
   }
 }

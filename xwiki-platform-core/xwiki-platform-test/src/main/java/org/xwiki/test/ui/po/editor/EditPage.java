@@ -22,9 +22,7 @@ package org.xwiki.test.ui.po.editor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BasePage;
@@ -47,8 +45,8 @@ public class EditPage extends BasePage
     @FindBy(name = "action_cancel")
     protected WebElement cancel;
 
-    @FindBy(xpath = "//*[@id = 'tmCurrentEditor']//*[@class = 'tme hastype']")
-    protected WebElement selectedEditMenuItem;
+    @FindBy(id = "editcolumn")
+    protected WebElement currentEditorDiv;
 
     @FindBy(id = "xwikidocsyntaxinput2")
     protected WebElement syntaxIdSelect;
@@ -155,7 +153,15 @@ public class EditPage extends BasePage
      */
     public Editor getEditor()
     {
-        return Editor.valueOf(this.selectedEditMenuItem.getText().toUpperCase());
+        String editor = "";
+        String[] CSSClasses = this.currentEditorDiv.getAttribute("class").split(" ");
+        for (int i = 0; i < CSSClasses.length; ++i) {
+            if (CSSClasses[i].startsWith("editor-")) {
+                editor = CSSClasses[i].substring(7);
+                break;
+            }
+        }
+        return Editor.valueOf(editor.toUpperCase());
     }
 
     /**
@@ -174,21 +180,5 @@ public class EditPage extends BasePage
     {
         Select select = new Select(this.syntaxIdSelect);
         select.selectByValue(syntaxId);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Overwrite in order to change the behavior of {@code clickEditXXX} methods in edit mode so that they switch from
-     * the current editor to the specified one.
-     * 
-     * @see org.xwiki.test.ui.po.BasePage#clickContentMenuEditSubMenuEntry(String)
-     */
-    @Override
-    protected void clickContentMenuEditSubMenuEntry(String id)
-    {
-        // Hover the top (floating) edit menu bar then the current editor menu.
-        new Actions(getDriver()).moveToElement(editMenuBar).moveToElement(currentEditorMenu).perform();
-        getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 }

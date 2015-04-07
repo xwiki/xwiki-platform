@@ -21,13 +21,20 @@ package com.xpn.xwiki;
 
 import java.io.UnsupportedEncodingException;
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.net.InetAddress;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 
+import org.apache.commons.net.smtp.SMTPClient;
+import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
@@ -37,18 +44,18 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
+import org.apache.velocity.VelocityContext;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
@@ -79,6 +86,18 @@ public privileged aspect XWikiCompatibilityAspect
 
     private EntityReferenceResolver<EntityReference> XWiki.defaultReferenceEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_REFERENCE);
+
+    private EntityReferenceSerializer<String> XWiki.localStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
+    
+    /**
+     * Used to get the temporary and permanent directory.
+     */
+    private Environment XWiki.environment = Utils.getComponent((Type) Environment.class);
+
+    /** Is the wiki running in test mode? Deprecated, was used when running Cactus tests. */
+    private boolean XWiki.test = false;
 
     /**
      * Transform a text in a URL compatible text
@@ -658,7 +677,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     public XWikiDocument XWiki.getDocumentFromPath(String path, XWikiContext context) throws XWikiException
@@ -669,7 +688,7 @@ public privileged aspect XWikiCompatibilityAspect
     /**
      * @since 2.3M1
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     public DocumentReference XWiki.getDocumentReferenceFromPath(String path, XWikiContext context)
@@ -709,7 +728,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     private XWikiEntityURL XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
@@ -776,7 +795,8 @@ public privileged aspect XWikiCompatibilityAspect
      * @param context the context which contains the request
      * @return the name of the wiki that was requested
      * @throws XWikiException if problems occur
-     * @deprecated starting with 5.2M1 use {@link ResourceFactory} instead
+     * @deprecated starting with 5.2M1 use  use {@link ResourceFactory} instead and since 6.1M2 use
+     *             {@link org.xwiki.resource.ResourceReferenceResolver} instead
      */
     @Deprecated
     public String XWiki.getRequestWikiName(XWikiContext context) throws XWikiException
@@ -1099,5 +1119,177 @@ public privileged aspect XWikiCompatibilityAspect
         }
 
         return parseContent(translatedMessage, context);
+    }
+
+    /**
+     * @deprecated starting with 6.1M2 this method shouldn't be used. There's no replacement, it's just not the right
+     *             way to do this anymore and the flash.vm template doesn't exist anymore
+     */
+    @Deprecated
+    public String XWiki.getFlash(String url, String width, String height, XWikiContext context)
+    {
+        VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));
+        try {
+            VelocityContext vcontext = (VelocityContext) vorigcontext.clone();
+            vcontext.put("flashurl", url);
+            vcontext.put("width", width);
+            vcontext.put("height", height);
+            context.put("vcontext", vcontext);
+
+            return parseTemplate("flash.vm", context);
+        } finally {
+            context.put("vcontext", vorigcontext);
+        }
+    }
+
+    /**
+     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
+     */
+    @Deprecated
+    public void XWiki.sendMessage(String sender, String[] recipients, String rawMessage, XWikiContext context)
+        throws XWikiException
+    {
+        LOGGER.trace("Entering sendMessage()");
+
+        // We'll be using the MailSender plugin, which has much more advanced capabilities (authentication, TLS).
+        // Since the plugin is in another module, and it depends on the core, we have to use it through reflection in
+        // order to avoid cyclic dependencies. This should be fixed once the mailsender becomes a clean component
+        // instead of a plugin.
+        Object mailSender;
+        Class mailSenderClass;
+        Method mailSenderSendRaw;
+
+        try {
+            mailSender = getPluginApi("mailsender", context);
+            mailSenderClass = Class.forName("com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi");
+
+            // public int sendRawMessage(String from, String to, String rawMessage)
+            mailSenderSendRaw =
+                mailSenderClass.getMethod("sendRawMessage", new Class[] {String.class, String.class, String.class});
+        } catch (Exception e) {
+            LOGGER.error("Problem getting MailSender via Reflection. Using the old sendMessage mechanism.", e);
+            sendMessageOld(sender, recipients, rawMessage, context);
+            return;
+        }
+
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sending message = \"" + rawMessage + "\"");
+        }
+
+        String messageRecipients = StringUtils.join(recipients, ',');
+
+        try {
+            mailSenderSendRaw.invoke(mailSender, sender, messageRecipients, rawMessage);
+        } catch (InvocationTargetException ite) {
+            Throwable cause = ite.getCause();
+            if (cause instanceof XWikiException) {
+                throw (XWikiException) cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (Exception e) {
+            // Probably either IllegalAccessException or IllegalArgumentException
+            // Shouldn't happen unless there were an incompatible code change
+            throw new RuntimeException(e);
+        }
+
+        LOGGER.info("Exiting sendMessage(). It seems everything went ok.");
+    }
+
+    /**
+     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
+     */
+    @Deprecated
+    private void XWiki.sendMessageOld(String sender, String[] recipient, String message, XWikiContext context)
+        throws XWikiException
+    {
+        SMTPClient smtpc = null;
+        try {
+            String server = getXWikiPreference("smtp_server", context);
+            String port = getXWikiPreference("smtp_port", context);
+            String login = getXWikiPreference("smtp_login", context);
+
+            if (context.get("debugMail") != null) {
+                StringBuffer msg = new StringBuffer(message);
+                msg.append("\n Recipient: ");
+                msg.append(recipient);
+                recipient = ((String) context.get("debugMail")).split(",");
+                message = msg.toString();
+            }
+
+            if ((server == null) || server.equals("")) {
+                server = "127.0.0.1";
+            }
+            if ((port == null) || (port.equals(""))) {
+                port = "25";
+            }
+            if ((login == null) || login.equals("")) {
+                login = InetAddress.getLocalHost().getHostName();
+            }
+
+            smtpc = new SMTPClient();
+            smtpc.connect(server, Integer.parseInt(port));
+            int reply = smtpc.getReplyCode();
+            if (!SMTPReply.isPositiveCompletion(reply)) {
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                    XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
+                    "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
+            }
+
+            if (smtpc.login(login) == false) {
+                reply = smtpc.getReplyCode();
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                    XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
+                    "Could not login to mail server {0} port {1} error code {2} ({3})", null, args);
+            }
+
+            if (smtpc.sendSimpleMessage(sender, recipient, message) == false) {
+                reply = smtpc.getReplyCode();
+                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                    XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
+                    "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
+            }
+
+        } catch (IOException e) {
+            Object[] args = {sender, recipient};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
+                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Exception while sending email from {0} to {1}",
+                e, args);
+        } finally {
+            if ((smtpc != null) && (smtpc.isConnected())) {
+                try {
+                    smtpc.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
+     */
+    @Deprecated
+    public void XWiki.sendMessage(String sender, String recipient, String message, XWikiContext context)
+        throws XWikiException
+    {
+        String[] recip = recipient.split(",");
+        sendMessage(sender, recip, message, context);
+    }
+
+    /**
+     * @deprecated since 7.0M1. This method should have actually been deprecated since 2.3M1, but it was left forgotten
+     *             and unused.
+     */
+    @Deprecated
+    public boolean XWiki.hasCaptcha(XWikiContext context)
+    {
+        return (this.getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
     }
 }

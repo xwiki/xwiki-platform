@@ -141,6 +141,7 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
      * @throws org.xwiki.security.authorization.AuthorizationException if an issue arise while reading these rules
      *         from the wiki.
      */
+    @Override
     public SecurityRuleEntry read(SecurityReference entity) throws AuthorizationException
     {
         if (entity == null) {

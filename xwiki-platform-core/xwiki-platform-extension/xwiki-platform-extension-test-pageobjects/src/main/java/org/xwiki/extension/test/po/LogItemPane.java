@@ -55,7 +55,7 @@ public class LogItemPane extends BaseElement
         if (classNames.length < 2) {
             return null;
         }
-        return classNames[1].substring("extension-log-item-".length());
+        return classNames[1].substring("log-item-".length());
     }
 
     /**
@@ -63,6 +63,6 @@ public class LogItemPane extends BaseElement
      */
     public String getMessage()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.tagName("DIV")).getText();
+        return getDriver().findElementWithoutWaiting(container, By.tagName("DIV")).getText();
     }
 }

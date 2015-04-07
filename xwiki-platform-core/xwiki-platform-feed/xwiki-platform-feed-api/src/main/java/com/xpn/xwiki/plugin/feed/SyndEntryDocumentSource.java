@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.feed;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -177,6 +178,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_XML_CONFIG.setProperty("input-xml", "yes");
         TIDY_XML_CONFIG.setProperty("output-xml", "yes");
         TIDY_XML_CONFIG.setProperty("add-xml-pi", "no");
+        TIDY_XML_CONFIG.setProperty("input-encoding", "UTF8");
 
         // HTML specific configuration
         TIDY_HTML_CONFIG = new Properties(TIDY_FEED_CONFIG);
@@ -185,6 +187,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_HTML_CONFIG.setProperty("drop-empty-paras", "yes");
         TIDY_HTML_CONFIG.setProperty("enclose-text", "yes");
         TIDY_HTML_CONFIG.setProperty("logical-emphasis", "yes");
+        TIDY_HTML_CONFIG.setProperty("input-encoding", "UTF8");
 
         // default parameters for all instances of this class
         DEFAULT_PARAMS = new HashMap<String, Object>();
@@ -625,7 +628,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         // Even if we add a message listener we still have to redirect the output. Otherwise all the messages will be
         // written to the standard output (besides being logged by TIDY_LOGGER).
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        return tidy.parseDOM(new ByteArrayInputStream(xmlFragment.getBytes()), out);
+        ByteArrayInputStream in = new ByteArrayInputStream(xmlFragment.getBytes(Charset.forName(config.getProperty("input-encoding"))));
+        return tidy.parseDOM(in, out);
     }
 
     /**

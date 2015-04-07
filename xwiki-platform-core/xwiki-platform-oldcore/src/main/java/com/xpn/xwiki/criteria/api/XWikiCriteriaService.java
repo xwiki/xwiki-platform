@@ -19,10 +19,10 @@
  */
 package com.xpn.xwiki.criteria.api;
 
-import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.criteria.impl.DurationFactory;
 import com.xpn.xwiki.criteria.impl.PeriodFactory;
 import com.xpn.xwiki.criteria.impl.RangeFactory;
+import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
 import com.xpn.xwiki.criteria.impl.ScopeFactory;
 
 public interface XWikiCriteriaService

@@ -23,7 +23,7 @@ package com.xpn.xwiki.render.macro.rss;
  * A simple bean which encapsulates macro parameters and does some logic, like making sure the <code>feed</code>
  * property, a <code>String</code> is a well-formed URL, and evaluating the <code>count</code> property against a
  * proposed number of items, in light of the possibility that <code>count</code> may not have been defined.
- * 
+ *
  * @author Joe Germuska
  * @version 0.2d
  */
@@ -51,7 +51,7 @@ public class RSSMacroParameters
 
     public String getFeed()
     {
-        return feed;
+        return this.feed;
     }
 
     public void setFeed(String feed) throws java.net.MalformedURLException
@@ -67,7 +67,7 @@ public class RSSMacroParameters
 
     public String getAlign()
     {
-        return align;
+        return this.align;
     }
 
     public void setImg(boolean img)
@@ -77,7 +77,7 @@ public class RSSMacroParameters
 
     public boolean isImg()
     {
-        return img;
+        return this.img;
     }
 
     public void setCss(boolean css)
@@ -97,28 +97,30 @@ public class RSSMacroParameters
 
     public int getCount()
     {
-        return count;
+        return this.count;
     }
 
     public java.net.URL getFeedURL()
     {
-        return feedURL;
+        return this.feedURL;
     }
 
     /**
      * Given <code>proposed</code> items and the current value of our <code>count</code> property, how many items should
      * be processed? If <code>count</code> is undefined or greater than <code>proposed</code>, return
      * <code>proposed</code>, otherwise return <code>count</code>.
-     * 
+     *
      * @param proposed
      * @return
      */
     public int evalCount(int proposed)
     {
-        if (this.count == UNDEFINED)
+        if (this.count == UNDEFINED) {
             return proposed;
-        if (this.count < proposed)
+        }
+        if (this.count < proposed) {
             return this.count;
+        }
         return proposed;
     }
 
@@ -129,7 +131,7 @@ public class RSSMacroParameters
 
     public boolean isFull()
     {
-        return full;
+        return this.full;
     }
 
     public void setSearch(boolean search)
@@ -139,7 +141,7 @@ public class RSSMacroParameters
 
     public boolean isSearch()
     {
-        return search;
+        return this.search;
     }
 
 }

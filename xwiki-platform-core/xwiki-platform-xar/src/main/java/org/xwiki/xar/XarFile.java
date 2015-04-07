@@ -27,13 +27,11 @@ import java.util.Collection;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
  * @since 5.4RC1
  */
-@Unstable
 public class XarFile implements Closeable
 {
     private File file;
@@ -42,16 +40,33 @@ public class XarFile implements Closeable
 
     private XarPackage xarPackage;
 
+    /**
+     * @param file the XAR file
+     * @throws XarException when failing parse the file (for example if it's not a valid XAR package)
+     * @throws IOException when failing to read file
+     */
     public XarFile(File file) throws XarException, IOException
     {
         this(file, (XarPackage) null);
     }
 
+    /**
+     * @param file the XAR file
+     * @param pages the pages in the XAR package
+     * @throws XarException when failing parse the file (for example if it's not a valid XAR package)
+     * @throws IOException when failing to read file
+     */
     public XarFile(File file, Collection<XarEntry> pages) throws XarException, IOException
     {
         this(file, pages != null ? new XarPackage(pages) : null);
     }
 
+    /**
+     * @param file the XAR file
+     * @param xarPackage the descriptor of the XAR package
+     * @throws XarException when failing parse the file (for example if it's not a valid XAR package)
+     * @throws IOException when failing to read file
+     */
     public XarFile(File file, XarPackage xarPackage) throws XarException, IOException
     {
         this.file = file;
@@ -59,16 +74,25 @@ public class XarFile implements Closeable
         this.xarPackage = xarPackage != null ? xarPackage : new XarPackage(this.zipFile);
     }
 
+    /**
+     * @return the XAR file
+     */
     public File getFile()
     {
         return this.file;
     }
 
+    @Override
     public void close() throws IOException
     {
         this.zipFile.close();
     }
 
+    /**
+     * @param reference the reference of the page
+     * @return an input stream to the page XML
+     * @throws IOException when failing to open a stream to the page XML
+     */
     public InputStream getInputStream(LocalDocumentReference reference) throws IOException
     {
         XarEntry entry = this.xarPackage.getEntry(reference);
@@ -79,11 +103,18 @@ public class XarFile implements Closeable
         return this.zipFile.getInputStream(this.zipFile.getEntry(entry.getEntryName()));
     }
 
+    /**
+     * @return the entries in the XAR file
+     */
     public Collection<XarEntry> getEntries()
     {
         return this.xarPackage.getEntries();
     }
 
+    /**
+     * @param reference the reference of the document
+     * @return the XAR entry associated to a wiki document
+     */
     public XarEntry getEntry(LocalDocumentReference reference)
     {
         return this.xarPackage.getEntry(reference);

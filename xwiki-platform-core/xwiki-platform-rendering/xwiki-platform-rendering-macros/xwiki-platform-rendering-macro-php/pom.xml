@@ -23,9 +23,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>  
+    <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rendering-macros</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-macro-php</artifactId>
   <name>XWiki Platform - Rendering - Macro - PHP</name>
@@ -36,6 +36,8 @@
     <xwiki.extension.features>org.xwiki.platform:xwiki-core-rendering-macro-php</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>PHP Macro</xwiki.extension.name>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -48,13 +50,11 @@
       <artifactId>resin-quercus</artifactId>
       <version>3.2.1</version>
     </dependency>
-
     <!-- Quercus needs the servlet API to properly initialize -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

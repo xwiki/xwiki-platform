@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.content.parsers;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.content.Link;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.content.Link;
 
 /**
  * Parses wiki links in the format defined in {@link com.xpn.xwiki.content.Link}.
@@ -45,14 +45,12 @@ public class LinkParser implements ContentParser
     private static final String LINK_SEPARATOR_PIPE = "|";
 
     /**
-     * Parse the raw content representing a Wiki link (as typed by the user) and transfer it into
-     * a structured form as a {@link Link} Object.
+     * Parse the raw content representing a Wiki link (as typed by the user) and transfer it into a structured form as a
+     * {@link Link} Object.
      *
-     * @param contentToParse the raw content to parse. This is the link content without the
-     *        square brackets.
+     * @param contentToParse the raw content to parse. This is the link content without the square brackets.
      * @return a {@link Link} object containing the parsed data
-     * @exception ContentParserException in case of an error while parsing, like a malformed
-     *           element for example
+     * @exception ContentParserException in case of an error while parsing, like a malformed element for example
      */
     public Link parse(String contentToParse) throws ContentParserException
     {
@@ -63,7 +61,7 @@ public class LinkParser implements ContentParser
         // Note: It's important to parse the alias and the target in that order. See
         // {@link #parseAlias} for more detailas as to why.
         parseAlias(content, link);
-        parseTarget(content, link);        
+        parseTarget(content, link);
 
         // Parse the link reference itself. Note: the order here is also very important.
         // We parse the query string early as it can contain our special delimiter characters
@@ -87,18 +85,16 @@ public class LinkParser implements ContentParser
 
     /**
      * Find out the alias part of the full link.
-     *
-     * <p>Note: As it's possible to specify a target we need a way to differentiate the following
-     * 2 links:
+     * <p>
+     * Note: As it's possible to specify a target we need a way to differentiate the following 2 links:
      * <ul>
-     *   <li>[Web Home>_blank]  -> alias = null, link = "Web Home", target = "_blank"</li>
-     *   <li>[Web Home>WebHome] -> alias = "Web Home", link = "WebHome", target = null</li>
+     * <li>[Web Home>_blank] -> alias = null, link = "Web Home", target = "_blank"</li>
+     * <li>[Web Home>WebHome] -> alias = "Web Home", link = "WebHome", target = null</li>
      * </ul>
      * The rule we have chosen is to force targets to start with an underscore character ("_").
      * </p>
      *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @param link the link on which to set the alias and the delimiter symbol used
      */
     protected void parseAlias(StringBuffer content, Link link)
@@ -128,12 +124,12 @@ public class LinkParser implements ContentParser
 
     /**
      * Find out the target part of the full link.
+     * <p>
+     * Note: The target element must start with an underscore ("_"). See {@link #parseAlias(StringBuffer, Link)} for
+     * more details as to why.
+     * </p>
      *
-     * <p>Note: The target element must start with an underscore ("_"). See
-     * {@link #parseAlias(StringBuffer, Link)} for more details as to why.</p>
-     *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @param link the link on which to set the target and the delimiter symbol used
      * @throws ContentParserException if the target does not start with an underscore
      */
@@ -153,8 +149,8 @@ public class LinkParser implements ContentParser
             if (!target.startsWith("_")) {
                 throw new ContentParserException(
                     XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_TARGET, "Invalid link "
-                    + "format. The target element must start with an underscore, got [" + target
-                    + "]");
+                        + "format. The target element must start with an underscore, got [" + target
+                        + "]");
             }
             content.delete(separatorIndex, content.length());
         }
@@ -163,11 +159,9 @@ public class LinkParser implements ContentParser
     }
 
     /**
-     * Find out the URI part of the full link. Supported URIs are either "mailto:" or any URL
-     * in the form "protocol://".
+     * Find out the URI part of the full link. Supported URIs are either "mailto:" or any URL in the form "protocol://".
      *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @return the parsed URI or null if no URI was specified
      * @throws ContentParserException if the URI is malformed
      */
@@ -216,8 +210,7 @@ public class LinkParser implements ContentParser
     /**
      * Find out the element located to the left of the passed separator.
      *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @param separator the separator string to locate the element
      * @return the parsed element or null if the separator string wasn't found
      */
@@ -237,8 +230,7 @@ public class LinkParser implements ContentParser
     /**
      * Find out the element located to the right of the passed separator.
      *
-     * @param content the string to parse. This parameter will be modified by the method to remove
-     *                the parsed content.
+     * @param content the string to parse. This parameter will be modified by the method to remove the parsed content.
      * @param separator the separator string to locate the element
      * @return the parsed element or null if the separator string wasn't found
      */

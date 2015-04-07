@@ -63,7 +63,8 @@ public class MergeConflictPane extends BaseElement
      */
     public Select getVersionToKeepSelect()
     {
-        return new Select(versionToKeepSelect);
+        // We use a custom implementation because the drop down list remains open some times when we select an option.
+        return new org.xwiki.test.ui.po.Select(versionToKeepSelect);
     }
 
     /**
@@ -91,8 +92,8 @@ public class MergeConflictPane extends BaseElement
     {
         diffButton.click();
         // Wait as long as the button remains disabled.
-        waitUntilElementIsVisible(By
-            .xpath("//button[@name = 'extensionAction' and @value = 'diff' and not(@disabled)]"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//button[@name = 'extensionAction' and @value = 'diff' and not(@disabled)]"));
         return new MergeConflictPane();
     }
 

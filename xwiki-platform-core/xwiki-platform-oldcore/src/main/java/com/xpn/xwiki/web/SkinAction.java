@@ -47,7 +47,7 @@ import com.xpn.xwiki.util.Util;
  * <p>
  * This action indicates that the results should be publicly cacheable for 30 days.
  * </p>
- * 
+ *
  * @version $Id$
  * @since 1.0
  */
@@ -93,7 +93,7 @@ public class SkinAction extends XWikiAction
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
 
         LOGGER.debug("document: [{}] ; baseskin: [{}] ; defaultbaseskin: [{}]",
-            new Object[] {doc.getDocumentReference(), baseskin, defaultbaseskin});
+            new Object[] { doc.getDocumentReference(), baseskin, defaultbaseskin });
 
         // Since we don't know exactly what does the URL point at, meaning that we don't know where the skin identifier
         // ends and where the path to the file starts, we must try to split at every '/' character.
@@ -111,7 +111,7 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the base skin document, if it is not the same as above.
-                if (!doc.getName().equals(baseskin)) {
+                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)) {
                     if (renderSkin(filename, baseskindoc, context)) {
                         found = true;
                         break;
@@ -119,7 +119,8 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the default base skin, if it wasn't already tested above.
-                if (!(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
+                if (StringUtils.isNotEmpty(baseskin)
+                    && !(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
                     // defaultbaseskin can only be on the filesystem, so don't try to use it as a
                     // skin document.
                     if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin), context)) {
@@ -152,7 +153,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Get the path for the given skin file in the given skin.
-     * 
+     *
      * @param filename Name of the file.
      * @param skin Name of the skin to search in.
      * @throws IOException if filename is invalid
@@ -170,7 +171,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Get the path for the given file in resources.
-     * 
+     *
      * @param filename Name of the file.
      * @throws IOException if filename is invalid
      */
@@ -193,7 +194,7 @@ public class SkinAction extends XWikiAction
      * <li>As a file located on the filesystem, in the directory with the same name as the current document (in case the
      * URL was actually pointing to <tt>/skins/directory/file</tt>).</li>
      * </ol>
-     * 
+     *
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
@@ -224,7 +225,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Tries to serve a file from the filesystem.
-     * 
+     *
      * @param path Path of the file that should be rendered.
      * @param context The current {@link XWikiContext request context}.
      * @return <tt>true</tt> if the file was found and its content was successfully sent.
@@ -241,7 +242,7 @@ public class SkinAction extends XWikiAction
                 String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
                 String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
                 Date modified = null;
-                if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
+                if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
                     // Always force UTF-8, as this is the assumed encoding for text files.
                     String rawContent = new String(data, ENCODING);
                     byte[] newdata = context.getWiki().parseContent(rawContent, context).getBytes(ENCODING);
@@ -273,7 +274,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Tries to serve the content of an XWikiSkins object field as a skin file.
-     * 
+     *
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
@@ -313,7 +314,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Tries to serve the content of an attachment as a skin file.
-     * 
+     *
      * @param filename The name of the skin file that should be rendered.
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
@@ -350,7 +351,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Checks if a mimetype indicates a javascript file.
-     * 
+     *
      * @param mimetype The mime type to check.
      * @return <tt>true</tt> if the mime type represents a javascript file.
      */
@@ -365,7 +366,7 @@ public class SkinAction extends XWikiAction
 
     /**
      * Checks if a mimetype indicates a CSS file.
-     * 
+     *
      * @param mimetype The mime type to check.
      * @return <tt>true</tt> if the mime type represents a css file.
      */
@@ -375,8 +376,19 @@ public class SkinAction extends XWikiAction
     }
 
     /**
+     * Checks if a file is a LESS file that should be parsed by velocity.
+     *
+     * @param filename name of the file to check.
+     * @return <tt>true</tt> if the filename represents a LESS.vm file.
+     */
+    private boolean isLessCssFile(String filename)
+    {
+        return filename.toLowerCase().endsWith(".less.vm");
+    }
+
+    /**
      * Sets several headers to properly identify the response.
-     * 
+     *
      * @param response The servlet response object, where the headers should be set.
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
      * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.

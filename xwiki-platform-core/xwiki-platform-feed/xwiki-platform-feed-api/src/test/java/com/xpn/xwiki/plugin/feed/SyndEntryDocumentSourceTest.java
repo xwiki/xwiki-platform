@@ -108,7 +108,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
-        getContext().getWiki().getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+        getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
         source = new SyndEntryDocumentSource();
     }
@@ -357,5 +357,19 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         String description = source(doc, params).getDescription().getValue();
         int descriptionLength = getXMLContentLength(description);
         Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
+    }
+    
+    public void testPreviewContentEncoding()
+    {
+        String snippet = "<p>Test ê</p>";
+        String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 10);
+        Assert.assertEquals(snippet, transformedHTML);
+        String transformedXML = SyndEntryDocumentSource.getXMLPreview(snippet, 10);
+        Assert.assertEquals(snippet, transformedXML);
+
+        String plainSnippet = " Test Text ê Rest ";
+        String previewExpected = "Test Text ê";
+        String transformedPlain = SyndEntryDocumentSource.getPlainPreview(plainSnippet, 12);
+        Assert.assertEquals(previewExpected, transformedPlain);
     }
 }

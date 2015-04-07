@@ -22,25 +22,26 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.InputFilterStream;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.filter.output.OutputFilterStream;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.filter.type.FilterStreamType;
+import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
-import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
-import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
-import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
-import org.xwiki.wikistream.output.OutputWikiStream;
-import org.xwiki.wikistream.output.OutputWikiStreamFactory;
-import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -56,8 +57,8 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
 /**
- * Exports in XAR, PDF, RTF or HTML formats.
- * 
+ * Exports in XAR, PDF, HTML and all output formats supported by *Office (when an *Office Server is running).
+ *
  * @version $Id$
  */
 public class ExportAction extends XWikiAction
@@ -88,7 +89,7 @@ public class ExportAction extends XWikiAction
 
     /**
      * Create ZIP archive containing wiki pages rendered in HTML, attached files and used skins.
-     * 
+     *
      * @param context the XWiki context.
      * @return always return null.
      * @throws XWikiException error when exporting HTML ZIP package.
@@ -100,16 +101,39 @@ public class ExportAction extends XWikiAction
         XWikiRequest request = context.getRequest();
 
         String description = request.get("description");
-        String name = request.get("name");
-        String[] pages = request.getParameterValues("pages");
 
-        List<String> pageList = new ArrayList<String>();
+        String name = request.get("name");
+        if (StringUtils.isBlank(name)) {
+            name = context.getDoc().getFullName();
+        }
+
+        Collection<String> pageList = getPagesToExport(request.getParameterValues("pages"), context);
+        if (pageList.isEmpty()) {
+            return null;
+        }
+
+        HtmlPackager packager = new HtmlPackager();
+
+        if (name != null && name.trim().length() > 0) {
+            packager.setName(name);
+        }
+
+        if (description != null) {
+            packager.setDescription(description);
+        }
+
+        packager.addPages(pageList);
+
+        packager.export(context);
+
+        return null;
+    }
+
+    private Collection<String> getPagesToExport(String[] pages, XWikiContext context) throws XWikiException
+    {
+        List<String> pageList = new ArrayList<>();
         if (pages == null || pages.length == 0) {
             pageList.add(context.getDoc().getFullName());
-
-            if (StringUtils.isBlank(name)) {
-                name = context.getDoc().getFullName();
-            }
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
             for (int i = 0; i < pages.length; ++i) {
@@ -121,7 +145,7 @@ public class ExportAction extends XWikiAction
                     wikiName = pattern.substring(0, index);
                     pattern = pattern.substring(index + 1);
                 } else {
-                    wikiName = context.getDatabase();
+                    wikiName = context.getWikiId();
                 }
 
                 StringBuffer where;
@@ -146,7 +170,7 @@ public class ExportAction extends XWikiAction
                 params.add(pattern);
             }
 
-            String database = context.getDatabase();
+            String database = context.getWikiId();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
                     String wikiName = entry.getKey();
@@ -155,7 +179,7 @@ public class ExportAction extends XWikiAction
                     @SuppressWarnings("unchecked")
                     List<String> params = (List<String>) query[1];
 
-                    context.setDatabase(wikiName);
+                    context.setWikiId(wikiName);
                     List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
@@ -166,29 +190,11 @@ public class ExportAction extends XWikiAction
                     }
                 }
             } finally {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
 
-        if (pageList.size() == 0) {
-            return null;
-        }
-
-        HtmlPackager packager = new HtmlPackager();
-
-        if (name != null && name.trim().length() > 0) {
-            packager.setName(name);
-        }
-
-        if (description != null) {
-            packager.setDescription(description);
-        }
-
-        packager.addPages(pageList);
-
-        packager.export(context);
-
-        return null;
+        return pageList;
     }
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException
@@ -198,15 +204,17 @@ public class ExportAction extends XWikiAction
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
-        if ("pdf".equalsIgnoreCase(format) || exportType == null) {
+        // Note 1: exportType will be null if no office server is started or it doesn't support the passed format
+        // Note 2: we don't use the office server for PDF exports since it doesn't work OOB. Instead we use FOP.
+        if ("pdf".equalsIgnoreCase(format)) {
             // The export format is PDF or the office converter can't be used (either it doesn't support the specified
             // format or the office server is not started).
             urlFactory = new PdfURLFactory();
             exporter = new PdfExportImpl();
             exportType = ExportType.PDF;
-            if ("rtf".equalsIgnoreCase(format)) {
-                exportType = ExportType.RTF;
-            }
+        } else if (exportType == null) {
+            context.put("message", "core.export.formatUnknown");
+            return "exception";
         }
 
         urlFactory.init(context);
@@ -225,7 +233,7 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private String exportXAR(XWikiContext context) throws XWikiException, IOException, WikiStreamException
+    private String exportXAR(XWikiContext context) throws XWikiException, IOException, FilterException
     {
         XWikiRequest request = context.getRequest();
 
@@ -256,9 +264,12 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 1) == 1) {
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usefilter", 1) == 1) {
             // Create input wiki stream
             DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
+
+            // We don't want to log the details
+            inputProperties.setVerbose(false);
 
             inputProperties.setWithJRCSRevisions(history);
             inputProperties.setWithRevisions(false);
@@ -266,26 +277,29 @@ public class ExportAction extends XWikiAction
             EntityReferenceSet entities = new EntityReferenceSet();
 
             if (all) {
-                entities.includes(new WikiReference(context.getDatabase()));
+                entities.includes(new WikiReference(context.getWikiId()));
             } else {
-                if (pages != null) {
-                    DocumentReferenceResolver<String> resolver =
-                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-                    for (String pageName : pages) {
-                        entities.includes(resolver.resolve(pageName));
-                    }
+                // Find all page references and add them for processing
+                Collection<String> pageList = getPagesToExport(pages, context);
+                DocumentReferenceResolver<String> resolver =
+                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+                for (String pageName : pageList) {
+                    entities.includes(resolver.resolve(pageName));
                 }
             }
 
             inputProperties.setEntities(entities);
 
-            InputWikiStreamFactory inputWikiStreamFactory =
-                Utils.getComponent(InputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
+            InputFilterStreamFactory inputFilterStreamFactory =
+                Utils.getComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
 
-            InputWikiStream inputWikiStream = inputWikiStreamFactory.createInputWikiStream(inputProperties);
+            InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(inputProperties);
 
             // Create output wiki stream
             XAROutputProperties xarProperties = new XAROutputProperties();
+
+            // We don't want to log the details
+            xarProperties.setVerbose(false);
 
             XWikiResponse response = context.getResponse();
 
@@ -306,16 +320,19 @@ public class ExportAction extends XWikiAction
             xarProperties.setPackageBackupPack(backup);
             xarProperties.setPreserveVersion(backup || history);
 
-            BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =
-                Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
+            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory =
+                Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
 
-            OutputWikiStream outputWikiStream = xarWikiStreamFactory.createOutputWikiStream(xarProperties);
+            OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
 
             // Export
             response.setContentType("application/zip");
             response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
 
-            inputWikiStream.read(outputWikiStream.getFilter());
+            inputFilterStream.read(outputFilterStream.getFilter());
+
+            inputFilterStream.close();
+            outputFilterStream.close();
 
             // Flush
             response.getOutputStream().flush();
@@ -355,8 +372,7 @@ public class ExportAction extends XWikiAction
                 export.backupWiki();
             } else {
                 if (pages != null) {
-                    for (int i = 0; i < pages.length; i++) {
-                        String pageName = pages[i];
+                    for (String pageName : pages) {
                         String defaultAction = request.get("action_" + pageName);
                         int iAction;
                         try {

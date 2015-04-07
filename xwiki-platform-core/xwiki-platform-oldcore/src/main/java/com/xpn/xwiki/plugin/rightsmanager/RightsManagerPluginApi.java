@@ -35,7 +35,7 @@ import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * API for managing rights, users and groups.
- * 
+ *
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
@@ -73,7 +73,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Create an instance of the Rights Manager plugin user api.
-     * 
+     *
      * @param plugin the entry point of the Rights Manager plugin.
      * @param context the XWiki context.
      */
@@ -112,11 +112,11 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Convert Map/List pattern matching parameter from Velocity to [][] used in {@link RightsManager}.
-     * 
+     *
      * @param map a map of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    static Object[][] createMatchingTable(Map< ? , ? > map)
+    static Object[][] createMatchingTable(Map<?, ?> map)
     {
         if (map == null || map.size() == 0) {
             return null;
@@ -125,11 +125,11 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         Object[][] table = new Object[map.size()][3];
 
         int i = 0;
-        for (Map.Entry< ? , ? > entry : map.entrySet()) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
             table[i][0] = entry.getKey();
 
             if (entry.getValue() instanceof List) {
-                List< ? > typeValue = (List< ? >) entry.getValue();
+                List<?> typeValue = (List<?>) entry.getValue();
                 table[i][1] = typeValue.get(0);
                 if (typeValue.size() > 1) {
                     table[i][2] = typeValue.get(1);
@@ -146,11 +146,11 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Convert List/List order fields from Velocity to [][] used in {@link RightsManager}.
-     * 
+     *
      * @param list a list of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    static Object[][] createOrderTable(List< ? > list)
+    static Object[][] createOrderTable(List<?> list)
     {
         if (list == null || list.size() == 0) {
             return null;
@@ -161,7 +161,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         int i = 0;
         for (Object entry : list) {
             if (entry instanceof List) {
-                List< ? > fieldParams = (List< ? >) entry;
+                List<?> fieldParams = (List<?>) entry;
                 table[i][0] = fieldParams.get(0);
                 if (fieldParams.size() > 1) {
                     table[i][1] = fieldParams.get(1);
@@ -181,7 +181,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Log error and register {@link #CONTEXT_LASTERRORCODE} and {@link #CONTEXT_LASTEXCEPTION}.
-     * 
+     *
      * @param comment the comment to use with {@link #LOGGER}.
      * @param e the exception.
      */
@@ -197,7 +197,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Get all groups containing provided user.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
@@ -209,7 +209,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         try {
             memberList = RightsManager.getInstance().getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all groups containing user [{0}]", new Object[] {member}), e);
+            logError(MessageFormat.format("Try to get all groups containing user [{0}]", new Object[] { member }), e);
 
             memberList = Collections.emptyList();
         }
@@ -219,7 +219,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Get all members (users or groups) provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
@@ -231,7 +231,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Get all members (users or groups) provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
@@ -245,7 +245,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Get members of provided group.
-     * 
+     *
      * @param group the group.
      * @param matchField a string to search in result to filter.
      * @param nb the maximum number of result to return.
@@ -265,7 +265,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
                 RightsManager.getInstance().getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc,
                     this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all matched member of group [{0}]", new Object[] {group}), e);
+            logError(MessageFormat.format("Try to get all matched member of group [{0}]", new Object[] { group }), e);
 
             memberList = Collections.emptyList();
         }
@@ -275,7 +275,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Return the number of groups containing provided member.
-     * 
+     *
      * @param member the name of the member (user or group).
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
@@ -295,7 +295,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 
     /**
      * Return the number of members provided group contains.
-     * 
+     *
      * @param group the name of the group.
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.

@@ -284,8 +284,8 @@ Object.extend(XWiki, {
    * Insert a link for editing sections.
    */
   insertSectionEditLinks: function(container) {
-      // Insert links only in view mode and for documents not in xwiki/1.0 syntax
-      if (XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
+      // Insert links only if enabled, in view mode and for documents not in xwiki/1.0 syntax
+      if ( $xwiki.hasSectionEdit() && XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
 
           // Section count starts at one, not zero.
           var sectioncount = 1;
@@ -1274,31 +1274,51 @@ XWiki.Document = Class.create({
     return url;
   }
 });
-
-/* Initialize the document URL factory, and create XWiki.currentDocument. */
-document.observe('xwiki:dom:loading', function() {
-  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : (XWiki.currentWiki || "xwiki");
-  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : (XWiki.currentSpace || "Main");
-  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : (XWiki.currentPage || "WebHome");
-  XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
-  XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
-  XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
-  XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";
-  XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
-    wiki = wiki || XWiki.Document.currentWiki;
-    var url;
-    if (space) {
-      url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", space);
-    } else {
-      url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", wiki);
-    }
-    if (queryString) {
-      url += "?" + queryString;
-    }
-    return url;
-  };
-  XWiki.currentDocument = new XWiki.Document();
-});
+/* Initialize the document URL factory, and create XWiki.currentDocument.
+TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225) */
+var htmlElement = $(document.documentElement);
+XWiki.Document.currentWiki = XWiki.currentWiki || "xwiki";
+if (htmlElement.readAttribute('data-xwiki-wiki')) {
+  // HTML 5 attribute
+  XWiki.Document.currentWiki = htmlElement.readAttribute('data-xwiki-wiki');
+} else if ($$("meta[name=wiki]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content
+} 
+XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
+if (htmlElement.readAttribute('data-xwiki-space')) {
+  // HTML 5 attribute
+  XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space');
+} else if ($$("meta[name=space]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentSpace = $$("meta[name=space]")[0].content
+} 
+XWiki.Document.currentPage = XWiki.currentPage || "WebHome";
+if (htmlElement.readAttribute('data-xwiki-page')) {
+    // HTML 5 attribute
+  XWiki.Document.currentPage = htmlElement.readAttribute('data-xwiki-page');
+} else if ($$("meta[name=page]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentPage = $$("meta[name=page]")[0].content
+} 
+XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
+XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
+XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
+XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";
+XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
+  wiki = wiki || XWiki.Document.currentWiki;
+  var url;
+  if (space) {
+    url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", space);
+  } else {
+    url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", wiki);
+  }
+  if (queryString) {
+    url += "?" + queryString;
+  }
+  return url;
+};
+XWiki.currentDocument = new XWiki.Document();
 
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
@@ -1388,7 +1408,7 @@ document.observe('xwiki:dom:loading', function() {
 document.observe('xwiki:dom:loaded', function() {
     var suggestionsMapping = {
         "documents" : {
-            script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
+            script: XWiki.Document.getRestSearchURL("scope=name&number=10&"),
             varname: "q",
             icon: "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
             noresults: "Document not found",
@@ -1399,7 +1419,7 @@ document.observe('xwiki:dom:loaded', function() {
             resultInfo : "pageFullName"
         },
         "spaces" : {
-            script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
+            script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&"),
             varname: "q",
             icon: "$xwiki.getSkinFile('icons/silk/folder.png')",
             noresults: "Space not found",
@@ -1418,8 +1438,7 @@ document.observe('xwiki:dom:loaded', function() {
           elements.each(function(element) {$(element).select(selector).each(function(item) {
             if (!item.hasClassName('initialized')) {
               var options = {
-                timeout : 30000,
-                parentContainer : item.up()
+                timeout : 30000
               };
               Object.extend(options, suggestionsMapping[keys[i]]);
               // Create the Suggest.
@@ -1547,6 +1566,10 @@ document.observe('xwiki:dom:loaded', function() {
  * JS improvement for keeping the content menu visible on the screen when scrolling down.
  */
 document.observe("xwiki:dom:loaded", function() {
+  // Do it only for colibri
+  if (!$("body").hasClassName("skin-colibri")) {
+    return;
+  }
   var menu = $('contentmenu') || $('editmenu'); // Both for view and edit
   var content = $('mainContentArea') || $('mainEditArea'); // Both for view and edit
   if (menu && content) {

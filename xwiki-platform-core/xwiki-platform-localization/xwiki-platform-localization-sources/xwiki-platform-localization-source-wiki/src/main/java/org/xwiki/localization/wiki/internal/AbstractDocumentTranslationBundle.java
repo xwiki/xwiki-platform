@@ -20,7 +20,6 @@
 package org.xwiki.localization.wiki.internal;
 
 import java.io.StringReader;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +37,7 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -53,6 +52,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -71,17 +71,25 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
      */
     public static int DEFAULTPRIORITY_WIKI = DEFAULTPRIORITY - 100;
 
+    protected ComponentManager componentManager;
+
     protected TranslationBundleContext bundleContext;
 
     protected EntityReferenceSerializer<String> serializer;
 
     protected Provider<XWikiContext> contextProvider;
 
-    private ObservationManager observation;
+    protected ObservationManager observation;
 
     protected TranslationMessageParser translationMessageParser;
 
     protected List<Event> events;
+
+    /**
+     * Indicate if it should try to access translations or not. A document bundle is usually in disposed state because
+     * the associated document does not exist anymore but something is still (wrongly) holding a reference to it.
+     */
+    protected boolean disposed;
 
     protected DocumentReference documentReference;
 
@@ -95,11 +103,11 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         throws ComponentLookupException
     {
         this.idPrefix = idPrefix;
+
+        this.componentManager = componentManager;
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.contextProvider =
-            componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
-                new Type[] {XWikiContext.class}));
+        this.contextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         this.observation = componentManager.getInstance(ObservationManager.class);
 
         this.translationMessageParser = translationMessageParser;
@@ -116,7 +124,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     private void initialize()
     {
         this.events =
-            Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
+            Arrays.<Event>asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
                 this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
                 this.documentReference.getWikiReference().getName()));
 
@@ -134,14 +142,26 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     {
         XWikiContext context = this.contextProvider.get();
 
-        XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
+        if (context == null) {
+            // No context for some reason, lets try later
+            return null;
+        }
+
+        XWiki xwiki = context.getWiki();
+
+        if (xwiki == null) {
+            // No XWiki instance ready, lets try later
+            return null;
+        }
+
+        XWikiDocument document = xwiki.getDocument(this.documentReference, context);
 
         if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
-            document = context.getWiki().getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
+            document = xwiki.getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
 
             if (document.isNew()) {
                 // No document found for this locale
-                return null;
+                return LocalizedTranslationBundle.EMPTY;
             }
         }
 
@@ -176,18 +196,19 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     }
 
     @Override
-    protected LocalizedTranslationBundle createBundle(Locale locale)
+    protected LocalizedTranslationBundle createBundle(Locale locale) throws Exception
     {
-        LocalizedTranslationBundle localeBundle;
-        try {
-            localeBundle = loadDocumentLocaleBundle(locale);
-        } catch (Exception e) {
-            this.logger.error("Failed to get localization bundle", e);
+        return loadDocumentLocaleBundle(locale);
+    }
 
-            localeBundle = null;
+    @Override
+    public Translation getTranslation(String key, Locale locale)
+    {
+        if (this.disposed) {
+            return null;
         }
 
-        return localeBundle;
+        return super.getTranslation(key, locale);
     }
 
     // DisposableCacheValue Disposable
@@ -195,18 +216,22 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     @Override
     public void dispose()
     {
+        this.disposed = true;
+        this.bundleCache.clear();
         this.observation.removeListener(getName());
     }
 
     // EventListener
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object source, Object data)
     {
-        if (arg0 instanceof WikiDeletedEvent) {
-            bundleCache.clear();
+        if (event instanceof WikiDeletedEvent) {
+            this.bundleCache.clear();
+
+            this.disposed = true;
         } else {
-            XWikiDocument document = (XWikiDocument) arg1;
+            XWikiDocument document = (XWikiDocument) source;
 
             this.bundleCache.remove(document.getLocale());
 

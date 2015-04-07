@@ -33,6 +33,8 @@ import org.openqa.selenium.support.FindBy;
  */
 public class TemplatesAdministrationSectionPage extends AdministrationSectionPage
 {
+    public static final String ADMINISTRATION_SECTION_ID = "Templates";
+
     @FindBy(id = "space")
     private WebElement spaceInput;
 
@@ -47,14 +49,13 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     public static TemplatesAdministrationSectionPage gotoPage()
     {
-        TemplatesAdministrationSectionPage page = new TemplatesAdministrationSectionPage();
-        page.getDriver().get(page.getURL());
-        return page;
+        AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
+        return new TemplatesAdministrationSectionPage();
     }
 
     public TemplatesAdministrationSectionPage()
     {
-        super("Templates");
+        super(ADMINISTRATION_SECTION_ID);
     }
 
     public TemplateProviderInlinePage createTemplateProvider(String space, String page)

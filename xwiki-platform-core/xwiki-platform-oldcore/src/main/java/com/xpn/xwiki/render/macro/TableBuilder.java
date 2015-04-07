@@ -26,7 +26,7 @@ import org.radeox.macro.table.Table;
 
 /**
  * Builds a Radeox {@link Table} by parsing its textual representation, usually the content of a {table} macro.
- * 
+ *
  * @version $Id$
  */
 public class TableBuilder

@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -37,20 +38,29 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.action.ActionManager;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceManager;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.resource.NotFoundResourceHandlerException;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceHandler;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -106,8 +116,29 @@ public abstract class XWikiAction extends Action
         "download");
 
     /**
+     * Indicate if the action is blocked until XWiki is initialized.
+     */
+    protected boolean waitForXWikiInitialization = true;
+
+    private ContextualLocalizationManager localization;
+
+    protected ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    protected String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+    }
+
+    /**
      * Handle server requests.
-     * 
+     *
      * @param mapping The ActionMapping used to select this instance
      * @param form The optional ActionForm bean for this request (if any)
      * @param req The HTTP request we are processing
@@ -153,7 +184,16 @@ public abstract class XWikiAction extends Action
 
             // Verify that the requested wiki exists
             try {
-                xwiki = XWiki.getXWiki(context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization, context);
+
+                // If XWiki is still initializing display initialization template
+                if (xwiki == null) {
+                    // Display initialization template
+                    renderInit(context);
+
+                    // Initialization template has been displayed, stop here.
+                    return null;
+                }
             } catch (XWikiException e) {
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
                 // redirects. If there are none, then we display the specific error template.
@@ -164,7 +204,8 @@ public abstract class XWikiAction extends Action
                     XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
                     context.setURLFactory(urlf);
 
-                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
+                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates
+                    // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
                     VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -186,10 +227,10 @@ public abstract class XWikiAction extends Action
                             // since we cannot set the non existing one as it would generate errors obviously...
                             EntityReferenceValueProvider valueProvider =
                                 Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(
-                                valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            xwiki.setPhonyDocument(
+                                new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI), valueProvider
+                                    .getDefaultValue(EntityType.SPACE), valueProvider
+                                    .getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -292,15 +333,24 @@ public abstract class XWikiAction extends Action
 
                 // Call the Actions
 
-                // First call the new Actions, implemented as components
+                // Call the new Entity Resource Reference Handler.
+                ResourceReferenceHandler entityResourceReferenceHandler =
+                    Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceHandler.class,
+                        ResourceType.class), "bin");
+                ResourceReference resourceReference =
+                    Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
-                    ActionManager actionManager = Utils.getComponent(ActionManager.class);
-                    Resource resource = Utils.getComponent(ResourceManager.class).getResource();
-                    if (actionManager.execute(resource)) {
-                        return null;
-                    }
+                    entityResourceReferenceHandler.handle(resourceReference, new DefaultResourceReferenceHandlerChain(
+                        Collections.<ResourceReferenceHandler>emptyList()));
+                    // Don't let the old actions kick in!
+                    return null;
+                } catch (NotFoundResourceHandlerException e) {
+                    // No Entity Resource Action has been found. Don't do anything and let it go through
+                    // so that the old Action system kicks in...
                 } catch (Throwable e) {
-                    LOGGER.error("Failed to call Action for [{}]" + context.getAction() + "]", e);
+                    // Some real failure, log it since it's a problem but still allow the old Action system a chance
+                    // to do something...
+                    LOGGER.error("Failed to handle Action for Resource [{}]", resourceReference, e);
                 }
 
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been
@@ -357,7 +407,7 @@ public abstract class XWikiAction extends Action
                             context.getWiki().Param("xwiki.attachment_exception", "attachmentdoesnotexist"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION) {
-                        vcontext.put("message", context.getMessageTool().get("platform.core.invalidUrl"));
+                        vcontext.put("message", localizePlainOrKey("platform.core.invalidUrl"));
                         xwiki.setPhonyDocument(xwiki.getDefaultSpace(context) + "." + xwiki.getDefaultPage(context),
                             context, vcontext);
                         context.getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -439,6 +489,33 @@ public abstract class XWikiAction extends Action
                 }
             }
         }
+    }
+
+    private void renderInit(XWikiContext xcontext) throws Exception
+    {
+        RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
+        MutableRenderingContext mutableRenderingContext =
+            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+
+        if (mutableRenderingContext != null) {
+            mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
+                renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(), Syntax.XHTML_1_0);
+        }
+
+        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
+
+        try {
+            Utils.getComponent(TemplateManager.class).render("init.vm", xcontext.getResponse().getWriter());
+        } finally {
+            if (mutableRenderingContext != null) {
+                mutableRenderingContext.pop();
+            }
+        }
+
+        xcontext.getResponse().flushBuffer();
+
+        xcontext.setFinished(true);
     }
 
     protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
@@ -547,7 +624,7 @@ public abstract class XWikiAction extends Action
     /**
      * Send redirection based on a regexp pattern (if any) set at the main wiki level. To enable this feature you must
      * add xwiki.preferences.redirect=1 to your xwiki.cfg.
-     * 
+     *
      * @param response the servlet response
      * @param url url of the request
      * @param context the XWiki context
@@ -586,7 +663,7 @@ public abstract class XWikiAction extends Action
                 response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
-            Object[] args = {url};
+            Object[] args = { url };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);
@@ -597,7 +674,7 @@ public abstract class XWikiAction extends Action
      * Gets the translated version of a document, in the specified language. If the translation does not exist, a new
      * document translation is created. If the requested language does not correspond to a translation (is not defined
      * or is the same as the main document), then the main document is returned.
-     * 
+     *
      * @param doc the main (default, untranslated) document to translate
      * @param language the requested document language
      * @param context the current request context
@@ -626,7 +703,7 @@ public abstract class XWikiAction extends Action
     /**
      * Perform CSRF check and redirect to the resubmission page if needed. Throws an exception if the access should be
      * denied, returns false if the check failed and the user will be redirected to a resubmission page.
-     * 
+     *
      * @param context current xwiki context containing the request
      * @return true if the check succeeded, false if resubmission is needed
      * @throws XWikiException if the check fails

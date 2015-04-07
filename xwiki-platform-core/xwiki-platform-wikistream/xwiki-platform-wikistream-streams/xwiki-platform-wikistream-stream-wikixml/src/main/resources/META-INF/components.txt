@@ -1,2 +1,0 @@
-org.xwiki.wikistream.wikixml.internal.input.WikiXMLInputWikiStreamFactory
-org.xwiki.wikistream.wikixml.internal.output.WikiXMLOutputWikiStreamFactory

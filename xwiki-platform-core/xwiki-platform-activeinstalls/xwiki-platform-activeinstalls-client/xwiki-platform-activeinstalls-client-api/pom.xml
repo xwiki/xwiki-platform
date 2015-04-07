@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls-client</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
   <name>XWiki Platform - Active Installs - Client - API</name>
@@ -51,6 +51,31 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-activeinstalls-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- We need to draw oldcore in order to be able to send the database name and version in the ping. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- We want to log the Servlet Container name/version in the ping -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <version>1.46</version>
+      <scope>test</scope>
+      <exclusions>
+        <!-- We are using SLF4J -->
+        <exclusion>
+          <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

@@ -90,4 +90,19 @@ public abstract class Collection extends Element
             return null;
         }
     }
+
+    /**
+     * @param name the name of the property
+     * @return the value of the passed property
+     * @since 6.2
+     */
+    public java.lang.Object getValue(String name)
+    {
+        Property property = getProperty(name);
+        if (property != null) {
+            return property.getValue();
+        }
+
+        return null;
+    }
 }

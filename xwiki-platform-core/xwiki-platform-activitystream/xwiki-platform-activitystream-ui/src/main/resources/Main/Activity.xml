@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>Activity</name>
   <language/>
@@ -29,20 +29,40 @@
   <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1385551024000</creationDate>
   <date>1385638578000</date>
   <contentUpdateDate>1385551024000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.activity')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+##
+## Activity Macro
+##
+## Optional parameters :
+##
+##  - entries (String set to a numerical value): number of entries to display the activity for.
+##  - subentries (String set to a numerical value): number of activities to show for each entry.
+##  - wikis (List of string[s]): comma separated list of wikis to display activity for.
+##  - spaces (List of string[s]): comma separated list of spaces to display the activity for.
+##  - authors (List of string[s]): comma separated list of authors whose modifications to show.
+##  - tags (List of string[s]): comma separated list of tags to display activity for.
+##  - minor (String set to "true" or "false"): whether to show modifications that create minor versions or not.
+##  - rss (String set to "true" or "false"): whether to show activity rss link or not.
+##  - messageSender (String set to "true" or "false"): whether or not to display the message sender input.
+##
+{{/velocity}}
+
+{{activity /}}</content>
   <object>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>5c505c61-ae77-44de-b1b0-f9fcaca3b2b6</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -114,10 +134,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.Activity</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>5c505c61-ae77-44de-b1b0-f9fcaca3b2b6</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -259,6 +275,10 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>36962c0c-7460-4536-9d05-a6381b65a37f</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -289,15 +309,15 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
-    <name>Main.Activity</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>36962c0c-7460-4536-9d05-a6381b65a37f</guid>
     <property>
       <level>programming</level>
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>ab40f34b-0de4-4e6a-a6c8-f03dce1d6db5</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -369,10 +389,6 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.Activity</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>ab40f34b-0de4-4e6a-a6c8-f03dce1d6db5</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -383,9 +399,14 @@ document.observe('xwiki:dom:loaded', function() {
   text-align: right;
 }
 
+.rssURL img {
+  margin-right: 5px;
+}
+
 ul.activityList {
   list-style: none;
   margin: 0;
+  padding: 0;
 }
 
 .activityItem {
@@ -492,6 +513,7 @@ ul.activityList {
   border-color: $theme.pageContentBackgroundColor;
   border-style: solid;
   border-width: 4px 1px 1px 3px;
+  box-sizing: content-box;
   bottom: -5px;
   height: 16px;
   position: absolute;
@@ -530,7 +552,7 @@ ul.activityList {
 
 .activityList .message {
   /* Preserve the white-space because messages are written in plain text. */
-  white-space: pre;
+  white-space: pre-wrap;
 }
 /** &lt;end&gt; **/
 
@@ -671,6 +693,10 @@ h1:hover .toolFilter .toolExpand {
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>8891cf6c-541d-4e15-8986-ca230207525e</guid>
     <class>
       <name>XWiki.WikiMacroClass</name>
       <customClass/>
@@ -780,10 +806,6 @@ h1:hover .toolFilter .toolExpand {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>Main.Activity</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>8891cf6c-541d-4e15-8986-ca230207525e</guid>
     <property>
       <code>{{velocity output=false}}
 ##
@@ -822,7 +844,7 @@ $xwiki.ssx.use('Main.Activity')##
 #set ($now = $datetool.date)
 #set ($todayYear = $datetool.getYear($now))
 #set ($todayMonth = $datetool.getMonth($now) + 1)
-#set ($todayMidnight = $currentTime.toDateMidnight())
+#set ($todayMidnight = $currentTime.withTimeAtStartOfDay())
 #set ($yesterdayMidnight = $todayMidnight.minusDays(1))
 #end
 ##
@@ -920,9 +942,10 @@ $xwiki.ssx.use('Main.Activity')##
   #foreach ($u in $aAuthors)
     #if ("$!u" != '')
       #set ($usersQuery = $usersQuery.concat(',?'))
-      #set ($discard = $fromUsersParameters.add($u))
-      #set ($discard = $toUsersParameters.add("${u}^XWiki.XWikiUsers"))
-      #if ($services.model.serialize($services.model.resolveDocument($u), 'default') != $currentUser)
+      #set ($resolvedUser = $services.model.serialize($services.model.resolveDocument($u), 'default'))
+      #set ($discard = $fromUsersParameters.add($resolvedUser))
+      #set ($discard = $toUsersParameters.add("${resolvedUser}^XWiki.XWikiUsers"))
+      #if ($resolvedUser != $currentUser)
         #set ($hasDifferentUsers = true)
       #end
     #end
@@ -992,9 +1015,10 @@ $xwiki.ssx.use('Main.Activity')##
     #set ($discard = $filterParameters.add("${currentUser}^XWiki.XWikiUsers"))
     ##
     ## A user should see personal messages from followed users
-    #if ($xwiki.watchlist.getWatchedUsers().size() &gt; 0)
+    #set ($followedUsers = $services.watchlist.getWatchedElements("USER"))
+    #if ($followedUsers.size() &gt; 0)
       #set ($messageFilter = "$messageFilter or (act.type = 'personalMessage' and act.user in (")
-      #foreach ($u in $xwiki.watchlist.getWatchedUsers())
+      #foreach ($u in $followedUsers)
         #if ($velocityCount &gt; 1)
           #set ($messageFilter = $messageFilter.concat(','))
         #end
@@ -1769,6 +1793,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>76922370-d2c4-4a50-98f3-2967415e0b73</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1817,10 +1845,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>76922370-d2c4-4a50-98f3-2967415e0b73</guid>
     <property>
       <defaultValue>20</defaultValue>
     </property>
@@ -1835,6 +1859,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>dac693ae-b800-4ffc-874f-dbc59db5f32d</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1883,10 +1911,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>1</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>dac693ae-b800-4ffc-874f-dbc59db5f32d</guid>
     <property>
       <defaultValue>10</defaultValue>
     </property>
@@ -1901,6 +1925,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>d5daa5b3-4105-45ca-999d-7dc678073243</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1949,10 +1977,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>2</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>d5daa5b3-4105-45ca-999d-7dc678073243</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1967,6 +1991,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>f96d717f-6bc7-465d-ae9e-36cda81cd99b</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2015,10 +2043,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>3</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>f96d717f-6bc7-465d-ae9e-36cda81cd99b</guid>
     <property>
       <defaultValue/>
     </property>
@@ -2033,6 +2057,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>71dc6bff-7a23-477b-a8a6-bf2bb47596e1</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2081,10 +2109,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>4</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>71dc6bff-7a23-477b-a8a6-bf2bb47596e1</guid>
     <property>
       <defaultValue/>
     </property>
@@ -2099,6 +2123,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>f5d8e941-1410-413a-a489-e5f2df8912c3</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2147,10 +2175,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>5</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>f5d8e941-1410-413a-a489-e5f2df8912c3</guid>
     <property>
       <defaultValue/>
     </property>
@@ -2165,6 +2189,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>128cca0e-87a2-407a-92fc-5afa6239bdb2</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2213,10 +2241,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>6</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>128cca0e-87a2-407a-92fc-5afa6239bdb2</guid>
     <property>
       <defaultValue>false</defaultValue>
     </property>
@@ -2231,6 +2255,10 @@ $xwiki.ssx.use('Main.Activity')##
     </property>
   </object>
   <object>
+    <name>Main.Activity</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>baa8452c-003a-4189-8268-6cd570f7f152</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2279,10 +2307,6 @@ $xwiki.ssx.use('Main.Activity')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Main.Activity</name>
-    <number>7</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>baa8452c-003a-4189-8268-6cd570f7f152</guid>
     <property>
       <defaultValue>false</defaultValue>
     </property>
@@ -2296,23 +2320,4 @@ $xwiki.ssx.use('Main.Activity')##
       <name>rss</name>
     </property>
   </object>
-  <content>{{velocity}}
-##
-## Activity Macro
-##
-## Optional parameters :
-##
-##  - entries (String set to a numerical value): number of entries to display the activity for.
-##  - subentries (String set to a numerical value): number of activities to show for each entry.
-##  - wikis (List of string[s]): comma separated list of wikis to display activity for.
-##  - spaces (List of string[s]): comma separated list of spaces to display the activity for.
-##  - authors (List of string[s]): comma separated list of authors whose modifications to show.
-##  - tags (List of string[s]): comma separated list of tags to display activity for.
-##  - minor (String set to "true" or "false"): whether to show modifications that create minor versions or not.
-##  - rss (String set to "true" or "false"): whether to show activity rss link or not.
-##  - messageSender (String set to "true" or "false"): whether or not to display the message sender input.
-##
-{{/velocity}}
-
-{{activity /}}</content>
 </xwikidoc>

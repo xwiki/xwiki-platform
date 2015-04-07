@@ -39,14 +39,13 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Special URL Factory used during exports, which stores referenced attachments and resources on the filesystem, in a
  * temporary folder, so that they can be included in the export result. The returned URLs point to these resources as
  * {@code file://} links, and not as {@code http://} links.
- * 
+ *
  * @version $Id$
  * @since 5.0RC1
  */
@@ -128,7 +127,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
         if (url == null) {
             return "";
         }
-        return Util.escapeURL(url.toString());
+        return url.toString();
     }
 
     /**
@@ -154,7 +153,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             XWikiDocument doc =
                 context.getWiki()
                     .getDocument(
-                        new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name),
+                        new DocumentReference(StringUtils.defaultString(wiki, context.getWikiId()), space, name),
                         context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {

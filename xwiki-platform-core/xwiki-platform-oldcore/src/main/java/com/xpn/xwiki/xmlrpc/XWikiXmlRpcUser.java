@@ -21,7 +21,7 @@ package com.xpn.xwiki.xmlrpc;
 
 /**
  * This is an helper class for storing XML RPC user information.
- * 
+ *
  * @version $Id$
  */
 public class XWikiXmlRpcUser
@@ -38,11 +38,11 @@ public class XWikiXmlRpcUser
 
     public String getName()
     {
-        return userName;
+        return this.userName;
     }
 
     public String getRemoteIp()
     {
-        return remoteIp;
+        return this.remoteIp;
     }
 }

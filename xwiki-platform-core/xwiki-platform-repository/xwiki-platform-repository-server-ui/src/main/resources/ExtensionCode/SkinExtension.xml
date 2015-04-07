@@ -234,7 +234,8 @@ div.extension-link {
   display: inline-block;
   margin: 0 1em 1em 1em;
   padding: 0 1em 0.5em;
-  min-height: 100px;
+  min-height: 115px;
+  min-width: 310px;
   vertical-align: top;
 }
 

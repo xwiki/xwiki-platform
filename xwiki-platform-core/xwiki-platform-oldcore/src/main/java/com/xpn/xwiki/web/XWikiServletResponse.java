@@ -21,14 +21,21 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class XWikiServletResponse implements XWikiResponse
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
+
     private HttpServletResponse response;
 
     /**
@@ -63,6 +70,14 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendRedirect(String redirect) throws IOException
     {
+        if (StringUtils.isBlank(redirect)) {
+            // Nowhere to go to
+            return;
+        }
+        if (StringUtils.containsAny(redirect, '\r', '\n')) {
+            LOGGER.warn("Possible HTTP Response Splitting attack, attempting to redirect to [{}]", redirect);
+            return;
+        }
         this.httpStatus = SC_FOUND;
         this.response.sendRedirect(redirect);
     }
@@ -155,7 +170,7 @@ public class XWikiServletResponse implements XWikiResponse
 
     /**
      * Remove a cookie.
-     * 
+     *
      * @param request The servlet request needed to find the cookie to remove
      * @param cookieName The name of the cookie that must be removed.
      */
@@ -292,5 +307,23 @@ public class XWikiServletResponse implements XWikiResponse
     public String getContentType()
     {
         return this.response.getContentType();
+    }
+
+    @Override
+    public String getHeader(String s)
+    {
+        return this.response.getHeader(s);
+    }
+
+    @Override
+    public Collection<String> getHeaders(String s)
+    {
+        return this.response.getHeaders(s);
+    }
+
+    @Override
+    public Collection<String> getHeaderNames()
+    {
+        return this.response.getHeaderNames();
     }
 }

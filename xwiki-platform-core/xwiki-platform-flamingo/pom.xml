@@ -25,36 +25,23 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo</artifactId>
-  <name>XWiki Platform - Flamingo</name>
+  <name>XWiki Platform - Flamingo - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Flamingo Skin</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <appendAssemblyId>false</appendAssemblyId>
-          <descriptors>
-            <descriptor>${basedir}/src/assemble/skin.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
+  <modules>
+    <module>xwiki-platform-flamingo-skin</module>
+    <module>xwiki-platform-flamingo-theme</module>
+    <module>xwiki-platform-flamingo-bootswatchthemes</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-flamingo-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

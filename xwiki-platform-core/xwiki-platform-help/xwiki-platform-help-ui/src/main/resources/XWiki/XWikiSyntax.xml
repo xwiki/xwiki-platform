@@ -30,23 +30,32 @@
   <creationDate>1384447292000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1384452769000</date>
   <contentUpdateDate>1384452769000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("help.syntaxpage.title")</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden/>
+  <hidden>false</hidden>
   <content>{{velocity output="false"}}
 #set($SUPPORTED_SYNTAXES = {})
 #set($void = $SUPPORTED_SYNTAXES.put(1.0, 'XWiki Syntax 1.0'))
 #set($void = $SUPPORTED_SYNTAXES.put(2.0, 'XWiki Syntax 2.0'))
 #set($void = $SUPPORTED_SYNTAXES.put(2.1, 'XWiki Syntax 2.1'))
+
+## We need a way to have a mapping between a string and a number, and we cannot use $mathtool.toDouble() because
+## it is locale dependent (see: http://jira.xwiki.org/browse/XWIKI-11343).
+## TODO: fix $mathtool or create a script service that handles this english-locale string&lt;-&gt;number conversion,
+## because this fix is a bit hacky/spaghetti.
+## A better fix would be to refactor this application, because the syntax number SHOULD NOT BE USED because a syntax
+## is not supposed to be a number (imagine that we switch to 'Markdown', it is impossible to compare).
+## Instead, a syntax object should have a list of categories that the syntax supports.
+#set($NUMBERS_CONVERSION = {})
+#set($void = $NUMBERS_CONVERSION.put('1.0', 1.0))
+#set($void = $NUMBERS_CONVERSION.put('2.0', 2.0))
+#set($void = $NUMBERS_CONVERSION.put('2.1', 2.1))
 
 #if ($request.xaction == 'switchContext')
   $response.sendRedirect($request.target)
@@ -58,11 +67,8 @@
   #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
 #end
 #set ($crtSectionId = "$!{request.section}")
-#set ($crtSyntaxVer = $mathtool.toDouble($request.syntax))
-#if ($crtSyntaxVer &amp;&amp; $SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
-  #set ($crtSyntaxVer = $mathtool.toDouble($crtSyntaxVer))
-
-#else
+#set ($crtSyntaxVer = $NUMBERS_CONVERSION.get($request.syntax))
+#if ("$!crtSyntaxVer" == '' || !$SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
   #set ($crtSyntaxVer = 2.1) ## Default to Syntax 2.1
 #end
 
@@ -86,7 +92,7 @@
 #set($catCount = -1)
 #set($catName = "")
 #set($catChildren = [])
-#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').addFilter('currentlanguage').execute())
+#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').addFilter('currentlanguage').addFilter('unique').execute())
 
 #if($results.empty)
   No syntax sections found!
@@ -94,31 +100,50 @@
   #foreach ($item in $results)
     #set($sectionDoc = $xwiki.getDocument($item))
     #set($obj = $sectionDoc.getObject("XWiki.XWikiSyntaxClass"))
-    #set($sectionOrigList = $sectionDoc.getSections())
-    #set($sectionList = $sectionDoc.getTranslatedDocument().getSections())
 
-    ## Get catName for first category
-    #if($catCount == -1)
-      #set($catCount = $catCount + 1)
-      #set($catId = $sectionOrigList.get(0).getSectionTitle())
-      #set($catName = $sectionList.get(0).getSectionTitle())
-
-    ## Put previous category into map, get new catName and reset children map
-    #elseif($catCount &lt; $obj.getProperty("category").value)
-      #set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
-      $syntaxMenu.add($cat)
-      #set($catCount = $catCount + 1)
-      #set($catId = $sectionOrigList.get(0).getSectionTitle())
-      #set($catName = $sectionList.get(0).getSectionTitle())
-      #set($catChildren = [])
+    ## detect if we entered a new category
+    #if($catCount &lt; $obj.getProperty("category").value))
+      ## Put previous category into map (if existing), and reset children map
+      #if($catId)
+        #set($cat = { 'id' : $catId, 'name' : $catName, 'children' : $catChildren })
+        $syntaxMenu.add($cat)
+        #set($catChildren = [])
+      #end
+      ## extract new catId and catName values, and sectionTitle as we are already traveling the DOM
+      #foreach($headerBlock in $sectionDoc.getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 1)
+          #set($catId = $headerBlock.getId().substring(1))
+          #set($catName = $services.rendering.render($headerBlock, 'plain/1.0'))
+        #elseif($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break
+        #end
+      #end
+      #foreach($headerBlock in $sectionDoc.getTranslatedDocument().getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 1)
+          #set($catName = $services.rendering.render($headerBlock, 'plain/1.0'))
+        #elseif($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break ## otherwise finds nested example headlines 
+        #end
+      #end
+      #set($catCount = $obj.getProperty("category").value)
+    #else
+      ## still in same category, only need new section title
+      #foreach($headerBlock in $sectionDoc.getTranslatedDocument().getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break
+        #end
+      #end
     #end
 
-    ## Add new sections to children map
-    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxVersion").value, 'maxSyntax' : $obj.getProperty("maxSyntaxVersion").value, 'name' : $sectionList.get(1).getSectionTitle()})
+    ## Add new sections to category children map
+    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxVersion").value, 'maxSyntax' : $obj.getProperty("maxSyntaxVersion").value, 'name' : $sectionTitle})
     $catChildren.add($child)
   #end
 #end
-#set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
+#set($cat = { 'id' : $catId, 'name' : $catName, 'children' : $catChildren })
 $syntaxMenu.add($cat)
 
 
@@ -129,6 +154,7 @@ $syntaxMenu.add($cat)
 #foreach ($category in $syntaxMenu)
   #set ($sectionsToRemove = [])
   #foreach ($section on $category.children)
+    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
     #if ($section.minSyntax &gt; $crtSyntaxVer)
       #set ($discard = $sectionsToRemove.add($section))
       #if ($section.id == $crtSectionId)
@@ -198,6 +224,7 @@ $syntaxMenu.add($cat)
 #macro(syntax_displayCategory $sections $translationPrefix $heading)
   #foreach ($section in $sections)
     #set ($displayVersion = $crtSyntaxVer)
+    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
     #if ($crtSyntaxVer &gt; $section.maxSyntax)
       #set ($displayVersion = $section.maxSyntax)
     #end
@@ -250,7 +277,7 @@ $syntaxMenu.add($cat)
     #set ($crtSelection = "$extraParams")
   #end
 {{html}}
-  &lt;form id="change-context" class="xformInline" action=""&gt;
+  &lt;form id="change-context" class="xformInline" action="$doc.getURL()"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       #if ($request.language)

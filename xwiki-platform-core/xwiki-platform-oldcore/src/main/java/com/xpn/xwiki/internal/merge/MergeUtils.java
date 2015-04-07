@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Provide some 3 ways merging related methods.
- * 
+ *
  * @version $Id$
  * @since 4.1M1
  */
@@ -45,7 +45,7 @@ public final class MergeUtils
     /**
      * Used to do the actual merge.
      */
-    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+    private static final DiffManager DIFFMANAGER = Utils.getComponent(DiffManager.class);
 
     /**
      * Utility class.
@@ -57,7 +57,7 @@ public final class MergeUtils
 
     /**
      * Merge String at lines level.
-     * 
+     *
      * @param previousStr previous version of the string
      * @param newStr new version of the string
      * @param currentStr current version of the string
@@ -68,7 +68,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<String> result;
         try {
-            result = diffManager.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
+            result = DIFFMANAGER.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -88,7 +88,7 @@ public final class MergeUtils
 
     /**
      * Merge an Object. Use Object#equals to find conflicts.
-     * 
+     *
      * @param previousObject previous version of the object
      * @param newObject new version of the object
      * @param currentObject current version of the object
@@ -100,6 +100,7 @@ public final class MergeUtils
     {
         if (ObjectUtils.notEqual(previousObject, newObject)) {
             if (ObjectUtils.equals(previousObject, currentObject)) {
+                mergeResult.setModified(true);
                 return newObject;
             } else if (ObjectUtils.equals(newObject, currentObject)) {
                 return currentObject;
@@ -114,7 +115,7 @@ public final class MergeUtils
 
     /**
      * Merge String at characters level.
-     * 
+     *
      * @param previousStr previous version of the string
      * @param newStr new version of the string
      * @param currentStr current version of the string
@@ -125,7 +126,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<Character> result;
         try {
-            result = diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
+            result = DIFFMANAGER.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -145,7 +146,7 @@ public final class MergeUtils
 
     /**
      * Merge a {@link List}.
-     * 
+     *
      * @param <T> the type of the lists elements
      * @param commonAncestor previous version of the collection
      * @param next new version of the collection
@@ -156,10 +157,17 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<T> result;
         try {
-            result = diffManager.merge(commonAncestor, next, current, null);
+            result = DIFFMANAGER.merge(commonAncestor, next, current, null);
 
-            current.clear();
-            current.addAll(result.getMerged());
+            mergeResult.getLog().addAll(result.getLog());
+
+            List<T> merged = result.getMerged();
+
+            if (!ObjectUtils.equals(merged, current)) {
+                current.clear();
+                current.addAll(result.getMerged());
+                mergeResult.setModified(true);
+            }
         } catch (MergeException e) {
             mergeResult.getLog().error("Failed to execute merge lists", e);
         }

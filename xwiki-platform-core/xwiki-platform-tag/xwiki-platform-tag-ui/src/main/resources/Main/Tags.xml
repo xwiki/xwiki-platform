@@ -123,8 +123,10 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>h1.xapp {
-  border-bottom: 0px none;
+      <code>#template('colorThemeInit.vm')
+
+h1.xapp {
+  border-bottom: 0 none;
   margin: 0;
 }
 
@@ -137,8 +139,8 @@ h1.xapp * {
 }
 
 h1.xapp .highlight {
-  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% #FFC;
-  border: solid 1px #DDD;
+  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% $theme.backgroundSecondaryColor;
+  border: solid 1px $theme.borderColor;
   border-radius: 10px;
   display: inline-block;
   font-weight: bold;
@@ -147,9 +149,10 @@ h1.xapp .highlight {
 }
 
 h1.xapp .button {
-  background: no-repeat 3px 50% #FFD;
-  border: solid 1px #DDD;
+  background: no-repeat 3px 50% $theme.pageContentBackgroundColor;
+  border: solid 1px $theme.borderColor;
   border-radius: 7px;
+  color: $theme.linkColor;
   display : inline-block;
   font-size: 50%;
   font-weight: normal;
@@ -166,7 +169,7 @@ h1.xapp .rename {
 }
 
 h1.xapp .button:hover {
-  background-color: #EEF;
+  background-color: $theme.highlightColor;
   text-decoration: none;
 }
 </code>
@@ -252,7 +255,7 @@ $xwiki.ssx.use('Main.Tags')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="renameTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    $services.localization.render('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+    $services.localization.render('xe.tag.rename.renameto', [$htmlEscapedTag]) &lt;input type="text" name="renameTo" /&gt; &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.rename')" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;$services.localization.render('cancel')&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
@@ -282,7 +285,7 @@ $xwiki.ssx.use('Main.Tags')##
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input name="do" type="hidden" value="deleteTag" /&gt;
     &lt;input name="tag" type="hidden" value="$htmlEscapedTag" /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;Cancel&lt;/a&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$services.localization.render('xe.tag.delete', [$htmlEscapedTag])" class="button"/&gt;&lt;/span&gt;&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL('view', "do=viewTag&amp;tag=${urlEscapedTag}")" class="secondary button"&gt;$services.localization.render('cancel')&lt;/a&gt;&lt;/span&gt;
    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

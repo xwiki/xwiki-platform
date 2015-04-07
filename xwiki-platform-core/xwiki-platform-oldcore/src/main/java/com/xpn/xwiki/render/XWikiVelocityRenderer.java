@@ -25,10 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -38,12 +43,33 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
+@Component
+@Named("velocity")
+@Singleton
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
     /** Anything which doesn't contain any of these characters cannot be velocity code */
     private static final String VELOCITY_CHARACTERS = "$#";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiVelocityRenderer.class);
+
+    @Inject
+    private VelocityManager velocityManager;
+
+    @Override
+    public String getId()
+    {
+        return "velocity";
+    }
+
+    private VelocityManager getVelocityManager()
+    {
+        if (this.velocityManager == null) {
+            this.velocityManager = Utils.getComponent(VelocityManager.class);
+        }
+
+        return this.velocityManager;
+    }
 
     @Override
     public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
@@ -59,8 +85,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         if (StringUtils.containsNone(content, VELOCITY_CHARACTERS)) {
             return content;
         }
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
+
+        VelocityContext vcontext = getVelocityManager().getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");
 
         content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
@@ -105,8 +131,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
-            Object[] args = {name};
+            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
+            Object[] args = { name };
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
@@ -121,10 +147,10 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         List<String> unnamedparams = new ArrayList<String>();
         if ((param != null) && (!param.trim().equals(""))) {
             String[] params = StringUtils.split(param, "|");
-            for (int i = 0; i < params.length; i++) {
-                String[] rparam = StringUtils.split(params[i], "=");
+            for (String param2 : params) {
+                String[] rparam = StringUtils.split(param2, "=");
                 if (rparam.length == 1) {
-                    unnamedparams.add(params[i]);
+                    unnamedparams.add(param2);
                 } else {
                     namedparams.put(rparam[0], rparam[1]);
                 }

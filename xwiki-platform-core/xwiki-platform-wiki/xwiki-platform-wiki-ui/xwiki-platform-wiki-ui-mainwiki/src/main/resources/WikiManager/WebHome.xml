@@ -174,5 +174,6 @@
   #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'edit', 'delete'] }))
 #end
 #livetable('wikis', $columns, $columnsProperties, $options)
+#set($docextras=[])
 {{/velocity}}</content>
 </xwikidoc>

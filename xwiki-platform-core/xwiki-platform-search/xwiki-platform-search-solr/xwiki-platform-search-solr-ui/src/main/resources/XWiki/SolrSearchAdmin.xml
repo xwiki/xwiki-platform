@@ -123,7 +123,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jQueryNoConflict'], function($) {
+      <code>require(['jquery'], function($) {
   var displayTimeDelta = function(millis) {
     millis = Math.floor(millis);
     if (millis &lt; 1000) {
@@ -388,7 +388,7 @@ search=Main.SolrSearch</parameters>
   <content>{{velocity output='false'}}
 #macro (displaySolrIndexForm)
   {{html}}
-  &lt;form class="xform half" action="" method="post"&gt;
+  &lt;form class="xform half" action="$xwiki.relativeRequestURL" method="post"&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
     &lt;/div&gt;

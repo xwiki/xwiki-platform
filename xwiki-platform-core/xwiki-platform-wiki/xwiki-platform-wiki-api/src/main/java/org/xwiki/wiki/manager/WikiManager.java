@@ -20,7 +20,6 @@
 package org.xwiki.wiki.manager;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 
 /**
@@ -30,7 +29,6 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
  * @since 5.3M2
  */
 @Role
-@Unstable
 public interface WikiManager
 {
     /**

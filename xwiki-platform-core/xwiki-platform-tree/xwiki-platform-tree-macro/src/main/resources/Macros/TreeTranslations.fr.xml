@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>Macros.Tree</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1424704114000</creationDate>
+  <date>1424704928000</date>
+  <contentUpdateDate>1424704928000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+rendering.macro.tree.content.description=Vous pouvez utiliser les listes à puces HTML imbriqués pour décrire la structure de l'arbre. Voir http\://www.jstree.com/docs/html/ pour plus d'informations.
+rendering.macro.tree.description=Affiche une hiérarchie de l'arborescence définie par le contenu de la macro ou le paramètre source.
+rendering.macro.tree.name=Arbre
+rendering.macro.tree.parameter.checkboxes.description=Pour afficher une case à cocher devant chaque nœud de l'arbre. Cela permet à l'utilisateur de sélectionner plusieurs nœuds de l'arbre.
+rendering.macro.tree.parameter.checkboxes.name=Cases à cocher
+rendering.macro.tree.parameter.class.description=Classes CSS additionnelles à ajouter à l'élément HTML supérieur de l'arbre.
+rendering.macro.tree.parameter.class.name=Classe
+rendering.macro.tree.parameter.contextMenu.description=Pour afficher le menu contextuel lorsque l'utilisateur clique avec le bouton droit sur un noeud de l'arbre.
+rendering.macro.tree.parameter.contextMenu.name=Menu contextuel
+rendering.macro.tree.parameter.dragAndDrop.description=Indique si l'utilisateur doit être en mesure de glisser-déposer des noeuds de l'arbre.
+rendering.macro.tree.parameter.dragAndDrop.name=Glisser-déposer
+rendering.macro.tree.parameter.edges.description=Pour montrer les fils qui relient les noeuds de l'arbre de même niveau entre eux et avec leurs parents.
+rendering.macro.tree.parameter.edges.name=Fils
+rendering.macro.tree.parameter.finder.description=Affiche une entrée texte qui peut être utilisée pour trouver des noeuds de l'arbre. L'entrée est affichée au-dessus de l'arbre et offre des Suggestions automatiques basées sur le contenu de l'arbre pendant que vous tapez. Quand une suggestion est sélectionnée, l'arbre est étendu jusqu'au noeud correspondant.
+rendering.macro.tree.parameter.finder.name=Filtre
+rendering.macro.tree.parameter.icons.description=Pour afficher les icônes de noeud de l'arbre ou non. Vous pouvez masquer les icônes si tous les noeuds de l'arbre sont du même type ou si vous voulez gagner de l'espace horizontal.
+rendering.macro.tree.parameter.icons.name=Icônes
+rendering.macro.tree.parameter.links.description=Indique si les labels de noeud doivent ressembler ou se comporter comme des liens (ancres).
+rendering.macro.tree.parameter.links.name=Liens
+rendering.macro.tree.parameter.openTo.description=L'id du noeud pour ouvrir l'arbre. Tous les parents du noeud spécifié, jusqu'à la racine de l'arbre, seront également ouverts.
+rendering.macro.tree.parameter.openTo.name=Ouvrir à
+rendering.macro.tree.parameter.reference.description=La référence à la ressource décrivant la structure de l'arbre et de son menu contextuel et qui est appelée à effectuer les actions sur les noeuds de l'arbre. Cette ressource est utilisée pour charger l'arbre dynamiquement (sur demande) quand un noeud de l'arbre est ouvert et pour demander le menu contextuel lorsque l'utilisateur clique droit sur un nœud de l'arbre qui l'a. La ressource n'est donc pas statique. Pour les arbres statiques vous devez utiliser le contenu de la macro à la place. La référence peut être une référence de document ou une URL / chemin.
+rendering.macro.tree.parameter.reference.name=Référence
+rendering.macro.tree.parameter.root.description=L'identifiant du noeud de la racine. C'est utile si vous souhaitez afficher uniquement les héritiers d'un noeud donné (qui est la racine spécifiée). L'arbre affiche les enfants du noeud racine sur le premier niveau, de sorte que le noeud racine n'est pas réellement affiché. L'arbre entier s'affiche si le noeud racine n'est pas spécifié.
+rendering.macro.tree.parameter.root.name=Racine
+</content>
+</xwikidoc>

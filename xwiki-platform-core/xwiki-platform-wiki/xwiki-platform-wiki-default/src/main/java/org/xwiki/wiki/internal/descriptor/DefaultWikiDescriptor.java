@@ -36,6 +36,11 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     public static final EntityReference SERVER_CLASS = XWikiServerClassDocumentInitializer.SERVER_CLASS;
 
     /**
+     * Used to associate to a cache key the fact that no descriptor exist.
+     */
+    public static final DefaultWikiDescriptor VOID = new DefaultWikiDescriptor(null, null);
+
+    /**
      * Constructor.
      * @param wikiId ID of the wiki
      * @param wikiAlias Alias of the wiki

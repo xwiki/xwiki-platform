@@ -1,3 +1,4 @@
+##!privileged=true
 $response.setContentType("text/xml")
 ##
 #set($classname = $request.get("classname"))

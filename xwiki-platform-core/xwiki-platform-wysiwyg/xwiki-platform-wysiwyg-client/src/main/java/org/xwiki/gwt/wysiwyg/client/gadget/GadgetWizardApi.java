@@ -94,11 +94,23 @@ public class GadgetWizardApi implements WizardListener
 
     /**
      * Creates a new gadget wizard.
+     *
+     * @deprecated: Since 7.0M2. Use {@link #GadgetWizardApi(JavaScriptObject)} instead
      */
+    @Deprecated
     public GadgetWizardApi()
     {
-        // TODO: read this from parameters passed from javascript, instead of hardcoding it
-        this.config = new DefaultConfig(JavaScriptObject.fromJson("{syntax:'xwiki/2.0'}"));
+        this(JavaScriptObject.fromJson("{syntax:'xwiki/2.0'}"));
+    }
+
+    /**
+     * Creates a new gadget wizard.
+     *
+     * @param jsConfig the {@link JavaScriptObject} used to configure the newly created gadget
+     */
+    public GadgetWizardApi(JavaScriptObject jsConfig)
+    {
+        this.config = new DefaultConfig(jsConfig);
         this.macroService = new MacroServiceAsyncCacheProxy((MacroServiceAsync) GWT.create(MacroService.class));
     }
 
@@ -281,8 +293,12 @@ public class GadgetWizardApi implements WizardListener
         $wnd.XWiki = $wnd.XWiki || {}
 
         // Attach the Gadget wizard
-        $wnd.XWiki.GadgetWizard = function() {
-            this.instance = @org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::new()();
+        $wnd.XWiki.GadgetWizard = function(config) {
+            // Make sure we always have a config passed, even if an empty/default one, for backwards compatibility.
+            if (typeof config != 'object') {
+                config = { syntax : 'xwiki/2.0' };
+            }
+            this.instance = @org.xwiki.gwt.wysiwyg.client.gadget.GadgetWizardApi::new(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(config);
         }
         // attach the add function, which will start the insert wizard
         $wnd.XWiki.GadgetWizard.prototype.add = function(onComplete) {

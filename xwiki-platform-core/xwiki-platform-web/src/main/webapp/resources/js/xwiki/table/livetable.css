@@ -10,8 +10,10 @@
   float: left;
   line-height: 22px;
 }
-.xwiki-livetable-pagination .xwiki-livetable-limits {
+.skin-colibri .xwiki-livetable-pagination .xwiki-livetable-limits {
   float: left;
+}
+.xwiki-livetable-pagination .xwiki-livetable-limits {
   line-height: 22px;
 }
 .xwiki-livetable-pagination .xwiki-livetable-limits strong {
@@ -20,6 +22,9 @@
 .xwiki-livetable-pagination .xwiki-livetable-pagesize {
   line-height: 22px;
   margin-left: 5px;
+}
+.xwiki-livetable-pagination .xwiki-livetable-pagesize .pagesizeselect {
+  padding: 0;
 }
 .xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
   display: inline;
@@ -63,28 +68,28 @@
   overflow: hidden;
   border: none;
 }
-.controlPagination a.prevPagination , .controlPagination span.noPrevPagination, .controlPagination a.nextPagination, .controlPagination span.noNextPagination {
+.controlPagination .prevPagination , .controlPagination .noPrevPagination, .controlPagination .nextPagination, .controlPagination .noNextPagination {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
   width: 21px;
   height: 22px;
 }
-.controlPagination a.prevPagination:hover, .controlPagination a.nextPagination:hover {
+.controlPagination .prevPagination:hover, .controlPagination .nextPagination:hover {
   cursor: pointer;
 }
-.controlPagination a.noPrevPagination:hover, .controlPagination a.noNextPagination:hover {
+.controlPagination .noPrevPagination:hover, .controlPagination .noNextPagination:hover {
   cursor: default;
 }
-.controlPagination a.prevPagination {
+.controlPagination .prevPagination {
   background-position: left top;
 }
-.controlPagination span.noPrevPagination {
+.controlPagination .noPrevPagination {
   background-position: left bottom;
 }
-.controlPagination a.nextPagination {
+.controlPagination .nextPagination {
   background-position: right top;
   left: 21px;
 }
-.controlPagination span.noNextPagination {
+.controlPagination .noNextPagination {
   background-position: right bottom;
   left: 21px;
 }
@@ -194,12 +199,12 @@ tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-
   cursor: pointer;
 }
 tbody.xwiki-livetable-display-body td:hover.linkeditor {
-  background: $theme.highlightColor url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+  background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
   cursor: pointer;
 }
 tbody.xwiki-livetable-display-body td.linkeditor a.editableCellHover { /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
   display: block;
-  background: $theme.highlightColor url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+  background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
   cursor: pointer;
   color: $theme.textColor;
   padding-right: 16px;
@@ -221,6 +226,7 @@ tbody.xwiki-livetable-display-body td a.action {
   background-repeat: no-repeat;
   margin-right: 5px;
   padding-bottom: 1px;
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.action:hover {
   text-decoration: underline;
@@ -396,11 +402,13 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 }
 
 .icon-manage {
+  box-sizing: content-box; /* Needed by IE9- */
   cursor: pointer;
   padding-right: 10px;
 }
 
 .icon-manageg {
+  box-sizing: content-box; /* Needed by IE */
   padding-right: 10px;
 }
 

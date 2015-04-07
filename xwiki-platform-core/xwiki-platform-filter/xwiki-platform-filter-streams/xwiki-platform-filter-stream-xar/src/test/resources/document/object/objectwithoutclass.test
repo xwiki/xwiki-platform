@@ -1,0 +1,75 @@
+.#------------------------------------------------------------------------------
+.inputexpect|xwiki+xar/1.1
+.#------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <version>1.1</version>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <name>space.page</name>
+    <number>0</number>
+    <className>space.class</className>
+    <property>
+      <property1>value</property1>
+    </property>
+  </object>
+</xwikidoc>
+
+.#------------------------------------------------------------------------------
+.inputexpect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <p>
+      <parameters>
+        <entry>
+          <string>locale</string>
+          <locale></locale>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1.1">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <org.xwiki.rendering.syntax.Syntax>
+                <type>
+                  <name>XWiki</name>
+                  <id>xwiki</id>
+                </type>
+                <version>1.0</version>
+              </org.xwiki.rendering.syntax.Syntax>
+            </entry>
+            <entry>
+              <string>hidden</string>
+              <boolean>false</boolean>
+            </entry>
+          </parameters>
+        </p>
+        <wikiObject name="space.class[0]">
+          <p>
+            <parameters>
+              <entry>
+                <string>number</string>
+                <int>0</int>
+              </entry>
+              <entry>
+                <string>class_reference</string>
+                <string>space.class</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiObjectProperty name="property1" value="value"></wikiObjectProperty>
+        </wikiObject>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

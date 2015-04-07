@@ -20,7 +20,6 @@
 package org.xwiki.wiki.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -29,15 +28,12 @@ public class ExtendedViewPage extends ViewPage
     @FindBy(id = "tmCreateWiki")
     private WebElement createWikiMenuLink;
 
-    @FindBy(id = "tmWiki")
-    private WebElement wikiMenu;
-
     @FindBy(id = "tmDeleteWiki")
     private WebElement deleteWikiMenuLink;
 
     public CreateWikiPage createWiki()
     {
-        moveToCreateMenu();
+        toggleCreateMenu();
         this.createWikiMenuLink.click();
         return new CreateWikiPage();
     }
@@ -45,17 +41,9 @@ public class ExtendedViewPage extends ViewPage
     /**
      * @since 6.0M1
      */
-    public void moveToWikiMenu()
-    {
-        new Actions(getDriver()).moveToElement(wikiMenu).perform();
-    }
-
-    /**
-     * @since 6.0M1
-     */
     public DeleteWikiPage deleteWiki()
     {
-        moveToWikiMenu();
+        toggleWikiMenu();
         this.deleteWikiMenuLink.click();
         return new DeleteWikiPage();
     }

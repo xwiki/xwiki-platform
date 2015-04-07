@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiLock;
  * Action used for saving and proceeding to view the saved page.
  * <p>
  * Used as a generic action for saving documents.
- * 
+ *
  * @version $Id$
  */
 public class SaveAction extends PreviewAction
@@ -45,9 +45,14 @@ public class SaveAction extends PreviewAction
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
 
+    public SaveAction()
+    {
+        this.waitForXWikiInitialization = true;
+    }
+
     /**
      * Saves the current document, updated according to the parameters sent in the request.
-     * 
+     *
      * @param context The current request {@link XWikiContext context}.
      * @return <code>true</code> if there was an error and the response needs to render an error page,
      *         <code>false</code> if the document was correctly saved.
@@ -95,7 +100,6 @@ public class SaveAction extends PreviewAction
                 // Same as above, clone the object retrieved from the store cache.
                 tdoc = tdoc.clone();
             }
-            tdoc.setTranslation(1);
         }
 
         if (doc.isNew()) {

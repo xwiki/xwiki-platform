@@ -28,7 +28,7 @@ import org.xwiki.logging.event.LogEvent;
 
 /**
  * Report of what happen during merge.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */
@@ -96,7 +96,7 @@ public class MergeResult
      * Error raised during the merge.
      * <p>
      * Generally collision for which we don't know what do to at all.
-     * 
+     *
      * @return the merge errors
      * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
@@ -111,7 +111,7 @@ public class MergeResult
      * <p>
      * The difference with error is that in that case a decision which should be good (or at least safe enough) for most
      * of the case has been made.
-     * 
+     *
      * @return the merge warning
      * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
@@ -123,7 +123,7 @@ public class MergeResult
 
     /**
      * Add error.
-     * 
+     *
      * @param e the error
      * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */
@@ -135,7 +135,7 @@ public class MergeResult
 
     /**
      * Add warning.
-     * 
+     *
      * @param e the warning
      * @deprecated since 4.1RC1 use {@link #getLog()} instead
      */

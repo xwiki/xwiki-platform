@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
@@ -114,26 +115,26 @@ public class WikiUIExtensionComponentBuilderEventListener implements EventListen
     {
         boolean needsUpdate = false;
 
-        if (org.apache.commons.lang3.StringUtils.isBlank(doc.getCreator())) {
+        if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
             doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
-        if (org.apache.commons.lang3.StringUtils.isBlank(doc.getAuthor())) {
+        if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
             doc.setAuthorReference(doc.getCreatorReference());
         }
-        if (org.apache.commons.lang3.StringUtils.isBlank(doc.getParent())) {
+        if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
-        if (org.apache.commons.lang3.StringUtils.isBlank(doc.getTitle())) {
+        if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
             doc.setTitle(title);
         }
-        if (org.apache.commons.lang3.StringUtils.isBlank(doc.getContent())
+        if (StringUtils.isBlank(doc.getContent())
             || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {

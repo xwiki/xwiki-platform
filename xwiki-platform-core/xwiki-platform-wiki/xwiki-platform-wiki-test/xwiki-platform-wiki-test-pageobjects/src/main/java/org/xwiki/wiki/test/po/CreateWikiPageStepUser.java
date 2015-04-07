@@ -21,38 +21,37 @@ package org.xwiki.wiki.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.editor.UserPicker;
 
 public class CreateWikiPageStepUser extends ExtendedViewPage
 {
+    @FindBy(id = "owner")
+    private WebElement ownerInput;
+
     @FindBy(id = "wizard-create")
     private WebElement createButton;
-
-    public static String getSpace()
-    {
-        return "WikiManager";
-    }
-
-    public static String getPage()
-    {
-        return "CreateNewWiki";
-    }
 
     public boolean isCreateButtonEnabled()
     {
         return createButton.isEnabled();
     }
-
-    public WikiHomePage createWithoutTemplate()
+    
+    public WikiCreationPage create()
     {
         createButton.click();
-        waitUntilPageIsLoaded();
-        return new WikiHomePage();
+        return new WikiCreationPage();
+        
     }
 
-    public CreateWikiPageStepProvisioning createWithTemplate()
+    public UserPicker getOwnerPicker()
     {
-        createButton.click();
-        waitUntilPageIsLoaded();
-        return new CreateWikiPageStepProvisioning();
+        return new UserPicker(this.ownerInput);
+    }
+
+    @Override
+    public CreateWikiPageStepUser waitUntilPageIsLoaded()
+    {
+        getOwnerPicker().waitToLoad();
+        return this;
     }
 }

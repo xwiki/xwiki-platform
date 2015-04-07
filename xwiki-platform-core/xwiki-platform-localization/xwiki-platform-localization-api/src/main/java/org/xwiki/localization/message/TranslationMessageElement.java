@@ -24,7 +24,6 @@ import java.util.Locale;
 
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * An element in a translation message.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.0M2
  */
-@Unstable
 public interface TranslationMessageElement
 {
     /**

@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
  * This is a temporary bridge to allow non components to call Utils.getComponent() and get a component instance without
  * having to pass around a XWiki Context (in order to retrieve the Servlet Context to get the component manager from an
  * attribute).
- * 
+ *
  * @version $Id$
  * @since 2.0M2
  */

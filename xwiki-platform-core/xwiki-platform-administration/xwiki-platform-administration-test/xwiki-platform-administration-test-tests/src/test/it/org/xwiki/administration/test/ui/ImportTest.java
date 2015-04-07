@@ -42,7 +42,7 @@ import org.xwiki.test.ui.po.ViewPage;
 public class ImportTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
@@ -108,8 +108,8 @@ public class ImportTest extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("4.1", history.getCurrentVersion());
-        Assert.assertEquals("Imported from XAR", history.getCurrentVersionComment());
+        Assert.assertEquals("3.1", history.getCurrentVersion());
+        Assert.assertEquals("A third version of the document", history.getCurrentVersionComment());
         Assert.assertTrue(history.hasVersionWithSummary("A new version of the document"));
     }
 

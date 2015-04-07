@@ -35,7 +35,7 @@ import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 public class AdministrationTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     /**
      * This method makes the following tests :
@@ -61,7 +61,6 @@ public class AdministrationTest extends AbstractTest
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Admin UI extension
         Assert.assertTrue(administrationPage.hasSection("Editing"));
         Assert.assertTrue(administrationPage.hasSection("Localization"));
-        Assert.assertTrue(administrationPage.hasSection("Email"));
         Assert.assertTrue(administrationPage.hasSection("Presentation"));
         Assert.assertTrue(administrationPage.hasSection("Elements"));
         Assert.assertTrue(administrationPage.hasSection("Registration"));
@@ -78,7 +77,7 @@ public class AdministrationTest extends AbstractTest
 
         // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
         // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        getDriver().waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
         // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 
@@ -89,7 +88,6 @@ public class AdministrationTest extends AbstractTest
         // All those sections should not be present
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Editing"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Localization"));
-        Assert.assertTrue(spaceAdministrationPage.hasNotSection("Email"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Registration"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Users"));
         Assert.assertTrue(spaceAdministrationPage.hasNotSection("Groups"));

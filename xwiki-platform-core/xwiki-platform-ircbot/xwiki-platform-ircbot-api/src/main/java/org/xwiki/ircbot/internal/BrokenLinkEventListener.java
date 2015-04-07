@@ -130,7 +130,7 @@ public class BrokenLinkEventListener implements EventListener
      */
     private String getSerializedLinkData(Map<String, Object> contextData)
     {
-        StringBuffer dataString = new StringBuffer();
+        StringBuilder dataString = new StringBuilder();
         if (contextData != null) {
             Iterator<Map.Entry<String, Object>> it = contextData.entrySet().iterator();
             while (it.hasNext()) {

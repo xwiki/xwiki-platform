@@ -21,14 +21,16 @@ package org.xwiki.search.solr.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -55,11 +57,6 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
      * Solr instance type for this implementation.
      */
     public static final String TYPE = "embedded";
-
-    /**
-     * Solr home directory system property.
-     */
-    public static final String SOLR_HOME_SYSTEM_PROPERTY = "solr.solr.home";
 
     /**
      * Default directory name for Solr's configuration and index files.
@@ -93,11 +90,10 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
 
             // Start embedded Solr server.
             this.logger.info("Starting embedded Solr server...");
-            System.setProperty(SOLR_HOME_SYSTEM_PROPERTY, solrHome);
-            this.logger.info("Using Solr home directory: {}", solrHome);
+            this.logger.info("Using Solr home directory: [{}]", solrHome);
 
             // Initialize the SOLR back-end using an embedded server.
-            this.container = createCoreContainer();
+            this.container = createCoreContainer(solrHome);
             // If we get here then there is at least one core found. We there are more, we use the first one.
             String coreName = this.container.getCores().iterator().next().getName();
             this.server = new EmbeddedSolrServer(container, coreName);
@@ -105,13 +101,13 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
             throw new InitializationException(String.format(
-                "Failed to initialize the solr embedded server with home directory set to '%s'", solrHome), e);
+                "Failed to initialize the Solr embedded server with home directory set to [%s]", solrHome), e);
         }
     }
 
-    private CoreContainer createCoreContainer() throws SolrServerException
+    private CoreContainer createCoreContainer(String solrHome) throws SolrServerException
     {
-        CoreContainer coreContainer = new CoreContainer();
+        CoreContainer coreContainer = new CoreContainer(solrHome);
         coreContainer.load();
         if (coreContainer.getCores().size() == 0) {
             throw new SolrServerException("Failed to initialize the Solr core. "
@@ -160,37 +156,40 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             // Exists but is unusable.
             if (!solrHomeDirectory.isDirectory() || !solrHomeDirectory.canWrite() || !solrHomeDirectory.canRead()) {
                 throw new IllegalArgumentException(String.format(
-                    "The given path '%s' must be a readable and writable directory", solrHomeDirectory));
+                    "The given path [%s] must be a readable and writable directory", solrHomeDirectory));
             }
         } else {
             // Create the home directory
             if (!solrHomeDirectory.mkdirs()) {
                 // Does not exist and can not be created.
                 throw new IllegalArgumentException(String.format(
-                    "The given path '%s' could not be created due to insufficient filesystem permissions",
-                    solrHomeDirectory));
+                    "The given path [%s] could not be created due to and invalid value %s", solrHomeDirectory,
+                    "or to insufficient filesystem permissions"));
             }
 
             // Initialize the Solr Home with the default configuration files if the folder does not already exist.
             // Add the configuration files required by Solr.
-            Map<String, URL> homeDirectoryConfiguration = this.solrConfiguration.getHomeDirectoryConfiguration();
-            for (Map.Entry<String, URL> file : homeDirectoryConfiguration.entrySet()) {
-                File destinationFile = new File(solrHomeDirectory, file.getKey());
-                FileUtils.copyURLToFile(file.getValue(), destinationFile);
+
+            InputStream stream = this.solrConfiguration.getHomeDirectoryConfiguration();
+            try (ZipInputStream zstream = new ZipInputStream(stream)) {
+                for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
+                    if (entry.isDirectory()) {
+                        File destinationDirectory = new File(solrHomeDirectory, entry.getName());
+                        destinationDirectory.mkdirs();
+                    } else {
+                        File destinationFile = new File(solrHomeDirectory, entry.getName());
+                        FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), destinationFile);
+                    }
+                }
             }
         }
     }
 
     /**
-     * @return the home directory determined from the {@value #SOLR_HOME_SYSTEM_PROPERTY} system property, configuration
-     *         or default location (in that order).
+     * @return the configured home directory location or the default value if no configuration is present.
      */
     private String determineHomeDirectory()
     {
-        if (StringUtils.isNotBlank(System.getProperty(SOLR_HOME_SYSTEM_PROPERTY))) {
-            return System.getProperty(SOLR_HOME_SYSTEM_PROPERTY);
-        }
-
         String defaultValue = getDefaultHomeDirectory();
 
         return this.solrConfiguration.getInstanceConfiguration(TYPE, "home", defaultValue);

@@ -1,0 +1,383 @@
+//
+// Misc
+// --------------------------------------------------
+
+// Left menu2 =================================================================
+.leftmenu2 {
+  background-color: #F0F0EE; 
+  padding: 5px;
+  a {
+    img {
+      margin: 2px;
+    }
+  }
+}
+
+// Tabbar =====================================================================
+
+.xwikitabbar { // Used by: AllDocs, DocExtra
+  .nav;
+  .nav-tabs;
+  margin: 0;
+}
+
+// Labels =====================================================================
+
+.language {
+  &-translation, 
+  &-default {
+    .label;
+    .label-default;
+    font-weight: 400;
+  }
+  &-default {
+    font-style: italic;
+  }
+  &-current {
+    .label-primary;
+    font-weight: 700;
+  }
+}
+
+// XDialogs ===================================================================
+
+.xdialog-content {
+  .buttonwrapper {
+    input.button{
+      margin: 2px;
+    }
+  }
+}
+
+// Wiki Code =================================================================
+
+.wiki-code {
+  width: 100%;
+}
+
+// Comments ==================================================================
+
+.commentcontent {
+  overflow-x: auto;
+}
+
+// Messages ===================================================================
+
+/* Used by: Toc, Box Macros */
+.floatinginfobox {
+  float: right;
+  margin: @padding-base-vertical 0 @padding-base-vertical @padding-base-horizontal;
+}
+
+// AllDocs Tree ===============================================================
+
+#XWEWrapper {
+  margin: 2px 0 (30px + @input-height-base);
+  .listGrid {
+    border-width: 0;
+    display: block !important; // Some browsers display this element distanced from the input
+    & div:first-child {
+      outline: none;
+      top: 0 !important; // Some browsers have this element distanced with 8px from the main container
+      left: 0 !important;
+    }
+    .gridBody {
+      overflow: hidden; // IE11
+    } 
+    table {
+      width: auto;
+    }
+    tr > td:first-child { // IE11 - the first column is too large
+      width: 0;
+    }
+    td {
+      vertical-align: baseline;
+    }
+    .vScrollThumb td, .vScrollThumbOver td, #isc_4 td {
+      vertical-align: middle; // Center grip in the middle of the scrollbar
+    }
+    #isc_4 { // Scrollbar area
+      background-image: -ms-linear-gradient(left, #f5f5f5 0%, #e8e8e9 50%, #d7d9da 50%, #caccce 82%, #c0c2c4 100%); // IE10
+      border: 1px solid #ababab; // IE10
+      width: 15px !important; // IE10
+      table {
+        width: 100%; // IE10
+      }
+    }
+    #isc_3 {
+      width: 15px !important; // IE10
+      height: auto !important; // IE10
+    }
+  }
+}
+
+#Treeview_Input {
+  box-sizing: content-box;
+  padding: 1px;
+}
+
+
+// Bugs =======================================================================
+
+// FIX: Administration: Panel Wizard
+.xwikitabbar {
+  #panelEditorSteps& { // PROBLEM: Mapping and usage
+    &>li { 
+      float: none;
+      display: inline-block;
+    }
+    &:after {
+      clear: none;
+    }
+  }
+}
+
+// FIX: Editor
+.editor-wysiwyg #titleinput { // IMPROVEMENT: Better spacing
+  //padding-bottom: @padding-grid-vertical;
+}
+
+// FIX: Livetables
+.xwiki-livetable {
+  .pagesizeselect { // PROBLEM: General styling reset
+    height: auto;
+  }
+}
+
+// FIX: Livetables, History Table
+.xwiki-livetable,
+.paginationFilter {
+  .pagination { // PROBLEM: Usage of a class with meaning inside Bootstrap
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+// FIX: WYSIWYG
+.gwt-MenuBar-horizontal { // PROBLEM: General styling reset
+  table {
+    width: auto; 
+  }
+}
+
+.gwt-MenuBarPopup, // PROBLEM: General styling reset
+.gwt-PopupPanel {
+  & table { 
+    margin-bottom: 0;
+    td {
+      padding: 0;
+      border-top: 0;
+    }
+  }
+}
+
+// FIX: History Table
+.xwikidatatable .row:after, .xwikidatatable .row:before { // PROBLEM: Usage of a class with meaning inside Bootstrap
+  display: none;
+}
+
+// FIX: User Profile labels
+.user-page-pane .label { // PROBLEM: Usage of a class with meaning inside Bootstrap
+  display: inherit;
+  font-size: inherit;
+  padding: inherit;
+  text-align: left;
+  white-space: normal;
+}
+
+// FIX: Blog Post footer
+.entry-footer address { // PROBLEM: Usage of a class with meaning inside Bootstrap
+  display: inline;
+  margin: 0;
+}
+
+// FIX: Date Picker
+.skin-flamingo .calendar_date_select {
+  width: auto;
+  div.cds_header select.month {
+    width: 9em;
+  }
+  div.cds_header select.year {
+    width: 7em;
+  }
+  td {
+    padding: 0;
+  }
+}
+
+// FIX: Auto-save
+.skin-flamingo #autosaveControl input.autosave-frequency {
+  width: 3em;
+}
+
+// FIX: user profile
+.skin-flamingo {
+  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before {
+    display: none;
+  }
+}
+
+// FIX: file upload
+.skin-flamingo {
+  .upload-status-container {
+    .buttonwrapper a, .upload-canceled-label {
+      .btn-xs();
+    }
+  }
+}
+
+// FIX: app bar
+.applicationPanelMoreContainer ul li > span > a {
+  &:extend(.nav > li > a);
+  &:extend(.nav-pills > li > a);
+  
+  &:hover {
+    &:extend(.nav > li > a:hover);
+  }
+}
+
+// FIX: login
+#loginForm {
+  .panel {
+    max-width: 450px;
+    margin: auto;
+    text-align: left;
+  }
+  .xAdditional {
+    font-size: .8em;
+    font-weight: normal;
+    float: right;
+    margin-top: .3em;
+  }
+}
+
+// FIX: User profile
+.skin-flamingo {
+  #user-menu-col {
+    width: 13em;
+    @media (max-width: @screen-xs-min) {
+      float: none;
+      margin: auto;
+    }
+  }
+
+  #user-page-content {
+    @media (max-width: @screen-xs-min) {
+      margin-left: 0;
+    }
+  }
+}
+
+// FIX: Syntax help page (XWIKI-10675)
+.syntax-menu:extend(.admin-menu all) {}
+#syntax-page-content:extend(#admin-page-content all) {}
+.skin-flamingo {
+  #syntax-page-content {
+    margin-left: 0;
+  }
+}
+
+// FIX: do no use .hidden (see: XWIKI-10827) but must be invisible
+#docextraanchors {
+  .invisible();
+  font-size: 0px;
+}
+
+
+// Fix: Glyphicon: the space icon has a bad width
+// (see: http://jira.xwiki.org/browse/XWIKI-10835)
+.glyphicon-folder-open:before {
+  margin-right: 3px;
+}
+
+// Export ---------------------------------------------------------------------
+#exportModal {
+  .modal-body {
+    a, button {
+      margin: 2px;
+    }
+  }
+}
+
+// Loading --------------------------------------------------------------------
+.loading {
+  background: transparent url(@xwiki-icon-spinner) no-repeat center;
+}
+
+// Importer -------------------------------------------------------------------
+#package .checkbox {
+  margin: 0 -2px 0 0;
+}
+
+// Viewer = changes -----------------------------------------------------------
+#changes-info {
+  background-color: @xwiki-background-secondary-color;
+  border: @border-width solid @xwiki-border-color;
+  margin-top: (@grid-gutter-width / 2);
+  padding-top: (@grid-gutter-width / 2);
+  padding-bottom: (@grid-gutter-width / 2);
+  position: relative;
+  /* Background arrow */
+  &:before {
+    background: @xwiki-page-content-bg;
+    height: 2em;
+    right: 50%;
+    top: 4em;
+    width: 2em;
+  }
+  &:after {
+    border-bottom: 2em solid transparent;
+    border-left: 3em solid @xwiki-page-content-bg;
+    border-top: 2em solid transparent;
+    left: 50%;
+    top: 3em;
+  }
+  &:before, &:after {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+}
+
+.changes-info-box {
+  .make-sm-column(6, @main-padding);
+}
+
+.changes-info-box, #changes-info-comment {
+  text-align: center;
+}
+
+.changes-info-title {
+  .h3;
+}
+
+@media (max-width: @screen-xs-max) {
+  #changes-info:before, #changes-info:after {
+    display: none; /* Hide the arrow for small resolutions */
+  }
+}
+
+// Panels Layout --------------------------------------------------------------
+/* Content Panels are defined in macros.vm in #displayPanelLayout and used in applications like Statistics */
+
+.panellayoutcol {
+  .panellayoutcontainer-1col &, .panellayoutcontainer-2col &, .panellayoutcontainer-3col &, .panellayoutcontainer-4col & {
+    .make-xs-column(12);
+    & .xwikipanelcontents {
+      overflow: auto;
+    }
+  }
+  .panellayoutcontainer-2col & {
+    .make-sm-column(6);
+  }
+  .panellayoutcontainer-3col & {
+    .make-sm-column(4);
+  }
+  .panellayoutcontainer-4col & {
+    .make-sm-column(3);
+  }
+}
+
+.panellayoutcontainer-1col, .panellayoutcontainer-2col, .panellayoutcontainer-3col, .panellayoutcontainer-4col {
+  .clearfix();
+}

@@ -59,8 +59,7 @@ public class ProgressBarPane extends BaseElement
      */
     public int getPercent()
     {
-        WebElement progressBar =
-            getUtil().findElementWithoutWaiting(getDriver(), container, By.className("ui-progress-bar"));
+        WebElement progressBar = getDriver().findElementWithoutWaiting(container, By.className("ui-progress-bar"));
         String style = progressBar.getAttribute("style");
         Matcher matcher = PERCENT_PATTERN.matcher(style);
         return matcher.find() ? Integer.parseInt(matcher.group(1)) : -1;
@@ -71,7 +70,6 @@ public class ProgressBarPane extends BaseElement
      */
     public String getMessage()
     {
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.className("ui-progress-message"))
-            .getText();
+        return getDriver().findElementWithoutWaiting(container, By.className("ui-progress-message")).getText();
     }
 }

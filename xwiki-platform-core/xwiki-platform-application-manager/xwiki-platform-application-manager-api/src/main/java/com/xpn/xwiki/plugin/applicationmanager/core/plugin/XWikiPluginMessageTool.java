@@ -33,6 +33,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
  * Plugin internationalization service based {@link XWikiMessageTool}.
  * 
  * @version $Id$
+ * @deprecated since 4.3M2 use the {@link org.xwiki.localization.LocalizationManager} component instead
  */
 @Deprecated
 public class XWikiPluginMessageTool extends XWikiMessageTool

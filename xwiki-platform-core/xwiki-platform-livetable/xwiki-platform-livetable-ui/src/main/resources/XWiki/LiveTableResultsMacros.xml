@@ -27,12 +27,12 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393535342000</creationDate>
+  <creationDate>1393531742000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1393542378000</date>
-  <contentUpdateDate>1393542368000</contentUpdateDate>
+  <date>1415643297000</date>
+  <contentUpdateDate>1415643297000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <comment/>
@@ -55,11 +55,11 @@
  * NOTE: This macro is not fully encapsulated because it defines a few Velocity variables that are used in subsequent macros.
  *#
 #macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
-  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  ## Additional columns; should *not* contain raw parameters, all added column names must be filtered
   #set($fromSql = '')
-  ## parametrized filter part of the query
+  ## Parametrized filter part of the query
   #set($whereSql = '')
-  ## list of parameters to use with $whereSql
+  ## List of values to use with $whereSql
   #set($whereParams = [])
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
@@ -91,41 +91,72 @@
   ##
   ## Order
   ##
+  ## if the object for the classname of the order column is not already in the from sql, put it
+  #macro(addObjectClause $objectAlias)
+    #if($fromSql.indexOf($objectAlias) &lt; 0)
+      #set($fromSql = "${fromSql}, BaseObject $objectAlias")
+      #set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
+      #set($discard = $whereParams.add($propClassName))
+    #end
+  #end
+  ## Set the order clause for a field. We first ignore the case using the lower function (so that e.g. 'aaa' equals 'AAA')
+  ## but then consider it only for equal values (so that e.g. 'AAA' comes before 'aaa').
+  #macro(setOrderClause $fieldName $direction $useRawValue)
+    #if ($useRawValue)
+      #set($orderSql = " order by ${fieldName} ${direction}")
+    #else
+      #set($orderSql = " order by lower(${fieldName}) ${direction}, ${fieldName} ${direction}")
+    #end
+  #end
   #set($order = "$!request.sort")
+  #set ($orderSql = '')
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
       #set($orderDirection = 'desc')
     #end
-    #if($order == 'description')
-      #set($tableAlias = 'dtable')
-    #else
-      #set($tableAlias = $order)
-    #end
-    ## only safe version should be used in SQL queries
-    #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+    ## Only safe version should be used in SQL queries
+    #set($safe_tableAlias = $order.replaceAll('[^a-zA-Z0-9_.]', ''))
     ##
     #if($order.startsWith('doc.'))
-      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
-    #elseif($tablelist.contains($tableAlias))
-      #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
-      #if ($multiselect != '1')
-        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
-      #end
-    #elseif($order == 'averagevote')
-      #livetable_getTableName($order)
-      #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-      #set($discard = $whereParams.add("${order}"))
-      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      ## The column is a document field.
+      ##
+      ## These document fields need to be ordered as raw values and not as strings.
+      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements', 'minorEdit1', 'hidden'])
+      #set($documentField = $stringtool.removeStart($order, 'doc.'))
+      #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection},  $rawDocumentFields.contains($documentField))
     #else
-      #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
-      #if("$multiselect" != '1')
-        #livetable_getTableName($order)
-        #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-        #set($discard = $whereParams.add("${order}"))
-        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      ## The column is an object property.
+      ##
+      ## Resolve the property.
+      #livetable_getPropertyClassAndType($order)
+      #set ($multiselect = "$!{propClass.get($order).getProperty('multiSelect').getValue()}")
+      ## We can only handle single values, not multiselect ones.
+      #if ($multiselect != '1')
+        ## Some property types do not need lowercasing since they have unique values by design, so we use the raw values to order.
+        #set($rawPropertyTypes = ['NumberClass', 'BooleanClass', 'DateClass', 'LevelsClass'])
+        ## If the order column is also a filer column, this means that it was already added to the query and all we need to do is to add it to the order clause.
+        #if(!$tablelist.contains($order))
+          ## The order column is not also a filter column, so not yet defined in the query.
+          ## We need to first define it (to the from and where clauses) before we can add it to the order clause.
+          ##
+          ## Resolve the table name of the property to be used in the from clause below.
+          #livetable_getTableName($order)
+          ## If the sort column has a _class specified, join that object in
+          #set($orderObjectAlias = 'obj')
+          #if($propClassName != '' &amp;&amp; "$!propClass" != '')
+            ## prepare the alias of the BaseObject table that corresponds to the class of this column
+            #set($orderObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]', '')}_obj")
+            #addObjectClause($orderObjectAlias)
+          #end
+          #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+          ## FIXME: Check if this is indeed a property of the class. Hint: $propType can be used.
+          ## Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
+          #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+          #set($discard = $whereParams.add("${order}"))
+        #end
+        ## Add the column to the order clause.
+        #setOrderClause("${safe_tableAlias}.value", ${orderDirection}, $rawPropertyTypes.contains($propType))
       #end
     #end
   #end
@@ -138,7 +169,7 @@
   #set($allMatchingParams = [])
   #if("$!className" != '')
     ## Class query
-    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
     #set($discard = $sqlParams.addAll($whereParams))
     ##
@@ -158,7 +189,7 @@
     #end
   #else
     ## Document query
-    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($sql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
@@ -174,7 +205,9 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #set($sql = "$countSql $!{orderSql}")
+  #if($orderSql != '')
+    #set($sql = "$sql $!{orderSql}")
+  #end
 #end
 
 
@@ -217,19 +250,19 @@
  *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
+  ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
-  #if (!$offset || $offset &lt; 0)
+  #if(!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
   #set($limit = $mathtool.toInteger($request.get('limit')))
-  #if (!$limit)
+  #if(!$limit)
     #set ($limit = 15)
   #end
   #set($query = $services.query.hql($sql))
   ## Apply query filters if defined. Otherwise use default.
   #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
-    #set ($query = $query.addFilter($queryFilter)) 
+    #set ($query = $query.addFilter($queryFilter))
   #end
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
@@ -254,7 +287,7 @@
 #macro(gridresult_buildRowJSON $item $rows)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
   ## only the document name is returned. When more than the document name is returned the $item variable is a list.
-  #if ($item.size())
+  #if($item.size())
     ## Extract doc name and doc language from $item
     #set($docName = $item[0])
     #set($docLanguage = $item[1])
@@ -270,16 +303,16 @@
     #set($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
     ## result is a translation.
-    #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+    #if("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
       #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
       #set($isTranslation = true)
     #else
-      #set($translatedDoc = $itemDoc)
+      #set($translatedDoc = $itemDoc.translatedDocument)
       #set($isTranslation = false)
     #end
     #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
     #set($discard = $itemDoc.use($className))
-    #if ($isTranslation)
+    #if($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
       #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
     #else
@@ -294,6 +327,8 @@
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
+    #set($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
+    #set($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
@@ -302,9 +337,9 @@
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
-    #set($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
+    #set($discard = $row.put('doc_author', $xwiki.getPlainUserName($translatedDoc.authorReference)))
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
+    #set($discard = $row.put('doc_creator', $xwiki.getPlainUserName($translatedDoc.creatorReference)))
     #foreach($colname in $collist)
       #gridresult_buildColumnJSON($colname $row)
     #end
@@ -334,17 +369,9 @@
     #livetable_getImagesList($itemDoc)
     #set($discard = $row.put($colname, $imagesList))
   #else
-    #set($propClassName = "$!request.get($colname.concat('_class'))")
-    #if($propClassName != '')
-      #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+    #livetable_getPropertyClassAndType($colname)
+    #if(!$propClass.equals($class))
       #set($discard = $itemDoc.use($propClassName))
-    #else
-      #set($propClass = $class)
-    #end
-    ## Retrieve the property type as it might be usefull
-    #set($propType = '')
-    #if($listtool.contains($propClass.getPropertyNames(), $colname))
-      #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")
     #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
@@ -352,7 +379,7 @@
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
     #set($fieldUrl = '')
-    ## only retrieve an URL for a DBListClass item
+    ## Only retrieve an URL for a DBListClass item
     #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
       #set($fieldUrl = $xwiki.getURL($fieldValue))
       #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
@@ -362,7 +389,7 @@
     #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     #set($discard = $row.put("${colname}_url", $fieldUrl))
-    ## reset to the default class
+    ## Reset to the default class
     #set($discard = $itemDoc.use($className))
   #end
 #end
@@ -377,7 +404,6 @@
   #gridresultwithfilter_buildQuery($className $collist $filterfrom $filterwhere $filterParams)
   #if("$!request.sql" == '1')
     #set($discard = $map.put('sql', $sql))
-    #set($discard = $map.put('countsql', $countSql))
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))
@@ -417,16 +443,7 @@
  * NOTE the resulting $tableName is safe to use inside SQL queries
  *#
 #macro(livetable_getTableName $colname)
-  #set($propClassName = "$!request.get(${colname.concat('_class')})")
-  #if($propClassName != '')
-    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
-  #else
-    #set($propClass = $class)
-  #end
-  #set($propType = '')
-  #if($listtool.contains($propClass.getPropertyNames(), $colname))
-    #set($propType = "$!{propClass.get($colname).type}")
-  #end
+  #livetable_getPropertyClassAndType($colname)
   #if($propType == 'NumberClass')
     #set($numberType = $propClass.get($colname).getProperty('numberType').getValue())
     #if($numberType == 'integer')
@@ -458,6 +475,22 @@
     #end
   #else
     #set($tableName = 'StringProperty')
+  #end
+#end
+
+#**
+ * Get the property class and type for a given livetable column.
+ *#
+#macro(livetable_getPropertyClassAndType $colname)
+  #set($propClassName = "$!request.get(${colname.concat('_class')})")
+  #if($propClassName != '')
+    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+  #else
+    #set($propClass = $class)
+  #end
+  #set($propType = '')
+  #if($propClass.getPropertyNames().contains($colname))
+    #set($propType = "$!{propClass.get($colname).type}")
   #end
 #end
 
@@ -538,90 +571,186 @@
  * Macro to extend the query to select the properties for the livetable columns.
  * NOTE $colname is filtered (all characters but [a-zA-Z0-9_.] are removed) before use
  *#
-#macro(livetable_addColumnToQuery $colname)
- ## Safe because / is not allowed in property names
- #set ($joinModeMarker = "/join_mode")
- #if (!$colname.endsWith($joinModeMarker))
-  #set ($filterValue = "$!{request.get($colname)}")
-  #if($colname == 'description')
-    #set($tableAlias = 'dtable')
-  #else
-    #set($tableAlias = $colname)
-  #end
-  ## only safe versions should be used in SQL queries
-  #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
-  #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
-  ##
-  #set($propType = '')
-  #set($propClassName = "$!request.get(${colname.concat('_class')})")
-  #if($propClassName != '')
-    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
-  #else
-    #set($propClass = $class)
-  #end
-  #if($propClass &amp;&amp; $listtool.contains($propClass.getPropertyNames(), $colname))
-    #set($propType = "$!{propClass.get($colname).type}")
-  #end
-  ##
-  ## Filter values
-  #if("$!filterValue" != '')
-    #set($discard = $tablelist.add($tableAlias))
-    #if($colname.startsWith('doc.'))
-      #set($whereSql = "${whereSql} and upper(str(${safe_colname.replace('_','.')})) like upper(?)")
-      #set($discard = $whereParams.add("%${filterValue}%"))
-    #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
-      #livetable_getTableName($colname)
-      #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($discard = $whereParams.addAll(["${colname}", $mathtool.toInteger(${filterValue})]))
-    #elseif($propType == 'DateClass')
-      #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
-    #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
-      #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
-    #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
-      #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
-      #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
-      #if($multiSelect == 1)
-        #if($relationalStorage == 1)
-          #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-          #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
-            #set ($joinOperator = 'AND')
-          #end
-          #foreach ($filterValue in $request.getParameterValues($colname))
-            #if ($foreach.isFirst())
-              #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
-              #set ($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
-              #set ($discard = $whereParams.add("${colname}"))
-            #else
-              #set ($whereSql = "${whereSql} ${joinOperator}")
-            #end
-            #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
-            #set ($discard = $whereParams.add("${filterValue}"))
-            #if ($foreach.isLast())
-              #set ($whereSql = "${whereSql})")
-            #end
-          #end
-        #else
-          #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
-          #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
-          #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
-        #end
+#macro (livetable_addColumnToQuery $colName)
+  ## Safe because / is not allowed in property names
+  ## The $joinModeMarker is used in #livetable_filterDBStringListProperty.
+  #set ($joinModeMarker = "/join_mode")
+  #if (!$colName.endsWith($joinModeMarker))
+    #set ($filterValue = "$!request.getParameter($colName)")
+    #if ("$!filterValue" != '')
+      #set ($discard = $tablelist.add($colName))
+      #if ($colName.startsWith('doc.'))
+        #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
+        #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
+        #set ($discard = $whereParams.add("%$filterValue%"))
       #else
-        #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-        #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
+        #livetable_filterProperty($colName $filterValue)
       #end
-    #else
-      #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
     #end
   #end
- #end
+#end
+
+
+#macro (livetable_filterProperty $colname $filterValue)
+  ## Only safe version should be used in SQL queries
+  #set ($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
+  #livetable_getTableName($colname)
+  #set ($fromSql = "$fromSql, $tableName as $safe_tableAlias")
+  ##
+  ## If the column is not from $class, we need to make sure we join with the proper table.
+  #set ($filterObjectAlias = 'obj')
+  #set ($propClass = $class)
+  #set ($propClassName = $request.getParameter("${colname}_class"))
+  #if ("$!propClassName" != '')
+    #set ($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+    #if ("$!propClass" != '')
+      ## Prepare the alias of the BaseObject table that corresponds to the class of this column
+      ## Property table is to be joined with its object, determined depending on $propClassName.
+      #set ($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]', '')}_obj")
+      #addObjectClause($filterObjectAlias)
+    #end
+  #end
+  #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ?")
+  #set ($whereSql = "$whereSql and $joinObjectTable")
+  #set ($discard = $whereParams.add($colname))
+  ##
+  ## Specifies how the filter value should be matched against the stored value.
+  #set ($matchType = $request.getParameter("${colname}_match"))
+  ## We determine the default match type (when not specified) based on the property meta class (e.g. DateClass).
+  #set ($propMetaClass = $NULL)
+  #if ($propClass &amp;&amp; $propClass.getPropertyNames().contains($colname))
+    #set ($propMetaClass = $propClass.get($colname).type)
+  #end
+  ##
+  #set ($numberProperties = ['IntegerProperty', 'LongProperty', 'FloatProperty', 'DoubleProperty'])
+  #if ($numberProperties.contains($tableName))
+    #livetable_filterNumberProperty()
+  #elseif ($tableName == 'DateProperty')
+    #livetable_filterDateProperty()
+  #elseif ($tableName == 'DBStringListProperty')
+    #livetable_filterDBStringListProperty()
+  #elseif ($tableName == 'StringListProperty')
+    #livetable_filterStringListProperty()
+  #else
+    ## StringProperty or LargeStringProperty
+    #livetable_filterStringProperty()
+  #end
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterNumberProperty)
+  #set($numberValue = $numbertool.toNumber($filterValue))
+  #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
+    #if($tableName == 'LongProperty')
+      #set($numberValue = $numberValue.longValue())
+    #else
+      ## IntegerProperty
+      #set($numberValue = $numberValue.intValue())
+    #end
+    #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = ?")
+  #else
+    #if($tableName == 'FloatProperty')
+      #set($numberValue = $numberValue.floatValue())
+    #else
+      ## DoubleProperty
+      #set($numberValue = $numberValue.doubleValue())
+    #end
+    #set($precision = 0.000001)
+    #set($whereSql = "${whereSql} and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+  #end
+  #set($discard = $whereParams.add($numberValue))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterDateProperty)
+  ## TODO: The date filter should be smarter than this..
+  #set ($whereSql = "${whereSql} and upper(str(${safe_tableAlias}.value)) like upper(?)")
+  #set ($discard = $whereParams.add("%$filterValue%"))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterDBStringListProperty)
+  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+    #set ($joinOperator = 'AND')
+  #end
+  #if ($matchType == 'partial' || $matchType == 'prefix')
+    ## We need to join with the list of values in order to be able to use the LIKE operator.
+    #set ($matchTarget = "${safe_tableAlias}_item")
+    #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
+    #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
+  #else
+    ## Perform exact matching by default (if no match type is specified).
+    #set ($matchType = 'exact')
+    #set ($matchTarget = "${safe_tableAlias}.list")
+  #end
+  #set ($filterValues = $request.getParameterValues($colname))
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true)")
+  #set ($constraints = $stringtool.repeat($filterQuery.trim(), " $joinOperator ", $filterValues.size()))
+  #set ($whereSql = "$whereSql and ($constraints)")
+  #foreach ($filterValue in $filterValues)
+    #livetable_addFilterParam($filterValue $matchType $whereParams)
+  #end
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterStringListProperty)
+  #set ($whereSql = "${whereSql} and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+  #set ($discard = $whereParams.add("%|$filterValue|%"))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterStringProperty)
+  #if ("$!matchType" == '')
+    #if ($propMetaClass.endsWith('ListClass'))
+      ## Perform exact matching by default for StaticListClass, DBListClass and DBTreeListClass
+      ## when they are stored as StringProperty (i.e. single value and no relational storage).
+      #set ($matchType = 'exact')
+    #else
+      ## Perform partial matching by default otherwise (if no match type is specified).
+      #set ($matchType = 'partial')
+    #end
+  #end
+  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType)")
+  #set ($whereSql = "${whereSql} and $filterQuery.trim()")
+  #livetable_addFilterParam($filterValue $matchType $whereParams)
+#end
+
+
+#macro (livetable_getFilterQuery $column $matchType $isList)
+  #if ($matchType == 'partial' || $matchType == 'prefix')
+    upper($column) like upper(?)
+  #elseif ($isList)
+    ? in elements($column)
+  #else
+    $column = ?
+  #end
+#end
+
+
+#macro (livetable_addFilterParam $filterValue $matchType $params)
+  #if ($matchType == 'partial')
+    #set ($discard = $params.add("%$!filterValue%"))
+  #elseif ($matchType == 'prefix')
+    #set ($discard = $params.add("$!filterValue%"))
+  #else
+    #set ($discard = $params.add($filterValue))
+  #end
 #end
 
 
@@ -632,6 +761,5 @@
 #macro(grid_addcolumn $colname)
   #livetable_addColumnToQuery($colname)
 #end
-
 {{/velocity}}</content>
 </xwikidoc>

@@ -40,7 +40,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ObjectAddAction extends XWikiAction
 {
-    private static final String[] EMPTY_PROPERTY = new String[] {""};
+    private static final String[] EMPTY_PROPERTY = new String[] { "" };
 
     /**
      * A pattern that matches the {@code xobjectNumber} request parameter which is used to pass the number of the added
@@ -95,7 +95,7 @@ public class ObjectAddAction extends XWikiAction
         if (doc.isNew()) {
             doc.setCreatorReference(userReference);
         }
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addObject"), true, context);
 
         // If this is an ajax request, no need to redirect.
         if (Utils.isAjaxRequest(context)) {

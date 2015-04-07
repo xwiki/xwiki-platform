@@ -1,5 +1,5 @@
 #*
- * commentsinline.vm Shows document comments and gives the user an oppertunity to add a comment.
+ * commentsinline.vm Shows document comments and gives the user an opportunity to add a comment.
  * To include this template in a document you may specify:
  *
  * $replyTo (Integer) - If set then the comment form will appear ready to make a reply to the comment with the id number given.
@@ -16,7 +16,7 @@
  *                                 name and sets this true if that equals 1.
  *
  * $fillInFields (boolean) - If true then author, and comment fields are filled in from request parameters of the same names 
- *                           as the fields, also if $replyTo is set the form appears under the comment corrisponding to the $replyTo
+ *                           as the fields, also if $replyTo is set the form appears under the comment corresponding to the $replyTo
  *                           number. If not set and $captchaAnswerWrong is true then this is set to true.
  *
  * $offerGuestsCaptcha (boolean) - If true then users who are not logged in are offered a captcha image to solve, if undefined then

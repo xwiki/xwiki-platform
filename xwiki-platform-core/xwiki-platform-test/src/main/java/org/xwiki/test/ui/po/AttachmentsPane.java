@@ -94,12 +94,13 @@ public class AttachmentsPane extends BaseElement
     {
         getDriver().findElement(
             By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../span[2]/a[@class='deletelink']")).click();
+                + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        waitUntilElementDisappears(By
+        getDriver().waitUntilElementDisappears(By
             .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName + "']"));
-        waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
+        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='"
+            + attachmentName + "']"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//div[@id='Attachmentspane']"));
     }
 
     /**
@@ -114,9 +115,9 @@ public class AttachmentsPane extends BaseElement
             .click();
 
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
-        waitUntilElementDisappears(By
+        getDriver().waitUntilElementDisappears(By
             .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));
-        waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp
+        getDriver().waitUntilElementDisappears(By.xpath("//div[@id='attachmentscontent']//a[text()='" + tmp
             + "']/../../span[2]/a[@class='deletelink']"));
     }
 
@@ -149,7 +150,8 @@ public class AttachmentsPane extends BaseElement
     public String getLatestVersionOfAttachment(String attachmentName)
     {
         return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[3]/a")).getText();
+            By.xpath("//div[@id='attachmentscontent']//a[text()= '" + attachmentName
+                + "']/../../span[@class='version']/a")).getText();
     }
 
     public String getSizeOfAttachment(String attachmentName)

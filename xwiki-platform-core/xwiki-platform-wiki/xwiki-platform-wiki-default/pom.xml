@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-default</artifactId>
   <name>XWiki Platform - Wiki - Default Implementation</name>
   <description>XWiki Platform - Wiki - Default Implementation</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.30</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.58</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -48,6 +48,11 @@
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>
@@ -70,15 +75,10 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-application-manager-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.model;
 
+import java.util.Locale;
+
 /**
  * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
  * 
@@ -64,5 +66,30 @@ public enum EntityType
      * Represents a class property entity.
      * @since 3.2M1
      */
-    CLASS_PROPERTY
+    CLASS_PROPERTY,
+
+    /**
+     * Represents a structured part of the content of a document or an object property.
+     * @since 6.0M1
+     */
+    BLOCK;
+
+    /**
+     * The lower case String version of the enum.
+     */
+    private String lowerCase;
+
+    EntityType()
+    {
+        this.lowerCase = name().toLowerCase(Locale.US);
+    }
+
+    /**
+     * @return the lower case String version of the enum
+     * @since 6.2.1
+     */
+    public String getLowerCase()
+    {
+        return this.lowerCase;
+    }
 }

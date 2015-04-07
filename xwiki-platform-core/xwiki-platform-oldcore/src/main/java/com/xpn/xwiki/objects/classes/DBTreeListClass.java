@@ -72,7 +72,7 @@ public class DBTreeListClass extends DBListClass
 
     /**
      * Get the ordered list of tree nodes that is currently cached, if any.
-     * 
+     *
      * @param context the current request context
      * @return the cached list, or {@code null} if not already cached
      */
@@ -85,13 +85,13 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName() + "-tree");
+            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName() + "-tree");
         }
     }
 
     /**
      * Store the ordered list of tree nodes in a cache.
-     * 
+     *
      * @param cachedDBTreeList the list to cache
      * @param context the current request context
      */
@@ -104,7 +104,7 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            context.put(context.getDatabase() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
+            context.put(context.getWikiId() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
         }
     }
 
@@ -132,7 +132,7 @@ public class DBTreeListClass extends DBListClass
     /**
      * Gets an ordered list of items in the tree. This is necessary to make sure children are coming right after their
      * parents.
-     * 
+     *
      * @param treemap the unordered list of tree nodes
      * @param map the mapping between a node name and its corresponding tree node
      * @param context the current request context
@@ -198,16 +198,8 @@ public class DBTreeListClass extends DBListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
-            selectlist = new ArrayList<String>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
-        } else {
-            selectlist = new ArrayList<String>();
-            selectlist.add(String.valueOf(prop.getValue()));
-        }
+        List<String> selectlist = toList(prop);
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);
@@ -381,7 +373,7 @@ public class DBTreeListClass extends DBListClass
      * The generated query always selects 3 columns, the first one is used as the stored value, the second one as the
      * displayed value, and the third one defines the "parent" of the current value.
      * </p>
-     * 
+     *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */

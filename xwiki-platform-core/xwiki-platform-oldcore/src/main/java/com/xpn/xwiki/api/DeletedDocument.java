@@ -25,7 +25,6 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -34,7 +33,7 @@ import com.xpn.xwiki.util.Programming;
 
 /**
  * Information about a deleted document in the recycle bin.
- * 
+ *
  * @version $Id$
  */
 public class DeletedDocument extends Api
@@ -50,7 +49,7 @@ public class DeletedDocument extends Api
     /**
      * Simple constructor, initializes a new API object with the current {@link com.xpn.xwiki.XWikiContext context} and
      * the specified protected {@link com.xpn.xwiki.doc.XWikiDeletedDocument deleted document} object.
-     * 
+     *
      * @param deletedDoc the internal object wrapped by this API
      * @param context the current request context
      */
@@ -102,7 +101,7 @@ public class DeletedDocument extends Api
 
     /**
      * Check if the current user has the right to restore the document.
-     * 
+     *
      * @return {@code true} if the current user can restore this document, {@code false} otherwise
      */
     public boolean canUndelete()
@@ -134,11 +133,10 @@ public class DeletedDocument extends Api
                 return false;
             }
             String waitdays;
-            XWikiConfig config = getXWikiContext().getWiki().getConfig();
             if (hasAdminRights()) {
-                waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.adminWaitDays", "0");
             } else {
-                waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+                waitdays = getXWikiContext().getWiki().Param("xwiki.store.recyclebin.waitDays", "7");
             }
             int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
             Calendar cal = Calendar.getInstance();

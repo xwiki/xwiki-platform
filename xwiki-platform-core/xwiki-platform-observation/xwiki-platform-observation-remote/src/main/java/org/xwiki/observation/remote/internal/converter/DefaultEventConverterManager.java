@@ -37,7 +37,7 @@ import org.xwiki.observation.remote.converter.RemoteEventConverter;
 
 /**
  * Default implementation of {@link EventConverterManager}.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

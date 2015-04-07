@@ -22,7 +22,10 @@ package org.xwiki.uiextension.internal;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,9 +34,11 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.uiextension.UIExtension;
 
+import com.xpn.xwiki.internal.template.SUExecutor;
+
 /**
- * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we
- * register against the Component Manager.
+ * Represents a dynamic component instance of a UI Extension (ie a UI Extension defined in a Wiki page) that we register
+ * against the Component Manager.
  *
  * @version $Id$
  * @since 4.2M3
@@ -49,6 +54,8 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * The key used for the UIX document in the UIX context.
      */
     public static final String CONTEXT_UIX_DOC_KEY = "doc";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WikiUIExtension.class);
 
     /**
      * @see #WikiUIExtension
@@ -75,6 +82,8 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      */
     private final String roleHint;
 
+    private final SUExecutor suExecutor;
+
     /**
      * Parameter manager for this extension.
      */
@@ -98,15 +107,18 @@ public class WikiUIExtension implements UIExtension, WikiComponent
      * @param extensionPointId ID of the extension point this extension is designed for
      * @param objectReference the reference of the object holding this extension
      * @param authorReference the reference of the author of the document holding this extension
+     * @param suExecutor the executor used to execute the extension with the proper user rights
      */
     public WikiUIExtension(String roleHint, String id, String extensionPointId, ObjectReference objectReference,
-        DocumentReference authorReference)
+        DocumentReference authorReference, SUExecutor suExecutor)
     {
         this.roleHint = roleHint;
         this.id = id;
         this.extensionPointId = extensionPointId;
         this.authorReference = authorReference;
         this.documentReference = (DocumentReference) objectReference.getParent();
+
+        this.suExecutor = suExecutor;
     }
 
     /**
@@ -165,10 +177,21 @@ public class WikiUIExtension implements UIExtension, WikiComponent
     public Block execute()
     {
         if (this.renderer != null) {
-            return this.renderer.execute();
-        } else {
-            return new WordBlock("");
+            try {
+                return this.suExecutor.call(new Callable<Block>()
+                {
+                    @Override
+                    public Block call() throws Exception
+                    {
+                        return renderer.execute();
+                    }
+                }, getAuthorReference());
+            } catch (Exception e) {
+                LOGGER.error("Error while executing transformation for extension [{}]", documentReference.toString());
+            }
         }
+
+        return new WordBlock("");
     }
 
     @Override

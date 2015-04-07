@@ -33,16 +33,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   width: auto !important;
   border: none !important;
 }
-#xwikiobjects input:hover, #xwikiobjects textarea:hover,
-#xwikiobjects input:focus, #xwikiobjects textarea:focus,
-#xwikiclassproperties input:hover, #xwikiclassproperties textarea:hover,
-#xwikiclassproperties input:focus, #xwikiclassproperties textarea:focus {
-  border: 1px solid $theme.textPrimaryColor;
-}
-#xwikiobjects input:focus, #xwikiobjects textarea:focus,
-#xwikiclassproperties input:focus, #xwikiclassproperties textarea:focus {
-  background-color: $theme.highlightColor;
-}
 
 /* Generic links */
 .more-actions {

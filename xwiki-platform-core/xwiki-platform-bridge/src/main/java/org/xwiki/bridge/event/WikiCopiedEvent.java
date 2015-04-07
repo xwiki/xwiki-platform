@@ -19,9 +19,15 @@
  */
 package org.xwiki.bridge.event;
 
-
 /**
  * An event triggered after a wiki has been copied.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the source wiki identifier as {@link String}</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 4.3M1

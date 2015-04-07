@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.job.AbstractRequest;
-import org.xwiki.stability.Unstable;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Base class for {@link org.xwiki.job.Request} implementations used by wiki provisioners.
@@ -32,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 5.3M2
  * @version $Id$
  */
-@Unstable
 public class WikiProvisioningJobRequest extends AbstractRequest
 {
     /**
@@ -46,16 +45,40 @@ public class WikiProvisioningJobRequest extends AbstractRequest
     public static final String PROPERTY_PROVISIONING_JOB_PARAMETER = "wikiprovisioning.parameter";
 
     /**
+     * Name of the property that stores the user that is provisioning the wiki.
+     */
+    public static final String PROPERTY_PROVISIONING_USER = "wikiprovisioning.user";
+
+    /**
      * Constructor.
      * @param id id of the job request
      * @param wikiId id of the wiki to provision
      * @param parameter the parameter to be used by the provisioning job
+     * @deprecated use {@link #WikiProvisioningJobRequest(List, String, Object, DocumentReference)}
      */
+    @Deprecated
     public WikiProvisioningJobRequest(List<String> id, String wikiId, Object parameter)
     {
         setId(id);
         setWikiId(wikiId);
         setProvisioningJobParameter(parameter);
+    }
+
+    /**
+     * Constructor.
+     * @param id id of the job request
+     * @param wikiId id of the wiki to provision
+     * @param parameter the parameter to be used by the provisioning job
+     * @param provisioningUser the user who executes the provisioning job
+     * @since 6.3M1
+     */
+    public WikiProvisioningJobRequest(List<String> id, String wikiId, Object parameter,
+        DocumentReference provisioningUser)
+    {
+        setId(id);
+        setWikiId(wikiId);
+        setProvisioningJobParameter(parameter);
+        setProvisioningUser(provisioningUser);
     }
 
     /**
@@ -88,6 +111,24 @@ public class WikiProvisioningJobRequest extends AbstractRequest
     public Object getProvisioningJobParameter()
     {
         return getProperty(PROPERTY_PROVISIONING_JOB_PARAMETER);
+    }
+
+    /**
+     * @param userReference the user who executes the provisioning job
+     * @since 6.3M1
+     */
+    public void setProvisioningUser(DocumentReference userReference)
+    {
+        setProperty(PROPERTY_PROVISIONING_USER, userReference);
+    }
+
+    /**
+     * @return the user who executes the provisioning job
+     * @since 6.3M1
+     */
+    public DocumentReference getProvisioningUser()
+    {
+        return getProperty(PROPERTY_PROVISIONING_USER);
     }
 
     @Override

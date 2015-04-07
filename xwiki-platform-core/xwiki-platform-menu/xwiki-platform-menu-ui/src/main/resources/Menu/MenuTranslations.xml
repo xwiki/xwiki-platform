@@ -24,7 +24,7 @@
   <web>Menu</web>
   <name>MenuTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <parent>MenuClass</parent>
   <creator>xwiki:XWiki.Admin</creator>

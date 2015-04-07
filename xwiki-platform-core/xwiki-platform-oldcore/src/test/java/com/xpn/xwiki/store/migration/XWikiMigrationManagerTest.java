@@ -32,7 +32,6 @@ import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -45,7 +44,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTestCase
 {
     /** mocked migration manager */
-    @Component
+    @Component(staticRegistration = false)
     @Named("TestDataMigration")
     @Singleton
     public static class TestDataMigrationManager extends AbstractDataMigrationManager
@@ -130,7 +129,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     protected void setUp() throws Exception
     {
         super.setUp();
-        XWikiConfig config = new XWikiConfig();
         getContext().setWiki(new XWiki() {
             @Override
             public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
@@ -138,7 +136,6 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
                 return Arrays.asList("xwiki");
             }
         });
-        getContext().getWiki().setConfig(config);
 
         registerComponent(TestDataMigrationManager.class);
     }
@@ -159,10 +156,9 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
      */
     public void testMigrationOrderAndIgnore() throws Exception
     {
-        XWikiConfig config = getContext().getWiki().getConfig();
-        config.setProperty("xwiki.store.migration.version", "123");
-        config.setProperty("xwiki.store.migration.ignored", "345");
-        TestDataMigrationManager mm = (TestDataMigrationManager) getComponentManager().getInstance(
+        getConfigurationSource().setProperty("xwiki.store.migration.version", "123");
+        getConfigurationSource().setProperty("xwiki.store.migration.ignored", "345");
+        TestDataMigrationManager mm = getComponentManager().getInstance(
             DataMigrationManager.class,"TestDataMigration");
         Collection neededMigration = mm.getNeededMigrations();
         assertEquals(2, neededMigration.size());
@@ -172,7 +168,7 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
         assertEquals(456, actual[1].dataMigration.getVersion().getVersion());
     }
 
-    @Component
+    @Component(staticRegistration = false)
     @Named("TestForcedMigration")
     @Singleton
     public static class TestForceMigration implements DataMigration
@@ -210,17 +206,15 @@ public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTest
     /** test "xwiki.store.migration.force" parameter */
     public void testMigrationForce() throws Exception
     {
-        XWikiConfig config = getContext().getWiki().getConfig();
-        config.setProperty("xwiki.store.migration.version", "234");
-        config.setProperty("xwiki.store.migration.force", "TestForcedMigration");
+        getConfigurationSource().setProperty("xwiki.store.migration.version", "234");
+        getConfigurationSource().setProperty("xwiki.store.migration.force", "TestForcedMigration");
         registerComponent(TestForceMigration.class);
 
-        TestDataMigrationManager mm = (TestDataMigrationManager) getComponentManager().getInstance(
+        TestDataMigrationManager mm = getComponentManager().getInstance(
             DataMigrationManager.class,"TestDataMigration");
         Collection neededMigration = mm.getNeededMigrations();
         assertEquals(1, neededMigration.size());
-        assertEquals(
-            567,
-            ((AbstractDataMigrationManager.XWikiMigration) neededMigration.toArray()[0]).dataMigration.getVersion().getVersion());
+        assertEquals(567, ((AbstractDataMigrationManager.XWikiMigration) neededMigration.toArray()[0])
+            .dataMigration.getVersion().getVersion());
     }
 }

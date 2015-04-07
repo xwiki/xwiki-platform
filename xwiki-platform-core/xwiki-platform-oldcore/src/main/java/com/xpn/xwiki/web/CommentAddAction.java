@@ -34,7 +34,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 /**
  * Action used to post a comment on a page, adds a comment object to the document and saves it, requires comment right
  * but not edit right.
- * 
+ *
  * @version $Id$
  */
 public class CommentAddAction extends XWikiAction
@@ -92,7 +92,7 @@ public class CommentAddAction extends XWikiAction
             doc.setContentDirty(false);
             // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
             doc.setMetaDataDirty(true);
-            xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
+            xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {
@@ -117,7 +117,7 @@ public class CommentAddAction extends XWikiAction
     /**
      * Checks the request parameter captcha_answer against the captcha module. This makes xwiki-core dependant on
      * xwiki-captcha and should be removed as soon as possible.
-     * 
+     *
      * @param context The XWikiContext for getting the request and whether guest comment requires a captcha.
      * @return true if the captcha answer is correct or if no captcha answer and captcha is not required.
      * @throws XWikiException if something goes wrong in the captcha module.

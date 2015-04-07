@@ -19,90 +19,36 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.Event;
-import org.xwiki.security.SecurityReferenceFactory;
-import org.xwiki.security.authorization.AuthorizationException;
-import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
-import org.xwiki.security.internal.XWikiConstants;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
- * The instance of this class monitors updates and invalidates right
- * cache entries whenever necessary.
+ * The instance of this class monitors updates and invalidates right cache entries whenever necessary.
+ * 
  * @version $Id$
  * @since 4.0M2
  */
 @Component
 @Singleton
-public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesInvalidator, EventListener
+public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesInvalidator
 {
     /**
-     * Fair read-write lock to suspend the delivery of
-     * cache updates while there are loads in progress.
+     * The role hint.
      */
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
-
-    /** Logger. **/
-    @Inject
-    private Logger logger;
-
-    /** The right cache. */
-    @Inject
-    private SecurityCache securityCache;
-
-    /** The security reference factory. */
-    @Inject
-    private SecurityReferenceFactory securityReferenceFactory;
-
-    /** Document reference resolver. */
-    @Inject
-    private DocumentReferenceResolver<String> resolver;
-
-    /** User document reference resolver. */
-    @Inject
-    @Named("user")
-    private DocumentReferenceResolver<String> userResolver;
-
-    /** Entity reference serializer. */
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    /** Execution object. */
-    @Inject
-    private Execution execution;
+    public static final String NAME = "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator";
 
     /**
-     * @return the current {@code XWikiContext}
+     * Fair read-write lock to suspend the delivery of cache updates while there are loads in progress.
      */
-    private XWikiContext getXWikiContext() {
-        return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
-    }
+    @Inject
+    @Named(NAME)
+    private ReadWriteLock readWriteLock;
 
     @Override
     public void suspend()
@@ -114,137 +60,5 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     public void resume()
     {
         readWriteLock.readLock().unlock();
-    }
-
-    @Override
-    public String getName()
-    {
-        return getClass().getName();
-    }
-
-    @Override
-    public List<Event> getEvents()
-    {
-        Event[] events = {
-            new DocumentCreatedEvent(),
-            new DocumentUpdatedEvent(),
-            new DocumentDeletedEvent(),
-        };
-        return Arrays.asList(events);
-    }
-
-    /**
-     * Obtain a document reference to the {@link com.xpn.xwiki.doc.XWikiDocument} given
-     * as parameter.
-     * @param xwikiDocument The xwiki document.
-     * @return The document reference.
-     */
-    private static DocumentReference getDocumentReference(Object xwikiDocument)
-    {
-        XWikiDocument doc = (XWikiDocument) xwikiDocument;
-        return doc.getDocumentReference();
-    }
-
-    /**
-     * @param source an xwiki document, that has just been updated.
-     * @return true if and only if the xwiki document corresponds to a group.
-     */
-    private boolean isGroupDocument(Object source)
-    {
-        XWikiDocument doc = (XWikiDocument) source;
-        DocumentReference docRef = doc.getDocumentReference();
-        DocumentReference groupClass = resolver.resolve(XWikiConstants.GROUP_CLASS, docRef);
-        List objects = doc.getXObjects(groupClass);
-        return objects != null && objects.size() > 0;
-    }
-
-    /**
-     * Drop from the cache all members of a given group.
-     * @param group The group.
-     * @param securityCache Right cache instance to invalidate.
-     * @throws org.xwiki.security.authorization.AuthorizationException on error.
-     */
-    public void invalidateGroupMembers(DocumentReference group, SecurityCache securityCache)
-        throws AuthorizationException
-    {
-        try {
-            XWikiContext xwikiContext = getXWikiContext();
-            XWikiGroupService groupService = xwikiContext.getWiki().getGroupService(xwikiContext);
-            String groupName = serializer.serialize(group);
-            
-            // The group members inherit the wiki from the group
-            // itself, unless the wiki name is explicitly given.
-
-            WikiReference wikiReference = group.getWikiReference();
-            final int nb = 100;
-            int i = 0;
-            Collection<String> memberNames;
-            do {
-                memberNames = groupService.getAllMembersNamesForGroup(groupName, nb, i * nb, xwikiContext);
-                for (String member : memberNames) {
-                    DocumentReference memberRef = userResolver.resolve(member, wikiReference);
-
-                    // Avoid infinite loops.
-
-                    if (!memberRef.equals(group)) {
-                        securityCache.remove(securityReferenceFactory.newUserReference(memberRef));
-                    }
-                }
-                i++;
-            } while(memberNames.size() == nb);
-        } catch (XWikiException e) {
-            throw new AuthorizationException("Failed to invalidate group member.", e);
-        }
-    }
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        DocumentReference ref = getDocumentReference(source);
-        readWriteLock.writeLock().lock();
-        try {
-            deliverUpdateEvent(ref);
-            if (isGroupDocument(source)) {
-                // When a group receive a new member, the update event is triggered and the above invalidate the group
-                // and also all its existing members already in cache, but NOT the new member that could be currently
-                // in the cache, and is not yet linked to the group. Here, we invalidate individually all members of
-                // the group based on the updated group, which will only have the effect of invaliding new members.
-                invalidateGroupMembers(ref, securityCache);
-            }
-        } catch (AuthorizationException e) {
-            this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
-        } finally {
-            readWriteLock.writeLock().unlock();
-        }
-    }
-
-    /**
-     * Describe {@code deliverUpdateEvent} method here.
-     *
-     * @param ref Reference to the document that should be
-     * invalidated.
-     */
-    private void deliverUpdateEvent(DocumentReference ref)
-    {
-        if (ref.getName().equals(XWikiConstants.WIKI_DOC)
-            && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)) {
-            // For XWiki.XWikiPreferences, remove the whole wiki.
-            securityCache.remove(securityReferenceFactory.newEntityReference(ref.getWikiReference()));
-        } else if (ref.getName().equals(XWikiConstants.SPACE_DOC)) {
-            // For WebPreferences, remove the whole space.
-            securityCache.remove(securityReferenceFactory.newEntityReference(ref.getParent()));
-        } else {
-            // For any other documents, remove that document cache.
-            securityCache.remove(securityReferenceFactory.newEntityReference(ref));
-            if (ref.getName().startsWith(XWikiConstants.WIKI_DESCRIPTOR_PREFIX)
-                && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)
-                && ref.getWikiReference().getName().equals(getXWikiContext().getMainXWiki())) {
-                // For xwiki:XWiki.XWikiServer... documents, also remove the whole corresponding wiki.
-                securityCache.remove(securityReferenceFactory.newEntityReference(
-                    new WikiReference(
-                        ref.getName().substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()).toLowerCase())
-                ));
-            }
-        }
     }
 }

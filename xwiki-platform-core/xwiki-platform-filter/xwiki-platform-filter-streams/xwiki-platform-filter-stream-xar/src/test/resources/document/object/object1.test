@@ -1,0 +1,187 @@
+.#------------------------------------------------------------------------------
+.inputexpect|xwiki+xar/1.1
+.#------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <version>1.1</version>
+  <syntaxId>xwiki/1.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <name>space.page</name>
+    <number>0</number>
+    <className>space.class</className>
+    <class>
+      <name>space.class</name>
+      <booleanproperty1>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </booleanproperty1>
+      <booleanproperty2>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </booleanproperty2>
+      <booleanproperty3>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </booleanproperty3>
+      <listproperty1>
+        <multiSelect>0</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </listproperty1>
+      <listproperty2>
+        <multiSelect>1</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </listproperty2>
+      <listproperty3>
+        <multiSelect>1</multiSelect>
+        <classType>StaticList</classType>
+      </listproperty3>
+      <usersproperty1>
+        <multiSelect>0</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </usersproperty1>
+      <usersproperty2>
+        <multiSelect>1</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+      </usersproperty2>
+      <dateproperty1>
+        <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+      </dateproperty1>
+    </class>
+    <property>
+      <booleanproperty1>0</booleanproperty1>
+    </property>
+    <property>
+      <booleanproperty2>1</booleanproperty2>
+    </property>
+    <property>
+      <booleanproperty3></booleanproperty3>
+    </property>
+    <property>
+      <listproperty1> value </listproperty1>
+    </property>
+    <property>
+      <listproperty2>
+        <value>value1</value>
+        <value>value2</value>
+      </listproperty2>
+    </property>
+    <property>
+      <listproperty3>
+        <value>value3</value>
+        <value>value4</value>
+      </listproperty3>
+    </property>
+    <property>
+      <usersproperty1>user</usersproperty1>
+    </property>
+    <property>
+      <usersproperty1>user1|user2</usersproperty1>
+    </property>
+    <property>
+      <dateproperty1>2013-02-10 11:41:23.0</dateproperty1>
+    </property>
+  </object>
+</xwikidoc>
+
+.#------------------------------------------------------------------------------
+.inputexpect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <p>
+      <parameters>
+        <entry>
+          <string>locale</string>
+          <locale></locale>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1.1">
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <org.xwiki.rendering.syntax.Syntax>
+                <type>
+                  <name>XWiki</name>
+                  <id>xwiki</id>
+                </type>
+                <version>1.0</version>
+              </org.xwiki.rendering.syntax.Syntax>
+            </entry>
+            <entry>
+              <string>hidden</string>
+              <boolean>false</boolean>
+            </entry>
+          </parameters>
+        </p>
+        <wikiObject name="space.class[0]">
+          <p>
+            <parameters>
+              <entry>
+                <string>number</string>
+                <int>0</int>
+              </entry>
+              <entry>
+                <string>class_reference</string>
+                <string>space.class</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiClass>
+            <wikiClassProperty name="booleanproperty1" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+            <wikiClassProperty name="booleanproperty2" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+            <wikiClassProperty name="booleanproperty3" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+            <wikiClassProperty name="listproperty1" type="com.xpn.xwiki.objects.classes.StaticListClass">
+              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="listproperty2" type="com.xpn.xwiki.objects.classes.StaticListClass">
+              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="listproperty3" type="StaticList">
+              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="usersproperty1" type="com.xpn.xwiki.objects.classes.UsersClass">
+              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="usersproperty2" type="com.xpn.xwiki.objects.classes.UsersClass">
+              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="dateproperty1" type="com.xpn.xwiki.objects.classes.DateClass"></wikiClassProperty>
+          </wikiClass>
+          <wikiObjectProperty name="booleanproperty1" value="0"></wikiObjectProperty>
+          <wikiObjectProperty name="booleanproperty2" value="1"></wikiObjectProperty>
+          <wikiObjectProperty name="booleanproperty3" value=""></wikiObjectProperty>
+          <wikiObjectProperty name="listproperty1" value=" value "></wikiObjectProperty>
+          <wikiObjectProperty name="listproperty2">
+            <p>
+              <value t="java.util.ArrayList">
+                <string>value1</string>
+                <string>value2</string>
+              </value>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="listproperty3">
+            <p>
+              <value t="java.util.ArrayList">
+                <string>value3</string>
+                <string>value4</string>
+              </value>
+            </p>
+          </wikiObjectProperty>
+          <wikiObjectProperty name="usersproperty1" value="user"></wikiObjectProperty>
+          <wikiObjectProperty name="usersproperty1" value="user1|user2"></wikiObjectProperty>
+          <wikiObjectProperty name="dateproperty1">
+            <p>
+              <value t="java.util.Date">2013-02-10 11:41:23.0 UTC</value>
+            </p>
+          </wikiObjectProperty>
+        </wikiObject>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

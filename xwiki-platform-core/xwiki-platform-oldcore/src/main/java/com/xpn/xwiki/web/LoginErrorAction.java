@@ -24,7 +24,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Action for re-displaying the login form when the submitted username and password are wrong.
- * 
+ *
  * @version $Id$
  */
 public class LoginErrorAction extends XWikiAction

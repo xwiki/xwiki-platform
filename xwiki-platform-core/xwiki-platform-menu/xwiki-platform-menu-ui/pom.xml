@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-menu</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-menu-ui</artifactId>
   <name>XWiki Platform - Menu - UI</name>
@@ -42,6 +42,15 @@
     <xwiki.extension.name>Menu Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- JavaScript dependencies -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>requirejs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery</artifactId>
+    </dependency>
     <!-- Required by the menu wiki macro -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

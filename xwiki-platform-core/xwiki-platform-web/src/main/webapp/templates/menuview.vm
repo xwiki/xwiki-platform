@@ -4,7 +4,6 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
-#set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
 #set ($isWikiAPIAvailable = ("!$services.wiki" != '') && ("!$services.wiki.user" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
@@ -134,7 +133,7 @@
   #if ($hasWatch && $xcontext.isMainWiki())
     #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isWikiWatched())
+    #if ($services.watchlist.isWatched("WIKI"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end
@@ -204,7 +203,7 @@
     #if ($hasWatch)
       #set ($watchClasses = '')
       #set ($unwatchClasses = 'hidden')
-      #if ($xwiki.watchlist.isWikiWatched())
+      #if ($services.watchlist.isWatched("WIKI"))
         #set ($watchClasses = 'hidden')
         #set ($unwatchClasses = '')
       #end
@@ -254,11 +253,11 @@
   #if ($hasWatch)
     #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isSpaceWatched())
+    #if ($services.watchlist.isWatched("SPACE"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end
-    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses)
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space') 'tmWatchSpace', $watchClasses)
     #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses)
     #set ($hasPreviousMenuSection = true)
   #end
@@ -268,11 +267,19 @@
     #submenuitem($adminspaceaction $services.localization.render('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)
   #end
-  #if ($xwiki.exists('Main.SpaceIndex'))
+  #set($spaceIndexReference = $services.model.createDocumentReference('', 'Main', 'SpaceIndex'))
+  #if ($xwiki.exists($spaceIndexReference))
     #if ($hasPreviousMenuSection)
       #submenuseparator()
     #end
-    #set ($spaceIndexUrl = $xwiki.getURL('Main.SpaceIndex', 'view',"space=${escapetool.url($doc.space)}"))
+    #set ($spaceHomeReference = $services.model.createDocumentReference('', $doc.space, 'WebHome'))
+    #if ($xwiki.exist($spaceHomeReference))
+      #set ($spaceIndexUrl = $xwiki.getURL($spaceHomeReference, 'view', 'sheet=Main.SpaceIndex'))
+    #elseif ($xwiki.exists($doc.documentReference))
+      #set ($spaceIndexUrl = $xwiki.getURL($doc.documentReference, 'view', 'sheet=Main.SpaceIndex'))
+    #else
+      #set ($spaceIndexUrl = $xwiki.getURL($spaceIndexReference, 'view', "space=${escapetool.url($doc.space)}"))
+    #end
     #submenuitem($spaceIndexUrl $services.localization.render('core.menu.space.documentindex') 'tmSpaceDocumentIndex' '')
     #set ($hasPreviousMenuSection = true)
   #end
@@ -289,9 +296,9 @@
 ##
 ## Page
 ##
-#set ($canView = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'view'))
+#set ($canView = !$doc.isNew() && $xwiki.hasAccessLevel('view'))
 #set ($canCopy = $canView && $hasCreatePage)
-#set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
+#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 #set ($canWatch = !$doc.isNew() && $hasWatch)
 #set ($displayPageSubmenu = $canWatch || $canShare || $canCopy || $canDelete)
@@ -303,7 +310,7 @@
   #if ($canWatch)
    #set ($watchClasses = '')
     #set ($unwatchClasses = 'hidden')
-    #if ($xwiki.watchlist.isDocumentWatched())
+    #if ($services.watchlist.isWatched("DOCUMENT"))
       #set ($watchClasses = 'hidden')
       #set ($unwatchClasses = '')
     #end

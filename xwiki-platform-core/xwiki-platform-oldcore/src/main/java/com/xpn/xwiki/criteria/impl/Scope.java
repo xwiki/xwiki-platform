@@ -72,7 +72,7 @@ public class Scope
 
     /**
      * Creates a new Scope instance with the specified field values.
-     * 
+     *
      * @param type The type of the scope
      * @param name The name of the document associated with this scope
      * @param deep <code>true</code> for matching all sub documents; <code>false</code> for matching the associated

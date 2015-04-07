@@ -18,7 +18,7 @@ $response.setContentType("application/x-json")
   #if(! $defaultKeys.contains( $key ) )
      ## build the filters map
      #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
-     #if( $docProps.contains( $key )) 
+     #if( $docProps.contains( $key ))
         #set ($arr = [])
         #set( $discard = $arr.add( null ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
@@ -48,14 +48,14 @@ $response.setContentType("application/x-json")
 #elseif( $value == "global" )
   #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
   #set( $countUsers = $rm.countAllMatchedGlobalUsers( $filterMap ) )
-#else  
+#else
   ## get both local and global users
   #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
   #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
 #end
 
 ### json starts
-{ 
+{
 "totalrows": $countUsers,
 "returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
 "offset": $offset,
@@ -70,11 +70,11 @@ $response.setContentType("application/x-json")
    #set($wikiname = $user.getWiki())
    #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
    #if( $velocityCount > 1 ) , #end
-   {"username"      : "$!{escapetool.javascript($user.name)}", 
+   {"username"      : "$!{escapetool.javascript($user.name)}",
     "fullname"      : "$!{escapetool.javascript($user.fullName)}",
     "wikiname"      : "$!{escapetool.javascript($wikiname)}",
-    "firstname"     : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').get('first_name'))}", 
-    "lastname"      : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').get('last_name'))}",
+    "firstname"     : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').getValue('first_name'))}",
+    "lastname"      : "$!{escapetool.javascript($user.getObject('XWiki.XWikiUsers').getValue('last_name'))}",
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL("save")",
     "userinlineurl" : "$user.getURL("edit", "xpage=edituser")",

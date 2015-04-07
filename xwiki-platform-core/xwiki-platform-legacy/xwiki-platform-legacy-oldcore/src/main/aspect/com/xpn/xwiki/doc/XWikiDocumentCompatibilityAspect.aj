@@ -35,6 +35,7 @@ import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -218,7 +219,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         Map<String, Vector<BaseObject>> objects = new LinkedHashMap<String, Vector<BaseObject>>();
 
         for (Map.Entry<DocumentReference, List<BaseObject>> entry : getXObjects().entrySet()) {
-            objects.put(this.compactWikiEntityReferenceSerializer.serialize(entry.getKey()), new Vector<BaseObject>(
+            objects.put(getCompactWikiEntityReferenceSerializer().serialize(entry.getKey()), new Vector<BaseObject>(
                 entry.getValue()));
         }
 
@@ -391,6 +392,24 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         }
     }
 
+    private String XWikiDocument.serializeReference(DocumentReference reference, EntityReferenceSerializer<String> serializer,
+        DocumentReference defaultReference)
+    {
+        XWikiContext xcontext = getXWikiContext();
+
+        String originalWikiName = xcontext.getWikiId();
+        XWikiDocument originalCurentDocument = xcontext.getDoc();
+        try {
+            xcontext.setWikiId(defaultReference.getWikiReference().getName());
+            xcontext.setDoc(new XWikiDocument(defaultReference));
+
+            return serializer.serialize(reference);
+        } finally {
+            xcontext.setDoc(originalCurentDocument);
+            xcontext.setWikiId(originalWikiName);
+        }
+    }
+
     /**
      * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
      * same as document wiki) to store as parent.
@@ -401,7 +420,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
     public void XWikiDocument.setParentReference(DocumentReference parentReference)
     {
         if (parentReference != null) {
-            setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
+            setParent(serializeReference(parentReference, getCompactWikiEntityReferenceSerializer(),
                 getDocumentReference()));
         } else {
             setParentReference((EntityReference) null);

@@ -41,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -50,7 +51,7 @@ import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 
 /**
  * Exposes {@link org.xwiki.display.internal.Displayer}s to scripts.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -92,34 +93,43 @@ public class DisplayScriptService implements ScriptService
     @Inject
     private SyntaxFactory syntaxFactory;
 
-    /**
-     * Displays a document.
-     * 
-     * @param document the document to display
-     * @param parameters the display parameters
-     * @return the result of displaying the given document
-     */
-    private String document(Document document, Map<String, Object> parameters)
+    @Inject
+    private RenderingContext renderingContext;
+
+    private Syntax getOutputSyntax(Map<String, Object> parameters)
     {
         Syntax outputSyntax = (Syntax) parameters.get("outputSyntax");
         if (outputSyntax == null) {
             String outputSyntaxId = (String) parameters.get("outputSyntaxId");
             if (outputSyntaxId != null) {
                 try {
-                    outputSyntax = syntaxFactory.createSyntaxFromIdString(outputSyntaxId);
+                    outputSyntax = this.syntaxFactory.createSyntaxFromIdString(outputSyntaxId);
                 } catch (Exception e) {
-                    logger.error("Failed to parse output syntax ID [{}].", outputSyntaxId, e);
+                    this.logger.error("Failed to parse output syntax ID [{}].", outputSyntaxId, e);
                     return null;
                 }
             } else {
-                outputSyntax = Syntax.XHTML_1_0;
+                outputSyntax = renderingContext.getTargetSyntax();
             }
         }
 
+        return outputSyntax;
+    }
+
+    /**
+     * Displays a document.
+     *
+     * @param document the document to display
+     * @param parameters the display parameters
+     * @return the result of displaying the given document
+     */
+    private String document(Document document, Map<String, Object> parameters, Syntax outputSyntax)
+    {
         DocumentDisplayerParameters displayerParameters =
             (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
         if (displayerParameters == null) {
             displayerParameters = new DocumentDisplayerParameters();
+            displayerParameters.setTargetSyntax(outputSyntax);
         }
 
         String displayerHint = (String) parameters.get("displayerHint");
@@ -127,10 +137,10 @@ public class DisplayScriptService implements ScriptService
             displayerHint = "configured";
         }
         try {
-            DocumentDisplayer displayer = componentManager.getInstance(DocumentDisplayer.class, displayerHint);
+            DocumentDisplayer displayer = this.componentManager.getInstance(DocumentDisplayer.class, displayerHint);
             return renderXDOM(displayer.display(getDocument(document), displayerParameters), outputSyntax);
         } catch (Exception e) {
-            logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
+            this.logger.error("Failed to display document [{}].", document.getPrefixedFullName(), e);
             return null;
         }
     }
@@ -150,12 +160,12 @@ public class DisplayScriptService implements ScriptService
      */
     public String content(Document document)
     {
-        return content(document, Collections.<String, Object> emptyMap());
+        return content(document, Collections.<String, Object>emptyMap());
     }
 
     /**
      * Displays the content of the given document.
-     * 
+     *
      * @param document the document whose content is displayed
      * @param parameters the display parameters
      * @return the result of rendering the content of the given document using the provided parameters
@@ -167,10 +177,12 @@ public class DisplayScriptService implements ScriptService
         try {
             content = document.getTranslatedContent();
         } catch (XWikiException e) {
-            logger.warn("Failed to get the translated content of document [{}].", document.getPrefixedFullName(), e);
+            this.logger.warn("Failed to get the translated content of document [{}].", document.getPrefixedFullName(),
+                e);
             return null;
         }
-        String renderedContent = renderingCache.getRenderedContent(document.getDocumentReference(), content, context);
+        String renderedContent =
+            this.renderingCache.getRenderedContent(document.getDocumentReference(), content, context);
         if (renderedContent == null) {
             Map<String, Object> actualParameters = new HashMap<String, Object>(parameters);
             DocumentDisplayerParameters displayerParameters =
@@ -186,10 +198,13 @@ public class DisplayScriptService implements ScriptService
             }
             // Ensure the content is displayed.
             displayerParameters.setTitleDisplayed(false);
+            Syntax outputSyntax = getOutputSyntax(parameters);
+            displayerParameters.setTargetSyntax(outputSyntax);
             actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
-            renderedContent = document(document, actualParameters);
+            renderedContent = document(document, actualParameters, outputSyntax);
             if (renderedContent != null) {
-                renderingCache.setRenderedContent(document.getDocumentReference(), content, renderedContent, context);
+                this.renderingCache.setRenderedContent(document.getDocumentReference(), content, renderedContent,
+                    context);
             }
         }
         return renderedContent;
@@ -199,7 +214,7 @@ public class DisplayScriptService implements ScriptService
      * Displays the document title. If a title has not been provided through the title field, it looks for a section
      * title in the document's content and if not found return the page name. The returned title is also interpreted
      * which means it's allowed to use Velocity, Groovy, etc. syntax within a title.
-     * 
+     *
      * @param document the document whose title is displayed
      * @param parameters the display parameters
      * @return the result of displaying the title of the given document
@@ -219,8 +234,10 @@ public class DisplayScriptService implements ScriptService
         }
         // Ensure the title is displayed.
         displayerParameters.setTitleDisplayed(true);
+        Syntax outputSyntax = getOutputSyntax(parameters);
+        displayerParameters.setTargetSyntax(outputSyntax);
         actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
-        return document(document, actualParameters);
+        return document(document, actualParameters, outputSyntax);
     }
 
     /**
@@ -230,12 +247,12 @@ public class DisplayScriptService implements ScriptService
      */
     public String title(Document document)
     {
-        return title(document, Collections.<String, Object> emptyMap());
+        return title(document, Collections.<String, Object>emptyMap());
     }
 
     /**
      * Note: This method accesses the low level XWiki document through reflection in order to bypass programming rights.
-     * 
+     *
      * @param document an instance of {@link Document} received from a script
      * @return an instance of {@link DocumentModelBridge} that wraps the low level document object exposed by the given
      *         document API
@@ -255,7 +272,7 @@ public class DisplayScriptService implements ScriptService
 
     /**
      * Renders the provided XDOM.
-     * 
+     *
      * @param content the XDOM content to render
      * @param targetSyntax the syntax of the rendering result
      * @return the result of rendering the given XDOM
@@ -264,7 +281,7 @@ public class DisplayScriptService implements ScriptService
     private String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
-            BlockRenderer renderer = componentManager.getInstance(BlockRenderer.class, targetSyntax.toIdString());
+            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, targetSyntax.toIdString());
             WikiPrinter printer = new DefaultWikiPrinter();
             renderer.render(content, printer);
             return printer.toString();
@@ -281,6 +298,6 @@ public class DisplayScriptService implements ScriptService
     @Deprecated
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

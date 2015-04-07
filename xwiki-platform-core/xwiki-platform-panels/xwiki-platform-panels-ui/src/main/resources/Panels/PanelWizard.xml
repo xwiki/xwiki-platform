@@ -429,6 +429,7 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 
 .pagelayoutoptions  table td {
   border: 0;
+  display: table;
   float: left;
 }
 
@@ -646,6 +647,11 @@ div.pagelayoutoption:hover .lmleftcolumn,
       #end
       window.showLeftColumn = $showLeftPanels;
       window.showRightColumn = $showRightPanels;
+      #if ($showApplicationPanel)
+        window.showApplicationPanel = true;
+      #else
+        window.showApplicationPanel = false;
+      #end
       var obj = {div:'panellistaccordion', no:0, height:512};
       document.observe('xwiki:dom:loaded', function () {
         createAccordion(obj);
@@ -729,16 +735,35 @@ div.pagelayoutoption:hover .lmleftcolumn,
           )))
         )))
       )))## pagelayoutoptions
+      ##
+      ## Panel widths
+      ##
+      (% class="xform third" %)
+      (((
+      ; {{translation key="XWiki.XWikiPreferences_leftPanelsWidth"/}}
+      : $doc.display('leftPanelsWidth', 'edit')
+      ; {{translation key="XWiki.XWikiPreferences_rightPanelsWidth"/}}
+      : $doc.display('rightPanelsWidth', 'edit')
+      )))
     )))## PageLayoutSection
   )))## xwikieditcontent
 
   (% id="panelwizardbuttons" class="floatcontainer" %)
   (((
-    (% class="xwikibuttonlink" %)
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.savenew')&gt;&gt;path:#||id="saveLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.revert')&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.homepage')&gt;&gt;Panels.WebHome]](%%) ##
-    (%%)
+    
+    {{html}}
+      &lt;div class="xwikibuttonlink"&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button id="saveLayout"&gt;$services.localization.render('xe.panels.wizard.savenew')&lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button id="revertLayout"&gt;$services.localization.render('xe.panels.wizard.revert')&lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'Panels', 'WebHome'))"&gt;$services.localization.render('xe.panels.wizard.homepage')&lt;/a&gt;
+        &lt;/span&gt;
+      &lt;/div&gt;
+    {{/html}}
   )))
 #end
 {{/velocity}}</content>

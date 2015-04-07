@@ -46,16 +46,6 @@ public class CreateWikiPage extends ExtendedViewPage
     @FindBy(id = "wizard-next")
     private WebElement nextStepButton;
 
-    public static String getSpace()
-    {
-        return "WikiManager";
-    }
-
-    public static String getPage()
-    {
-        return "CreateNewWiki";
-    }
-
     public void setPrettyName(String prettyName)
     {
         prettyNameField.clear();
@@ -72,7 +62,7 @@ public class CreateWikiPage extends ExtendedViewPage
      */
     public String getComputedName()
     {
-        waitUntilElementHasNonEmptyAttributeValue(By.name("wikiname"), "value");
+        getDriver().waitUntilElementHasNonEmptyAttributeValue(By.name("wikiname"), "value");
         return getName();
     }
 
@@ -117,8 +107,7 @@ public class CreateWikiPage extends ExtendedViewPage
     public CreateWikiPageStepUser goUserStep()
     {
         nextStepButton.click();
-        waitUntilPageIsLoaded();
-        return new CreateWikiPageStepUser();
+        return new CreateWikiPageStepUser().waitUntilPageIsLoaded();
     }
 
     public void goNextStep()

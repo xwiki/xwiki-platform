@@ -1,2 +1,0 @@
-org.xwiki.wikistream.instance.output.ExtensionInstanceOutputWikiStream
-org.xwiki.wikistream.instance.output.ExtensionInstanceOutputWikiStreamFactory

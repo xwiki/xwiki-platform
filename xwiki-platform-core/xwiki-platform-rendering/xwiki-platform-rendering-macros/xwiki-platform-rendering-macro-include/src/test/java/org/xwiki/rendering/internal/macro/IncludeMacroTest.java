@@ -134,7 +134,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                     + "[[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
                 + "beginMacroMarkerStandalone [velocity] [] [$foo]\n"
                 + "beginGroup [[class]=[xwikirenderingerror]]\n"
-                + "onWord [Failed to execute the [velocity] macro]\n"
+                + "onWord [Failed to execute the [velocity] macro. Click on this message for details.]\n"
                 + "endGroup [[class]=[xwikirenderingerror]]\n"
                 + "beginGroup [[class]=[xwikirenderingerrordescription hidden]]\n"
                 + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: "

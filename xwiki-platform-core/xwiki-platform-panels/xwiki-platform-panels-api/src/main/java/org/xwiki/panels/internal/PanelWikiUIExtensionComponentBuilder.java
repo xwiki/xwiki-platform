@@ -19,7 +19,6 @@
  */
 package org.xwiki.panels.internal;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,13 +33,12 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
+import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -80,6 +78,12 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
+    /**
+     * Content parser used to parse the panel content.
+     */
+    @Inject
+    private ContentParser parser;
+
     @Override
     public List<DocumentReference> getDocumentReferences()
     {
@@ -92,7 +96,7 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
             List<Object[]> results = query.execute();
             for (Object[] result : results) {
                 references.add(
-                    new DocumentReference(getXWikiContext().getDatabase(), (String) result[0], (String) result[1]));
+                    new DocumentReference(getXWikiContext().getWikiId(), (String) result[0], (String) result[1]));
             }
         } catch (Exception e) {
             // Fail "silently"
@@ -106,7 +110,7 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
         List<WikiComponent> components = new ArrayList<WikiComponent>();
-        DocumentReference panelXClass = new DocumentReference(getXWikiContext().getDatabase(), "Panels", "PanelClass");
+        DocumentReference panelXClass = new DocumentReference(getXWikiContext().getWikiId(), "Panels", "PanelClass");
         String content = (String) documentAccessBridge.getProperty(reference, panelXClass, "content");
         Syntax syntax = null;
         DocumentReference authorReference;
@@ -115,19 +119,17 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
             syntax = documentAccessBridge.getDocument(reference).getSyntax();
             authorReference =
                 getXWikiContext().getWiki().getDocument(reference, getXWikiContext()).getAuthorReference();
-            Parser parser = componentManager.getInstance(Parser.class, syntax.toIdString());
+            XDOM xdom = parser.parse(content, syntax, reference);
 
-            try {
-                XDOM xdom = parser.parse(new StringReader(content));
-                components.add(new PanelWikiUIExtension(reference, authorReference, xdom, syntax, componentManager));
-            } catch (ParseException e) {
-                throw new WikiComponentException(
-                    String.format("Failed to find parse content of panel [{}]", reference));
-            }
+            components.add(new PanelWikiUIExtension(reference, authorReference, xdom, syntax, componentManager));
+        } catch (WikiComponentException e) {
+            throw e;
         } catch (ComponentLookupException e) {
-            throw new WikiComponentException(String.format("Failed to find a parser for syntax [{}]", syntax));
-        }  catch (Exception e) {
-            String.format("Failed to retrieve panel document [{}]", reference);
+            throw new WikiComponentException(
+                String.format("Failed to initialize Panel UI extension [%s]", reference), e);
+        } catch (Exception e) {
+            throw new WikiComponentException(
+                String.format("Failed to retrieve panel document [%s]", reference), e);
         }
 
         return components;

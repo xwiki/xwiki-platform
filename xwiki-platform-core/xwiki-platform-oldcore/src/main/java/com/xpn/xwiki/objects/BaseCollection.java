@@ -51,7 +51,6 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -65,7 +64,7 @@ import com.xpn.xwiki.web.Utils;
  * <li>an XObject definition (composed of XObject properties)</li>
  * <li>an XWikiStats object (composed of stats properties)</li>
  * </ul>
- * 
+ *
  * @version $Id$
  */
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R> implements ObjectInterface,
@@ -94,7 +93,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
 
-    protected List fieldsToRemove = new ArrayList();
+    protected List<Object> fieldsToRemove = new ArrayList<>();
 
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
@@ -110,14 +109,38 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.TYPE_STRING, "relative");
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     /**
      * Used to normalize references.
      */
-    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
-        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver;
+
+    /**
+     * @return the component used to resolve XClass references in the way they are stored externally (database, xml,
+     *         etc), ie relative or absolute
+     */
+    protected EntityReferenceResolver<String> getRelativeEntityReferenceResolver()
+    {
+        if (this.relativeEntityReferenceResolver == null) {
+            this.relativeEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        }
+
+        return this.relativeEntityReferenceResolver;
+    }
+
+    /**
+     * @return the component used to normalize references
+     */
+    protected DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
+    {
+        if (this.currentReferenceDocumentReferenceResolver == null) {
+            this.currentReferenceDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        }
+
+        return this.currentReferenceDocumentReferenceResolver;
+    }
 
     public int getNumber()
     {
@@ -143,14 +166,14 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Get the absolute reference of the XClass.
-     * 
+     *
      * @since 2.2M2
      */
     public DocumentReference getXClassReference()
     {
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
             this.xClassReferenceCache =
-                this.currentReferenceDocumentReferenceResolver.resolve(getRelativeXClassReference(),
+                getCurrentReferenceDocumentReferenceResolver().resolve(getRelativeXClassReference(),
                     getDocumentReference());
         }
 
@@ -159,7 +182,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Get the actual reference to the XClass as stored in this instance.
-     * 
+     *
      * @since 4.0M2
      */
     public EntityReference getRelativeXClassReference()
@@ -169,7 +192,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
-     * 
+     *
      * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
      */
     @Deprecated
@@ -177,7 +200,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         String xClassAsString;
         if (getXClassReference() != null) {
-            xClassAsString = this.localEntityReferenceSerializer.serialize(getXClassReference());
+            xClassAsString = getLocalEntityReferenceSerializer().serialize(getXClassReference());
         } else {
             xClassAsString = "";
         }
@@ -189,7 +212,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * <p>
      * Note that absolute reference are not supported for xclasses which mean that the wiki part (whatever the wiki is)
      * of the reference will be systematically removed.
-     * 
+     *
      * @param xClassReference the reference to the XClass of this XObject.
      * @since 2.2.3
      */
@@ -211,7 +234,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
-     * 
+     *
      * @deprecated since 2.2.3 use {@link #setXClassReference(EntityReference)} ()} instead
      */
     @Deprecated
@@ -223,7 +246,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
             // "internal".
             if (!"internal".equals(name)) {
-                xClassReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+                xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
             }
         }
         setXClassReference(xClassReference);
@@ -784,9 +807,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
-                    // XXX: collision between DB and new: property to add but already exists in the DB
-                    mergeResult.error(new CollisionException("Collision found on property ["
-                        + newProperty.getReference() + "]"));
+                    // collision between DB and new: property to add but already exists in the DB
+                    mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                 if (propertyResult != null) {
@@ -795,15 +817,13 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         removeField(diff.getPropName());
                         mergeResult.setModified(true);
                     } else {
-                        // XXX: collision between DB and new: property to remove but not the same as previous
+                        // collision between DB and new: property to remove but not the same as previous
                         // version
-                        mergeResult.error(new CollisionException("Collision found on property ["
-                            + previousProperty.getReference() + "]"));
+                        mergeResult.getLog().error("Collision found on property [{}]", previousProperty.getReference());
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
-                    mergeResult.warn(new CollisionException("Property [" + previousProperty.getReference()
-                        + "] already removed"));
+                    mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                 if (propertyResult != null) {
@@ -814,13 +834,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
-                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
+                        mergeField(propertyResult, previousProperty, newProperty, configuration, context, mergeResult);
                     }
                 } else {
-                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                    // collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.warn(new CollisionException("Collision found on property ["
-                        + newProperty.getReference() + "]"));
+                    mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
 
                     addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                         : newProperty.clone());
@@ -828,6 +847,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+    }
+
+    protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context, MergeResult mergeResult)
+    {
+        currentElement.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     @Override
@@ -870,10 +895,11 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
     /**
      * Set the owner document of this base object.
-     * 
+     *
      * @param ownerDocument The owner document.
      * @since 5.3M1
      */
+    @Override
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);

@@ -1,0 +1,2 @@
+org.xwiki.filter.instance.output.ExtensionInstanceOutputFilterStream
+org.xwiki.filter.instance.output.ExtensionInstanceOutputFilterStreamFactory

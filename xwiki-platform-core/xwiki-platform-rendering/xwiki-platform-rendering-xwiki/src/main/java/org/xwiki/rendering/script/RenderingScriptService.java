@@ -25,8 +25,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -45,7 +47,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Provides Rendering-specific Scripting APIs.
- * 
+ *
  * @version $Id$
  * @since 2.3M1
  */
@@ -58,7 +60,8 @@ public class RenderingScriptService implements ScriptService
      * Used to lookup parsers and renderers to discover available syntaxes.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * @see #getDefaultTransformationNames()
@@ -72,6 +75,9 @@ public class RenderingScriptService implements ScriptService
     @Inject
     private SyntaxFactory syntaxFactory;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @return the list of syntaxes for which a Parser is available
      */
@@ -79,11 +85,12 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManager.<Parser>getInstanceList(Parser.class)) {
+            for (Parser parser : this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
             // Failed to lookup parsers, consider there are no syntaxes available
+            this.logger.error("Failed to lookup parsers", e);
         }
 
         return syntaxes;
@@ -96,20 +103,22 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            List<PrintRendererFactory> factories = this.componentManager.getInstanceList(PrintRendererFactory.class);
+            List<PrintRendererFactory> factories =
+                this.componentManagerProvider.get().getInstanceList(PrintRendererFactory.class);
             for (PrintRendererFactory factory : factories) {
                 syntaxes.add(factory.getSyntax());
             }
         } catch (ComponentLookupException e) {
             // Failed to lookup renderers, consider there are no syntaxes available
+            this.logger.error("Failed to lookup renderers", e);
         }
 
         return syntaxes;
     }
 
     /**
-     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by
-     *         the Transformation Manager when running all transformations
+     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by the
+     *         Transformation Manager when running all transformations
      */
     public List<String> getDefaultTransformationNames()
     {
@@ -128,7 +137,7 @@ public class RenderingScriptService implements ScriptService
     {
         XDOM result;
         try {
-            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            Parser parser = this.componentManagerProvider.get().getInstance(Parser.class, syntaxId);
             result = parser.parse(new StringReader(text));
         } catch (Exception e) {
             result = null;
@@ -149,7 +158,8 @@ public class RenderingScriptService implements ScriptService
         String result;
         WikiPrinter printer = new DefaultWikiPrinter();
         try {
-            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId);
+            BlockRenderer renderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, outputSyntaxId);
             renderer.render(block, printer);
             result = printer.toString();
         } catch (Exception e) {
@@ -173,5 +183,60 @@ public class RenderingScriptService implements ScriptService
             syntax = null;
         }
         return syntax;
+    }
+
+    /**
+     * Escapes a give text using the escaping method specific to the given syntax.
+     * <p/>
+     * One example of escaping method is using escape characters like {@code ~} for the {@link Syntax#XWIKI_2_1} syntax
+     * on all or just some characters of the given text.
+     * <p/>
+     * The current implementation only escapes XWiki 1.0, 2.0 and 2.1 syntaxes.
+     *
+     * @param content the text to escape
+     * @param syntax the syntax to escape the content in (e.g. {@link Syntax#XWIKI_1_0}, {@link Syntax#XWIKI_2_0},
+     *            {@link Syntax#XWIKI_2_1}, etc.). This is the syntax where the output will be used and not necessarily
+     *            the same syntax of the input content
+     * @return the escaped text or {@code null} if the given content or the given syntax are {@code null}, or if the
+     *         syntax is not supported
+     * @since 7.1M1
+     */
+    public String escape(String content, Syntax syntax)
+    {
+        if (content == null || syntax == null) {
+            return null;
+        }
+        String input = String.valueOf(content);
+
+        // Determine the escape character for the syntax.
+        char escapeChar;
+        try {
+            escapeChar = getEscapeCharacter(syntax);
+        } catch (Exception e) {
+            // We don`t know how to proceed, so we just return null.
+            return null;
+        }
+
+        // Since we prefix all characters, the result size will be double the input's, so we can just use char[].
+        char[] result = new char[input.length() * 2];
+
+        // Escape the content.
+        for (int i = 0; i < input.length(); i++) {
+            result[2 * i] = escapeChar;
+            result[2 * i + 1] = input.charAt(i);
+        }
+
+        return String.valueOf(result);
+    }
+
+    private char getEscapeCharacter(Syntax syntax) throws IllegalArgumentException
+    {
+        if (Syntax.XWIKI_1_0.equals(syntax)) {
+            return '\\';
+        } else if (Syntax.XWIKI_2_0.equals(syntax) || Syntax.XWIKI_2_1.equals(syntax)) {
+            return '~';
+        }
+
+        throw new IllegalArgumentException(String.format("Escaping is not supported for Syntax [%s]", syntax));
     }
 }

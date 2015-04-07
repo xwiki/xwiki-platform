@@ -1,0 +1,35 @@
+#template('xwikivars.vm')
+#set($parents = [])
+#set($discard = $parents.add($doc.fullName))
+#macro(computeHierarchy $doc $result $level)
+  #set($parent = $doc.parent)
+  #if(($parent != '') && ($level < 6) && (!$parents.contains($parent)))
+    #set($discard = $parents.add($parent))
+    #set($pdoc = $xwiki.getDocument($parent))
+    #if ($pdoc)
+      #set ($pdocurl = $pdoc.getURL('view'))
+      #set ($nstring = "<li><a href='$pdocurl'>$escapetool.xml(${pdoc.translatedDocument.plainTitle})</a></li>$result")
+      #set ($level = $level + 1)
+      #computeHierarchy($pdoc $nstring $level)
+    #else
+      ## No access to the parent document
+      <li><a href='$xwiki.getURL($parent)'>$escapetool.xml(${parent})</a></li>
+      $result
+    #end
+  #else
+    $result
+  #end
+#end
+#if($isInServletMode) ## Visible only in a page
+  #if("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+    <ol id="hierarchy" class="breadcrumb clearfix">
+    #if ($doc.fullName != 'Main.WebHome')
+      #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+        #computeHierarchy($doc "<li><a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a></li>" 0)
+      #else
+        #computeHierarchy($doc "<li class='active'>$escapetool.xml($tdoc.getPlainTitle())</li>" 0)
+      #end
+    #end
+    </ol>
+  #end
+#end

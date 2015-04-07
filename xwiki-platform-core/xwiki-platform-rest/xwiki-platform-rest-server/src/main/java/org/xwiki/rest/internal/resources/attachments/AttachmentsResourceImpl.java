@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
 
+import javax.inject.Named;
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Multipart;
@@ -44,7 +45,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.attachments.AttachmentsResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.attachments.AttachmentsResourceImpl")
 public class AttachmentsResourceImpl extends BaseAttachmentsResource implements AttachmentsResource
 {
     private static String FORM_FILENAME_FIELD = "filename";

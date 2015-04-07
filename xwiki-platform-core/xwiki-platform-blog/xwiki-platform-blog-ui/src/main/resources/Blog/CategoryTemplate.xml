@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>CategoryTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.CategoryClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.CategoryClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1220442193000</creationDate>
   <date>1226817947000</date>
   <contentUpdateDate>1226817947000</contentUpdateDate>
   <version>1.1</version>
   <title>Template for blog categories</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Blog.CategoryTemplate</name>
+    <number>0</number>
+    <className>Blog.CategoryClass</className>
+    <guid>bbda1bac-f20a-4599-91ad-b5395b5e4efd</guid>
     <class>
       <name>Blog.CategoryClass</name>
       <customClass/>
@@ -56,6 +57,7 @@
       <description>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
+        <disabled>0</disabled>
         <editor>---</editor>
         <name>description</name>
         <number>2</number>
@@ -71,6 +73,7 @@
       </description>
       <name>
         <customDisplay/>
+        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <picker>0</picker>
@@ -83,10 +86,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>Blog.CategoryTemplate</name>
-    <number>0</number>
-    <className>Blog.CategoryClass</className>
-    <guid>bbda1bac-f20a-4599-91ad-b5395b5e4efd</guid>
     <property>
       <description>Category description</description>
     </property>
@@ -94,5 +93,4 @@
       <name>CategoryName</name>
     </property>
   </object>
-  <content/>
 </xwikidoc>

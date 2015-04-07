@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * @version $Id$
@@ -34,6 +35,8 @@ public class DistributionRequest extends AbstractRequest implements Cloneable
      */
     public static final String PROPERTY_WIKI = "wiki";
 
+    public static final String PROPERTY_USERREFERENCE = "user.reference";
+
     public void setWiki(String wiki)
     {
         setProperty(PROPERTY_WIKI, wiki);
@@ -42,6 +45,16 @@ public class DistributionRequest extends AbstractRequest implements Cloneable
     public String getWiki()
     {
         return getProperty(PROPERTY_WIKI);
+    }
+
+    public void setUserReference(DocumentReference userReference)
+    {
+        setProperty(PROPERTY_USERREFERENCE, userReference);
+    }
+
+    public DocumentReference getUserReference()
+    {
+        return getProperty(PROPERTY_USERREFERENCE);
     }
 
     @Override

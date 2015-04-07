@@ -1,0 +1,49 @@
+#set ($discard = $xwiki.ssfx.use('uicomponents/job/job.css', true))
+
+$services.template.execute('logging_macros.vm')
+
+#macro (displayJobProgressBar $jobStatus)
+  <div class="ui-progress">
+    <div class="ui-progress-background">
+      #set ($percent = $jobStatus.progress.offset)
+      ## There is no progress information if the job was scheduled but hasn't started yet.
+      #if (!$percent)
+        #set ($percent = 0)
+      #end
+      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+      <div class="ui-progress-bar green" style="width:${percent}%"></div>
+    </div>
+    #if ($jobStatus && !$jobStatus.log.isEmpty())
+      ## We need the tail of the log queue.
+      #set ($logList = [])
+      #set ($discard = $logList.addAll($jobStatus.log))
+      <p class="ui-progress-message">
+        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
+      </p>
+    #end
+  </div>
+#end
+
+#macro (displayJobStatusLog $status $collapsed)
+  <dl class="xform">
+    ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
+    <dt>
+      <label class="collapsible#if ($collapsed || $status.state == 'WAITING') collapsed#end">
+        #set ($jobType = $status.request.getProperty('job.type'))
+        #set ($translationKey = "job.log.label.$jobType")
+        #if (!$services.localization.get($translationKey))
+          #set ($translationKey = 'job.log.label')
+        #end
+        $services.localization.render($translationKey)
+      </label>
+    </dt>
+    <dd>#printStatusLog($status)</dd>
+  </dl>
+#end
+
+#macro (printStatusLog $status)
+  #if ($status.state != 'FINISHED')
+    #set($loading = true)
+  #end
+  #printLogs($status.log $loading)
+#end

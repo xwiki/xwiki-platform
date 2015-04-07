@@ -28,9 +28,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Action for re-enabling a property definition of the current class. The property to enable is specified in the {@code
- * propname} request parameter, and the class is the one defined in the requested document.
- * 
+ * Action for re-enabling a property definition of the current class. The property to enable is specified in the
+ * {@code propname} request parameter, and the class is the one defined in the requested document.
+ *
  * @version $Id$
  * @since 2.4M2
  */
@@ -47,7 +47,9 @@ public class PropEnableAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.enableField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.enableClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(
+            doc,
+            localizePlainOrKey("core.model.xclass.enableClassProperty.versionSummary",
+                Collections.singletonList(propertyName)), true, context);
     }
 }

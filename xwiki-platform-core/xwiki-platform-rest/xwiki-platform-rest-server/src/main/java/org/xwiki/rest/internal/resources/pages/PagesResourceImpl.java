@@ -22,6 +22,8 @@ package org.xwiki.rest.internal.resources.pages;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -37,7 +39,8 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.pages.PagesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.pages.PagesResourceImpl")
 public class PagesResourceImpl extends XWikiResource implements PagesResource
 {
     @Override
@@ -45,12 +48,12 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
             String parentFilterExpression, String order, Boolean withPrettyNames)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         Pages pages = objectFactory.createPages();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             Query query = ("date".equals(order)) ? queryManager.createQuery(
                     "select doc.name from Document doc where doc.space=:space and language='' order by doc.date desc",
@@ -105,7 +108,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return pages;

@@ -45,9 +45,9 @@ public class LoadingPanel extends FocusPanel
      */
     public boolean isLoading()
     {
-        // NOTE: We don't test the parent but the next sibling because in IE the parent of an orphan node is sometimes a
-        // document fragment, thus not null.
-        return getElement().getNextSibling() != null;
+        // NOTE: We use getParentElement() instead of getParentNode() because in IE the parent of an orphan node is
+        // sometimes a document fragment, so we have to check if the parent is an element node.
+        return getElement().getParentElement() != null;
     }
 
     /**

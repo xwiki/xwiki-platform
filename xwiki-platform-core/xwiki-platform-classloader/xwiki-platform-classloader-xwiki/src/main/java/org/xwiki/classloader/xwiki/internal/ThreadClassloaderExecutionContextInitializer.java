@@ -24,12 +24,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.classloader.ClassLoaderManager;
-import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
@@ -53,21 +51,14 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
      */
     @Inject
     @Named("current")
-    private EntityReferenceValueProvider provider;
+    private EntityReferenceValueProvider currentWikiProvider;
 
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        String currentWikiId = this.provider.getDefaultValue(EntityType.WIKI);
-
-        NamespaceURLClassLoader extensionClassLoader =
-            this.classLoaderManager.getURLClassLoader(currentWikiId != null ? "wiki:" + currentWikiId : null, false);
-
-        if (extensionClassLoader != null) {
-            // TODO: This overwrite the current context classloader. We should instead save the current classloader in
-            // a stack and add a restore() method to put it back (and ensure that at the end of a request the stack is
-            // always empty!).
-            Thread.currentThread().setContextClassLoader(extensionClassLoader);
+        if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
+            Thread.currentThread().setContextClassLoader(
+                new ContextNamespaceURLClassLoader(currentWikiProvider, this.classLoaderManager));
         }
     }
 }

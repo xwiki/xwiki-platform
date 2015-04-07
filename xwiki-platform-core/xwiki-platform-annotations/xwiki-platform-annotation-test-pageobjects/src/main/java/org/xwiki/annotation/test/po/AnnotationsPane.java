@@ -40,9 +40,15 @@ public class AnnotationsPane extends BaseElement
      */
     public void showAnnotationsPane()
     {
-        WebElement annotationsPane = getDriver().findElement(By.xpath("//div[@id='tmAnnotations']//a[@class='tme']"));
+        // Open the page menu
+        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
+            click();
+        // Click on the annotations button
+        WebElement annotationsPane = getDriver().findElement(
+            By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
-        waitUntilElementIsVisible(By.className("annotationsettings"));
+        // Verify that the annotationssettings panel is open
+        getDriver().waitUntilElementIsVisible(By.className("annotationsettings"));
     }
 
     /**
@@ -50,9 +56,15 @@ public class AnnotationsPane extends BaseElement
      */
     public void hideAnnotationsPane()
     {
-        WebElement annotationsPane = getDriver().findElement(By.xpath("//div[@id='tmAnnotations']//a[@class='tme']"));
+        // Open the page menu
+        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
+                click();
+        // Click on the annotations button
+        WebElement annotationsPane = getDriver().findElement(
+                By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
-        waitUntilElementDisappears(By.className("annotationsettings"));
+        // Verify that the annotationssettings panel is close
+        getDriver().waitUntilElementDisappears(By.className("annotationsettings"));
     }
 
     /**
@@ -82,7 +94,7 @@ public class AnnotationsPane extends BaseElement
      */
     public boolean checkIfShowAnnotationsCheckboxExists()
     {
-        if (getUtil().findElementsWithoutWaiting(getDriver(), By.id("annotationsdisplay")).size() > 0) {
+        if (getDriver().findElementsWithoutWaiting(By.id("annotationsdisplay")).size() > 0) {
             return true;
         } else {
             return false;

@@ -34,7 +34,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
 /**
  * An automatic XWikiContext stub injecter for ExecutionContext for daemons unable to create a proper XWikiContext (no
  * real request information or not even know about XWikiContext like components).
- * 
+ *
  * @see XWikiStubContextProvider
  * @version $Id$
  * @since 2.0M3

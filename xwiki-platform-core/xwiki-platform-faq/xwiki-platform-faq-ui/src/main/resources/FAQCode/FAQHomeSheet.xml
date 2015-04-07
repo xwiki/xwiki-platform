@@ -40,8 +40,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', 'true'))
 #set($faqHome = $doc.getObject("FAQCode.FAQHomeClass"))
 #if($faqHome)
+  ## Don't display doc extra tabs for FAQ home pages
+  #set($docextras=[])
   $doc.use("FAQCode.FAQHomeClass")
   $xwiki.jsx.use('FAQCode.SkinExtension')
   $xwiki.ssx.use('FAQCode.SkinExtension')
@@ -61,20 +64,18 @@
     {{/box}}
   #end
 
-  (% class="centered" %) (((
-
-  (% class="faq-link search-faq" %)(((
-    $services.localization.render('platform.faq.search.title')
+  (% class="faq-link search-faq box" %)(((
+    === #if($services.icon)$services.icon.render('find')#end $services.localization.render('platform.faq.search.title') ===
     (((
     {{html}}
-    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')"&gt;
+    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')" class="xformInline"&gt;
       &lt;div&gt;
       ## Lucene search needs the $request.space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
       ## Lucene search needs the $request.wikinames param
       &lt;input type="hidden" name="wikinames" value="${xcontext.database}" /&gt;
       ## Both Lucene and SOLR searches obey the $request.text param
-      &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
+      &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="16" class="withTip" /&gt;
       &lt;span class="buttonwrapper"&gt;
         &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.search.submit')" /&gt;
       &lt;/span&gt;
@@ -84,8 +85,8 @@
     )))
   )))
 
-  (% class="faq-link add-faq" %)(((
-    $services.localization.render('platform.faq.create.title')
+  (% class="faq-link add-faq box" %)(((
+    === #if($services.icon)$services.icon.render('add')#end $services.localization.render('platform.faq.create.title') ===
 
     (((
     {{html}}
@@ -94,14 +95,14 @@
       #set($register = ${escapetool.xml($xwiki.getURL($services.model.resolveDocument('', 'default'), "register", "xredirect=$doc.externalURL"))})
       $services.localization.render('platform.faq.need', ["&lt;a href=$login&gt;","&lt;/a&gt;","&lt;a href=$register&gt;","&lt;/a&gt;"])
     #else
-      &lt;form action="" id="newfaq"&gt;
+      &lt;form action="$doc.getURL()" id="newfaq" class="xformInline"&gt;
         &lt;div&gt;
           &lt;input type="hidden" name="parent" value="${faqSpace}.WebHome" /&gt;
           &lt;input type="hidden" name="template" value="FAQCode.FAQTemplate" /&gt;
           &lt;input type="hidden" name="createFAQ" value="true" /&gt;
-          &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="25"/&gt;
+          &lt;input class="withTip" type="text" name="question" value="$services.localization.render('platform.faq.create.questionHint')" size="16"/&gt;
           &lt;span class="buttonwrapper"&gt;
-            &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.create.submit')" /&gt;
+            &lt;input class="btn btn-success button" type="submit" value="$services.localization.render('platform.faq.create.submit')" /&gt;
           &lt;/span&gt;
         &lt;/div&gt;
       &lt;/form&gt;
@@ -110,13 +111,11 @@
     )))
   )))
 
-  )))
-
   (% class="clearfloats" %)((()))(%%)
 
   {{faq filter="space=${faqSpace}"/}}
-  #else
-    This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
-  #end
+#else
+  This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
+#end
 {{/velocity}}</content>
 </xwikidoc>

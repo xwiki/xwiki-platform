@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -34,7 +34,7 @@
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.restlet.jse</groupId>
@@ -68,11 +68,15 @@
           <artifactId>stax-api</artifactId>
           <groupId>javax.xml.stream</groupId>
         </exclusion>
-        <!-- We use Servlet API 2.4 at the moment but org.restlet.ext.jaxrs requires version 2.5 so we need to exclude
-             it. Luckily it seems to work fine with 2.4. -->
+        <!-- Exclude Servlet API 2.5 which is not declared as provided. And we use a newer version too. -->
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -93,6 +97,23 @@
       <artifactId>org.restlet.ext.jaxb</artifactId>
       <version>${restlet.version}</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-api</artifactId>
+          <groupId>javax.xml.bind</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -110,14 +131,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-lucene-api</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -199,13 +220,13 @@
             org/xwiki/rest/internal/resources/spaces/SpaceSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/spaces/SpacesResourceImpl.java,
             org/xwiki/rest/internal/resources/SyntaxesResourceImpl.java,
+            org/xwiki/rest/internal/resources/search/*,
             org/xwiki/rest/internal/resources/tags/PagesForTagsResourceImpl.java,
             org/xwiki/rest/internal/resources/tags/TagsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiAttachmentsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiPagesResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchQueryResourceImpl.java,
-            org/xwiki/rest/internal/resources/wikis/WikisSearchQueryResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikisResourceImpl.java,
             org/xwiki/rest/internal/Utils.java,
             org/xwiki/rest/internal/XWikiAuthentication.java,

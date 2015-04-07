@@ -55,7 +55,7 @@ public class SafeCoreExtension<T extends CoreExtension> extends WrappingCoreExte
     @Override
     public CoreExtensionFile getFile()
     {
-        return this.safeProvider.get(super.getRepository());
+        return this.safeProvider.get(super.getFile());
     }
 
     @Override

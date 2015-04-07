@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.Utils;
  * <li>fromIncludingDoc: If present, when the current document is included using #include*, use the top level document
  * instead of the included one. This is useful for templates, for example.</li>
  * </ul>
- * 
+ *
  * @version $Id$
  */
 public class ImageMacro extends BaseLocaleMacro
@@ -151,7 +151,7 @@ public class ImageMacro extends BaseLocaleMacro
         }
 
         // Create the img code
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (halign != null && !halign.equals("none")) {
             str.append("<div class=\"img" + halign.trim() + "\">");
         }

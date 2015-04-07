@@ -26,7 +26,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A mutable version of a DeletedFilesystemAttachment, passed around and populated while loading.
- * 
+ *
  * @version $Id$
  * @since 3.0M3
  */

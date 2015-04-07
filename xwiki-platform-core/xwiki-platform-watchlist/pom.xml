@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-watchlist</artifactId>
   <name>XWiki Platform - Watchlist - Parent POM</name>
@@ -39,7 +39,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-watchlist-test-pageobjects</module>
+        <module>xwiki-platform-watchlist-test</module>
       </modules>
     </profile>
   </profiles>

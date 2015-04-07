@@ -55,20 +55,18 @@ public class InvitationSenderPage extends BasePage
 
     public static InvitationSenderPage gotoPage()
     {
-        InvitationSenderPage page = new InvitationSenderPage();
-        page.getDriver().get(page.getURL());
-        return page;
+        getUtil().gotoPage(getURL());
+        return new InvitationSenderPage();
     }
 
-    public String getURL()
+    public static String getURL()
     {
         return getUtil().getURL("Invitation", "WebHome");
     }
 
     public boolean userIsSpammer()
     {
-        for (WebElement error : getUtil().findElementsWithoutWaiting(getDriver(),
-            By.id("invitation-permission-error"))) {
+        for (WebElement error : getDriver().findElementsWithoutWaiting(By.id("invitation-permission-error"))) {
             if (error.getText().equals(
                 "A message which you sent was reported as spam and your privilege to send mail has"
                     + " been suspended pending investigation, we apologize for the inconvenience.")) {

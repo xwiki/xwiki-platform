@@ -230,7 +230,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
-     * Get documents with the given tags.
+     * Get non-hidden documents with the given tags.
      *
      * @param tag a list of tags to match.
      * @param context XWiki context.
@@ -240,6 +240,22 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getDocumentsWithTag(tag, context);
+    }
+
+    /**
+     * Get documents with the given tags.
+     *
+     * @param tag a list of tags to match.
+     * @param includeHiddenDocuments if true then also include hidden documents
+     * @param context XWiki context.
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 6.2M1
+     */
+    public List<String> getDocumentsWithTag(String tag, boolean includeHiddenDocuments, XWikiContext context)
+        throws XWikiException
+    {
+        return TagQueryUtils.getDocumentsWithTag(tag, includeHiddenDocuments, context);
     }
 
     /**
@@ -302,7 +318,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -358,7 +374,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (added) {
             setDocumentTags(document, documentTags, context);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tags);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -428,7 +444,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             setDocumentTags(document, tags, context);
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
-            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+            String comment = localizePlainOrKey("plugin.tag.editcomment.removed", commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -453,14 +469,16 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
-        List<String> docNamesToProcess = getDocumentsWithTag(tag, context);
+        // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
+        // accessible to users, it's just not visible for simple users; it doesn't change permissions.
+        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, context);
         if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
         List<String> commentArgs = new ArrayList<String>();
         commentArgs.add(tag);
         commentArgs.add(newTag);
-        String comment = context.getMessageTool().get("plugin.tag.editcomment.renamed", commentArgs);
+        String comment = localizePlainOrKey("plugin.tag.editcomment.renamed", commentArgs);
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);
@@ -497,7 +515,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult deleteTag(String tag, XWikiContext context) throws XWikiException
     {
-        List<String> docsToProcess = getDocumentsWithTag(tag, context);
+        // Since we're deleting a tag, we want to delete it even if the document is hidden. A hidden document is still
+        // accessible to users, it's just not visible for simple users; it doesn't change permissions.
+        List<String> docsToProcess = getDocumentsWithTag(tag, true, context);
 
         if (docsToProcess.size() == 0) {
             return TagOperationResult.NO_EFFECT;

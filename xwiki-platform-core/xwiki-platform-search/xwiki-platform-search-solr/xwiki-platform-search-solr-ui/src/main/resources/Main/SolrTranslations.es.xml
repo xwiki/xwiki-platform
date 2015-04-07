@@ -44,23 +44,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+solr.admin.indexing.action.label=Acción
+solr.admin.status.title=Estado
 solr.facets.collapseAll=Contraer todo
 solr.facets.expandAll=Expandir Todo
-solr.filter.title=Opciones Avanzadas
-solr.filterBy.fileType=Tipo de fichero
+solr.field.creator_display=Creador
 solr.filterBy.fileType.image=Imagen
 solr.filterBy.fileType.text=Texto
-solr.filterBy.language=Idioma
-solr.filterBy.language.all=Todos los idiomas
-solr.filterBy.space=Espacio
-solr.filterBy.type=Tipo
-solr.filterBy.type.all=Todos los tipos
 solr.filterBy.type.attachment=Adjunto
 solr.filterBy.type.document=Documento
 solr.filterBy.type.object=Objeto
-solr.filterBy.wiki.all=Todos los wikis
 solr.result.location=Ubicado en {0} » {1} » {2}
-solr.result.property=Propiedad {0}\#{1}
 solr.sortBy=Ordenar por\:
 solr.sortBy.author_display_sort=Último Autor
 solr.sortBy.date=Fecha

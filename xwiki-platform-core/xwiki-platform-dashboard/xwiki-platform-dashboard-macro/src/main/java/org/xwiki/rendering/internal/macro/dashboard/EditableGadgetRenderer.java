@@ -25,7 +25,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -36,6 +40,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
  * Editable gadget renderer, that renders the gadget as in view mode, but with additional metadata that allows editing
@@ -54,13 +59,67 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
      * holds the rest of the metadata).
      */
     protected static final String METADATA = "metadata";
+    
+    private static final String ANNOTATED_SYNTAXES_PREFIX = "annotated";
 
     /**
      * The macro content renderer, to render the macro as annotated XHTML to be editable.
      */
     @Inject
     @Named("annotatedxhtml/1.0")
-    protected BlockRenderer gadgetContentRenderer;
+    protected BlockRenderer defaultGadgetContentRenderer;
+    
+    @Inject
+    protected ComponentManager componentManager;
+    
+    @Inject
+    protected RenderingContext renderingContext;
+    
+    @Inject
+    protected Logger logger;
+
+    /** 
+     * @return the renderer corresponding to the "annotated" version of the current target syntax
+     */
+    protected BlockRenderer getGadgetContentRenderer()
+    {
+        // Get the current syntax
+        Syntax currentTargetSyntax = renderingContext.getTargetSyntax();
+        if (currentTargetSyntax == null) {
+            // (it should never happen actually)
+            return defaultGadgetContentRenderer;
+        }
+
+        // Get the annotated syntax corresponding to the current target syntax
+        String annotatedTargetSyntax = currentTargetSyntax.toIdString();
+        if (!StringUtils.startsWith(annotatedTargetSyntax, ANNOTATED_SYNTAXES_PREFIX)) {
+            annotatedTargetSyntax = ANNOTATED_SYNTAXES_PREFIX + annotatedTargetSyntax;
+        }
+        
+        try {
+            return componentManager.getInstance(BlockRenderer.class, annotatedTargetSyntax);
+        } catch (ComponentLookupException e) {
+            logger.warn("Failed to load the syntax [{}].", annotatedTargetSyntax);
+            // Failback to the default renderer
+            return defaultGadgetContentRenderer;
+        }
+    }
+
+    /** 
+     * @param gadgetContentRenderer the renderer used to render the gadget
+     * @return the syntax to set to the raw block according to the given renderer
+     */
+    protected Syntax getRawBlockSyntax(BlockRenderer gadgetContentRenderer)
+    {
+        // If there is a BlockRenderer corresponding to the "annotated" version of the current 
+        // RenderingContext#getTargetSyntax(), then we return the current target syntax.
+        //
+        // On the opposite, if we have fallbacked to the defaultGadgetContentRenderer (see getGadgetContentRenderer()),
+        // we have to use the syntax corresponding to that renderer: XHTML 1.0.
+        //
+        return gadgetContentRenderer != defaultGadgetContentRenderer
+                ? renderingContext.getTargetSyntax() : Syntax.XHTML_1_0;
+    }
 
     /**
      * @param gadget the gadget to decorate
@@ -86,8 +145,9 @@ public class EditableGadgetRenderer extends DefaultGadgetRenderer
             GroupBlock renderedContentBlock = new GroupBlock();
             renderedContentBlock.setParameter(CLASS, "content");
             WikiPrinter printer = new DefaultWikiPrinter();
+            BlockRenderer gadgetContentRenderer = getGadgetContentRenderer();            
             gadgetContentRenderer.render(gadget.getContent(), printer);
-            RawBlock rawBlock = new RawBlock(printer.toString(), Syntax.XHTML_1_0);
+            RawBlock rawBlock = new RawBlock(printer.toString(), getRawBlockSyntax(gadgetContentRenderer));
             renderedContentBlock.addChild(rawBlock);
 
             // render the title in the page as well, to be edited as source

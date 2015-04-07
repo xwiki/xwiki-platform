@@ -20,25 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogPostSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.BlogPostClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.BlogPostClass</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1226267213000</creationDate>
   <date>1227223071000</date>
   <contentUpdateDate>1227223071000</contentUpdateDate>
   <version>1.1</version>
   <title>$!doc.getValue("title")</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -48,7 +44,6 @@
 {{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
-{{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
 $xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
@@ -69,7 +64,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   ; {{translation key='xe.blog.sheet.summary'/}}
   : $doc.display('extract', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.category'/}}
-  : (((#displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((())))))
+  : ((({{html clean="false" wiki="true"}}#displayCategoryManagementTree('' 'selectable'){{/html}} (% class="clearfloats" %)((())))))
   #if ($doc.isNew())
     ## We're creating a new blog post. We handle this case differently because #isPublished returns true when the
     ## property is not set (object missing) and thus the new blog post will appear as published. See also the comment
@@ -94,9 +89,10 @@ $xwiki.ssx.use('Blog.ManageCategories')##
       ## The publish date was not set, force it to be the creation date
       $entryObj.set('publishDate', $doc.creationDate)
     #end
+    {{html clean="false" wiki="true"}}
     #publishMessageBox("$services.localization.render('xe.blog.sheet.notpublished') &lt;label&gt;**$services.localization.render('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}**&lt;/label&gt;\\&lt;label&gt;$services.localization.render('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
+    {{/html}}
   #end
 #end
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

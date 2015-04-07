@@ -40,13 +40,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -70,12 +69,12 @@ public class Utils
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
      * for any non component code that need to initialize/access components.
      */
-    private static ComponentManager componentManager;
+    private static ComponentManager rootComponentManager;
 
     /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
      * Response}. This is the main entry point to the View part of the XWiki MVC architecture.
-     * 
+     *
      * @param template The name of the template to parse, without the {@code .vm} prefix. The template will be searched
      *            in the usual places: current XWikiSkins object, attachment of the current skin document, current skin
      *            folder, baseskin folder, /templates/ folder.
@@ -92,7 +91,7 @@ public class Utils
     /**
      * Generate the response by parsing a velocity template and (optionally) printing the result to the
      * {@link XWikiResponse Response}.
-     * 
+     *
      * @param template The name of the template to parse, without the {@code .vm} prefix. The template will be searched
      *            in the usual places: current XWikiSkins object, attachment of the current skin document, current skin
      *            folder, baseskin folder, /templates/ folder.
@@ -113,8 +112,7 @@ public class Utils
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
         if ((response instanceof XWikiServletResponse)
-            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND)
-        {
+            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND) {
             return;
         }
 
@@ -122,6 +120,13 @@ public class Utils
         response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
         String action = context.getAction();
+        long cacheSetting = context.getWiki().getXWikiPreferenceAsLong("headers_nocache", -1, context);
+        if (cacheSetting == -1) {
+            cacheSetting = context.getWiki().ParamAsLong("xwiki.httpheaders.cache", -1);
+        }
+        if (cacheSetting == -1) {
+            cacheSetting = 1;
+        }
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
@@ -131,10 +136,18 @@ public class Utils
                     }
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
+                if (cacheSetting == 1) {
                     response.setHeader("Pragma", "no-cache");
                     response.setHeader("Cache-Control", "no-cache");
+                } else if (cacheSetting == 2) {
+                    response.setHeader("Pragma", "no-cache");
+                    response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+                } else if (cacheSetting == 3) {
+                    response.setHeader("Cache-Control", "private");
+                } else if (cacheSetting == 4) {
+                    response.setHeader("Cache-Control", "public");
                 }
+
                 // Set an expires in one month
                 long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
                 if (expires == -1) {
@@ -147,7 +160,7 @@ public class Utils
 
         if (("download".equals(action)) || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
-            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
+            if (cacheSetting == 1 || cacheSetting == 2) {
                 response.setHeader("Cache-Control", "no-cache");
             }
         }
@@ -195,9 +208,8 @@ public class Utils
             // We only write if the caller has asked.
             // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
             // response has already been written to and we shouldn't try to write in it.
-            if (write && ((response instanceof XWikiServletResponse)
-                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
-            {
+            if (write
+                && ((response instanceof XWikiServletResponse) && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)) {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
@@ -225,7 +237,7 @@ public class Utils
      * Retrieve the URL to which the client should be redirected after the successful completion of the requested
      * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
      * is set to an empty value, return the default redirect specified as the second argument.
-     * 
+     *
      * @param request the current request
      * @param defaultRedirect the default value to use if no {@code xredirect} parameter is present
      * @return the destination URL, as specified in the {@code xredirect} parameter, or the specified default URL
@@ -245,7 +257,7 @@ public class Utils
      * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
      * is set to an empty value, compose an URL back to the current document, using the specified action and query
      * string, and return it.
-     * 
+     *
      * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
      * @param queryString the query parameters to append to the fallback URL
      * @param context the current context
@@ -262,7 +274,7 @@ public class Utils
      * action. If any of the specified {@code redirectParameters} (in order) is present in the query string, it is
      * returned as the redirect destination. If none of the parameters is set, compose an URL back to the current
      * document using the specified action and query string, and return it.
-     * 
+     *
      * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
      * @param queryString the query parameters to append to the fallback URL
      * @param redirectParameters list of request parameters to look for as the redirect destination; each of the
@@ -294,7 +306,7 @@ public class Utils
      * Retrieve the URL to which the client should be redirected after the successful completion of the requested
      * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
      * is set to an empty value, compose an URL back to the current document, using the specified action, and return it.
-     * 
+     *
      * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
      * @param context the current context
      * @return the destination URL, as specified in the {@code xredirect} parameter, or computed using the current
@@ -309,7 +321,7 @@ public class Utils
      * Retrieve the name of the velocity template which should be used to generate the response. This is taken from the
      * {@code xpage} parameter in the query string. If this parameter is not set, or is set to an empty value, return
      * the provided default name.
-     * 
+     *
      * @param request the current request
      * @param defaultpage the default value to use if no {@code xpage} parameter is set
      * @return the name of the requested template, as specified in the {@code xpage} parameter, or the specified default
@@ -327,7 +339,7 @@ public class Utils
 
     /**
      * Get the name of an uploaded file, corresponding to the specified form field.
-     * 
+     *
      * @param filelist the list of uploaded files, computed by the FileUpload plugin
      * @param name the name of the form field
      * @return the original name of the file, if the specified field name does correspond to an uploaded file, or
@@ -346,7 +358,7 @@ public class Utils
 
     /**
      * Get the content of an uploaded file, corresponding to the specified form field.
-     * 
+     *
      * @param filelist the list of uploaded files, computed by the FileUpload plugin
      * @param name the name of the form field
      * @return the content of the file, if the specified field name does correspond to an uploaded file, or {@code null}
@@ -389,7 +401,7 @@ public class Utils
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);
-        context.setDatabase(dbname);
+        context.setWikiId(dbname);
 
         int mode = 0;
         if (request instanceof XWikiServletRequest) {
@@ -408,7 +420,7 @@ public class Utils
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
-     * 
+     *
      * @param data input string containing request parameters
      * @param encoding the encoding to use for transforming bytes into characters
      * @throws IllegalArgumentException if the data is malformed
@@ -447,7 +459,7 @@ public class Utils
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
-     * 
+     *
      * @param data input byte array containing request parameters
      * @param encoding Encoding to use for converting hex
      * @throws UnsupportedEncodingException if the data is malformed
@@ -506,7 +518,7 @@ public class Utils
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
-     * 
+     *
      * @param b the character value byte
      */
     private static byte convertHexDigit(byte b)
@@ -530,7 +542,7 @@ public class Utils
      * <p>
      * Code borrowed from Apache Tomcat 5.0
      * </p>
-     * 
+     *
      * @param map the map that is being constructed
      * @param name the name of the parameter
      * @param value the value of the parameter
@@ -551,7 +563,7 @@ public class Utils
 
     /**
      * Escapes the XML special characters in a <code>String</code> using numerical XML entities.
-     * 
+     *
      * @param value the text to escape, may be null
      * @return a new escaped <code>String</code>, <code>null</code> if null input
      * @deprecated starting with 2.7 use {@link XMLUtils#escape(Object) $services.xml.escape(content)}
@@ -591,7 +603,7 @@ public class Utils
 
     /**
      * Process a multi-part request, extracting all the uploaded files.
-     * 
+     *
      * @param request the current request to process
      * @param context the current context
      * @return the instance of the {@link FileUploadPlugin} used to parse the uploaded files
@@ -626,27 +638,74 @@ public class Utils
     }
 
     /**
-     * @param componentManager the component manager used by {@link #getComponent(Class)} and
+     * @param componentManager the root component manager used by {@link #getComponent(Class)} and
      *            {@link #getComponent(Class, String)}
      */
     public static void setComponentManager(ComponentManager componentManager)
     {
-        Utils.componentManager = componentManager;
+        Utils.rootComponentManager = componentManager;
     }
 
     /**
-     * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @return the root component manager
+     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
+     *             possible since it add a strong dependency to a static to your code
+     */
+    @Deprecated
+    public static ComponentManager getRootComponentManager()
+    {
+        return rootComponentManager;
+    }
+
+    /**
+     * @return the contextual component manager used by {@link #getComponent(Class)} and
+     *         {@link #getComponent(Class, String)}
+     * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
      */
     @Deprecated
     public static ComponentManager getComponentManager()
     {
-        return componentManager;
+        ComponentManager contextComponentManager;
+
+        try {
+            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context/root");
+        } catch (ComponentLookupException e) {
+            // This means the Context Root CM doesn't exist, use the Root CM.
+            contextComponentManager = rootComponentManager;
+            LOGGER.debug("Failed to find the [context/root] Component Manager. Cause: [{}]. Using the Root Component "
+                + "Manager", ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        return contextComponentManager;
+    }
+
+    /**
+     * @return the contextual component manager used by {@link #getComponent(Class)} and
+     *         {@link #getComponent(Class, String)}
+     * @since 6.0RC1
+     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
+     *             possible since it add a strong dependency to a static to your code
+     */
+    @Deprecated
+    public static ComponentManager getContextComponentManager()
+    {
+        ComponentManager contextComponentManager;
+
+        try {
+            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context");
+        } catch (ComponentLookupException e) {
+            // This means the Context CM doesn't exist, use the Root CM.
+            contextComponentManager = rootComponentManager;
+            LOGGER.debug("Failed to find the [context] Component Manager. Cause: [{}]. Using the Root Component "
+                + "Manager", ExceptionUtils.getRootCauseMessage(e));
+        }
+
+        return contextComponentManager;
     }
 
     /**
      * Lookup a XWiki component by role and hint.
-     * 
+     *
      * @param role the class (aka role) that the component implements
      * @param hint a value to differentiate different component implementations for the same role
      * @return the component's instance
@@ -662,7 +721,7 @@ public class Utils
 
     /**
      * Lookup a XWiki component by role (uses the default hint).
-     * 
+     *
      * @param role the class (aka role) that the component implements
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
@@ -677,7 +736,7 @@ public class Utils
 
     /**
      * Lookup a XWiki component by role and hint.
-     * 
+     *
      * @param roleType the class (aka role) that the component implements
      * @param roleHint a value to differentiate different component implementations for the same role
      * @return the component's instance
@@ -689,6 +748,8 @@ public class Utils
     public static <T> T getComponent(Type roleType, String roleHint)
     {
         T component;
+
+        ComponentManager componentManager = getContextComponentManager();
 
         if (componentManager != null) {
             try {
@@ -707,7 +768,7 @@ public class Utils
 
     /**
      * Lookup a XWiki component by role (uses the default hint).
-     * 
+     *
      * @param roleType the class (aka role) that the component implements
      * @return the component's instance
      * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
@@ -733,6 +794,9 @@ public class Utils
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
+
+        ComponentManager componentManager = getContextComponentManager();
+
         if (componentManager != null) {
             try {
                 components = componentManager.getInstanceList(role);
@@ -754,7 +818,7 @@ public class Utils
      * {@link #setComponentManager(ComponentManager)} is not called when running component unit tests. You have to take
      * the XWiki context yourself from the injected Execution when inside a component. This method should be used only
      * by non-component code.
-     * 
+     *
      * @return the current context or {@code null} if the execution context is not yet initialized
      * @since 3.2M3
      */
@@ -767,7 +831,7 @@ public class Utils
 
     /**
      * Check if placeholders are enabled in the current context.
-     * 
+     *
      * @param context The current context.
      * @return <code>true</code> if placeholders can be used, <code>false</code> otherwise.
      */
@@ -780,7 +844,7 @@ public class Utils
 
     /**
      * Enable placeholder support in the current request context.
-     * 
+     *
      * @param context The current context.
      */
     public static void enablePlaceholders(XWikiContext context)
@@ -791,7 +855,7 @@ public class Utils
 
     /**
      * Disable placeholder support in the current request context.
-     * 
+     *
      * @param context The current context.
      */
     public static void disablePlaceholders(XWikiContext context)
@@ -804,7 +868,7 @@ public class Utils
      * Create a placeholder key for a string that should be protected from further processing. The value is stored in
      * the context, and the returned key can be used by the calling code as many times in the rendering result. At the
      * end of the rendering process all placeholder keys are replaced with the values they replace.
-     * 
+     *
      * @param value The string to hide.
      * @param context The current context.
      * @return The key to be used instead of the value.
@@ -827,7 +891,7 @@ public class Utils
 
     /**
      * Insert back the replaced strings.
-     * 
+     *
      * @param content The rendered content, with placeholders.
      * @param context The current context.
      * @return The content with all placeholders replaced with the real values.
@@ -850,7 +914,7 @@ public class Utils
 
     /**
      * Verify if the current request is an AJAX request.
-     * 
+     *
      * @param context the current request context
      * @return True if this is an AJAX request, false otherwise.
      * @since 2.4M2

@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Default implementation of XWikiStubContextProvider.
- * 
+ *
  * @todo make DefaultXWikiStubContextProvider able to generate a stub context from scratch some way, it will need some
  *       refactor around XWiki class for this to be possible. The current limitation is that without a first request
  *       this provider is unusable.
@@ -67,7 +67,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
         newContext.setUserReference(null);
         newContext.setLanguage(null);
-        newContext.setDatabase(context.getMainXWiki());
+        newContext.setWikiId(context.getMainXWiki());
 
         // Cleanup
         newContext.flushClassCache();
@@ -100,6 +100,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         }
 
         this.initialContext = newContext;
+
         this.logger.debug("Stub context initialized.");
     }
 

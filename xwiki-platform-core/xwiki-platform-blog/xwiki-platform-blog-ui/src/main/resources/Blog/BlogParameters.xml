@@ -20,24 +20,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogParameters</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>Blog.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016402000</creationDate>
   <date>1373018319000</date>
   <contentUpdateDate>1373018319000</contentUpdateDate>
   <version>1.1</version>
   <title>Constants and variables for the Blog application</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -77,6 +74,6 @@
  * @param $imgName The name of the icon to use (without the extension).
  * @param alt The alternate text that should be displayed when images are not viewable.
  *#
-#macro(toolImage $imgName $alt)&lt;img class="icon-manage" src="$xwiki.getSkinFile("icons/silk/${imgName}.png")" alt="${alt}"/&gt;#end
+#macro(toolImage $imgName $alt)[[image:path:$xwiki.getSkinFile("icons/silk/${imgName}.png")||class="icon-manage" alt="${alt}"]]#end
 {{/velocity}}</content>
 </xwikidoc>

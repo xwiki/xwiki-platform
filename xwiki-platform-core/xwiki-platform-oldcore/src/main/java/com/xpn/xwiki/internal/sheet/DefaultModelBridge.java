@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.sheet.internal.ModelBridge;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Bridge between the sheet module and the old XWiki model.
- * 
+ *
  * @version $Id$
  * @since 4.1M1
  */
@@ -53,35 +53,25 @@ public class DefaultModelBridge implements ModelBridge
     private Logger logger;
 
     /**
-     * Execution context handler, needed for accessing the XWikiContext.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
      * The component used to serialize entity references.
      */
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     /**
-     * @return the XWiki context
-     * @deprecated avoid using this method; try using the document access bridge instead
+     * Used to access the XWiki context.
      */
-    @Deprecated
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-    }
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public String getDefaultEditMode(DocumentModelBridge document)
     {
         try {
-            return ((XWikiDocument) document).getDefaultEditMode(getXWikiContext());
+            return ((XWikiDocument) document).getDefaultEditMode(this.xcontextProvider.get());
         } catch (XWikiException e) {
-            logger.warn("Failed to get the default edit mode for [{}].",
-                defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
+            this.logger.warn("Failed to get the default edit mode for [{}].",
+                this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()));
             return null;
         }
     }
@@ -93,11 +83,12 @@ public class DefaultModelBridge implements ModelBridge
         if (((XWikiDocument) document).getTranslation() != 0) {
             try {
                 // Load the default document translation.
-                XWikiContext xcontext = getXWikiContext();
+                XWikiContext xcontext = this.xcontextProvider.get();
                 return xcontext.getWiki().getDocument(document.getDocumentReference(), xcontext);
             } catch (XWikiException e) {
-                String stringReference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
-                logger.warn("Failed to load the default translation of [{}].", stringReference, e);
+                String stringReference =
+                    this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+                this.logger.warn("Failed to load the default translation of [{}].", stringReference, e);
             }
         }
         return document;
@@ -106,32 +97,13 @@ public class DefaultModelBridge implements ModelBridge
     @Override
     public String getCurrentAction()
     {
-        return getXWikiContext().getAction();
-    }
-
-    @Override
-    public boolean hasProgrammingRights(DocumentModelBridge document)
-    {
-        XWikiContext xcontext = getXWikiContext();
-        return xcontext.getWiki().getRightService().hasProgrammingRights((XWikiDocument) document, xcontext);
-    }
-
-    @Override
-    public void setContentAuthorReference(DocumentModelBridge document, DocumentReference contentAuthorReference)
-    {
-        ((XWikiDocument) document).setContentAuthorReference(contentAuthorReference);
-    }
-
-    @Override
-    public DocumentReference getContentAuthorReference(DocumentModelBridge document)
-    {
-        return ((XWikiDocument) document).getContentAuthorReference();
+        return this.xcontextProvider.get().getAction();
     }
 
     @Override
     public DocumentModelBridge getCurrentDocument()
     {
-        return getXWikiContext().getDoc();
+        return this.xcontextProvider.get().getDoc();
     }
 
     @Override
@@ -140,10 +112,10 @@ public class DefaultModelBridge implements ModelBridge
         Map<String, Object> backupObjects = new HashMap<String, Object>();
 
         // Backup the current context state.
-        XWikiDocument.backupContext(backupObjects, getXWikiContext());
+        XWikiDocument.backupContext(backupObjects, this.xcontextProvider.get());
 
         // Change the context document, using the XWikiContext from the cloned ExecutionContext.
-        ((XWikiDocument) document).setAsContextDoc(getXWikiContext());
+        ((XWikiDocument) document).setAsContextDoc(this.xcontextProvider.get());
 
         return backupObjects;
     }
@@ -152,5 +124,11 @@ public class DefaultModelBridge implements ModelBridge
     public Set<DocumentReference> getXObjectClassReferences(DocumentModelBridge document)
     {
         return ((XWikiDocument) document).getXObjects().keySet();
+    }
+
+    @Override
+    public DocumentModelBridge setSecurityDocument(DocumentModelBridge document)
+    {
+        return (DocumentModelBridge) this.xcontextProvider.get().put(XWikiDocument.CKEY_SDOC, document);
     }
 }

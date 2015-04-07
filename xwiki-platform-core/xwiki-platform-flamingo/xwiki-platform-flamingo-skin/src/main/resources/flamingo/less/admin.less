@@ -1,0 +1,24 @@
+//
+// Administration
+// --------------------------------------------------
+
+.admin-menu {
+  .make-xs-column(12);
+  .make-sm-column(3);
+  
+  @media (min-width: @screen-lg-min) {
+    max-width: 300px;
+  }
+}
+
+.admin-category, #admin-page-content {
+  .make-xs-column(12);
+  .make-sm-column(9);
+}
+
+@media (max-width: @screen-xs-min) {
+  .admin-menu, .admin-category, #admin-page-content {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

@@ -20,11 +20,18 @@
 package com.xpn.xwiki.web.sx;
 
 import java.io.StringWriter;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.lesscss.compiler.LESSCompiler;
+import org.xwiki.lesscss.compiler.LESSCompilerException;
+import org.xwiki.lesscss.resources.LESSResourceReference;
+import org.xwiki.lesscss.resources.LESSResourceReferenceFactory;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -32,6 +39,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -46,11 +54,17 @@ public class SxDocumentSource implements SxSource
     /** The name of the property in the script extension object which contains the script content. */
     private static final String CONTENT_PROPERTY_NAME = "code";
 
+    /** The name of the property in the script extension object which contains the content type. */
+    private static final String CONTENT_TYPE_PROPERTY_NAME = "contentType";
+
     /** The name of the property in the script extension object which tells us if the content should be parsed. */
     private static final String PARSE_CONTENT_PROPERTY_NAME = "parse";
 
     /** The name of the property in the script extension object which contains the cache policy. */
     private static final String CACHE_POLICY_PROPERTY_NAME = "cache";
+
+    /** The name of the property in the script extension object which contains the name of the object. */
+    private static final String NAME_PROPERTY_NAME = "name";
 
     /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SxDocumentSource.class);
@@ -96,7 +110,7 @@ public class SxDocumentSource implements SxSource
                     }
                 } catch (Exception ex) {
                     LOGGER.warn("SX object [{}#{}] has an invalid cache policy: [{}]",
-                        new Object[]{this.document.getFullName(), sxObj.getStringValue("name"),
+                        new Object[]{this.document.getFullName(), sxObj.getStringValue(NAME_PROPERTY_NAME),
                             sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)});
                 }
             }
@@ -109,14 +123,32 @@ public class SxDocumentSource implements SxSource
     {
         StringBuilder resultBuilder = new StringBuilder();
 
-        if (this.document.getObjects(this.extension.getClassName()) != null) {
-            for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
+        List<BaseObject> objects = this.document.getObjects(this.extension.getClassName());
+        if (objects != null) {
+            for (BaseObject sxObj : objects) {
                 if (sxObj == null) {
                     continue;
                 }
                 String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
-                if (parse == 1) {
+                if ("LESS".equals(sxObj.getStringValue(CONTENT_TYPE_PROPERTY_NAME))) {
+                    LESSCompiler lessCompiler = Utils.getComponent(LESSCompiler.class);
+                    LESSResourceReferenceFactory lessResourceReferenceFactory =
+                        Utils.getComponent(LESSResourceReferenceFactory.class);
+                    ObjectPropertyReference objectPropertyReference =
+                        new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
+                            sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
+                    LESSResourceReference lessResourceReference =
+                        lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
+                    try {
+                        sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1), false);
+                    } catch (LESSCompilerException e) {
+                        // Set the error message in a CSS comment to help the developer understand why its SSX is not
+                        // working (it will work only if the CSS minifier is not used).
+                        sxContent = String.format("/* LESS errors while parsing skin extension [%s]. */\n/* %s */",
+                            sxObj.getStringValue(NAME_PROPERTY_NAME), ExceptionUtils.getRootCauseMessage(e));
+                    }
+                } else if (parse == 1) {
                     try {
                         StringWriter writer = new StringWriter();
                         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
@@ -131,8 +163,8 @@ public class SxDocumentSource implements SxSource
                             engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
                         }
                     } catch (XWikiVelocityException ex) {
-                        LOGGER.warn("Velocity errors while parsing skin extension [{}]: ",
-                            this.document.getPrefixedFullName(), ex.getMessage());
+                        LOGGER.warn("Velocity errors while parsing skin extension [{}] with content [{}]: ",
+                            this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(ex));
                     }
                 }
                 // Also add a newline, in case the different object contents don't end with a blank

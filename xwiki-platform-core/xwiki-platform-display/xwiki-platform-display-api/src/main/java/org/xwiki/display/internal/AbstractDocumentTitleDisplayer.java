@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -39,7 +40,9 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
@@ -95,6 +98,10 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
+
     /**
      * Used to emulate an in-line parsing.
      */
@@ -138,13 +145,16 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         }
 
         // 2. Try to extract the title from the document content.
-        try {
-            XDOM title = extractTitleFromContent(document, parameters);
-            if (title != null) {
-                return title;
+        if ("1".equals(this.xwikicfg.getProperty("xwiki.title.compatibility", "0"))) {
+            try {
+                XDOM title = extractTitleFromContent(document, parameters);
+                if (title != null) {
+                    return title;
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(),
+                    e);
             }
-        } catch (Exception e) {
-            logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(), e);
         }
 
         // 3. The title was not specified or its evaluation failed. Use the document name as a fall-back.
@@ -180,12 +190,25 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String nameSpace =
+        String namespace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
                 : documentAccessBridge.getCurrentDocumentReference());
+
+        // Get the velocity engine
+        VelocityEngine velocityEngine;
+        try {
+            velocityEngine = this.velocityManager.getVelocityEngine();
+        } catch (XWikiVelocityException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Execute Velocity code
         Map<String, Object> backupObjects = null;
         boolean canPop = false;
         try {
+            // Prepare namespace cleanup
+            velocityEngine.startedUsingMacroNamespace(namespace);
+
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
                 // The following method call also clones the execution context.
@@ -193,11 +216,14 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Pop the document from the context only if the push was successful!
                 canPop = true;
             }
-            velocityManager.getVelocityEngine()
-                .evaluate(velocityManager.getVelocityContext(), writer, nameSpace, title);
+            velocityEngine
+                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            // Clean namespace unless this execution is part of a wider range
+            velocityEngine.stoppedUsingMacroNamespace(namespace);
+
             if (canPop) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
             }
@@ -220,7 +246,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM
+     * @deprecated since 7.0M1
      */
+    @Deprecated
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
 

@@ -59,6 +59,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -249,7 +250,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         }
         if (StringUtils.isBlank(doc.getContent()) || !Syntax.XWIKI_2_0.equals(doc.getSyntax())) {
             needsUpdate = true;
-            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setContent("{{include reference=\"XWiki.ClassSheet\" /}}");
             doc.setSyntax(Syntax.XWIKI_2_0);
         }
         if (!doc.isHidden()) {
@@ -797,11 +798,10 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         String language, VelocityContext vcontext, XWikiContext context) throws XWikiException
     {
         XWikiURLFactory originalURLFactory = context.getURLFactory();
-        // Backup the Locale and restore it in the finally block
-        // because setting the language below to the given language changes the locale.
         Locale originalLocale = context.getLocale();
         try {
             context.setURLFactory(new ExternalServletURLFactory(context));
+            context.setLocale(LocaleUtils.toLocale(language));
             VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);

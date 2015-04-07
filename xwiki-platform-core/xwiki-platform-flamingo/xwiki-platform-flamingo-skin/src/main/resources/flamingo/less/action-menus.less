@@ -1,0 +1,162 @@
+//
+// Action Menus
+// --------------------------------------------------
+
+#menuview {
+  .navbar {
+    border-radius: 0;
+    border: 0;
+    margin-bottom: 0;
+  }
+  .navbar-header {
+    min-width: percentage((1 / @grid-columns));
+    text-align: center;
+  }
+  .navbar-brand {
+    float: none;
+    img {
+      height: @navbar-height;
+      display: inline;
+    }
+  }
+  @media (max-width: @screen-sm-min) {
+    .dropdown-menu .divider {
+      background-color: @navbar-default-border;
+    }
+  }
+}
+
+.globalsearch {
+  @media (min-width: @screen-sm-min) {
+    .input-group {
+      width: 15em;
+    }
+  }
+
+  .btn {
+    border: 1px solid lighten(@btn-primary-bg, 10%);
+    box-shadow: none;
+    height: @input-height-base;
+    &:hover,
+    &:focus {
+      border: 1px solid lighten(@btn-primary-bg, 10%);
+      box-shadow: none;
+    }
+  }
+}
+
+#contentmenu {
+  .text-right();
+}
+
+@media (min-width: @screen-sm-min) {
+  .navbar-nav > li > a {
+    /* When the page name is long, add ellipsis. */
+    max-width: 10em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// Navbar avatar ==========================================================
+
+.navbar-avatar {
+  > img {
+    @avatar-size: 24px;
+    border-radius: @thumbnail-border-radius;
+    height: @avatar-size;
+    margin-top: -@navbar-padding-horizontal+@navbar-height/2-@avatar-size/2;
+    vertical-align: middle;
+    width: @avatar-size;
+  }
+}
+
+// Navbar dropdown ========================================================
+
+@media (min-width: @screen-sm-min) {
+  // We use mixin guards to simulate conditional assignment. We need the hover and active background color to fall back
+  // on the default background color if transparent (e.g. if the user doesn't specify it in the color theme).
+  .navbar-dropdown(@bg; @hover-bg; @active-bg) when not (@bg = transparent) and (@hover-bg = transparent) {
+    // Make sure the hover background color falls back on the default background color.
+    .navbar-dropdown(@bg, @bg, @active-bg)
+  }
+
+  .navbar-dropdown(@bg; @hover-bg; @active-bg) when not (@bg = transparent) and not (@hover-bg = transparent) and (@active-bg = transparent) {
+    // Make sure the active background color falls back on the default background color.
+    .navbar-dropdown(@bg, @hover-bg, @bg)
+  }
+
+  .navbar-dropdown(@bg; @hover-bg; @active-bg) when not (@bg = transparent) and not (@hover-bg = transparent) and not (@active-bg = transparent) {
+    @navbar-dropdown-contrast: 30%;
+
+    @separator-color: contrast(@bg,
+      darken(@bg, @navbar-dropdown-contrast),
+      lighten(@bg, @navbar-dropdown-contrast));
+    @separator-hover-color: contrast(@hover-bg,
+      darken(@hover-bg, @navbar-dropdown-contrast),
+      lighten(@hover-bg, @navbar-dropdown-contrast));
+    @separator-active-color: contrast(@active-bg,
+      darken(@active-bg, @navbar-dropdown-contrast),
+      lighten(@active-bg, @navbar-dropdown-contrast));
+
+    > a {
+      /**
+       * We have two anchors in the same menu entry: one has the label and the caret for extra small screens (phones,
+       * where the menu is displayed vertically) and the other has the caret for larger screens (where the menu is
+       * displayed horizontally).
+       */
+      float: left;
+    }
+    > .dropdown-split-left {
+      /* Display it closer to the menu toggle. */
+      padding-right: ceil(@navbar-padding-horizontal / 2);
+      > .caret {
+        /* Hide the caret used for extra small screens. */
+        display: none;
+      }
+      /* The separator between the label and the toggle. */
+      &:after {
+        background-color: @separator-color;
+        content: "";
+        display: inline-block;
+        height: @line-height-computed;
+        position: absolute;
+        right: 0;
+        top: @navbar-padding-vertical;
+        width: 1px;
+      }
+      &:hover:after {
+        /* Update the separator color based on the hover color. */
+        background-color: @separator-hover-color;
+      }
+      &:focus:after,
+      &:active:after {
+        /* Update the separator color based on the active color. */
+        background-color: @separator-active-color;
+      }
+    }
+    > .dropdown-split-right {
+      /* Display it closer to the menu label. */
+      padding-left: ceil(@navbar-padding-horizontal / 2);
+      > .caret {
+        /* Reset the left margin for the caret used on large screens. */
+        margin-left: 0;
+      }
+    }
+    &.open > .dropdown-split-left {
+      /* Highlight only the toggle (right side) when the menu is open. */
+      background-color: transparent;
+      color: @navbar-default-link-color;
+      &:hover {
+        /* The link can be hovered when the menu is open because only the toggle is active. */
+        background-color: @navbar-default-link-hover-bg;
+        color: @navbar-default-link-hover-color;
+      }
+    }
+  }
+
+  .navbar-nav > .dropdown-split {
+    .navbar-dropdown(@navbar-default-bg, @navbar-default-link-hover-bg, @navbar-default-link-active-bg)
+  }
+}

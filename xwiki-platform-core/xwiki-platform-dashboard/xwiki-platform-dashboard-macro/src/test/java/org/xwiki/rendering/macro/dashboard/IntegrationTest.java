@@ -37,6 +37,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.velocity.VelocityManager;
@@ -74,14 +75,6 @@ public class IntegrationTest
                 allowing(mockSsfx).use(with("uicomponents/dashboard/dashboard.css"), with(any(Map.class)));
                 allowing(mockJsfx).use(with("js/scriptaculous/dragdrop.js"));
                 allowing(mockJsfx).use(with("js/scriptaculous/effects.js"));
-                allowing(mockJsfx).use(with("js/smartclient/initsc.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_Core.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/overwritesc.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_Foundation.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_Containers.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_Grids.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_Forms.js"), with(any(Map.class)));
-                allowing(mockJsfx).use(with("js/smartclient/modules/ISC_DataBinding.js"), with(any(Map.class)));
                 allowing(mockJsfx).use(with("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js"), with(any(Map.class)));
                 allowing(mockJsfx).use(with("uicomponents/dashboard/dashboard.js"), with(any(Map.class)));
             }
@@ -141,5 +134,7 @@ public class IntegrationTest
                 }));
             }
         });
+
+        componentManager.registerMockComponent(mockery, ContextualAuthorizationManager.class);
     }
 }

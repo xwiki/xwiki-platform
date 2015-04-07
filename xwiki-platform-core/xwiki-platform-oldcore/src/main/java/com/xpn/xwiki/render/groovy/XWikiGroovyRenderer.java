@@ -19,15 +19,13 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.Writable;
-import groovy.text.Template;
-
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -39,6 +37,9 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.xml.XMLUtils;
 
@@ -56,6 +57,13 @@ import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Writable;
+import groovy.text.Template;
+
+@Component
+@Named("groovy")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroovyRenderer.class);
@@ -63,6 +71,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     private Cache<Template> cache;
 
     private Cache<CachedGroovyClass> classCache;
+
+    @Override
+    public String getId()
+    {
+        return "groovy";
+    }
 
     @Override
     public void flushCache()
@@ -207,7 +221,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             return result;
         } catch (Exception e) {
             e.printStackTrace();
-            Object[] args = {name};
+            Object[] args = { name };
 
             String title;
             String text;
@@ -268,10 +282,10 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         List<String> unnamedparams = new ArrayList<String>();
         if ((param != null) && (!param.trim().equals(""))) {
             String[] params = StringUtils.split(param, "|");
-            for (int i = 0; i < params.length; i++) {
-                String[] rparam = StringUtils.split(params[i], "=");
+            for (String param2 : params) {
+                String[] rparam = StringUtils.split(param2, "=");
                 if (rparam.length == 1) {
-                    unnamedparams.add(params[i]);
+                    unnamedparams.add(param2);
                 } else {
                     namedparams.put(rparam[0], rparam[1]);
                 }
@@ -355,7 +369,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
         ClassLoader parentClassLoader = (ClassLoader) context.get("parentclassloader");
         try {
             CachedGroovyClass cgc = this.classCache.get(script);
-            Class< ? > gc;
+            Class<?> gc;
 
             if (cgc == null) {
                 GroovyClassLoader gcl =
@@ -376,14 +390,14 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 
     public class CachedGroovyClass implements DisposableCacheValue
     {
-        protected Class< ? > cl;
+        protected Class<?> cl;
 
-        public CachedGroovyClass(Class< ? > cl)
+        public CachedGroovyClass(Class<?> cl)
         {
             this.cl = cl;
         }
 
-        public Class< ? > getGroovyClass()
+        public Class<?> getGroovyClass()
         {
             return this.cl;
         }

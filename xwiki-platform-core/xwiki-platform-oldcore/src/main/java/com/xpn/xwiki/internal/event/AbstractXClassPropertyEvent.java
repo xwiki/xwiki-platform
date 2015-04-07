@@ -23,7 +23,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Base class for all class property {@link org.xwiki.observation.event.Event events}.
- * 
+ *
  * @version $Id$
  * @since 3.2M1
  */

@@ -37,7 +37,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Delete attachment xwiki action.
- * 
+ *
  * @version $Id$
  */
 public class DeleteAttachmentAction extends XWikiAction
@@ -109,9 +109,8 @@ public class DeleteAttachmentAction extends XWikiAction
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             if (vcontext != null) {
-                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
-                vcontext.put("details",
-                    context.getMessageTool().get("platform.core.action.deleteAttachment.noAttachment"));
+                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
+                vcontext.put("details", localizePlainOrKey("platform.core.action.deleteAttachment.noAttachment"));
             }
             return true;
         }
@@ -122,9 +121,9 @@ public class DeleteAttachmentAction extends XWikiAction
         ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
         if (attachment.isImage(context)) {
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
+            newdoc.setComment(localizePlainOrKey("core.comment.deleteImageComment", params));
         } else {
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
+            newdoc.setComment(localizePlainOrKey("core.comment.deleteAttachmentComment", params));
         }
 
         try {
@@ -134,7 +133,7 @@ public class DeleteAttachmentAction extends XWikiAction
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             if (vcontext != null) {
-                vcontext.put("message", context.getMessageTool().get("core.action.deleteAttachment.failed", filename));
+                vcontext.put("message", localizePlainOrKey("core.action.deleteAttachment.failed", filename));
                 vcontext.put("details", ExceptionUtils.getRootCauseMessage(ex));
             }
             return true;

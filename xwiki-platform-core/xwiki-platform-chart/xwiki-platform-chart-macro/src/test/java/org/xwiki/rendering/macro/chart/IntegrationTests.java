@@ -29,6 +29,7 @@ import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -39,7 +40,9 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Run all tests found in {@code *.test} files located in the classpath. These {@code *.test} files must follow the
@@ -81,5 +84,7 @@ public class IntegrationTests
 
         AuthorizationManager authorizationManager = componentManager.registerMockComponent(AuthorizationManager.class);
         when(authorizationManager.hasAccess(Right.VIEW, null, documentReference)).thenReturn(true);
+
+        componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
     }
 }

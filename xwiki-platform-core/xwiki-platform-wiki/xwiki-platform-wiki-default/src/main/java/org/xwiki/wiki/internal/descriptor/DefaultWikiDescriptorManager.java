@@ -21,6 +21,8 @@ package org.xwiki.wiki.internal.descriptor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -42,8 +44,9 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link WikiDescriptorManager}.
+ * 
  * @version $Id$
- * @since 5.3M2
+ * @since 6.0M1
  */
 @Component
 @Singleton
@@ -68,31 +71,61 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // (in initialize()) and thereafter only use the cache. The problem with this approach is that our Cache will
         // need to be unbounded which is not the case right now. This would mean being able to put all descriptors in
         // the cache and thus it might not scale if there were a very large number of wikis.
+        // Note that the full list of ids is cached since it takes a lot less memory that descriptors.
 
-        List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
-        try {
-            List<String> documentNames = descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
-            for (String documentName : documentNames) {
-                // Get the id
-                String wikiId = descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
-                // Get the descriptor from the cache
-                DefaultWikiDescriptor descriptor = cache.getFromId(wikiId);
-                if (descriptor == null) {
-                    // Get the document
-                    XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-                    // Extract the Wiki
-                    descriptor = buildDescriptorFromDocument(document);
-                }
-                // Add it to the result list
-                if (descriptor != null) {
-                    result.add(descriptor);
-                }
+        Collection<String> wikiIds = getAllIds();
+
+        List<WikiDescriptor> result = new ArrayList<WikiDescriptor>(wikiIds.size());
+
+        for (String wikiId : wikiIds) {
+            // Get the descriptor
+            WikiDescriptor descriptor = getById(wikiId);
+
+            // Add it to the result list
+            if (descriptor != null) {
+                result.add(descriptor);
             }
-        } catch (Exception e) {
-            throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);
         }
 
         return result;
+    }
+
+    @Override
+    public Collection<String> getAllIds() throws WikiManagerException
+    {
+        Collection<String> wikiIds = this.cache.getWikiIds();
+
+        if (wikiIds == null) {
+            List<String> documentNames;
+            try {
+                documentNames = this.descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
+            } catch (Exception e) {
+                throw new WikiManagerException("Failed to get wiki ids", e);
+            }
+
+            wikiIds = new HashSet<String>(documentNames.size());
+
+            boolean foundMainWiki = false;
+
+            XWikiContext xcontext = this.xcontextProvider.get();
+
+            for (String documentName : documentNames) {
+                String wikId = this.descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
+
+                wikiIds.add(wikId);
+
+                foundMainWiki |= xcontext.isMainWiki(wikId);
+            }
+
+            // Make sure we always return a descriptor for main wiki, even a virtual one
+            if (!foundMainWiki) {
+                wikiIds.add(getMainWikiId());
+            }
+
+            this.cache.setWikiIds(Collections.unmodifiableCollection(wikiIds));
+        }
+
+        return wikiIds;
     }
 
     @Override
@@ -113,9 +146,14 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
             }
+
+            if (descriptor == null) {
+                // Cache the fact that no descriptor is available for this alias
+                cache.addFromAlias(wikiAlias, DefaultWikiDescriptor.VOID);
+            }
         }
 
-        return descriptor;
+        return descriptor != DefaultWikiDescriptor.VOID && descriptor != null ? descriptor.clone() : null;
     }
 
     @Override
@@ -126,18 +164,28 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
             XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+
             if (!document.isNew()) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
+            } else if (getMainWikiId().equals(wikiId)) {
+                // Return a "virtual" descriptor if main wiki does not yet have a descriptor document
+                descriptor = new WikiDescriptor(wikiId, "localhost");
+            }
+
+            if (descriptor == null) {
+                // Cache the fact that no descriptor is available for this alias
+                cache.addFromId(wikiId, DefaultWikiDescriptor.VOID);
             }
         }
 
-        return descriptor;
+        return descriptor != DefaultWikiDescriptor.VOID && descriptor != null ? descriptor.clone() : null;
     }
 
     @Override
-    public boolean exists(String wikiId) throws WikiManagerException {
-        return getById(wikiId) != null;
+    public boolean exists(String wikiId) throws WikiManagerException
+    {
+        return getAllIds().contains(wikiId);
     }
 
     @Override
@@ -146,8 +194,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         try {
             wikiDescriptorBuilder.save(descriptor);
         } catch (WikiDescriptorBuilderException e) {
-            throw new WikiManagerException(String.format("Unable to save wiki descriptor for [%s].",
-                    descriptor.getId()), e);
+            throw new WikiManagerException(
+                String.format("Unable to save wiki descriptor for [%s].", descriptor.getId()), e);
         }
     }
 
@@ -166,22 +214,27 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public String getCurrentWikiId()
     {
-        return xcontextProvider.get().getDatabase();
+        return xcontextProvider.get().getWikiId();
+    }
+
+    @Override
+    public WikiDescriptor getCurrentWikiDescriptor() throws WikiManagerException
+    {
+        return getById(getCurrentWikiId());
     }
 
     private DefaultWikiDescriptor buildDescriptorFromDocument(XWikiDocument document)
     {
         DefaultWikiDescriptor descriptor = null;
         List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
-        if (serverClassObjects != null) {
+        if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
             descriptor = wikiDescriptorBuilder.buildDescriptorObject(serverClassObjects, document);
             // Add to the cache
             if (descriptor != null) {
                 cache.add(descriptor);
             }
         }
+
         return descriptor;
     }
-
-
 }

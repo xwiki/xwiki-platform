@@ -21,6 +21,7 @@ package org.xwiki.extension.distribution.internal.job.step;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
+import org.xwiki.job.annotation.Serializable;
 import org.xwiki.rendering.block.Block;
 
 /**
@@ -28,6 +29,7 @@ import org.xwiki.rendering.block.Block;
  * @since 5.0M1
  */
 @Role
+@Serializable
 public interface DistributionStep
 {
     public enum State
@@ -46,5 +48,5 @@ public interface DistributionStep
 
     void setState(State stepState);
 
-    Block render();
+    Block execute();
 }

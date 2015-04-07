@@ -29,13 +29,13 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
@@ -54,7 +54,6 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("wiki.user")
 @Singleton
-@Unstable
 public class WikiUserManagerScriptService implements ScriptService
 {
     /**
@@ -401,6 +400,75 @@ public class WikiUserManagerScriptService implements ScriptService
             setLastError(e);
             return null;
         }
+    }
+
+    /**
+     * @param user DocumentReference to the user to test
+     * @param wikiId id of the wiki to test
+     * @return either or not the user has a pending invitation to join the wiki, null if some problems occur
+     */
+    public Boolean hasPendingInvitation(DocumentReference user, String wikiId)
+    {
+        // Guest users never have pending invitations!
+        if (user == null) {
+            return false;
+        }
+
+        try {
+            // Check if the current user is userId and if the current script has the programing rights
+            XWikiContext xcontext = xcontextProvider.get();
+            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                    xcontext.getDoc().getDocumentReference());
+
+            // If the current user is not concerned by the invitation, he must be admin of the subwiki
+            if (!xcontext.getUserReference().equals(user)) {
+                authorizationManager.checkAccess(Right.ADMIN,
+                        xcontext.getUserReference(), new WikiReference(wikiId));
+            }
+            // Do the job
+            return wikiUserManager.hasPendingInvitation(user, wikiId);
+        } catch (AccessDeniedException e) {
+            setLastError(e);
+        } catch (WikiUserManagerException e) {
+            setLastError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param user DocumentReference to the user to test
+     * @param wikiId id of the wiki to test
+     * @return either or not the user has a pending request to join the wiki, null if some problems occur
+     */
+    public Boolean hasPendingRequest(DocumentReference user, String wikiId)
+    {
+        // Guest users never have pending requests!
+        if (user == null) {
+            return false;
+        }
+
+        try {
+            // Check if the passed user is the current user and if the current document has the programming rights
+            XWikiContext xcontext = xcontextProvider.get();
+            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                    xcontext.getDoc().getDocumentReference());
+
+            // If the current user is not concerned by the invitation, he must be admin of the subwiki to have pending
+            // requests.
+            if (!xcontext.getUserReference().equals(user)) {
+                authorizationManager.checkAccess(Right.ADMIN,
+                        xcontext.getUserReference(), new WikiReference(wikiId));
+            }
+            // Do the job
+            return wikiUserManager.hasPendingRequest(user, wikiId);
+        } catch (AccessDeniedException e) {
+            setLastError(e);
+        } catch (WikiUserManagerException e) {
+            setLastError(e);
+        }
+
+        return null;
     }
 
     /**

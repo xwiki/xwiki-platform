@@ -19,10 +19,53 @@ REM Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
+REM -------------------------------------------------------------------------
+REM Optional ENV vars
+REM -----------------
+REM   XWIKI_OPTS - parameters passed to the Java VM when running Jetty
+REM     e.g. to increase the memory allocated to the JVM to 1GB, use
+REM       set XWIKI_OPTS=-Xmx1024m
+REM   JETTY_OPTS - optional parameters passed to Jetty's start.jar. For example to list the configuration that will
+REM       execute, try setting it to "--list-config". See
+REM       http://www.eclipse.org/jetty/documentation/9.2.3.v20140905/start-jar.html for more options.
+REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
+REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
+REM -------------------------------------------------------------------------
+
+setlocal EnableDelayedExpansion
+
 set JETTY_HOME=jetty
-set JETTY_PORT=8080
-set JETTY_STOP_PORT=8079
-set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
+set JETTY_BASE=.
+if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
+
+REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
+if not defined JETTY_PORT (
+  REM Alternatively, it can be passed to this script as the first argument
+  set JETTY_PORT=%1
+  if not defined JETTY_PORT (
+    set JETTY_PORT=8080
+  )
+)
+
+REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+if not defined JETTY_STOP_PORT (
+  REM Alternatively, it can be passed to this script as the second argument
+  set JETTY_STOP_PORT=%2
+  if not defined JETTY_STOP_PORT (
+    set JETTY_STOP_PORT=8079
+  )
+)
+
+echo Starting Jetty on port %JETTY_PORT%, please wait...
+
+REM Get javaw.exe from the latest properly installed JRE
+if not "%JAVA_HOME%" == "" (
+  set JAVA_PATH=%JAVA_HOME\bin:java.exe
+) else (
+  for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
+  set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
+  if "%JAVA_PATH%"=="" set JAVA_PATH=java
+)
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
@@ -34,26 +77,23 @@ if not exist %XWIKI_DATA_DIR% mkdir %XWIKI_DATA_DIR%
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist %XWIKI_DATA_DIR%\logs mkdir %XWIKI_DATA_DIR%\logs
 
-REM The port on which to start Jetty can be passed to this script as the first argument
-IF NOT [%1]==[] set JETTY_PORT=%1
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
-
-REM Specify Jetty's home directory
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME%
-
-REM The port on which to stop Jetty can be passed to this script as the second argument
-IF NOT [%2]==[] set JETTY_STOP_PORT=%2
-set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
+REM Specify Jetty's home and base directories
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -Djetty.base=%JETTY_BASE%
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
 
-REM In order to avoid getting a "java.lang.IllegalStateException: Form too large" error
-REM when editing large page in XWiki we need to tell Jetty to allow for large content
-REM since by default it only allows for 20K. We do this by passing the
-REM org.eclipse.jetty.server.Request.maxFormContentSize property.
-REM Note that setting this value too high can leave your server vulnerable to denial of
-REM service attacks.
-set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
+REM Specify port on which HTTP requests will be handled
+set JETTY_OPTS=%JETTY_OPTS% jetty.port=%JETTY_PORT%
+REM In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
+REM the port we use as a System Property
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 
-java %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
+REM Specify port and key to stop a running Jetty instance
+set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%
+
+"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar --module=xwiki %JETTY_OPTS%
+
+REM Pause so that the command window used to run this script doesn't close automatically in case of problem
+REM (like when the JDK/JRE is not installed)
+PAUSE

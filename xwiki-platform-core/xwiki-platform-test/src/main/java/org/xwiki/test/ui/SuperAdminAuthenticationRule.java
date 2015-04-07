@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.ui;
 
-import org.openqa.selenium.WebDriver;
-
 /**
  * Authenticates the superadmin user in the wiki before the test starts.
  *
@@ -29,8 +27,8 @@ import org.openqa.selenium.WebDriver;
  */
 public class SuperAdminAuthenticationRule extends AuthenticationRule
 {
-    public SuperAdminAuthenticationRule(TestUtils testUtils, WebDriver driver)
+    public SuperAdminAuthenticationRule(TestUtils util)
     {
-        super("superadmin", "pass", testUtils, driver);
+        super("superadmin", "pass", util);
     }
 }

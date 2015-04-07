@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-test</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-test-tests</artifactId>
   <name>XWiki Platform - Wiki - Tests - Functional Tests</name>
@@ -36,6 +36,8 @@
   <properties>
     <!-- TODO: Remove once http://jira.xwiki.org/jira/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -48,6 +50,18 @@
       <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+    </dependency>
+    <!-- Needed by wiki creation job to resolve extensions -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <!-- For snapshots too -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-repository-maven-snapshots</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -102,6 +116,35 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <!-- We set a default UI for the subwiki in the webapp, so that the Wiki Creation UI knows which extension to
+       install on a subwiki by default (which is something we test) -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <version>1.5.3</version>
+        <executions>
+          <execution>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <basedir>${basedir}/target/xwiki/</basedir>
+          <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
+          <regex>false</regex>
+          <commentsEnabled>false</commentsEnabled>
+          <skip>${skipTests}</skip>
+          <replacements>
+            <replacement>
+              <token>&lt;/properties&gt;</token>
+              <value>    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
+  &lt;/properties&gt;</value>
+            </replacement>
+          </replacements>
+        </configuration>
       </plugin>
       <!-- Only execute AllTests and not individual tests. We do this to avoid having to start/stop XWiki and the
            browser several times -->

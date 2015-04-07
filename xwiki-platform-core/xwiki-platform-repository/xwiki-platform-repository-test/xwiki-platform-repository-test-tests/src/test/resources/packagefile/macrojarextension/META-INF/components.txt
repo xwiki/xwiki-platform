@@ -1,0 +1,2 @@
+packagefile.macrojarextension.TestMacroExtension
+packagefile.macrojarextension.TestScriptServiceExtension

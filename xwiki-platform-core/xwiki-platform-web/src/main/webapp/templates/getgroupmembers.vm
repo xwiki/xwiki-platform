@@ -39,7 +39,7 @@ $response.setContentType('application/x-json')
     'doc_viewable': $xwiki.hasAccessLevel('view', $xcontext.user, $member),
     'doc_hasadmin': $xwiki.hasAccessLevel('admin', $xcontext.user, $doc.fullName),
     'doc_hasedit': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
-    'doc_hasdelete': $xwiki.hasAccessLevel('delete', $xcontext.user, $doc.fullName),
+    'doc_hasdelete': $xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName),
     'member': "$xwiki.getUserName($member, false)#if($hasAdmin || $isAdvancedUser) ($member)#end",
     'member_url': $xwiki.getURL($memberReference),
     'doc_delete_url': $doc.getURL('view', $escapetool.url({

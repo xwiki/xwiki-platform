@@ -53,6 +53,8 @@ public abstract class AbstractReferenceEntityReferenceResolver extends AbstractE
             put(EntityType.WIKI, Collections.<EntityType> emptyList());
             put(EntityType.OBJECT, Arrays.asList(EntityType.DOCUMENT));
             put(EntityType.OBJECT_PROPERTY, Arrays.asList(EntityType.OBJECT));
+            put(EntityType.CLASS_PROPERTY, Arrays.asList(EntityType.DOCUMENT));
+            put(EntityType.BLOCK, Arrays.asList(EntityType.DOCUMENT, EntityType.OBJECT_PROPERTY));
         }
     };
 

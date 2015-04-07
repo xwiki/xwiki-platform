@@ -24,7 +24,7 @@
   <web>Main</web>
   <name>ActivityTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <parent>Main.Activity</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -76,5 +76,10 @@
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>activity.link.title=Located in {0} » {1} » {2}</content>
+  <content>activity.link.title=Located in {0} » {1} » {2}
+activity.rss.pages.modified=Modified Pages RSS Feed
+activity.rss.feed.description=RSS feed for document changes
+activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
+activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
+activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"</content>
 </xwikidoc>

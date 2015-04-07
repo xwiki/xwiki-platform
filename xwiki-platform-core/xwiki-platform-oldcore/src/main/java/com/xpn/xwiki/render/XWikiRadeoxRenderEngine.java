@@ -82,7 +82,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     /**
      * Render an input with text markup and return a String with e.g. HTML
-     * 
+     *
      * @param content String with the input to render
      * @param context Special context for the filter engine, e.g. with configuration information
      * @return result Output with rendered content
@@ -108,13 +108,13 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     @Override
     public boolean exists(String name)
     {
-        String database = getXWikiContext().getDatabase();
+        String database = getXWikiContext().getWikiId();
         try {
             int colonIndex = name.indexOf(":");
             if (colonIndex != -1) {
                 String db = name.substring(0, colonIndex);
                 name = name.substring(colonIndex + 1);
-                getXWikiContext().setDatabase(db);
+                getXWikiContext().setWikiId(db);
             }
 
             name = StringUtils.substringBefore(StringUtils.substringBefore(name, "?"), "#");
@@ -136,7 +136,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             return false;
         } finally {
             // Reset the current wiki to the original one
-            getXWikiContext().setDatabase(database);
+            getXWikiContext().setWikiId(database);
         }
 
     }
@@ -150,7 +150,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     /**
      * Appends for example the &lt;a href&gt; HTML code for linking to a wiki page with the given name to the passed
      * buffer.
-     * 
+     *
      * @param buffer the string to append to
      * @param name the name of the wiki page pointed to by the link
      * @param view the text that will be shown to the user for the link
@@ -163,7 +163,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor);
         } else {
-            String database = getXWikiContext().getDatabase();
+            String database = getXWikiContext().getWikiId();
             XWikiContext context = getXWikiContext();
 
             try {
@@ -172,7 +172,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 if (colonIndex != -1) {
                     db = name.substring(0, colonIndex);
                     name = name.substring(colonIndex + 1);
-                    context.setDatabase(db);
+                    context.setWikiId(db);
                 }
 
                 String querystring = null;
@@ -206,7 +206,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 buffer.append(cleanText(view));
                 buffer.append("</a></span>");
             } finally {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
     }
@@ -261,7 +261,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     @Override
     public void appendCreateLink(StringBuffer buffer, String name, String view)
     {
-        String database = getXWikiContext().getDatabase();
+        String database = getXWikiContext().getWikiId();
         XWikiContext context = getXWikiContext();
 
         try {
@@ -270,7 +270,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if (colonIndex != -1) {
                 db = name.substring(0, colonIndex);
                 name = name.substring(colonIndex + 1);
-                context.setDatabase(db);
+                context.setWikiId(db);
             }
 
             StringBuilder querystring = new StringBuilder();
@@ -308,14 +308,14 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             buffer.append("<span class=\"wikicreatelinkqm\">?</span>");
             buffer.append("</a>");
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
     }
 
     /**
      * Get a link to an image. This can be used by filters or macros to get images for e.g. external links or icons
      * Should be refactored to get other images as well
-     * 
+     *
      * @return result String with an HTML link to an image
      */
     @Override

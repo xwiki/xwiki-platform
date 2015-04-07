@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -35,6 +34,8 @@ import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and aborts execution if the user is
@@ -52,9 +53,9 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
     @Inject
     private MacroManager macroManager;
 
-    /** Used to check if the current document's author has programming rights. */
+    /** Used to check if programming rights is allowed. */
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager authorizationManager;
 
     /**
      * Used to get Macro Permission Policy implementations.
@@ -103,8 +104,8 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
                 // no special permission needed
                 return;
             }
-            // with not protected script engine, we are testing if the current document's author has "programming" right
-            if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // with not protected script engine, we are testing if programming right is allowed
+            if (!this.authorizationManager.hasAccess(Right.PROGRAM)) {
                 event.cancel(
                     String.format("You need Programming Rights to execute the script macro [%s]", macroId.getId()));
             }

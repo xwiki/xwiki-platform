@@ -19,12 +19,6 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.DOM4JCSSStyleSheet;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,10 +83,16 @@ import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+import info.informatica.doc.dom4j.CSSStylableElement;
+import info.informatica.doc.dom4j.DOM4JCSSStyleSheet;
+import info.informatica.doc.dom4j.XHTMLDocument;
+import info.informatica.doc.dom4j.XHTMLDocumentFactory;
+import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+
 /**
  * Default implementation for the PDF Export process, which uses XSLT transformations and Apache FOP to convert a
  * Document into PDF, passing through HTML, valid XHTML, styled XHTML, and XSL-FO.
- * 
+ *
  * @version $Id$
  */
 public class PdfExportImpl implements PdfExport
@@ -226,7 +226,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Cleans up an HTML document, turning it into valid XHTML.
-     * 
+     *
      * @param input the source HTML to process
      * @return the cleaned up source
      */
@@ -250,7 +250,7 @@ public class PdfExportImpl implements PdfExport
      * Note: This method is protected just allow other exporters to hook their code and use the PDF export
      * infrastructure. This is just a temporary solution. The PDF export code needs to be redesigned because it has
      * parts than can be reused for other export formats.
-     * 
+     *
      * @param xhtml the source document to transform
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
@@ -280,7 +280,7 @@ public class PdfExportImpl implements PdfExport
      * <li>An eventual post-processing transformation which cleans up the temporary XSL-FO in order to avoid FOP bugs;
      * it uses the <tt>fop.xsl</tt> file, or the <tt>fopxsl</tt> property of the applied PDFTemplate.</li>
      * </ol>
-     * 
+     *
      * @param xhtml the XHTML document to convert
      * @param context the current request context
      * @return the resulting XML-FO document
@@ -295,7 +295,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Convert an XSL-FO document into PDF.
-     * 
+     *
      * @param xmlfo the source FO to render
      * @param out where to write the resulting document
      * @param type the type of the output: PDF or RTF
@@ -346,7 +346,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Applies an XSLT transformation to an XML document.
-     * 
+     *
      * @param xml the XML document to convert
      * @param xslt the XSLT to apply
      * @return the converted document
@@ -375,7 +375,7 @@ public class PdfExportImpl implements PdfExport
      * The content found in these locations is concatenated. The CSS rules are applied on the document, and the
      * resulting style properties are embedded in the document, inside <tt>style</tt> attributes. The resulting XHTML
      * document with the inlined style is then serialized and returned.
-     * 
+     *
      * @param html the valid XHTML document to style
      * @param context the current request context
      * @return the document with inlined style
@@ -394,7 +394,7 @@ public class PdfExportImpl implements PdfExport
     /**
      * Apply a CSS style sheet to an XHTML document and return the document with the resulting style properties inlined
      * in <tt>style</tt> attributes.
-     * 
+     *
      * @param html the valid XHTML document to style
      * @param css the style sheet to apply
      * @param context the current request context
@@ -438,7 +438,7 @@ public class PdfExportImpl implements PdfExport
     /**
      * Recursively inline the computed style that applies to a DOM Element into the {@code style} attribute of that
      * Element.
-     * 
+     *
      * @param element the Element whose style should be inlined
      */
     private void applyInlineStyle(Element element)
@@ -464,7 +464,7 @@ public class PdfExportImpl implements PdfExport
      * <li>the <tt>xhtmlxsl</tt> property of the current PDFTemplate</li>
      * <li>the <tt>xhtml2fo.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
-     * 
+     *
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
@@ -479,7 +479,7 @@ public class PdfExportImpl implements PdfExport
      * <li>the <tt>fopxsl</tt> property of the current PDFTemplate</li>
      * <li>the <tt>fop.xsl</tt> resource (usually a file inside xwiki-core-*.jar)</li>
      * </ol>
-     * 
+     *
      * @param context the current request context
      * @return the content of the XSLT as a byte stream
      */
@@ -494,7 +494,7 @@ public class PdfExportImpl implements PdfExport
      * <li>the <tt>fopxsl</tt> property of the current <tt>PDFTemplate</tt></li>
      * <li>the <tt>fop.xsl</tt> resource (usually a file inside <tt>xwiki-core-*.jar</tt>)</li>
      * </ol>
-     * 
+     *
      * @param propertyName the name of the <tt>XWiki.PDFClass</tt> property to read from the current PDFTemplate
      *            document
      * @param fallbackFile the name of a resource file to use when the PDFTemplate does not contain an override
@@ -516,7 +516,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Read a property from the current PDFTemplate document, and pass it through the Velocity engine.
-     * 
+     *
      * @param propertyName the property to read
      * @param context the current request context
      * @return the content of the property, velocity-parsed, or an empty string if there's no such property in the
@@ -531,6 +531,7 @@ public class PdfExportImpl implements PdfExport
 
         if (StringUtils.isNotEmpty(pdftemplate)) {
             templateReference = referenceResolver.resolve(pdftemplate);
+            classReference = new DocumentReference(templateReference.getWikiReference().getName(), "XWiki", "PDFClass");
         }
 
         String result = (String) dab.getProperty(templateReference, classReference, propertyName);
@@ -558,7 +559,7 @@ public class PdfExportImpl implements PdfExport
 
     /**
      * Create an XWikiException object with the given source, export type and error type.
-     * 
+     *
      * @param source the source exception that is forwarded
      * @param exportType the type of the export performed while the exception occurred, PDF or RTF
      * @param errorType the type of error that occurred, one of the constants in {@link XWikiException}

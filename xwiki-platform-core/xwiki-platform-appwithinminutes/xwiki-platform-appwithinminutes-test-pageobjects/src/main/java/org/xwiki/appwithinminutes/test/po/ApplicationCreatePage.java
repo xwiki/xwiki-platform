@@ -78,7 +78,7 @@ public class ApplicationCreatePage extends ViewPage
     public void waitForApplicationNamePreview()
     {
         final String appName = appNameInput.getAttribute("value");
-        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public Boolean apply(WebDriver driver)
@@ -94,7 +94,7 @@ public class ApplicationCreatePage extends ViewPage
      */
     public void waitForApplicationNameError()
     {
-        waitUntilElementHasAttributeValue(By.id("appName"), "class", "xErrorField");
+        getDriver().waitUntilElementHasAttributeValue(By.id("appName"), "class", "xErrorField");
     }
 
     /**

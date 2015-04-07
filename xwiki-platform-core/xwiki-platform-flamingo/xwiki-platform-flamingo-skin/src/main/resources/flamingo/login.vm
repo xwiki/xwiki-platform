@@ -1,0 +1,74 @@
+#if ($xcontext.user != 'XWiki.XWikiGuest')
+  #if ($request.xredirect)
+    $response.sendRedirect($request.xredirect)
+  #else
+    $response.sendRedirect($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+  #end
+#elseif($doc.fullName != 'XWiki.XWikiLogin')
+  #set($qs = "$!{request.queryString}")
+  #if(!$request.getParameter('xredirect'))
+    #set($qs = "xredirect=$escapetool.url($doc.getURL('view'))&${qs}")
+  #end
+  $response.sendRedirect($xwiki.getURL('XWiki.XWikiLogin', 'login', $qs))
+#else
+###
+### Login page
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="mainContentArea">
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
+<div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+#if("$!request.srid" != '')
+  <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
+#end
+  <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}"/>
+</div>
+#xwikimessageboxstart($services.localization.render('login') '')
+#set($message = $xcontext.message)
+#if($message)
+  <!-- previous login errors -->
+  #error($services.localization.render($message))
+#end
+<dl>
+  <dt>
+    <label for="j_username">$services.localization.render('username')</label>
+    #if($xwiki.exists('XWiki.ForgotUsername') && $xwiki.hasAccessLevel('view', 'XWiki.ForgotUsername'))
+      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ForgotUsername')" tabindex="500">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+    #end
+  </dt>
+  <dd class="input-group">
+    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value="" tabindex="100"/>
+  </dd>
+  <dt>
+    <label for="j_password">$services.localization.render('password')</label>
+    #if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
+      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ResetPassword')" tabindex="600">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+    #end
+  </dt>
+  <dd class="input-group">
+    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+    <input type="password" id="j_password" size="60" name="j_password" value="" tabindex="200"/>
+  </dd>
+  <dt></dt>
+  <dd>
+    <label class="xHint" for="rememberme">
+      <input id="rememberme" type="checkbox" name="j_rememberme" value="true" tabindex="300"/> $services.localization.render('remembermeonthiscomp')
+    </label>
+  </dd>
+  <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')" tabindex="400"/></dt>
+</dl>
+#xwikimessageboxend()
+</form>
+</div>## mainContentArea
+</div>## main
+## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
+<script type="text/javascript">
+//<![CDATA[
+  document.forms.loginForm.j_username.focus();
+//]]>
+</script>
+#template("endpage.vm")
+#end

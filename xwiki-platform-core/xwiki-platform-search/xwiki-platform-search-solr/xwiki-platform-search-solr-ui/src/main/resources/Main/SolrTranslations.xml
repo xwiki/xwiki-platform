@@ -146,6 +146,7 @@ solr.field.name_exact=Page
 solr.field.title=Title
 solr.field.author=Last Author
 solr.field.author_display=Last Author
+solr.field.creator=Creator
 solr.field.creator_display=Creator
 solr.field.date=Last Modification Date
 solr.field.creationdate=Creation Date
@@ -161,6 +162,7 @@ solr.field.comment=Comments
 solr.field.objcontent=Objects
 solr.field.mimetype=File Type
 solr.field.attauthor=Uploaded By
+solr.field.attauthor_display=Uploaded By
 solr.field.attdate=Upload Date
 solr.field.attsize=File Size</content>
   <object>

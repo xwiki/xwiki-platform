@@ -22,6 +22,9 @@ package org.xwiki.rendering.internal.transformation;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.SpaceBlock;
@@ -36,7 +39,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 2.3M1
  */
-@Component("testgeneratedcontent")
+@Component
+@Named("testgeneratedcontent")
+@Singleton
 public class TestGeneratedContentMacro extends AbstractNoParameterMacro
 {
     /**

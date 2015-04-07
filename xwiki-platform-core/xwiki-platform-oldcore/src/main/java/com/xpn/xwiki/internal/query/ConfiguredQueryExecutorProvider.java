@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -34,7 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * A provider of QueryExecutor. Allows providing of a QueryExecutor defined by the configuration.
- * 
+ *
  * @version $Id$
  * @since 4.0M1
  */
@@ -72,7 +73,7 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
     {
         final XWikiContext context;
         try {
-            context = (XWikiContext) exec.getContext().getProperty("xwikicontext");
+            context = (XWikiContext) this.exec.getContext().getProperty("xwikicontext");
         } catch (NullPointerException e) {
             this.logger.warn("The QueryExecutor was called without an XWikiContext available. "
                 + "This means the old core (and likely the storage engine) is probably "
@@ -84,9 +85,10 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
         try {
             this.queryExecutor = this.manager.getInstance(QueryExecutor.class, storeName);
         } catch (ComponentLookupException e) {
-            this.logger.warn(
-                "Could not find a QueryExecutor with hint " + storeName + " which is the hint for the storage engine. "
-                    + "the default QueryExecutor will not be used instead.", e);
+            this.logger.warn("Could not find a QueryExecutor with hint [{}] which is the hint for the storage engine, "
+                + "defined in your XWiki configuration under the [xwiki.store.main.hint] property. "
+                + "The default QueryExecutor will be used instead. Reason: [{}]", storeName,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         this.initialized = true;

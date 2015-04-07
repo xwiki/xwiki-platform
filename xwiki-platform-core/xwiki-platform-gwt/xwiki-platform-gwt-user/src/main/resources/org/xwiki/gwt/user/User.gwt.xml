@@ -24,7 +24,7 @@
   <inherits name='com.google.gwt.json.JSON' />
   <inherits name="org.xwiki.gwt.dom.DOM" />
 
-  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,nl,pt_BR,ru,sv,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,nl,pl,pt_BR,ru,sv,zh,zh_TW" />
 
   <!-- RichTextArea -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIEOld">
@@ -34,7 +34,10 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
@@ -73,6 +76,7 @@
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
     <any>
       <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
       <when-property-is name="user.agent" value="ie11" />
     </any>
   </replace-with>

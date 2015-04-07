@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -36,6 +36,7 @@
    </description>
   <properties>
     <mavenVersion>3.0.5</mavenVersion>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Maven -->
@@ -47,7 +48,6 @@
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
-      <version>1.7</version>
     </dependency>
     <!-- Plexus -->
     <dependency>
@@ -124,14 +124,14 @@
          a provided scope in XWiki core it's not inherited as part of transitive deps -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- These dependencies are needed at runtime when this plugin executes. We list them here to be sure that any
          pom.xml that uses this packager plugin is built after those deps are built -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-colibri</artifactId>
+      <artifactId>xwiki-platform-flamingo-skin</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>
@@ -161,6 +161,24 @@
       <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-lesscss-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-lesscss-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -219,18 +237,25 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+      <artifactId>xwiki-platform-filter-instance-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- We need to pick a URL implementation @ runtime -->

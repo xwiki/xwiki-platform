@@ -22,13 +22,13 @@ package org.xwiki.wiki.test.po;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents actions that can be done on the WikiManager.WebHome page.
- *
+ * 
  * @version $Id$
  */
 public class WikiIndexPage extends ExtendedViewPage
@@ -40,25 +40,17 @@ public class WikiIndexPage extends ExtendedViewPage
     private List<WebElement> wikiPrettyNames;
 
     /**
+     * The wiki index live table.
+     */
+    private LiveTableElement liveTable = new LiveTableElement("wikis");
+
+    /**
      * Opens the home page.
      */
-    public static WikiIndexPage gotoPage() throws InterruptedException
+    public static WikiIndexPage gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage());
-        // Wait for the livetable to generate ajax requests
-        WikiIndexPage indexPage = new WikiIndexPage();
-        indexPage.waitUntilElementIsVisible(By.id("wikis"));
-        return indexPage;
-    }
-
-    public static String getSpace()
-    {
-        return "WikiManager";
-    }
-
-    public static String getPage()
-    {
-        return "WebHome";
+        getUtil().gotoPage("WikiManager", "WebHome");
+        return new WikiIndexPage();
     }
 
     public List<WikiLink> getWikiPrettyNames()
@@ -82,5 +74,12 @@ public class WikiIndexPage extends ExtendedViewPage
         }
         // We have not found the wiki in the list
         return null;
+    }
+
+    @Override
+    public WikiIndexPage waitUntilPageIsLoaded()
+    {
+        this.liveTable.waitUntilReady();
+        return this;
     }
 }

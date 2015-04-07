@@ -37,6 +37,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 
 import com.xpn.xwiki.XWikiContext;
@@ -82,6 +83,11 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
     /**
      * @see #WikiIRCBotListener
      */
+    private RenderingContext renderingContext;
+
+    /**
+     * @see #WikiIRCBotListener
+     */
     private Transformation macroTransformation;
 
     /**
@@ -108,20 +114,21 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
      * @param listenerData the listener data that have been extracted from the wiki page XObject
      * @param events the event scripts that have been extracted from the wiki page XObjects
      * @param syntax the syntax of the wiki page that contained the Bot Listener XObjects
+     * @param renderingContext the rendering context that we need to keep updated for right management.
      * @param macroTransformation the macro transformation that we'll run to execute the event scripts
      * @param plainTextBlockRenderer the renderer that we'll use to render the parsed event scripts into plain text.
      *        If the rendering has non empty text then this text is sent to the IRC channel
      * @param ircModel used to access the XWiki Context
      * @param executingUserReference the reference to the user under which the Wiki Bot Listener will executed its
-     *        content.
      */
     public WikiIRCBotListener(WikiBotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
-        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel,
-        DocumentReference executingUserReference)
+        RenderingContext renderingContext, Transformation macroTransformation, BlockRenderer plainTextBlockRenderer,
+        WikiIRCModel ircModel, DocumentReference executingUserReference)
     {
         this.listenerData = listenerData;
         this.events = events;
         this.syntax = syntax;
+        this.renderingContext = renderingContext;
         this.macroTransformation = macroTransformation;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
         this.ircModel = ircModel;
@@ -230,7 +237,8 @@ public class WikiIRCBotListener<T extends PircBotX> extends ListenerAdapter<T>
         // Bot Listener. The reason is that the XDOM might use privileged API that require some special rights
         // (like Programming Rights if it contains a Groovy macro for example).
         this.ircModel.executeAsUser(this.executingUserReference, this.listenerData.getReference(),
-            new DefaultExecutor(xdom, this.syntax, event, this.macroTransformation, this.plainTextBlockRenderer));
+            new DefaultExecutor(xdom, this.syntax, event, this.renderingContext, this.macroTransformation,
+                this.plainTextBlockRenderer));
     }
 
     /**

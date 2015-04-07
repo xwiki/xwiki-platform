@@ -169,7 +169,7 @@ public class Util
      * Create a Map from a string holding a space separated list of key=value pairs. If keys or values must contain
      * spaces, they can be placed inside quotes, like <code>"this key"="a larger value"</code>. To use a quote as part
      * of a key/value, use <code>%_Q_%</code>.
-     * 
+     *
      * @param mapString The string that must be parsed.
      * @return A Map containing the keys and values. If a key is defined more than once, the last value is used.
      */
@@ -554,12 +554,12 @@ public class Util
         if (i0 != -1) {
             database = name.substring(0, i0);
             name = name.substring(i0 + 1);
-            context.setDatabase(database);
+            context.setWikiId(database);
             return name;
         }
 
         // This does not make sense
-        // context.setDatabase(context.getWiki().getDatabase());
+        // context.setWikiId(context.getWiki().getDatabase());
         if (name.indexOf(".") != -1) {
             return name;
         } else {
@@ -590,16 +590,10 @@ public class Util
     {
         String title = XMLUtils.escape(xe.getMessage());
         String text = XMLUtils.escape(xe.getFullMessage());
-        String id = (String) context.get("xwikierrorid");
-        if (id == null) {
-            id = "1";
-        } else {
-            id = "" + (Integer.parseInt(id) + 1);
-        }
 
-        return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id
-            + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror" + id
-            + "\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
+        return "<div class=\"xwikirenderingerror\" title=\"Read technical information related to this error\" "
+            + "style=\"cursor: pointer;\">" + title + "</div>"
+            + "<div class=\"xwikirenderingerrordescription hidden\"><pre>" + text + "</pre></div>";
     }
 
     public static MonitorPlugin getMonitorPlugin(XWikiContext context)
@@ -617,7 +611,7 @@ public class Util
 
     /**
      * API to obtain a DOM document for the specified string
-     * 
+     *
      * @param str The parsed text
      * @return A DOM document element corresponding to the string, or null on error
      */
@@ -639,7 +633,7 @@ public class Util
 
     /**
      * API to get a new DOM document
-     * 
+     *
      * @return a new DOM document element, or null on error
      */
     public org.w3c.dom.Document getDOMDocument()
@@ -655,10 +649,12 @@ public class Util
 
     /**
      * API to protect Text from Radeox transformation
-     * 
+     *
      * @param text
      * @return escaped text
+     * @deprecated dedicated to Radeox which is deprecated since a long time
      */
+    @Deprecated
     public static String escapeText(String text)
     {
         text = text.replaceAll("http://", "&#104;ttp://");
@@ -677,10 +673,12 @@ public class Util
 
     /**
      * API to protect URLs from Radeox transformation
-     * 
+     *
      * @param url
      * @return encoded URL
+     * @deprecated dedicated to Radeox which is deprecated since a long time
      */
+    @Deprecated
     public static String escapeURL(String url)
     {
         url = url.replaceAll("\\~", "%7E");
@@ -702,7 +700,7 @@ public class Util
      * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
      * URIs, as a parameter value in a query string or as a segment in the URI path. This uses the UTF-8 encoding, the
      * default encoding for URIs, as stated in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
-     * 
+     *
      * @param text the non encoded text
      * @param context the current context
      * @return encoded text
@@ -722,7 +720,7 @@ public class Util
      * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of
      * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as stated
      * in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
-     * 
+     *
      * @param text the encoded text
      * @param context the current context
      * @return decoded text
@@ -741,7 +739,7 @@ public class Util
     /**
      * Removes all non alpha numerical characters from the passed text. First tries to convert accented chars to their
      * alpha numeric representation.
-     * 
+     *
      * @param text the text to convert
      * @return the alpha numeric equivalent
      */
@@ -781,7 +779,7 @@ public class Util
      * <li>Names must not start (case-insensitive) with the letters xml.</li>
      * <li>Names cannot contain spaces.</li>
      * </ul>
-     * 
+     *
      * @param elementName the XML element name to validate
      * @return true if the element name is valid, false if it is not
      */
@@ -797,7 +795,7 @@ public class Util
 
     /**
      * Load resources from: 1. FileSystem 2. ServletContext 3. ClassPath in this order.
-     * 
+     *
      * @param resource resource path to load
      * @return InputStream of resource or null if not found
      */
@@ -829,7 +827,7 @@ public class Util
      * Normalize the given language code. Converts the given language code to lower case and checks its validity (i.e.
      * whether it is an ISO 639 language code or the string "default").
      * <p>
-     * 
+     *
      * <pre>
      * Util.normalizeLanguage(null)      = null
      * Util.normalizeLanguage("")        = ""
@@ -840,9 +838,9 @@ public class Util
      * Util.normalizeLanguage("en")      = "en"
      * Util.normalizeLanguage("DE_at")   = "de_AT"
      * </pre>
-     * 
+     *
      * </p>
-     * 
+     *
      * @param languageCode the language code to normalize
      * @return normalized language code or the string "default" if the code is invalid
      */
@@ -884,8 +882,8 @@ public class Util
      * Get a likely unique 64bit hash representing the provided uid string. Use the MD5 hashing algorithm.
      *
      * @param uid an uid string usually provided by
-     * {@link org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer} or
-     * {@link org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer}
+     *            {@link org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer} or
+     *            {@link org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer}
      * @return 64bit hash
      * @since 4.0M1
      */

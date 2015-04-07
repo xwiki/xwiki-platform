@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -69,6 +70,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Named("R40001XWIKI7540")
+@Singleton
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
     /** The comment class reference. */
@@ -129,17 +131,17 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         try {
             EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
             currentAnnotationClassReference =
-                currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
+                currentAnnotationClassReference.removeParent(new WikiReference(context.getWikiId()));
             if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
                 logger.warn("Skipping database [{}] because it uses a custom annotation class. "
-                    + resultOfSkippingDatabase, context.getDatabase());
+                    + resultOfSkippingDatabase, context.getWikiId());
                 return false;
             }
 
             BaseClass commentsClass = context.getWiki().getCommentsClass(context);
             if (commentsClass.hasCustomMapping()) {
                 logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
-                    + resultOfSkippingDatabase, context.getDatabase());
+                    + resultOfSkippingDatabase, context.getWikiId());
                 return false;
             }
         } catch (Exception e) {

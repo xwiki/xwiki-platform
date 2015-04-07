@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.macro.script;
 
+import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +38,11 @@ import javax.script.ScriptException;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -57,6 +60,17 @@ import org.xwiki.script.ScriptContextManager;
 public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParameters> extends AbstractScriptMacro<P>
     implements PrivilegedScriptMacro
 {
+
+    /**
+     * The name of the binding containing the {@link ScriptContext} itself.
+     */
+    public static final String BINDING_CONTEXT = "context";
+
+    /**
+     * The name of the "out" binding..
+     */
+    public static final String BINDING_OUT = "out";
+
     /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
@@ -72,6 +86,9 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
      */
     @Inject
     private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private ConverterManager converterManager;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -208,37 +225,68 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
         ScriptContext scriptContext = getScriptContext();
 
-        StringWriter stringWriter = new StringWriter();
-
+        Writer currentWriter = scriptContext.getWriter();
+        Reader currentReader = scriptContext.getReader();
+        Object currentContextBinding = scriptContext.getAttribute(BINDING_CONTEXT, ScriptContext.ENGINE_SCOPE);
+        Object currentFilename = scriptContext.getAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
+        // Some engines like Groovy are duplicating the writer in "out" binding
+        Object currentOut = scriptContext.getAttribute(BINDING_OUT, ScriptContext.ENGINE_SCOPE);
         // Set standard javax.script.filename property
         MetaDataBlock metaDataBlock =
             context.getCurrentMacroBlock().getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE),
                 Axes.ANCESTOR_OR_SELF);
         if (metaDataBlock != null) {
-            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData()
-                .getMetaData(MetaData.SOURCE), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE),
+                ScriptContext.ENGINE_SCOPE);
         }
 
-        // set writer in script context
-        scriptContext.setWriter(stringWriter);
-
         try {
+            StringWriter stringWriter = new StringWriter();
+
+            // set writer in script context
+            scriptContext.setWriter(stringWriter);
+
             Object scriptResult = eval(content, engine, scriptContext);
 
-            if (scriptResult instanceof XDOM) {
-                result = ((XDOM) scriptResult).getChildren();
-            } else if (scriptResult instanceof Block) {
-                result = Collections.singletonList((Block) scriptResult);
-            } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
-                && ((List< ? >) scriptResult).get(0) instanceof Block) {
-                result = (List<Block>) scriptResult;
-            } else {
-                // Run the wiki syntax parser on the script-rendered content
-                result = parseScriptResult(stringWriter.toString(), parameters, context);
-            }
+            result = convertScriptExecution(scriptResult, stringWriter, parameters, context);
         } finally {
-            // remove writer script from context
-            scriptContext.setWriter(null);
+            // restore current writer
+            scriptContext.setWriter(currentWriter);
+            // restore current reader
+            scriptContext.setReader(currentReader);
+            // restore "context" binding
+            scriptContext.setAttribute(BINDING_CONTEXT, currentContextBinding, ScriptContext.ENGINE_SCOPE);
+            // restore "javax.script.filename" binding
+            scriptContext.setAttribute(ScriptEngine.FILENAME, currentFilename, ScriptContext.ENGINE_SCOPE);
+            // restore "out" binding
+            scriptContext.setAttribute(BINDING_OUT, currentOut, ScriptContext.ENGINE_SCOPE);
+        }
+
+        return result;
+    }
+
+    private List<Block> convertScriptExecution(Object scriptResult, StringWriter scriptContextWriter, P parameters,
+        MacroTransformationContext context) throws MacroExecutionException
+    {
+        List<Block> result;
+
+        if (scriptResult instanceof XDOM) {
+            result = ((XDOM) scriptResult).getChildren();
+        } else if (scriptResult instanceof Block) {
+            result = Collections.singletonList((Block) scriptResult);
+        } else if (scriptResult instanceof List && !((List< ? >) scriptResult).isEmpty()
+            && ((List< ? >) scriptResult).get(0) instanceof Block) {
+            result = (List<Block>) scriptResult;
+        } else {
+            // If the Script Context writer is empty and the Script Result isn't, then convert the String Result
+            // to String and display it!
+            String contentToParse = scriptContextWriter.toString();
+            if (StringUtils.isEmpty(contentToParse) && scriptResult != null) {
+                // Convert the returned value into a String.
+                contentToParse = this.converterManager.convert(String.class, scriptResult);
+            }
+            // Run the wiki syntax parser on the Script returned content
+            result = parseScriptResult(contentToParse, parameters, context);
         }
 
         return result;

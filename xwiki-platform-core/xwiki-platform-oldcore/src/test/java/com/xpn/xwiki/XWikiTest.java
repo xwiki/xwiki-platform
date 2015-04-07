@@ -32,7 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -45,6 +45,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,7 +64,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
@@ -89,7 +90,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
-        
+
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
             // Avoid all the error at XWiki initialization
@@ -108,7 +109,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
-        this.xwiki.getConfig().setProperty("xwiki.render.velocity.macrolist", "");
+        getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
@@ -168,6 +169,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setAuthor("Albatross");
 
         this.xwiki.saveDocument(this.document, getContext());
+
+        Mock mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        mockWikiDescriptorManager.stubs().method("getMainWikiId").will(returnValue("xwiki"));
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
@@ -238,6 +242,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         attachment.setDoc(skin);
         this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
+
         assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
         assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
         assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
@@ -380,17 +385,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         });
 
         // Set the wiki to multilingual mode.
-        XWikiDocument preferences = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences")) {
-            @Override
-            public BaseObject getXObject()
-            {
-                BaseObject preferencesObject = new BaseObject();
-                preferencesObject.setIntValue("multilingual", 1);
-
-                return preferencesObject;
-            }
-        };
-        this.xwiki.saveDocument(preferences, getContext());
+        getConfigurationSource().setProperty("multilingual", "1");
 
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }
@@ -425,7 +420,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Check that the user validation feature works when the validation key is stored both as plain text and as a hashed
      * field.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testValidationKeyStorage() throws Exception
@@ -474,7 +469,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     /**
      * Tests that XWiki.XWikiPreferences page is not saved each time XWiki is initialized.
-     * 
+     *
      * @throws Exception when any exception occurs inside XWiki
      */
     public void testGetPrefsClass() throws Exception
@@ -502,8 +497,9 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 }
             });
         mockStore.expects(once()).method("saveXWikiDoc").with(same(prefsDoc), same(getContext()));
+        mockStore.expects(once()).method("exists").will(returnValue(false));
 
-        xwiki.getPrefsClass(getContext());
-        xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
+        this.xwiki.getPrefsClass(getContext());
     }
 }

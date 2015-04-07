@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -36,18 +37,22 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Script service to manager wikis.
+ * Script service to manage wikis.
  * 
  * @version $Id$
  * @since 5.3M2
@@ -100,6 +105,15 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private ScriptServiceManager scriptServiceManager;
 
+    @Inject
+    private StandardURLConfiguration standardURLConfiguration;
+
+    @Inject
+    private WikiConfiguration wikiConfiguration;
+
+    @Inject
+    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
     /**
      * Logging tool.
      */
@@ -145,8 +159,8 @@ public class WikiManagerScriptService implements ScriptService
     private void checkProgrammingRights() throws AuthorizationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                xcontext.getDoc().getDocumentReference());
+        authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(), xcontext.getDoc()
+            .getDocumentReference());
     }
 
     /**
@@ -236,13 +250,17 @@ public class WikiManagerScriptService implements ScriptService
                 error(new Exception(errorMessage));
                 return false;
             }
-            String owner = descriptor.getOwnerId();
+            // Get the full reference of the given user
+            DocumentReference userReference = documentReferenceResolver.resolve(userId);
+            String fullUserId = entityReferenceSerializer.serialize(userReference);
+
             // If the user is the owner
-            if (userId.equals(owner)) {
+            String owner = descriptor.getOwnerId();
+            if (fullUserId.equals(owner)) {
                 return true;
             }
+
             // If the user is an admin
-            DocumentReference userReference = documentReferenceResolver.resolve(userId);
             WikiReference wikiReference = new WikiReference(wikiId);
             if (authorizationManager.hasAccess(Right.ADMIN, userReference, wikiReference)) {
                 return true;
@@ -305,6 +323,25 @@ public class WikiManagerScriptService implements ScriptService
         } catch (WikiManagerException e) {
             error(e);
             wikis = new ArrayList<WikiDescriptor>();
+        }
+
+        return wikis;
+    }
+
+    /**
+     * Get all the wiki identifiers.
+     * 
+     * @return the list of all wiki identifiers
+     * @since 6.2M1
+     */
+    public Collection<String> getAllIds()
+    {
+        Collection<String> wikis;
+        try {
+            wikis = wikiDescriptorManager.getAllIds();
+        } catch (WikiManagerException e) {
+            error(e);
+            wikis = new ArrayList<String>();
         }
 
         return wikis;
@@ -374,6 +411,21 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * @return the descriptor of the current wiki
+     */
+    public WikiDescriptor getCurrentWikiDescriptor()
+    {
+        WikiDescriptor descriptor = null;
+        try {
+            descriptor = wikiDescriptorManager.getCurrentWikiDescriptor();
+        } catch (WikiManagerException e) {
+            error(e);
+        }
+
+        return descriptor;
+    }
+
+    /**
      * Save the specified descriptor (if you have the right).
      * 
      * @param descriptor descriptor to save
@@ -383,31 +435,85 @@ public class WikiManagerScriptService implements ScriptService
     {
         XWikiContext context = xcontextProvider.get();
 
-        try {
-            // Check if the current script has the programming rights
-            checkProgrammingRights();
+        boolean result = false;
 
+        try {
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
+            WikiReference wikiReference = descriptor.getReference();
             if (oldDescriptor != null) {
-                String owner = oldDescriptor.getOwnerId();
-                // Check right access
-                WikiReference wikiReference = new WikiReference(oldDescriptor.getId());
-                if (!entityReferenceSerializer.serialize(context.getUserReference()).equals(owner)) {
-                    authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+                if (!result) {
+                    // Users that can edit the wiki's descriptor document are allowed to use this API as well. This
+                    // includes global admins.
+                    DocumentReference descriptorDocument =
+                        wikiDescriptorDocumentHelper.getDocumentReferenceFromId(oldDescriptor.getId());
+                    result = authorizationManager.hasAccess(Right.EDIT, context.getUserReference(), descriptorDocument);
+                }
+
+                String currentOwner = oldDescriptor.getOwnerId();
+                if (!result) {
+                    // The current owner can edit anything.
+                    result = entityReferenceSerializer.serialize(context.getUserReference()).equals(currentOwner);
+                }
+
+                if (!result) {
+                    // Local admins can edit the descriptor, except for the "ownerId" field, which should be
+                    // editable only by the current owner or main wiki admins.
+                    String newOwner = descriptor.getOwnerId();
+                    result =
+                        authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), wikiReference)
+                            && StringUtils.equals(newOwner, currentOwner);
                 }
             } else {
                 // Saving a descriptor that did not already exist should be reserved to global admins
-                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(),
-                        new WikiReference(wikiDescriptorManager.getMainWikiId()));
+                result =
+                    authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(), new WikiReference(
+                        wikiDescriptorManager.getMainWikiId()));
             }
-            wikiDescriptorManager.saveDescriptor(descriptor);
 
-            return true;
+            if (!result) {
+                // Exhausted all options. Deny access for the current user to edit the descriptor.
+                throw new AccessDeniedException(context.getUserReference(), wikiReference);
+            } else {
+                // Execute the operation.
+                wikiDescriptorManager.saveDescriptor(descriptor);
+            }
+
+            return result;
         } catch (Exception e) {
             error(e);
             return false;
         }
+    }
+
+    /**
+     * Tell if the path mode is used for subwikis.
+     * <p/>
+     * Example:
+     * 
+     * <pre>
+     * {@code
+     * wiki alias: subwiki
+     * URL if path mode is enabled:
+     *   /xwiki/wiki/subwiki/
+     * URL if path mode is disabled:
+     *   http://subwiki/
+     * }
+     * </pre>
+     *
+     * @return either or not the path mode is enabled
+     */
+    public boolean isPathMode()
+    {
+        return standardURLConfiguration.isPathBasedMultiWiki();
+    }
+
+    /**
+     * @return the default suffix to append to new wiki aliases.
+     */
+    public String getAliasSuffix()
+    {
+        return wikiConfiguration.getAliasSuffix();
     }
 
     /**

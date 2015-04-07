@@ -31,7 +31,7 @@ import org.openqa.selenium.support.FindBy;
  * @version $Id$
  * @since 3.2M3
  */
-public class CommentsTab extends ViewPage
+public class CommentsTab extends BaseElement
 {
     @FindBy(xpath = "//fieldset[@id='commentform']/label/span")
     private WebElement commentAuthor;
@@ -63,7 +63,7 @@ public class CommentsTab extends ViewPage
 
     public int getCommentID(String content)
     {
-        this.commentsList = getUtil().findElementsWithoutWaiting(getDriver(), By.className("xwikicomment"));
+        this.commentsList = getDriver().findElementsWithoutWaiting(By.className("xwikicomment"));
 
         for (int i = 0; i < this.commentsList.size(); i++) {
             if (this.commentsList.get(i).findElement(By.className("commentcontent")).getText().equals(content)) {
@@ -101,10 +101,12 @@ public class CommentsTab extends ViewPage
 
     public void deleteCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='delete']")).click();
+        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id
+            + "']//a[contains(@class, 'delete')]")).click();
         this.confirmDelete = new ConfirmationModal();
         this.confirmDelete.clickOk();
-        waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
+        getDriver().waitUntilElementIsVisible(
+            By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
         getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"))
             .click();
     }
@@ -117,8 +119,8 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm replyToCommentByID(int id)
     {
-        getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
+        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
 
@@ -137,9 +139,9 @@ public class CommentsTab extends ViewPage
      */
     public CommentForm editCommentByID(int id)
     {
-        getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
-        waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
+        getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + id + "']//a[contains(@class, 'edit')]")).click();
+        getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
         return new CommentForm(By.className("edit-xcomment"));
     }
 
@@ -153,14 +155,14 @@ public class CommentsTab extends ViewPage
 
     public String getCommentAuthorByID(int id)
     {
-        return getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//span[@class='commentauthor']")).getText();
+        return getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + id + "']//span[@class='commentauthor']")).getText();
     }
 
     public String getCommentContentByID(int id)
     {
-        return getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//div[@class='commentcontent']")).getText();
+        return getDriver().findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + id + "']//div[@class='commentcontent']")).getText();
     }
 
     /**
@@ -168,7 +170,7 @@ public class CommentsTab extends ViewPage
      */
     public boolean hasEditButtonForCommentByID(int commentId)
     {
-        return getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + commentId + "']//a[@class='edit']")).size() > 0;
+        return getDriver().findElementsWithoutWaiting(By.xpath("//div[@id='xwikicomment_"
+            + commentId + "']//a[contains(@class, 'edit')]")).size() > 0;
     }
 }

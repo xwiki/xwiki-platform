@@ -22,7 +22,6 @@ package org.xwiki.search.solr.internal.reference;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Recursively retrieves the references for all the indexable entities contained by the given start entity.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 5.1M2
  */
-@Unstable
 @Role
 public interface SolrReferenceResolver
 {

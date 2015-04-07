@@ -4,6 +4,9 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
+#set($discard = $services.template.execute('job_macros.vm'))
+#set($discard = $services.template.execute('rating_macros.vm'))
+
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
 ## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
@@ -23,7 +26,7 @@
 #macro (displayExtensionSearchBar)
   <div class="extension-search-bar">
     ## Simple search form.
-    <form action="" id="extension-search-simple">
+    <form action="$xwiki.relativeRequestURL" id="extension-search-simple">
       <div>
         #if ($request.section)
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
@@ -45,7 +48,7 @@
       </div>
     </form>
     ## Advanced search form.
-    <form action="" class="xform">
+    <form action="$xwiki.relativeRequestURL" class="xform">
       <fieldset id="extension-search-advanced">
         <legend><a href="#extension-search-advanced-body">$services.localization.render('extensions.advancedSearch.title')</a></legend>
         <div id="extension-search-advanced-body"></div>
@@ -137,6 +140,12 @@
     ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
     #getInstalledExtension($extension $extensionNamespace $installedExtension)
     #extensionActionButtons($installedExtension 'uninstall' true)
+    #if ($installedExtension && $installedExtension.type == 'xar'
+        && $installedExtension.isInstalled($extensionNamespace))
+      ## Add the button that can be used to compute the differences between the documents from the XAR and the documents
+      ## from the database.
+      #extensionActionButton('diffXAR' true)
+    #end
   #elseif ($extensionStatus == 'remote')
     ## Installable extension.
     #if ($xcontext.action == 'distribution' && $showRepairXARButton)
@@ -158,6 +167,16 @@
     #else
       #extensionActionButtons($installedExtension 'downgrade' true)
     #end
+  #end
+#end
+
+#macro (displayExtensionRating $extension)
+  #set ($rating = $extension.getRating())
+  #if ($rating != $NULL)
+    #set($id = $xwiki.getUniquePageName("string").replaceAll("[0-9]*", "").toLowerCase())
+    <div class="extension-rating">
+      #ratingstars($id "" "" $rating.averageVote $rating.totalVotes true)
+    </div>
   #end
 #end
 
@@ -187,28 +206,6 @@
   #end
 #end
 
-#macro (displayJobProgressBar $jobStatus)
-  <div class="ui-progress">
-    <div class="ui-progress-background">
-      #set ($percent = $jobStatus.progress.offset)
-      ## There is no progress information if the job was scheduled but hasn't started yet.
-      #if (!$percent)
-        #set ($percent = 0)
-      #end
-      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
-      <div class="ui-progress-bar green" style="width:${percent}%"></div>
-    </div>
-    #if ($jobStatus && !$jobStatus.log.isEmpty())
-      ## We need the tail of the log queue.
-      #set ($logList = [])
-      #set ($discard = $logList.addAll($jobStatus.log))
-      <p class="ui-progress-message">
-        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
-      </p>
-    #end
-  </div>
-#end
-
 #macro (displayExtensionDetails_menuLink $detail $selected)
   <a href="#extension-body-${detail}-$extensionIdHashCode"#if ($selected) class="current"#end>
     $services.localization.render("extensions.info.category.${detail}")
@@ -228,6 +225,9 @@
 #end
 ##
 #if ($jobStatus)
+#if ($jobState == 'FINISHED' && $jobStatus.documentDiffs)
+<li>#displayExtensionDetails_menuLink('changes')</li>##
+#end
 #set ($selected = $jobState != 'FINISHED' || $request.extensionSection == 'progress')
 <li>#displayExtensionDetails_menuLink('progress' $selected)</li>##
 #end
@@ -236,84 +236,133 @@
 
 #macro (displayExtensionDetails_description $extension)
   <div id="extension-body-description-$extensionIdHashCode"></div>
-  <div class="extension-body-description extension-body-section">
-    <dl class="extension-metadata">
-      <dt>$services.localization.render('extensions.info.id')</dt>
-      <dd>$extension.id.id</dd>
+  <dl class="extension-body-description extension-body-section">
+    <dt>$services.localization.render('extensions.info.id')</dt>
+    <dd>$extension.id.id</dd>
 
-      #if ($extension.features.size() > 0)
-        <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
-        <dd>
-        #if ($extension.features.size() == 1)
-          $escapetool.xml($extension.features.iterator().next())
+    #if ($extension.features.size() > 0)
+      <dt>$services.localization.render('extensions.info.features', [$extension.features.size()])</dt>
+      <dd>
+      #if ($extension.features.size() == 1)
+        $escapetool.xml($extension.features.iterator().next())
+      #else
+        <ul>
+          #foreach ($feature in $extension.features)
+            <li>$escapetool.xml($feature)</li>
+          #end
+        </ul>
+      #end
+      </dd>
+    #end
+
+    <dt>$services.localization.render('extensions.info.type')</dt>
+    <dd>$extension.type</dd>
+
+    <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
+    #if ($extension.licenses.size() > 0)
+      <dd>
+        #if ($extension.licenses.size() == 1)
+          $extension.licenses.iterator().next().name
         #else
           <ul>
-            #foreach ($feature in $extension.features)
-              <li>$escapetool.xml($feature)</li>
+            #foreach ($license in $extension.licenses)
+              <li>$license.name</li>
             #end
           </ul>
         #end
-        </dd>
+      </dd>
+    #end
+
+    #if ("$!{extension.webSite}" != '')
+      <dt>$services.localization.render('extensions.info.website')</dt>
+      <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+    #end
+
+    #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
+      <dt>$services.localization.render('extensions.info.repository')</dt>
+      <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
+    #end
+
+    #if ($extension.scm)
+      #if ($extension.scm.url)
+        <dt>$services.localization.render('extensions.info.scm')</dt>
+        <dd><a href="$extension.scm.url">$escapetool.xml($extension.scm.url.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
+      #elseif ($extension.scm.connection)
+        <dt>$services.localization.render('extensions.info.scm')</dt>
+        <dd><a href="$extension.scm.connection.path">$escapetool.xml($extension.scm.connection.system)</a></dd>
       #end
+    #end
 
-      <dt>$services.localization.render('extensions.info.type')</dt>
-      <dd>$extension.type</dd>
+    #if ($extension.issueManagement.getURL())
+      <dt>$services.localization.render('extensions.info.issueManagement')</dt>
+      <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
+    #end
 
-      <dt>$services.localization.render('extensions.info.license', [$extension.licenses.size()])</dt>
-      #if ($extension.licenses.size() > 0)
-        <dd>
-          #if ($extension.licenses.size() == 1)
-            $extension.licenses.iterator().next().name
-          #else
-            <ul>
-              #foreach ($license in $extension.licenses)
-                <li>$license.name</li>
-              #end
-            </ul>
-          #end
-        </dd>
-      #end
+    #if ($extension.isInstalled())
+      #displayExtensionDetails_description_wikis($extension)
+    #end
 
-      #if ("$!{extension.webSite}" != '')
-        <dt>$services.localization.render('extensions.info.website')</dt>
-        <dd><a href="$extension.webSite">$escapetool.xml($extension.webSite.replaceAll('^[^/]++//([^/\?]++)[/\?]?.*+$', '$1'))</a></dd>
-      #end
+    #if ($extensionStatus != 'loading')
+      #displayExtensionDetails_description_versions($extension)
+    #end
 
-      #if ($extension.repository.descriptor.URI && $extension.repository.descriptor.URI.scheme != 'file')
-        <dt>$services.localization.render('extensions.info.repository')</dt>
-        <dd><a href="$extension.repository.descriptor.URI">$escapetool.xml($extension.repository.descriptor.id)</a></dd>
-      #end
-
-      #if ($extension.isInstalled())
-        #displayExtensionDetails_description_wikis($extension)
-      #end
-
-      #if ($extensionStatus != 'loading')
-        #displayExtensionDetails_description_versions($extension)
-      #end
-
-      ##
-      ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
-      ## server side generated HTML, etc.)
-      ## <dt>Description</dt>
-      ## <dd>$!extension.description</dd>
-    </dl>
-  </div>
+    ##
+    ## TODO: need a decision on what exactly is the description and how it should be safely displayed (wiki syntax,
+    ## server side generated HTML, etc.)
+    ## <dt>Description</dt>
+    ## <dd>$!extension.description</dd>
+  </dl>
 #end
 
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #getInstallInfo($extension $NULL $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedGloballyBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #else
+      <dt>$services.localization.render('extensions.info.namespaces.global')</dt>
+    #end
   #elseif ($xcontext.isMainWiki())
     ## Display the list of namespaces where the given extension is installed only if we are on the main wiki.
     <dt>$services.localization.render('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
-        <li>#displayExtensionNamespace($namespace)</li>
+        #getInstallInfo($extension $namespace $install)
+        #if ($install.date)
+          <li>$services.localization.render('extensions.info.installedOnNamespaceBy', [
+            "#displayExtensionNamespace($namespace)",
+            $xwiki.getUserName($install.userReference),
+            $xwiki.formatDate($install.date)
+          ])</li>
+        #else
+          <li>#displayExtensionNamespace($namespace)</li>
+        #end
       #end
     </ul></dd>
+  #else
+    #getInstallInfo($extension $extensionNamespace $install)
+    #if ($install.date)
+      <dt>$services.localization.render('extensions.info.installedBy',
+        [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
+    #end
   #end
+#end
+
+#macro (getInstallInfo $installedExtension $namespace $return)
+  #set ($install = {'date': $installedExtension.getInstallDate($namespace)})
+  #if ($install.date)
+    #set ($install.userReference = $installedExtension.getUserReference($namespace))
+  #else
+    #set ($installJobStatus = $extensionManager.getExtensionJobStatus($installedExtension.id.id, $namespace))
+    #if ($installJobStatus && $installJobStatus.request.getProperty('job.type') == 'install')
+      #set ($install.date = $installJobStatus.startDate)
+      #set ($install.userReference = $installJobStatus.request.getProperty('user.reference'))
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $install)
 #end
 
 #macro (displayExtensionNamespace $namespace)
@@ -327,17 +376,14 @@ $namespace##
 #end
 
 #macro (displayExtensionDetails_description_versions $extension)
-  #if (!$request.listVersions)
-    <dt></dt>
-    <dd>
+  <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
+  <dd>
+    #if (!$request.listVersions)
       <a href="#getExtensionURL($extension.id.id $extension.id.version.value {'listVersions': true})"
         class="extension-versions-link">
         $services.localization.render('extensions.info.stableVersions.linkLabel')
       </a>
-    </dd>
-  #else
-    <dt>$services.localization.render('extensions.info.stableVersions.label')</dt>
-    <dd>
+    #else
       #set ($stableVersions = [])
       #foreach ($version in $extensionManager.resolveVersions($extension.id.id, 0, -1))
         #if ($version.type == 'STABLE')
@@ -355,8 +401,8 @@ $namespace##
       #else
         $services.localization.render('extensions.info.stableVersions.noResults')
       #end
-    </dd>
-  #end
+    #end
+  </dd>
 #end
 
 #**
@@ -408,25 +454,29 @@ $namespace##
 
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   #if ($extension.dependencies.size() > 0)
-    <p>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
-    <ul>
-      #foreach ($dependency in $extension.dependencies)
-        <li>#displayDependency($dependency $extensionNamespace)</li>
-      #end
-    </ul>
+    <dt>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</dt>
+    <dd>
+      <ul class="dependencies">
+        #foreach ($dependency in $extension.dependencies)
+          <li>#displayDependency($dependency $extensionNamespace)</li>
+        #end
+      </ul>
+    </dd>
   #end
 #end
 
 #macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
   #if ($backwardDependencies.size() > 0)
-    <p>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
-    <ul>
-      #foreach ($namespace in $backwardDependencies.entrySet())
-        #foreach ($dependency in $namespace.value)
-          <li>#displayDependency($dependency $namespace.key)</li>
+    <dt>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</dt>
+    <dd>
+      <ul class="dependencies">
+        #foreach ($namespace in $backwardDependencies.entrySet())
+          #foreach ($dependency in $namespace.value)
+            <li>#displayDependency($dependency $namespace.key)</li>
+          #end
         #end
-      #end
-    </ul>
+      </ul>
+    </dd>
   #end
 #end
 
@@ -434,9 +484,24 @@ $namespace##
   #if ($extension.dependencies.size() > 0 || $backwardDependencies.size() > 0)
     <div id="extension-body-dependencies-$extensionIdHashCode"></div>
     #computeXBack()
-    <div class="extension-body-dependencies extension-body-section">
+    <dl class="extension-body-dependencies extension-body-section">
       #displayExtensionDetails_dependencies_upstream($extension)
       #displayExtensionDetails_dependencies_downstream($backwardDependencies)
+    </dl>
+  #end
+#end
+
+#macro (displayExtensionDetails_changes $extension)
+  #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #set ($jobState = $jobStatus.state)
+  #end
+  #set ($documentDiffs = $jobStatus.documentDiffs)
+  #if ($jobState == 'FINISHED' && $documentDiffs)
+    <div id="extension-body-changes-$extensionIdHashCode"></div>
+    <div class="extension-body-changes extension-body-section">
+      #template('diff_macros.vm')
+      #displayDocumentUnifiedDiffs($documentDiffs)
     </div>
   #end
 #end
@@ -464,7 +529,22 @@ $namespace##
   #if ($isExtensionPlan)
     #displayExtensionPlan($jobStatus)
   #else
-    #printStatusLog($jobStatus)
+    ## Display any incompatibility errors
+    #set ($jobStatusCollapsed = false)
+    #if ($jobStatus.state == 'FINISHED')
+      ## Check if there are any logged errors.
+      #foreach ($log in $jobStatus.log.getLogs('ERROR'))
+        #if ($log.throwable && $exceptiontool.getRootCauseMessage($log.throwable).contains('not compatible'))
+          #set ($jobStatusCollapsed = true)
+          #set ($errorMessage = $services.localization.render('platform.extension.info.error.versionNotCompatible'))
+          #set ($errorMessage = "${errorMessage}<br/>")
+          #set ($errorMessage = "${errorMessage}${services.localization.render('platform.extension.info.error.versionNotCompatibleHint')}")
+          <p>#error($errorMessage)</p>
+          #break
+        #end
+      #end
+    #end
+    #displayJobStatusLog($jobStatus, $jobStatusCollapsed)
   #end
 #end
 
@@ -502,151 +582,34 @@ $namespace##
     })
     <div class="infomessage">$services.localization.render($emptyPlanMessageKeys.get($plan.request.getProperty('job.type')))</div>
   #else
+    <dl>
     #foreach($entry in $extensionsByAction.entrySet())
       #if (!$entry.value.isEmpty())
-        <p>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</p>
-        <ul>
-          #foreach ($planAction in $entry.value)
-            <li>#displayDependency($planAction.extension $planAction.namespace)</li>
-          #end
-        </ul>
+        <dt>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</dt>
+        <dd>
+          <ul class="dependencies">
+            #foreach ($planAction in $entry.value)
+              <li>#displayDependency($planAction.extension $planAction.namespace)</li>
+            #end
+          </ul>
+        </dd>
       #end
     #end
+    </dl>
   #end
-#end
-
-#macro (printStatusLog $status)
-  #if ($status.log.size() > 0)
-  <ul>
-  #foreach ($log in $status.log)
-    #set ($logLevel = $log.level.toString().toLowerCase())
-    #if (!$foreach.hasNext && $status.state != 'FINISHED')
-      ## Display the last log item as loading if the job is in progress.
-      #set ($logLevel = 'loading')
-    #end
-    <li class="extension-log-item extension-log-item-$logLevel">
-      #if ($log.throwable)
-        #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-        #if ("$!message.trim()" != '')
-          <div>$escapetool.xml($message)</div>
-        #else
-          <div>#printLogMessage($log)</div>
-        #end
-        #printThrowable($log.throwable)
-      #else
-        <div>#printLogMessage($log)</div>
-      #end
-    </li>
-  #end
-  </ul>
-  #end
-#end
-
-#macro (getThrowableRootCauseMessage $throwable)
-  #if ($throwable.cause)
-    #getThrowableRootCauseMessage($throwable.cause)
-  #else
-    $!{throwable.message}##
-  #end
-#end
-
-#macro (printThrowable $throwable $isCause)
-#if (!$isCause)
-  <div class="stacktrace">##
-#end
-$throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
-
-#foreach($stackTraceElement in $throwable.stackTrace)
-    at $stackTraceElement
-#end
-#if ($throwable.cause)
-Caused by: #printThrowable($throwable.cause true)
-#end
-#if (!$isCause)</div>#end
-#end
-
-#macro (printLogMessage $log $resolveRemotely)
-  #set ($message = '')
-  #set ($messageElements = $log.messageElements)
-  #foreach ($messageElement in $messageElements)
-    #if ($velocityCount == $messageElements.size())
-      ## Skip the last message element because we always have more message elements than arguments.
-      #break
-    #end
-    #set ($argument = $log.argumentArray.get($foreach.index))
-    #set ($message = "$message$escapetool.xml($messageElement)")
-    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
-    ## We will display a link to that entity, so we need to extract the document from it.
-    #set ($documentReference = $argument.extractReference("DOCUMENT"))
-    #if ($documentReference)
-      #set ($documentReferenceDisplay = "#displayDocumentReference($documentReference)")
-      #set ($message = "$message$documentReferenceDisplay.trim()")
-    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
-      #if ($resolveRemotely)
-        ## Assume the argument is an extension dependency.
-        #set ($_extension = $extensionManager.resolve($argument, $extensionNamespace))
-        #if (!$_extension)
-          ## Assume the argument is an extension id.
-          #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-        #end
-      #else
-        ## Search for the extension/dependency only in the core and local repositories.
-        ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
-        ## downloaded). We need a resolve method that doesn't perform any remote calls.
-        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
-        #if (!$_extension)
-          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
-        #end
-      #end
-      #if ($_extension)
-        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
-        #set ($_extensionName = "#displayExtensionName($_extension)")
-        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
-      #else
-        #set ($version = $argument.version)
-        #if (!$version)
-          #set ($version = $argument.versionConstraint)
-        #end
-        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
-        #set ($_extensionName = $argument)
-      #end
-      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
-    #elseif ($argument.listIterator())
-      ## Assume the argument is a job id.
-      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
-    #elseif ($argument.startsWith('wiki:'))
-      #set ($message = "$message#wikiHomePageLink($argument)")
-    #elseif ($argument.previous && $argument.next)
-      ## Assume the argument is a diff Delta.
-      #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
-    #else
-      #set ($message = "$message$escapetool.xml($argument)")
-    #end
-  #end
-  ## Add the last message element.
-  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
-#end
-
-#macro (displayDocumentReference $documentReference)
-  #set ($path = [])
-  #set ($wikiPrettyName = $services.wiki.getById($documentReference.wikiReference.name).prettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $documentReference.wikiReference.name)
-  #end
-  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $documentReference.wikiReference))
-  #set ($discard = $path.add("<a href=""$xwiki.getURL($wikiHomeDocRef)"">$escapetool.xml($wikiPrettyName)</a>"))
-  ##
-  #foreach ($spaceReference in $documentReference.spaceReferences)
-    #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
-    #set ($discard = $path.add("<a href=""$xwiki.getURL($spaceHomeDocRef)"">$escapetool.xml($spaceReference.name)</a>"))
-  #end
-  ##
-  #set ($discard = $path.add("<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($documentReference.name)</a>"))
-  $stringtool.join($path, ' &raquo; ')
 #end
 
 #macro (displayExtensionDetails_progressQuestion $extension $jobStatus)
   #set ($question = $jobStatus.question)
+  #set ($questionType = $question.getClass().getName())
+  #if ($questionType.endsWith('.ConflictQuestion'))
+    #displayExtensionDetails_mergeConflictQuestion($question)
+  #elseif ($questionType.endsWith('.CleanPagesQuestion'))
+    #displayExtensionDetails_cleanPagesQuestion($question)
+  #end
+#end
+
+#macro (displayExtensionDetails_mergeConflictQuestion $question)
   <dl>
     <dt>
       <label>$services.localization.render('extensions.upgrade.mergeConflict.label')</label>
@@ -671,11 +634,18 @@ Caused by: #printThrowable($throwable.cause true)
       #end
       </select>
     </dd>
+    <dt>
+      <label>
+        <input type="checkbox" name="autoResolve" value="true" />
+        $services.localization.render('extensions.upgrade.mergeConflict.autoResolve')
+      </label>
+      <span class="xHint">$services.localization.render('extensions.upgrade.mergeConflict.autoResolve.hint')</span>
+    </dt>
   </dl>
-  #displayExtensionDetails_progressChanges($question)
+  #displayExtensionDetails_mergeConflictChanges($question)
 #end
 
-#macro (displayExtensionDetails_progressChanges $question)
+#macro (displayExtensionDetails_mergeConflictChanges $question)
   <h3 class="extension-diff-title">$services.localization.render('extensions.upgrade.mergeConflict.changes.title',
     ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</h3>
   <div class="extension-diff-options">
@@ -730,6 +700,81 @@ Caused by: #printThrowable($throwable.cause true)
   #end
 #end
 
+#macro (displayExtensionDetails_cleanPagesQuestion $question)
+  <dl>
+    <dt>
+      <label>$escapetool.xml($services.localization.render('extensions.uninstall.cleanPages.label'))</label>
+      <span class="xHint">$escapetool.xml($services.localization.render('extensions.uninstall.cleanPages.hint'))</span>
+    </dt>
+    <dd>
+      #set ($entityReferenceTree = $services.model.toTree($question.pages.keySet()))
+      #displayDocumentTree($entityReferenceTree $question.pages)
+    </dd>
+  </dl>
+#end
+
+#macro (displayDocumentTree $entityReferenceTree $mapOfSelectedDocuments)
+  #set ($currentLocale = $services.localization.currentLocale)
+  #displayDocumentTreeNode($entityReferenceTree $mapOfSelectedDocuments)
+#end
+
+#macro (displayDocumentTreeNode $node $mapOfSelectedDocuments)
+  #if ($node.reference)
+    #set ($nodeLabel = $node.reference.name)
+    #if ("$node.reference.type" == 'WIKI')
+      #set ($wikiPrettyName = $services.wiki.getById($node.reference.name).prettyName)
+      #if ("$!wikiPrettyName.trim()" != '')
+        #set ($nodeLabel = $wikiPrettyName)
+      #end
+    #end
+    <div class="$!node.reference.type.toString().toLowerCase() node">$escapetool.xml($nodeLabel)
+      #if ("$node.reference.type" == 'DOCUMENT')
+        ## Currently there's no string representation of a document reference with parameters (such as locale) that can
+        ## be resolved so we need to submit a set of (document reference without locale, locale) pairs.
+        #set ($name = $escapetool.xml($services.model.serialize($node.reference, 'default')))
+        ## We don't display the locale child nodes if there is only one locale. We display just the document node.
+        #if ($node.locales && $node.locales.size() == 1)
+          #set ($documentReference = $node.locales.iterator().next())
+          #if ("$!documentReference.locale" != '')
+            ## Display the locale if it's not the default one.
+            <span class="locale">$escapetool.xml($documentReference.locale.getDisplayName($currentLocale))</span>
+          #end
+          <span class="actions">
+            <input type="checkbox" name="$name" value="$escapetool.xml("$!documentReference.locale")"
+              #if ($mapOfSelectedDocuments.get($documentReference)) checked="checked"#end />
+          </span>
+        #end
+      #end
+    </div>
+  #end
+  #if ($node.children && $node.children.size() > 0)
+    <ul#if (!$node.reference) class="collapsible selectable document-tree"#end>
+      #foreach ($child in $node.children)
+        <li#if ("$!child.reference.type" == 'DOCUMENT') class="collapsed"#end>
+          #displayDocumentTreeNode($child $mapOfSelectedDocuments)
+        </li>
+      #end
+    </ul>
+  #elseif ($node.locales && $node.locales.size() > 1)
+    <ul>
+      #foreach ($documentReference in $node.locales)
+        #if ("$!documentReference.locale" == '')
+          #set ($locale = $services.localization.render(
+            'platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage'))
+        #else
+          #set ($locale = $documentReference.locale.getDisplayName($currentLocale))
+        #end
+        <li class="locale node">$escapetool.xml($locale)
+          <span class="actions">
+            <input type="checkbox" name="$name" value="$escapetool.xml("$!documentReference.locale")"
+              #if ($mapOfSelectedDocuments.get($documentReference)) checked="checked"#end />
+          </span>
+        </li>
+      #end
+    </ul>
+  #end
+#end
+
 #macro (getBackwardDependencies $extension $return)
   #getInstalledExtension($extension $extensionNamespace $installedExtension)
   #if ($installedExtension.isInstalled($NULL))
@@ -768,6 +813,7 @@ Caused by: #printThrowable($throwable.cause true)
 
     #displayExtensionDetails_description($extension)
     #displayExtensionDetails_dependencies($extension $backwardDependencies)
+    #displayExtensionDetails_changes($extension)
     #displayExtensionDetails_progress($extension)
   </div>
 #end
@@ -777,7 +823,7 @@ Caused by: #printThrowable($throwable.cause true)
   #set ($jobStatus = $NULL)
   #isShowingExtensionDetails($extension $showExtensionDetails)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
-  <form action="" method="post" class="extension-item extension-item-${extensionStatus}">
+  <form action="$xwiki.relativeRequestURL" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">
       <input name="extensionId" value="$!escapetool.xml($extension.id.id)" type="hidden" />
       <input name="extensionVersion" value="$!escapetool.xml($extension.id.version.value)" type="hidden" />
@@ -795,6 +841,7 @@ Caused by: #printThrowable($throwable.cause true)
         <p class="extension-status">$escapetool.xml($extensionStatusMessage)</p>
       #end
       #displayExtensionActionButtons($extension)
+      #displayExtensionRating($extension)
       #if ($extension.authors.size() > 0)
         #displayExtensionAuthors($extension)
       #end
@@ -841,6 +888,8 @@ Caused by: #printThrowable($throwable.cause true)
     #computeUninstallPlan($request.extensionId $request.extensionVersion $extensionNamespace)
   #elseif ($request.extensionAction == 'uninstallGlobally')
     #computeUninstallPlan($request.extensionId $request.extensionVersion $NULL)
+  #elseif ($request.extensionAction == 'diffXAR')
+    #diffXarExtension($request.extensionId $request.extensionVersion)
   #elseif ($request.extensionVersionConstraint)
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersionConstraint))
     #displayDependency($dependency $extensionNamespace true)
@@ -862,6 +911,15 @@ Caused by: #printThrowable($throwable.cause true)
       <div class="infomessage">$services.localization.render('extensions.advancedSearch.noResults',
         ["<strong>$!escapetool.xml($request.extensionId)</strong>",
         "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
+
+      ## DEBUG START: Check if there is any job status associated with the specified extension.
+      #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
+      #if ($jobStatus)
+        ## Normally we shouldn't get here.
+        <div class="errormessage">We found an extension job associated with the missing extension:</div>
+        #displayExtensionJobStatus($jobStatus)
+      #end
+      ## DEBUG STOP
     #end
   #end
 #end
@@ -930,9 +988,20 @@ Caused by: #printThrowable($throwable.cause true)
     #end
   #elseif ($jobState == 'WAITING')
     ## Continue an interactive extension job using the data submitted by the user.
-    #if ($jobType == 'install')
+    #set ($questionType = $jobStatus.question.getClass().getName())
+    #if ($questionType.endsWith('.ConflictQuestion'))
       ## A merge conflict occurred during installation.
       #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
+      #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
+    #elseif ($questionType.endsWith('.CleanPagesQuestion'))
+      #foreach ($entry in $jobStatus.question.pages.entrySet())
+        ## Currently there's no string representation of a document reference with parameters (such as locale) that can
+        ## be resolved so what has been submitted is a set of (document reference without locale, locale) pairs.
+        #set ($stringReferenceWithoutLocale = $services.model.serialize($entry.key, 'default'))
+        #set ($localesToDelete = $request.getParameterValues($stringReferenceWithoutLocale))
+        #set ($delete = $localesToDelete && $localesToDelete.contains($entry.key.locale.toString()))
+        #set ($discard = $entry.setValue($delete))
+      #end
     #end
     #set ($discard = $jobStatus.answered())
   #end
@@ -982,6 +1051,16 @@ Caused by: #printThrowable($throwable.cause true)
   #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.extension.xar)
 #end
 
+#macro (diffXarExtension $extensionId $extensionVersion)
+  #if ($extensionNamespace.startsWith('wiki:'))
+    #set ($wikiName = $extensionNamespace.substring(5))
+  #else
+    #set ($wikiName = $xcontext.database)
+  #end
+  #set ($discard = $services.extension.xar.diff($extensionId, $wikiName))
+  #handleExtensionJobStartFailure('extensions.install.error.diffXarFailure' $services.extension.xar)
+#end
+
 #macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)
   #if ($scriptService)
     #set ($lastError = $scriptService.lastError)
@@ -1015,6 +1094,8 @@ Caused by: #printThrowable($throwable.cause true)
       ## Determine if the extension is still valid.
       #if ("$!extension.isValid($extensionNamespace)" == 'false')
         #set ($status = 'installed-invalid')
+      #elseif ($extension.isDependency($extensionNamespace))
+        #set ($status = 'installed-dependency')
       #else
         #set ($status = 'installed')
       #end
@@ -1028,9 +1109,7 @@ Caused by: #printThrowable($throwable.cause true)
         #getInstalledExtension($extension $extensionNamespace $currentVersion)
       #end
       #if ($currentVersion)
-        #set ($repoId = $currentVersion.repository.descriptor.id)
-        #set ($options = ["remote-$repoId", $repoId, "remote-${repoId}-incompatible", "remote-${repoId}-invalid"])
-        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint $options)")
+        #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint)")
       #else
         #set ($status = 'remote')
       #end
@@ -1046,16 +1125,20 @@ Caused by: #printThrowable($throwable.cause true)
   #setVariable ("$_extensionStatusMessage" $message)
 #end
 
-#macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
-#set ($status = $options.get(0))
-#if ($alice.id.equals($bob.id))
-#set ($status = $options.get(1))
-#elseif ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
-#set ($status = $options.get(2))
-#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
-#set ($status = $options.get(3))
+#macro (determineVersionCompatibility $alice $bob $versionConstraint)
+#set ($prefix = '')
+#if (!$alice.id.equals($bob.id))
+#set ($prefix = 'remote-')
 #end
-$status##
+#set ($suffix = '')
+#if ($versionConstraint && !$versionConstraint.isCompatible($bob.id.version))
+#set ($suffix = '-incompatible')
+#elseif ("$!bob.isValid($extensionNamespace)" == 'false')
+#set ($suffix = '-invalid')
+#elseif ($bob.isDependency($extensionNamespace))
+#set ($suffix = '-dependency')
+#end
+${prefix}${bob.repository.descriptor.id}${suffix}##
 #end
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
@@ -1339,34 +1422,105 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       $services.localization.render("platform.extension.updater.${key}ExtensionsLabel")
     </div>
   #end
+  ## Sort the extensions by namespace and by their name.
+  #set ($items = [])
   #foreach ($entry in $actionByNamespace.entrySet())
-    <div class="xHint">
-      $services.localization.render("platform.extension.updater.${key}ExtensionsHint",
-        ["#displayExtensionNamespace($entry.key)"])
-    </div>
-    <div class="${key}Extensions">
-      #foreach ($planAction in $entry.value)
-        #set ($extensionNamespace = $planAction.namespace)
-        #displayExtension($planAction.extension)
+    #foreach ($planAction in $entry.value)
+      #set ($namespace = $entry.key)
+      #set ($namespacePrettyName = $namespace)
+      #if ($stringtool.indexOf($namespace, ':') >= 0)
+        #set ($namespacePrettyName = $stringtool.substringAfter($namespace, ':'))
+        #if ($namespace.startsWith('wiki:'))
+          #set ($wikiPrettyName = $services.wiki.getById($namespacePrettyName).prettyName)
+          #if ("$!wikiPrettyName.trim()" != '')
+            #set ($namespacePrettyName = $wikiPrettyName)
+          #end
+        #end
       #end
+      #set ($extension = $planAction.extension)
+      #set ($extensionName = "#displayExtensionName($extension)")
+      #set ($discard = $items.add({
+        'namespace': $namespace,
+        'namespacePrettyName': "$!namespacePrettyName",
+        'extension': $extension,
+        'extensionName': $extensionName.trim()
+      }))
+    #end
+  #end
+  #set ($items = $sorttool.sort($items, ['namespacePrettyName', 'extensionName']))
+  ## Paginate the extensions.
+  #set ($hasPagination = false)
+  ## We don't load the pagination CSS here (noSx:true) because the upgrade plan can be loaded through AJAX so
+  ## the Skin Extension hooks might not be available. We load the pagination CSS elsewhere.
+  #set ($paginationParams = {
+    'defaultItemsPerPage': 5,
+    'itemParamName': "${key}FirstIndex",
+    'itemsPerPageParamName': "${key}PerPage",
+    'noSx': true
+  })
+  #paginationPrepareParams($paginationParams)
+  #if ($items.size() > $paginationParams.itemsPerPage)
+    #set ($hasPagination = true)
+    #set ($paginationParams.totalItems = $items.size())
+    #set ($requestParams = {})
+    #set ($discard = $requestParams.putAll($request.getParameterMap()))
+    #set ($discard = $requestParams.remove($paginationParams.itemParamName))
+    #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+    #set ($paginationParams.url = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+    #pagination($paginationParams)
+  #end
+  #set ($lastItem = $mathtool.min($items.size(), $mathtool.add($paginationParams.firstItem,
+    $paginationParams.itemsPerPage)))
+  #set ($items = $items.subList($paginationParams.firstItem, $lastItem))
+  #foreach ($item in $items)
+    #if ($foreach.index == 0 || $item.namespace != $extensionNamespace)
+      #if ($foreach.index > 0)
+        ## Close the previous group of extensions.
+        </div>
+      #end
+      ## Start a new group of extensions.
+      <div class="xHint">
+        $services.localization.render("platform.extension.updater.${key}ExtensionsHint",
+          ["#displayExtensionNamespace($item.namespace)"])
+      </div>
+      <div class="${key}Extensions">
+      #set ($extensionNamespace = $item.namespace)
+    #end
+    #displayExtension($item.extension)
+  #end
+  #if ($items.size() > 0)
+    ## Close the last group of extensions.
     </div>
+  #end
+  #if ($hasPagination)
+    #set ($paginationParams.position = 'bottom')
+    #pagination($paginationParams)
   #end
 #end
 
 #macro (getExtensionUpdaterPlan $_plan)
-  ## By default we return the upgrade plan for the current wiki.
-  #set ($namespace = $extensionNamespace)
-  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
-    ## We need the upgrade plan for the entire farm.
-    #set ($namespace = $NULL)
+  #set ($localPlan = $extensionManager.getExtensionPlanJobStatus($NULL, $extensionNamespace))
+  #if ($xcontext.isMainWiki())
+    #set ($globalPlan = $extensionManager.getExtensionPlanJobStatus($NULL, $NULL))
+  #else
+    #set ($globalPlan = $NULL)
   #end
-  #set ($return = $extensionManager.getExtensionPlanJobStatus($null, $namespace))
   #set ($_plan = $NULL)
-  #setVariable("$_plan" $return)
+  #if (!$globalPlan)
+    #setVariable ("$_plan" $localPlan)
+  #elseif (!$localPlan)
+    #setVariable ("$_plan" $globalPlan)
+  ## Return the most recent one between the local plan and the global plan.
+  ## No start date means the plan was scheduled but hasn't started yet.
+  #elseif (!$localPlan.startDate || ($globalPlan.startDate && $localPlan.startDate.after($globalPlan.startDate)))
+    #setVariable ("$_plan" $localPlan)
+  #else
+    #setVariable ("$_plan" $globalPlan)
+  #end
 #end
 
-#macro(computeExtensionUpdaterPlan $_plan)
-  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
+#macro(computeExtensionUpdaterPlan $_plan $globally)
+  #if ($globally && $xcontext.isMainWiki())
     ## Create the upgrade plan for the entire farm.
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
   #else
@@ -1378,55 +1532,90 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #end
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
   #end
-  #set ($lastError = $extensionManager.lastError)
-  #if ($lastError)
-    <div class="errormessage">
-      $services.localization.render('platform.extension.updater.createUpgradePlanFailure')
-      #printThrowable($lastError)
-    </div>
-  #else
-    #set ($_plan = $NULL)
-    #setVariable ("$_plan" $upgradePlanJob.status)
-  #end
+  #set ($_plan = $NULL)
+  #setVariable("$_plan" $upgradePlanJob.status)
 #end
 
-#macro (isExtensionUpdaterPlanOutdated $plan $_outdated)
-  ## Return true (outdated) if the plan is null.
-  #set ($return = "$!plan" == '' && $plan != '')
-  #if (!$return && $plan.state == 'FINISHED')
-    #set ($endDate = $xwiki.jodatime.getDateTime($plan.endDate.getTime()))
-    #set ($currentDate = $xwiki.jodatime.getDateTime())
-    #set ($duration = $xwiki.jodatime.getDuration($endDate, $currentDate))
-    ## The plan becomes outdated after one day.
-    #set ($return = $duration.standardDays > 0)
-  #end
-  #set ($_outdated = $NULL)
-  #setVariable("$_outdated" $return)
+#macro (displayExtensionUpdaterTrigger $plan)
+  <form action="$xwiki.relativeRequestURL" method="post">
+    <div class="hidden">
+      #if ($xcontext.action == 'view' || $xcontext.action == 'admin')
+        #set ($docAction = 'get')
+      #else
+        #set ($docAction = $xcontext.action)
+      #end
+      ## Compute the URL that will be used to submit the request asynchronously.
+      #if ("$!request.section" != '')
+        ## Administration section.
+        #set ($asyncURL = $xwiki.getURL($request.section, $docAction, $escapetool.url({
+          'section': $request.section
+        })))
+      #else
+        ## Stand-alone or Distribution Wizard.
+        #set ($asyncURL = $doc.getURL($docAction))
+      #end
+      <input type="hidden" name="asyncURL" value="$!escapetool.xml($asyncURL)" disabled="disabled" />
+      ## Redirect back to view mode after a POST request.
+      <input type="hidden" name="xredirect" value="$!escapetool.xml($xwiki.relativeRequestURL)" />
+    </div>
+    #set ($disabled = $plan && $plan.state != 'FINISHED')
+    <p class="buttons dynamic-button-group">
+      #if ($xcontext.isMainWiki() && $plan && !$plan.request.hasNamespaces())
+        ## The latest upgrade plan was computed for the entire farm so we display the global button first.
+        #displayExtensionUpdaterButton('checkForUpdatesGlobally' $disabled)
+      #end
+      #displayExtensionUpdaterButton('checkForUpdates' $disabled)
+      #if ($xcontext.isMainWiki() && (!$plan || $plan.request.hasNamespaces()))
+        ## On the main wiki we can also compute the upgrade plan for the entire farm.
+        #displayExtensionUpdaterButton('checkForUpdatesGlobally' $disabled)
+      #end
+    </p>
+  </form>
+#end
+
+#macro (displayExtensionUpdaterButton $value $disabled)
+  <span class="buttonwrapper">
+    <button name="action" value="$value"#if ($disabled) disabled="disabled"#end>
+      $escapetool.xml($services.localization.render("platform.extension.updater.$value"))
+    </button>
+  </span>
 #end
 
 #macro (extensionUpdater)
-  #if ("$!request.action" == '')
-    #getExtensionUpdaterPlan($plan)
-    #isExtensionUpdaterPlanOutdated($plan $outdated)
-    #if ($outdated)
-      ## There is no upgrade plan computed or the previously computed plan is outdated.
-      #computeExtensionUpdaterPlan($plan)
+  #set ($plan = $NULL)
+  #set ($error = $NULL)
+  #if ($request.action.startsWith('checkForUpdates'))
+    #computeExtensionUpdaterPlan($plan $request.action.equals('checkForUpdatesGlobally'))
+    #set ($error = $extensionManager.lastError)
+    #if ("$!request.xredirect" != '' && !$error)
+      #set ($discard = $response.sendRedirect($request.xredirect))
+      #break
     #end
-    <div id="extensionUpdater">
-      #if ($plan.state != 'FINISHED')
-        <div>$services.localization.render('platform.extension.updater.loading')</div>
-        #displayJobProgressBar($plan)
-        #displayExtensionUpdaterPlanStatus($plan)
-      #else
-        #displayExtensionUpdaterPlan($plan)
-        <div class="xHint"> $services.localization.render('platform.extension.updater.reloadHint',
-          ["<a class=""checkForUpdates""
-            href=""?action=checkForUpdates&section=$!escapetool.url($request.section)&xredirect=$escapetool.url($xwiki.relativeRequestURL)"">",
-          '</a>'])</div>
-      #end
-    </div>
-  #elseif ($request.action == 'checkForUpdates')
-    #computeExtensionUpdaterPlan()
-    $response.sendRedirect($request.xredirect)
   #end
+  #if (!$plan)
+    #getExtensionUpdaterPlan($plan)
+  #end
+  #if (!$isAjaxRequest)
+    ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
+    #displayExtensionUpdaterTrigger($plan)
+  #end
+  <div class="extensionUpdater">
+    #if ($error)
+      <div class="errormessage">
+        $services.localization.render('platform.extension.updater.createUpgradePlanFailure')
+        #printThrowable($error)
+      </div>
+    #elseif ($plan.state == 'FINISHED')
+      <div class="xHint">
+        $escapetool.xml($services.localization.render('platform.extension.updater.lastCheckDate',
+          [$xwiki.formatDate($plan.endDate)]))
+      </div>
+      #displayExtensionUpdaterPlan($plan)
+    #elseif ($plan)
+      <div class="xHint">$services.localization.render('platform.extension.updater.loading')</div>
+      #displayJobProgressBar($plan)
+      #displayExtensionUpdaterPlanStatus($plan)
+    #end
+  </div>
 #end

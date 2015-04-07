@@ -19,17 +19,17 @@
  */
 package com.xpn.xwiki.internal.objects;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.hibernate.usertype.UserCollectionType;
 import org.hibernate.HibernateException;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.persister.collection.CollectionPersister;
+import org.hibernate.usertype.UserCollectionType;
 
 import com.xpn.xwiki.objects.ListProperty.NotifyList;
 
@@ -43,7 +43,7 @@ public class ListPropertyCollectionType implements UserCollectionType
 {
 
     @Override
-    public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister) 
+    public PersistentCollection instantiate(SessionImplementor session, CollectionPersister persister)
         throws HibernateException
     {
         return new ListPropertyPersistentList(session);
@@ -86,12 +86,12 @@ public class ListPropertyCollectionType implements UserCollectionType
     @Override
     @SuppressWarnings("unchecked")
     public Object replaceElements(
-                                  Object original, 
-                                  Object target, 
-                                  CollectionPersister persister, 
-                                  Object owner, 
-                                  Map copyCache, 
-                                  SessionImplementor session)
+        Object original,
+        Object target,
+        CollectionPersister persister,
+        Object owner,
+        Map copyCache,
+        SessionImplementor session)
         throws HibernateException
     {
         Collection cTarget = (Collection) target;

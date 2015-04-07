@@ -28,7 +28,6 @@ import com.xpn.xwiki.util.Util;
 
 public class EditForm extends XWikiForm
 {
-
     // ---- Form fields -------------------------------------------------
     private String content;
 
@@ -61,6 +60,8 @@ public class EditForm extends XWikiForm
     private String syntaxId;
 
     private String hidden;
+    
+    private ObjectPolicyType objectPolicy;
 
     @Override
     public void readRequest()
@@ -82,6 +83,7 @@ public class EditForm extends XWikiForm
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
         setHidden(request.getParameter("xhidden"));
+        setObjectPolicy(request.getParameter("objectPolicy"));
     }
 
     public void setTags(String[] parameter)
@@ -90,7 +92,7 @@ public class EditForm extends XWikiForm
             this.tags = null;
             return;
         }
-        StringBuffer tags = new StringBuffer();
+        StringBuilder tags = new StringBuilder();
         boolean first = true;
         for (int i = 0; i < parameter.length; ++i) {
             if (!parameter[i].equals("")) {
@@ -280,4 +282,36 @@ public class EditForm extends XWikiForm
         this.hidden = hidden;
     }
 
+    /**
+     * Return the object policy given in the HTTP request. See {@link com.xpn.xwiki.web.ObjectPolicyType
+     * ObjectPolicyType} for more information about what is an object policy.
+     *
+     * @return the Object Policy type
+     * @since 7.0RC1
+     */
+    public ObjectPolicyType getObjectPolicy() {
+        return this.objectPolicy;
+    }
+
+    /**
+     * see {@link #getObjectPolicyType}
+     * 
+
+     * @since 7.0RC1
+     */
+    private void setObjectPolicy(ObjectPolicyType objectPolicy)
+    {
+        this.objectPolicy = objectPolicy;
+    }
+
+    /**
+     * see {@link #getObjectPolicyType}
+     *
+     * @param objectPolicy is a string converted to {@link com.xpn.xwiki.web.ObjectPolicyType ObjectPolicyType}
+     * @since 7.0RC1
+     */
+    private void setObjectPolicy(String objectPolicyName)
+    {
+        this.objectPolicy = ObjectPolicyType.forName(objectPolicyName);
+    }
 }

@@ -56,7 +56,7 @@ import com.xpn.xwiki.web.Utils;
  * database before any modification but in the case of observation it's used as the previous version of the document).
  * TODO: we should probably think about a separation of theses two notions in something more clear, something for the
  * new model.
- * 
+ *
  * @version $Id$
  * @since 2.0M4
  */
@@ -83,7 +83,7 @@ public class LazyXWikiDocument extends XWikiDocument
 
     /**
      * Load and return the document in the database.
-     * 
+     *
      * @return the real document
      */
     private XWikiDocument getDocument()
@@ -93,13 +93,12 @@ public class LazyXWikiDocument extends XWikiDocument
             XWikiContext context =
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
-            XWikiDocument doc = new XWikiDocument(getDocumentReference());
-            doc.setLocale(getLocale());
+            XWikiDocument doc = new XWikiDocument(getDocumentReference(), getLocale());
 
-            String currentWiki = context.getDatabase();
+            String currentWiki = context.getWikiId();
             try {
                 // Put context in document wiki
-                context.setDatabase(getDocumentReference().getWikiReference().getName());
+                context.setWikiId(getDocumentReference().getWikiReference().getName());
 
                 if (this.version == null) {
                     this.document = context.getWiki().getDocument(doc, context);
@@ -126,7 +125,7 @@ public class LazyXWikiDocument extends XWikiDocument
             } catch (XWikiException e) {
                 throw new RuntimeException("Failed to get document [" + this + "]", e);
             } finally {
-                context.setDatabase(currentWiki);
+                context.setWikiId(currentWiki);
             }
         }
 

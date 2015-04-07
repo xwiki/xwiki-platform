@@ -1,0 +1,105 @@
+//
+// Tables
+// --------------------------------------------------
+
+/* -----------------------------
+ Make a table responsive to the screen size.
+ --
+ To use it, just add the ".responsive-table" class to you table, be sure you have proper <thead> and <tbody> tags in
+ it, and put the title of the each column in the "data-title" attribute of every cell.
+ Example:
+ <table class="responsive-table">
+   <thead>
+     <tr>
+       <th>Name</th>
+       <th>Age</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <td data-title="Name">John Smith</td>
+       <td data-title="Age">42</td>
+     </tr>
+   </tbody>
+ </table>
+
+ @since 6.4M2
+*/
+.responsive-table {
+  @media only screen and (max-width: @screen-xs-max) {
+    thead, tbody, th, td, tr {
+      display: block;
+    }
+    
+    > thead {
+      display: none;
+    }
+    
+    > tbody {
+      .responsive-table-tbody();
+        
+      > tr {
+        .responsive-table-tbody-tr();
+      }
+      
+      > tr > td, > tr > th {
+        .responsive-table-tbody-tr-tdth();
+      }
+    }
+  }
+}
+/* -----------------------------
+  Mixins to create a responsive table
+*/
+.responsive-table-tbody() {
+  clear: left;
+}
+.responsive-table-tbody-tr() {
+  .clearfix();
+  border-top: 2px solid @table-border-color;
+}
+// The cell (td or th) must be displayed as a row. The content is displayed on the right side to let display fake
+// headers on the left
+.responsive-table-tbody-tr-tdth() {
+  border: none;
+  border-bottom: 1px solid @table-border-color;
+  float: left;
+  min-height: @input-height-base;
+  overflow: hidden;
+  position: relative;
+  padding-left: 50%;
+  padding-top: @table-cell-padding;
+  top: 0;
+  text-align:left;
+  text-overflow: ellipsis;
+  width: 100%;
+  white-space: normal;
+  
+  // Fake header: display a fake cell to display the title of the current cell
+  &:before {
+    // Behave like a table header
+    &:extend(.table > thead > tr > th);
+    color: @text-color;
+    // The title is stored in the data-title attribute of the cell
+    content: attr(data-title);
+    display: inline-block;
+    font-weight: bold;
+    left: @table-cell-padding;
+    overflow: hidden;
+    padding-right: @table-cell-padding;
+    // The position is absolute to be able to put the fake cell exactly where we want and to express width relative
+    // to the screen size.
+    position: absolute;
+    text-align: left;
+    text-overflow: ellipsis;
+    top: @table-cell-padding;
+    // Because of the "absolute" position, we cannot make the text wrap, because it won't resize the whole row and the
+    // results is not good looking (see: http://jira.xwiki.org/secure/attachment/30083/30083_Prop3_wrap.png).
+    white-space: nowrap;
+    width: 45%;
+  }
+  
+  &:last-child {
+    border: 0;
+  }
+}

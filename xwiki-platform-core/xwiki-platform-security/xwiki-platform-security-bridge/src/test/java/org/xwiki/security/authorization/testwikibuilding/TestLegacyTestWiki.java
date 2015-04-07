@@ -36,7 +36,7 @@ public class TestLegacyTestWiki extends AbstractLegacyWikiTestCase
 
         XWikiRightServiceImpl legacyImpl = new XWikiRightServiceImpl();
 
-        testWiki.getXWikiContext().setDatabase("xwiki");
+        testWiki.getXWikiContext().setWikiId("xwiki");
 
         Assert.assertTrue(
             legacyImpl.hasAccessLevel("view", "AllanSvensson", "Main.WebHome", testWiki.getXWikiContext()));

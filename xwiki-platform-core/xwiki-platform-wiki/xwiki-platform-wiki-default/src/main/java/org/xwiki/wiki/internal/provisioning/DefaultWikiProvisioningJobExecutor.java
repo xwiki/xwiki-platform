@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -35,17 +36,18 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Default implementation for {@link org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor}.
  *
- * @since 5.3M2
+ * @since 6.0M1
  * @version $Id$
  */
 @Component
@@ -69,6 +71,12 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Provider to get the xwiki context.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -86,6 +94,8 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             WikiProvisioningJobException
     {
         try {
+            // Get the context
+            XWikiContext xcontext = xcontextProvider.get();
             // Create the job
             WikiProvisioningJob job = componentManager.getInstance(Job.class, provisioningJobName);
             // Id of the new job
@@ -95,11 +105,11 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             jobId.add(provisioningJobName);
             jobId.add(wikiId);
             // Initialize it
-            job.initialize(new WikiProvisioningJobRequest(jobId, wikiId, parameter));
+            job.initialize(new WikiProvisioningJobRequest(jobId, wikiId, parameter, xcontext.getUserReference()));
             // Add it to the list of jobs
             jobs.put(jobId, job);
             // Pass it to the executor
-            jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
+            jobExecutor.execute(job);
             // Return the job
             return job;
         } catch (ComponentLookupException e) {
@@ -111,12 +121,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        try {
-            WikiProvisioningJob job = jobs.get(jobId);
-            return job;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new WikiProvisioningJobException(
-                    String.format("There is no job corresponding to the jobId [%d].", jobId), e);
-        }
+        WikiProvisioningJob job = jobs.get(jobId);
+        return job;
     }
 }

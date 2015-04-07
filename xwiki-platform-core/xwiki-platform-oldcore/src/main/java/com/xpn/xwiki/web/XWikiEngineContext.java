@@ -23,11 +23,27 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public interface XWikiEngineContext {
+import org.xwiki.environment.Environment;
+
+public interface XWikiEngineContext
+{
     public Object getAttribute(String name);
+
     public void setAttribute(String name, Object value);
+
     public String getRealPath(String path);
-    public URL getResource(String name) throws MalformedURLException;
-    public InputStream getResourceAsStream(String name);
+
     public String getMimeType(String filename);
+
+    /**
+     * @deprecated since 3.5M1, use {@link Environment#getResource(String)} instead
+     */
+    @Deprecated
+    public URL getResource(String name) throws MalformedURLException;
+
+    /**
+     * @deprecated since 3.5M1, use {@link Environment#getResourceAsStream(String)} instead
+     */
+    @Deprecated
+    public InputStream getResourceAsStream(String name);
 }

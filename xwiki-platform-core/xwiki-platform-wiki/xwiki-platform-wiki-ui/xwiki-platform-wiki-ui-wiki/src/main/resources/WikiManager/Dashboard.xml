@@ -449,8 +449,7 @@
        ( "$!contributor" != 'XWiki.XWikiGuest' ) &amp;&amp; $xwiki.exists($contributor)
       )
     #set ($validContributors = $validContributors + 1)
-    #set ($contributorDoc = $xwiki.getDocument($contributor))
-    1. [[$!{contributorDoc.first_name} $!{contributorDoc.last_name}&gt;&gt;$!{contributor}]]
+    1. {{html}}$xwiki.getUserName("$!contributor"){{/html}}
   #end
   #if ($validContributors == $MAX_CONTRIBUTORS)
     #break

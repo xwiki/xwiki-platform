@@ -65,7 +65,12 @@ public class ResourceReference implements IsSerializable
         /**
          * Represents an attachment.
          */
-        ATTACHMENT("attach");
+        ATTACHMENT("attach"),
+
+        /**
+         * Represents a Windows Explorer shared resource.
+         */
+        UNC("unc");
 
         /**
          * The mapping between scheme and resource types.

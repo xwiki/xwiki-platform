@@ -22,6 +22,9 @@ package org.xwiki.formula.internal;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -45,7 +48,9 @@ import org.xwiki.formula.ImageData;
  * @version $Id$
  * @since 2.1M1
  */
-@Component("googlecharts")
+@Component
+@Named("googlecharts")
+@Singleton
 public final class GoogleChartsFormulaRenderer extends AbstractFormulaRenderer implements Initializable
 {
     /** The base URL of the mathematical formula transformation service. */

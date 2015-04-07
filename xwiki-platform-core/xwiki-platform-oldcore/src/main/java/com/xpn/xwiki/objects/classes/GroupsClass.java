@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,16 +30,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
  * Defines an XClass property type whose value is a list of group references.
- * 
+ *
  * @version $Id$
  */
 public class GroupsClass extends ListClass
@@ -54,7 +58,7 @@ public class GroupsClass extends ListClass
 
     /**
      * Creates a new Groups List property that is described by the given meta class.
-     * 
+     *
      * @param metaClass the meta class that defines the list of meta properties associated with this property type
      */
     public GroupsClass(PropertyMetaClass metaClass)
@@ -106,7 +110,7 @@ public class GroupsClass extends ListClass
     /**
      * Sets whether to list all the available groups in the list box used to select the groups. This property should not
      * be set when the number of groups is very large.
-     * 
+     *
      * @param usesList {@code true} to fill the list box that is used to select the groups with all the available
      *            groups, {@code false} otherwise
      * @deprecated since 4.3M2 this meta property is not used anymore because we changed the default displayer
@@ -136,12 +140,10 @@ public class GroupsClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = new ArrayList<String>();
-        for (int i = 0; i < strings.length; i++) {
-            list.add(strings[i]);
-        }
+        List<String> list = Arrays.asList(strings);
+
         BaseProperty prop = newProperty();
-        prop.setValue(StringUtils.join(list, ','));
+        fromList(prop, list);
         return prop;
     }
 
@@ -160,7 +162,7 @@ public class GroupsClass extends ListClass
 
     /**
      * Splits the given string into a list of group names.
-     * 
+     *
      * @param value a comma separate list of group names
      * @return the list of group names
      */
@@ -174,5 +176,35 @@ public class GroupsClass extends ListClass
     {
         String value = ppcel.getText();
         return fromString(value);
+    }
+
+    @Override
+    public List<String> toList(BaseProperty<?> property)
+    {
+        List<String> selectlist;
+
+        if (property == null) {
+            selectlist = new ArrayList<String>();
+        } else {
+            selectlist = getListFromString((String) property.getValue());
+        }
+
+        return selectlist;
+    }
+
+    @Override
+    public void fromList(BaseProperty<?> property, List<String> list)
+    {
+        property.setValue(list != null ? StringUtils.join(list, ',') : null);
+    }
+
+    @Override
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext xcontext, MergeResult mergeResult)
+    {
+        // always a not ordered list
+        mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, xcontext,
+            mergeResult);
     }
 }

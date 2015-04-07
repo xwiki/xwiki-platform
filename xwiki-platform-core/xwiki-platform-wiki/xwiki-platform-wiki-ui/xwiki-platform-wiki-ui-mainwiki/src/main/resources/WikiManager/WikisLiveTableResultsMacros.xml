@@ -224,7 +224,7 @@
     #set($itemDoc = $xwiki.getDocument($docName))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     ## Some constants which are usefull while processing each item.
-    #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
+    #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
     #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'DeleteWiki'))
     #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWiki'))
     #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'LeaveWiki'))
@@ -239,8 +239,7 @@
     #set ($itemHasViewInvitation = false)
     #set ($itemHasLeave = false)
     ## Determine if current user is already a member.
-    #set ($wikiMembers = $services.wiki.user.getMembers($wikiId))
-    #set ($currentUserIsMember = ($wikiMembers &amp;&amp; $wikiMembers.contains($currentUser)) || $currentUser == $wiki.ownerId)
+    #set ($currentUserIsMember = ($services.wiki.user.isMember($currentUser, $wiki.id) || $currentUser == $wiki.ownerId))
     ## Determine available membership action and action URL.
     #if ($currentUserIsMember)
       ## Don't allow the owner to leave the workspace.
@@ -388,7 +387,7 @@
     #end
     ## Retrieve the property type as it might be usefull
     #set($propType = '')
-    #if($listtool.contains($propClass.getPropertyNames(), $colname))
+    #if($propClass.getPropertyNames().contains($colname))
       #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")

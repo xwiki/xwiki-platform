@@ -28,17 +28,25 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Action called when the request URL has the "/view/" string in its path (this is configured in
  * <code>struts-config.xml</code>. It means the request is to display a page in view mode.
- * 
+ *
  * @version $Id$
  */
 public class ViewAction extends XWikiAction
 {
     /**
      * The identifier of the view action.
-     * 
+     *
      * @todo need an enumerated class for actions.
      */
     public static final String VIEW_ACTION = "view";
+
+    /**
+     * Default constructor.
+     */
+    public ViewAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

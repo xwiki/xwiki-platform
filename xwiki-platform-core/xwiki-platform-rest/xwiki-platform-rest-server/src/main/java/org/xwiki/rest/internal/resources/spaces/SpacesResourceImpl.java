@@ -21,6 +21,8 @@ package org.xwiki.rest.internal.resources.spaces;
 
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.XWikiResource;
@@ -36,19 +38,20 @@ import com.xpn.xwiki.api.XWiki;
 /**
  * @version $Id$
  */
-@Component("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
+@Component
+@Named("org.xwiki.rest.internal.resources.spaces.SpacesResourceImpl")
 public class SpacesResourceImpl extends XWikiResource implements SpacesResource
 {
     @Override
     public Spaces getSpaces(String wikiName, Integer start, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         Spaces spaces = objectFactory.createSpaces();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<String> spaceNames = queryManager.getNamedQuery("getSpaces").addFilter(
                     componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden")).setOffset(start)
@@ -70,7 +73,7 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return spaces;

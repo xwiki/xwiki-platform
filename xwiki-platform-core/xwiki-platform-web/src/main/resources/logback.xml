@@ -36,9 +36,17 @@
   </appender>
 
   <logger name="org.xwiki" level="info"/>
+
+  <!-- Old code is using the com.xpn.xwiki package and is logging too much stuff at INFO level, which is why we use
+       the default WARN level. -->
   <logger name="com.xpn.xwiki" level="warn"/>
   <logger name="com.xpn.xwiki.store.migration" level="info"/>
   <logger name="com.xpn.xwiki.render.XWikiRadeoxRenderEngine" level="warn"/>
+
+  <!-- Special loggers, not using class names -->
+
+  <!-- Set it to DEBUG to get logs for shuts down operations -->
+  <logger name="org.xwiki.shutdown" level="info"/>
 
   <!-- Hibernate logging options -->
 

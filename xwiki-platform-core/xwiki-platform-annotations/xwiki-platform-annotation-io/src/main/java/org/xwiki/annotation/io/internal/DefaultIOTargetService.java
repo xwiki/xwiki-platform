@@ -19,18 +19,34 @@
  */
 package org.xwiki.annotation.io.internal;
 
+import java.io.StringReader;
+
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.annotation.io.IOServiceException;
 import org.xwiki.annotation.io.IOTargetService;
-import org.xwiki.annotation.reference.IndexedObjectReference;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.display.internal.DocumentDisplayer;
+import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
+
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Default {@link IOTargetService} implementation, based on resolving XWiki documents and object properties as
@@ -47,10 +63,23 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 public class DefaultIOTargetService implements IOTargetService
 {
     /**
+     * Component manager used to lookup the parsers.
+     */
+    @Inject
+    private ComponentManager componentManager;
+
+    /**
      * Document access bridge to manipulate xwiki documents.
      */
     @Inject
     private DocumentAccessBridge dab;
+
+    /**
+     * Document displayer.
+     */
+    @Inject
+    @Named("configured")
+    private DocumentDisplayer documentDisplayer;
 
     /**
      * Entity reference handler to resolve the reference.
@@ -58,11 +87,8 @@ public class DefaultIOTargetService implements IOTargetService
     @Inject
     private TypedStringEntityReferenceResolver referenceResolver;
 
-    /**
-     * Default entity reference serializer.
-     */
     @Inject
-    private EntityReferenceSerializer<String> serializer;
+    private RenderingContext renderingContext;
 
     @Override
     public String getSource(String reference) throws IOServiceException
@@ -70,18 +96,9 @@ public class DefaultIOTargetService implements IOTargetService
         try {
             EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
             if (ref.getType() == EntityType.OBJECT_PROPERTY) {
-                EntityReference docRef = ref.extractReference(EntityType.DOCUMENT);
-                // handle this as a reference to an object, parse an indexed object out of this property's parent
-                IndexedObjectReference objRef = new IndexedObjectReference(ref.getParent());
-                if (objRef.getObjectNumber() != null) {
-                    return dab.getProperty(serializer.serialize(docRef), objRef.getClassName(),
-                        objRef.getObjectNumber(), ref.getName()).toString();
-                } else {
-                    return dab.getProperty(serializer.serialize(docRef), objRef.getClassName(), ref.getName())
-                        .toString();
-                }
+                return getObjectPropertyContent(new ObjectPropertyReference(ref));
             } else if (ref.getType() == EntityType.DOCUMENT) {
-                return dab.getDocumentContent(serializer.serialize(ref));
+                return dab.getDocument(new DocumentReference(ref)).getContent();
             } else {
                 // it was parsed as something else, just ignore the parsing and get the document content as its initial
                 // name was
@@ -101,13 +118,80 @@ public class DefaultIOTargetService implements IOTargetService
             if (docRef != null) {
                 // return the syntax of the document in this reference, regardless of the type of reference, obj prop or
                 // doc
-                return dab.getDocumentSyntaxId(serializer.serialize(docRef));
+                return dab.getDocument(new DocumentReference(docRef)).getSyntax().toIdString();
             } else {
                 return dab.getDocumentSyntaxId(reference);
             }
         } catch (Exception e) {
             throw new IOServiceException("An exception has occurred while getting the syntax of the source for "
                 + reference, e);
+        }
+    }
+
+    @Override
+    public XDOM getXDOM(String reference) throws IOServiceException
+    {
+        return getXDOM(reference, null);
+    }
+
+    @Override
+    public XDOM getXDOM(String reference, String syntax) throws IOServiceException
+    {
+        String sourceSyntaxId = syntax;
+        // get if unspecified, get the source from the io service
+        if (sourceSyntaxId == null) {
+            sourceSyntaxId = getSourceSyntax(reference);
+        }
+        try {
+            EntityReference ref = referenceResolver.resolve(reference, EntityType.DOCUMENT);
+            if (ref.getType() == EntityType.OBJECT_PROPERTY) {
+                return getTransformedXDOM(getObjectPropertyContent(new ObjectPropertyReference(ref)),
+                    sourceSyntaxId);
+            } else if (ref.getType() == EntityType.DOCUMENT) {
+                return getDocumentXDOM(new DocumentReference(ref));
+            } else {
+                // it was parsed as something else, just ignore the parsing and get the document content as its initial
+                // name was
+                return getTransformedXDOM(dab.getDocumentContent(reference), sourceSyntaxId);
+            }
+        } catch (Exception e) {
+            throw new IOServiceException("An exception has occurred while getting the XDOM for " + reference, e);
+        }
+    }
+
+    private XDOM getDocumentXDOM(DocumentReference reference) throws Exception
+    {
+        DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+        parameters.setExecutionContextIsolated(true);
+        parameters.setContentTranslated(true);
+        parameters.setTargetSyntax(renderingContext.getTargetSyntax());
+        return documentDisplayer.display(dab.getDocument(reference), parameters);
+    }
+
+    private XDOM getTransformedXDOM(String content, String sourceSyntaxId)
+        throws ParseException, org.xwiki.component.manager.ComponentLookupException, TransformationException
+    {
+        Parser parser = componentManager.getInstance(Parser.class, sourceSyntaxId);
+        XDOM xdom = parser.parse(new StringReader(content));
+
+        // run transformations
+        SyntaxFactory syntaxFactory = componentManager.getInstance(SyntaxFactory.class);
+        TransformationContext txContext =
+            new TransformationContext(xdom, syntaxFactory.createSyntaxFromIdString(sourceSyntaxId));
+        TransformationManager transformationManager = componentManager.getInstance(TransformationManager.class);
+        transformationManager.performTransformations(xdom, txContext);
+
+        return xdom;
+    }
+
+    private String getObjectPropertyContent(ObjectPropertyReference reference) {
+        BaseObjectReference objRef = new BaseObjectReference(reference.getParent());
+        DocumentReference docRef = new DocumentReference(objRef.getParent());
+        if (objRef.getObjectNumber() != null) {
+            return dab.getProperty(docRef, objRef.getXClassReference(),
+                objRef.getObjectNumber(), reference.getName()).toString();
+        } else {
+            return dab.getProperty(docRef, objRef.getXClassReference(), reference.getName()).toString();
         }
     }
 }

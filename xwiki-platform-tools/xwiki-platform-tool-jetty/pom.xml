@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty</artifactId>
   <name>XWiki Platform - Tools - Jetty - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
   <properties>
-    <jetty.version>8.1.9.v20130131</jetty.version>
+    <jetty.version>9.2.3.v20140905</jetty.version>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->

@@ -19,8 +19,13 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,9 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -45,13 +49,15 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -78,15 +84,15 @@ public class XarExtensionHandlerTest
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.componentManager,
         this.oldcore);
 
-    private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
-
     private ExtensionId localXarExtensiontId1;
 
     private ExtensionId localXarExtensiontId2;
 
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
 
     private InstalledExtensionRepository xarExtensionRepository;
+
+    private ObservationManager observation;
 
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
@@ -97,7 +103,7 @@ public class XarExtensionHandlerTest
     {
         // mock
 
-        this.contextUser = new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
+        this.contextUser = new DocumentReference(getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");
@@ -109,111 +115,7 @@ public class XarExtensionHandlerTest
 
         // checking
 
-        Mockito.when(
-            this.oldcore.getMockXWiki().getDocument(Mockito.any(DocumentReference.class),
-                Mockito.any(XWikiContext.class))).then(new Answer<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-            {
-                DocumentReference target = (DocumentReference) invocation.getArguments()[0];
-
-                if (target.getLocale() == null) {
-                    target = new DocumentReference(target, Locale.ROOT);
-                }
-
-                XWikiDocument document = documents.get(target);
-
-                if (document == null) {
-                    document = new XWikiDocument(target);
-                }
-
-                return document;
-            }
-        });
-        Mockito
-            .doAnswer(new Answer()
-            {
-                @Override
-                public Object answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-                    boolean minorEdit = (Boolean) invocation.getArguments()[2];
-
-                    document.setMinorEdit(minorEdit);
-                    document.setNew(false);
-
-                    if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        Date ndate = new Date();
-                        document.setDate(ndate);
-                        if (document.isContentDirty()) {
-                            document.setContentUpdateDate(ndate);
-                            document.setContentAuthorReference(document.getAuthorReference());
-                        }
-                        document.incrementVersion();
-                        document.setContentDirty(false);
-                        document.setMetaDataDirty(false);
-                    }
-
-                    XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
-
-                    for (XWikiAttachment attachment : document.getAttachmentList()) {
-                        if (!attachment.isContentDirty()) {
-                            attachment.setAttachment_content(previousDocument.getAttachment(attachment.getFilename())
-                                .getAttachment_content());
-                        }
-                    }
-
-                    documents.put(document.getDocumentReferenceWithLocale(), document);
-
-                    return null;
-                }
-            })
-            .when(this.oldcore.getMockXWiki())
-            .saveDocument(Mockito.any(XWikiDocument.class), Mockito.any(String.class), Mockito.anyBoolean(),
-                Mockito.any(XWikiContext.class));
-        Mockito
-            .doAnswer(new Answer()
-            {
-                @Override
-                public Object answer(InvocationOnMock invocation) throws Throwable
-                {
-                    oldcore.getMockXWiki().saveDocument((XWikiDocument) invocation.getArguments()[0],
-                        (String) invocation.getArguments()[1], false, (XWikiContext) invocation.getArguments()[2]);
-
-                    return null;
-                }
-            }).when(this.oldcore.getMockXWiki())
-            .saveDocument(Mockito.any(XWikiDocument.class), Mockito.any(String.class), Mockito.any(XWikiContext.class));
-        Mockito.doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-
-                documents.remove(document.getDocumentReferenceWithLocale());
-
-                return null;
-            }
-        }).when(this.oldcore.getMockXWiki())
-            .deleteDocument(Mockito.any(XWikiDocument.class), Mockito.any(XWikiContext.class));
-        Mockito.when(
-            this.oldcore.getMockXWiki()
-                .getXClass(Mockito.any(DocumentReference.class), Mockito.any(XWikiContext.class))).then(
-            new Answer<BaseClass>()
-            {
-                @Override
-                public BaseClass answer(InvocationOnMock invocation) throws Throwable
-                {
-                    DocumentReference documentReference = (DocumentReference) invocation.getArguments()[0];
-
-                    return classes.get(documentReference.getName());
-                }
-            });
-
-        Mockito.when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(Mockito.any(XWikiContext.class))).thenReturn(
-            true);
+        when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(any(XWikiContext.class))).thenReturn(true);
 
         getXWikiContext().setUserReference(this.contextUser);
 
@@ -221,32 +123,31 @@ public class XarExtensionHandlerTest
             .initialize(getXWikiContext());
 
         CoreConfiguration coreConfiguration = this.componentManager.getInstance(CoreConfiguration.class);
-        Mockito.when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.PLAIN_1_0);
+        when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.PLAIN_1_0);
 
         // lookup
 
-        this.jobManager = this.componentManager.getInstance(JobManager.class);
+        this.jobExecutor = this.componentManager.getInstance(JobExecutor.class);
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+        this.observation = this.repositoryUtil.getComponentManager().getInstance(ObservationManager.class);
 
         // Get rid of wiki macro listener
-        this.componentManager.<ObservationManager> getInstance(ObservationManager.class).removeListener(
+        this.componentManager.<ObservationManager>getInstance(ObservationManager.class).removeListener(
             "RegisterMacrosOnImportListener");
     }
 
     private void mockHasAdminRight(boolean right) throws XWikiException
     {
-        Mockito.when(
-            this.oldcore.getMockRightService().hasAccessLevel(Mockito.eq("admin"),
-                Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
-                Mockito.any(XWikiContext.class))).thenReturn(right);
+        when(
+            this.oldcore.getMockAuthorizationManager().hasAccess(eq(Right.ADMIN), eq(this.contextUser),
+                any(EntityReference.class))).thenReturn(right);
     }
 
     private void verifyHasAdminRight(int times) throws XWikiException
     {
-        Mockito.verify(this.oldcore.getMockRightService(), Mockito.times(times)).hasAccessLevel(Mockito.eq("admin"),
-            Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
-            Mockito.any(XWikiContext.class));
+        verify(this.oldcore.getMockAuthorizationManager(), times(times)).hasAccess(eq(Right.ADMIN),
+            eq(this.contextUser), any(EntityReference.class));
     }
 
     private XWikiContext getXWikiContext()
@@ -272,7 +173,8 @@ public class XarExtensionHandlerTest
         if (namespace != null) {
             installRequest.addNamespace(namespace);
         }
-        Job installJob = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
+        Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
+        installJob.join();
 
         List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
@@ -295,7 +197,8 @@ public class XarExtensionHandlerTest
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);
         }
-        Job uninstallJob = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+        Job uninstallJob = this.jobExecutor.execute(UninstallJob.JOBTYPE, uninstallRequest);
+        uninstallJob.join();
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
@@ -323,7 +226,7 @@ public class XarExtensionHandlerTest
 
         MandatoryDocumentInitializer mandatoryInitializer =
             this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatory");
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
         XWikiDocument mandatoryDocument = new XWikiDocument(new DocumentReference("wiki", "space", "mandatory"));
         mandatoryDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         mandatoryDocument.setSyntax(Syntax.PLAIN_1_0);
@@ -405,7 +308,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -419,7 +323,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -539,7 +444,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -553,7 +459,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -709,8 +616,8 @@ public class XarExtensionHandlerTest
     @Test
     public void testUpgradeOnRoot() throws Throwable
     {
-        Mockito.when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(Mockito.any(XWikiContext.class)))
-            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
 
         mockHasAdminRight(true);
 
@@ -934,7 +841,7 @@ public class XarExtensionHandlerTest
         MandatoryDocumentInitializer mandatoryInitializer =
             this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
 
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+        when(mandatoryInitializer.updateDocument(any(XWikiDocument.class))).thenReturn(true);
 
         mockHasAdminRight(true);
 
@@ -960,8 +867,8 @@ public class XarExtensionHandlerTest
     public void testInstallOnRoot() throws Throwable
     {
         mockHasAdminRight(true);
-        Mockito.when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(Mockito.any(XWikiContext.class)))
-            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
 
         // install
 
@@ -1049,8 +956,8 @@ public class XarExtensionHandlerTest
     public void testUninstallOnRootWithoutAdminRights() throws Throwable
     {
         mockHasAdminRight(true);
-        Mockito.when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(Mockito.any(XWikiContext.class)))
-            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
@@ -1077,5 +984,145 @@ public class XarExtensionHandlerTest
         uninstall(this.localXarExtensiontId1, "wiki");
 
         verifyHasAdminRight(3);
+    }
+
+    @Test
+    public void testInstallOnNamespaceThenOnRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
+
+        // install on wiki
+
+        install(this.localXarExtensiontId1, "wiki1", this.contextUser);
+
+        // validate
+
+        XWikiDocument pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki1.setContent("modified content");
+        this.oldcore.getMockXWiki().saveDocument(pageWiki1, getXWikiContext());
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+
+        // install on root
+
+        install(this.localXarExtensiontId1, null, this.contextUser);
+
+        // validate
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+        // Make sure modifications are kept
+        Assert.assertEquals("modified content", pageWiki1.getContent());
+    }
+
+    @Test
+    public void testInstallOnNamespaceThenUpgradeOnRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
+
+        // install on wiki
+
+        install(this.localXarExtensiontId1, "wiki1", this.contextUser);
+
+        // validate
+
+        XWikiDocument pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        XWikiDocument pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space", "page"), getXWikiContext());
+
+        Assert.assertTrue(pageWiki2.isNew());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertTrue(pageWiki2.isNew());
+
+        // install on root
+
+        install(this.localXarExtensiontId2, null, this.contextUser);
+
+        // validate
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki2.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki2.isNew());
+        Assert.assertEquals("1.1", pageWiki2.getVersion());
+    }
+
+    @Test
+    public void testCreateNewWiki() throws Throwable
+    {
+        mockHasAdminRight(true);
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
+
+        install(this.localXarExtensiontId1, null, this.contextUser);
+
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertTrue(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
+
+        this.observation.notify(new WikiCreatingEvent("newwiki"), null, this.oldcore.getXWikiContext());
+        this.observation.notify(new WikiCreatedEvent("newwiki"), null, this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
     }
 }

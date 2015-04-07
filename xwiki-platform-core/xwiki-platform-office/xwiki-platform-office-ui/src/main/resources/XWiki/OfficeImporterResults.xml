@@ -110,7 +110,7 @@
     #set ($xdomOfficeDoc = $services.officeimporter.officeToXDOM($officeFileStream, $fileName, $targetDocumentReference, $filterStyles))
     #if ($xdomOfficeDoc)
       #if (!$splitDocument)
-        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, "xwiki/2.0", $parentReference, $null, $appendContent))
+        #set ($result = $services.officeimporter.save($xdomOfficeDoc, $targetDocumentReference, "xwiki/2.1", $parentReference, $null, $appendContent))
         #if ($result)
           {{info}}$services.localization.render('xe.officeimporter.results.success', [$resultDocumentLink, $goBack]){{/info}}
         #else
@@ -127,7 +127,7 @@
               #set ($_parentReference = $parentReference)
             #end
             #set ($result = $services.officeimporter.save($splitXdomOfficeDoc, $targetDescriptor.documentReference,
-              "xwiki/2.0", $_parentReference, null, $appendContent))
+              "xwiki/2.1", $_parentReference, null, $appendContent))
             #if (!$result)
               {{warning}}$services.officeimporter.errorMessage{{/warning}}
             #end

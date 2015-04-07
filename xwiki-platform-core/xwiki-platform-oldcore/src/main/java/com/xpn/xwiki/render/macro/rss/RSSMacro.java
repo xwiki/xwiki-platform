@@ -42,7 +42,7 @@ import com.sun.syndication.io.XmlReader;
 
 /**
  * A Radeox MacroFilter for rendering an RSS feed.
- * 
+ *
  * @author Joe Germuska
  * @version 0.2d
  */
@@ -53,15 +53,15 @@ public class RSSMacro extends BaseLocaleMacro
 
     private static final String DESCRIPTION = "Use to aggregate RSS feeds";
 
-    private static final String[] PARAM_DESCRIPTION = new String[] {"feed: url of an RSS feed",
+    private static final String[] PARAM_DESCRIPTION = new String[] { "feed: url of an RSS feed",
     "?img: if 'true' and if feed has an image, image will be included",
     "?align: if an image will be included, use this alignment",
     "?css: if 'true', elements will be created with CSS styles; otherwise, static formatting methods will be used",
     "?count: an integer, the maximum number of feed items to display",
     "?full: if 'true', descriptions for each item will be included.  Otherwise, just titles.",
-    "?search: if 'true' and if feed has a search field, field will be included"};
+    "?search: if 'true' and if feed has a search field, field will be included" };
 
-    private static final String[] PARAM_NAMES = new String[] {"img", "align", "css", "count", "full", "search"};
+    private static final String[] PARAM_NAMES = new String[] { "img", "align", "css", "count", "full", "search" };
 
     private static final char NEWLINE = '\n';
 
@@ -79,7 +79,7 @@ public class RSSMacro extends BaseLocaleMacro
 
     /**
      * Process the macro.
-     * 
+     *
      * @param writer the output writer
      * @param parameter the input parameters of the macro.
      * @throws java.lang.IllegalArgumentException
@@ -102,8 +102,9 @@ public class RSSMacro extends BaseLocaleMacro
         } catch (Exception ex) {
             throw new java.io.IOException("Error processing " + feedURL + ": " + ex.getMessage());
         }
-        if (feed == null)
+        if (feed == null) {
             throw new IllegalArgumentException("No feed found at " + feedURL);
+        }
         if (paramObj.isCss()) {
             writer.write(NEWLINE);
             writer.write("<div class='rssfeed'>");
@@ -123,7 +124,7 @@ public class RSSMacro extends BaseLocaleMacro
     /**
      * Render as many of the given <code>Channel</code>'s items as needed, according to the value of the optional
      * <code>count</code> parameter and the number of items in the feed.
-     * 
+     *
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException
@@ -139,7 +140,7 @@ public class RSSMacro extends BaseLocaleMacro
 
     /**
      * Render the given RSS <code>Item</code> according to whether or not the parameters call for CSS processing.
-     * 
+     *
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException from calls to <code>writer.write()</code>
@@ -162,7 +163,7 @@ public class RSSMacro extends BaseLocaleMacro
      * <li>The link is rendered using the <code>{link}</code> macro.</li>
      * <li>If present, the item description is wrapped in <code>{quote}</code> macro tags.</li>
      * </ul>
-     * 
+     *
      * @param buf the StringBuffer we're using to prepare the output
      * @param paramObj our parameter helper object
      */
@@ -191,7 +192,7 @@ public class RSSMacro extends BaseLocaleMacro
      * <li>The item title link is wrapped in <code>&lt;a class='rss.item.title'&gt;</code></li>
      * <li>If present, the item description is wrapped in <code>&lt;div class='rss.item.description'&gt;</li>
      * </ul>
-     * 
+     *
      * @param buf the StringBuffer we're using to prepare the output
      * @param paramObj our parameter helper object TODO Figure out how to stop Radeox from filtering the URLs
      */
@@ -210,14 +211,14 @@ public class RSSMacro extends BaseLocaleMacro
         if (paramObj.isFull() && entry.getDescription() != null) {
             buf.append(NEWLINE).append("<div class='rssitemdescription'>").append(NEWLINE)
                 .append(entry.getDescription().getValue()).append(NEWLINE).append("</div>"); // close
-                                                                                             // rss.item.description
+            // rss.item.description
         }
         buf.append(NEWLINE).append("</div>"); // close rss.item
     }
 
     /**
      * Render the 'title' of the given RSS Channel to the <code>Writer</code>.
-     * 
+     *
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
@@ -236,15 +237,16 @@ public class RSSMacro extends BaseLocaleMacro
 
     /**
      * Render the title from the given Channel to the given StringBuffer, using standard Radeox filtering tags.
-     * 
+     *
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param buf the StringBuffer we're using to prepare the output
      */
     private void renderTitleDefault(SyndFeed feed, StringBuffer buf)
     {
         buf.append("__");
-        if (feed.getLink() != null)
+        if (feed.getLink() != null) {
             buf.append("{link:");
+        }
         buf.append(feed.getTitle());
         if (feed.getLink() != null) {
             buf.append("|").append(feed.getLink()).append("}");
@@ -257,7 +259,7 @@ public class RSSMacro extends BaseLocaleMacro
      * title will be enclosed in a &lt;div&gt; with the class <code>rss.channel.title</code>. If the channel includes a
      * link, the title will be rendered as a link to that URL, and the &lt;a&gt; tag will also be of class
      * <code>rss.channel.title</code>
-     * 
+     *
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param buf the StringBuffer we're using to prepare the output TODO Figure out how to stop Radeox from filtering
      *            the URLs
@@ -269,15 +271,16 @@ public class RSSMacro extends BaseLocaleMacro
             buf.append("<a class='rsschanneltitle' href=\"").append(Encoder.escape(feed.getLink())).append("\">");
         }
         buf.append(feed.getTitle());
-        if (feed.getLink() != null)
+        if (feed.getLink() != null) {
             buf.append("</a>");
+        }
         buf.append(NEWLINE).append("</div>");
     }
 
     /**
      * If a parameter was passed with the name "img" and the literal value "true", render the image from the channel (if
      * it has one.) This requires the use of named parameters.
-     * 
+     *
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
@@ -285,10 +288,12 @@ public class RSSMacro extends BaseLocaleMacro
      */
     private void renderImage(SyndFeed feed, Writer writer, RSSMacroParameters paramObj) throws java.io.IOException
     {
-        if (feed.getImage() == null)
+        if (feed.getImage() == null) {
             return;
-        if (!(paramObj.isImg()))
+        }
+        if (!(paramObj.isImg())) {
             return;
+        }
 
         SyndImage rssImage = feed.getImage();
         StringBuffer buf = new StringBuffer(NEWLINE + "{image:");
@@ -310,7 +315,7 @@ public class RSSMacro extends BaseLocaleMacro
      * be in a div, class 'rss.textinput.description'. &lt;form&gt; element will be class 'rss.textinput.form'. Field
      * will be an HTML &lt;input&gt; (type text) tag, class 'rss.textinput.field'. Submit button will be an HTML
      * &lt;input&gt; (type submit), class 'rss.textinput.submit'.
-     * 
+     *
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
@@ -318,14 +323,17 @@ public class RSSMacro extends BaseLocaleMacro
      */
     private void renderSearch(SyndFeed feed, Writer writer, RSSMacroParameters paramObj) throws java.io.IOException
     {
-        if (!(paramObj.isSearch()))
+        if (!(paramObj.isSearch())) {
             return;
+        }
         WireFeed wireFeed = feed.createWireFeed();
-        if (!(wireFeed instanceof Channel))
+        if (!(wireFeed instanceof Channel)) {
             return;
+        }
         TextInput textInput = ((Channel) wireFeed).getTextInput();
-        if (textInput == null)
+        if (textInput == null) {
             return;
+        }
         writer.write(NEWLINE);
         writer.write("\\\\");
         writer.write(NEWLINE);
@@ -383,7 +391,7 @@ public class RSSMacro extends BaseLocaleMacro
 
     /**
      * Transform the input parameters into <code>RSSMacroParameters</code> object.
-     * 
+     *
      * @param parameter the parameters as prepared by the Radeox system.
      * @throws java.lang.IllegalArgumentException if the 'feed' named parameter is missing, or is a malformed URL, or if
      *             any of the other parameter values are not of the correct types. Note that unknown parameters will
@@ -405,10 +413,10 @@ public class RSSMacro extends BaseLocaleMacro
             Logger.warn("Invalid feed URL: " + feedURLString);
             throw new IllegalArgumentException("Invalid feed URL: " + feedURLString);
         }
-        for (int i = 0; i < PARAM_NAMES.length; i++) {
-            String paramName = parameter.get(PARAM_NAMES[i]);
+        for (String element : PARAM_NAMES) {
+            String paramName = parameter.get(element);
             if (paramName != null) {
-                paramMap.put(PARAM_NAMES[i], paramName);
+                paramMap.put(element, paramName);
             }
         }
         try {

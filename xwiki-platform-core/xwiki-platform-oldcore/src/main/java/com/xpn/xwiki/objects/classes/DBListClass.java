@@ -185,7 +185,7 @@ public class DBListClass extends ListClass
      * If there are two columns selected, use the first one as the stored value and the second one as the displayed
      * value.
      * </p>
-     * 
+     *
      * @param context The current {@link XWikiContext context}.
      * @return The HQL query corresponding to this property.
      */
@@ -357,7 +357,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             return this.cachedDBList;
         } else {
-            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName());
+            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName());
         }
     }
 
@@ -366,7 +366,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             this.cachedDBList = cachedDBList;
         } else {
-            context.put(context.getDatabase() + ":" + getFieldFullName(), cachedDBList);
+            context.put(context.getWikiId() + ":" + getFieldFullName(), cachedDBList);
         }
     }
 
@@ -469,7 +469,7 @@ public class DBListClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         // input display
-        if (getDisplayType().equals("input")) {
+        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
@@ -478,9 +478,11 @@ public class DBListClass extends ListClass
             boolean setInpVal = true;
 
             BaseProperty prop = (BaseProperty) object.safeget(name);
-            String val = "";
+            String value = "";
+            String databaseValue = "";
             if (prop != null) {
-                val = prop.toText();
+                value = this.toFormString(prop);
+                databaseValue = prop.toText();
             }
 
             if (isPicker()) {
@@ -505,12 +507,12 @@ public class DBListClass extends ListClass
                         hidden.setName(prefix + name);
                         hidden.setType("hidden");
                         hidden.setDisabled(isDisabled());
-                        if (val != null && !val.equals("")) {
-                            hidden.setValue(val);
+                        if (StringUtils.isNotEmpty(value)) {
+                            hidden.setValue(value);
                         }
                         buffer.append(hidden.toString());
 
-                        input.setValue(getValue(val, hibquery, context));
+                        input.setValue(getValue(databaseValue, hibquery, context));
                         setInpVal = false;
                     }
                 }
@@ -536,12 +538,12 @@ public class DBListClass extends ListClass
                 input.setID(prefix + name);
             }
             if (setInpVal == true) {
-                input.setValue(val);
+                input.setValue(value);
             }
 
             input.setDisabled(isDisabled());
             buffer.append(input.toString());
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
+        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);

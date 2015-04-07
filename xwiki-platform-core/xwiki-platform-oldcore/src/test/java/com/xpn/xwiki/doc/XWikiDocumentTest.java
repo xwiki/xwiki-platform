@@ -49,6 +49,8 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
@@ -111,6 +113,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockVelocityEngine;
 
     private Mock mockDisplayConfiguration;
+    
+    private Mock mockRenderingContext;
 
     private CustomStub velocityEngineEvaluateStub;
 
@@ -207,6 +211,9 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.registerComponents();
 
+        // Mock xwiki.cfg
+        getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), getConfigurationSource());
+
         // Setup display configuration.
         this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
         this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
@@ -269,6 +276,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("=== level3");
         this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
         // Overwrite the title heading depth.
         this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(3));
@@ -947,8 +956,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
-        this.translatedDocument.setLocale(Locale.FRENCH);
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
         this.translatedDocument.setContent("~italic~");
         this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
         this.translatedDocument.setNew(false);
@@ -968,8 +976,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
-        this.translatedDocument.setLocale(Locale.FRENCH);
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
         this.translatedDocument.setContent("//italic//");
         this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setNew(false);
@@ -1189,7 +1196,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc.setParent("page");
         assertEquals("page", doc.getParent());
 
-        getContext().setDatabase("otherwiki");
+        getContext().setWikiId("otherwiki");
         assertEquals("page", doc.getParent());
 
         doc.setDocumentReference(new DocumentReference("otherwiki", "otherspace", "otherpage"));

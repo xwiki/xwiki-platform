@@ -28,6 +28,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.context.Execution;
@@ -41,10 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
-
-import org.junit.Assert;
 
 /**
  * Unit tests for {@link Context}.
@@ -92,7 +90,7 @@ public class ContextTest extends AbstractComponentTestCase
     }
 
     /**
-     * Tests that pages can override the default property display mode using {@code $context.setDisplayMode}.
+     * Tests that pages can override the default property display mode using {@code $xcontext.setDisplayMode}.
      *
      * @see "XWIKI-2436."
      */
@@ -102,7 +100,7 @@ public class ContextTest extends AbstractComponentTestCase
         // Setup Context and XWiki objects
         final XWikiContext xcontext = new XWikiContext();
         xcontext.setMainXWiki("testwiki");
-        xcontext.setDatabase("testwiki");
+        xcontext.setWikiId("testwiki");
 
         final com.xpn.xwiki.XWiki xwiki = getMockery().mock(com.xpn.xwiki.XWiki.class);
         xcontext.setWiki(xwiki);

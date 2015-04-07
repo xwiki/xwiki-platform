@@ -21,7 +21,6 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Named;
@@ -41,7 +40,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI-883: global access preferences cannot be updated.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -78,8 +77,7 @@ public class R4340XWIKI883DataMigration extends AbstractHibernateDataMigration
                     return null;
                 }
                 List<LargeStringProperty> lst2 = new ArrayList<LargeStringProperty>(lst.size());
-                for (Iterator<StringProperty> it = lst.iterator(); it.hasNext();) {
-                    StringProperty sp = it.next();
+                for (StringProperty sp : lst) {
                     LargeStringProperty lsp = new LargeStringProperty();
                     lsp.setId(sp.getId());
                     lsp.setName(sp.getName());

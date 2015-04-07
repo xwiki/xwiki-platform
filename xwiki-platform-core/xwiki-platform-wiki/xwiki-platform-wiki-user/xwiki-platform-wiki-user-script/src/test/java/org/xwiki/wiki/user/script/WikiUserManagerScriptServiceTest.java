@@ -99,7 +99,7 @@ public class WikiUserManagerScriptServiceTest
         wikiUserManager = mocker.getInstance(WikiUserManager.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
                 EntityReferenceSerializer.class, String.class));
         execution = mocker.getInstance(Execution.class);
@@ -607,5 +607,103 @@ public class WikiUserManagerScriptServiceTest
         assertFalse(result);
 
         assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
+    }
+
+    @Test
+    public void hasPendingInvitation() throws Exception
+    {
+        String wikiId = "subwiki";
+
+        // Mocks
+        when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(true);
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId);
+        assertTrue(result);
+
+        // Second run
+        when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(false);
+        assertFalse(mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId));
+    }
+
+    @Test
+    public void hasPendingInvitationWhenError() throws Exception
+    {
+        String wikiId = "subwiki";
+
+        // Current user is not admin
+        AccessDeniedException exception = new AccessDeniedException(userDocRef, new WikiReference(wikiId));
+        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef),
+                eq(new WikiReference(wikiId)));
+
+        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
+        assertNull(result);
+        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+
+    }
+
+    @Test
+    public void hasPendingInvitationWhenNoPR() throws Exception
+    {
+        String wikiId = "subwiki";
+        Exception exception = currentScriptHasNotProgrammingRight();
+        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
+        assertNull(result);
+        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+    }
+
+    @Test
+    public void hasPendingRequest() throws Exception
+    {
+        String wikiId = "subwiki";
+
+        // Mocks
+        when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(true);
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId);
+        assertTrue(result);
+
+        // Second run
+        when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(false);
+        assertFalse(mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId));
+    }
+
+    @Test
+    public void hasPendingRequestWhenError() throws Exception
+    {
+        String wikiId = "subwiki";
+
+        // Current user is not admin
+        AccessDeniedException exception = new AccessDeniedException(userDocRef, new WikiReference(wikiId));
+        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef),
+                eq(new WikiReference(wikiId)));
+
+        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
+        assertNull(result);
+        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+
+    }
+
+    @Test
+    public void hasPendingRequestWhenNoPR() throws Exception
+    {
+        String wikiId = "subwiki";
+        Exception exception = currentScriptHasNotProgrammingRight();
+        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
+
+        // Test
+        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
+        assertNull(result);
+        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
 }

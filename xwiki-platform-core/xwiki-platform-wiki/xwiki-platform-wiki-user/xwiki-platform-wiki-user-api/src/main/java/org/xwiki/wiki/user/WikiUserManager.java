@@ -22,7 +22,7 @@ package org.xwiki.wiki.user;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Component that manage how users can participate on a wiki (local users, members, invitation, etc...).
@@ -31,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  */
 @Role
-@Unstable
 public interface WikiUserManager
 {
     /**
@@ -143,6 +142,22 @@ public interface WikiUserManager
      * @throws WikiUserManagerException if problems occur
      */
     Collection<MemberCandidacy> getAllRequests(String wikiId) throws WikiUserManagerException;
+
+    /**
+     * @param user DocumentReference to the user to test
+     * @param wikiId id of the wiki to test
+     * @return either or not the user has a pending invitation to join the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    boolean hasPendingInvitation(DocumentReference user, String wikiId) throws WikiUserManagerException;
+
+    /**
+     * @param user DocumentReference to the user to test
+     * @param wikiId id of the wiki to test
+     * @return either or not the user has a pending request to join the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    boolean hasPendingRequest(DocumentReference user, String wikiId) throws WikiUserManagerException;
 
     /**
      * Get the specified member candidacy.

@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -45,6 +46,7 @@ import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactor
  */
 @Component
 @Named("jira")
+@Singleton
 public class JiraScriptService implements ScriptService
 {
     /**

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>6.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -37,11 +37,25 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Follow the specifications regarding the WebJar content path. -->
+    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
+    <!-- The bootstrap version is used is several places -->
+    <bootstrap.version>3.3.2</bootstrap.version>
   </properties>
   <dependencies>
+    <!-- Adds an Annotation Processor to automatically verify Component declarations.
+         Note that we need to add this dependency because the Maven Compiler Plugin doesn't support
+         having a plugin dependency. Thus we need it as a normal dependency and in order to avoid drawing it
+         transitively we defined it as a "provided" dependency -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-test-component</artifactId>
+      <artifactId>xwiki-commons-tool-verification-resources</artifactId>
+      <version>${commons.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
@@ -50,37 +64,33 @@
     <dependencies>
       <!-- Standard dependencies used in several modules -->
       <!-- Jython engine -->
+      <!-- We use a customized Jython JAR here because the standard one contains lots of useless files creating conflicts -->
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.4-rc1</version>
+        <version>2.7-rc1-xwiki-1</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.4.2.Final</version>
+        <version>3.6.3.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.5</version>
+        <version>1.7</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
-          <exclusion>
-            <groupId>org.gagravarr</groupId>
-            <artifactId>vorbis-java-core</artifactId>
           </exclusion>
           <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
                require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
@@ -153,12 +163,6 @@
         <version>1.2.0-xwiki</version>
         <scope>runtime</scope>
       </dependency>
-      <!-- Used by several projects (HTMLCleaner, Formula renderer, etc.) directly or indirectly to do XPath and XSLT transformations -->
-      <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.1</version>
-      </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
         <groupId>org.apache.struts</groupId>
@@ -169,11 +173,6 @@
           <exclusion>
             <groupId>antlr</groupId>
             <artifactId>antlr</artifactId>
-          </exclusion>
-          <!-- We use a more recent version of Xalan (see above) -->
-          <exclusion>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
           </exclusion>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -200,6 +199,13 @@
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.1.4</version>
+        <exclusions>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>stax-api</artifactId>
+            <groupId>javax.xml.stream</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
@@ -207,18 +213,35 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
-      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
-           on bcprov and bcmail for jdk14. -->
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.0.19</version>
+      </dependency>
+      <!-- Used directly and indirectly in various projects. -->
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.7</version>
+      </dependency>
+      <!-- Common WebJars -->
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>requirejs</artifactId>
+        <version>2.1.15</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>1.11.1</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>${bootstrap.version}</version>
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -283,14 +306,28 @@
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
             </excludes>
-            <systemProperties>
+            <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
               <property>
                 <name>screenshotDirectory</name>
                 <value>${basedir}/target/screenshots</value>
               </property>
             </systemProperties>
+            <!-- Verify that unit tests don't output anything to stdout/stderr -->
+            <properties>
+              <property>
+                <name>listener</name>
+                <value>org.xwiki.test.CaptureConsoleRunListener</value>
+              </property>
+            </properties>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>com.atlassian.maven.plugins</groupId>
@@ -309,12 +346,64 @@
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
+          <executions>
+            <execution>
+              <!-- Minify the WebJar resources before packing the jar. -->
+              <id>minify-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>compress</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
+                <excludes>
+                  <exclude>**/*.min.*</exclude>
+                </excludes>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
           <configuration>
             <skip>${xwiki.minification.skip}</skip>
+            <!-- We prefer to use the JSHint Maven Plugin because it gives us more control over the validation rules. -->
             <jswarn>false</jswarn>
-            <!-- Overwrite the resource files with the minimized version. -->
-            <nosuffix>true</nosuffix>
+            <!-- The default suffix uses the dash as separator (-min) but we prefer the dot (.min) because it is
+              currently more widely used in the JavaScript world. -->
+            <suffix>.min</suffix>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.cj.jshintmojo</groupId>
+          <artifactId>jshint-maven-plugin</artifactId>
+          <version>1.3.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>lint</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <globals>require,define</globals>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <!-- Copy the WebJar resources to the right path before packing the jar. -->
+              <id>copy-webjar-resources</id>
+              <!-- Make sure this execution is not used by default (you need to call it explicitly in your pom). -->
+              <phase>none</phase>
+              <goals>
+                <goal>resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -352,108 +441,11 @@
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/resource/EntityResource</className>
-              <method>java.lang.String getAction()</method>
-              <justification>Resource module is still a young API. Moved to Resource.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/resource/EntityResource</className>
-              <method>void setAction(java.lang.String)</method>
-              <justification>Resource module is still a young API. Moved to Resource.</justification>
-            </difference>
-            <difference>
               <differenceType>7012</differenceType>
-              <className>org/xwiki/resource/Resource</className>
-              <method>org.xwiki.resource.ActionId getActionId()</method>
-              <justification>Resource module is still a young API. Moved from EntityResource</justification>
+              <className>org/xwiki/skin/Skin</className>
+              <method>org.xwiki.rendering.syntax.Syntax getOutputSyntax()</method>
+              <justification>Add a new method to this young API</justification>
             </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/resource/EntityResource</className>
-              <method>EntityResource(org.xwiki.model.reference.EntityReference)</method>
-              <justification>Resource module is still a young API. Added constructor parameter to EntityResource</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/WysiwygEditorApi</className>
-              <method>com.google.gwt.user.client.Element getPlainTextArea()</method>
-              <to>com.google.gwt.dom.client.Element</to>
-              <justification>com.google.gwt.user.client.Element has been deprecated in GWT 2.6. WysiwygEditorApi is not a
-                Java API anyway.</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
-              <className>org/xwiki/gwt/wysiwyg/client/WysiwygEditorApi</className>
-              <method>com.google.gwt.user.client.Element getRichTextArea()</method>
-              <to>com.google.gwt.dom.client.Element</to>
-              <justification>com.google.gwt.user.client.Element has been deprecated in GWT 2.6. WysiwygEditorApi is not a
-                Java API anyway.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/gwt/dom/client/DOMUtils</className>
-              <method>void stop(org.xwiki.gwt.dom.client.Window)</method>
-              <justification>This method is available on the Window object.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/rendering/macro/include/IncludeMacroParameters</className>
-              <method>java.lang.String getDocument()</method>
-              <justification>Not a breakage, moved to legacy</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/rendering/macro/include/IncludeMacroParameters</className>
-              <method>void setDocument(java.lang.String)</method>
-              <justification>Not a breakage, moved to legacy</justification>
-            </difference>
-            <!-- START: Due to removal of "compatibility" directory in legacy aspects directory structure -->
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWikiContext</className>
-              <method>void ajc$privMethod$compatibility_com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$setUserInternal(java.lang.String, boolean)</method>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/api/Api</className>
-              <method>com.xpn.xwiki.XWikiContext ajc$get$context(com.xpn.xwiki.api.Api)</method>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/api/Api</className>
-              <method>void ajc$set$context(com.xpn.xwiki.api.Api, com.xpn.xwiki.XWikiContext)</method>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>compatibility/com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</className>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</className>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</className>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>compatibility/com/xpn/xwiki/api/UtilCompatibilityAspect</className>
-              <justification>Removed wrong "compatibility" package</justification>
-            </difference>
-            <!-- END: Due to removal of "compatibility" directory in legacy aspects directory structure -->
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -474,7 +466,6 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
@@ -502,22 +493,28 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-feed</module>
+    <module>xwiki-platform-filter</module>
+    <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
     <module>xwiki-platform-gwt</module>
     <module>xwiki-platform-help</module>
+    <module>xwiki-platform-icon</module>
     <module>xwiki-platform-index</module>
     <module>xwiki-platform-instance</module>
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
+    <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
+    <module>xwiki-platform-lesscss</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
+    <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
@@ -527,6 +524,7 @@
     <module>xwiki-platform-oldcore</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
+    <module>xwiki-platform-ratings</module>
     <module>xwiki-platform-refactoring</module>
     <module>xwiki-platform-release</module>
     <module>xwiki-platform-rendering</module>
@@ -534,6 +532,7 @@
     <module>xwiki-platform-resource</module>
     <module>xwiki-platform-rest</module>
     <module>xwiki-platform-sandbox</module>
+    <module>xwiki-platform-sharepage</module>
     <module>xwiki-platform-scheduler</module>
     <module>xwiki-platform-search</module>
     <module>xwiki-platform-security</module>
@@ -543,7 +542,9 @@
     <module>xwiki-platform-statistics</module>
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
+    <module>xwiki-platform-template</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>
@@ -553,9 +554,9 @@
     <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
-    <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
+    <module>xwiki-platform-xclass</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>

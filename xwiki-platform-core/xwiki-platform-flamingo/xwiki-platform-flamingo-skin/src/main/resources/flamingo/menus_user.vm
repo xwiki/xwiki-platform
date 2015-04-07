@@ -1,0 +1,49 @@
+##################################
+##          USER MENU
+##################################
+## LOGIN
+#if (!$xcontext.action.startsWith('login') && $isGuest)
+  #set ($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+  #xwikitopmenuentry($!loginurl $!services.localization.render('login') 'tmLogin')
+#end
+## REGISTER
+#if ($isGuest && $xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
+  #set ($regurl = $xwiki.getURL('XWiki.Register', 'register'))
+  #xwikitopmenuentry($!regurl $!services.localization.render('core.register') 'tmRegister')
+#end
+##
+##
+#if (!$isGuest)
+#if ($isSuperAdmin)
+  #xwikitopmenuentrystart('', $!services.localization.render('superadmin'), 'tmUser', 'navbar-avatar', 'user', '')
+    ## LOGOUT
+    #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+    #xwikitopmenuentry($!logouturl $!services.localization.render('logout') 'tmLogout', '', 'log-out')
+  #xwikitopmenuentryend()
+#else
+  #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
+  #if($currentUserAvatar.specified)
+    #set($currentUserAvatar = "#smallUserAvatar($xcontext.user)")
+    #set($userGlyphIcon = '')
+  #else
+    #set($currentUserAvatar = "")
+    #set($userGlyphIcon = 'user')
+  #end
+  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$services.localization.render('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'navbar-avatar' $userGlyphIcon $currentUserAvatar)
+    #submenuitem($xwiki.getURL($xcontext.user, 'view') $services.localization.render('core.menu.profile') 'tmProfile', '', 'user')
+    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=preferences') $services.localization.render('core.menu.userPreferences') 'tmUserPreferences', '', 'wrench')
+    #if ($hasWatch)
+      #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=watchlist') $services.localization.render('core.menu.watchlist.management') 'tmWatchlistManager', '', 'eye-open')
+      #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=network') $services.localization.render('core.menu.network') 'tmUserNetwork', '', 'globe')
+    #end
+    #if ($isWikiUIAvailable && $isMainWikiUser)
+      #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=wikis') $services.localization.render('platform.wiki.menu.userwikis') 'tmUserWikis', '', 'list')
+    #end
+    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=dashboard') $services.localization.render('core.menu.userDashboard') 'tmUserDashboard', '', 'th')
+    #submenuseparator()
+    ## LOGOUT
+    #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+    #xwikitopmenuentry($!logouturl $!services.localization.render('logout') 'tmLogout', '', 'log-out')
+  #xwikitopmenuentryend()
+#end
+#end

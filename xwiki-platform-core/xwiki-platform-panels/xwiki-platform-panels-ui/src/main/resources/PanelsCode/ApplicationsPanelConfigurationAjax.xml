@@ -43,30 +43,32 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if(!$services.csrf.isTokenValid($request.form_token))
-BAD CSRF
-#elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, 'PanelsCode.ApplicationsPanelConfiguration'))
-NO RIGHT
-#else
-  ## Get the blacklist configuration
-  #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
-  ## Get the desired blacklist
-  #set($list = $jsontool.parse($request.blacklist))
-  #foreach($app in $list)
-    #set($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $app))
-    #if(!$blackListObj)
-      #set($blackListObj = $configDoc.newObject('PanelsCode.ApplicationsPanelBlackListClass'))
-      #set($discard = $blackListObj.set('applicationId', $app))
+#if($xcontext.action=='get' &amp;&amp; $request.outputSyntax == 'plain')
+  #if(!$services.csrf.isTokenValid($request.form_token))
+  BAD CSRF
+  #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, 'PanelsCode.ApplicationsPanelConfiguration'))
+  NO RIGHT
+  #else
+    ## Get the blacklist configuration
+    #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
+    ## Get the desired blacklist
+    #set($list = $jsontool.parse($request.blacklist))
+    #foreach($app in $list)
+      #set($blackListObj = $configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $app))
+      #if(!$blackListObj)
+        #set($blackListObj = $configDoc.newObject('PanelsCode.ApplicationsPanelBlackListClass'))
+        #set($discard = $blackListObj.set('applicationId', $app))
+      #end
     #end
-  #end
-  #foreach($obj in $configDoc.getObjects('PanelsCode.ApplicationsPanelBlackListClass').clone())
-    #set($app = $obj.getValue('applicationId'))
-    #if(!$list.contains($app))
-      #set($discard = $configDoc.removeObject($obj))
+    #foreach($obj in $configDoc.getObjects('PanelsCode.ApplicationsPanelBlackListClass').clone())
+      #set($app = $obj.getValue('applicationId'))
+      #if(!$list.contains($app))
+        #set($discard = $configDoc.removeObject($obj))
+      #end
     #end
+    #set($discard = $configDoc.save("Save the new configuration"))
+    SUCCESS
   #end
-  #set($discard = $configDoc.save("Save the new configuration"))
-  SUCCESS
 #end
 {{/velocity}}
 </content>

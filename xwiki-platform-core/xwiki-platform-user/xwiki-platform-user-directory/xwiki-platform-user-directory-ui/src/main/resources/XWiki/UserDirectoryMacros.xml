@@ -247,13 +247,13 @@
           #end
           &lt;/select&gt;
         &lt;/dd&gt;
-        &lt;dt&gt;
+        &lt;dd&gt;
           &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
           &lt;input type='hidden' name='action' value='add' /&gt;
           &lt;span class='buttonwrapper'&gt;
             &lt;input type="submit" class="button" name="submit" value="$services.localization.render('xe.userdirectory.customizeAddColumnButtonLabel')" /&gt;
           &lt;/span&gt;
-        &lt;/dt&gt;
+        &lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/form&gt;
     &lt;form class='xform half' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
@@ -263,7 +263,7 @@
           &lt;span class='xHint'&gt;$services.localization.render('xe.userdirectory.customizeSelectedColumnsHint')&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;$configurationDoc.display('columns', 'edit', $configuration)&lt;/dd&gt;
-        &lt;dt&gt;
+        &lt;dd&gt;
           &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
           &lt;input type='hidden' name='action' value='save' /&gt;
           &lt;span class='buttonwrapper'&gt;
@@ -272,7 +272,7 @@
           &lt;span class="buttonwrapper"&gt;
             &lt;a href="$doc.getURL($xcontext.action, "$request.queryString&amp;amp;action=reset&amp;amp;xredirect=$escapetool.url($xredirect)")" class='button secondary'&gt;{{translation key="xe.userdirectory.customizeResetButtonLabel"/}}&lt;/a&gt;
           &lt;/span&gt;
-        &lt;/dt&gt;
+        &lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/form&gt;
     {{/html}}

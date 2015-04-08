@@ -53,7 +53,7 @@
       ##-----------------------------------------------------------
       #if($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
         #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
-        <form action="" class="xform third">
+        <form action="$xwiki.relativeRequestURL" class="xform third">
           ## CSRF prevention
           <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
           <input type="hidden" name="xpage" value="copy" />
@@ -85,7 +85,7 @@
         #error($services.localization.render('core.rename.targetNotWritable'))
       #end
     #else
-    <form action="" class="xform third">
+    <form action="$xwiki.relativeRequestURL" class="xform third">
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

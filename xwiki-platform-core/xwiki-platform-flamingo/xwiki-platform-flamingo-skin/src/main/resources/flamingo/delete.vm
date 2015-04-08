@@ -74,7 +74,7 @@
   #xwikimessageboxend()
 #else ## request.id
   #xwikimessageboxstart($services.localization.render('core.delete') $services.localization.render('core.recyclebin.completelyDeleteConfirm'))
-    <form action="" method="post">
+    <form action="$xwiki.relativeRequestURL" method="post">
       <div class="hidden">
         ## CSRF prevention
         <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

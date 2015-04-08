@@ -1,4 +1,4 @@
-<form action="" method="post" class="xform half">
+<form action="$xwiki.relativeRequestURL" method="post" class="xform half">
 <dl>
   <dt><label for="name">$services.localization.render('export_packagename')</label></dt>
   <dd><input type="text" name="name" id="name" value=""/></dd>

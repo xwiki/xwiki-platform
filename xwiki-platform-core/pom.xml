@@ -469,6 +469,12 @@
             <exclude>com/xpn/xwiki/plugin/graphviz/GraphVizMacro</exclude>
             <exclude>com/xpn/xwiki/plugin/svg/SVGMacro</exclude>
             <exclude>com/xpn/xwiki/util/MenuSubstitution</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/ChartingMacro</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/CustomXWikiRenderingEngine</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/RadeoxHelper</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSource</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSourceFactory</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/wizard/DatasourceDefaultsHelper</exclude>
           </excludes>
         </configuration>
       </plugin>

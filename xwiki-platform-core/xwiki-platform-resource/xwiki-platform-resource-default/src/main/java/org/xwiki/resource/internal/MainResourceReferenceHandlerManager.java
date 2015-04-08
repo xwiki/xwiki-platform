@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
-import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
 
 /**
@@ -36,17 +35,17 @@ import org.xwiki.resource.ResourceType;
  */
 @Component
 @Singleton
-public class MainResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager
+public class MainResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager<ResourceType>
 {
     @Override
-    protected boolean matches(ResourceReferenceHandler handler, ResourceReference reference)
+    protected boolean matches(ResourceReferenceHandler handler, ResourceType resourceType)
     {
-        return handler.getSupportedResourceReferences().contains(reference.getType());
+        return handler.getSupportedResourceReferences().contains(resourceType);
     }
 
     @Override
-    public void handle(ResourceReference reference) throws ResourceReferenceHandlerException
+    protected ResourceType extractResourceReferenceQualifier(ResourceReference reference)
     {
-        handle(reference, ResourceType.class);
+        return reference.getType();
     }
 }

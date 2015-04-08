@@ -27,6 +27,8 @@ import org.xwiki.stability.Unstable;
 /**
  * Handles a given {@link ResourceReference}.
  *
+ * @param <T> the qualifying element to specify what Resource Reference are handled by thus Handler
+ *        (e.g. Resource Type, Entity Resource Action)
  * @param <T> the type of supported items
  * @version $Id$
  * @since 6.1M2
@@ -44,7 +46,8 @@ public interface ResourceReferenceHandler<T> extends Comparable<ResourceReferenc
     int getPriority();
 
     /**
-     * @return the list of Resource References supported by this Handler
+     * @return the list of qualifying Resource References elements supported by this Handler (e.g Resource Type,
+     *         Entity Resource Action)
      */
     List<T> getSupportedResourceReferences();
 

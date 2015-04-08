@@ -33,6 +33,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.url.ExtendedURL;
@@ -168,11 +169,11 @@ public class BinEntityResourceReferenceResolverTest
         throws Exception
     {
         when(this.entityReferenceResolver.resolve(expectedReference, expectedEntityType)).thenReturn(returnedReference);
-        ExtendedURL url = new ExtendedURL(new URL(testURL));
+        ExtendedURL extendedURL = new ExtendedURL(new URL(testURL), null);
         // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
-        url.getSegments().remove(0);
-        EntityResourceReference entityResource =
-            (EntityResourceReference) this.resolver.resolve(url, Collections.EMPTY_MAP);
+        extendedURL.getSegments().remove(0);
+        EntityResourceReference entityResource = (EntityResourceReference) this.resolver.resolve(extendedURL,
+            new ResourceType("bin"), Collections.<String, Object>emptyMap());
 
         assertEquals(expectedActionName, entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());

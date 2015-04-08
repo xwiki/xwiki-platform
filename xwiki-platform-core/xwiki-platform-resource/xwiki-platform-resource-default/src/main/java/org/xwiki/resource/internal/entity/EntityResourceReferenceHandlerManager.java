@@ -19,13 +19,11 @@
  */
 package org.xwiki.resource.internal.entity;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
-import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.AbstractResourceReferenceHandlerManager;
@@ -38,20 +36,18 @@ import org.xwiki.resource.internal.AbstractResourceReferenceHandlerManager;
  * @since 6.1M2
  */
 @Component
-@Named("entity")
 @Singleton
-public class EntityResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager
+public class EntityResourceReferenceHandlerManager extends AbstractResourceReferenceHandlerManager<EntityResourceAction>
 {
     @Override
-    protected boolean matches(ResourceReferenceHandler handler, ResourceReference reference)
+    protected boolean matches(ResourceReferenceHandler handler, EntityResourceAction action)
     {
-        EntityResourceReference entityResourceReference = (EntityResourceReference) reference;
-        return handler.getSupportedResourceReferences().contains(entityResourceReference.getAction());
+        return handler.getSupportedResourceReferences().contains(action);
     }
 
     @Override
-    public void handle(ResourceReference reference) throws ResourceReferenceHandlerException
+    protected EntityResourceAction extractResourceReferenceQualifier(ResourceReference reference)
     {
-        handle(reference, EntityResourceAction.class);
+        return ((EntityResourceReference) reference).getAction();
     }
 }

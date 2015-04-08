@@ -475,6 +475,8 @@
             <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSource</exclude>
             <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSourceFactory</exclude>
             <exclude>com/xpn/xwiki/plugin/charts/wizard/DatasourceDefaultsHelper</exclude>
+            <!-- Young API. Large refactoring for adding the ability to register new URL Resource Types -->
+            <exclude>**/org/xwiki/resource/**</exclude>
           </excludes>
         </configuration>
       </plugin>

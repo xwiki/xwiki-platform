@@ -55,7 +55,7 @@ public class ExtendedURLURLNormalizerTest
         when(configurationSource.getProperty("xwiki.webapppath")).thenReturn("xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ExtendedURLURLNormalizerTest
         when(configurationSource.getProperty("xwiki.webapppath")).thenReturn("/xwiki/");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ExtendedURLURLNormalizerTest
         when(xwikiRequest.getContextPath()).thenReturn("/xwiki");
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class ExtendedURLURLNormalizerTest
         when(xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/xwiki/bin/view/space/page"));
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ExtendedURLURLNormalizerTest
         when(xwikiContext.getURL()).thenReturn(new URL("http://localhost:8080/xwiki"));
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
-        assertEquals("xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
+        assertEquals("/xwiki/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     @Test
@@ -142,7 +142,7 @@ public class ExtendedURLURLNormalizerTest
             this.mocker.getComponentUnderTest().normalize(extendedURL);
             fail("Should have thrown an exception");
         } catch (RuntimeException expected) {
-            assertEquals("Failed to normalize the URL [one/two] since the application's Servlet context couldn't be "
+            assertEquals("Failed to normalize the URL [/one/two] since the application's Servlet context couldn't be "
                 + "computed.", expected.getMessage());
         }
     }

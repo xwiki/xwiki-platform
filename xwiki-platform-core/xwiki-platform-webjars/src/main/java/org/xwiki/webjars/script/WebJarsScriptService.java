@@ -19,28 +19,30 @@
  */
 package org.xwiki.webjars.script;
 
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.velocity.tools.EscapeTool;
+import org.xwiki.url.ExtendedURL;
+import org.xwiki.webjars.internal.WebJarsResourceReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Make it easy to use WebJars in scripts. For example it can compute an XWiki WebJars URL.
@@ -53,6 +55,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 @Singleton
 public class WebJarsScriptService implements ScriptService
 {
+    private static final String RESOURCE_SEPARATOR = "/";
+
     /**
      * The name of the parameter that specifies the WebJar version.
      */
@@ -65,12 +69,6 @@ public class WebJarsScriptService implements ScriptService
 
     @Inject
     private Logger logger;
-
-    /**
-     * @todo finish implementing URL serialization in the URL module to avoid this dependency on oldcore.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Used to check if the WebJar is a core extension and to get its version.
@@ -90,13 +88,11 @@ public class WebJarsScriptService implements ScriptService
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
-    /**
-     * Used to serialize a {@link Map} as a URL query string.
-     */
-    private EscapeTool escapeTool = new EscapeTool();
+    @Inject
+    private ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> webJarsResourceReferenceSerializer;
 
     /**
-     * Compute an XWiki WebJar URL of the form {@code http://server/bin/webjars/resource/path?value=(resource name)}.
+     * Compute an XWiki WebJar URL of the form {@code http://server/webjars?resource=(resource name)}.
      * 
      * @param resourceName the resource asked (e.g. {@code angular/2.1.11/angular.js"})
      * @return the computed URL
@@ -107,7 +103,7 @@ public class WebJarsScriptService implements ScriptService
             return null;
         }
 
-        String[] parts = resourceName.split("/", 3);
+        String[] parts = resourceName.split(RESOURCE_SEPARATOR, 3);
         if (parts.length < 3) {
             logger.warn("Invalid webjar resource name [{}]. Expected format is 'webjarId/version/path'", resourceName);
             return null;
@@ -177,17 +173,27 @@ public class WebJarsScriptService implements ScriptService
             version = getVersion(String.format("%s:%s", groupId, artifactId));
         }
 
-        String fullPath = String.format("%s/%s/%s", artifactId, version, path);
-        urlParams.put("value", fullPath);
+        // Construct a WebJarsResourceReference so that we can serialize it!
+        List<String> segments = new ArrayList<>();
+        segments.add(artifactId);
+        segments.add((String) version);
+        segments.addAll(Arrays.asList(path.split(RESOURCE_SEPARATOR)));
 
-        XWikiContext xcontext = xcontextProvider.get();
-        XWikiURLFactory urlFactory = xcontext.getURLFactory();
-        // Note: we have to encode the query string since URLFactory will not do that currently (Actually it cannot do
-        // this at the moment since it accepts a string representing the QueryString and it's thus not possible to
-        // encode it automatically - we would need to pass a Map to allow for query string encoding done by the
-        // URLFactory).
-        URL url = urlFactory.createURL("resources", "path", "webjars", escapeTool.url(urlParams), null, xcontext);
-        return urlFactory.getURL(url, xcontext);
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference(segments);
+        for (Map.Entry<String, Object> parameterEntry : urlParams.entrySet()) {
+            resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
+        }
+
+        ExtendedURL extendedURL;
+        try {
+            extendedURL = this.webJarsResourceReferenceSerializer.serialize(resourceReference);
+        } catch (UnsupportedResourceReferenceException e) {
+            this.logger.warn("Error while serializing WebJar URL for id [{}], path = [{}]. Root cause = [{}]",
+                webjarId, path, ExceptionUtils.getRootCauseMessage(e));
+            return null;
+        }
+
+        return extendedURL.serialize();
     }
 
     private String getVersion(String extensionId)

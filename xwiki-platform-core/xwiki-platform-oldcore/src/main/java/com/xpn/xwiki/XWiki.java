@@ -101,6 +101,7 @@ import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.NamespacedComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
@@ -137,12 +138,15 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.url.ExtendedURL;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -667,13 +671,17 @@ public class XWiki implements EventListener
         // requires that the XWiki object be initialized first (the line above). Thus we'll be able to to move it only
         // after the XWiki init is done also in an ExecutionContextInitializer (and with priorities).
         @SuppressWarnings("deprecation")
-        ResourceReferenceResolver<URL> urlResolver = Utils.getComponent(ResourceReferenceResolver.TYPE_URL);
-        URL url = context.getURL();
         EntityResourceReference entityResourceReference;
+        URL url = context.getURL();
         try {
-            entityResourceReference =
-                (EntityResourceReference) urlResolver.resolve(url,
-                    Collections.<String, Object>singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+            ExtendedURL extendedURL = new ExtendedURL(url, context.getRequest().getContextPath());
+            ResourceTypeResolver<ExtendedURL> typeResolver = Utils.getComponent(new DefaultParameterizedType(
+                null, ResourceTypeResolver.class, ExtendedURL.class));
+            ResourceType type = typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
+            ResourceReferenceResolver<ExtendedURL> resourceResolver = Utils.getComponent(new DefaultParameterizedType(
+                null, ResourceReferenceResolver.class, ExtendedURL.class));
+            entityResourceReference = (EntityResourceReference) resourceResolver.resolve(extendedURL, type,
+                Collections.<String, Object>emptyMap());
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);

@@ -20,6 +20,7 @@
 package org.xwiki.resource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -64,14 +65,27 @@ public abstract class AbstractResourceReference implements ResourceReference
     }
 
     @Override
-    public void addParameter(String name, String value)
+    public void addParameter(String name, Object value)
     {
         List<String> list = this.parameters.get(name);
         if (list == null) {
             list = new ArrayList<>();
         }
         if (value != null) {
-            list.add(value);
+            // If the value is a Collection or an Array then add a multivalued parameter!
+            if (value.getClass().isArray()) {
+                Object[] objectValues = (Object[]) value;
+                for (Object objectValue : objectValues) {
+                    list.add(objectValue.toString());
+                }
+            } else if (Collection.class.isAssignableFrom(value.getClass())) {
+                Collection<?> collectionValues = (Collection<?>) value;
+                for (Object collectionValue : collectionValues) {
+                    list.add(collectionValue.toString());
+                }
+            } else {
+                list.add(value.toString());
+            }
         }
         this.parameters.put(name, list);
     }

@@ -31,6 +31,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.standard.entity.WikiEntityResourceReferenceResolver;
@@ -70,7 +71,7 @@ public class WikiEntityResourceReferenceResolverTest
     @Test
     public void resolve() throws Exception
     {
-        ExtendedURL url = new ExtendedURL(new URL("http://localhost/wiki/somewiki/view/space/page"));
+        ExtendedURL url = new ExtendedURL(new URL("http://localhost/wiki/somewiki/view/space/page"), null);
         url.getSegments().remove(0);
         when(wikiReferenceExtractor.extract(url)).thenReturn(this.wikiReference);
 
@@ -87,11 +88,11 @@ public class WikiEntityResourceReferenceResolverTest
     {
         when(this.entityReferenceResolver.resolve(expectedReference, expectedEntityType)).thenReturn(
             returnedReference);
-        ExtendedURL url = new ExtendedURL(new URL(testURL));
+        ExtendedURL extendedURL = new ExtendedURL(new URL(testURL), null);
         // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
-        url.getSegments().remove(0);
-        EntityResourceReference entityResource =
-            (EntityResourceReference) this.resolver.resolve(url, Collections.EMPTY_MAP);
+        extendedURL.getSegments().remove(0);
+        EntityResourceReference entityResource = (EntityResourceReference) this.resolver.resolve(extendedURL,
+            new ResourceType("wiki"), Collections.<String, Object>emptyMap());
 
         assertEquals(expectedActionName, entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());

@@ -32,9 +32,11 @@
   <packaging>jar</packaging>
   <description>Adds support for packaging web resources (JavaScript, CSS, images, fonts, etc.) using WebJars</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
+    <!-- Too many dependencies required -->
+    <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
   </properties>
   <dependencies>
     <dependency>
@@ -72,7 +74,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-container-servlet</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

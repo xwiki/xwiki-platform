@@ -19,24 +19,22 @@
  */
 package org.xwiki.webjars;
 
-import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.url.ExtendedURL;
+import org.xwiki.webjars.internal.WebJarsResourceReference;
 import org.xwiki.webjars.script.WebJarsScriptService;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -51,30 +49,22 @@ public class WebJarsScriptServiceTest
 {
     @Rule
     public MockitoComponentMockingRule<WebJarsScriptService> mocker =
-        new MockitoComponentMockingRule<WebJarsScriptService>(WebJarsScriptService.class);
-
-    private XWikiContext xcontext = mock(XWikiContext.class);
-
-    private XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
-
-    @Before
-    public void configure() throws Exception
-    {
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.xcontext);
-        when(this.xcontext.getURLFactory()).thenReturn(this.urlFactory);
-    }
+        new MockitoComponentMockingRule<>(WebJarsScriptService.class);
 
     @Test
     public void computeURLWithVersion() throws Exception
     {
-        URL url = new URL("http://www.xwiki.org");
-        when(urlFactory.createURL("resources", "path", "webjars", "value=ang%3Aular%2F2.1.11%2Fangular.js",
-            null, xcontext)).thenReturn(url);
-        when(urlFactory.getURL(url, xcontext)).thenReturn("foo");
-
+        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
+            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
+                ExtendedURL.class));
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+            Arrays.asList("ang:ular", "2.1.11", "angular.js"));
         // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
-        assertEquals("foo", this.mocker.getComponentUnderTest().url("ang:ular/2.1.11/angular.js"));
+        when(serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.js")));
+
+        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.js",
+            this.mocker.getComponentUnderTest().url("ang:ular/2.1.11/angular.js"));
     }
 
     @Test
@@ -90,27 +80,37 @@ public class WebJarsScriptServiceTest
             extension);
         when(extension.getId()).thenReturn(new ExtensionId("bar", "2.1.11"));
 
-        URL url = new URL("http://www.xwiki.org");
-        when(urlFactory.createURL("resources", "path", "webjars", "value=angular%2F2.1.11%2Fangular.js",
-            null, xcontext)).thenReturn(url);
-        when(urlFactory.getURL(url, xcontext)).thenReturn("foo");
+        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
+            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
+                ExtendedURL.class));
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+            Arrays.asList("angular", "2.1.11", "angular.js"));
+        when(serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.js")));
 
-        assertEquals("foo", this.mocker.getComponentUnderTest().url("angular", "angular.js"));
+        assertEquals("/xwiki/angular/2.1.11/angular.js",
+            this.mocker.getComponentUnderTest().url("angular", "angular.js"));
     }
 
     @Test
     public void computeURLWithParameters() throws Exception
     {
-        URL url = new URL("http://www.xwiki.org");
-        when(urlFactory.createURL("resources", "path", "webjars",
-            "value=angular%2F2.1.11%2Fangular.js&evaluate=true&list=one&list=two", null, xcontext)).thenReturn(url);
-        when(urlFactory.getURL(url, xcontext)).thenReturn("foo");
+        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
+            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
+                ExtendedURL.class));
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference(
+            Arrays.asList("angular", "2.1.11", "angular.js"));
+        resourceReference.addParameter("evaluate", "true");
+        resourceReference.addParameter("list", Arrays.asList("one", "two"));
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.js"),
+            resourceReference.getParameters());
+        when(serializer.serialize(resourceReference)).thenReturn(extendedURL);
 
-        Map<String, Object> params = new LinkedHashMap<String, Object>();
+        Map<String, Object> params = new LinkedHashMap<>();
         params.put("version", "2.1.11");
-        params.put("value", "will be overwritten");
         params.put("evaluate", true);
         params.put("list", new String[] {"one", "two"});
-        assertEquals("foo", this.mocker.getComponentUnderTest().url("angular", "angular.js", params));
+        assertEquals("/xwiki/angular/2.1.11/angular.js?evaluate=true&list=one&list=two",
+            this.mocker.getComponentUnderTest().url("angular", "angular.js", params));
     }
 }

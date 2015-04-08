@@ -26,13 +26,18 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.stability.Unstable;
+import org.xwiki.velocity.tools.EscapeTool;
 
 /**
  * Extend a {@link URL} by providing access to the URL path segments (URL-decoded).
@@ -69,6 +74,13 @@ public class ExtendedURL implements Cloneable
      */
     private List<String> segments;
 
+    private Map<String, List<String>> parameters;
+
+    /**
+     * Used to serialize a {@link Map} as a URL query string.
+     */
+    private EscapeTool escapeTool = new EscapeTool();
+
     /**
      * Populate the Extended URL with a list of path segments.
      *
@@ -76,17 +88,20 @@ public class ExtendedURL implements Cloneable
      */
     public ExtendedURL(List<String> segments)
     {
-        this.segments = new ArrayList<>(segments);
+        this(segments, Collections.<String, List<String>>emptyMap());
     }
 
     /**
-     * @param url the URL being wrapped
-     * @throws org.xwiki.resource.CreateResourceReferenceException if the passed URL is invalid which can happen if it
-     *         has incorrect encoding
+     * Populate the Extended URL with a list of path segments.
+     *
+     * @param segments the path segments of the URL
+     * @param parameters the query string parameters of the URL
+     * @since 7.1M1
      */
-    public ExtendedURL(URL url) throws CreateResourceReferenceException
+    public ExtendedURL(List<String> segments, Map<String, List<String>> parameters)
     {
-        this(url, null);
+        this.segments = new ArrayList<>(segments);
+        this.parameters = parameters;
     }
 
     /**
@@ -131,6 +146,7 @@ public class ExtendedURL implements Cloneable
         rawPath = StringUtils.removeStart(rawPath, URL_SEPARATOR);
 
         this.segments = extractPathSegments(rawPath);
+        this.parameters = extractParameters(internalURI);
     }
 
     /**
@@ -155,6 +171,47 @@ public class ExtendedURL implements Cloneable
     public URI getURI()
     {
         return this.uri;
+    }
+
+    /**
+     * @return the list of query string parameters passed in the original URL
+     * @since 7.1M1
+     */
+    public Map<String, List<String>> getParameters()
+    {
+        return this.parameters;
+    }
+
+    private Map<String, List<String>> extractParameters(URI uri)
+    {
+        Map<String, List<String>> uriParameters;
+        if (uri.getQuery() != null) {
+            uriParameters = new LinkedHashMap<>();
+            for (String nameValue : Arrays.asList(uri.getQuery().split("&"))) {
+                String[] pair = nameValue.split("=", 2);
+                // Check if the parameter has a value or not.
+                if (pair.length == 2) {
+                    addParameter(pair[0], pair[1], uriParameters);
+                } else {
+                    addParameter(pair[0], null, uriParameters);
+                }
+            }
+        } else {
+            uriParameters = Collections.emptyMap();
+        }
+        return uriParameters;
+    }
+
+    private void addParameter(String name, String value, Map<String, List<String>> parameters)
+    {
+        List<String> list = parameters.get(name);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        if (value != null) {
+            list.add(value);
+        }
+        parameters.put(name, list);
     }
 
     /**
@@ -231,22 +288,35 @@ public class ExtendedURL implements Cloneable
     }
 
     /**
-     * @return the serialized segments as a relative URL with URL-encoded path segments
+     * @return the serialized segments as a relative URL with URL-encoded path segments. Note that the returned String
+     *         starts with a URL separator ("/")
      */
     public String serialize()
     {
+        StringBuilder builder  = new StringBuilder();
         List<String> encodedSegments = new ArrayList<>();
         for (String path : getSegments()) {
-            try {
-                encodedSegments.add(URLEncoder.encode(path, UTF8));
-            } catch (UnsupportedEncodingException e) {
-                // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
-                // without that encoding.
-                throw new RuntimeException(String.format("Failed to URL encode [%s] using UTF-8.", path), e);
-            }
+            encodedSegments.add(encodeSegment(path));
         }
+        builder.append(URL_SEPARATOR);
+        builder.append(StringUtils.join(encodedSegments, URL_SEPARATOR));
+        Map<String, List<String>> uriParameters = getParameters();
+        if (!uriParameters.isEmpty()) {
+            builder.append('?');
+            builder.append(this.escapeTool.url(uriParameters));
+        }
+        return builder.toString();
+    }
 
-        return StringUtils.join(encodedSegments, URL_SEPARATOR);
+    private String encodeSegment(String value)
+    {
+        try {
+            return URLEncoder.encode(value, UTF8);
+        } catch (UnsupportedEncodingException e) {
+            // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+            // without that encoding.
+            throw new RuntimeException(String.format("Failed to URL encode [%s] using UTF-8.", value), e);
+        }
     }
 
     @Override

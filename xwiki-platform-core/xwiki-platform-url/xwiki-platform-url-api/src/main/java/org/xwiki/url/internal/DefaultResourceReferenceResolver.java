@@ -19,7 +19,6 @@
  */
 package org.xwiki.url.internal;
 
-import java.net.URL;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -29,10 +28,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
 
 /**
@@ -44,7 +46,7 @@ import org.xwiki.url.URLConfiguration;
  */
 @Component
 @Singleton
-public class DefaultResourceReferenceResolver implements ResourceReferenceResolver<URL>
+public class DefaultResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
 {
     /**
      * Used to get the hint of the {@link org.xwiki.resource.ResourceReferenceResolver} to use.
@@ -60,18 +62,18 @@ public class DefaultResourceReferenceResolver implements ResourceReferenceResolv
     private ComponentManager componentManager;
 
     @Override
-    public ResourceReference resolve(URL urlRepresentation, Map<String, Object> parameters)
+    public ResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         ResourceReferenceResolver resolver;
         try {
-            resolver = this.componentManager.getInstance(ResourceReferenceResolver.TYPE_URL,
-                this.configuration.getURLFormatId());
+            resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
+                ResourceReferenceResolver.class, ExtendedURL.class), this.configuration.getURLFormatId());
         } catch (ComponentLookupException e) {
             throw new CreateResourceReferenceException(
                 String.format("Invalid configuration hint [%s]. Cannot create Resource Reference for [%s].",
-                    this.configuration.getURLFormatId(), urlRepresentation), e);
+                    this.configuration.getURLFormatId(), extendedURL.getWrappedURL()), e);
         }
-        return resolver.resolve(urlRepresentation, parameters);
+        return resolver.resolve(extendedURL, type, parameters);
     }
 }

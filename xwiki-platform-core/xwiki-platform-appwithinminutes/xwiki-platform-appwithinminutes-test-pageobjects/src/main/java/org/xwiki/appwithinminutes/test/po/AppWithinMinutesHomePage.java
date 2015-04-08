@@ -31,6 +31,10 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AppWithinMinutesHomePage extends ViewPage
 {
+    /**
+     * The title of the AppWithinMinutes home page.
+     */
+    public static final String TITLE = "App Within Minutes";
 
     @FindBy(xpath = "//a[@class = 'button' and . = 'Create Application']")
     private WebElement createAppButton;

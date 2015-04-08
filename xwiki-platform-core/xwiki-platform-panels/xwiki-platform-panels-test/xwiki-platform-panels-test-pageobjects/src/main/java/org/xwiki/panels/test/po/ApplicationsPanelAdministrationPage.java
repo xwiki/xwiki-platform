@@ -61,7 +61,7 @@ public class ApplicationsPanelAdministrationPage extends ViewPage
     private Collection<String> getApplicationsInPanel(WebElement panel)
     {
         Collection<String> results = new ArrayList<>();
-        for (WebElement elem : getDriver().findElementsWithoutWaiting(panel,
+        for (WebElement elem : getUtil().findElementsWithoutWaiting(getDriver(), panel,
                 By.xpath("div[contains(@class, 'panel-body')]/ul"
                         + "/li[contains(@class, 'draggableApp')]//span[contains(@class, 'application-label')]"))) {
             results.add(elem.getText());

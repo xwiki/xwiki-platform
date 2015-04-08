@@ -458,6 +458,12 @@
               <method>void setRenderingEngine(com.xpn.xwiki.render.XWikiRenderingEngine)</method>
               <justification>Not used since a long time now (XWikiRenderingEngine is a component) and impossible to implement it without a trigerring most of the old rendering engine.</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/url/ExtendedURL</className>
+              <method>ExtendedURL(java.net.URL)</method>
+              <justification>Young API. Added handling of URL parameters</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

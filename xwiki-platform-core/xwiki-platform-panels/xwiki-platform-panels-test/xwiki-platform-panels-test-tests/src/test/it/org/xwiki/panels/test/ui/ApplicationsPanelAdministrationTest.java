@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 public class ApplicationsPanelAdministrationTest extends AbstractTest
 {
     @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
     @Test
     public void testApplicationsPanelAdministration()

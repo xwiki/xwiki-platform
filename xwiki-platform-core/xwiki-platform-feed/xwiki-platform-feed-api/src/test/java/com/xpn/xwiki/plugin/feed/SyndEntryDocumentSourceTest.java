@@ -90,7 +90,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         doc.setAuthor("Albatross");
         doc.setTitle("Fidis from MilkyWay");
         doc.setContent("blah blah blah..");
-        doc.setSyntax(Syntax.XWIKI_1_0);
+        doc.setSyntax(Syntax.XWIKI_2_1);
 
         initArticleClass();
 

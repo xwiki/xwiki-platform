@@ -1292,4 +1292,24 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return (this.getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
     }
+
+    /**
+     * @deprecated since 6.1M2, directly lookup default {@link com.xpn.xwiki.render.XWikiRenderingEngine} component
+     *             instead
+     */
+    @Deprecated
+    public Object getRenderingEngine()
+    {
+        try {
+            return Utils.getComponent(getClass().forName("com.xpn.xwiki.render.XWikiRenderingEngine"));
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    @Deprecated
+    public void XWiki.resetRenderingEngine(XWikiContext context) throws XWikiException
+    {
+        getOldRendering().resetRenderingEngine(context);
+    }
 }

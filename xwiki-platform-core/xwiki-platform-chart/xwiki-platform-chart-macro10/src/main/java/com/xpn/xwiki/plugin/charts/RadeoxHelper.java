@@ -49,7 +49,7 @@ public class RadeoxHelper
     public RadeoxHelper(XWikiDocument document, XWikiContext context) throws XWikiException
     {
         this.context = context;
-        this.radeoxRenderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
+        this.radeoxRenderer = Utils.getComponent(XWikiRenderingEngine.class).getRenderer("wiki");
         this.document = document;
     }
 

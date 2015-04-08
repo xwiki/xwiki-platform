@@ -113,7 +113,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         // not providing it in our unit test resources).
         getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
-        this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
+        this.engine = (DefaultXWikiRenderingEngine) getComponentManager().getInstance(XWikiRenderingEngine.class);
 
         // Make sure the wiki in the context will say that we have programming permission.
         getContext().setWiki(this.xwiki);
@@ -209,8 +209,8 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
     public void testRenderWithoutContextDoc()
     {
-        String result = getContext().getWiki().getRenderingEngine().interpretText("toto", null, getContext());
-        
+        String result = this.engine.interpretText("toto", null, getContext());
+
         Assert.assertEquals("toto", result);
     }
 }

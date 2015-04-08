@@ -39,8 +39,11 @@
     #end
   #end
 </div>
+## TODO: move that in a place common to old and new rendering footnotes
+#if ($doc.syntax.toIdString() == 'xwiki/1.0')
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
+#end
 #if ("$!{request.comments}" == '1')
   #template("comments2.vm")
 #end

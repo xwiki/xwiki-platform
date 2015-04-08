@@ -92,6 +92,9 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
     private ObservationManager observationManager;
 
     @Inject
+    private Provider<XWikiRenderingEngine> engineProvider;
+
+    @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     protected Map<String, String> macros_libraries;
@@ -235,7 +238,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
 
             XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isSingleLine())) {
-                result.append(context.getWiki().getRenderingEngine()
+                result.append(this.engineProvider.get()
                     .convertSingleLine(macroname, params, allcontent, macro, context));
             } else {
                 result.append(allcontent);
@@ -265,7 +268,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
 
             XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isMultiLine())) {
-                result.append(context.getWiki().getRenderingEngine()
+                result.append(this.engineProvider.get()
                     .convertMultiLine(macroname, params, data, allcontent, macro, context));
             } else {
                 result.append(allcontent);

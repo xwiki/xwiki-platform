@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.display;
 
 import java.util.Collections;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentModelBridge;
@@ -48,6 +50,12 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 @Singleton
 public class XWiki10DocumentContentDisplayer extends DocumentContentDisplayer
 {
+    @Inject
+    private XWikiRenderingEngine renderingEngine;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     protected XDOM display(DocumentModelBridge document, String nameSpace, DocumentDisplayerParameters parameters)
     {
@@ -55,28 +63,17 @@ public class XWiki10DocumentContentDisplayer extends DocumentContentDisplayer
             return super.display(document, nameSpace, parameters);
         }
 
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xcontextProvider.get();
         try {
             String content = document.getContent();
             if (parameters.isContentTranslated()) {
                 content = ((XWikiDocument) document).getTranslatedContent(context);
             }
-            XWikiRenderingEngine renderingEngine = context.getWiki().getRenderingEngine();
-            String result = renderingEngine.renderText(content, context.getDoc(), context);
+            String result = this.renderingEngine.renderText(content, context.getDoc(), context);
             return generateXDOM(result);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @return the XWiki context
-     * @deprecated avoid using this method; try using the document access bridge instead
-     */
-    @Deprecated
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
     }
 
     /**

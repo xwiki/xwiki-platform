@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +38,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -1196,20 +1196,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to reset the rendering engine This would restore the rendering engine evaluation loop and take
-     * into account new configuration parameters
-     */
-    public void resetRenderingEngine()
-    {
-        if (hasProgrammingRights()) {
-            try {
-                this.xwiki.resetRenderingEngine(getXWikiContext());
-            } catch (XWikiException e) {
-            }
-        }
-    }
-
-    /**
      * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
      *
      * @return true for success/false for failure
@@ -1581,54 +1567,6 @@ public class XWiki extends Api
             return this.xwiki.getRightService().hasAccessLevel(level, user, docname, getXWikiContext());
         } catch (Exception e) {
             return false;
-        }
-    }
-
-    /**
-     * API to render a text in the context of a document
-     *
-     * @param text text to render
-     * @param doc the text is evaluated in the content of this document
-     * @return evaluated content
-     * @throws XWikiException if the evaluation went wrong
-     */
-    public String renderText(String text, Document doc) throws XWikiException
-    {
-        return this.xwiki.getRenderingEngine().renderText(text, doc.getDoc(), getXWikiContext());
-    }
-
-    /**
-     * API to render a chunk (difference between two versions
-     *
-     * @param chunk difference between versions to render
-     * @param doc document to use as a context for rendering
-     * @return resuilt of the rendering
-     */
-    public String renderChunk(Chunk chunk, Document doc)
-    {
-        return renderChunk(chunk, false, doc);
-    }
-
-    /**
-     * API to render a chunk (difference between two versions
-     *
-     * @param chunk difference between versions to render
-     * @param doc document to use as a context for rendering
-     * @param source true to render the difference as wiki source and not as wiki rendered text
-     * @return resuilt of the rendering
-     */
-    public String renderChunk(Chunk chunk, boolean source, Document doc)
-    {
-        StringBuffer buf = new StringBuffer();
-        chunk.toString(buf, "", "\n");
-        if (source == true) {
-            return buf.toString();
-        }
-
-        try {
-            return this.xwiki.getRenderingEngine().renderText(buf.toString(), doc.getDoc(), getXWikiContext());
-        } catch (Exception e) {
-            return buf.toString();
         }
     }
 

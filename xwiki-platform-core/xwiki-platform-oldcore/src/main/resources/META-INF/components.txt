@@ -17,7 +17,6 @@ com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
 com.xpn.xwiki.script.display.DisplayScriptService
-com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
@@ -66,17 +65,11 @@ com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultModelBridge
 com.xpn.xwiki.internal.store.PropertyConverter
+com.xpn.xwiki.internal.render.DefaultOldRendering
+com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
-com.xpn.xwiki.render.DefaultXWikiRenderingEngine
-com.xpn.xwiki.render.XWikiJSPRenderer
-com.xpn.xwiki.render.XWikiMacrosMappingRenderer
-com.xpn.xwiki.render.XWikiPluginRenderer
-com.xpn.xwiki.render.XWikiRadeoxRenderer
-com.xpn.xwiki.render.XWikiVelocityRenderer
-com.xpn.xwiki.render.XWikiWikiBaseRenderer
-com.xpn.xwiki.render.groovy.XWikiGroovyRenderer
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor
 com.xpn.xwiki.store.hibernate.query.DefaultQueryExecutor

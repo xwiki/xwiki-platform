@@ -36,7 +36,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -167,11 +167,10 @@
       <artifactId>struts-core</artifactId>
     </dependency>
 
-    <!-- Rendering -->
+    <!-- Used by parse groovy from page -->
     <dependency>
-      <groupId>radeox</groupId>
-      <artifactId>radeox</artifactId>
-      <version>1.0-b2</version>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Storage -->
@@ -359,18 +358,6 @@
       <groupId>picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
       <version>1.2</version>
-    </dependency>
-
-    <!-- Regular expressions -->
-    <dependency>
-      <groupId>oro</groupId>
-      <artifactId>oro</artifactId>
-      <version>2.0.8</version>
-    </dependency>
-    <!-- Used by XWiki 1.0 Groovy macro -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Other XWiki modules -->
@@ -736,6 +723,8 @@
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
               **/internal/DefaultXWikiStubContextProvider.java,
+              **/internal/render/OldRendering.java,
+              **/render/groovy/ParseGroovyFromString.java,
               **/internal/mandatory/AbstractRightsDocumentInitializer.java,
               **/internal/mandatory/XWikiPreferencesDocumentInitializer.java,
               **/internal/mandatory/XWikiUsersDocumentInitializer.java,
@@ -800,7 +789,6 @@
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
-              **/plugin/graphviz/GraphVizMacro.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,
@@ -824,66 +812,16 @@
               **/plugin/query/XWikiNamespaceResolver.java,
               **/plugin/query/XWikiQueryConstants.java,
               **/plugin/query/XWikiQuery.java,
-              **/plugin/svg/SVGMacro.java,
               **/plugin/svg/SVGPluginApi.java,
               **/plugin/svg/SVGPlugin.java,
               **/plugin/XWikiPluginManager.java,
               **/pref/api/XWikiPrefService.java,
               **/pref/impl/xwiki/XWikiPrefServiceImpl.java,
               **/render/DefaultVelocityManager.java,
-              **/render/DefaultXWikiRenderingEngine.java,
-              **/render/filter/CodeFilter.java,
-              **/render/filter/CodeRemoveFilter.java,
-              **/render/filter/CodeRestoreFilter.java,
-              **/render/filter/EscapeFilter.java,
-              **/render/filter/MacroFilter.java,
-              **/render/filter/StrongFilter.java,
-              **/render/filter/StyleFilter.java,
-              **/render/filter/UnderlineFilter.java,
-              **/render/filter/UrlFilter.java,
-              **/render/filter/XWikiFilter.java,
-              **/render/filter/XWikiHeadingFilter.java,
-              **/render/filter/XWikiLinkFilter.java,
-              **/render/FormattingSubstitution.java,
-              **/render/groovy/XWikiGroovyRenderer.java,
-              **/render/groovy/XWikiPageClassLoader.java,
-              **/render/groovy/XWikiSimpleTemplateEngine.java,
-              **/render/HeadingSubstitution.java,
-              **/render/ListSubstitution.java,
-              **/render/macro/AttachMacro.java,
-              **/render/macro/DisplayMacro.java,
-              **/render/macro/FieldMacro.java,
-              **/render/macro/FormMacro.java,
-              **/render/macro/ImageMacro.java,
-              **/render/macro/LinkMacro.java,
-              **/render/macro/MacroLoader.java,
-              **/render/macro/MacroRepository.java,
-              **/render/macro/rss/RSSMacro.java,
-              **/render/macro/rss/RSSMacroParameters.java,
-              **/render/macro/StyleMacro.java,
-              **/render/macro/TableBuilder.java,
-              **/render/macro/TableMacro.java,
-              **/render/macro/UseMacro.java,
-              **/render/macro/WikiCodeFilter.java,
-              **/render/macro/XWikiCodeMacro.java,
-              **/render/macro/XWikiMacro.java,
-              **/render/PreTagSubstitution.java,
-              **/render/WikiNameSubstitution.java,
               **/render/WikiSubstitution.java,
-              **/render/XWikiInterpreter.java,
-              **/render/XWikiJSPRenderer.java,
-              **/render/XWikiMacrosMappingRenderer.java,
-              **/render/XWikiPluginRenderer.java,
-              **/render/XWikiRadeoxRenderEngine.java,
-              **/render/XWikiRadeoxRenderer.java,
-              **/render/XWikiRenderer.java,
-              **/render/XWikiRenderingCache.java,
-              **/render/XWikiRenderingEngine.java,
               **/render/XWikiScriptContextInitializer.java,
               **/render/XWikiVelocityContextInitializer.java,
-              **/render/XWikiVelocityRenderer.java,
-              **/render/XWikiVirtualMacro.java,
-              **/render/XWikiWikiBaseRenderer.java,
+              **/render/groovy/XWikiPageClassLoader.java,
               **/security/XWikiSecurityManager.java,
               **/store/DBCPConnectionProvider.java,
               **/store/hibernate/DefaultHibernateSessionFactory.java,

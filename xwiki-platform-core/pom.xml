@@ -446,11 +446,29 @@
               <method>org.xwiki.rendering.syntax.Syntax getOutputSyntax()</method>
               <justification>Add a new method to this young API</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>com.xpn.xwiki.render.XWikiRenderingEngine getRenderingEngine()</method>
+              <justification>Not really been removed but now return Object. Breaks code building that use this method but should be ok for runtime.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>void setRenderingEngine(com.xpn.xwiki.render.XWikiRenderingEngine)</method>
+              <justification>Not used since a long time now (XWikiRenderingEngine is a component) and impossible to implement it without a trigerring most of the old rendering engine.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Move xwiki/1.0 and old rendering engine to its own module -->
+            <exclude>com/xpn/xwiki/content/**</exclude>
+            <exclude>com/xpn/xwiki/render/**</exclude>
+            <exclude>com/xpn/xwiki/plugin/graphviz/GraphVizMacro</exclude>
+            <exclude>com/xpn/xwiki/plugin/svg/SVGMacro</exclude>
+            <exclude>com/xpn/xwiki/util/MenuSubstitution</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -522,6 +540,7 @@
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
     <module>xwiki-platform-oldcore</module>
+    <module>xwiki-platform-oldrendering</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>

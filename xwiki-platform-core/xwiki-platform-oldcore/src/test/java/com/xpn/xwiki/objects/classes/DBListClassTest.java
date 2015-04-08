@@ -29,7 +29,7 @@ import org.jmock.core.stub.CustomStub;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -55,9 +55,9 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
             getContext()});
         xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
 
-        Mock mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
-        mockXWikiRenderingEngine.stubs().method("interpretText").will(
-            new CustomStub("Implements XWikiRenderingEngine.interpretText")
+        Mock mockRendering = registerMockComponent(OldRendering.class);
+        mockRendering.stubs().method("parseContent").will(
+            new CustomStub("Implements OldRendering.parseContent")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -65,8 +65,6 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
                     return invocation.parameterValues.get(0);
                 }
             });
-
-        xwiki.setRenderingEngine((XWikiRenderingEngine) mockXWikiRenderingEngine.proxy());
 
         getContext().setWiki(xwiki);
     }

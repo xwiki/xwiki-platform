@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-core</artifactId>
+    <version>7.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-oldrendering</artifactId>
+  <name>XWiki Platform - Old Rendering</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Old Rendering</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.47</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Rendering -->
+    <dependency>
+      <groupId>radeox</groupId>
+      <artifactId>radeox</artifactId>
+      <version>1.0-b2</version>
+    </dependency>
+
+    <!-- Regular expressions -->
+    <dependency>
+      <groupId>oro</groupId>
+      <artifactId>oro</artifactId>
+      <version>2.0.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+
+    <!-- Test dependencies -->
+
+    <!-- Used to mock XWiki class -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-logging-logback</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-script</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-groovy</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-instance-document</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- XWiki syntax parsers -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-xwiki10</artifactId>
+      <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Publish a Core Test JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- We must have an ID here, as otherwise the configuration is used for generating the normal jar, too.
+                 See XWIKI-2757 -->
+            <id>build-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/*.class</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              **/content/parsers/RenamePageReplaceLinkHandler.java,
+              **/plugin/graphviz/GraphVizMacro.java,
+              **/plugin/svg/SVGMacro.java,
+              **/internal/render/XWiki10OldRendering.java,
+              **/render/DefaultXWikiRenderingEngine.java,
+              **/render/filter/CodeFilter.java,
+              **/render/filter/CodeRemoveFilter.java,
+              **/render/filter/CodeRestoreFilter.java,
+              **/render/filter/EscapeFilter.java,
+              **/render/filter/MacroFilter.java,
+              **/render/filter/StrongFilter.java,
+              **/render/filter/StyleFilter.java,
+              **/render/filter/UnderlineFilter.java,
+              **/render/filter/UrlFilter.java,
+              **/render/filter/XWikiFilter.java,
+              **/render/filter/XWikiHeadingFilter.java,
+              **/render/filter/XWikiLinkFilter.java,
+              **/render/FormattingSubstitution.java,
+              **/render/groovy/XWikiGroovyRenderer.java,
+              **/render/groovy/XWikiSimpleTemplateEngine.java,
+              **/render/HeadingSubstitution.java,
+              **/render/ListSubstitution.java,
+              **/render/macro/AttachMacro.java,
+              **/render/macro/DisplayMacro.java,
+              **/render/macro/FieldMacro.java,
+              **/render/macro/FormMacro.java,
+              **/render/macro/ImageMacro.java,
+              **/render/macro/LinkMacro.java,
+              **/render/macro/MacroLoader.java,
+              **/render/macro/MacroRepository.java,
+              **/render/macro/rss/RSSMacro.java,
+              **/render/macro/rss/RSSMacroParameters.java,
+              **/render/macro/StyleMacro.java,
+              **/render/macro/TableBuilder.java,
+              **/render/macro/TableMacro.java,
+              **/render/macro/UseMacro.java,
+              **/render/macro/WikiCodeFilter.java,
+              **/render/macro/XWikiCodeMacro.java,
+              **/render/macro/XWikiMacro.java,
+              **/render/PreTagSubstitution.java,
+              **/render/WikiNameSubstitution.java,
+              **/render/XWikiInterpreter.java,
+              **/render/XWikiJSPRenderer.java,
+              **/render/XWikiMacrosMappingRenderer.java,
+              **/render/XWikiPluginRenderer.java,
+              **/render/XWikiRadeoxRenderEngine.java,
+              **/render/XWikiRadeoxRenderer.java,
+              **/render/XWikiRenderer.java,
+              **/render/XWikiRenderingCache.java,
+              **/render/XWikiRenderingEngine.java,
+              **/render/XWikiVelocityRenderer.java,
+              **/render/XWikiVirtualMacro.java,
+              **/render/XWikiWikiBaseRenderer.java,
+              **/util/MenuSubstitution.java,
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- Skip aspectj when in M2Eclipse, it's useless, slow and a bad practice anyway to develop with deprecated methods. Plus it make the build failed when AJDT is not installed. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>
+                      aspectj-maven-plugin
+                    </artifactId>
+                    <versionRange>[1.3,)</versionRange>
+                    <goals>
+                      <goal>compile</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

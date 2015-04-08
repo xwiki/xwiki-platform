@@ -97,15 +97,10 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.manager.NamespacedComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
@@ -148,6 +143,7 @@ import org.xwiki.skin.Skin;
 import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
+import org.xwiki.velocity.VelocityManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -176,6 +172,8 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.internal.render.OldRendering;
+import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.skin.InternalSkinConfiguration;
 import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.objects.BaseObject;
@@ -186,9 +184,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
@@ -413,6 +408,10 @@ public class XWiki implements EventListener
 
     private ContextualLocalizationManager localization;
 
+    private OldRendering oldRendering;
+
+    private ParseGroovyFromString parseGroovyFromString;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -511,6 +510,24 @@ public class XWiki implements EventListener
         }
 
         return this.localization;
+    }
+
+    private OldRendering getOldRendering()
+    {
+        if (this.oldRendering == null) {
+            this.oldRendering = Utils.getComponent(OldRendering.class);
+        }
+
+        return this.oldRendering;
+    }
+
+    public ParseGroovyFromString getParseGroovyFromString()
+    {
+        if (this.parseGroovyFromString == null) {
+            this.parseGroovyFromString = Utils.getComponent(ParseGroovyFromString.class);
+        }
+
+        return this.parseGroovyFromString;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1028,7 +1045,6 @@ public class XWiki implements EventListener
                     if (initClasses) {
                         initializeMandatoryDocuments(context);
                         getPluginManager().virtualInit(context);
-                        getRenderingEngine().virtualInit(context);
                     }
 
                     // Add initdone which will allow to
@@ -1146,26 +1162,6 @@ public class XWiki implements EventListener
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR, "Cannot load class {1} from param {0}", ecause,
                 args);
-        }
-    }
-
-    public void resetRenderingEngine(XWikiContext context) throws XWikiException
-    {
-        XWikiRenderingEngine engine;
-        try {
-            engine = Utils.getComponentManager().getInstance(XWikiRenderingEngine.class);
-        } catch (ComponentLookupException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to lookup rendering engine", e);
-        }
-
-        if (engine instanceof Initializable) {
-            try {
-                ((Initializable) engine).initialize();
-            } catch (InitializationException e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Failed to initialize rendering engine", e);
-            }
         }
     }
 
@@ -1658,35 +1654,6 @@ public class XWiki implements EventListener
         return null;
     }
 
-    /**
-     * @deprecated since 6.1M2, directly lookup default {@link XWikiRenderingEngine} component instead
-     */
-    @Deprecated
-    public XWikiRenderingEngine getRenderingEngine()
-    {
-        return Utils.getComponent(XWikiRenderingEngine.class);
-    }
-
-    /**
-     * @deprecated since 6.1M2
-     */
-    @Deprecated
-    public void setRenderingEngine(XWikiRenderingEngine renderingEngine)
-    {
-        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor =
-            new DefaultComponentDescriptor<XWikiRenderingEngine>();
-
-        descriptor.setImplementation(renderingEngine.getClass());
-        descriptor.setRoleType(XWikiRenderingEngine.class);
-        descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-
-        try {
-            Utils.getRootComponentManager().registerComponent(descriptor, renderingEngine);
-        } catch (ComponentRepositoryException e) {
-            LOGGER.error("Failed to register rendering engine [{}]", renderingEngine, e);
-        }
-    }
-
     public MetaClass getMetaclass()
     {
         return this.metaclass;
@@ -1730,17 +1697,9 @@ public class XWiki implements EventListener
         return getStore().search(sql, nb, start, whereParams, context);
     }
 
-    public String parseContent(String content, XWikiContext context)
+    public String parseContent(String content, XWikiContext xcontext)
     {
-        String parsedContent;
-
-        if (StringUtils.isNotEmpty(content)) {
-            parsedContent = context.getWiki().getRenderingEngine().interpretText(content, context.getDoc(), context);
-        } else {
-            parsedContent = "";
-        }
-
-        return parsedContent;
+        return getOldRendering().parseContent(content, xcontext);
     }
 
     /**
@@ -1821,8 +1780,7 @@ public class XWiki implements EventListener
     public String renderTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            return getRenderingEngine().getRenderer("wiki").render(parseTemplate(template, skin, context),
-                context.getDoc(), context.getDoc(), context);
+            return getOldRendering().renderTemplate(template, skin, context);
         } catch (Exception ex) {
             LOGGER.error("Failed to render template [" + template + "] for skin [" + skin + "]", ex);
             return parseTemplate(template, skin, context);
@@ -1832,8 +1790,7 @@ public class XWiki implements EventListener
     public String renderTemplate(String template, XWikiContext context)
     {
         try {
-            return getRenderingEngine().getRenderer("wiki").render(parseTemplate(template, context), context.getDoc(),
-                context.getDoc(), context);
+            return getOldRendering().renderTemplate(template, context);
         } catch (Exception ex) {
             LOGGER.error("Failed to render template [" + template + "]", ex);
             return parseTemplate(template, context);
@@ -2648,10 +2605,8 @@ public class XWiki implements EventListener
             ((XWikiCacheStoreInterface) getStore()).flushCache();
         }
         // Flush renderers.. Groovy renderer has a cache
-        XWikiRenderingEngine rengine = getRenderingEngine();
-        if (rengine != null) {
-            rengine.flushCache();
-        }
+        getOldRendering().flushCache();
+        getParseGroovyFromString().flushCache();
 
         XWikiPluginManager pmanager = getPluginManager();
         if (pmanager != null) {
@@ -3484,20 +3439,15 @@ public class XWiki implements EventListener
             } else {
                 // We stay in the included document context
 
-                // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
-                if (contentdoc.getSyntax().equals(Syntax.XWIKI_1_0)) {
-                    result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc, context);
-                } else {
-                    // Since the Script macro checks for programming rights in the current document, we need to
-                    // temporarily set the contentdoc as the current doc before rendering it.
-                    XWikiDocument originalDoc = null;
-                    try {
-                        originalDoc = context.getDoc();
-                        context.put("doc", doc);
-                        result = getRenderedContent(contentdoc, doc, context);
-                    } finally {
-                        context.put("doc", originalDoc);
-                    }
+                // Since the Script macro checks for programming rights in the current document, we need to
+                // temporarily set the contentdoc as the current doc before rendering it.
+                XWikiDocument originalDoc = null;
+                try {
+                    originalDoc = context.getDoc();
+                    context.put("doc", doc);
+                    result = getRenderedContent(contentdoc, doc, context);
+                } finally {
+                    context.put("doc", originalDoc);
                 }
             }
             try {
@@ -3563,8 +3513,9 @@ public class XWiki implements EventListener
         context.put("idoc", includingDoc);
         context.put("sdoc", includedDoc);
         try {
-            result = includedDoc.getRenderedContent(Utils.getComponent(RenderingContext.class).getTargetSyntax(), false,
-                context);
+            result =
+                includedDoc.getRenderedContent(Utils.getComponent(RenderingContext.class).getTargetSyntax(), false,
+                    context);
         } finally {
             // Remove including doc or set the previous one
             if (idoc == null) {
@@ -4132,8 +4083,7 @@ public class XWiki implements EventListener
             }
             if (contextPath == null) {
                 // Extract the context by getting the first path segment
-                contextPath = StringUtils.substringBefore(
-                    StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
+                contextPath = StringUtils.substringBefore(StringUtils.stripStart(context.getURL().getPath(), "/"), "/");
             }
         }
 
@@ -4871,8 +4821,8 @@ public class XWiki implements EventListener
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
                 text =
-                    XWikiVelocityRenderer.evaluate(format, "<username formatting code in "
-                        + context.getDoc().getDocumentReference() + ">", vcontext, context);
+                    evaluateVelocity(format, "<username formatting code in " + context.getDoc().getDocumentReference()
+                        + ">", vcontext, context);
             }
 
             if (escapeXML || link) {
@@ -4889,6 +4839,24 @@ public class XWiki implements EventListener
             LOGGER.error("Failed to get user profile page", e);
 
             return escapeXML ? XMLUtils.escape(userReference.getName()) : userReference.getName();
+        }
+    }
+
+    private String evaluateVelocity(String content, String name, VelocityContext vcontext, XWikiContext context)
+    {
+        StringWriter writer = new StringWriter();
+        try {
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
+            return writer.toString();
+        } catch (Exception e) {
+            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
+            Object[] args = { name };
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
+                    e, args);
+            return Util.getHTMLExceptionMessage(xe, context);
         }
     }
 
@@ -5595,14 +5563,9 @@ public class XWiki implements EventListener
      * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromString(String script, XWikiContext xcontext) throws XWikiException
     {
-        if (getRenderingEngine().getRenderer("groovy") == null) {
-            return null;
-        } else {
-            return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy")).parseGroovyFromString(script,
-                context);
-        }
+        return getParseGroovyFromString().parseGroovyFromString(script, xcontext);
     }
 
     /**
@@ -5613,23 +5576,19 @@ public class XWiki implements EventListener
      * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext xcontext) throws XWikiException
     {
-        if (getRenderingEngine().getRenderer("groovy") == null) {
-            return null;
-        }
-
-        XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, context);
-        Object prevParentClassLoader = context.get("parentclassloader");
+        XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, xcontext);
+        Object prevParentClassLoader = xcontext.get("parentclassloader");
         try {
-            context.put("parentclassloader", pcl);
+            xcontext.put("parentclassloader", pcl);
 
-            return parseGroovyFromString(script, context);
+            return parseGroovyFromString(script, xcontext);
         } finally {
             if (prevParentClassLoader == null) {
-                context.remove("parentclassloader");
+                xcontext.remove("parentclassloader");
             } else {
-                context.put("parentclassloader", prevParentClassLoader);
+                xcontext.put("parentclassloader", prevParentClassLoader);
             }
         }
     }
@@ -6123,7 +6082,7 @@ public class XWiki implements EventListener
             om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
         }
 
-        saveDocument(rolledbackDoc, localizePlainOrKey("core.comment.rollback", Arrays.asList(rev)), context);
+        saveDocument(rolledbackDoc, localizePlainOrKey("core.comment.rollback", rev), context);
 
         // Since the the store resets the original document, we need to temporarily put it back to send notifications.
         XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();

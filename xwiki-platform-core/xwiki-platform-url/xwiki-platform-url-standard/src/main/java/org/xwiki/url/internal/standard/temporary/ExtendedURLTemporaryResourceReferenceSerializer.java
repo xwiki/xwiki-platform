@@ -36,7 +36,7 @@ import org.xwiki.url.ExtendedURL;
 /**
  * Resolver that generates {@link ExtendedURL} out of {@link org.xwiki.resource.temporary.TemporaryResourceReference}.
  *
- * The generated format corresponfs to {@code http://(server)/xwiki/temp/(space)/(page)/(module name)/(resource name)},
+ * The generated format corresponds to {@code http://(server)/xwiki/temp/(space)/(page)/(module name)/(resource name)},
  * where:
  * <ul>
  *     <li>(space): the space owning the temporary resource (used to check permissions when accessing the resource

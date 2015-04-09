@@ -88,7 +88,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), getConfigurationSource());
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.document.setSyntax(Syntax.XWIKI_1_0);
+        this.document.setSyntax(Syntax.XWIKI_2_1);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
@@ -96,7 +96,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getContext().setDoc(this.document);
 
         this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        this.translatedDocument.setSyntax(Syntax.XWIKI_2_1);
         this.translatedDocument.setLanguage("fr");
         this.translatedDocument.setNew(false);
 

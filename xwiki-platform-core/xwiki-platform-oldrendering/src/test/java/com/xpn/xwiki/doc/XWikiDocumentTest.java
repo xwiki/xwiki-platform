@@ -138,7 +138,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setNew(false);
 
         this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
+        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setLanguage("fr");
         this.translatedDocument.setNew(false);
 

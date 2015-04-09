@@ -685,6 +685,8 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-configuration-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-resource-servlet", getXWikiPlatformVersion(), null, "jar"));
 
         // Get the platform's pom.xml to get the versions of some needed externals dependencies, so that we do not
         // hardcode them.

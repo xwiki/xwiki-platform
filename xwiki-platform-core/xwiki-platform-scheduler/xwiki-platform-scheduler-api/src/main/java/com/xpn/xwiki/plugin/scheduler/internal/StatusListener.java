@@ -17,19 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.scheduler;
+package com.xpn.xwiki.plugin.scheduler.internal;
 
+import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.JobKey;
 import org.quartz.JobListener;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @version $Id$
+ * @since 7.1M1
  */
 public class StatusListener implements SchedulerListener, JobListener
 {
@@ -41,13 +45,13 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void jobScheduled(Trigger trigger)
     {
-        LOGGER.info("Task [{}] scheduled", trigger.getJobName());
+        LOGGER.info("Task [{}] scheduled", trigger.getKey());
     }
 
     @Override
-    public void jobUnscheduled(String name, String group)
+    public void jobUnscheduled(TriggerKey key)
     {
-        LOGGER.info("Task [{}] unscheduled", name);
+        LOGGER.info("Task [{}] unscheduled", key);
     }
 
     @Override
@@ -56,25 +60,25 @@ public class StatusListener implements SchedulerListener, JobListener
     }
 
     @Override
-    public void triggersPaused(String trigger, String group)
+    public void triggerPaused(TriggerKey triggerKey)
     {
     }
 
     @Override
-    public void triggersResumed(String trigger, String group)
+    public void triggerResumed(TriggerKey triggerKey)
     {
     }
 
     @Override
-    public void jobsPaused(String name, String group)
+    public void jobPaused(JobKey jobKey)
     {
-        LOGGER.info("Task [{}] paused", name);
+        LOGGER.info("Task [{}] paused", jobKey);
     }
 
     @Override
-    public void jobsResumed(String name, String group)
+    public void jobResumed(JobKey jobKey)
     {
-        LOGGER.info("Task [{}] resumed", name);
+        LOGGER.info("Task [{}] resumed", jobKey);
     }
 
     @Override
@@ -98,7 +102,7 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void jobToBeExecuted(JobExecutionContext context)
     {
-        LOGGER.info("Task [{}] is about to be executed", context.getJobDetail().getName());
+        LOGGER.info("Task [{}] is about to be executed", context.getJobDetail().getKey());
     }
 
     @Override
@@ -109,6 +113,83 @@ public class StatusListener implements SchedulerListener, JobListener
     @Override
     public void jobWasExecuted(JobExecutionContext context, JobExecutionException e)
     {
-        LOGGER.info("Task [{}] executed: ", context.getJobDetail().getName(), e);
+        LOGGER.info("Task [{}] executed: ", context.getJobDetail().getKey(), e);
+    }
+
+    @Override
+    public void triggersPaused(String triggerGroup)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void triggersResumed(String triggerGroup)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void jobAdded(JobDetail jobDetail)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void jobDeleted(JobKey jobKey)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void jobsPaused(String jobGroup)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void jobsResumed(String jobGroup)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void schedulerInStandbyMode()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void schedulerStarted()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void schedulerStarting()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void schedulerShuttingdown()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void schedulingDataCleared()
+    {
+        // TODO Auto-generated method stub
+        
     }
 }

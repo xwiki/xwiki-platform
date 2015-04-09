@@ -38,21 +38,13 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opensymphony.quartz</groupId>
+      <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-      <version>1.6.5</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>2.2.1</version>
     </dependency>
-    <!-- Needed at run time. Some versions of Maven don't inherit provided dependencies. -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -69,9 +61,7 @@
             com/xpn/xwiki/plugin/scheduler/SchedulerPlugin.java,
             com/xpn/xwiki/plugin/scheduler/SchedulerPluginApi.java,
             com/xpn/xwiki/plugin/scheduler/SchedulerPluginException.java,
-            com/xpn/xwiki/plugin/scheduler/StatusListener.java,
-            com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub.java,
-            com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub.java
+            com/xpn/xwiki/plugin/scheduler/internal/StatusListener.java
           </excludes>
         </configuration>
       </plugin>

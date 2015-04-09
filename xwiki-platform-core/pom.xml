@@ -464,6 +464,11 @@
               <method>ExtendedURL(java.net.URL)</method>
               <justification>Young API. Added handling of URL parameters</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/plugin/scheduler/StatusListener</className>
+              <justification>Never supposed to be an API</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -67,6 +67,8 @@ public class XWikiSkinsDocumentInitializer extends AbstractMandatoryDocumentInit
         needsUpdate |= bclass.addTextField("name", "Name", 30);
         needsUpdate |= bclass.addTextField("baseskin", "Base Skin", 30);
         needsUpdate |= bclass.addTextField("logo", "Logo", 30);
+        needsUpdate |= bclass.addStaticListField("outputSyntax", "Output Syntax",
+            "html/5.0=HTML 5|xhtml/1.0=XHTML 1.0");
         needsUpdate |= bclass.addTemplateField("style.css", "Style");
         needsUpdate |= bclass.addTemplateField("header.vm", "Header");
         needsUpdate |= bclass.addTemplateField("footer.vm", "Footer");

@@ -77,6 +77,13 @@
       <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Required at runtime! -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-container</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <!-- Used to determine the Content Type of the requested resource. -->
       <groupId>org.apache.tika</groupId>

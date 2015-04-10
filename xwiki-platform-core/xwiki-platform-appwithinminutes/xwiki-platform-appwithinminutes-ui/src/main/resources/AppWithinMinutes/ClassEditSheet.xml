@@ -614,7 +614,9 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
         #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')
-        #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=AppWithinMinutes.WebHome")
+        #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
+        #set($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
+        #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=$wikiHomePage")
       #end
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));
     #else

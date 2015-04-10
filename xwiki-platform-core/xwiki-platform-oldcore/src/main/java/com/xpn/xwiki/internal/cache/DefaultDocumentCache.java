@@ -222,8 +222,12 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
     @Override
     public void removeAll()
     {
-        this.cache.removeAll();
-        this.mappingCache.removeAll();
+        if (this.cache != null) {
+            this.cache.removeAll();
+        }
+        if (this.mappingCache != null) {
+            this.mappingCache.removeAll();
+        }
     }
 
     @Override

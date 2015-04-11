@@ -7,6 +7,8 @@ $response.setContentType("text/xml")
 #set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
 #set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($classnametosearch = $!{p.getCustomMappingMap()['classname']})
+#set($propnametosearch = $!{p.getCustomMappingMap()['idField']})
 #set($hibquery = "$!p.getSql()")
 ##
 ## Determine what was the input. If the property accepts multiple values and has separators, then
@@ -35,68 +37,91 @@ $response.setContentType("text/xml")
   #end
   #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
   #if($whereidx < 0)
-    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ?")
+    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :userinput")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
-    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ? and")
+    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :userinput and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $xwiki.search($hibquery, 30, 0, ["%${input}%"]))
-  <?xml version="1.0" encoding="UTF-8"?>
-  <results type="${resultsType}">
-  #foreach($res in $results)
-    #set($info = '')
-    #set($rs = $res)
-    #foreach($r in $res)
-      #if($velocityCount == 1)
-        #set($info = $r)
-      #elseif($velocityCount == 2)
-        #set($rs = $r)
-      #end
-    #end
-    #if(($info != '-') && ($rs != '-'))
-      <rs id="" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
-    #end
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
+  #set($queryChain = $services.query.hql($hibquery))
+  #foreach($key in $bindValues.keySet())
+    #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
   #end
-  </results>
-#else ## hibquery == ""
+  #set($queryChain = $queryChain.setLimit(30))
+  #set($queryChain = $queryChain.setOffset(0))
+  #set($results = $queryChain.execute())
+#elseif(!$classnametosearch.isEmpty()) ## hibquery == ""
+  #if(!$propnametosearch.isEmpty())
+    #set($query = "select distinct doc.fullName, obj.$propnametosearch from Document doc, doc.object($classnametosearch) as obj where lower(obj.$propnametosearch) like :userinput")
+    #set($resultsType = "6")
+  #else ## if propnametosearch == ""
+    #set($query = "select distinct doc.fullName, doc.fullName from Document doc, doc.object($classnametosearch) as obj where lower(doc.fullName) like :userinput")
+    #set($resultsType = "7")
+  #end ## if propnametosearch != ""
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
+  #set($queryChain = $services.query.xwql($query))
+  #foreach($key in $bindValues.keySet())
+    #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+  #end
+  #set($queryChain = $queryChain.setLimit(30))
+  #set($queryChain = $queryChain.setOffset(0))
+  #set($results = $queryChain.execute())
+#else ## if hibquery == "" and classnametosearch == ""
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('templatename', ${templatename}))
+  #set($discard = $bindValues.put('classname', ${classname}))
+  #set($discard = $bindValues.put('fieldname', ${fieldname}))
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.id.name = ? and lower(list) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="3">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
-    #end
-    </results>
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :userinput")
+    #set($resultsType = "3")
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
-    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.name = ? and lower(prop.textValue) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="5">
-    #foreach($res in $results)
-      #set($list = $p.getListFromString($res, $sep, false))
-      #set($list = $list.toArray())
-      #foreach($word in $list)
-          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
-      #end
-    #end
-    </results>
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :userinput")
+    #set($resultsType = "5")
   ######################### StringProperty query
   #else
-    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = ? and obj.name <> ? and prop.id.id = obj.id and prop.id.name = ? and lower(prop.value) like ?")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0, [${classname}, ${templatename}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="8">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
-    #end
-    </results>
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :userinput")
+    #set($resultsType = "8")
   #end
-#end ## if hibquery
+  #set($queryChain = $services.query.hql($query))
+  #foreach($key in $bindValues.keySet())
+    #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+  #end
+  #set($queryChain = $queryChain.setLimit(30))
+  #set($queryChain = $queryChain.setOffset(0))
+  #set($results = $queryChain.execute())
+  #if($p.isMultiSelect() && !$p.isRelationalStorage())
+    #set($finalList = [])
+    #foreach($res in $results)
+      #set($list = $p.getListFromString($res, '|', false))
+      #foreach($e in $list)
+        #set($discard = $finalList.add($e))
+      #end
+    #end
+    #set($results = $finalList)
+  #end
+#end ## if hibquery != "" and classnametosearch != ""
+##### Printing the XML file
+<?xml version="1.0" encoding="UTF-8"?>
+<results type="${resultsType}">
+#foreach($res in $results)
+  #set($info = '')
+  #set($rs = $res)
+  #foreach($r in $res)
+    #if(${foreach.count} == 1)
+      #set($info = $r)
+    #elseif(${foreach.count} == 2)
+      #set($rs = $r)
+    #end
+  #end
+  #if(($info != '-') && ($rs != '-'))
+    <rs id="${foreach.count}" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
+  #end
+#end
+</results>

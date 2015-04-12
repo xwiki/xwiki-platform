@@ -70,6 +70,14 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
+    <!-- CSS and JS compression tool -->
+    <dependency>
+      <groupId>com.yahoo.platform.yui</groupId>
+      <artifactId>yuicompressor</artifactId>
+      <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
+           yuicompressor -->
+      <version>2.4.7-xwiki</version>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>

@@ -112,10 +112,6 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -130,10 +126,6 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -241,14 +233,6 @@
       <version>1.1</version>
     </dependency>
 
-    <!-- JSON -->
-    <dependency>
-      <!-- Used by packaging plugin -->
-      <groupId>net.sf.json-lib</groupId>
-      <artifactId>json-lib</artifactId>
-      <classifier>jdk15</classifier>
-    </dependency>
-
     <!-- XmlRpc -->
     <dependency>
       <groupId>org.apache.xmlrpc</groupId>
@@ -326,18 +310,10 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
       <version>1.7</version>
+      <scope>runtime</scope>
     </dependency>
-
 
     <!-- Misc -->
-    <!-- CSS and JS compression tool, used in SkinExtensions -->
-    <dependency>
-      <groupId>com.yahoo.platform.yui</groupId>
-      <artifactId>yuicompressor</artifactId>
-      <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
-           yuicompressor -->
-      <version>2.4.7-xwiki</version>
-    </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
       <groupId>joda-time</groupId>
@@ -352,12 +328,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-    </dependency>
-    <!-- Used by another tool, it should be removed some time -->
-    <dependency>
-      <groupId>picocontainer</groupId>
-      <artifactId>picocontainer</artifactId>
-      <version>1.2</version>
     </dependency>
 
     <!-- Other XWiki modules -->
@@ -380,6 +350,7 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -955,37 +926,5 @@
         </configuration>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!-- Skip aspectj when in M2Eclipse, it's useless, slow and a bad practice anyway to develop with deprecated methods. Plus it make the build failed when AJDT is not installed. -->
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>
-                      aspectj-maven-plugin
-                    </artifactId>
-                    <versionRange>[1.3,)</versionRange>
-                    <goals>
-                      <goal>compile</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 </project>

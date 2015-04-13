@@ -357,6 +357,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             JobBuilder jobBuilder = JobBuilder.newJob((Class<Job>) Class.forName(object.getStringValue("jobClass")));
 
             jobBuilder.withIdentity(xjob);
+            jobBuilder.storeDurably();
 
             JobDataMap data = new JobDataMap();
 

@@ -107,7 +107,7 @@ public class OldRenderingProvider implements Provider<OldRendering>, Initializab
             try {
                 this.oldRendering = this.componentManagerProvider.get().getInstance(OldRendering.class);
             } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to get lookup default implementatio of  [" + OldRendering.class
+                throw new RuntimeException("Failed to get lookup default implementation of [" + OldRendering.class
                     + "]", e);
             }
         }

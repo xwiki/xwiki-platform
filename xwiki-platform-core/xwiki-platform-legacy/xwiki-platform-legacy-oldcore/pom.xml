@@ -91,6 +91,11 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

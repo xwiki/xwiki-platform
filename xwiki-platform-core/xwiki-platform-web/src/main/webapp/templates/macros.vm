@@ -1551,6 +1551,14 @@ ${Msz}Mb##
                 #end
                 </select>
                 </td>
+              #elseif("$!colprop.type" == 'listboolean' && $isFilterable)
+                <td class="xwiki-livetable-display-header-filter">
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'>
+                  <option value=''>$services.localization.render('platform.livetable.selectAll')</option>
+                  <option value='0'>$services.localization.render('platform.livetable.false')</option></option>
+                  <option value='1'>$services.localization.render('platform.livetable.true')</option>
+                </select>
+                </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
                 <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type" == 'hidden')

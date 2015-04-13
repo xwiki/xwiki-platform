@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -55,6 +56,11 @@ public class OldRenderingProvider implements Provider<OldRendering>, Initializab
     private ObservationManager observation;
 
     @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
+    // Not injecting it directly since it triggers a lot of dependencies.
+    // Also we want to possibly find it in extensions
     private OldRendering oldRendering;
 
     @Inject
@@ -97,6 +103,15 @@ public class OldRenderingProvider implements Provider<OldRendering>, Initializab
     @Override
     public OldRendering get()
     {
+        if (this.oldRendering == null) {
+            try {
+                this.oldRendering = this.componentManagerProvider.get().getInstance(OldRendering.class);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to get lookup default implementatio of  [" + OldRendering.class
+                    + "]", e);
+            }
+        }
+
         return this.oldRendering;
     }
 }

@@ -24,6 +24,8 @@ import javax.inject.Provider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertNotSame;
@@ -34,6 +36,7 @@ import static org.junit.Assert.assertSame;
  * 
  * @version $Id$
  */
+@ComponentList(ContextComponentManagerProvider.class)
 public class OldRenderingProviderTest
 {
     @Rule
@@ -55,7 +58,8 @@ public class OldRenderingProviderTest
         DefaultComponentDescriptor<OldRendering> componentDescriptor = new DefaultComponentDescriptor<OldRendering>();
         componentDescriptor.setImplementation(oldRendering2.getClass());
         componentDescriptor.setRoleType(OldRendering.class);
-        ((OldRenderingProvider)this.mocker.getComponentUnderTest()).onNewOldRendering(componentDescriptor, this.mocker);
+        ((OldRenderingProvider) this.mocker.getComponentUnderTest())
+            .onNewOldRendering(componentDescriptor, this.mocker);
 
         assertSame(oldRendering2, this.mocker.getComponentUnderTest().get());
     }

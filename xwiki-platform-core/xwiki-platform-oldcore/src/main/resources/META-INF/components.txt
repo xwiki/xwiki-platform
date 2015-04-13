@@ -66,6 +66,7 @@ com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultModelBridge
 com.xpn.xwiki.internal.store.PropertyConverter
 com.xpn.xwiki.internal.render.DefaultOldRendering
+com.xpn.xwiki.internal.render.OldRenderingProvider
 com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer

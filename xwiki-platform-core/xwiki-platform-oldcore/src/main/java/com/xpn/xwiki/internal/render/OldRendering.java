@@ -19,9 +19,13 @@
  */
 package com.xpn.xwiki.internal.render;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,8 +34,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 
 /**
- * Hook to let xwiki/1.0 module override a few internal methods to inject some specific behavior that only make
- * sense with the old rendering engine.
+ * Hook to let xwiki/1.0 module override a few internal methods to inject some specific behavior that only make sense
+ * with the old rendering engine.
  * 
  * @version $Id$
  * @since 7.1M1
@@ -41,6 +45,11 @@ import com.xpn.xwiki.doc.XWikiLink;
 @Deprecated
 public interface OldRendering
 {
+    /**
+     * Type instance for Provider<OldRendering>.
+     */
+    ParameterizedType TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class, OldRendering.class);
+
     void flushCache();
 
     void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldReference, DocumentReference newReference,

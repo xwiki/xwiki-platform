@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -542,7 +543,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
-    private OldRendering oldRendering;
+    private Provider<OldRendering> oldRenderingProvider;
 
     /**
      * @see #getSyntaxFactory()
@@ -739,11 +740,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private OldRendering getOldRendering()
     {
-        if (this.oldRendering == null) {
-            this.oldRendering = Utils.getComponent(OldRendering.class);
+        if (this.oldRenderingProvider == null) {
+            this.oldRenderingProvider = Utils.getComponent(OldRendering.TYPE_PROVIDER);
         }
 
-        return this.oldRendering;
+        return this.oldRenderingProvider.get();
     }
 
     private String localizePlainOrKey(String key, Object... parameters)

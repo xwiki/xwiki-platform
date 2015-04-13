@@ -40,6 +40,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -111,7 +112,6 @@ import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.migration.MigrationRequiredException;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * The XWiki Hibernate database driver.
@@ -170,6 +170,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Inject
+    private Provider<OldRendering> oldRenderingProvider;
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
@@ -1992,7 +1995,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             context.remove("links");
 
             // Extract and save links
-            Set<XWikiLink> links = Utils.getComponent(OldRendering.class).extractLinks(doc, context);
+            Set<XWikiLink> links = this.oldRenderingProvider.get().extractLinks(doc, context);
             for (XWikiLink wikiLink : links) {
                 session.save(wikiLink);
             }

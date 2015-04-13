@@ -412,7 +412,7 @@ public class XWiki implements EventListener
 
     private ContextualLocalizationManager localization;
 
-    private OldRendering oldRendering;
+    private Provider<OldRendering> oldRenderingProvider;
 
     private ParseGroovyFromString parseGroovyFromString;
 
@@ -518,11 +518,11 @@ public class XWiki implements EventListener
 
     private OldRendering getOldRendering()
     {
-        if (this.oldRendering == null) {
-            this.oldRendering = Utils.getComponent(OldRendering.class);
+        if (this.oldRenderingProvider == null) {
+            this.oldRenderingProvider = Utils.getComponent(OldRendering.TYPE_PROVIDER);
         }
 
-        return this.oldRendering;
+        return this.oldRenderingProvider.get();
     }
 
     public ParseGroovyFromString getParseGroovyFromString()

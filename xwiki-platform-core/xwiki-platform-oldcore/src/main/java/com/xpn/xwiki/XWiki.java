@@ -6295,19 +6295,15 @@ public class XWiki implements EventListener
         Pattern.compile("backlinks"), EntityType.OBJECT_PROPERTY, new RegexEntityReference(
             Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
-    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new XObjectAddedEvent(SERVERCLASS_REFERENCE));
-            add(new XObjectDeletedEvent(SERVERCLASS_REFERENCE));
-            add(new XObjectUpdatedEvent(SERVERCLASS_REFERENCE));
-            add(new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
-            add(new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
-            add(new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
-            add(new WikiDeletedEvent());
-            add(new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
-        }
-    };
+    private static final List<Event> LISTENER_EVENTS = Arrays.<Event>asList(
+        new XObjectAddedEvent(SERVERCLASS_REFERENCE),
+        new XObjectDeletedEvent(SERVERCLASS_REFERENCE),
+        new XObjectUpdatedEvent(SERVERCLASS_REFERENCE),
+        new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new WikiDeletedEvent(),
+        new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
 
     @Override
     public List<Event> getEvents()

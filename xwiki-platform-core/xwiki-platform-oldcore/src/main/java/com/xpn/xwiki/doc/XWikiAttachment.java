@@ -29,8 +29,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -468,9 +469,7 @@ public class XWikiAttachment implements Cloneable
             wr.writeDocumentStart(doc);
             toXML(wr, bWithAttachmentContent, bWithVersions, context);
             wr.writeDocumentEnd(doc);
-            byte[] array = baos.toByteArray();
-            baos = null;
-            return new String(array, context.getWiki().getEncoding());
+            return baos.toString();
         } catch (IOException e) {
             e.printStackTrace();
             return "";
@@ -539,7 +538,9 @@ public class XWikiAttachment implements Cloneable
             loadContent(context);
             XWikiAttachmentContent acontent = getAttachment_content();
             if (acontent != null) {
-                wr.writeBase64(el, getAttachment_content().getContentInputStream());
+                try (InputStream stream = acontent.getContentInputStream()) {
+                    wr.writeBase64(el, stream);
+                }
             } else {
                 el.addText("");
                 wr.write(el);
@@ -552,7 +553,7 @@ public class XWikiAttachment implements Cloneable
             if (aarchive != null) {
                 el = new DOMElement("versions");
                 try {
-                    el.addText(new String(aarchive.getArchive()));
+                    el.addText(aarchive.getArchiveAsString());
                     wr.write(el);
                 } catch (XWikiException e) {
                 }
@@ -612,19 +613,21 @@ public class XWikiAttachment implements Cloneable
         setComment(docel.element("comment").getText());
 
         String sdate = docel.element("date").getText();
-        Date date = new Date(Long.parseLong(sdate));
-        setDate(date);
+        setDate(new Date(Long.parseLong(sdate)));
 
         Element contentel = docel.element("content");
         if (contentel != null) {
             String base64content = contentel.getText();
-            byte[] content = Base64.decodeBase64(base64content.getBytes());
-            setContent(content);
+            try (Base64InputStream decoded =
+                new Base64InputStream(new ReaderInputStream(new StringReader(base64content)))) {
+                setContent(decoded);
+            } catch (IOException e) {
+                throw new XWikiException("Failed to read base 64 encoded atachment content", e);
+            }
         }
         Element archiveel = docel.element("versions");
         if (archiveel != null) {
-            String archive = archiveel.getText();
-            setArchive(archive);
+            setArchive(archiveel.getText());
         }
 
         // The setters we're calling above will set the metadata dirty flag to true since they're changing the
@@ -764,7 +767,7 @@ public class XWikiAttachment implements Cloneable
             this.attachment_archive.setAttachment(this);
         }
 
-        this.attachment_archive.setArchive(data.getBytes());
+        this.attachment_archive.setArchive(data);
     }
 
     public synchronized Version[] getVersions()
@@ -772,9 +775,9 @@ public class XWikiAttachment implements Cloneable
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}", new Object[] { getFilename(),
-            getDoc().getDocumentReference(), ex.getMessage() });
-            return new Version[] { new Version(this.getVersion()) };
+            LOGGER.warn("Cannot retrieve versions of attachment [{}@{}]: {}", new Object[] {getFilename(),
+            getDoc().getDocumentReference(), ex.getMessage()});
+            return new Version[] {new Version(this.getVersion())};
         }
     }
 
@@ -860,7 +863,7 @@ public class XWikiAttachment implements Cloneable
             } catch (Exception ex) {
                 LOGGER.warn("Failed to load content for attachment [{}@{}]. "
                     + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
-                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage() });
+                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage()});
             }
         }
     }
@@ -874,7 +877,7 @@ public class XWikiAttachment implements Cloneable
             } catch (Exception ex) {
                 LOGGER.warn("Failed to load archive for attachment [{}@{}]. "
                     + "This attachment is broken, please consider re-uploading it. Internal error: {}", new Object[] {
-                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage() });
+                getFilename(), (this.doc != null) ? this.doc.getDocumentReference() : "<unknown>", ex.getMessage()});
             }
         }
 
@@ -887,8 +890,7 @@ public class XWikiAttachment implements Cloneable
             return;
         }
 
-        // XWikiAttachmentArchive no longer uses the byte array passed as it's first parameter making it redundant.
-        loadArchive(context).updateArchive(null, context);
+        loadArchive(context).updateArchive(context);
     }
 
     /**

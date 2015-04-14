@@ -219,6 +219,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
      *
      * @see com.xpn.xwiki.doc.XWikiAttachmentArchive#getArchive()
      */
+    @Override
     public byte[] getArchive()
     {
         return new byte[0];
@@ -263,7 +264,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     }
 
     @Override
-    public void updateArchive(final byte[] data, final XWikiContext context)
+    public void updateArchive(final XWikiContext context)
     {
         this.update();
     }

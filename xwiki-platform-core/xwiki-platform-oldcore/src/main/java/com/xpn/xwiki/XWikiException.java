@@ -332,6 +332,14 @@ public class XWikiException extends Exception
         }
     }
 
+    /**
+     * @since 7.1M1
+     */
+    public XWikiException(String message, Throwable e)
+    {
+        this(MODULE_XWIKI, ERROR_XWIKI_UNKNOWN, message, e);
+    }
+
     public XWikiException(int module, int code, String message, Throwable e)
     {
         this(module, code, message, e, null);

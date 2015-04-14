@@ -1470,11 +1470,11 @@ ${Msz}Mb##
         </span>
   #end
         <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
-          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$escapetool.xml($services.localization.render('platform.livetable.loading'))" title="" />
         </span>
         <span class="controlPagination">
-          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
-          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
+          <a title="$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevTitle'))" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageNextTitle'))" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
@@ -1552,7 +1552,7 @@ ${Msz}Mb##
                 </select>
                 </td>
               #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("$!colprop.size" != '') size="${colprop.size}" title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")]))"#end /></td>
               #elseif("$!colprop.type" == 'hidden')
               #elseif($colname != '_actions' || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>
@@ -1573,8 +1573,8 @@ ${Msz}Mb##
       <td class="xwiki-livetable-pagination">
         <span class="xwiki-livetable-limits"></span>
         <span class="controlPagination">
-          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
-          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
+          <a title="$escapetool.xml($services.localization.render('platform.livetable.paginationPagePrevTitle'))" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$escapetool.xml($services.localization.render('platform.livetable.paginationPageNextTitle'))" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
         </span>
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>

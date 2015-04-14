@@ -249,8 +249,7 @@ public class XWikiAttachmentArchive implements Cloneable
         try {
             this.attachment.incrementVersion();
             this.attachment.setDate(new Date());
-            final String sdata = this.attachment.toStringXML(true, false, context);
-            final Object[] lines = ToString.stringToArray(sdata);
+            final Object[] lines = ToString.stringToArray(this.attachment.toStringXML(true, false, context));
 
             if (this.archive != null) {
                 this.archive.addRevision(lines, "");

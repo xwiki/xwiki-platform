@@ -95,7 +95,7 @@ public class WikiReader
         read(stream, filter, proxyFilter);
 
         // Close last space
-        if (this.documentReader.getCurrentSpace() != null) {
+        if (this.documentReader.isSentBeginWikiSpace() && this.documentReader.getCurrentSpace() != null) {
             proxyFilter.endWikiSpace(this.documentReader.getCurrentSpace(),
                 this.documentReader.getCurrentSpaceParameters());
         }

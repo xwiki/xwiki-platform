@@ -123,8 +123,7 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
             throw new FilterException("Failed to read XAR XML document", e);
         }
 
-        // Close last space
-        if (documentReader.getCurrentSpace() != null) {
+        if (documentReader.isSentBeginWikiSpace() && documentReader.getCurrentSpace() != null) {
             proxyFilter.endWikiSpace(documentReader.getCurrentSpace(), documentReader.getCurrentSpaceParameters());
         }
     }

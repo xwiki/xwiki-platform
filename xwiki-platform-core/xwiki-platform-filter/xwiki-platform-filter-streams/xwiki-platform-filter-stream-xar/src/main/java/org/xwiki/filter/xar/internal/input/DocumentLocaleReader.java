@@ -117,6 +117,11 @@ public class DocumentLocaleReader extends AbstractReader
         return this.currentSpace;
     }
 
+    public boolean isSentBeginWikiSpace()
+    {
+        return this.sentBeginWikiSpace;
+    }
+
     public FilterEventParameters getCurrentSpaceParameters()
     {
         return this.currentSpaceParameters;

@@ -146,11 +146,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         private boolean disposed;
 
         /**
-         * True if this entry is a user. 
-         */
-        private boolean isUser = false;
-
-        /**
          * Create a new cache entry for a security rule, linking it to its parent.
          * @param entry the security rule entry to cache.
          * @throws ParentEntryEvictedException if the parent required is no more available in the cache.
@@ -264,7 +259,6 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             throws ParentEntryEvictedException
         {
             this.entry = entry;
-            this.isUser = true;
             int parentSize = groups.size() + ((parentReference == null) ? 0 : 1);
             if (parentSize > 0) {
                 this.parents = new ArrayList<SecurityCacheEntry>(parentSize);
@@ -316,30 +310,26 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          * @param groups the groups to be added to this entry, if null or empty nothing will be done.
          * @throws ParentEntryEvictedException if one of the groups has been evicted from the cache.
          */
-        void updateParentGroups(Collection<GroupSecurityReference> groups)
+        boolean updateParentGroups(Collection<GroupSecurityReference> groups)
             throws ParentEntryEvictedException
         {            
-            if (isUser || !(entry instanceof SecurityRuleEntry)) {
-                return;
+            if (isUser() || !(entry instanceof SecurityRuleEntry)) {
+                return false;
             }
 
-            // Since we have parent groups, the entry is a user and her ancestry is fully loaded.
-            isUser = true;
-            
-            if (groups == null || groups.isEmpty()) {
-                // No group or not an appropriate entry, do nothing.
-                return;
+            if (groups != null && !groups.isEmpty()) {
+                if (this.parents == null) {
+                    this.parents = new ArrayList<SecurityCacheEntry>(groups.size());
+                    addParentGroups(groups, null);
+                } else {
+                    SecurityCacheEntry parent = this.parents.iterator().next();
+                    this.parents = new ArrayList<SecurityCacheEntry>(groups.size() + 1);
+                    this.parents.add(parent);
+                    addParentGroups(groups, parent.entry.getReference());
+                }
             }
 
-            if (this.parents == null) {
-                this.parents = new ArrayList<SecurityCacheEntry>(groups.size());
-                addParentGroups(groups, null);
-            } else {
-                SecurityCacheEntry parent = this.parents.iterator().next();
-                this.parents = new ArrayList<SecurityCacheEntry>(groups.size() + 1);
-                this.parents.add(parent);
-                addParentGroups(groups, parent.entry.getReference());
-            }
+            return true;
         }
 
         /**
@@ -445,7 +435,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
          */
         public boolean isUser()
         {
-            return isUser;
+            return entry.getReference() instanceof UserSecurityReference;
         }
     }
 
@@ -592,11 +582,13 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread have inserted an entry which is different from this entry!
-                throw new ConflictingInsertionException();               
+                throw new ConflictingInsertionException();
             }
-            // Another thread have already inserted this entry, or it is a user/group that may be incomplete
-            // TODO: if oldEntry.isUser, compare the parents
-            oldEntry.updateParentGroups(groups);
+            // If the user/group has been completed
+            if (oldEntry.updateParentGroups(groups)) {
+                // Upgrade it to a user/group entry
+                oldEntry.entry = entry;
+            }
             
             return true;
         }
@@ -934,7 +926,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
             
             // Add the parent group (if we have not already seen it)
             SecurityReference parentRef = parent.getEntry().getReference();
-            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference)parentRef)) {
+            if (parentRef instanceof GroupSecurityReference && groups.add((GroupSecurityReference) parentRef)) {
                 entriesToExplore.add(parent);
             }
         }

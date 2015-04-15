@@ -189,7 +189,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
         // Guests should not have PR
-        sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", XWikiConstants.GUEST_USER));
+        sdoc.setContentAuthorReference(null);
         Assert.assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
         Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
 

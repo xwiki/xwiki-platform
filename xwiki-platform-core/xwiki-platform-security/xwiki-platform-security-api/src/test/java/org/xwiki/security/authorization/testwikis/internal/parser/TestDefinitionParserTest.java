@@ -61,7 +61,7 @@ import static org.junit.Assert.assertThat;
  */
 @ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
     DefaultEntityReferenceValueProvider.class, DefaultModelConfiguration.class})
-public class TestDefinitionTestParser
+public class TestDefinitionParserTest
 {
     @Rule
     public final ComponentManagerRule componentManager = new ComponentManagerRule();
@@ -111,7 +111,7 @@ public class TestDefinitionTestParser
 
         Collection<TestAccessRule> rules = mainwiki.getAccessRules();
 
-        assertThat("There must be 22 access rules on main wiki", rules.size(), equalTo(22));
+        assertThat("There must be 24 access rules on main wiki", rules.size(), equalTo(24));
 
         List<DocumentReference> userRefs = new ArrayList<DocumentReference>();
         List<Right> rights = new ArrayList<Right>();

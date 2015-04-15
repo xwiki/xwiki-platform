@@ -211,8 +211,21 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         }
         
         // Otherwise we have to load the entry
-        groups = new HashSet<>();
-        
+        groups = new HashSet<GroupSecurityReference>();
+
+        // Public access could not appear in any group, no need to load it carefully, just optimized here
+        if (user.getOriginalReference() == null) {
+            if (securityCache.get(user) == null) {
+                // Main wiki entry should be loaded
+                getRules(user);
+            }
+            if (entityWiki != null) {
+                // Ensure there is a Public shadow in the subwiki of the checked entity
+                securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+            }
+            return groups;
+        }
+
         // If the user is global and we are looking for rules inside a subwiki
         if (entityWiki != null) {
             // Optim: We know we will have to load at least the rules concerning the local groups of the user, but we 
@@ -295,14 +308,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // Store a shadow entry for a global user/group involved in a local wiki
             securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), userGroups);
         } else {
-            SecurityRuleEntry entry = securityCache.get(user);
-            if (entry == null) {
-                // If not yet in the cache, retrieve associated rules store the user/group in the cache
-                loadUserEntry(user, userGroups);
-            } else {
-                // Else, ensure that the entry has all the groups appropriately linked to it in the cache
-                securityCache.add(entry, userGroups);
-            }
+            // Store or upgrade document entry into a user/group entry in the cache
+            // While the document rules could be already loaded in the cache, even if these rules should stay the same,
+            // we need to reload them as a user/group to have the security rules reference properly typed and
+            // recognized by the cache as a user. (cfr. XWIKI-12016)
+            loadUserEntry(user, userGroups);
         }
     }
 

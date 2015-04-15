@@ -19,8 +19,6 @@
  */
 package org.xwiki.filter.xar;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -48,11 +46,15 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.output.StringWriterOutputTarget;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.AllLogRule;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+
+import static org.junit.Assert.assertTrue;
 
 @AllComponents
 public class XARInputFilterStreamTest
@@ -116,6 +118,22 @@ public class XARInputFilterStreamTest
         xarProperties.setEntities(entities);
 
         assertXML("testSkipFirstDocument", xarProperties);
+
+        assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
+    }
+
+    @Test
+    public void testSkipLastSpace() throws FilterException, IOException, ComponentLookupException
+    {
+        XARInputProperties xarProperties = new XARInputProperties();
+
+        xarProperties.setSource(new DefaultFileInputSource(extensionPackager.getExtensionFile(new ExtensionId("xar1",
+            "1.0"))));
+        EntityReferenceSet entities = new EntityReferenceSet();
+        entities.excludes(new EntityReference("space2", EntityType.SPACE));
+        xarProperties.setEntities(entities);
+
+        assertXML("testSkipLastSpace", xarProperties);
 
         assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
     }

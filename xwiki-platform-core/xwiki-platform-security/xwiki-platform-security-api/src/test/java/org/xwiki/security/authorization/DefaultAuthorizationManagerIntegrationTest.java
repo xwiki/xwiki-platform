@@ -65,6 +65,7 @@ import org.xwiki.test.LogRule;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -636,10 +637,50 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         // a userA entry is in the cache
         assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), notNullValue());
 
+        assertThat("UserA should be considered as a user by the cache, else the group cache will not be used",
+            securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))).getReference(),
+            instanceOf(UserSecurityReference.class));
+
         // remove group A from the cache => this should also remove all members of groupA
         securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
 
         // check that userA was seen as a member of groupA by the cache => implies document userA was considered as a 
+        // user (and not simply a document) after the second check.
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
+    }
+
+    // Test XWIKI-12016
+    @Test
+    public void testGroupCacheLoadingUserAfterGroupDoc() throws Exception
+    {
+        initialiseWikiMock("loadUserAfterUserDoc");
+
+        // Check access to the groupA document => introduce the groupA as a simple document into the cache
+        authorizationManager.checkAccess(VIEW, getXUser("userB"), getXUser("groupA"));
+
+        // Check access of userA to the userA document => it transform group document into a true group
+        authorizationManager.checkAccess(VIEW, getXUser("userA"), getXUser("userA"));
+
+        // Check access of userA to the userB document => it prove userA is in groupA (from cache) and has access
+        authorizationManager.checkAccess(VIEW, getXUser("userA"), getXUser("userB"));
+
+        SecurityCache securityCache = componentManager.getInstance(SecurityCache.class);
+
+        // a userA entry is in the cache
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), notNullValue());
+
+        assertThat("UserA should be considered as a user by the cache, else the group cache will not be used",
+            securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))).getReference(),
+            instanceOf(UserSecurityReference.class));
+
+        // a userA entry in the cache is know as a user, else the group cache is inactive for her
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))).getReference(),
+            instanceOf(UserSecurityReference.class));
+
+        // remove group A from the cache => this should also remove all members of groupA
+        securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
+
+        // check that userA was seen as a member of groupA by the cache => implies document userA was considered as a
         // user (and not simply a document) after the second check.
         assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
     }

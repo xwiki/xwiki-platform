@@ -127,7 +127,5 @@ public class XARInputFilterStreamTest
         xarProperties.setEntities(entities);
 
         assertXML("testSkipLastSpace", xarProperties);
-
-        assertTrue(this.allLogRule.getMarker(0).contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED));
     }
 }

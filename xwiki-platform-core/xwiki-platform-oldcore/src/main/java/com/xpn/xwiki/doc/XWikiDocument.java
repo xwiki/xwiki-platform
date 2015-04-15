@@ -80,7 +80,6 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
@@ -7476,16 +7475,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private XWikiContext getXWikiContext()
     {
-        Execution execution = Utils.getComponent(Execution.class);
+        Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
 
-        ExecutionContext ec = execution.getContext();
-
-        XWikiContext context = null;
-        if (ec != null) {
-            context = (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        if (xcontextProvider != null) {
+            return xcontextProvider.get();
         }
 
-        return context;
+        return null;
     }
 
     /**

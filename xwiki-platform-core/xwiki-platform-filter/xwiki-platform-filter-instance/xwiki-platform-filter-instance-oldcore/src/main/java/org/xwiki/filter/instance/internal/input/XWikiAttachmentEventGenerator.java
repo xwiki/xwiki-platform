@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -76,6 +77,10 @@ public class XWikiAttachmentEventGenerator extends
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());
+
+        if (StringUtils.isNotEmpty(attachment.getMimeType())) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_MIMETYPE, attachment.getMimeType());
+        }
 
         if (properties.isWithJRCSRevisions()) {
             try {

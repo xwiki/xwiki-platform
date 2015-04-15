@@ -209,6 +209,9 @@ public class UploadAction extends XWikiAction
             comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params);
         }
 
+        // Calculate and store mime type
+        attachment.resetMimeType(context);
+
         // Save the document.
         try {
             context.getWiki().saveDocument(doc, comment, context);

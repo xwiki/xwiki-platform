@@ -43,6 +43,12 @@ public interface WikiAttachmentFilter
 
     /**
      * @type {@link String}
+     * @since 7.1M1
+     */
+    String PARAMETER_MIMETYPE = "mimetype";
+
+    /**
+     * @type {@link String}
      */
     String PARAMETER_CONTENT_TYPE = "content_type";
 

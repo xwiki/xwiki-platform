@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.inject.Provider;
+
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -109,6 +111,8 @@ public class XWikiAttachment implements Cloneable
     private XWikiDocument doc;
 
     private int filesize;
+
+    private String mimeType;
 
     private String filename;
 
@@ -512,8 +516,14 @@ public class XWikiAttachment implements Cloneable
         wr.write(el);
 
         el = new DOMElement("filesize");
-        el.addText("" + getFilesize());
+        el.addText(String.valueOf(getFilesize()));
         wr.write(el);
+
+        if (StringUtils.isNotEmpty(getMimeType())) {
+            el = new DOMElement("mimetype");
+            el.addText(getMimeType());
+            wr.write(el);
+        }
 
         el = new DOMElement("author");
         el.addText(getAuthor());
@@ -521,7 +531,7 @@ public class XWikiAttachment implements Cloneable
 
         long d = getDate().getTime();
         el = new DOMElement("date");
-        el.addText("" + d);
+        el.addText(String.valueOf(d));
         wr.write(el);
 
         el = new DOMElement("version");
@@ -606,18 +616,18 @@ public class XWikiAttachment implements Cloneable
 
     public void fromXML(Element docel) throws XWikiException
     {
-        setFilename(docel.element("filename").getText());
-        setFilesize(Integer.parseInt(docel.element("filesize").getText()));
-        setAuthor(docel.element("author").getText());
-        setVersion(docel.element("version").getText());
-        setComment(docel.element("comment").getText());
+        setFilename(getElementText(docel, "filename"));
+        setFilesize(Integer.parseInt(getElementText(docel, "filesize")));
+        setMimeType(getElementText(docel, "mimetype"));
+        setAuthor(getElementText(docel, "author"));
+        setVersion(getElementText(docel, "version"));
+        setComment(getElementText(docel, "comment"));
 
-        String sdate = docel.element("date").getText();
+        String sdate = getElementText(docel, "date");
         setDate(new Date(Long.parseLong(sdate)));
 
-        Element contentel = docel.element("content");
-        if (contentel != null) {
-            String base64content = contentel.getText();
+        String base64content = getElementText(docel, "content");
+        if (base64content != null) {
             try (Base64InputStream decoded =
                 new Base64InputStream(new ReaderInputStream(new StringReader(base64content)))) {
                 setContent(decoded);
@@ -625,15 +635,20 @@ public class XWikiAttachment implements Cloneable
                 throw new XWikiException("Failed to read base 64 encoded atachment content", e);
             }
         }
-        Element archiveel = docel.element("versions");
-        if (archiveel != null) {
-            setArchive(archiveel.getText());
-        }
+
+        setArchive(getElementText(docel, "versions"));
 
         // The setters we're calling above will set the metadata dirty flag to true since they're changing the
         // attachment's identity. However since this method is about loading the attachment from XML it shouldn't be
         // considered as dirty.
         setMetaDataDirty(false);
+    }
+
+    private String getElementText(Element element, String name)
+    {
+        Element child = element.element(name);
+
+        return child != null ? child.getText() : null;
     }
 
     public XWikiAttachmentContent getAttachment_content()
@@ -894,19 +909,61 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Detects the media type of this attachment's content using {@link Tika}. We first try to determine the media type
-     * based on the file name extension and if the extension is unknown we try to determine the media type by reading
-     * the first bytes of the attachment content.
+     * Return the stored media type. If none is stored try to detects the media type of this attachment's content using
+     * {@link Tika}. We first try to determine the media type based on the file name extension and if the extension is
+     * unknown we try to determine the media type by reading the first bytes of the attachment content.
      *
-     * @param context the XWiki context
+     * @param xcontext the XWiki context
      * @return the media type of this attachment's content
      */
-    public String getMimeType(XWikiContext context)
+    public String getMimeType(XWikiContext xcontext)
+    {
+        String type = getMimeType();
+
+        if (StringUtils.isEmpty(type)) {
+            type = extractMimeType(xcontext);
+        }
+
+        return type;
+    }
+
+    /**
+     * Return the stored media type.
+     * 
+     * @return the media type of this attachment's content
+     * @since 7.1M1
+     */
+    public String getMimeType()
+    {
+        return this.mimeType;
+    }
+
+    /**
+     * @param mimeType the explicit mime type of the file
+     * @since 7.1M1
+     */
+    public void setMimeType(String mimeType)
+    {
+        this.mimeType = mimeType;
+    }
+
+    /**
+     * Extract the mime type from the file name and content and remember it to be stored.
+     * 
+     * @param xcontext the {@link XWikiContext} use to load the content if it's not already loaded
+     * @since 7.1M1
+     */
+    public void resetMimeType(XWikiContext xcontext)
+    {
+        this.mimeType = extractMimeType(xcontext);
+    }
+
+    private String extractMimeType(XWikiContext xcontext)
     {
         // We try name-based detection and then fall back on content-based detection. We don't do this in a single step,
         // by passing both the content and the file name to Tika, because the default detector looks at the content
         // first which can be an issue for large attachments. Our approach is less accurate but has better performance.
-        String mediaType = TIKA.detect(getFilename());
+        String mediaType = getFilename() != null ? TIKA.detect(getFilename()) : MediaType.OCTET_STREAM.toString();
         if (MediaType.OCTET_STREAM.toString().equals(mediaType)) {
             try {
                 // Content-based detection is more accurate but it may require loading the attachment content in memory
@@ -919,11 +976,12 @@ public class XWikiAttachment implements Cloneable
                 // can happen for small files if AutoCloseInputStream is used, which supports the mark and reset methods
                 // so Tika uses it directly. In this case, the input stream is automatically closed after the first
                 // detector reads it so the next detector fails to read it.
-                mediaType = TIKA.detect(new BufferedInputStream(getContentInputStream(context)));
+                mediaType = TIKA.detect(new BufferedInputStream(getContentInputStream(xcontext)));
             } catch (Exception e) {
                 LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type.", getReference());
             }
         }
+
         return mediaType;
     }
 
@@ -1056,5 +1114,16 @@ public class XWikiAttachment implements Cloneable
         }
 
         return userReference;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        Provider<XWikiContext> xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+
+        if (xcontextProvider != null) {
+            return xcontextProvider.get();
+        }
+
+        return null;
     }
 }

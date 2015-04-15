@@ -357,6 +357,10 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
                 (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
         }
 
+        if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE)) {
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_MIMETYPE,
+                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
+        }
         if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR)) {
             this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
                 (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));

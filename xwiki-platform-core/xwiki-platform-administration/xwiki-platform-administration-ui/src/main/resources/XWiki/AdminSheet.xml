@@ -107,6 +107,24 @@
   }
 ])
 
+#**
+ * Returns whether or not the requested section exists
+ *
+ * Example of use:
+ * #if("#admin_hasSection('sectionId')" != '')
+ *   OK
+ * #end
+ *#
+#macro (admin_hasSection $sectionId)
+  #foreach($category in $adminMenu)
+    #foreach($section in $category.children)
+      #if($section.id == $sectionId)
+        OK
+      #end
+    #end
+  #end
+#end
+
 ##
 ## Fill in the list of custom applications to configure
 ##
@@ -134,9 +152,13 @@
   #set ($crtCategoryId = '')
 #end
 
-#if ($crtSectionId != '')
-  #set ($crtItemId = $crtSectionId)
-#elseif ($crtCategoryId != '')
+#if ("$!crtSectionId" != '')
+  #if("#admin_hasSection($crtSectionId)" != '')
+    #set ($crtItemId = $crtSectionId)
+  #else
+    #set($crtSectionId = $NULL)
+  #end
+#elseif ("$!crtCategoryId" != '')
   #set ($crtItemId = $adminMenu.get($crtCategoryId).id)
 #end
 #set ($crtSection = $NULL)
@@ -285,20 +307,20 @@
  *#
 #macro (admin_spaceSwitch)
 {{html clean="false"}}
-  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action, $request.queryString)"&gt;
+  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action)"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
       &lt;select id="goto-select" name="target"&gt;
         #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
           &lt;optgroup label="$services.localization.render('admin.gotoglobaladministration')"&gt;
-            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin')" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$services.localization.render('admin.globaladministration')&lt;/option&gt;
+            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$services.localization.render('admin.globaladministration')&lt;/option&gt;
           &lt;/optgroup&gt;
         #end
         &lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
         #foreach($spaceitem in $xwiki.spaces)
           #set ($spacePreferencesDocument = $services.model.createDocumentReference('', $spaceitem, 'WebPreferences'))
           #if ($xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocument, 'default')))
-            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', '')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
+            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
           #end
         #end
         &lt;/optgroup&gt;
@@ -334,11 +356,11 @@
     #end
   #end
   $xwiki.ssx.use('XWiki.AdminSheet', $parameterMap)##
-  #if ($crtSectionId != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0 &amp;&amp; $xwiki.exists($crtSectionId))
+  #if ("$!crtSectionId" != '' &amp;&amp; $crtSectionId.indexOf('.') &gt; 0 &amp;&amp; $xwiki.exists($crtSectionId))
     #set ($sectionName = $xwiki.getDocument($crtSectionId).getDisplayTitle())
   #elseif ($crtSectionId != '' &amp;&amp; $services.localization.get("admin.${crtSectionId.toLowerCase()}"))
     #set ($sectionName = $services.localization.render("admin.${crtSectionId.toLowerCase()}"))
-  #elseif ($crtSectionId != '')
+  #elseif ("$!crtSectionId" != '')
     #set ($sectionName = $crtSectionId)
   #elseif ($crtCategoryId != '')
     #set ($sectionName = $services.localization.render("admin.${crtItemId}"))

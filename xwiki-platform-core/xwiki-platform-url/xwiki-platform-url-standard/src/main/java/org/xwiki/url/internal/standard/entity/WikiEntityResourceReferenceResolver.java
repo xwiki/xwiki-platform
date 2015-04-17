@@ -39,13 +39,13 @@ public class WikiEntityResourceReferenceResolver extends AbstractEntityResourceR
     private WikiReferenceExtractor wikiExtractor;
 
     @Override
-    protected WikiReference extractWikiReference(ExtendedURL url)
+    protected WikiReference extractWikiReference(ExtendedURL extendedURL)
     {
-        WikiReference wikiReference = this.wikiExtractor.extract(url);
+        WikiReference wikiReference = this.wikiExtractor.extract(extendedURL);
 
         // Remove the first path segment since it contains the wiki name and we need the first segment to be the
         // action name
-        url.getSegments().remove(0);
+        extendedURL.getSegments().remove(0);
 
         return wikiReference;
     }

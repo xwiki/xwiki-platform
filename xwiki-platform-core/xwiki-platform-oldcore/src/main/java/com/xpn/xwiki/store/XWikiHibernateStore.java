@@ -40,6 +40,7 @@ import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -61,7 +62,6 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -73,7 +73,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.store.UnexpectedException;
 
 import com.xpn.xwiki.XWiki;
@@ -84,6 +83,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -109,7 +109,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.migration.MigrationRequiredException;
 import com.xpn.xwiki.util.Util;
@@ -171,6 +170,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Inject
+    private Provider<OldRendering> oldRenderingProvider;
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
@@ -1992,14 +1994,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // necessary to blank links from doc
             context.remove("links");
 
-            if (doc.getSyntax().equals(Syntax.XWIKI_1_0)) {
-                saveLinks10(doc, context, session);
-            } else {
-                // When not in 1.0 content get WikiLinks directly from XDOM
-                Set<XWikiLink> links = doc.getUniqueWikiLinkedPages(context);
-                for (XWikiLink wikiLink : links) {
-                    session.save(wikiLink);
-                }
+            // Extract and save links
+            Set<XWikiLink> links = this.oldRenderingProvider.get().extractLinks(doc, context);
+            for (XWikiLink wikiLink : links) {
+                session.save(wikiLink);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -2010,50 +2008,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     endTransaction(context, false);
                 }
             } catch (Exception e) {
-            }
-        }
-    }
-
-    private void saveLinks10(XWikiDocument doc, XWikiContext context, Session session) throws XWikiException
-    {
-        // call to RenderEngine and converting the list of links into a list of backlinks
-        // Note: We need to set the passed document as the current document as the "wiki"
-        // renderer uses context.getDoc().getSpace() to find out the space name if no
-        // space is specified in the link. A better implementation would be to pass
-        // explicitely the current space to the render() method.
-        ExecutionContext econtext = getExecution().getContext();
-
-        List<String> links;
-        try {
-            // Create new clean context to avoid wiki manager plugin requests in same session
-            XWikiContext renderContext = context.clone();
-
-            renderContext.setDoc(doc);
-            econtext.setProperty("xwikicontext", renderContext);
-
-            setSession(null, renderContext);
-            setTransaction(null, renderContext);
-
-            XWikiRenderer renderer = renderContext.getWiki().getRenderingEngine().getRenderer("wiki");
-            renderer.render(doc.getContent(), doc, doc, renderContext);
-
-            links = (List<String>) renderContext.get("links");
-        } catch (Exception e) {
-            // If the rendering fails lets forget backlinks without errors
-            links = Collections.emptyList();
-        } finally {
-            econtext.setProperty("xwikicontext", context);
-        }
-
-        if (links != null) {
-            for (String reference : links) {
-                // XWikiLink is the object declared in the Hibernate mapping
-                XWikiLink link = new XWikiLink();
-                link.setDocId(doc.getId());
-                link.setFullName(doc.getFullName());
-                link.setLink(reference);
-
-                session.save(link);
             }
         }
     }

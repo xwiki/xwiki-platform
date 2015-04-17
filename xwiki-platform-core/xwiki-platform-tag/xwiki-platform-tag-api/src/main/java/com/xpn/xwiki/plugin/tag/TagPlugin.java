@@ -318,7 +318,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -374,7 +374,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
         if (added) {
             setDocumentTags(document, documentTags, context);
-            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, Collections.singletonList(tags));
+            String comment = localizePlainOrKey(DOC_COMMENT_TAG_ADDED, tags);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -444,7 +444,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             setDocumentTags(document, tags, context);
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
-            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
+            String comment = localizePlainOrKey("plugin.tag.editcomment.removed", commentArgs);
 
             // Since we're changing the document we need to set the new author
             document.setAuthorReference(context.getUserReference());
@@ -478,7 +478,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         List<String> commentArgs = new ArrayList<String>();
         commentArgs.add(tag);
         commentArgs.add(newTag);
-        String comment = context.getMessageTool().get("plugin.tag.editcomment.renamed", commentArgs);
+        String comment = localizePlainOrKey("plugin.tag.editcomment.renamed", commentArgs);
 
         for (String docName : docNamesToProcess) {
             XWikiDocument doc = context.getWiki().getDocument(docName, context);

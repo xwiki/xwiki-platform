@@ -308,13 +308,25 @@ public class WatchListScriptService implements ScriptService
     }
 
     /**
-     * Get the list of available notifiers (list of document full names, example: "Scheduler.WatchListHourlyNotifier").
+     * Get the list of available notification intervals IDs. This can contain both IDs and document full names, example:
+     * ("realtime", "Scheduler.WatchListHourlyNotifier", etc.).
      *
-     * @return the list of available notifiers. An empty list may also be returned in case of error.
+     * @return the list of available notification intervals. An empty list may also be returned in case of error.
      */
-    public Collection<String> getNotifiers()
+    public List<String> getIntervals()
     {
-        return watchlist.getStore().getJobDocumentNames();
+        return watchlist.getStore().getIntervals();
+    }
+
+    /**
+     * Get the notification interval preference of a user.
+     * 
+     * @param user the user to check
+     * @return the notification interval ID, which can be either an ID or a scheduler job document name
+     */
+    public String getInterval(String user)
+    {
+        return watchlist.getStore().getInterval(user);
     }
 
     /**

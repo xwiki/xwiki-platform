@@ -184,6 +184,15 @@ public class WikiSkinUtils
 
         return null;
     }
+    
+    public String getSkinProperty(String skin, String property)
+    {
+        BaseObject obj = getSkinObject(skin);
+        if (obj != null) {
+            return obj.getStringValue(property);
+        }
+        return null;
+    }
 
     public String getParentId(String id)
     {

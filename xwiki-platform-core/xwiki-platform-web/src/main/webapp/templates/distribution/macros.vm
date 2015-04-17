@@ -20,7 +20,7 @@
 #end
 
 #macro (displayUpgradeQuestion $documentCount)
-  <form action="" class="xform upgradeQuestion hidden">
+  <form action="$xwiki.relativeRequestURL" class="xform upgradeQuestion hidden">
     <div class="xHint">$escapetool.xml($services.localization.render(
       'platform.extension.distributionWizard.uiStepPreviousUIUpgradeQuestion', [$documentCount]))</div>
     <p class="buttons">
@@ -37,7 +37,7 @@
 #end
 
 #macro (displayPreviousUIForm $wiki $recommendedUIExtension)
-  <form action="" method="post" class="xform previousUI">
+  <form action="$xwiki.relativeRequestURL" method="post" class="xform previousUI">
     <div class="xHint">$escapetool.xml($services.localization.render(
       'platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
     <div class="hidden">

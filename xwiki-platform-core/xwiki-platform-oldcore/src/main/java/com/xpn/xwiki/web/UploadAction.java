@@ -204,10 +204,13 @@ public class UploadAction extends XWikiAction
         params.add(filename);
         params.add(doc.getAttachmentRevisionURL(filename, nextRev, context));
         if (attachment.isImage(context)) {
-            comment = context.getMessageTool().get("core.comment.uploadImageComment", params);
+            comment = localizePlainOrKey("core.comment.uploadImageComment", params);
         } else {
-            comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+            comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params);
         }
+
+        // Calculate and store mime type
+        attachment.resetMimeType(context);
 
         // Save the document.
         try {
@@ -279,7 +282,7 @@ public class UploadAction extends XWikiAction
         if (ajax) {
             try {
                 context.getResponse().getOutputStream()
-                    .println("error: " + context.getMessageTool().get((String) context.get("message")));
+                    .println("error: " + localizePlainOrKey((String) context.get("message")));
             } catch (IOException ex) {
                 LOGGER.error("Unhandled exception writing output:", ex);
             }

@@ -33,11 +33,14 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.extension.script.ExtensionManagerScriptService;
+import org.xwiki.extension.version.Version;
+import org.xwiki.extension.xar.internal.job.DiffXarJob;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -84,7 +87,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
             return null;
         }
 
-        String namespace = "wiki:" + wiki;
+        String namespace = getWikiNamespace(wiki);
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, id, namespace));
@@ -109,6 +112,42 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
         }
 
         return job;
+    }
+
+    /**
+     * Computes the differences, in unified format, between the documents of an installed XAR extension and the document
+     * from the wiki.
+     * 
+     * @param feature the identifier of a XAR extension (or one of its features)
+     * @param wiki the wiki where the XAR extension is installed
+     * @return the {@link Job} object which can be used to monitor the progress while the differences are being
+     *         computed, or {@code null} in case of failure
+     * @since 7.0RC1
+     */
+    @Unstable
+    public Job diff(String feature, String wiki)
+    {
+        setError(null);
+
+        InstallRequest installRequest = new InstallRequest();
+        installRequest.addExtension(new ExtensionId(feature, (Version) null));
+        if (StringUtils.isNotBlank(wiki)) {
+            installRequest.addNamespace(getWikiNamespace(wiki));
+        }
+        installRequest.setId(getJobId(ExtensionManagerScriptService.EXTENSIONACTION_JOBID_PREFIX, feature,
+            installRequest.hasNamespaces() ? installRequest.getNamespaces().iterator().next() : null));
+
+        try {
+            return this.jobExecutor.execute(DiffXarJob.JOB_TYPE, installRequest);
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    private String getWikiNamespace(String wiki)
+    {
+        return "wiki:" + wiki;
     }
 
     /**

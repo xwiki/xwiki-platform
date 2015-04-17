@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import org.slf4j.Logger;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.Skin;
 
 /**
+ * Represents a skin stored in a wiki document.
+ *
  * @version $Id$
  * @since 6.4M1
  */
@@ -30,9 +34,10 @@ public class WikiSkin extends AbstractSkin
 {
     private WikiSkinUtils utils;
 
-    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration, WikiSkinUtils utils)
+    public WikiSkin(String id, InternalSkinManager skinManager, InternalSkinConfiguration configuration, 
+            WikiSkinUtils utils, Logger logger, SyntaxFactory syntaxFactory)
     {
-        super(id, skinManager, configuration);
+        super(id, skinManager, configuration, logger, syntaxFactory);
         this.utils = utils;
     }
 
@@ -46,5 +51,11 @@ public class WikiSkin extends AbstractSkin
     public Resource<?> getLocalResource(String resourceName)
     {
         return this.utils.getResource(resourceName, this);
+    }
+
+    @Override
+    public String getOutputSyntaxString()
+    {
+        return utils.getSkinProperty(id, "outputSyntax");
     }
 }

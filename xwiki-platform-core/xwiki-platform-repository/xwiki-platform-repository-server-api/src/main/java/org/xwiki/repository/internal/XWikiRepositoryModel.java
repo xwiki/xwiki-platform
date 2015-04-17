@@ -146,7 +146,7 @@ public class XWikiRepositoryModel
         public SolrField(String name, String type, Float boostValue)
         {
             this.name = toExtensionClassSolrPropertyName(name, type);
-            this.boostName = toExtensionClassSolrPropertyName(name);
+            this.boostName = type != null ? toExtensionClassSolrPropertyName(name) : null;
             this.boostValue = boostValue;
         }
     }
@@ -159,7 +159,9 @@ public class XWikiRepositoryModel
         SOLR_FIELDS.put(Extension.FIELD_TYPE, new SolrField(PROP_EXTENSION_TYPE, 8.0f));
         SOLR_FIELDS.put(Extension.FIELD_CATEGORY, new SolrField(PROP_EXTENSION_CATEGORY, 7.0f));
         SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new SolrField(PROP_EXTENSION_SUMMARY, 6.0f));
-        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(PROP_EXTENSION_DESCRIPTION, 5.0f));
+
+        // We only search in the description but we don't retrieve it (because it's not stored in a stable field) 
+        SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(PROP_EXTENSION_DESCRIPTION, null, 5.0f));
 
         // Not very interesting for fulltext search
         SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new SolrField(PROP_EXTENSION_AUTHORS, null));

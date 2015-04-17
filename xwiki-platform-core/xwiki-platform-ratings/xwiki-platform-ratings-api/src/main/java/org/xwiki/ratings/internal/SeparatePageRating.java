@@ -21,6 +21,7 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
@@ -32,6 +33,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * @version $Id$
@@ -190,6 +193,9 @@ public class SeparatePageRating implements Rating
     @Override
     public void save() throws RatingsException
     {
+        DocumentReference superadmin =
+            new DocumentReference("xwiki", XWiki.SYSTEM_SPACE, XWikiRightService.SUPERADMIN_USER);
+
         try {
             if (document == null) {
                 throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
@@ -206,7 +212,11 @@ public class SeparatePageRating implements Rating
             // to
             // note a document, which service will only set the rating, so the behavior will be correct.
             document.setContentDirty(false);
-            context.getWiki().saveDocument(getDocument(), context);
+            document.setCreatorReference(superadmin);
+            document.setAuthorReference(superadmin);
+            ContextualLocalizationManager localization = Utils.getComponent(ContextualLocalizationManager.class);
+            context.getWiki().saveDocument(getDocument(), localization.getTranslationPlain("rating.saveComment"), true,
+                context);
         } catch (XWikiException e) {
             throw new RatingsException(e);
         }
@@ -290,6 +300,7 @@ public class SeparatePageRating implements Rating
             XWiki xwiki = context.getWiki();
             XWikiDocument doc = xwiki.getDocument(pageRef, context);
             doc.setParent(parentDocName);
+            doc.setHidden(true);
             BaseObject obj = doc.newXObject(RatingsManager.RATINGS_CLASSREFERENCE, context);
             obj.setStringValue(RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR,
                 ratingsManager.entityReferenceSerializer.serialize(author));

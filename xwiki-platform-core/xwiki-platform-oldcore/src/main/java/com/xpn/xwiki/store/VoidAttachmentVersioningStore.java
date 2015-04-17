@@ -113,11 +113,14 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
             setAttachment(attachment);
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        public void updateArchive(byte[] data, XWikiContext context) throws XWikiException
+        public void updateArchive(final byte[] data, final XWikiContext context) throws XWikiException
+        {
+            updateArchive(context);
+        }
+
+        @Override
+        public void updateArchive(XWikiContext context) throws XWikiException
         {
             getAttachment().incrementVersion();
             getAttachment().setDate(new Date());

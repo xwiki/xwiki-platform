@@ -47,7 +47,9 @@ public class PropDisableAction extends AbstractPropChangeAction
         XWikiDocument doc = context.getDoc();
 
         xclass.disableField(propertyName);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.model.xclass.disableClassProperty.versionSummary",
-            Collections.singletonList(propertyName)), true, context);
+        xwiki.saveDocument(
+            doc,
+            localizePlainOrKey("core.model.xclass.disableClassProperty.versionSummary",
+                Collections.singletonList(propertyName)), true, context);
     }
 }

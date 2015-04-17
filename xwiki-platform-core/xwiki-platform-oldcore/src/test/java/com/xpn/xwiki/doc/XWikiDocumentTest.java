@@ -63,7 +63,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -96,8 +95,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private XWikiDocument translatedDocument;
 
     private Mock mockXWiki;
-
-    private Mock mockXWikiRenderingEngine;
 
     private Mock mockXWikiVersioningStore;
 
@@ -146,8 +143,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki = mock(XWiki.class);
 
-        this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
-
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
 
@@ -162,7 +157,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiRightService = mock(XWikiRightService.class);
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
-        this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
@@ -823,21 +817,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("content not in section\n\n= header 1 =\n\nheader 1 content", content3);
     }
 
-    public void testDisplay10()
-    {
-        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
-
-        assertEquals("string", this.document.display("string", "view", getContext()));
-        assertEquals(
-            "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
-            this.document.display("string", "edit", getContext()));
-
-        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
-            .will(returnValue("area"));
-
-        assertEquals("area", this.document.display("area", "view", getContext()));
-    }
-
     public void testDisplay()
     {
         this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
@@ -869,42 +848,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             this.document.display("string", "edit", getContext()));
 
         assertEquals("<p>area</p>", this.document.display("area", "view", getContext()));
-    }
-
-    public void testDisplay2010()
-    {
-        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
-
-        XWikiDocument doc10 = new XWikiDocument();
-        doc10.setSyntax(Syntax.XWIKI_2_0);
-        getContext().setDoc(doc10);
-
-        assertEquals("string", this.document.display("string", "view", getContext()));
-        assertEquals(
-            "{{html clean=\"false\" wiki=\"false\"}}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{{/html}}",
-            this.document.display("string", "edit", getContext()));
-
-        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
-            .will(returnValue("area"));
-
-        assertEquals("area", this.document.display("area", "view", getContext()));
-    }
-
-    public void testDisplayTemplate10()
-    {
-        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
-
-        getContext().put("isInRenderingEngine", false);
-
-        assertEquals("string", this.document.display("string", "view", getContext()));
-        assertEquals(
-            "<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>",
-            this.document.display("string", "edit", getContext()));
-
-        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING)
-            .will(returnValue("area"));
-
-        assertEquals("area", this.document.display("area", "view", getContext()));
     }
 
     public void testDisplayTemplate20()
@@ -941,29 +884,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"
             + "1.1 object header 2\nobject header 2 content", this.baseObject.getStringValue("puretextarea"));
         assertEquals("xwiki/2.0", this.document.getSyntaxId());
-    }
-
-    public void testGetRenderedContent10() throws XWikiException
-    {
-        this.document.setContent("*bold*");
-        this.document.setSyntax(Syntax.XWIKI_1_0);
-
-        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("*bold*"), ANYTHING, ANYTHING)
-            .will(returnValue("<b>bold</b>"));
-
-        assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
-
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
-        this.translatedDocument.setContent("~italic~");
-        this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
-        this.translatedDocument.setNew(false);
-
-        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
-        this.mockXWiki.stubs().method("getDocument").with(eq(new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())), ANYTHING).will(returnValue(this.translatedDocument));
-        this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("~italic~"), ANYTHING, ANYTHING)
-            .will(returnValue("<i>italic</i>"));
-
-        assertEquals("<i>italic</i>", this.document.getRenderedContent(getContext()));
     }
 
     public void testGetRenderedContent() throws XWikiException

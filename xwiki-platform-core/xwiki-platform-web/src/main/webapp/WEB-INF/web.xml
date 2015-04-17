@@ -34,6 +34,17 @@
     <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
   </context-param>
 
+  <!-- Filter in charge of deciding whether to call the ResourceReferenceHandler Servlet (currently used to handle new
+       Resource Types registered as Components) or instead to continue with the rest of the filters and mappings below.
+       In the future, the goal is to move more and more Resource handling using the ResourceReferenceHandler Servlet and
+       remove the Struts Action Servlet at some point.
+
+       Note: it is important that this filter be the first filter declared (and thus executed). -->
+  <filter>
+    <filter-name>RoutingFilter</filter-name>
+    <filter-class>org.xwiki.resource.servlet.RoutingFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -131,6 +142,12 @@
       <param-value>*</param-value>
     </init-param>
   </filter>
+
+  <!-- The Routing Fitler decides how to route all requests and thus must be mapped to handle all incoming requests -->
+  <filter-mapping>
+    <filter-name>RoutingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
@@ -234,6 +251,12 @@
   <listener>
     <listener-class>org.xwiki.container.servlet.SetThreadNameServletRequestListener</listener-class>
   </listener>
+
+  <!-- Handles Resource Types registered as Components (e.g. WebJars) -->
+  <servlet>
+    <servlet-name>resourceReferenceHandler</servlet-name>
+    <servlet-class>org.xwiki.resource.servlet.ResourceReferenceHandlerServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>action</servlet-name>

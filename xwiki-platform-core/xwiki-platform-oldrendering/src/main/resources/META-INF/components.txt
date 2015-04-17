@@ -1,0 +1,11 @@
+com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
+com.xpn.xwiki.render.DefaultXWikiRenderingEngine
+com.xpn.xwiki.render.XWikiJSPRenderer
+com.xpn.xwiki.render.XWikiMacrosMappingRenderer
+com.xpn.xwiki.render.XWikiPluginRenderer
+com.xpn.xwiki.render.XWikiRadeoxRenderer
+com.xpn.xwiki.render.XWikiVelocityRenderer
+com.xpn.xwiki.render.XWikiWikiBaseRenderer
+com.xpn.xwiki.render.groovy.XWikiGroovyRenderer
+com.xpn.xwiki.internal.render.RenderingEngineInitializerListener
+500:com.xpn.xwiki.internal.render.XWiki10OldRendering

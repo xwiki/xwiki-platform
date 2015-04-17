@@ -242,11 +242,14 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
 
         this.classSheetDefaultContent =
             "## you can modify this page to customize the presentation of your object\n\n"
-                + "1 Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName + "\").xWikiClass)\n"
-                + "\n" + "<dl>\n" + "  #foreach($prop in $class.properties)\n" + "    <dt> ${prop.prettyName} </dt>\n"
-                + "    <dd>$doc.display($prop.getName())</dd>\n  #end\n" + "</dl>\n";
+                + "= Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName + "\").xWikiClass)\n"
+                + "\n"
+                + "  #foreach($prop in $class.properties)\n"
+                + "    ; ${prop.prettyName}\n"
+                + "    : $doc.display($prop.getName())\n"
+                + "  #end\n";
 
-        this.classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
+        this.classTemplateDefaultContent = "";
     }
 
     @Override
@@ -456,7 +459,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName() + DOCUMENTCONTENT_EXT;
                 String content = getResourceDocumentContent(documentContentPath);
                 doc.setContent(content != null ? content : getClassSheetDefaultContent());
-                doc.setSyntax(Syntax.XWIKI_1_0);
+                doc.setSyntax(Syntax.XWIKI_2_1);
                 doc.setParent(getClassFullName());
                 doc.setHidden(true);
             }
@@ -514,7 +517,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                     getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX + getClassTemplateFullName()
                         + DOCUMENTCONTENT_EXT);
                 doc.setContent(content != null ? content : getClassTemplateDefaultContent());
-                doc.setSyntax(Syntax.XWIKI_1_0);
+                doc.setSyntax(Syntax.XWIKI_2_1);
                 doc.setParent(getClassFullName());
                 doc.setHidden(true);
             }

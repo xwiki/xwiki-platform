@@ -25,7 +25,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
@@ -62,17 +61,11 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Override
     public WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException
     {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
         WikiTemplatePropertyGroup group = new WikiTemplatePropertyGroup(GROUP_NAME);
 
         try {

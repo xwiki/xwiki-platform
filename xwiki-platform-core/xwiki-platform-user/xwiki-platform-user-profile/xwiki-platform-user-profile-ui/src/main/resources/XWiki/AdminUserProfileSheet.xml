@@ -461,18 +461,15 @@ links</sections>
       &lt;/dt&gt;
       &lt;dd&gt;$sheetDocument.display('properties', 'edit', $sectionObject)&lt;/dd&gt;
     #end
+    &lt;/dl&gt;
     ## Avoid duplicating the save button for edit mode.
     #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
-      &lt;dt&gt;
-        &lt;br/&gt;
-        &lt;span class='buttonwrapper'&gt;
-          &lt;input class='button' type='submit' name='save' value="$services.localization.render('platform.user.profileConfigureSaveButtonLabel')"/&gt;
-        &lt;/span&gt;
-        &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
-        &lt;input type='hidden' name='form_token' value="$formToken" /&gt;
-      &lt;/dt&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input class='button' type='submit' name='save' value="$services.localization.render('platform.user.profileConfigureSaveButtonLabel')"/&gt;
+      &lt;/span&gt;
+      &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
+      &lt;input type='hidden' name='form_token' value="$formToken" /&gt;
     #end
-    &lt;/dl&gt;
   &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

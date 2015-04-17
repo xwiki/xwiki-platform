@@ -40,9 +40,10 @@ public interface ResourceReference
 
     /**
      * @param name the name of the parameter to add
-     * @param value the value of the parameter to add. If null then no value is added.
+     * @param value the value of the parameter to add. If null then no value is added. Collections are also supported
+     *        in which case a multivalued parameter is used.
      */
-    void addParameter(String name, String value);
+    void addParameter(String name, Object value);
 
     /**
      * A Resource Reference parameter provides optional additional information about the Resource Reference.

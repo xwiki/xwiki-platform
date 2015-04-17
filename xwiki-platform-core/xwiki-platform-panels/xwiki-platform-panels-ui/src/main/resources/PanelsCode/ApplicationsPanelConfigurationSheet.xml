@@ -129,7 +129,9 @@
 require.config({
   paths: {
     'jquery-ui' : "$services.webjars.url('jquery-ui', 'jquery-ui.min.js')",
-    'jquery-ui-touch-punch' : "$services.webjars.url('jquery-ui-touch-punch', 'jquery.ui.touch-punch.min.js')"
+    ## The WebJar version doesn't match the version of the packaged jquery-ui-touch-punch library so we are forced to
+    ## specify the library version when computing the WebJar resource URL.
+    'jquery-ui-touch-punch' : "$services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js')"
   },
   shim: {
     'jquery-ui' : ['jquery'],

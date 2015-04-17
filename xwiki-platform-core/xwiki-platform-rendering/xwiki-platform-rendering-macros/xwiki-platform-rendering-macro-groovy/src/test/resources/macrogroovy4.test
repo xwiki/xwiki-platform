@@ -3,11 +3,11 @@
 .input|xwiki/2.0
 .# Ensure that 2 groovy macros share the same classloader.
 .#--------------------------------------------------------
-{{groovy}}
+{{groovy output="false"}}
 class MyClass {}
 {{/groovy}}
 
-{{groovy}}
+{{groovy output="false"}}
 .# An error would be raised here if MyClass was not visible
 def var = new MyClass()
 {{/groovy}}
@@ -15,8 +15,8 @@ def var = new MyClass()
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [groovy] [] [class MyClass {}]
-endMacroMarkerStandalone [groovy] [] [class MyClass {}]
-beginMacroMarkerStandalone [groovy] [] [def var = new MyClass()]
-endMacroMarkerStandalone [groovy] [] [def var = new MyClass()]
+beginMacroMarkerStandalone [groovy] [output=false] [class MyClass {}]
+endMacroMarkerStandalone [groovy] [output=false] [class MyClass {}]
+beginMacroMarkerStandalone [groovy] [output=false] [def var = new MyClass()]
+endMacroMarkerStandalone [groovy] [output=false] [def var = new MyClass()]
 endDocument

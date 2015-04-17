@@ -343,7 +343,7 @@ lq1soW/lB5YqcHYSQfVSAAAAAElFTkSuQmCC</content>
   #set($serverType=$msgServerTypeExternalRemote)
 #end
 {{html wiki="true" clean="false"}}
-&lt;form action="" enctype="multipart/form-data" method="post" class="xform"&gt;
+&lt;form action="$doc.getURL()" enctype="multipart/form-data" method="post" class="xform"&gt;
 &lt;fieldset&gt;
 &lt;legend&gt;$services.localization.render('admin.ooserver.options')&lt;/legend&gt;
 

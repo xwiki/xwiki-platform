@@ -53,7 +53,7 @@ import org.xwiki.stability.Unstable;
  *   #set ($message = $services.mailSender.createMessage(to, subject))
  *   #set ($discard = $message.addPart("html", "html message", {"alternate" : "text message",
  *     "attachments" : $attachments}))
- *   #set ($discard = $message.send())
+ *   #set ($mailResult = $services.mailsender.send($message))
  * </code></pre>
  *
  * @version $Id$

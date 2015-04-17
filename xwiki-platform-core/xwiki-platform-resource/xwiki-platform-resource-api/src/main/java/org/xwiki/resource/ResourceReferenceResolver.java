@@ -19,12 +19,9 @@
  */
 package org.xwiki.resource;
 
-import java.lang.reflect.ParameterizedType;
-import java.net.URL;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -39,21 +36,19 @@ import org.xwiki.stability.Unstable;
 public interface ResourceReferenceResolver<T>
 {
     /**
-     * Type instance for {@code ResourceReferenceResolver<URL>}.
-     */
-    ParameterizedType TYPE_URL = new DefaultParameterizedType(null, ResourceReferenceResolver.class, URL.class);
-
-    /**
      * Transforms some representation of a XWiki Resource Reference into a {@link ResourceReference} instance.
      *
      * @param representation the object to transform into a {@link ResourceReference} instance
+     * @param resourceType the type of Resource represented by the passed representation parameter. To get this type
+     *        you can use a {@link ResourceTypeResolver}
      * @param parameters generic parameters that depend on the underlying implementation. In order to know what to pass
      *        you need to check the documentation for the implementation you're using.
      * @return the {@link ResourceReference} instance
      * @throws CreateResourceReferenceException if there was an error while creating the XWiki Resource object
      * @throws UnsupportedResourceReferenceException if the passed representation points to an unsupported Resource
      *         Reference type that we don't know how to resolve
+     * @since 7.1M1
      */
-    ResourceReference resolve(T representation, Map<String, Object> parameters)
+    ResourceReference resolve(T representation, ResourceType resourceType, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException;
 }

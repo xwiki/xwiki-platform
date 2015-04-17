@@ -95,7 +95,7 @@ public class ObjectAddAction extends XWikiAction
         if (doc.isNew()) {
             doc.setCreatorReference(userReference);
         }
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
+        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addObject"), true, context);
 
         // If this is an ajax request, no need to redirect.
         if (Utils.isAjaxRequest(context)) {

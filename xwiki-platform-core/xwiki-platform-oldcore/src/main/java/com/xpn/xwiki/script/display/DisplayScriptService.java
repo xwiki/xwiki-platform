@@ -41,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -92,6 +93,9 @@ public class DisplayScriptService implements ScriptService
     @Inject
     private SyntaxFactory syntaxFactory;
 
+    @Inject
+    private RenderingContext renderingContext;
+
     private Syntax getOutputSyntax(Map<String, Object> parameters)
     {
         Syntax outputSyntax = (Syntax) parameters.get("outputSyntax");
@@ -105,7 +109,7 @@ public class DisplayScriptService implements ScriptService
                     return null;
                 }
             } else {
-                outputSyntax = Syntax.XHTML_1_0;
+                outputSyntax = renderingContext.getTargetSyntax();
             }
         }
 

@@ -100,7 +100,7 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
     @Test
     public void testAddExtension() throws Exception
-    {
+    {   
         // Set id prefix
 
         RepositoryAdminPage repositoryAdminPage = RepositoryAdminPage.gotoPage();
@@ -150,6 +150,9 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Add attachment
         getRepositoryTestUtils().attachFile(this.baseExtension);
+
+        // Wait until all asynchronous tasks are done
+        getRepositoryTestUtils().waitUntilReady();
 
         // Check livetable
 
@@ -238,7 +241,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
@@ -265,12 +267,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Empty search
         extension = searchExtension(this.baseExtension.getId().getId());
-        if (extension == null) {
-            // Give more time to Solr to index the document
-            // FIXME: provide a helper to wait for Solr queue to be empty
-            Thread.sleep(10000);
-            extension = searchExtension(this.baseExtension.getId().getId());
-        }
 
         if (extension == null) {
             Assert.fail("Could not find extension [" + this.baseExtension.getId().getId() + "]");
@@ -280,7 +276,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());
@@ -302,7 +297,6 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
         Assert.assertEquals(this.baseExtension.getType(), extension.getType());
         Assert.assertEquals(this.baseExtension.getSummary(), extension.getSummary());
         Assert.assertEquals(this.baseLicense.getName(), extension.getLicenses().get(0).getName());
-        Assert.assertEquals(this.baseExtension.getDescription(), extension.getDescription());
         Assert.assertEquals(this.baseAuthor.getName(), extension.getAuthors().get(0).getName());
         Assert.assertEquals(this.baseAuthor.getURL().toString(), extension.getAuthors().get(0).getUrl());
         Assert.assertEquals("10.0", extension.getVersion());

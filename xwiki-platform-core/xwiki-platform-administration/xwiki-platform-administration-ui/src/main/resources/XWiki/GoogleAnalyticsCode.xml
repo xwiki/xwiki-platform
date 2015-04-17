@@ -93,7 +93,7 @@
 #displayAnalyticsStatus()
 
 {{html}}
-&lt;form action="" method="post" class="xform half"&gt;
+&lt;form action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="analytics_method"&gt;$!methodPropertyClass.translatedPrettyName&lt;/label&gt;

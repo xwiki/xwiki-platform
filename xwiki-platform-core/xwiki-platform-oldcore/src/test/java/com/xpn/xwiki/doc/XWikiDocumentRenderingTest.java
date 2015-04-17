@@ -23,33 +23,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-import com.xpn.xwiki.api.Document;
-
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.internal.MockConfigurationSource;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.user.api.XWikiRightService;
-
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.jmx.JMXVelocityEngine;
 import org.xwiki.velocity.internal.jmx.JMXVelocityEngineMBean;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -74,8 +69,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     private Mock mockXWiki;
 
-    private Mock mockXWikiRenderingEngine;
-
     private Mock mockXWikiVersioningStore;
 
     private Mock mockXWikiStoreInterface;
@@ -95,7 +88,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"), getConfigurationSource());
 
         this.document = new XWikiDocument(new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME));
-        this.document.setSyntax(Syntax.XWIKI_1_0);
+        this.document.setSyntax(Syntax.XWIKI_2_1);
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
         this.document.setNew(false);
@@ -103,7 +96,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         getContext().setDoc(this.document);
 
         this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        this.translatedDocument.setSyntax(Syntax.XWIKI_2_1);
         this.translatedDocument.setLanguage("fr");
         this.translatedDocument.setNew(false);
 
@@ -111,17 +104,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
-
-        this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
-        this.mockXWikiRenderingEngine.stubs().method("interpretText").will(
-            new CustomStub("Implements XWikiRenderingEngine.interpretText")
-            {
-                @Override
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return invocation.parameterValues.get(0);
-                }
-            });
 
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
@@ -134,7 +116,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
-        this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
@@ -214,8 +195,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<strong>ti<em>tle</strong>", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
 
         this.document.setTitle("#set($key = \"title\")$key");
-        this.mockXWikiRenderingEngine.stubs().method("interpretText").with(eq("#set($key = \"title\")$key"), ANYTHING,
-            ANYTHING).will(returnValue("title"));
 
         assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }

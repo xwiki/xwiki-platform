@@ -57,13 +57,14 @@ public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory
         Map<String, Object> parameters) throws MessagingException
     {
         List<DocumentReference> userReferences = getTypedSource(userReferencesObject, List.class);
+
+        // We verify that we have both a Factory hint specified but also the source for the Factory.
         validateParameters(parameters, HINT, SOURCE);
 
         // Extract from the passed parameters the MimeMessageFactory to use to create a single mail
         String factoryHint = (String) parameters.get(HINT);
-        Object factorySource = parameters.get(SOURCE);
 
-        MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint, factorySource);
+        MimeMessageFactory factory = getInternalMimeMessageFactory(factoryHint);
 
         UsersMimeMessageIterator iterator = new UsersMimeMessageIterator(userReferences, factory, parameters,
             this.componentManagerProvider.get());

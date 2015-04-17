@@ -46,8 +46,8 @@ public class BinEntityResourceReferenceResolver extends AbstractEntityResourceRe
     private WikiReferenceExtractor wikiExtractor;
 
     @Override
-    protected WikiReference extractWikiReference(ExtendedURL url)
+    protected WikiReference extractWikiReference(ExtendedURL extendedURL)
     {
-        return this.wikiExtractor.extract(url);
+        return this.wikiExtractor.extract(extendedURL);
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -68,13 +68,13 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.7-b4-xwiki-1</version>
+        <version>2.7-rc2-xwiki</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.6.2.Final</version>
+        <version>3.6.3.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
@@ -441,46 +441,53 @@
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
-              <differenceType>7006</differenceType>
-              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
-              <method>org.suigeneris.jrcs.rcs.Version getRev()</method>
-              <to>java.lang.String</to>
-              <justification>Using String instead of jrcs Version for better flexibility. Probably should not have been public from the start.</justification>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/skin/Skin</className>
+              <method>org.xwiki.rendering.syntax.Syntax getOutputSyntax()</method>
+              <justification>Add a new method to this young API</justification>
             </difference>
             <difference>
-              <differenceType>7006</differenceType>
-              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
-              <method>org.suigeneris.jrcs.rcs.Version getRev1()</method>
-              <to>java.lang.String</to>
-              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>com.xpn.xwiki.render.XWikiRenderingEngine getRenderingEngine()</method>
+              <justification>Not really been removed but now return Object. Breaks code building that use this method but should be ok for runtime.</justification>
             </difference>
             <difference>
-              <differenceType>7006</differenceType>
-              <className>com/xpn/xwiki/web/DeleteVersionsForm</className>
-              <method>org.suigeneris.jrcs.rcs.Version getRev2()</method>
-              <to>java.lang.String</to>
-              <justification>Using String instead of Version for better flexibility. Probably should not have been public from the start.</justification>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>void setRenderingEngine(com.xpn.xwiki.render.XWikiRenderingEngine)</method>
+              <justification>Not used since a long time now (XWikiRenderingEngine is a component) and impossible to implement it without a trigerring most of the old rendering engine.</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/url/ExtendedURL</className>
+              <method>ExtendedURL(java.net.URL)</method>
+              <justification>Young API. Added handling of URL parameters</justification>
             </difference>
             <difference>
               <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletRequestStub</className>
-              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/plugin/scheduler/XWikiServletResponseStub</className>
-              <justification>Move to Servlet 3.0.1. Also this class should never have been public</justification>
+              <className>com/xpn/xwiki/plugin/scheduler/StatusListener</className>
+              <justification>Never supposed to be an API</justification>
             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- The watchlist plugin has been moved to legacy and a component-based implementation has replaced it.
-                 Major refactoring has been performed. -->
-            <exclude>**/com/xpn/xwiki/plugin/watchlist/**</exclude>
-            <!-- Refactoring the LESS API. Make internal all the classes and interfaces that should never have been public. -->
-            <exclude>**/org/xwiki/lesscss/**</exclude>
+            <!-- Move xwiki/1.0 and old rendering engine to its own module -->
+            <exclude>com/xpn/xwiki/content/**</exclude>
+            <exclude>com/xpn/xwiki/render/**</exclude>
+            <exclude>com/xpn/xwiki/plugin/graphviz/GraphVizMacro</exclude>
+            <exclude>com/xpn/xwiki/plugin/svg/SVGMacro</exclude>
+            <exclude>com/xpn/xwiki/util/MenuSubstitution</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/ChartingMacro</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/CustomXWikiRenderingEngine</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/RadeoxHelper</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSource</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSourceFactory</exclude>
+            <exclude>com/xpn/xwiki/plugin/charts/wizard/DatasourceDefaultsHelper</exclude>
+            <!-- Young API. Large refactoring for adding the ability to register new URL Resource Types -->
+            <exclude>**/org/xwiki/resource/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -552,6 +559,7 @@
     <module>xwiki-platform-observation</module>
     <module>xwiki-platform-office</module>
     <module>xwiki-platform-oldcore</module>
+    <module>xwiki-platform-oldrendering</module>
     <module>xwiki-platform-panels</module>
     <module>xwiki-platform-query</module>
     <module>xwiki-platform-ratings</module>

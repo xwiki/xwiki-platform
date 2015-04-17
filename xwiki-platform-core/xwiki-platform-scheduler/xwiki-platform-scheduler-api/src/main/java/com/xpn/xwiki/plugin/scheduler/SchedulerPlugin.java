@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.scheduler;
 
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -29,12 +28,17 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.quartz.CronTrigger;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
+import org.quartz.Trigger.TriggerState;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer;
+import com.xpn.xwiki.plugin.scheduler.internal.StatusListener;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletRequest;
@@ -338,7 +343,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public JobState getJobStatus(BaseObject object, XWikiContext context) throws SchedulerException
     {
-        int state = getScheduler().getTriggerState(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+        TriggerState state = getScheduler().getTriggerState(new TriggerKey(getObjectUniqueId(object, context)));
         return new JobState(state);
     }
 
@@ -346,49 +351,55 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     {
         boolean scheduled = true;
         try {
-            JobDataMap data = new JobDataMap();
-
             // compute the job unique Id
             String xjob = getObjectUniqueId(object, context);
 
-            JobDetail job =
-                new JobDetail(xjob, Scheduler.DEFAULT_GROUP, Class.forName(object.getStringValue("jobClass")));
+            JobBuilder jobBuilder = JobBuilder.newJob((Class<Job>) Class.forName(object.getStringValue("jobClass")));
 
-            Trigger trigger =
-                new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob, Scheduler.DEFAULT_GROUP,
-                    object.getStringValue("cron"));
+            jobBuilder.withIdentity(xjob);
+            jobBuilder.storeDurably();
+
+            JobDataMap data = new JobDataMap();
 
             // Let's prepare an execution context...
             XWikiContext stubContext = prepareJobStubContext(object, context);
-
             data.put("context", stubContext);
             data.put("xcontext", stubContext);
             data.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), stubContext));
             data.put("xjob", object);
             data.put("services", Utils.getComponent(ScriptServiceManager.class));
 
-            job.setJobDataMap(data);
+            jobBuilder.setJobData(data);
 
-            getScheduler().addJob(job, true);
+            getScheduler().addJob(jobBuilder.build(), true);
+
+            TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger();
+
+            triggerBuilder.withIdentity(xjob);
+            triggerBuilder.forJob(xjob);
+
+            triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(object.getStringValue("cron")));
+
+            Trigger trigger = triggerBuilder.build();
 
             JobState status = getJobStatus(object, context);
 
-            switch (status.getState()) {
-                case Trigger.STATE_PAUSED:
+            switch (status.getQuartzState()) {
+                case PAUSED:
                     // a paused job must be resumed, not scheduled
                     break;
-                case Trigger.STATE_NORMAL:
+                case NORMAL:
                     if (getTrigger(object, context).compareTo(trigger) != 0) {
                         LOGGER.debug("Reschedule Job: [{}]", object.getStringValue("jobName"));
                     }
-                    getScheduler().rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
+                    getScheduler().rescheduleJob(trigger.getKey(), trigger);
                     break;
-                case Trigger.STATE_NONE:
+                case NONE:
                     LOGGER.debug("Schedule Job: [{}]", object.getStringValue("jobName"));
                     getScheduler().scheduleJob(trigger);
                     LOGGER.info("XWiki Job Status: [{}]", object.getStringValue("status"));
                     if (object.getStringValue("status").equals("Paused")) {
-                        getScheduler().pauseJob(xjob, Scheduler.DEFAULT_GROUP);
+                        getScheduler().pauseJob(new JobKey(xjob));
                         saveStatus("Paused", object, context);
                     } else {
                         saveStatus("Normal", object, context);
@@ -403,9 +414,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
                 "Error while scheduling job " + object.getStringValue("jobName"), e);
-        } catch (ParseException e) {
-            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_BAD_CRON_EXPRESSION,
-                "Error while parsing cron expression for job " + object.getStringValue("jobName"), e);
         } catch (ClassNotFoundException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while loading job class for job : " + object.getStringValue("jobName"), e);
@@ -413,6 +421,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while saving job status for job : " + object.getStringValue("jobName"), e);
         }
+
         return scheduled;
     }
 
@@ -423,8 +432,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void pauseJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        String job = getObjectUniqueId(object, context);
         try {
-            getScheduler().pauseJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+            getScheduler().pauseJob(new JobKey(job));
             saveStatus("Paused", object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
@@ -442,8 +452,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void resumeJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        String job = getObjectUniqueId(object, context);
         try {
-            getScheduler().resumeJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+            getScheduler().resumeJob(new JobKey(job));
             saveStatus("Normal", object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
@@ -462,8 +473,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void triggerJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        String job = getObjectUniqueId(object, context);
         try {
-            getScheduler().triggerJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+            getScheduler().triggerJob(new JobKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TRIGGER_JOB,
                 "Error occured while trying to trigger job " + object.getStringValue("jobName"), e);
@@ -477,8 +489,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
      */
     public void unscheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
+        String job = getObjectUniqueId(object, context);
         try {
-            getScheduler().deleteJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+            getScheduler().deleteJob(new JobKey(job));
             saveStatus("None", object, context);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
@@ -501,7 +514,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
         String job = getObjectUniqueId(object, context);
         Trigger trigger;
         try {
-            trigger = getScheduler().getTrigger(job, Scheduler.DEFAULT_GROUP);
+            trigger = getScheduler().getTrigger(new TriggerKey(job));
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while getting trigger for job " + job, e);
@@ -593,8 +606,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
     {
         StatusListener listener = new StatusListener();
         try {
-            getScheduler().addSchedulerListener(listener);
-            getScheduler().addGlobalJobListener(listener);
+            getScheduler().getListenerManager().addSchedulerListener(listener);
+            getScheduler().getListenerManager().addJobListener(listener);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_INITIALIZE_STATUS_LISTENER,

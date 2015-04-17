@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4.1
  */
+@Deprecated
 public class GroupMimeMessageFactoryTest
 {
     @Rule
@@ -101,7 +102,7 @@ public class GroupMimeMessageFactoryTest
         DocumentReference groupReference = new DocumentReference("wiki", "space", "page");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("hint", "factoryHint");
-        parameters.put("source", "factoryHint");
+        parameters.put("source", "factorySource");
 
         Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
@@ -111,7 +112,7 @@ public class GroupMimeMessageFactoryTest
             this.mocker.getComponentUnderTest().createMessage(session, groupReference, parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
-            assertEquals("Failed to find a [MimeMessageFactory<String, MimeMessage>] for hint [factoryHint]",
+            assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",
                 expected.getMessage());
         }
     }

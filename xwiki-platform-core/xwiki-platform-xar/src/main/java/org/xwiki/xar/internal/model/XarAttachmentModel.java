@@ -31,6 +31,11 @@ public class XarAttachmentModel
 
     public static final String ELEMENT_CONTENT_SIZE = "filesize";
 
+    /**
+     * @since 7.1M1
+     */
+    public static final String ELEMENT_MIMETYPE = "mimetype";
+
     public static final String ELEMENT_CONTENT = "content";
 
     public static final String ELEMENT_REVISION = "version";

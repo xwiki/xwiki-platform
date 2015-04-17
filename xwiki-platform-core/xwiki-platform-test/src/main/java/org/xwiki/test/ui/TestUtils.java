@@ -1048,16 +1048,41 @@ public class TestUtils
                 + escapeURL(file.getName()), Status.OK.getStatusCode());
     }
 
-    public InputStream getRESTInputStream(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
+    public InputStream getRESTInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
         throws Exception
     {
-        UriBuilder builder =
-            UriBuilder.fromUri(BASE_REST_URL.substring(0, BASE_REST_URL.length() - 1)).path(
-                !resourceUri.isEmpty() && resourceUri.charAt(0) == '/' ? resourceUri.substring(1) : resourceUri);
+        return getInputStream(BASE_REST_URL, resourceUri, queryParams, elements);
+    }
+
+    public InputStream getInputStream(String path, Map<String, ?> queryParams) throws Exception
+    {
+        return getInputStream(BASE_URL, path, queryParams);
+    }
+
+    public String getString(String path, Map<String, ?> queryParams) throws Exception
+    {
+        try (InputStream inputStream = getInputStream(BASE_URL, path, queryParams)) {
+            return IOUtils.toString(inputStream);
+        }
+    }
+
+    public InputStream getInputStream(String prefix, String path, Map<String, ?> queryParams, Object... elements)
+        throws Exception
+    {
+        String cleanPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
+        if (path.startsWith(cleanPrefix)) {
+            cleanPrefix = "";
+        }
+
+        UriBuilder builder = UriBuilder.fromUri(cleanPrefix).path(path.startsWith("/") ? path.substring(1) : path);
 
         if (queryParams != null) {
-            for (Map.Entry<String, Object[]> entry : queryParams.entrySet()) {
-                builder.queryParam(entry.getKey(), entry.getValue());
+            for (Map.Entry<String, ?> entry : queryParams.entrySet()) {
+                if (entry.getValue() instanceof Object[]) {
+                    builder.queryParam(entry.getKey(), (Object[]) entry.getValue());
+                } else {
+                    builder.queryParam(entry.getKey(), entry.getValue());
+                }
             }
         }
 

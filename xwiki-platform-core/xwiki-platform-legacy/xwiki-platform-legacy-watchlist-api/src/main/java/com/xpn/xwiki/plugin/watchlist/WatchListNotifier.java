@@ -23,8 +23,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.watchlist.internal.WatchListEventConverter;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -71,11 +75,23 @@ public class WatchListNotifier
     {
         // Convert the parameters.
         List<org.xwiki.watchlist.internal.api.WatchListEvent> watchListEvents = new ArrayList<>();
+        WatchListEventConverter<ActivityEvent> eventConverter =
+            Utils.getComponent(new DefaultParameterizedType(null, WatchListEventConverter.class, ActivityEvent.class));
         for (WatchListEvent event : events) {
-            // Possibly composite event.
-            org.xwiki.watchlist.internal.api.WatchListEvent watchListEvent =
-                new org.xwiki.watchlist.internal.api.WatchListEvent(event.getData(), context);
+            List<ActivityEvent> activityEvents = event.getData();
 
+            // Get the main event.
+            org.xwiki.watchlist.internal.api.WatchListEvent watchListEvent =
+                eventConverter.convert(activityEvents.get(0));
+
+            // Possibly composite event.
+            for (int i = 1; i < activityEvents.size(); i++) {
+                org.xwiki.watchlist.internal.api.WatchListEvent associatedEvent =
+                    eventConverter.convert(activityEvents.get(i));
+                watchListEvent.addEvent(associatedEvent);
+            }
+
+            // Add the converted event to the list.
             watchListEvents.add(watchListEvent);
         }
 

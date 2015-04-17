@@ -449,7 +449,17 @@ XWiki.widgets.LiveTable = Class.create({
     if (!a) {
       return null;
     }
-    return a.getAttribute('rel');
+    return this.getColumnNameAttribute(a);
+  },
+  
+  /**
+   * Return the attribute of a link element where the name of the column is stored. The "data-rel" attribute is
+   * normally used, but for compatibility reason with skins using the XHTML1.0 syntax, it could end-up in the "rel"
+   * attribute ('data-*' attributes are not valid in XHTML 1.0).
+   */
+  getColumnNameAttribute: function(element)
+  {
+    return element.hasAttribute('data-rel') ? element.getAttribute('data-rel') : element.getAttribute('rel');
   },
 
   /**
@@ -482,7 +492,7 @@ XWiki.widgets.LiveTable = Class.create({
   {
     var self = this;
     $(this.domNodeName).select('th.sortable').each(function(el) {
-      var colname = el.down("a") ? el.down("a").getAttribute("rel") : null;
+      var colname = el.down("a") ? self.getColumnNameAttribute(el.down("a")) : null;
       if (colname == column) {
         self.selectedColumn = el;
         el.addClassName('selected');

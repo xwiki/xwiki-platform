@@ -25,13 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mailsender</artifactId>
   <name>XWiki Platform - Mail Sender</name>
   <description>XWiki Platform - Mail Sender</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -78,7 +78,7 @@
   #end
 #end
 ##
-&lt;form method="get" action=""&gt;
+&lt;form method="get" action="$doc.getURL()"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type="hidden" name="action" value="create" /&gt;

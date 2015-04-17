@@ -22,8 +22,11 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,9 +45,17 @@ import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiAttachment}.
@@ -77,12 +88,20 @@ public class XWikiAttachmentTest
      * current one as this would mean changing its identity...
      */
     @Test
-    public void fromXMLShouldntSetMetaDataAsDirty() throws Exception
+    public void fromXML() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
         attachment.fromXML("<attachment>\n" + "<filename>XWikiLogo.png</filename>\n" + "<filesize>1390</filesize>\n"
-            + "<author>xwiki:XWiki.Admin</author>\n" + "<date>1252454400000</date>\n" + "<version>1.1</version>\n"
-            + "<comment/>\n" + "<content>content</content>\n" + "</attachment>");
+            + "<mimetype>image/png2</mimetype>\n" + "<author>xwiki:XWiki.Admin</author>\n" + "<date>1252454400000</date>\n"
+            + "<version>1.1</version>\n" + "<comment/>\n" + "<content>MDEyMzQ1Njc4OQ==</content>\n" + "</attachment>");
+
+        assertEquals("XWikiLogo.png", attachment.getFilename());
+        assertEquals(new Date(1252454400000L), attachment.getDate());
+        assertEquals("1.1", attachment.getVersion());
+        assertEquals("0123456789", IOUtils.toString(attachment.getContentInputStream(null)));
+        assertEquals("image/png2", attachment.getMimeType());
+        assertEquals("image/png2", attachment.getMimeType(null));
+
         assertFalse(attachment.isMetaDataDirty());
     }
 
@@ -179,12 +198,23 @@ public class XWikiAttachmentTest
     }
 
     @Test
-    public void testGetMimeType() throws Exception
+    public void testSetContentWithMaxSize() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new ReaderInputStream(new StringReader("123456789")), 5);
+
+        assertEquals("12345", IOUtils.toString(attachment.getContentInputStream(null)));
+    }
+
+    @Test
+    public void testGetMime() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setFilename("image.jpg");
 
+        assertNull("image/jpeg", attachment.getMimeType());
         assertEquals("image/jpeg", attachment.getMimeType(null));
 
         attachment.setFilename("xml.xml");
@@ -206,6 +236,34 @@ public class XWikiAttachmentTest
         attachment.setFilename("unknown");
         attachment.setContent(new ByteArrayInputStream("content".getBytes()));
         assertEquals("text/plain", attachment.getMimeType(null));
+    }
+
+    @Test
+    public void testSetMimeType()
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        assertEquals(null, attachment.getMimeType());
+        assertEquals("application/octet-stream", attachment.getMimeType(null));
+
+        attachment.setMimeType("image/jpeg");
+
+        assertEquals("image/jpeg", attachment.getMimeType());
+        assertEquals("image/jpeg", attachment.getMimeType(null));
+    }
+
+    @Test
+    public void testResetMimeType()
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        assertEquals(null, attachment.getMimeType());
+        assertEquals("application/octet-stream", attachment.getMimeType(null));
+
+        attachment.resetMimeType(null);
+
+        assertEquals("application/octet-stream", attachment.getMimeType());
+        assertEquals("application/octet-stream", attachment.getMimeType(null));
     }
 
     @Test
@@ -294,8 +352,9 @@ public class XWikiAttachmentTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
-            this.oldcore.getXWikiContext())).thenReturn(document);
+        when(
+            this.oldcore.getXWikiContext().getWiki()
+                .getDocument(document.getDocumentReference(), this.oldcore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         when(document.getAttachment(attachment.getFilename())).thenReturn(attachment);
@@ -318,8 +377,9 @@ public class XWikiAttachmentTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
-            this.oldcore.getXWikiContext())).thenReturn(document);
+        when(
+            this.oldcore.getXWikiContext().getWiki()
+                .getDocument(document.getDocumentReference(), this.oldcore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         attachment.setVersion("3.5");

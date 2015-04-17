@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -177,7 +178,8 @@ public class SecurityTest extends AbstractComponentTestCase
 
         MacroTransformationContext context = new MacroTransformationContext();
         context.getTransformationContext().setRestricted(restricted);
-        // The script macro checks the current block (which is a macro block) to see what engine to use
+        context.setSyntax(Syntax.XWIKI_2_1);
+        // The script macro checks the current block (which is a macro block) to see what engine to use.
         context.setCurrentMacroBlock(new MacroBlock("groovy", Collections.<String, String>emptyMap(), false));
 
         macro.execute(parameters, script, context);

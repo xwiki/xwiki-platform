@@ -52,6 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4M3
  */
+@Deprecated
 public class UsersMimeMessageIteratorTest
 {
     @Test

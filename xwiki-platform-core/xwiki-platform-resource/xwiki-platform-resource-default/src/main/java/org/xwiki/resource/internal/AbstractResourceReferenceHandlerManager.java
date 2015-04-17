@@ -26,6 +26,8 @@ import java.util.TreeSet;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -39,10 +41,11 @@ import org.xwiki.resource.ResourceReferenceHandlerManager;
 /**
  * Helper to implement {@link ResourceReferenceHandlerManager}.
  *
+ * @param <T> the qualifying element to distinguish a Resource Reference (e.g. Resource Type, Entity Resource Action)
  * @version $Id$
  * @since 6.1M2
  */
-public abstract class AbstractResourceReferenceHandlerManager implements ResourceReferenceHandlerManager
+public abstract class AbstractResourceReferenceHandlerManager<T> implements ResourceReferenceHandlerManager<T>
 {
     /**
      * Used to lookup Resource Handler components. We use the Context Component Manager so that Extensions can
@@ -52,20 +55,19 @@ public abstract class AbstractResourceReferenceHandlerManager implements Resourc
     @Named("context")
     private ComponentManager contextComponentManager;
 
-    protected abstract boolean matches(ResourceReferenceHandler handler, ResourceReference reference);
+    @Inject
+    private Logger logger;
 
-    protected void handle(ResourceReference reference, Class typeClass) throws ResourceReferenceHandlerException
+    protected abstract boolean matches(ResourceReferenceHandler handler, T resourceReferenceQualifier);
+
+    protected abstract T extractResourceReferenceQualifier(ResourceReference reference);
+
+    @Override
+    public void handle(ResourceReference reference) throws ResourceReferenceHandlerException
     {
-        boolean result;
-
         // Look for a Handler supporting the Resource Type located in the passed Resource Reference object.
-        // TODO: Use caching to avoid having to sort all Handlers at every call.
-        Set<ResourceReferenceHandler> orderedHandlers = new TreeSet<>();
-        for (ResourceReferenceHandler handler : getHandlers(typeClass)) {
-            if (matches(handler, reference)) {
-                orderedHandlers.add(handler);
-            }
-        }
+        Set<ResourceReferenceHandler> orderedHandlers =
+            getMatchingHandlers(extractResourceReferenceQualifier(reference));
 
         if (!orderedHandlers.isEmpty()) {
             // Create the Handler chain
@@ -77,6 +79,35 @@ public abstract class AbstractResourceReferenceHandlerManager implements Resourc
             // Resource has not been handled since no Handler was found for it!
             throw new NotFoundResourceHandlerException(reference);
         }
+    }
+
+    @Override
+    public boolean canHandle(T resourceReferenceQualifier)
+    {
+        boolean result;
+        try {
+            result = !getMatchingHandlers(resourceReferenceQualifier).isEmpty();
+        } catch (ResourceReferenceHandlerException e) {
+            this.logger.warn("Failed to list Resource Reference Handers. Error [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
+            result = false;
+        }
+        return result;
+    }
+
+    private Set<ResourceReferenceHandler> getMatchingHandlers(T resourceReferenceQualifier)
+        throws ResourceReferenceHandlerException
+    {
+        // Look for a Handler supporting the Resource Type located in the passed Resource Reference object.
+        // TODO: Use caching to avoid having to sort all Handlers at every call.
+        Set<ResourceReferenceHandler> orderedHandlers = new TreeSet<>();
+        for (ResourceReferenceHandler handler : getHandlers(resourceReferenceQualifier.getClass())) {
+            if (matches(handler, resourceReferenceQualifier)) {
+                orderedHandlers.add(handler);
+            }
+        }
+
+        return orderedHandlers;
     }
 
     private List<ResourceReferenceHandler> getHandlers(Class typeClass) throws ResourceReferenceHandlerException

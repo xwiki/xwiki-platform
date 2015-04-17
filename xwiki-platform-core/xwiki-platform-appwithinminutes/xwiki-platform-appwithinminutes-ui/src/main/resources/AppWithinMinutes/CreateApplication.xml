@@ -54,7 +54,7 @@
         (% class="description" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Description")
     #end
   )))
-  &lt;form action="" method="post" class="xform wizard-body"&gt;
+  &lt;form action="$doc.getURL()" method="post" class="xform wizard-body"&gt;
     ; &lt;label for="appName"&gt;$services.localization.render('platform.appwithinminutes.appNameLabel')&lt;/label&gt;
       (% class="xHint" %)$services.localization.render('platform.appwithinminutes.appNameHint')
     : &lt;input type="text" id="appName" name="appName" /&gt;

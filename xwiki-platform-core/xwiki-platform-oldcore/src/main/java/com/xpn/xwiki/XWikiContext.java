@@ -40,7 +40,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -796,7 +795,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
+     * @deprecated since 4.3M2 use {@link org.xwiki.localization.ContextualLocalizationManager} component instead
      */
     @Deprecated
     public XWikiMessageTool getMessageTool()
@@ -806,6 +805,7 @@ public class XWikiContext extends Hashtable<Object, Object>
             getWiki().prepareResources(this);
             msg = ((XWikiMessageTool) get("msg"));
         }
+
         return msg;
     }
 

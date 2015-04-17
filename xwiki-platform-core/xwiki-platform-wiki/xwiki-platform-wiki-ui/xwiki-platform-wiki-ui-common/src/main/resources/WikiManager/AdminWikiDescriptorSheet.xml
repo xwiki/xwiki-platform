@@ -147,11 +147,11 @@
               &lt;input id='owner' name='owner' type='text' size='30' class='$class'  value="$!{escapetool.xml($descriptor.ownerId)}" /&gt;
             &lt;/dd&gt;
 
-            &lt;dt class='warning'&gt;
+            &lt;dd class='warning'&gt;
               &lt;label for='owner'&gt;
                 &lt;span class='xErrorMsg'&gt;$services.localization.render('platform.wiki.admin.wiki.ownerWarning')&lt;/span&gt;
               &lt;/label&gt;
-            &lt;/dt&gt;
+            &lt;/dd&gt;
             #end
 
           &lt;/dl&gt;

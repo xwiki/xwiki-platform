@@ -83,6 +83,12 @@ public class WikiManagerRestTest
         marshaller = context.createMarshaller();
         unmarshaller = context.createUnmarshaller();
         objectFactory = new ObjectFactory();
+
+        // Access once the wiki to make sure the DW is run on main wiki before messing with it
+        HttpClient httpClient = new HttpClient();
+        GetMethod getMethod = new GetMethod("http://localhost:" + port + "/xwiki/");
+        getMethod.setFollowRedirects(true);
+        httpClient.executeMethod(getMethod);
     }
 
     @Test

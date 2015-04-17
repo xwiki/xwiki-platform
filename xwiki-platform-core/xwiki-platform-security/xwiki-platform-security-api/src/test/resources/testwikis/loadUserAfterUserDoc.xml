@@ -5,10 +5,12 @@
     <denyUser name="userA" />
     <denyUser name="userB" />
     <user name="userA" alt="a global user in local groupA">
+      <allowUser name="userA" />
       <allowUser name="userB" />
     </user>
     <group name="groupA">
       <user name="userA" />
+      <allowUser name="userB" />
     </group>
     <user name="userB" alt="another global user">
       <allowGroup name="groupA" />

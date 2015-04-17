@@ -214,11 +214,9 @@ $xwiki.jsx.use($paneldoc.fullName)##
   {{/html}}
 #end
 ##--------------------------------------------------------------------------
-{{html}}
-&lt;dd class="checkbox"&gt;
+: (% class="checkbox" %){{html}}
 &lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
-&lt;/dd&gt;
 {{/html}}
 ##--------------------------------------------------------------------------
 #if($pages.size() != 0)

@@ -19,9 +19,13 @@
  */
 package com.xpn.xwiki.plugin;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Abstract base plugin implementation.
@@ -38,6 +42,8 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
      * @see #getName()
      */
     private String name;
+
+    private ContextualLocalizationManager localization;
 
     /**
      * The mandatory plugin constructor, this is the method called (through reflection) by the plugin manager.
@@ -158,6 +164,20 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface
     {
         // The default is to do nothing, just return the original attachment
         return attachment;
+    }
+
+    protected ContextualLocalizationManager getLocalization()
+    {
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
+        }
+
+        return this.localization;
+    }
+
+    protected String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     /**

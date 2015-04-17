@@ -83,6 +83,9 @@ public class LinkUploadWizardStep<C extends EntityConfig> extends AbstractFileUp
     protected void onAttachmentUploaded(Attachment attachment, final AsyncCallback<Boolean> callback)
     {
         entityLink.getDestination().setEntityReference(attachment.getReference().clone());
+        // Reset the link configuration.
+        entityLink.getData().setReference(null);
+        entityLink.getData().setUrl(null);
         callback.onSuccess(true);
     }
 

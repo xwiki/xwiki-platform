@@ -107,8 +107,6 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         } finally {
                             context.setWikiId(db);
                         }
-
-                        context.getWiki().flushCache(context);
                     }
                     if (principal == null) {
                         if (LOGGER.isDebugEnabled())

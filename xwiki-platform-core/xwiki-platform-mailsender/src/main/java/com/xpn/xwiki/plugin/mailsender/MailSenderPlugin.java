@@ -61,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -73,8 +74,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExternalServletURLFactory;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
@@ -819,12 +821,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             String txtContent = obj.getStringValue("text");
             String htmlContent = obj.getStringValue("html");
 
-            String subject =
-                XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
-            String msg =
-                XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
-            String html =
-                XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
+            String subject = evaluate(subjectContent, templateDocFullName, updatedVelocityContext, context);
+            String msg = evaluate(txtContent, templateDocFullName, updatedVelocityContext, context);
+            String html = evaluate(htmlContent, templateDocFullName, updatedVelocityContext, context);
 
             Mail mail = new Mail();
             mail.setFrom((String) updatedVelocityContext.get("from.address"));
@@ -846,6 +845,24 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         } finally {
             context.setURLFactory(originalURLFactory);
             context.setLocale(originalLocale);
+        }
+    }
+
+    private String evaluate(String content, String name, VelocityContext vcontext, XWikiContext context)
+    {
+        StringWriter writer = new StringWriter();
+        try {
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
+            return writer.toString();
+        } catch (Exception e) {
+            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
+            Object[] args = { name };
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
+                    e, args);
+            return Util.getHTMLExceptionMessage(xe, context);
         }
     }
 

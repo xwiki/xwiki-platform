@@ -19,7 +19,6 @@
  */
 package org.xwiki.url.internal.standard.entity;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +28,12 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.internal.AbstractResourceReferenceResolver;
 
 /**
  * Common code for Entity Resource Reference Resolvers.
@@ -42,7 +41,7 @@ import org.xwiki.url.ExtendedURL;
  * @version $Id$
  * @since 6.3M1
  */
-public abstract class AbstractEntityResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
+public abstract class AbstractEntityResourceReferenceResolver extends AbstractResourceReferenceResolver
 {
     /**
      * Used to resolve blanks in entity references when the URL doesn't specify all parts of an entity reference.
@@ -52,13 +51,13 @@ public abstract class AbstractEntityResourceReferenceResolver implements Resourc
     protected abstract WikiReference extractWikiReference(ExtendedURL url);
 
     @Override
-    public ResourceReference resolve(ExtendedURL url, Map<String, Object> parameters)
+    public EntityResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         EntityResourceReference entityURL;
 
         // Extract the wiki reference from the URL
-        WikiReference wikiReference = extractWikiReference(url);
+        WikiReference wikiReference = extractWikiReference(extendedURL);
 
         // Rules based on counting the url segments:
         // - 0 segments (e.g. ""): default document reference, "view" action
@@ -72,7 +71,7 @@ public abstract class AbstractEntityResourceReferenceResolver implements Resourc
         // - 4 segments or more (e.g. "/action/Space/Document/whatever/else"): specified space, document (and default
         //     doc if empty), specified "action" (if action != "download"), trailing segments ignored
 
-        List<String> pathSegments = url.getSegments();
+        List<String> pathSegments = extendedURL.getSegments();
         String spaceName = null;
         String pageName = null;
         String attachmentName = null;
@@ -96,7 +95,7 @@ public abstract class AbstractEntityResourceReferenceResolver implements Resourc
             buildEntityReference(wikiReference, spaceName, pageName, attachmentName),
             EntityResourceAction.fromString(action));
 
-        copyParameters(url, entityURL);
+        copyParameters(extendedURL, entityURL);
 
         return entityURL;
     }
@@ -126,27 +125,5 @@ public abstract class AbstractEntityResourceReferenceResolver implements Resourc
             entityType = EntityType.ATTACHMENT;
         }
         return this.defaultReferenceEntityReferenceResolver.resolve(reference, entityType);
-    }
-
-    /**
-     * Copies query string parameters from the passed {@link org.xwiki.url.ExtendedURL} to the passed {@link org.xwiki.resource.entity.EntityResourceReference}.
-     *
-     * @param source the source URL from where to get the query string parameters
-     * @param target the {@link org.xwiki.resource.entity.EntityResourceReference} on which to copy the query string parameters
-     */
-    private void copyParameters(ExtendedURL source, EntityResourceReference target)
-    {
-        // Add the Query string parameters from the passed URL in the returned XWikiURL
-        if (source.getURI().getQuery() != null) {
-            for (String nameValue : Arrays.asList(source.getURI().getQuery().split("&"))) {
-                String[] pair = nameValue.split("=", 2);
-                // Check if the parameter has a value or not.
-                if (pair.length == 2) {
-                    target.addParameter(pair[0], pair[1]);
-                } else {
-                    target.addParameter(pair[0], null);
-                }
-            }
-        }
     }
 }

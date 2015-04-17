@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -77,6 +78,10 @@ public class XWikiAttachmentEventGenerator extends
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());
 
+        if (StringUtils.isNotEmpty(attachment.getMimeType())) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_MIMETYPE, attachment.getMimeType());
+        }
+
         if (properties.isWithJRCSRevisions()) {
             try {
                 // We need to make sure content is loaded
@@ -84,7 +89,7 @@ public class XWikiAttachmentEventGenerator extends
                 archive = attachment.loadArchive(xcontext);
                 if (archive != null) {
                     attachmentParameters.put(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS,
-                        new String(archive.getArchive()));
+                        archive.getArchiveAsString());
                 }
             } catch (XWikiException e) {
                 this.logger.error("Attachment [{}] has malformed history", attachment.getReference(), e);

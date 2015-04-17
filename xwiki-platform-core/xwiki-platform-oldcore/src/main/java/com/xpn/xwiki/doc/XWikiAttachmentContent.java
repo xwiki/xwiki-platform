@@ -29,6 +29,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.xwiki.environment.Environment;
 import org.xwiki.store.UnexpectedException;
@@ -293,9 +294,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public void setContent(InputStream is, int len) throws IOException
     {
-        // TODO Fix so this sends a EOS when the limit is reached.
-        // this.setContent(new LimitedInputStream(is, ((long) len)));
-        this.setContent(is);
+        this.setContent(new BoundedInputStream(is, len));
     }
 
     /**

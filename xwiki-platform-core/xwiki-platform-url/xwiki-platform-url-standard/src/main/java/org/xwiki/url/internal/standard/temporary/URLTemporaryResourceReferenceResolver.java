@@ -27,9 +27,10 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.resource.temporary.TemporaryResourceReference;
 
 /**
  * Resolve URLs pointing to a temporary resource.
@@ -43,7 +44,7 @@ import org.xwiki.resource.UnsupportedResourceReferenceException;
 public class URLTemporaryResourceReferenceResolver implements ResourceReferenceResolver<URL>
 {
     @Override
-    public ResourceReference resolve(URL representation, Map<String, Object> parameters)
+    public TemporaryResourceReference resolve(URL representation, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
         return null;

@@ -133,13 +133,13 @@ public class SxDocumentSource implements SxSource
                 int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
                 if ("LESS".equals(sxObj.getStringValue(CONTENT_TYPE_PROPERTY_NAME))) {
                     LESSCompiler lessCompiler = Utils.getComponent(LESSCompiler.class);
-                    LESSResourceReferenceFactory lessResourceReferenceFactory
-                            = Utils.getComponent(LESSResourceReferenceFactory.class);
+                    LESSResourceReferenceFactory lessResourceReferenceFactory =
+                        Utils.getComponent(LESSResourceReferenceFactory.class);
                     ObjectPropertyReference objectPropertyReference =
-                            new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
-                                    sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
-                    LESSResourceReference lessResourceReference
-                            = lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
+                        new ObjectPropertyReference(CONTENT_PROPERTY_NAME, new BaseObjectReference(
+                            sxObj.getXClassReference(), sxObj.getNumber(), sxObj.getDocumentReference()));
+                    LESSResourceReference lessResourceReference =
+                        lessResourceReferenceFactory.createReferenceForXObjectProperty(objectPropertyReference);
                     try {
                         sxContent = lessCompiler.compile(lessResourceReference, true, (parse == 1), false);
                     } catch (LESSCompilerException e) {

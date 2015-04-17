@@ -37,7 +37,6 @@ import org.xwiki.watchlist.internal.DefaultWatchListStore;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 import org.xwiki.watchlist.internal.api.WatchList;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
-import org.xwiki.watchlist.internal.api.WatchedElementType;
 import org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -243,30 +242,21 @@ public class WatchListJob extends AbstractJob implements Job
 
             // Determine what happened since the last execution for everybody.
             Date previousFireTime = getPreviousFireTime();
-            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, this.context);
+            WatchListEventMatcher eventMatcher = Utils.getComponent(WatchListEventMatcher.class);
+            List<WatchListEvent> events = eventMatcher.getEventsSince(previousFireTime);
             setPreviousFireTime();
 
             // Stop here if nothing happened in the meantime.
-            if (eventMatcher.getEventNumber() == 0) {
+            if (events.size() == 0) {
                 return;
             }
 
             // Notify all interested subscribers, one at a time.
             for (String subscriber : subscribers) {
                 try {
-                    Collection<String> wikis =
-                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.WIKI);
-                    Collection<String> spaces =
-                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.SPACE);
-                    Collection<String> documents =
-                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.DOCUMENT);
-                    Collection<String> users =
-                        this.watchlist.getStore().getWatchedElements(subscriber, WatchedElementType.USER);
-
                     // Determine what happened since the last execution on the watched elements of the current
                     // subscriber only.
-                    List<WatchListEvent> matchingEvents =
-                        eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, this.context);
+                    List<WatchListEvent> matchingEvents = eventMatcher.getMatchingVisibleEvents(events, subscriber);
                     String userWiki = StringUtils.substringBefore(subscriber, DefaultWatchListStore.WIKI_SPACE_SEP);
 
                     // If events have occurred on at least one element watched by the user, send the email

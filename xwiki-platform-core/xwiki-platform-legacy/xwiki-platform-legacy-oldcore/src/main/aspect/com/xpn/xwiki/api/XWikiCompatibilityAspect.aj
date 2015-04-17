@@ -31,6 +31,7 @@ import java.util.TreeMap;
 
 import org.xwiki.query.QueryManager;
 import org.xwiki.xml.XMLUtils;
+import org.suigeneris.jrcs.diff.delta.Chunk;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.internal.render.OldRendering;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.api.XWiki} class.
@@ -1081,7 +1083,78 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public DocumentStats XWiki.getCurrentMonthXWikiStats(String action)
     {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
+        return this.xwiki.getStatsService(getXWikiContext())
             .getDocMonthStats("", action, new Date(), getXWikiContext());
+    }
+
+    /**
+     * Privileged API to reset the rendering engine This would restore the rendering engine evaluation loop and take
+     * into account new configuration parameters
+     * 
+     * @deprecated
+     */
+    @Deprecated
+    public void XWiki.resetRenderingEngine()
+    {
+        if (hasProgrammingRights()) {
+            try {
+                this.xwiki.resetRenderingEngine(getXWikiContext());
+            } catch (XWikiException e) {
+            }
+        }
+    }
+
+    /**
+     * API to render a text in the context of a document. Only works for xwiki/1.0 content.
+     *
+     * @param text text to render
+     * @param doc the text is evaluated in the content of this document
+     * @return evaluated content
+     * @throws XWikiException if the evaluation went wrong
+     * @deprecated
+     */
+    @Deprecated
+    public String XWiki.renderText(String text, Document doc) throws XWikiException
+    {
+        return Utils.getComponent(OldRendering.class).renderText(text, doc.getDoc(), getXWikiContext());
+    }
+
+    /**
+     * API to render a chunk (difference between two versions
+     *
+     * @param chunk difference between versions to render
+     * @param doc document to use as a context for rendering
+     * @return resuilt of the rendering
+     * @deprecated
+     */
+    @Deprecated
+    public String XWiki.renderChunk(Chunk chunk, Document doc)
+    {
+        return renderChunk(chunk, false, doc);
+    }
+
+    /**
+     * API to render a chunk (difference between two versions
+     *
+     * @param chunk difference between versions to render
+     * @param doc document to use as a context for rendering
+     * @param source true to render the difference as wiki source and not as wiki rendered text
+     * @return resuilt of the rendering
+     * @deprecated
+     */
+    @Deprecated
+    public String XWiki.renderChunk(Chunk chunk, boolean source, Document doc)
+    {
+        StringBuffer buf = new StringBuffer();
+        chunk.toString(buf, "", "\n");
+        if (source == true) {
+            return buf.toString();
+        }
+
+        try {
+            return renderText(buf.toString(), doc);
+        } catch (Exception e) {
+            return buf.toString();
+        }
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -36,7 +36,7 @@
     <xwiki.extension.features>com.xpn.xwiki.platform:xwiki-core</xwiki.extension.features>
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.jacoco.instructionRatio>0.31</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -112,10 +112,6 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
@@ -130,10 +126,6 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -167,11 +159,10 @@
       <artifactId>struts-core</artifactId>
     </dependency>
 
-    <!-- Rendering -->
+    <!-- Used by parse groovy from page -->
     <dependency>
-      <groupId>radeox</groupId>
-      <artifactId>radeox</artifactId>
-      <version>1.0-b2</version>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Storage -->
@@ -240,14 +231,6 @@
       <groupId>javax.xml</groupId>
       <artifactId>jaxrpc-api</artifactId>
       <version>1.1</version>
-    </dependency>
-
-    <!-- JSON -->
-    <dependency>
-      <!-- Used by packaging plugin -->
-      <groupId>net.sf.json-lib</groupId>
-      <artifactId>json-lib</artifactId>
-      <classifier>jdk15</classifier>
     </dependency>
 
     <!-- XmlRpc -->
@@ -327,18 +310,10 @@
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
       <version>1.7</version>
+      <scope>runtime</scope>
     </dependency>
-
 
     <!-- Misc -->
-    <!-- CSS and JS compression tool, used in SkinExtensions -->
-    <dependency>
-      <groupId>com.yahoo.platform.yui</groupId>
-      <artifactId>yuicompressor</artifactId>
-      <!-- See http://jira.xwiki.org/jira/browse/XWIKI-6148 to understand why we use a specially packaged version of
-           yuicompressor -->
-      <version>2.4.7-xwiki</version>
-    </dependency>
     <!-- Better date manipulation than what JDK provides -->
     <dependency>
       <groupId>joda-time</groupId>
@@ -353,24 +328,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-    </dependency>
-    <!-- Used by another tool, it should be removed some time -->
-    <dependency>
-      <groupId>picocontainer</groupId>
-      <artifactId>picocontainer</artifactId>
-      <version>1.2</version>
-    </dependency>
-
-    <!-- Regular expressions -->
-    <dependency>
-      <groupId>oro</groupId>
-      <artifactId>oro</artifactId>
-      <version>2.0.8</version>
-    </dependency>
-    <!-- Used by XWiki 1.0 Groovy macro -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
     </dependency>
 
     <!-- Other XWiki modules -->
@@ -393,6 +350,7 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-local</artifactId>
       <version>${commons.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -736,6 +694,8 @@
               **/i18n/i18n.java,
               **/internal/DefaultCoreConfiguration.java,
               **/internal/DefaultXWikiStubContextProvider.java,
+              **/internal/render/OldRendering.java,
+              **/render/groovy/ParseGroovyFromString.java,
               **/internal/mandatory/AbstractRightsDocumentInitializer.java,
               **/internal/mandatory/XWikiPreferencesDocumentInitializer.java,
               **/internal/mandatory/XWikiUsersDocumentInitializer.java,
@@ -800,7 +760,6 @@
               **/plugin/autotag/FrenchStemmer.java,
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
-              **/plugin/graphviz/GraphVizMacro.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,
@@ -824,66 +783,16 @@
               **/plugin/query/XWikiNamespaceResolver.java,
               **/plugin/query/XWikiQueryConstants.java,
               **/plugin/query/XWikiQuery.java,
-              **/plugin/svg/SVGMacro.java,
               **/plugin/svg/SVGPluginApi.java,
               **/plugin/svg/SVGPlugin.java,
               **/plugin/XWikiPluginManager.java,
               **/pref/api/XWikiPrefService.java,
               **/pref/impl/xwiki/XWikiPrefServiceImpl.java,
               **/render/DefaultVelocityManager.java,
-              **/render/DefaultXWikiRenderingEngine.java,
-              **/render/filter/CodeFilter.java,
-              **/render/filter/CodeRemoveFilter.java,
-              **/render/filter/CodeRestoreFilter.java,
-              **/render/filter/EscapeFilter.java,
-              **/render/filter/MacroFilter.java,
-              **/render/filter/StrongFilter.java,
-              **/render/filter/StyleFilter.java,
-              **/render/filter/UnderlineFilter.java,
-              **/render/filter/UrlFilter.java,
-              **/render/filter/XWikiFilter.java,
-              **/render/filter/XWikiHeadingFilter.java,
-              **/render/filter/XWikiLinkFilter.java,
-              **/render/FormattingSubstitution.java,
-              **/render/groovy/XWikiGroovyRenderer.java,
-              **/render/groovy/XWikiPageClassLoader.java,
-              **/render/groovy/XWikiSimpleTemplateEngine.java,
-              **/render/HeadingSubstitution.java,
-              **/render/ListSubstitution.java,
-              **/render/macro/AttachMacro.java,
-              **/render/macro/DisplayMacro.java,
-              **/render/macro/FieldMacro.java,
-              **/render/macro/FormMacro.java,
-              **/render/macro/ImageMacro.java,
-              **/render/macro/LinkMacro.java,
-              **/render/macro/MacroLoader.java,
-              **/render/macro/MacroRepository.java,
-              **/render/macro/rss/RSSMacro.java,
-              **/render/macro/rss/RSSMacroParameters.java,
-              **/render/macro/StyleMacro.java,
-              **/render/macro/TableBuilder.java,
-              **/render/macro/TableMacro.java,
-              **/render/macro/UseMacro.java,
-              **/render/macro/WikiCodeFilter.java,
-              **/render/macro/XWikiCodeMacro.java,
-              **/render/macro/XWikiMacro.java,
-              **/render/PreTagSubstitution.java,
-              **/render/WikiNameSubstitution.java,
               **/render/WikiSubstitution.java,
-              **/render/XWikiInterpreter.java,
-              **/render/XWikiJSPRenderer.java,
-              **/render/XWikiMacrosMappingRenderer.java,
-              **/render/XWikiPluginRenderer.java,
-              **/render/XWikiRadeoxRenderEngine.java,
-              **/render/XWikiRadeoxRenderer.java,
-              **/render/XWikiRenderer.java,
-              **/render/XWikiRenderingCache.java,
-              **/render/XWikiRenderingEngine.java,
               **/render/XWikiScriptContextInitializer.java,
               **/render/XWikiVelocityContextInitializer.java,
-              **/render/XWikiVelocityRenderer.java,
-              **/render/XWikiVirtualMacro.java,
-              **/render/XWikiWikiBaseRenderer.java,
+              **/render/groovy/XWikiPageClassLoader.java,
               **/security/XWikiSecurityManager.java,
               **/store/DBCPConnectionProvider.java,
               **/store/hibernate/DefaultHibernateSessionFactory.java,
@@ -1017,37 +926,5 @@
         </configuration>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <!-- Skip aspectj when in M2Eclipse, it's useless, slow and a bad practice anyway to develop with deprecated methods. Plus it make the build failed when AJDT is not installed. -->
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>
-                      aspectj-maven-plugin
-                    </artifactId>
-                    <versionRange>[1.3,)</versionRange>
-                    <goals>
-                      <goal>compile</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 </project>

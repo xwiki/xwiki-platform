@@ -26,12 +26,13 @@ import org.xwiki.stability.Unstable;
  * The Resource Handler Manager's goal is to locate the right {@link ResourceReferenceHandler}
  * implementations to call in the right order.
  *
+ * @param <T> the qualifying element to distinguish a Resource Reference (e.g. Resource Type, Entity Resource Action)
  * @version $Id$
  * @since 6.1M2
  */
 @Role
 @Unstable
-public interface ResourceReferenceHandlerManager
+public interface ResourceReferenceHandlerManager<T>
 {
     /**
      * Handles a passed {@link org.xwiki.resource.ResourceReference}.
@@ -41,4 +42,15 @@ public interface ResourceReferenceHandlerManager
      *         Handler was found to handle the passed Resource Reference
      */
     void handle(ResourceReference reference) throws ResourceReferenceHandlerException;
+
+    /**
+     * Check if there's a Handler for the passed Resource Reference or not.
+     *
+     * @param resourceReferenceQualifier the qualifying element to distinguish a Resource Reference for which we wish
+     *        to check if we can handle it or not (ie we have a Handler available for it). This can be for example the
+     *        Resource Type or for an Entity Resource it can be an Entity Resource Action
+     * @return true if we have a Handler for the passed Resource Reference qualifier or false otherwise
+     * @since 7.1M1
+     */
+    boolean canHandle(T resourceReferenceQualifier);
 }

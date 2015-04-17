@@ -78,14 +78,14 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
+    public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
+    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
 
-    public static final String[] EPROPERTIES_EXTRA = new String[] {XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
+    public static final String[] EPROPERTIES_EXTRA = new String[] { XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
     XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, XWikiRepositoryModel.PROP_EXTENSION_WEBSITE,
     XWikiRepositoryModel.PROP_EXTENSION_AUTHORS, XWikiRepositoryModel.PROP_EXTENSION_FEATURES,
     XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME, XWikiRepositoryModel.PROP_EXTENSION_SCMURL,
-    XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION};
+    XWikiRepositoryModel.PROP_EXTENSION_SCMCONNECTION, XWikiRepositoryModel.PROP_EXTENSION_SCMDEVCONNECTION };
 
     protected static final String DEFAULT_BOOST;
 
@@ -143,10 +143,12 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             }
 
             // Fields list
-            if (flBuilder.length() > 0) {
-                flBuilder.append(',');
+            if (field.name != null) {
+                if (flBuilder.length() > 0) {
+                    flBuilder.append(',');
+                }
+                flBuilder.append(field.name);
             }
-            flBuilder.append(field.name);
         }
         DEFAULT_BOOST = boostBuilder.toString();
         DEFAULT_FL = flBuilder.toString();
@@ -508,7 +510,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setSummary(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
-        extension.setDescription(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION));
 
         // SCM
         ExtensionScm scm = new ExtensionScm();
@@ -554,6 +555,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setVersion((String) entry[EPROPERTIES_INDEX.size()]);
 
         // TODO: add support for
+        // * description
         // * dependencies
 
         return extension;
@@ -572,7 +574,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
-        extension.setDescription(this.<String>getSolrValue(document, Extension.FIELD_DESCRIPTION, false));
 
         // SCM
         ExtensionScm scm = new ExtensionScm();

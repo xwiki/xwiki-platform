@@ -25,14 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>7.0-SNAPSHOT</version>
+    <version>7.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource</artifactId>
   <name>XWiki Platform - Resource - Parent POM</name>
   <packaging>pom</packaging>
   <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-resource-api</module>
     <module>xwiki-platform-resource-default</module>
+    <module>xwiki-platform-resource-servlet</module>
   </modules>
 </project>

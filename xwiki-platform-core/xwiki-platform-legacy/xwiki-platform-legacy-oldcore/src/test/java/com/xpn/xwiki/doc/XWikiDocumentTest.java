@@ -42,7 +42,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
@@ -75,8 +74,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private XWikiDocument translatedDocument;
 
     private Mock mockXWiki;
-
-    private Mock mockXWikiRenderingEngine;
 
     private Mock mockXWikiVersioningStore;
 
@@ -120,8 +117,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWiki = mock(XWiki.class);
 
-        this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
-
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
 
@@ -136,7 +131,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiRightService = mock(XWikiRightService.class);
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
-        this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));

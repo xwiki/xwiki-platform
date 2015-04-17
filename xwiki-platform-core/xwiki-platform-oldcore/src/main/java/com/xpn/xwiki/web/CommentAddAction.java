@@ -92,7 +92,7 @@ public class CommentAddAction extends XWikiAction
             doc.setContentDirty(false);
             // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
             doc.setMetaDataDirty(true);
-            xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
+            xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

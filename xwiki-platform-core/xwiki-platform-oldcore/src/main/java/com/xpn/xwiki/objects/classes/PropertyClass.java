@@ -369,8 +369,8 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             return getPrettyName();
         }
 
-        String prettyName = context.getMessageTool().get(msgName);
-        if (prettyName.equals(msgName)) {
+        String prettyName = localizePlain(msgName);
+        if (prettyName == null) {
             return getPrettyName();
         }
         return prettyName;
@@ -396,11 +396,11 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     public String getTooltip(XWikiContext context)
     {
         String tooltipName = getFieldFullName() + "_tooltip";
-        String tooltip = context.getMessageTool().get(tooltipName);
-        if (tooltipName.equals(tooltip)) {
+        String tooltip = localizePlain(tooltipName);
+        if (tooltip == null) {
             tooltipName = getLargeStringValue("tooltip");
             if ((tooltipName != null) && (!tooltipName.trim().equals(""))) {
-                tooltip = context.getMessageTool().get(tooltipName);
+                tooltip = localizePlainOrKey(tooltipName, tooltipName);
             }
         }
         return tooltip;

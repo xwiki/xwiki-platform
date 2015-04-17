@@ -623,8 +623,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           "title":$homePageTitle,
           "parent":$wikiHomePage
         }))
-        #set($queryString = $escapetool.url($queryString))
       #end
+      #set($queryString = $escapetool.url($queryString))
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));
     #else
       ## Redirect to view mode.

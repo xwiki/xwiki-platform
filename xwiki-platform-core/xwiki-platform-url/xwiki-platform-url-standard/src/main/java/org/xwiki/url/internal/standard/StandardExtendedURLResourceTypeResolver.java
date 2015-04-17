@@ -19,6 +19,7 @@
  */
 package org.xwiki.url.internal.standard;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -56,7 +57,10 @@ public class StandardExtendedURLResourceTypeResolver implements ResourceTypeReso
     {
         ResourceType resourceType;
 
-        // Find the Resource Type, which is the first segment in the ExtendedURL.
+        // Find the Resource Type, which is the first segment in the ExtendedURL, except for GTW resources which
+        // use a ".gwtrpc" suffix.
+        // TODO: Right now we don't have any specific Resolver for GWT resources and we just consider them as Entity
+        // Resources.
         //
         // Note that we need to remove it from the ExtendedURL instance since it's passed to the specific resolvers
         // and they shouldn't be aware of where it was located since they need to be able to resolve the rest of the
@@ -70,7 +74,14 @@ public class StandardExtendedURLResourceTypeResolver implements ResourceTypeReso
         // However since we also want this code to work when short URLs are enabled, we only remove the segment part
         // if a Resource type has been identified (see below) and if not, we assume the URL is pointing to an Entity
         // Resource.
-        String type = extendedURL.getSegments().get(0);
+        List<String> segments = extendedURL.getSegments();
+        String type = segments.get(0);
+
+        // Special handling for GWT resources
+        if (segments.get(segments.size() - 1).endsWith(".gwtrpc"))
+        {
+            return EntityResourceReference.TYPE;
+        }
 
         // First, find out if an ExtendedURL Resource Resolver exists, only for this URL scheme.
         // Second, if not found, try to locate a URL Resolver registered for all URL schemes

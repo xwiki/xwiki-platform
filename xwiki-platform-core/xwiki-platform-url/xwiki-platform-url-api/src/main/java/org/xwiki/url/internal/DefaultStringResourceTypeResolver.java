@@ -29,67 +29,55 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.CreateResourceTypeException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.url.ExtendedURL;
+import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.url.URLConfiguration;
 
 /**
- * Delegates the work to the Resource Reference Resolver matching the URL Scheme defined in the XWiki Configuration
+ * Delegates the work to the Resource Type Resolver matching the URL Scheme defined in the XWiki Configuration
  * (see {@link org.xwiki.url.URLConfiguration#getURLFormatId()}. If none is found, defaults to the Generic
- * Resource Reference Resolver.
+ * Resource Type Resolver.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 7.1M1
  */
 @Component
 @Singleton
-public class DefaultResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
+public class DefaultStringResourceTypeResolver implements ResourceTypeResolver<String>
 {
-    /**
-     * Used to get the hint of the {@link org.xwiki.resource.ResourceReferenceResolver} to use.
-     */
     @Inject
     private URLConfiguration configuration;
 
     @Inject
-    @Named("generic")
-    private ResourceReferenceResolver<ExtendedURL> genericResourceReferenceResolver;
-
-    /**
-     * Used to lookup the correct {@link org.xwiki.resource.ResourceReferenceResolver} component.
-     */
-    @Inject
     @Named("context")
     private ComponentManager componentManager;
 
-    @Override
-    public ResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
-        throws CreateResourceReferenceException, UnsupportedResourceReferenceException
-    {
-        ResourceReferenceResolver resolver;
+    @Inject
+    @Named("generic")
+    private ResourceTypeResolver<String> genericResourceTypeResolver;
 
-        // Step 1: Look for a URL-scheme-specific Resolver (a general one that is independent of the passed
-        //         Resource Type). This allows URL-scheme implementation to completely override handling of any
-        //         Resource Type if they wish.
-        DefaultParameterizedType parameterizedType = new DefaultParameterizedType(null,
-            ResourceReferenceResolver.class, ExtendedURL.class);
+    @Override
+    public ResourceType resolve(String type, Map<String, Object> parameters)
+        throws CreateResourceTypeException
+    {
+        ResourceTypeResolver resolver;
+
+        DefaultParameterizedType parameterizedType =
+            new DefaultParameterizedType(null, ResourceTypeResolver.class, String.class);
         String hint = this.configuration.getURLFormatId();
         if (this.componentManager.hasComponent(parameterizedType, hint)) {
             try {
                 resolver = this.componentManager.getInstance(parameterizedType, hint);
             } catch (ComponentLookupException e) {
-                throw new CreateResourceReferenceException(
-                    String.format("Failed to create Resource Reference for [%s].", extendedURL.getWrappedURL()), e);
+                throw new CreateResourceTypeException(
+                    String.format("Failed to convert Resource Type from String [%s] to [%s]", type,
+                        ResourceType.class.getSimpleName()), e);
             }
         } else {
-            // Step 2: If not found, use the Generic Resolver, which tries to find a Resolver registered for the
-            //         specific Resource Type.
-            resolver = this.genericResourceReferenceResolver;
+            // No specific String Resource Type Resolver for the Scheme URL, use the generic one!
+            resolver = this.genericResourceTypeResolver;
         }
-        return resolver.resolve(extendedURL, type, parameters);
+        return resolver.resolve(type, parameters);
     }
 }

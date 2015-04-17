@@ -17,42 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal;
+package org.xwiki.url.internal.reference;
 
-import javax.inject.Inject;
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.url.URLConfiguration;
+import org.xwiki.resource.CreateResourceTypeException;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.internal.AbstractExtendedURLResourceTypeResolver;
 
 /**
- * Default implementation reading data from the {@code xwiki.properties} file.
+ * Extracts the {@link ResourceType} from a passed {@link ExtendedURL}, using the {@code reference} URL scheme format.
+ * In that format the Resource Type is the path segment in the URL just after the Context Path one (e.g.
+ * {@code entity} in {@code http://localhost:8080/entity/view/page/wiki:space.page}.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 7.1M1
  */
 @Component
+@Named("reference")
 @Singleton
-public class DefaultURLConfiguration implements URLConfiguration
+public class ReferenceExtendedURLResourceTypeResolver extends AbstractExtendedURLResourceTypeResolver
 {
-    /**
-     * Prefix for configuration keys for the Resource module.
-     */
-    private static final String PREFIX = "url.";
-
-    /**
-     * Defines from where to read the Resource configuration data.
-     */
-    @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configuration;
-
     @Override
-    public String getURLFormatId()
+    public ResourceType resolve(ExtendedURL extendedURL, Map<String, Object> parameters)
+        throws CreateResourceTypeException
     {
-        // Note: the format corresponds to the component hint for the Resource Factory implementation to use.
-        return this.configuration.getProperty(PREFIX + "format", "standard");
+        return resolve("reference", extendedURL, parameters);
     }
 }

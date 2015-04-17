@@ -19,40 +19,32 @@
  */
 package org.xwiki.url.internal;
 
-import javax.inject.Inject;
+import java.util.Map;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.url.URLConfiguration;
+import org.xwiki.resource.CreateResourceTypeException;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.ResourceTypeResolver;
 
 /**
- * Default implementation reading data from the {@code xwiki.properties} file.
+ * A basic Resource Type Resolver which creates a Resource Type based on the passed String representation without
+ * performing any transformation to the passed String.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 7.1M1
  */
 @Component
+@Named("generic")
 @Singleton
-public class DefaultURLConfiguration implements URLConfiguration
+public class GenericStringResourceTypeResolver implements ResourceTypeResolver<String>
 {
-    /**
-     * Prefix for configuration keys for the Resource module.
-     */
-    private static final String PREFIX = "url.";
-
-    /**
-     * Defines from where to read the Resource configuration data.
-     */
-    @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configuration;
-
     @Override
-    public String getURLFormatId()
+    public ResourceType resolve(String type, Map<String, Object> parameters)
+        throws CreateResourceTypeException
     {
-        // Note: the format corresponds to the component hint for the Resource Factory implementation to use.
-        return this.configuration.getProperty(PREFIX + "format", "standard");
+        return new ResourceType(type);
     }
 }

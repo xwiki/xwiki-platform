@@ -22,8 +22,16 @@ package org.xwiki.url.internal;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -34,6 +42,43 @@ import org.xwiki.url.ExtendedURL;
  */
 public abstract class AbstractResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
 {
+    @Inject
+    @Named("context")
+    protected ComponentManager componentManager;
+
+    /**
+     *  Find the right Resolver for the passed Resource type and call it.
+     */
+    protected ResourceReferenceResolver<ExtendedURL> findResourceResolver(String hintPrefix, ResourceType type)
+        throws UnsupportedResourceReferenceException
+    {
+        ResourceReferenceResolver<ExtendedURL> resolver;
+
+        try {
+            // Step 1: Look for a Resolver specific to the scheme and specific to the Resource Type
+            resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
+                ResourceReferenceResolver.class, ExtendedURL.class), computeResolverHint(hintPrefix, type.getId()));
+        } catch (ComponentLookupException e) {
+            // Step 2: If not found, look for a Resolver specific to the Resource Type but registered for all URL
+            // schemes
+            try {
+                resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
+                    ResourceReferenceResolver.class, ExtendedURL.class), type.getId());
+            } catch (ComponentLookupException cle) {
+                // There's no Resolver registered for the passed Resource Type
+                throw new UnsupportedResourceReferenceException(String.format(
+                    "Couldn't find any Resource Reference Resolver for type [%s]", type), cle);
+            }
+        }
+
+        return resolver;
+    }
+
+    protected String computeResolverHint(String hintPrefix, String type)
+    {
+        return String.format("%s/%s", hintPrefix, type);
+    }
+
     /**
      * Copies query string parameters from the passed {@link org.xwiki.url.ExtendedURL} to the passed
      * {@link ResourceReference}.

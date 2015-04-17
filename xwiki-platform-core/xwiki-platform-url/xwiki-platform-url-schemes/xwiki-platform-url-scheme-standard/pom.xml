@@ -24,19 +24,19 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-url</artifactId>
+    <artifactId>xwiki-platform-url-schemes</artifactId>
     <version>7.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-url-api</artifactId>
-  <name>XWiki Platform - URL - API</name>
+  <artifactId>xwiki-platform-url-scheme-standard</artifactId>
+  <name>XWiki Platform - URL - Scheme - Standard Implementation</name>
   <packaging>jar</packaging>
-  <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
+  <description>Standard URL scheme</description>
   <properties>
-    <!-- The reason for this low TPC value is because this module is tested uisng integration tests in the various
-         URL Scheme modules -->
-    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>URL API</xwiki.extension.name>
+    <xwiki.extension.name>Standard URL Scheme</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-url-standard</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
@@ -44,18 +44,27 @@
       <artifactId>xwiki-commons-configuration-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- TODO: Used to access EscapeTool. We need to fix this by introducing a new xwiki-commons-url module and
-         add a URIUtils class there (and also move stuff from this module that can be moved there, like ExtendedURL)
-         and then refactory EscapeTool to use that new module -->
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-velocity</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-default</artifactId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
+    <!--dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-component-multi</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency-->
   </dependencies>
 </project>

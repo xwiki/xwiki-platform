@@ -46,17 +46,6 @@ public class ResourceType
     }
 
     /**
-     * Converts a string to an {@link ResourceType} instance.
-     *
-     * @param id see {@link #getId()}
-     * @return the object representing the Resource Type id passed as a string
-     */
-    public static ResourceType fromString(String id)
-    {
-        return new ResourceType(id);
-    }
-
-    /**
      * @return the technical id of the Resource Type
      */
     public String getId()

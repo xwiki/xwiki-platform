@@ -1,4 +1,6 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -16,32 +18,22 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-package org.xwiki.resource.resources;
+-->
 
-import org.xwiki.resource.AbstractResourceReference;
-import org.xwiki.resource.ResourceType;
-import org.xwiki.stability.Unstable;
-
-/**
- * Represents a reference to a static filesystem template resource.
- *
- * @version $Id$
- * @since 7.1M1
- */
-@Unstable
-public class ResourcesResourceReference extends AbstractResourceReference
-{
-    /**
-     * Represents a static filesystem template Resource Type.
-     */
-    public static final ResourceType TYPE = new ResourceType("resources");
-
-    /**
-     * Sets the Resource Reference Type.
-     */
-    public ResourcesResourceReference()
-    {
-        setType(TYPE);
-    }
-}
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-url</artifactId>
+    <version>7.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-url-schemes</artifactId>
+  <name>XWiki Platform - URL - Schemes - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>XWiki Platform - URL - Schemes - Parent POM</description>
+  <modules>
+    <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-url-scheme-reference</module>
+    <module>xwiki-platform-url-scheme-standard</module>
+  </modules>
+</project>

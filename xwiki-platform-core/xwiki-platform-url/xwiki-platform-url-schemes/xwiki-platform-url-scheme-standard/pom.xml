@@ -59,12 +59,5 @@
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Test Dependencies -->
-    <!--dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-component-multi</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency-->
   </dependencies>
 </project>

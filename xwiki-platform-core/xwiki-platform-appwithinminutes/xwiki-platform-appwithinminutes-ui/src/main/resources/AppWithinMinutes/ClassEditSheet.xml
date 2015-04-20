@@ -613,14 +613,13 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
       #set($queryString = {"wizard" : true})
       #if(!$xwiki.exists($homePageRef))
-        #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')
         #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
         #set($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
         #set($discard = $queryString.putAll({
           "editor":"inline",
           "template":"AppWithinMinutes.LiveTableTemplate",
           "AppWithinMinutes.LiveTableClass_0_class":$doc.fullName,
-          "title":$homePageTitle,
+          "title":'$doc.space',
           "parent":$wikiHomePage
         }))
       #end

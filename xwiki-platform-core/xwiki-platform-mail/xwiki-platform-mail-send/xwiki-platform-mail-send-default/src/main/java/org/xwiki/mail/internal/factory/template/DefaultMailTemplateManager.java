@@ -163,7 +163,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     private VelocityContext createVelocityContext(Map<String, String> data)
     {
         // Note: We create an inner Velocity Context to make it read only and try to prevent the script to modify
-        // its bindings. We also clone its values to try try to protect them. It's not guaranteed though since the
+        // its bindings. We also clone its values to try to protect them. It's not guaranteed though since the
         // clone() method of VelocityContext only performs shallow cloning.
         // However, this whole code is executed in a thread and we recreate the context for each email so it should be
         // pretty safe!

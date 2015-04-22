@@ -31,6 +31,7 @@ import org.xwiki.gwt.dom.client.filter.WithName;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 
 /**
  * Utility class providing methods for manipulating the DOM tree. Add here only the methods that work with any kind of
@@ -1333,14 +1334,35 @@ public class DOMUtils
                 }
                 break;
             case Node.ELEMENT_NODE:
-                for (int i = startOffset; i < endOffset; i++) {
-                    contents.appendChild(node.getChildNodes().getItem(startOffset));
+                // Collect all the child nodes that need to be extracted before removing them because the removal of a
+                // node can have side effects (e.g. the browser inserts a BR element, changing the child node indexes).
+                for (Node child : getChildNodes(node, startOffset, endOffset)) {
+                    contents.appendChild(child);
                 }
                 break;
             default:
                 // ignore
         }
         return contents;
+    }
+
+    /**
+     * Obtain a sub-list of child nodes.
+     * 
+     * @param node the parent node
+     * @param startOffset the index of the first child node to return
+     * @param endOffset the index where to stop
+     * @return the children of the given node that have the index between the specified values (including start offset
+     *         and excluding end offset)
+     */
+    public List<Node> getChildNodes(Node node, int startOffset, int endOffset)
+    {
+        NodeList<Node> childNodes = node.getChildNodes();
+        List<Node> subList = new ArrayList<Node>();
+        for (int i = startOffset; i < endOffset && i < childNodes.getLength(); i++) {
+            subList.add(childNodes.getItem(i));
+        }
+        return subList;
     }
 
     /**

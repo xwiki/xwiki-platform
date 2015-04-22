@@ -104,6 +104,8 @@ public class PasswordClass extends StringClass
         input input = new input();
         input.setAttributeFilter(new XMLAttributeValueFilter());
         BaseProperty prop = (BaseProperty) object.safeget(name);
+        // Only display the obfuscation placeholder is the value is not empty to not confuse users into thinking that
+        // the property is set.
         if (prop != null && !StringUtils.isEmpty(prop.toText())) {
             input.setValue(FORM_PASSWORD_PLACEHODLER);
         }

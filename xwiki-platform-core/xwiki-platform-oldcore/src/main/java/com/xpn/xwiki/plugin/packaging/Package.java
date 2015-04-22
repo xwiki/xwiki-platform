@@ -99,7 +99,7 @@ public class Package
     /**
      * @see #isInstallExension()
      */
-    private boolean installExension = true;
+    private boolean installExtension = true;
 
     private String extensionId;
 
@@ -156,15 +156,43 @@ public class Package
     /**
      * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
      *         <code>false</code> otherwise.
+     * @deprecated since 6.4.5, 7.0.1, 7.1M1, use {@link #isInstallExtension()} instead
      */
+    @Deprecated
     public boolean isInstallExension()
     {
-        return this.installExension;
+        return isInstallExtension();
     }
 
+    /**
+     * @return <code>true</code> if the extension packaged in the XAR should be registered as such automatically,
+     *         <code>false</code> otherwise.
+     * @since 6.4.5, 7.0.1, 7.1M1
+     */
+    public boolean isInstallExtension()
+    {
+        return this.installExtension;
+    }
+
+    /**
+     * @param installExension <code>true</code> if the extension packaged in the XAR should be registered as such
+     *            automatically, <code>false</code> otherwise.
+     * @deprecated since 6.4.5, 7.0.1, 7.1M1, use {@link #setInstallExension(boolean)} instead
+     */
+    @Deprecated
     public void setInstallExension(boolean installExension)
     {
-        this.installExension = installExension;
+        this.installExtension = installExension;
+    }
+
+    /**
+     * @param installExension <code>true</code> if the extension packaged in the XAR should be registered as such
+     *            automatically, <code>false</code> otherwise.
+     * @since 6.4.5, 7.0.1, 7.1M1
+     */
+    public void setInstallExtension(boolean installExtension)
+    {
+        this.installExtension = installExtension;
     }
 
     public String getExtensionId()
@@ -682,7 +710,7 @@ public class Package
     private void registerExtension(XWikiContext context)
     {
         // Register the package as extension if it's one
-        if (isInstallExension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
+        if (isInstallExtension() && StringUtils.isNotEmpty(getExtensionId()) && StringUtils.isNotEmpty(getVersion())) {
             ExtensionId extensionId = new ExtensionId(getExtensionId(), getVersion());
 
             try {
@@ -802,15 +830,11 @@ public class Package
                             LOGGER.debug("Failed to delete document " + previousdoc.getDocumentReference(), e);
                         }
                     }
-                }
-                else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS))
-                {
+                } else if (previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
                     // We conserve the old attachments in the new documents
                     List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
-                    for (XWikiAttachment att : previousdoc.getAttachmentList())
-                    {
-                        if (doc.getDoc().getAttachment(att.getFilename()) == null)
-                        {
+                    for (XWikiAttachment att : previousdoc.getAttachmentList()) {
+                        if (doc.getDoc().getAttachment(att.getFilename()) == null) {
                             // We add the attachment to new document
                             newDocAttachments.add(att);
                             // But then we add it in the "to remove list" of the document

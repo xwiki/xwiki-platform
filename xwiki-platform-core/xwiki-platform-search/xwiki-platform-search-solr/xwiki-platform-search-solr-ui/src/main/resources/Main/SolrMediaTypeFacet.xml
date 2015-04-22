@@ -288,32 +288,36 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function () {
-  var MediaTypeFacetBehavior = Class.create({
-    initialize: function(container) {
-      container.select('.mediaTypeCategory').each(function(category) {
-        var subtypes = category.next('ul');
-        var selected = category.down('.selected') || category.down('input:checked')
-          || subtypes.down('.selected') || subtypes.down('input:checked');
-        !selected &amp;&amp; category.addClassName('closed');
-        subtypes.toggle(selected);
-        category.down('.itemCount').observe('click', function(event) {
-          category.toggleClassName('closed');
-          subtypes.toggle();
-        });
-      });
+      <code>require(['jquery'], function($) {
+  var enhanceMediaTypeCategory = function() {
+    var category = $(this);
+    var subtypes = category.next('ul');
+    var selected = category.add(subtypes).find('.selected, input:checked').size() &gt; 0;
+    !selected &amp;&amp; category.addClass('closed');
+    subtypes.toggle(selected);
+    category.find('.itemCount').click(function(event) {
+      category.toggleClass('closed');
+      subtypes.toggle();
+    });
+  };
+
+  var maybeEnhanceMediaTypeCategory = function() {
+    if (!this.__mediaTypeCategory) {
+      this.__mediaTypeCategory = true;
+      enhanceMediaTypeCategory.call(this);
     }
+  };
+
+  var enhanceMediaTypeFacets = function(elements) {
+    $(elements).find('.search-facet .mediaTypes .mediaTypeCategory').each(maybeEnhanceMediaTypeCategory);
+  };
+
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceMediaTypeFacets(data.elements);
   });
 
-  var init = function() {
-    $('body').select('.search-facet .mediaTypes').each(function(mediaTypeFacet) {
-      new MediaTypeFacetBehavior(mediaTypeFacet);
-    });
-
-    return true;
-  };
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
-})();</code>
+  enhanceMediaTypeFacets(document.body);
+});</code>
     </property>
     <property>
       <name/>

@@ -171,6 +171,12 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
   #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  &lt;label&gt;
+    &lt;input type="checkbox" class="hidden" /&gt;
+    &lt;span class="itemName"&gt;
+      $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
+    &lt;/span&gt;
+  &lt;/label&gt;
   &lt;form action="$xwiki.getURL('Main.SolrDateFacet', 'get')"&gt;
     &lt;div class="hidden"&gt;
       ## Reset the pagination because the number of results can change when a facet is applied.
@@ -181,8 +187,10 @@
       })
       &lt;input type="hidden" name="xredirect" value="$escapetool.xml($url)" /&gt;
       &lt;input type="hidden" name="facet" value="$escapetool.xml($facetRequestParameter)" /&gt;
+      ## This will be overwritten on the client side (with the TimeZone indicated by the browser).
+      #set ($timeZoneOffset = $datetool.timeZone.getOffset($datetool.date.time) / 60000)
+      &lt;input type="hidden" name="timezoneOffset" value="$timeZoneOffset" /&gt;
     &lt;/div&gt;
-    &lt;div class="itemName"&gt;$escapetool.xml($services.localization.render('solr.facet.date.customInterval'))&lt;/div&gt;
     &lt;dl&gt;
       &lt;dt class="hidden"&gt;
         &lt;label for="$escapetool.xml($facetRequestParameter)_startDate"&gt;
@@ -370,60 +378,30 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function () {
-  var CustomDateIntervalBehavior = Class.create({
-    initialize: function(container) {
-      this.container = container;
-      var form = this.container.down('form');
+      <code>require(['jquery'], function($) {
+  var maybeEnhanceCustomDateInterval = function() {
+    // Hide the custom date interval form by default.
+    var form = $(this).find('form').hide();
 
-      // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
-      // and we need (local time - UTC) on the server.
-      var timezoneOffset = new Element('input', {
-        type: 'hidden',
-        name: 'timezoneOffset',
-        value: -new Date().getTimezoneOffset()
-      });
-      form.down('div.hidden').insert(timezoneOffset);
+    // Toggle the form when the user selects the corresponding option. We pass null to prevent animation.
+    $(this).find('.itemName').prev('input[type="checkbox"]').removeClass('hidden').click($.proxy(form, 'toggle', null));
 
-      var checkbox = new Element('input', {type: 'checkbox'});
-      checkbox.observe('click', function() {
-        form.toggle();
-      });
+    // Use the client TimeZone when searching and displaying dates on the server.
+    // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+    // and we need (local time - UTC) on the server.
+    form.find('input[name="timezoneOffset"]').val(-new Date().getTimezoneOffset());
+  };
 
-      var label = new Element('label');
-      label.insert(checkbox);
-      var wrap = new Element('span', {'class':'itemName'});
-      wrap.insert( form.down('.itemName').remove().innerHTML);
-      label.insert(wrap);
-      form.hide().insert({before: label});
-    },
+  var enhanceDateFacets = function(elements) {
+    $(elements).find('.search-facet .customDateInterval').each(maybeEnhanceCustomDateInterval);
+  };
 
-    _onToggle: function(event) {
-      var link = event.element();
-      var startDate = this.container.down('input.datetime');
-      var endDate = startDate.next('input.datetime');
-      // We change the sign because Date#getTimezoneOffset() returns (UTC - local time)
-      // and we need (local time - UTC) on the server.
-      var timezoneOffset = -new Date().getTimezoneOffset();
-      link.href = XWiki.currentDocument.getURL('get', Object.toQueryString({
-        facet: startDate.name,
-        startDate: startDate.value,
-        endDate: endDate.value,
-        timezoneOffset: timezoneOffset,
-        xredirect: link.readAttribute('href')
-      }));
-    }
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceDateFacets(data.elements);
   });
 
-  var init = function() {
-    $('body').select('.customDateInterval').each(function(customDateInterval) {
-      new CustomDateIntervalBehavior(customDateInterval);
-    });
-
-    return true;
-  };
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
-})();</code>
+  enhanceDateFacets(document.body);
+});</code>
     </property>
     <property>
       <name/>
@@ -515,14 +493,20 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.search-facet-body .customDateInterval input {
-  margin-bottom: .3em;
+      <code>.search-facet-body .customDateInterval label {
+  display: block;
 }
 .search-facet-body .customDateInterval .itemName {
   cursor: pointer;
 }
 .search-facet-body .customDateInterval form {
   margin-top: .5em;
+}
+.search-facet-body .customDateInterval dl {
+  margin: 0;
+}
+.search-facet-body .customDateInterval input {
+  margin-bottom: .3em;
 }</code>
     </property>
     <property>

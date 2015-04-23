@@ -90,7 +90,14 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- used to trigger the watchlist notification mail -->
+    <!-- Used to test the watch users feature -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used to trigger the watchlist notification mail -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-scheduler-test-pageobjects</artifactId>

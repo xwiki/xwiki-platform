@@ -505,6 +505,7 @@ document.observe('xwiki:dom:loaded', function(e) {
 
 .panel-width-Small .applicationPanelMoreContainer ul {
   padding: 0;
+  margin: 0;
   background-color: $theme.pageContentBackgroundColor;
 }
 

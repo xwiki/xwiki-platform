@@ -255,13 +255,16 @@ Object.extend(XWiki, {
    * Apply this on links found in the passed content if any, or on the document's all body otherwise.
    */
   fixLinksTargetAttribute: function(content) {
-    // apply this transformation only in the view mode, to not apply transformation on the content in edit mode to
-    // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline,
-    // but like this is consistent with the next function, for section editing.
-    if (XWiki.contextaction == "view" || XWiki.contextaction == "preview") {
       var anchors = $(content || 'body').select("a[rel]");
       for (var i = 0; i < anchors.length; i++) {
           var anchor = anchors[i];
+          if (anchor.up('.xRichTextEditor')) {
+              // Do not touch links inside a WYSIWYG editor since, if the content is saved, our modification would be saved
+              // with it and we do not want to alter the content.
+              // Note: The WYSIWYG editor is currently in a frame, so this code would not reach it anyway. This is more of
+              // a precaution for the future, in case that changes.
+              continue;
+          }
           if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
               // Since the rel attribute can have other values we need to only take into account the ones
               // starting with "_"
@@ -277,7 +280,6 @@ Object.extend(XWiki, {
               }
           }
       }
-    }
   },
 
   /**

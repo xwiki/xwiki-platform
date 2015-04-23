@@ -12,6 +12,7 @@
   #set ($elementType = 'DOCUMENT')
 #elseif ($do.contains('user'))
   #set ($elementType = 'USER')
+  #set ($watchRef = $services.model.serialize($doc.documentReference, 'default'))
 #end
 ##
 #if ($do.startsWith('add'))

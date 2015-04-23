@@ -442,15 +442,14 @@ ul.applicationsPanel li img {
 .panel-width-Medium ul.applicationsPanel li .application-img, .panel-width-Large ul.applicationsPanel li .application-img {
   display: block;
   float: left;
-  width: 16px;
 }
 
 ul.applicationsPanel li .application-label {
   margin-left: 0.5em;
 }
 
-div.applicationPanelMoreContainer ul {
-  margin-left: 0;
+.applicationPanelMoreContainer ul {
+  margin-left: 5px;
 }
 
 div.applicationPanelMoreContainer li a {
@@ -524,6 +523,31 @@ div.applicationPanelMoreContainer li a {
   height: 24px;
 }
 
+.panel-width-Medium .applicationsPanel > li > a,
+.panel-width-Medium .applicationsPanelMoreList > li > a,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a,
+.panel-width-Large .applicationsPanel > li > a,
+.panel-width-Large .applicationsPanelMoreList > li > a,
+.panel-width-Large .applicationPanelMoreContainer ul > li > a {
+  padding: 0;
+}
+
+.panel-width-Medium .applicationsPanel > li > a:hover,
+.panel-width-Medium .applicationsPanel > li > a:focus,
+.panel-width-Medium .applicationsPanelMoreList > li > a:hover,
+.panel-width-Medium .applicationsPanelMoreList > li > a:focus,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a:hover,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a:focus,
+.panel-width-Large .applicationsPanel > li > a:hover,
+.panel-width-Large .applicationsPanel > li > a:focus,
+.panel-width-Large .applicationsPanelMoreList > li > a:hover,
+.panel-width-Large .applicationsPanelMoreList > li > a:focus,
+.panel-width-Large .applicationPanelMoreContainer ul > li > a:hover 
+.panel-width-Large .applicationPanelMoreContainer ul > li > a:focus {
+  background-color: transparent;
+  text-decoration: underline;
+}
+
 /* Phone case */
 @media (max-width: 768px) {
   .panel-width-Small .applicationsPanel li {
@@ -553,9 +577,8 @@ div.applicationPanelMoreContainer li a {
 
 /* for colibri */
 
-.skin-colibri .panel-width-Medium .applicationPanelMoreContainer .application-img,
-.skin-colibri .panel-width-Large .applicationPanelMoreContainer .application-img {
-  width: auto;
+.skin-colibri .applicationPanelMoreContainer ul {
+  margin-left: 0;
 }
 
 .skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,

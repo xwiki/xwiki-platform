@@ -456,7 +456,6 @@ div.applicationPanelMoreContainer ul {
 div.applicationPanelMoreContainer li a {
   font-size: 90%;
   line-height: 16px;
-  font-weight: bold;
 }
 
 .panel-width-Small .panel.Applications{
@@ -553,6 +552,17 @@ div.applicationPanelMoreContainer li a {
 }
 
 /* for colibri */
+
+.skin-colibri .panel-width-Medium .applicationPanelMoreContainer .application-img,
+.skin-colibri .panel-width-Large .applicationPanelMoreContainer .application-img {
+  width: auto;
+}
+
+.skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,
+.skin-colibri .panel-width-Large .applicationPanelMoreContainer ul {
+  margin-left: 20px;
+}
+
 .skin-colibri .panel-width-Small .applicationsPanel {
   margin: 0;
 }

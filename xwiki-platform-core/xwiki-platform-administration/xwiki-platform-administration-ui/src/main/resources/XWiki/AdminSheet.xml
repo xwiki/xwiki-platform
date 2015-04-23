@@ -37,7 +37,7 @@
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.ConfigurableClassMacros" /}}
 
@@ -177,9 +177,9 @@
   #else
     #set ($category.iconReference = "XWiki.ConfigurableClass@DefaultAdminSectionIcon.png")
   #end
-  #set ($category.description = $services.localization.render("admin.${category.id}.description"))
+  #set ($category.description = $services.localization.render("admin.${category.id}.description").trim())
   #set ($category.cssClass = "${category.id}Icon")
-  #set ($category.name = $services.localization.render("admin.${category.id}"))
+  #set ($category.name = $services.localization.render("admin.${category.id}").trim())
   #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
   #end
@@ -298,7 +298,7 @@
 #macro(admin_displayCategories $adminMenu $translationPrefix)
 (% class="admin-category" %)
   #foreach ($category in $adminMenu)
-    * {{html wiki="true"}}&lt;a href="$category.url"&gt;[[image:${category.iconReference}]] **${services.localization.render("${translationPrefix}${category.id}")}**&lt;/a&gt;{{/html}} (% class="description" %)$!{category.description}
+    * [[[[image:${category.iconReference}]] **${category.name}**&gt;&gt;path:${category.url}]] (% class="description" %)$!{category.description}
   #end
 #end
 

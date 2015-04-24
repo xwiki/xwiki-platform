@@ -19,31 +19,36 @@
  */
 package com.xpn.xwiki.test.mockito;
 
+import org.hamcrest.Description;
+import org.mockito.ArgumentMatcher;
+import org.mockito.internal.matchers.Equality;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.model.reference.DocumentReference;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.mockito.Matchers.argThat;
 
 /**
- * Various matchers for oldcore APIs.
+ * Match a {@link CacheConfiguration} parameter with an id.
  * 
  * @version $Id$
- * @since 7.0M1
+ * @since 7.1M1
  */
-public class OldcoreMatchers
+public class CacheConfigurationMatcher extends ArgumentMatcher<CacheConfiguration>
 {
-    public static XWikiDocument isDocument(DocumentReference expected)
+    private final String id;
+
+    public CacheConfigurationMatcher(String id)
     {
-        return argThat(new XWikiDocumentMatcher(expected));
+        this.id = id;
     }
 
-    /**
-     * @since 7.1M1
-     */
-    public static CacheConfiguration isCacheConfiguration(String id)
+    @Override
+    public boolean matches(Object actual)
     {
-        return argThat(new CacheConfigurationMatcher(id));
+        return actual != null && actual instanceof CacheConfiguration
+            && Equality.areEqual(this.id, ((CacheConfiguration) actual).getConfigurationId());
+    }
+
+    @Override
+    public void describeTo(Description description)
+    {
+        description.appendText(String.valueOf(this.id));
     }
 }

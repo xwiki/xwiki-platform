@@ -848,7 +848,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 // Make sure to always return a document with an original version, even for one that does not exist.
                 // Allow writing more generic code.
-                doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference()));
+                doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
 
                 return doc;
             }

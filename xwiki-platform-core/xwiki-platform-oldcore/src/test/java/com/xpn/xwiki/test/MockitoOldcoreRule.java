@@ -19,12 +19,6 @@
  */
 package com.xpn.xwiki.test;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
-import org.mockito.Mockito;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -50,6 +43,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -75,6 +69,12 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test rule to initialize and manipulate various oldcore APIs.
@@ -113,6 +113,8 @@ public class MockitoOldcoreRule implements MethodRule
     private boolean notifyDocumentUpdatedEvent;
 
     private boolean notifyDocumentDeletedEvent;
+
+    private MemoryConfigurationSource configurationSource;
 
     public MockitoOldcoreRule()
     {
@@ -201,7 +203,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Make sure a default ConfigurationSource is available
         if (!getMocker().hasComponent(ConfigurationSource.class)) {
-            getMocker().registerMemoryConfigurationSource();
+            this.configurationSource = getMocker().registerMemoryConfigurationSource();
         }
 
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
@@ -240,7 +242,8 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
-            Provider<XWikiContext> xcontextProvider = this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+            Provider<XWikiContext> xcontextProvider =
+                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
             when(xcontextProvider.get()).thenReturn(this.context);
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
@@ -294,6 +297,18 @@ public class MockitoOldcoreRule implements MethodRule
                     return document;
                 }
             });
+        when(getMockXWiki().getDocument(any(XWikiDocument.class), any(XWikiContext.class))).then(
+            new Answer<XWikiDocument>()
+            {
+                @Override
+                public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiDocument target = (XWikiDocument) invocation.getArguments()[0];
+
+                    return getMockXWiki().getDocument(target.getDocumentReferenceWithLocale(),
+                        (XWikiContext) invocation.getArguments()[1]);
+                }
+            });
         when(getMockXWiki().exists(any(DocumentReference.class), any(XWikiContext.class))).then(new Answer<Boolean>()
         {
             @Override
@@ -308,73 +323,72 @@ public class MockitoOldcoreRule implements MethodRule
                 return documents.containsKey(target);
             }
         });
-        Mockito
-            .doAnswer(new Answer<Void>()
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
             {
-                @Override
-                public Void answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-                    String comment = (String) invocation.getArguments()[1];
-                    boolean minorEdit = (Boolean) invocation.getArguments()[2];
+                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                String comment = (String) invocation.getArguments()[1];
+                boolean minorEdit = (Boolean) invocation.getArguments()[2];
 
-                    boolean isNew = document.isNew();
+                boolean isNew = document.isNew();
 
-                    document.setComment(StringUtils.defaultString(comment));
-                    document.setMinorEdit(minorEdit);
+                document.setComment(StringUtils.defaultString(comment));
+                document.setMinorEdit(minorEdit);
 
-                    if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        document.setDate(new Date());
-                        if (document.isContentDirty()) {
-                            document.setContentUpdateDate(new Date());
-                            document.setContentAuthorReference(document.getAuthorReference());
-                        }
-                        document.incrementVersion();
-
-                        document.setContentDirty(false);
-                        document.setMetaDataDirty(false);
+                if (document.isContentDirty() || document.isMetaDataDirty()) {
+                    document.setDate(new Date());
+                    if (document.isContentDirty()) {
+                        document.setContentUpdateDate(new Date());
+                        document.setContentAuthorReference(document.getAuthorReference());
                     }
-                    document.setNew(false);
-                    document.setStore(getMockStore());
+                    document.incrementVersion();
 
-                    XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
-
-                    if (previousDocument != document) {
-                        for (XWikiAttachment attachment : document.getAttachmentList()) {
-                            if (!attachment.isContentDirty()) {
-                                attachment.setAttachment_content(previousDocument.getAttachment(
-                                    attachment.getFilename()).getAttachment_content());
-                            }
-                        }
-                    }
-
-                    XWikiDocument originalDocument = document.getOriginalDocument();
-                    if (originalDocument == null) {
-                        originalDocument = mockXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
-                        document.setOriginalDocument(originalDocument);
-                    }
-
-                    documents.put(document.getDocumentReferenceWithLocale(), document.clone());
-
-                    if (isNew) {
-                        if (notifyDocumentCreatedEvent) {
-                            getObservationManager().notify(new DocumentCreatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
-                        }
-                    } else {
-                        if (notifyDocumentUpdatedEvent) {
-                            getObservationManager().notify(new DocumentUpdatedEvent(document.getDocumentReference()),
-                                document, getXWikiContext());
-                        }
-                    }
-
-                    document.setOriginalDocument(document.clone());
-
-                    return null;
+                    document.setContentDirty(false);
+                    document.setMetaDataDirty(false);
                 }
-            }).when(getMockXWiki())
-            .saveDocument(any(XWikiDocument.class), any(String.class), anyBoolean(), any(XWikiContext.class));
-        Mockito.doAnswer(new Answer<Void>()
+                document.setNew(false);
+                document.setStore(getMockStore());
+
+                XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
+
+                if (previousDocument != document) {
+                    for (XWikiAttachment attachment : document.getAttachmentList()) {
+                        if (!attachment.isContentDirty()) {
+                            attachment.setAttachment_content(previousDocument.getAttachment(attachment.getFilename())
+                                .getAttachment_content());
+                        }
+                    }
+                }
+
+                XWikiDocument originalDocument = document.getOriginalDocument();
+                if (originalDocument == null) {
+                    originalDocument = mockXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
+                    document.setOriginalDocument(originalDocument);
+                }
+
+                documents.put(document.getDocumentReferenceWithLocale(), document.clone());
+
+                if (isNew) {
+                    if (notifyDocumentCreatedEvent) {
+                        getObservationManager().notify(new DocumentCreatedEvent(document.getDocumentReference()),
+                            document, getXWikiContext());
+                    }
+                } else {
+                    if (notifyDocumentUpdatedEvent) {
+                        getObservationManager().notify(new DocumentUpdatedEvent(document.getDocumentReference()),
+                            document, getXWikiContext());
+                    }
+                }
+
+                document.setOriginalDocument(document.clone());
+
+                return null;
+            }
+        }).when(getMockXWiki()).saveDocument(any(XWikiDocument.class), any(String.class), anyBoolean(),
+            any(XWikiContext.class));
+        doAnswer(new Answer<Void>()
         {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
@@ -385,7 +399,7 @@ public class MockitoOldcoreRule implements MethodRule
                 return null;
             }
         }).when(getMockXWiki()).saveDocument(any(XWikiDocument.class), any(String.class), any(XWikiContext.class));
-        Mockito.doAnswer(new Answer<Void>()
+        doAnswer(new Answer<Void>()
         {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
@@ -481,7 +495,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // XWikiStoreInterface
 
-        Mockito.when(getMockStore().getTranslationList(any(XWikiDocument.class), any(XWikiContext.class))).then(
+        when(getMockStore().getTranslationList(any(XWikiDocument.class), any(XWikiContext.class))).then(
             new Answer<List<String>>()
             {
                 @Override
@@ -515,7 +529,7 @@ public class MockitoOldcoreRule implements MethodRule
 
         // Users
 
-        Mockito.when(getMockXWiki().getUserClass(any(XWikiContext.class))).then(new Answer<BaseClass>()
+        when(getMockXWiki().getUserClass(any(XWikiContext.class))).then(new Answer<BaseClass>()
         {
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
@@ -545,7 +559,7 @@ public class MockitoOldcoreRule implements MethodRule
                 return userClass;
             }
         });
-        Mockito.when(getMockXWiki().getGroupClass(any(XWikiContext.class))).then(new Answer<BaseClass>()
+        when(getMockXWiki().getGroupClass(any(XWikiContext.class))).then(new Answer<BaseClass>()
         {
             @Override
             public BaseClass answer(InvocationOnMock invocation) throws Throwable
@@ -647,5 +661,13 @@ public class MockitoOldcoreRule implements MethodRule
     public QueryManager getQueryManager()
     {
         return this.queryManager;
+    }
+
+    /**
+     * @since 7.1M1
+     */
+    public MemoryConfigurationSource getConfigurationSource()
+    {
+        return this.configurationSource;
     }
 }

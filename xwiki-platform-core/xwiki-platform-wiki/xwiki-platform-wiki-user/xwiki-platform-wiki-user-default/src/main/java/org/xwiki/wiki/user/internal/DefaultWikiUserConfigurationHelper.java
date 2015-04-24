@@ -121,8 +121,10 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
         BaseObject object = document.getXObject(WikiUserClassDocumentInitializer.CONFIGURATION_CLASS, true, context);
         object.setStringValue(WikiUserClassDocumentInitializer.FIELD_USERSCOPE,
                 configuration.getUserScope().name().toLowerCase());
-        object.setStringValue(WikiUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE,
-                configuration.getMembershipType().name().toLowerCase());
+        if (configuration.getMembershipType() != null) {
+            object.setStringValue(WikiUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE,
+                    configuration.getMembershipType().name().toLowerCase());
+        }
 
         // Save the document
         try {

@@ -22,9 +22,9 @@ package org.xwiki.ratings.internal;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.ratings.AverageRating;
@@ -54,7 +54,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
     private Logger logger;
 
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public String getRatingsClassName()
@@ -80,7 +80,7 @@ public abstract class AbstractRatingsManager implements RatingsManager
      */
     protected XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return this.xcontextProvider.get();
     }
 
     /**

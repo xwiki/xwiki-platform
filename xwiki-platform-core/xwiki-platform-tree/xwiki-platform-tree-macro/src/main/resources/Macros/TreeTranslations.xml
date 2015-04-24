@@ -64,7 +64,7 @@ rendering.macro.tree.parameter.openTo.description=The id of the node to open the
 rendering.macro.tree.parameter.finder.name=Finder
 rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
 rendering.macro.tree.content.description=You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.
-rendering.macro.tree.editModeWarning=This tree can't be displayed in edit mode.
+tree.macro.editModeWarning=This tree can't be displayed in edit mode.
 </content>
   <object>
     <name>Macros.TreeTranslations</name>

@@ -433,33 +433,32 @@ document.observe('xwiki:dom:loaded', function(e) {
   margin-top: 1em;
 }
 
-ul.applicationsPanel li img {
-  float: left; 
+.applicationsPanel li img {
+  float: left;
   width: 16px;
   height: 16px;
 }
 
-.panel-width-Medium ul.applicationsPanel li .application-img, .panel-width-Large ul.applicationsPanel li .application-img {
+.panel-width-Medium .applicationsPanel li .application-img, 
+.panel-width-Large .applicationsPanel li .application-img {
   display: block;
   float: left;
-  width: 16px;
 }
 
-ul.applicationsPanel li .application-label {
+.applicationsPanel li .application-label {
   margin-left: 0.5em;
 }
 
-div.applicationPanelMoreContainer ul {
-  margin-left: 0;
+.applicationPanelMoreContainer ul {
+  margin-left: 5px;
 }
 
-div.applicationPanelMoreContainer li a {
+.applicationPanelMoreContainer li a {
   font-size: 90%;
   line-height: 16px;
-  font-weight: bold;
 }
 
-.panel-width-Small .panel.Applications{
+.panel-width-Small .panel.Applications {
   background-color: transparent;
   border: 0;
   box-shadow: none;
@@ -506,6 +505,7 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationPanelMoreContainer ul {
   padding: 0;
+  margin: 0;
   background-color: $theme.pageContentBackgroundColor;
 }
 
@@ -520,9 +520,35 @@ div.applicationPanelMoreContainer li a {
 .panel-width-Small .application-img {
   font-size: 24px;
 }
+
 .panel-width-Small .application-img img {
   width: 24px;
   height: 24px;
+}
+
+.panel-width-Medium .applicationsPanel > li > a,
+.panel-width-Medium .applicationsPanelMoreList > li > a,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a,
+.panel-width-Large .applicationsPanel > li > a,
+.panel-width-Large .applicationsPanelMoreList > li > a,
+.panel-width-Large .applicationPanelMoreContainer ul > li > a {
+  padding: 0;
+}
+
+.panel-width-Medium .applicationsPanel > li > a:hover,
+.panel-width-Medium .applicationsPanel > li > a:focus,
+.panel-width-Medium .applicationsPanelMoreList > li > a:hover,
+.panel-width-Medium .applicationsPanelMoreList > li > a:focus,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a:hover,
+.panel-width-Medium .applicationPanelMoreContainer ul> li > a:focus,
+.panel-width-Large .applicationsPanel > li > a:hover,
+.panel-width-Large .applicationsPanel > li > a:focus,
+.panel-width-Large .applicationsPanelMoreList > li > a:hover,
+.panel-width-Large .applicationsPanelMoreList > li > a:focus,
+.panel-width-Large .applicationPanelMoreContainer ul > li > a:hover 
+.panel-width-Large .applicationPanelMoreContainer ul > li > a:focus {
+  background-color: transparent;
+  text-decoration: underline;
 }
 
 /* Phone case */
@@ -531,7 +557,7 @@ div.applicationPanelMoreContainer li a {
     float: left;
     width: 33%;
   }
-  
+
   /* no responsive design for colibri */
   .skin-colibri .panel-width-Small .applicationsPanel li {
     float: none;
@@ -544,7 +570,7 @@ div.applicationPanelMoreContainer li a {
     float: left;
     width: 20%;
   }
-  
+
   /* no responsive design for colibri */
   .skin-colibri .panel-width-Small .applicationsPanel li {
     float: none;
@@ -553,25 +579,40 @@ div.applicationPanelMoreContainer li a {
 }
 
 /* for colibri */
+
+.skin-colibri .applicationPanelMoreContainer ul {
+  margin-left: 0;
+}
+
+.skin-colibri .panel-width-Medium .applicationPanelMoreContainer ul,
+.skin-colibri .panel-width-Large .applicationPanelMoreContainer ul {
+  margin-left: 20px;
+}
+
 .skin-colibri .panel-width-Small .applicationsPanel {
   margin: 0;
 }
-.skin-colibri .panel-width-Small .applicationsPanel li{
+
+.skin-colibri .panel-width-Small .applicationsPanel li {
   padding: 15px 0;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
   margin: 1px 0;
 }
+
 .skin-colibri .panel-width-Small .applicationsPanel li.active {
   background-color: $theme.buttonPrimaryBackgroundColor;  
 }
+
 .skin-colibri .panel-width-Small .applicationsPanel li.active a {
   color: $theme.buttonPrimaryTextColor
 }
+
 .skin-colibri .panel-width-Small .applicationsPanel li:hover {
   background-color: $theme.highlightColor;
 }
+
 .skin-colibri .panel-width-Small .applicationsPanel li:hover a {
   color: $theme.textPrimaryColor; 
 }

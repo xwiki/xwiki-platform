@@ -40,7 +40,7 @@ public class DefaultURLConfiguration implements URLConfiguration
     /**
      * Prefix for configuration keys for the Resource module.
      */
-    private static final String PREFIX = "url";
+    private static final String PREFIX = "url.";
 
     /**
      * Defines from where to read the Resource configuration data.

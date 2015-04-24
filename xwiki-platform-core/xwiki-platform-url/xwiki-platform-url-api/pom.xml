@@ -32,7 +32,9 @@
   <packaging>jar</packaging>
   <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.56</xwiki.jacoco.instructionRatio>
+    <!-- The reason for this low TPC value is because this module is tested uisng integration tests in the various
+         URL Scheme modules -->
+    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>URL API</xwiki.extension.name>
   </properties>
@@ -52,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-api</artifactId>
+      <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

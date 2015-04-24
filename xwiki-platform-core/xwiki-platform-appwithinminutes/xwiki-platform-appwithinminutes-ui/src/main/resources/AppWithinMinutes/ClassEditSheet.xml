@@ -611,11 +611,19 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
         #set($appName = $stringtool.removeEnd($doc.title, ' Class'))
       #end
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
-      #set($queryString = 'wizard=true')
+      #set($queryString = {"wizard" : true})
       #if(!$xwiki.exists($homePageRef))
-        #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')
-        #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.LiveTableTemplate&amp;AppWithinMinutes.LiveTableClass_0_class=$escapetool.url($doc.fullName)&amp;title=$escapetool.url($homePageTitle)&amp;parent=AppWithinMinutes.WebHome")
+        #set($wikiHomePageRef = $services.model.resolveDocument('', 'default'))
+        #set($wikiHomePage = $services.model.serialize($wikiHomePageRef, 'local'))
+        #set($discard = $queryString.putAll({
+          "editor":"inline",
+          "template":"AppWithinMinutes.LiveTableTemplate",
+          "AppWithinMinutes.LiveTableClass_0_class":$doc.fullName,
+          "title":'$doc.space',
+          "parent":$wikiHomePage
+        }))
       #end
+      #set($queryString = $escapetool.url($queryString))
       $response.sendRedirect($xwiki.getURL($homePageRef, 'edit', $queryString));
     #else
       ## Redirect to view mode.

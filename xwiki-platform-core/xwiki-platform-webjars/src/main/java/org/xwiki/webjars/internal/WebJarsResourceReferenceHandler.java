@@ -65,11 +65,6 @@ import org.xwiki.velocity.VelocityManager;
 public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
 {
     /**
-     * The WebJars Type.
-     */
-    public static final ResourceType TYPE = new ResourceType("webjars");
-
-    /**
      * Prefix for locating resource files (JavaScript, CSS) in the classloader.
      */
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
@@ -104,7 +99,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     @Override
     public List<ResourceType> getSupportedResourceReferences()
     {
-        return Arrays.asList(TYPE);
+        return Arrays.asList(WebJarsResourceReference.TYPE);
     }
 
     @Override

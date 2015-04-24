@@ -55,4 +55,28 @@ public class EntityResourceReferenceTest
         resource.setRevision("1.0");
         assertEquals("1.0", resource.getRevision());
     }
+
+    @Test
+    public void identity()
+    {
+        EntityReference entityReference = new DocumentReference("wiki", "space", "page");
+        EntityResourceReference reference1 = new EntityResourceReference(entityReference, EntityResourceAction.VIEW);
+        EntityResourceReference reference2 = new EntityResourceReference(entityReference, EntityResourceAction.VIEW);
+        EntityResourceReference reference3 = new EntityResourceReference(entityReference,
+            new EntityResourceAction("other"));
+
+        assertEquals(reference1.hashCode(), reference2.hashCode());
+        assertEquals(reference1, reference2);
+        assertNotEquals(reference1, reference3);
+    }
+
+    @Test
+    public void toStringTest()
+    {
+        EntityReference entityReference = new DocumentReference("wiki", "space", "page");
+        EntityResourceReference reference = new EntityResourceReference(entityReference, EntityResourceAction.VIEW);
+        assertEquals(
+            "type = [entity], parameters = [], reference = [wiki:space.page], action = [view], locale = [<null>]",
+            reference.toString());
+    }
 }

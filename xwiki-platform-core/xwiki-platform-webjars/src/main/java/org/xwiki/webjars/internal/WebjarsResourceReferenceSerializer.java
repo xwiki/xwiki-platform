@@ -51,8 +51,8 @@ public class WebjarsResourceReferenceSerializer
     {
         List<String> segments = new ArrayList<>();
 
-        // Add the resource type segment. Use the Resource Type name as the segment name
-        segments.add(resourceReference.getType().getId());
+        // Add the resource type segment.
+        segments.add("webjars");
 
         // Add the resource name
         segments.addAll(resourceReference.getResourceSegments());

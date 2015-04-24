@@ -178,7 +178,6 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns a
 platform.appwithinminutes.appLiveTableHeading=Entries
 platform.appwithinminutes.appLiveTableEditEntryActionName=Edit
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Delete
-platform.appwithinminutes.appHomePageTitle={0} Home
 platform.appwithinminutes.appHomePageActionsHeading=Actions
 platform.appwithinminutes.appHomePageAddEntryLabel=Add
 platform.appwithinminutes.appHomePageAddEntryHint=Add new entry

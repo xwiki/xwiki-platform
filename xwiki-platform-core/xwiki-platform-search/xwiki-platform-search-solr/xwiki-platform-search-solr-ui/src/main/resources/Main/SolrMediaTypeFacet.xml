@@ -232,7 +232,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -277,10 +277,10 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -288,32 +288,36 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>(function () {
-  var MediaTypeFacetBehavior = Class.create({
-    initialize: function(container) {
-      container.select('.mediaTypeCategory').each(function(category) {
-        var subtypes = category.next('ul');
-        var selected = category.down('.selected') || category.down('input:checked')
-          || subtypes.down('.selected') || subtypes.down('input:checked');
-        !selected &amp;&amp; category.addClassName('closed');
-        subtypes.toggle(selected);
-        category.down('.itemCount').observe('click', function(event) {
-          category.toggleClassName('closed');
-          subtypes.toggle();
-        });
-      });
+      <code>require(['jquery'], function($) {
+  var enhanceMediaTypeCategory = function() {
+    var category = $(this);
+    var subtypes = category.next('ul');
+    var selected = category.add(subtypes).find('.selected, input:checked').size() &gt; 0;
+    !selected &amp;&amp; category.addClass('closed');
+    subtypes.toggle(selected);
+    category.find('.itemCount').click(function(event) {
+      category.toggleClass('closed');
+      subtypes.toggle();
+    });
+  };
+
+  var maybeEnhanceMediaTypeCategory = function() {
+    if (!this.__mediaTypeCategory) {
+      this.__mediaTypeCategory = true;
+      enhanceMediaTypeCategory.call(this);
     }
+  };
+
+  var enhanceMediaTypeFacets = function(elements) {
+    $(elements).find('.search-facet .mediaTypes .mediaTypeCategory').each(maybeEnhanceMediaTypeCategory);
+  };
+
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceMediaTypeFacets(data.elements);
   });
 
-  var init = function() {
-    $('body').select('.search-facet .mediaTypes').each(function(mediaTypeFacet) {
-      new MediaTypeFacetBehavior(mediaTypeFacet);
-    });
-
-    return true;
-  };
-  (XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
-})();</code>
+  enhanceMediaTypeFacets(document.body);
+});</code>
     </property>
     <property>
       <name/>
@@ -349,7 +353,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -365,6 +369,22 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -394,10 +414,10 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -433,6 +453,9 @@
 .mediaTypeCategory.closed .itemCount:hover {
   background-image: url("$xwiki.getAttachmentURL('Main.SolrSearch', 'dark-grey-disclosure-arrow-left.png')")
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name/>

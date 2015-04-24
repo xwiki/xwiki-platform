@@ -36,4 +36,12 @@ public class ResourcesResourceReference extends AbstractResourceReference
      * Represents a static filesystem template Resource Type.
      */
     public static final ResourceType TYPE = new ResourceType("resources");
+
+    /**
+     * Sets the Resource Reference Type.
+     */
+    public ResourcesResourceReference()
+    {
+        setType(TYPE);
+    }
 }

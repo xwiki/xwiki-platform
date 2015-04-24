@@ -21,10 +21,14 @@ package org.xwiki.resource.entity;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.resource.AbstractResourceReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represents an XWiki Resource Reference pointing to an Entity (Document, Space, Wiki, Object, etc).
@@ -38,7 +42,7 @@ public class EntityResourceReference extends AbstractResourceReference
     /**
      * Represents an Entity Resource Type.
      */
-    public static final ResourceType TYPE = new ResourceType("bin");
+    public static final ResourceType TYPE = new ResourceType("entity");
 
     /**
      * The parameter name that represents a version of the entity.
@@ -133,5 +137,48 @@ public class EntityResourceReference extends AbstractResourceReference
     public String getRevision()
     {
         return getParameterValue(REVISION_PARAMETER_NAME);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(9, 9)
+            .appendSuper(super.hashCode())
+            .append(getEntityReference())
+            .append(getLocale())
+            .append(getAction())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        EntityResourceReference rhs = (EntityResourceReference) object;
+        return new EqualsBuilder()
+            .appendSuper(super.equals(object))
+            .append(getEntityReference(), rhs.getEntityReference())
+            .append(getLocale(), rhs.getLocale())
+            .append(getAction(), rhs.getAction())
+            .isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.appendSuper(super.toString());
+        builder.append("reference", getEntityReference());
+        builder.append("action", getAction());
+        builder.append("locale", getLocale());
+        return builder.toString();
     }
 }

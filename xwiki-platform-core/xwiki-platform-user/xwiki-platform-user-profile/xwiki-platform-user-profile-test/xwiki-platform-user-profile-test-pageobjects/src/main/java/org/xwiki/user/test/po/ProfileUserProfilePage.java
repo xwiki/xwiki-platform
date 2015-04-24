@@ -26,7 +26,7 @@ import org.openqa.selenium.support.FindBy;
 
 /**
  * Represents the User Profile Profile Tab.
- * 
+ *
  * @version $Id$
  */
 public class ProfileUserProfilePage extends AbstractUserProfilePage
@@ -66,6 +66,9 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     @FindBy(xpath = "//div[@id='avatar']//img")
     private WebElement userAvatarImage;
+
+    @FindBy(css = ".activity-follow a")
+    private WebElement followUnfollowButton;
 
     public static ProfileUserProfilePage gotoPage(String username)
     {
@@ -147,5 +150,23 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     {
         return StringUtils.substringBefore(
             StringUtils.substringAfterLast(this.userAvatarImage.getAttribute("src"), "/"), "?");
+    }
+
+    public boolean isFollowed()
+    {
+        String[] classNames = followUnfollowButton.getAttribute("class").split(" ");
+        for (String className : classNames) {
+            if ("unfollow".equals(className)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public ProfileUserProfilePage toggleFollowButton()
+    {
+        this.followUnfollowButton.click();
+        return new ProfileUserProfilePage(this.getUsername());
     }
 }

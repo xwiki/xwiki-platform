@@ -267,7 +267,7 @@
     <!-- We need to pick a URL implementation @ runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-url-standard</artifactId>
+      <artifactId>xwiki-platform-url-scheme-standard</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

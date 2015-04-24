@@ -218,7 +218,7 @@
       <password/>
     </property>
     <property>
-      <port>3025</port>
+      <port/>
     </property>
     <property>
       <properties/>

@@ -2,3 +2,6 @@ org.xwiki.url.internal.DefaultURLConfiguration
 org.xwiki.url.internal.DefaultResourceReferenceResolver
 org.xwiki.url.internal.DefaultResourceReferenceSerializer
 org.xwiki.url.internal.DefaultResourceTypeResolver
+org.xwiki.url.internal.GenericResourceReferenceResolver
+org.xwiki.url.internal.GenericStringResourceTypeResolver
+org.xwiki.url.internal.DefaultStringResourceTypeResolver

@@ -102,7 +102,7 @@ function maybeEnhanceField(field) {
 var initDateTimePickers = function(event) {
   var containers = (event && event.memo.elements) || [$('body')];
   containers.each(function(container) {
-    $('body').select('input.datetime').each(function(dateTimeInput) {
+    $(container).select('input.datetime').each(function(dateTimeInput) {
       if (!dateTimeInput.hasClassName('initialized')) {
         // The input title holds the date format.
         new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);

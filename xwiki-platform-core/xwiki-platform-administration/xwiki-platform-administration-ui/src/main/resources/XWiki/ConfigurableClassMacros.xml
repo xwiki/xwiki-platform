@@ -254,6 +254,12 @@
       #else
         #set($prettyName = "#evaluate($app.displayPrettyName($propName, $obj))")
         ##
+        #set($hintKey = "${obj.xWikiClass.name}_${propName}.hint")
+        #set($hint = $services.localization.render($hintKey))
+        #if($hint == $hintKey)
+          #set($hint = $NULL)
+        #end
+        ##
         ## Further processing of the field display HTML is needed.
         ## Step 1: Strip &lt;pre&gt; tags which $obj.display inserts, this won't affect content because it's escaped.
         #set($out = $obj.display($propName, 'edit').replaceAll('&lt;[/]?+pre&gt;', ''))
@@ -274,6 +280,9 @@
         #if($linkPrefix != '')
           #set($linkScript = "$linkPrefix$propName")
           &lt;a href="$escapetool.xml("#evaluate($linkScript)")" class="xHelp" title="$services.localization.render('admin.documentation')"&gt;$services.localization.render('admin.documentation')&lt;/a&gt;
+        #end
+        #if ($hint)
+          &lt;span class="xHint"&gt;$hint&lt;/span&gt;
         #end
         &lt;/dt&gt;
         #if ($out.indexOf('type=''checkbox''') == -1)

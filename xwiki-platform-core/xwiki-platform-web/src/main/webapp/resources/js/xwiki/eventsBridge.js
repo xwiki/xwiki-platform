@@ -1,32 +1,52 @@
-// Bridge custom XWiki events fired from Prototype.js to jQuery.
-require(['jquery'], function($) {
-  var triggerJQueryEvent = function(event) {
-    if (event.eventName.substr(0, 6) === 'xwiki:') {
-      var jQueryEvent = $.Event(event.eventName);
-      // This function is executed in the context of the target element.
-      $(this).trigger(jQueryEvent, event.memo);
-      if (jQueryEvent.isDefaultPrevented()) {
-        event.stop();
+// Bridge custom XWiki events between Prototype.js and jQuery.
+define(['jquery'], function($) {
+  var oldJQueryTrigger = $.event.trigger;
+  var oldPrototypeFire = Element.fire;
+
+  var shouldBridgeEvent = function(eventName) {
+    return eventName && eventName.substr(0, 6) === 'xwiki:';
+  };
+
+  var newJQueryTrigger = function(event, data, element, onlyHandlers) {
+    var result = oldJQueryTrigger(event, data, element, onlyHandlers);
+    var jQueryEvent, eventName;
+    if (event && typeof(event) === 'object' && event.type) {
+      jQueryEvent = event;
+      eventName = event.type;
+    } else if (typeof(event) === 'string') {
+      eventName = event;
+    }
+    var propagationStopped = jQueryEvent && typeof(jQueryEvent.isPropagationStopped) === 'function'
+      && jQueryEvent.isPropagationStopped();
+    if (!propagationStopped && element && shouldBridgeEvent(eventName)) {
+      var memo = $.isArray(data) ? data[0] : data;
+      var bubble = !onlyHandlers;
+      var prototypeEvent = oldPrototypeFire(element, eventName, memo, bubble);
+      // Make sure the jQuery event can be canceled from Prototype.
+      if (prototypeEvent.stopped && jQueryEvent && typeof(jQueryEvent.preventDefault) === 'function') {
+        jQueryEvent.preventDefault();
       }
     }
-    return event;
+    return result;
+  }
+
+  var newPrototypeFire = function(element, eventName, memo, bubble) {
+    var prototypeEvent = oldPrototypeFire(element, eventName, memo, bubble);
+    if (!prototypeEvent.stopped && shouldBridgeEvent(eventName)) {
+      var jQueryEvent = $.Event(eventName);
+      var data = memo ? [memo] : null;
+      var onlyHandlers = bubble === undefined ? false : !bubble;
+      oldJQueryTrigger(jQueryEvent, data, element, onlyHandlers);
+      // Make sure the Prototype event can be canceled from jQuery.
+      if (jQueryEvent.isDefaultPrevented()) {
+        prototypeEvent.stop();
+      }
+    }
+    return prototypeEvent;
   };
 
-  var bridge = function(oldPrototypeFire) {
-    return function() {
-      // Prototype doesn't extend the event object if there are no registered event listeners. In IE8 the event object is
-      // missing the target element for custom events, if the event object is not extended. As a consequence calling
-      // Event#element() throws an exception. We need to know the target element in this case, and for this we execute
-      // triggerJQueryEvent() in the context of the target element.
-      //
-      // If this is an element or the document then use it as target, otherwise use the first method argument.
-      var target = (this.nodeType === 1 || this.nodeType === 9) ? this : arguments[0];
-      return triggerJQueryEvent.call(target, oldPrototypeFire.apply(this, arguments));
-    };
-  };
-
-  $.each([Event, Element, document], function() {
-    this.fire = bridge(this.fire);
-  });
+  $.event.trigger = newJQueryTrigger;
+  Element.addMethods({fire: newPrototypeFire});
+  Object.extend(Event, {fire: newPrototypeFire});
+  Object.extend(document, {fire: newPrototypeFire.methodize()});
 });
-

@@ -36,4 +36,12 @@ public class SkinsResourceReference extends AbstractResourceReference
      * Represents a static filesystem Skins Resource Type.
      */
     public static final ResourceType TYPE = new ResourceType("skins");
+
+    /**
+     * Sets the Resource Reference Type.
+     */
+    public SkinsResourceReference()
+    {
+        setType(TYPE);
+    }
 }

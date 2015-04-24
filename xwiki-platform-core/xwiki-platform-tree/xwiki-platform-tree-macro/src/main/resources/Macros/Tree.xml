@@ -365,7 +365,7 @@
 #set ($discard = $attributes.add("data-finder='$finder'"))
 #set ($content = $xcontext.macro.content)
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit')
-  #set ($content = "$services.icon.render('chart_organisation') This tree can't be displayed in edit mode.")
+  #set ($content = "$services.icon.render('chart_organisation') $services.localization.render('tree.macro.editModeWarning')")
 #end
 #set ($output = "(% $stringtool.join($attributes, ' ') %)((($!content)))")
 ## Parse the output and return the resulting XDOM blocks.

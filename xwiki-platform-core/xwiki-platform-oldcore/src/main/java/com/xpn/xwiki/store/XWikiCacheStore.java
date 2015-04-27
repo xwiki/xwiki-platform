@@ -307,15 +307,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             LOGGER.debug("Cache: Got doc {} from storage", key);
 
             getCache().set(key, doc);
+
+            // Also update exist cache
             getPageExistCache().set(key, Boolean.valueOf(!doc.isNew()));
 
             LOGGER.debug("Cache: put doc {} in cache", key);
         }
 
         LOGGER.debug("Cache: end for doc {} in cache", key);
-
-        // Also update exist cache
-        getPageExistCache().set(key, doc.isNew());
 
         return doc;
     }

@@ -72,6 +72,10 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public DocumentReference getDocumentReferenceFromId(String wikiId)
     {
+        if (wikiId == null) {
+            throw new IllegalArgumentException("Wiki id cannot be null");
+        }
+
         WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
         return new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                 XWiki.SYSTEM_SPACE, String.format("XWikiServer%s", StringUtils.capitalize(wikiId)));
@@ -99,6 +103,10 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public DocumentReference findXWikiServerClassDocumentReference(String wikiAlias) throws WikiManagerException
     {
+        if (wikiAlias == null) {
+            throw new IllegalArgumentException("Wiki alias cannot be null");
+        }
+
         WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
 
         DocumentReference result = null;

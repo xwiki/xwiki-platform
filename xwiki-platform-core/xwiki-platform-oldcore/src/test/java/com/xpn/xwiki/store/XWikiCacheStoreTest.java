@@ -33,15 +33,16 @@ import org.xwiki.test.annotation.ComponentList;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
-import static org.mockito.Mockito.times;
-
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -70,8 +71,8 @@ public class XWikiCacheStoreTest
         when(cacheManager.<XWikiDocument>createNewCache(isCacheConfiguration("xwiki.store.pagecache"))).thenReturn(
             cache);
         existCache = mock(Cache.class);
-        when(cacheManager.<Boolean>createNewCache(isCacheConfiguration("xwiki.store.pageexistcache")))
-            .thenReturn(existCache);
+        when(cacheManager.<Boolean>createNewCache(isCacheConfiguration("xwiki.store.pageexistcache"))).thenReturn(
+            existCache);
     }
 
     @Test
@@ -89,16 +90,26 @@ public class XWikiCacheStoreTest
         assertFalse(existingDocument.isNew());
         verify(this.cache).set(eq(existingDocument.getKey()), any(XWikiDocument.class));
         verify(this.existCache).set(existingDocument.getKey(), Boolean.TRUE);
-        verify(this.existCache, times(0)).set(existingDocument.getKey(), Boolean.FALSE);
+        verify(this.cache).get(anyString());
+        verify(this.existCache).get(anyString());
+
+        verifyNoMoreInteractions(this.cache);
+        verifyNoMoreInteractions(this.existCache);
 
         XWikiDocument notExistingDocument =
             store.loadXWikiDoc(new XWikiDocument(new DocumentReference("wiki", "space", "nopage")),
                 this.oldcore.getXWikiContext());
 
         assertTrue(notExistingDocument.isNew());
+
         // Make sure only the existing document has been put in the cache
         verify(this.cache).set(eq(existingDocument.getKey()), any(XWikiDocument.class));
         verify(this.existCache).set(existingDocument.getKey(), Boolean.TRUE);
-        verify(this.existCache, times(0)).set(existingDocument.getKey(), Boolean.FALSE);
+        verify(this.existCache).set(notExistingDocument.getKey(), Boolean.FALSE);
+        verify(this.cache, times(2)).get(anyString());
+        verify(this.existCache, times(2)).get(anyString());
+
+        verifyNoMoreInteractions(this.cache);
+        verifyNoMoreInteractions(this.existCache);
     }
 }

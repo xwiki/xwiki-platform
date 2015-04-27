@@ -293,25 +293,25 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
                 // Make sure to always return a document with an original version, even for one that does not exist.
                 // Allow writing more generic code.
                 doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference(), doc.getLocale()));
+            } else {
+                LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
 
-                // The document does not exist we directly return an empty doc, no need to fill the cache with not
-                // existing documents
-                return doc;
+                doc = this.store.loadXWikiDoc(doc, context);
+                doc.setStore(this.store);
+
+                LOGGER.debug("Cache: Got doc {} from storage", key);
+
+                if (doc.isNew()) {
+                    getPageExistCache().set(key, Boolean.FALSE);
+                } else {
+                    getCache().set(key, doc);
+
+                    // Also update exist cache
+                    getPageExistCache().set(key, Boolean.TRUE);
+                }
+
+                LOGGER.debug("Cache: put doc {} in cache", key);
             }
-
-            LOGGER.debug("Cache: Trying to get doc {} from persistent storage", key);
-
-            doc = this.store.loadXWikiDoc(doc, context);
-            doc.setStore(this.store);
-
-            LOGGER.debug("Cache: Got doc {} from storage", key);
-
-            getCache().set(key, doc);
-
-            // Also update exist cache
-            getPageExistCache().set(key, Boolean.valueOf(!doc.isNew()));
-
-            LOGGER.debug("Cache: put doc {} in cache", key);
         }
 
         LOGGER.debug("Cache: end for doc {} in cache", key);

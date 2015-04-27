@@ -1,6 +1,7 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
 #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
@@ -501,7 +502,7 @@ $namespace##
     <div id="extension-body-changes-$extensionIdHashCode"></div>
     <div class="extension-body-changes extension-body-section">
       #template('diff_macros.vm')
-      #displayDocumentUnifiedDiffs($documentDiffs)
+      #displayDocumentUnifiedDiffsWithSummary($documentDiffs 3)
     </div>
   #end
 #end

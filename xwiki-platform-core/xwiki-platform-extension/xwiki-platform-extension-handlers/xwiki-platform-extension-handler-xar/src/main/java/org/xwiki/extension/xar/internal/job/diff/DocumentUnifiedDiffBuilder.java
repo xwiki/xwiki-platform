@@ -296,6 +296,11 @@ public class DocumentUnifiedDiffBuilder extends AbstractUnifiedDiffBuilder
         addObjectDiff(previousProperty == null ? new PropertyClass() : previousProperty, nextProperty == null
             ? new PropertyClass() : nextProperty, classPropertyDiff);
 
+        // The property name is already specified by the previous / next reference.
+        classPropertyDiff.remove("name");
+        // This meta property is not used (there's no UI to change it).
+        classPropertyDiff.remove("unmodifiable");
+
         if (classPropertyDiff.size() > 0) {
             documentDiff.getClassPropertyDiffs().add(classPropertyDiff);
         }

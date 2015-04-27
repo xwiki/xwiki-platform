@@ -23,50 +23,6 @@
   </div>
 #end
 
-#macro (unifiedDiffLine $line)
-#if($line.type.symbol == ' ')&nbsp;#else$line.type.symbol#end##
-#if ($line.chunks)##
-#inlineDiffLine($line.chunks)##
-#else##
-$escapetool.xml($line.value)##
-#end
-#end
-
-#macro (inlineDiffLine $chunks)
-#foreach ($chunk in $chunks)
-#set ($escapedChunk = $escapetool.xml($chunk))
-#if ($chunk.added)##
-<ins>$escapedChunk</ins>##
-#elseif ($chunk.deleted)##
-<del>$escapedChunk</del>##
-#else##
-$escapedChunk##
-#end
-#end
-#end
-
-#macro (diffIcon $icon $action)
-  #set ($_action = "$!action")
-  #set ($_action = $_action.toLowerCase())
-  #set ($aliases = {
-    'added': 'insert',
-    'removed': 'delete',
-    'changed': 'change',
-    '': 'change'
-  })
-  #if ($aliases.containsKey($_action))
-    #set ($_action = $aliases.get($_action))
-  #end
-  <span class="diff-icon diff-icon-$_action" title="$_action">
-    $services.icon.renderHTML($icon)
-  </span>
-#end
-
-#macro (diffAnchor $entityReference)
-#set ($id = "$!entityReference.type:$!services.model.serialize($entityReference, 'default')")
-diff$id.hashCode()##
-#end
-
 #macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate)
   #set ($previousValue = "$!previousValue")
   #set ($newValue = "$!newValue")
@@ -526,19 +482,175 @@ diff$id.hashCode()##
 ## New macros used to display differences, in unified format, between two versions of an XWiki entity.
 ##
 
-#macro (displayDocumentUnifiedDiffs $documentDiffs)
+##
+## Helpers
+##
+
+#macro (unifiedDiffLine $line)
+#if($line.type.symbol == ' ')&nbsp;#else$line.type.symbol#end##
+#if ($line.chunks)##
+#inlineDiffLine($line.chunks)##
+#else##
+$escapetool.xml($line.value)##
+#end
+#end
+
+#macro (inlineDiffLine $chunks)
+#foreach ($chunk in $chunks)
+#set ($escapedChunk = $escapetool.xml($chunk))
+#if ($chunk.added)##
+<ins>$escapedChunk</ins>##
+#elseif ($chunk.deleted)##
+<del>$escapedChunk</del>##
+#else##
+$escapedChunk##
+#end
+#end
+#end
+
+#macro (diffIcon $icon $action)
+  #set ($_action = "$!action")
+  #set ($_action = $_action.toLowerCase())
+  #set ($aliases = {
+    'added': 'insert',
+    'removed': 'delete',
+    'changed': 'change',
+    '': 'change'
+  })
+  #if ($aliases.containsKey($_action))
+    #set ($_action = $aliases.get($_action))
+  #end
+  <span class="diff-icon diff-icon-$_action" title="$_action">
+    $services.icon.renderHTML($icon)
+  </span>
+#end
+
+#macro (diffAnchor $entityReference)
+#set ($id = "$!entityReference.type:$!services.model.serialize($entityReference, 'default')")
+diff$id.hashCode()##
+#end
+
+#macro (displayDocumentUnifiedDiffsWithSummary $documentDiffs $headingLevel)
+  <h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
+  #displayDocumentUnifiedDiffsSummary($documentDiffs)
+  #if ($documentDiffs.size() > 0)
+    <h$headingLevel>$services.localization.render('web.history.changes.details')</h$headingLevel>
+    #displayDocumentUnifiedDiffs($documentDiffs)
+  #end
+#end
+
+##
+## Summary
+##
+
+#macro (displayDocumentUnifiedDiffsSummary $documentDiffs)
   #if ($documentDiffs.isEmpty())
     #info($services.localization.render('web.history.changes.noChanges'))
   #else
     #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
     #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
-    #foreach ($documentDiff in $documentDiffs)
-      <h3>
-        #diffIcon('page' $documentDiff.type)
-        $escapetool.xml($services.model.serialize($documentDiff.reference, 'local'))
-      </h3>
-      #displayDocumentUnifiedDiff($documentDiff)
+    <div class="diff-summary-item">
+      $services.icon.renderHTML('branch')
+      $services.localization.render('web.history.changes.summary.documents',
+        ['<a href="#details">', $documentDiffs.size(), '</a>'])
+      <span class="diff-summary-item-hint">
+        #set ($count = {'change': 0, 'insert': 0, 'delete': 0})
+        #countEntityUnifiedDiffsChanges($documentDiffs $count)
+        ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved',
+          [$count.change, $count.insert, $count.delete]))
+      </span>
+    </div>
+    <ul class="diff-summary">
+      #foreach ($documentDiff in $documentDiffs)
+        <li>#displayDocumentUnifiedDiffSummary($documentDiff)</li>
+      #end
+    </ul>
+  #end
+#end
+
+#macro (countEntityUnifiedDiffsChanges $entityDiffs $count)
+  #foreach ($entityDiff in $entityDiffs)
+    #set ($type = $entityDiff.type.toString().toLowerCase())
+    #set ($discard = $count.put($type, $mathtool.add($count.get($type), 1)))
+  #end
+#end
+
+#macro (displayDocumentUnifiedDiffSummary $documentDiff)
+  <div class="diff-summary-item">
+    #diffIcon('page' $documentDiff.type)
+    <a href="#details">$escapetool.xml($services.model.serialize($documentDiff.reference, 'local'))</a>
+  </div>
+  <ul>
+    #if ($documentDiff.size() > 0)
+      #displayDocumentPropertiesDiffSummary($documentDiff)
     #end
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.attachmentDiffs 'attach'
+      'web.history.changes.summary.attachments')
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.objectDiffs 'cubes' 'web.history.changes.summary.objects')
+    #maybeDisplayEntityUnifiedDiffsSummary($documentDiff.classPropertyDiffs 'cube'
+      'web.history.changes.summary.classProperties')
+  </ul>
+#end
+
+#macro (displayDocumentPropertiesDiffSummary $documentDiff)
+  <li class="diff-summary-item">
+    $services.icon.renderHTML('file-text')
+    <a href="$escapetool.h#diffAnchor($documentDiff.reference)">
+      $escapetool.xml($services.localization.render('web.history.changes.summary.documentProperties'))
+    </a>
+    <span class="diff-summary-item-hint">
+      ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved', [$documentDiff.size(), 0, 0]))
+    </span>
+  </li>
+#end
+
+#macro (maybeDisplayEntityUnifiedDiffsSummary $entityDiffs $icon $label)
+  #if ($entityDiffs.size() > 0)
+    <li>#displayEntityUnifiedDiffsSummary($entityDiffs)</li>
+  #end
+#end
+
+#macro (displayEntityUnifiedDiffsSummary $entityDiffs $icon $label)
+  <div class="diff-summary-item">
+    $services.icon.renderHTML($icon)
+    <a href="#details">$escapetool.xml($services.localization.render($label))</a>
+    <span class="diff-summary-item-hint">
+      #set ($count = {'change': 0, 'insert': 0, 'delete': 0})
+      #countEntityUnifiedDiffsChanges($entityDiffs $count)
+      ($services.localization.render('web.history.changes.summary.modifiedAddedRemoved',
+        [$count.change, $count.insert, $count.delete]))
+    </span>
+  </div>
+  <ul>
+    #foreach($entityDiff in $entityDiffs)
+      <li class="diff-summary-item">
+        #diffIcon($icon $entityDiff.type)
+        #set ($entityReference = $entityDiff.reference)
+        <a href="$escapetool.h#diffAnchor($entityReference)">
+          #if ($entityReference.type == 'OBJECT')
+            $escapetool.xml($services.model.serialize($entityReference.xClassReference, 'local'))
+            [$entityReference.objectNumber]
+          #else
+            $escapetool.xml($entityReference.name)
+          #end
+        </a>
+      </li>
+    #end
+  </ul>
+#end
+
+##
+## Details
+##
+
+#macro (displayDocumentUnifiedDiffs $documentDiffs)
+  #foreach ($documentDiff in $documentDiffs)
+    #set ($documentReference = $documentDiff.reference)
+    <h$mathtool.add($headingLevel, 1) id="#diffAnchor($documentReference)">
+      #diffIcon('page' $documentDiff.type)
+      $escapetool.xml($services.model.serialize($documentReference, 'local'))
+    </h$mathtool.add($headingLevel, 1)>
+    #displayDocumentUnifiedDiff($documentDiff)
   #end
 #end
 
@@ -581,9 +693,20 @@ diff$id.hashCode()##
   <dl>
     #foreach ($entry in $entityDiff.entrySet())
       <dt class="diff-header">
-        $escapetool.xml($entry.key)
+        #set ($entityType = $entityDiff.reference.type.toString().toLowerCase())
+        #if ($entityType == 'document' || $entityType == 'attachment')
+          $services.localization.render("web.history.changes.${entityType}.$entry.key")
+        #else
+          $escapetool.xml($entry.key)
+        #end
         #if ($entry.value.isEmpty())
-          <span class="diff-info-icon" title="$services.localization.render('web.history.changes.privateInformation')">
+          #if ($entityType == 'attachment' && $entry.key == 'content')
+            ## This is not a text file or the file is too large.
+            #set ($hintKey = 'web.history.changes.attachment.noContentChanges')
+          #else
+            #set ($hintKey = 'web.history.changes.privateInformation')
+          #end
+          <span class="diff-info-icon" title="$services.localization.render($hintKey)">
             $services.icon.renderHTML('info')
           </span>
         #end

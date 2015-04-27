@@ -1,6 +1,6 @@
-require(['jquery'], function($) {
+require(['jquery', 'xwiki-events-bridge'], function($) {
   // Collapsible diff summary.
-  $('div.diff-summary-item').each(function() {
+  var enhanceDiffSummaryItem = function() {
     var details = $(this).next('ul');
     if (details.size() > 0) {
       details.hide();
@@ -9,5 +9,15 @@ require(['jquery'], function($) {
         details.toggle();
       });
     }
+  };
+
+  var enhanceDiffSummaryItems = function(elements) {
+    $(elements).find('div.diff-summary-item').each(enhanceDiffSummaryItem);
+  }
+
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceDiffSummaryItems(data.elements);
   });
+
+  enhanceDiffSummaryItems([document.body]);
 });

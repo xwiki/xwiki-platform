@@ -93,6 +93,20 @@ public class WebJarsScriptServiceTest
     }
 
     @Test
+    public void computeURLWithoutVersionAndNoExtensionMatchingWebJarId() throws Exception
+    {
+        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer =
+            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+                WebJarsResourceReference.class, ExtendedURL.class));
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference(Arrays.asList("angular", "angular.js"));
+        when(serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js")));
+
+        assertEquals("/xwiki/angular/angular.js", this.mocker.getComponentUnderTest().url("angular", "angular.js"));
+    }
+
+    @Test
     public void computeURLWithParameters() throws Exception
     {
         ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(

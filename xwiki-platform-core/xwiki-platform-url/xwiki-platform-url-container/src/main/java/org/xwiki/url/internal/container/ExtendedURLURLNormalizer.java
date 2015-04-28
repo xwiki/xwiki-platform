@@ -31,8 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
-import org.xwiki.url.URLNormalizer;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.URLNormalizer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -70,7 +70,9 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
             XWikiRequest request = context.getRequest();
             if (request != null) {
                 contextPath = request.getContextPath();
-            } else {
+            }
+
+            if (contextPath == null) {
                 URL currentURL = context.getURL();
                 if (currentURL != null) {
                     // Extract the context by getting the first path segment
@@ -90,7 +92,7 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
         segments.add(contextPath);
         segments.addAll(partialURL.getSegments());
 
-        return new ExtendedURL(segments);
+        return new ExtendedURL(segments, partialURL.getParameters());
     }
 
     private XWikiContext getXWikiContext()

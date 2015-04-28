@@ -605,7 +605,7 @@ require(['jquery'], function($) {
       <code>// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
 require.config({
   paths: {
-    'colpick': "$services.webjars.url('colpick', 'js/colpick.js')"
+    'colpick': "$services.webjars.url('colpick', 'js/colpick')"
   },
   shim: {
     'colpick' : ['jquery']

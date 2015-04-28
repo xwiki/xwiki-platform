@@ -170,13 +170,18 @@ public class WebJarsScriptService implements ScriptService
 
         Object version = urlParams.remove(VERSION);
         if (version == null) {
+            // Try to determine the version based on the extensions that are currently installed or provided by default.
             version = getVersion(String.format("%s:%s", groupId, artifactId));
         }
 
         // Construct a WebJarsResourceReference so that we can serialize it!
         List<String> segments = new ArrayList<>();
         segments.add(artifactId);
-        segments.add((String) version);
+        // Don't include the version if it's not specified and there's no installed/core extension that matches the
+        // given WebJar id.
+        if (version != null) {
+            segments.add((String) version);
+        }
         segments.addAll(Arrays.asList(path.split(RESOURCE_SEPARATOR)));
 
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(segments);

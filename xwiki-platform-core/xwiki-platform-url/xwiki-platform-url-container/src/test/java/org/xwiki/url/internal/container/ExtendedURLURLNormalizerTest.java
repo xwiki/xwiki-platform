@@ -21,6 +21,9 @@ package org.xwiki.url.internal.container;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -145,5 +148,19 @@ public class ExtendedURLURLNormalizerTest
             assertEquals("Failed to normalize the URL [/one/two] since the application's Servlet context couldn't be "
                 + "computed.", expected.getMessage());
         }
+    }
+
+    @Test
+    public void normalizeExtendedURLWithParameters() throws Exception
+    {
+        ConfigurationSource configurationSource = this.mocker.getInstance(ConfigurationSource.class, "xwikicfg");
+        when(configurationSource.getProperty("xwiki.webapppath")).thenReturn("xwiki");
+
+        Map<String, List<String>> params = new HashMap<>();
+        params.put("age", Arrays.asList("32"));
+        params.put("colors", Arrays.asList("red", "blue"));
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"), params);
+        assertSame(params, this.mocker.getComponentUnderTest().normalize(extendedURL).getParameters());
     }
 }

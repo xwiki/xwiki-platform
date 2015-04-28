@@ -50,6 +50,8 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
      */
     public static final String ID = "wiki";
 
+    private static final String KEY_PREFIX = ID + ':';
+
     /**
      * Used to access the current entities.
      */
@@ -63,10 +65,30 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
     @Inject
     private ComponentManager rootComponentManager;
 
+    private String getCurrentWiki()
+    {
+        return this.currentProvider.getDefaultValue(EntityType.WIKI);
+    }
+
     @Override
     protected EntityReference getCurrentReference()
     {
-        return new WikiReference(this.currentProvider.getDefaultValue(EntityType.WIKI));
+        return new WikiReference(getCurrentWiki());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override default implementation with one much better for performances.
+     * 
+     * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
+     */
+    @Override
+    protected String getKey()
+    {
+        String wiki = getCurrentWiki();
+
+        return wiki != null ? KEY_PREFIX + wiki : null;
     }
 
     @Override

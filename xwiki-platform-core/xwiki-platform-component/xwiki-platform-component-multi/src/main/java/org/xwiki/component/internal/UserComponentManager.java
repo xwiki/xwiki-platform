@@ -50,6 +50,8 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
      */
     public static final String ID = "user";
 
+    private static final String KEY_PREFIX = ID + ':';
+
     /**
      * Used to access the current user in the Execution Context.
      */
@@ -82,6 +84,7 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     protected String getKey()
     {
         DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
-        return userReference != null ? ID + ':' + this.referenceSerializer.serialize(userReference) : null;
+
+        return userReference != null ? KEY_PREFIX + this.referenceSerializer.serialize(userReference) : null;
     }
 }

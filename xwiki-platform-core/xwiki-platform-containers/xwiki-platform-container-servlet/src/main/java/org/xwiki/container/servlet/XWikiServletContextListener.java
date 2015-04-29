@@ -57,7 +57,7 @@ public class XWikiServletContextListener implements ServletContextListener
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
 
         // Initialize all the components. Note that this can fail with a Runtime Exception. This is done voluntarily so
-        // that the XWiki webaopp will not be available if one component fails to load. It's better to fail-fast.
+        // that the XWiki webapp will not be available if one component fails to load. It's better to fail-fast.
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 

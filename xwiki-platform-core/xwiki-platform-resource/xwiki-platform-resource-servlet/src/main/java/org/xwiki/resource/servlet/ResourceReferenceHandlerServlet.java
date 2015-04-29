@@ -90,7 +90,7 @@ public class ResourceReferenceHandlerServlet extends HttpServlet
 
         // Before handling the Resource Reference we need to setup the Request/Response so that it's available to
         // the Handlers (for writing content to the reponse for example!)
-        // Note that we don't initialize other things such as thes XWiki Contexts for example since we assume that
+        // Note that we don't initialize other things such as the XWiki Contexts for example since we assume that
         // not all Resource Handlers require the XWiki Contexts (the WebJar Resource Handler doesn't need it for
         // example). Thus it's up for the specific Resource Handlers to initialize anything else they need to work.
         // We just initialize the Request/Response/Session here as we consider them to be basic needs for all Resource

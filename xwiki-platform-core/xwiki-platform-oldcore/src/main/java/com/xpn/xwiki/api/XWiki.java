@@ -2507,7 +2507,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth() throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(this.context);
+        return this.context.getWiki().checkImpersonation(this.context.getWiki().getAuthService().checkAuth(this.context), context);
     }
 
     /**
@@ -2522,7 +2522,7 @@ public class XWiki extends Api
      */
     public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
     {
-        return this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context);
+        return this.context.getWiki().checkImpersonation(this.context.getWiki().getAuthService().checkAuth(username, password, rememberme, this.context), context);
     }
 
     /**

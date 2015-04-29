@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>ImpersonateUserConfigurationSheet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1407398161000</creationDate>
+  <date>1407398161000</date>
+  <contentUpdateDate>1407398161000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.TagClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <tags>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <multiSelect>1</multiSelect>
+        <name>tags</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Tags</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>,</separator>
+        <separators>,|</separators>
+        <size>30</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </tags>
+    </class>
+    <name>XWiki.ImpersonateUserConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.TagClass</className>
+    <guid>fcf3452c-9d60-4e27-b284-cf7f3ad09b68</guid>
+    <property>
+      <tags/>
+    </property>
+  </object>
+  <content>This configuration allows an admin user to impersonate another user for testing.
+
+Choose the user you would like to impersonate:
+
+{{velocity}}
+#set($cookieg = $xwiki.parseGroovyFromPage("XWiki.ImpersonateUserConfigurationGroovy"))
+#set($cookiename = $cookieg.getCookieName($xwiki))
+#set($error = false)
+#set($errormsg = "Impossible to find user to impersonate")
+#if($request.email || $request.userid)
+ #if($request.userid&amp;&amp;$request.userid!="")
+  #set($userid = $request.userid)
+  #if(!$userid.startsWith("XWiki."))
+   #set($userid = "XWiki.${userid}")
+  #end 
+ #elseif($request.email&amp;&amp;$request.email!="")
+  #set($hql = ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj.id=prop.id.id and prop.id.name='email' and prop.value='${request.email}'")
+  #set($list = $xwiki.searchDocuments($hql))
+  #if($list &amp;&amp; $list.size()==1)
+   #set($userid = $list.get(0))
+  #elseif($list.size()&gt;1)
+   Select the user to impersonate:
+
+   #foreach($user in $list)
+    #set($username = $xwiki.getUserName($user, false))
+    * [[$username&gt;&gt;?userid=${user}]]
+   #end
+  #else
+   #set($error = true)
+   #set($errormsg = "Impossible to find user with this email")
+  #end
+ #end
+ #set($userdoc = $xwiki.getDocument($userid))
+ #set($cuserid = $cookieg.convertUserId($userid, $xwiki))
+ #if(!$cuserid || $cuserid.trim()=="")
+  #set($error = true)
+  #set($errormsg = "Impossible to impersonate user without an email set")
+ #end
+ #if(!$error &amp;&amp; !$userdoc.isNew()&amp;&amp;$userdoc.getObject("XWiki.XWikiUsers"))
+  Impersonating user: $xwiki.getUserName($userid, false)
+  #set($ok = $cookieg.addCookie($cookiename, $userid, -1, $request, $response, $xwiki))
+  {{info}}User has been impersonated. Check status [[here&gt;&gt;XWiki.ImpersonateUserConfiguration]]{{/info}}
+  {{html clean==false}}
+  &lt;script type="text/javascript"&gt;
+   location = '$xwiki.getURL("XWiki.ImpersonateUserConfiguration")';
+  &lt;/script&gt;
+  {{/html}}
+ #else
+  #if($error)
+  {{warning}}$errormsg{{/warning}}
+  #end 
+#end
+#end
+{{/velocity}}
+
+{{html clean=false}}
+&lt;form action=""&gt;
+&lt;input type="hidden" name="section" value="Impersonate" /&gt;
+email: &lt;input type="text" name="email" value="" size="30" /&gt;
+
+user id:  &lt;input type="text" name="userid" class="suggestUsers" value="" size="30" /&gt;
+
+&lt;input type="submit" class="button" value="Change User" /&gt;
+&lt;/form&gt;
+{{/html}}
+ 
+</content>
+</xwikidoc>

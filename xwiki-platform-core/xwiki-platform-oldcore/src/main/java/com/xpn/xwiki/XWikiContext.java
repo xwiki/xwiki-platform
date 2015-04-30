@@ -573,6 +573,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @return the current locale
+     * @since 4.3M1
      */
     public Locale getLocale()
     {
@@ -581,6 +582,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @param locale the current locale
+     * @since 4.3M1
      */
     public void setLocale(Locale locale)
     {
@@ -602,6 +604,10 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.interfaceLocale != null ? this.interfaceLocale.toString() : null;
     }
 
+    /**
+     * @return the {@link Locale} to use to display the user interface
+     * @since 6.0M1
+     */
     public Locale getInterfaceLocale()
     {
         return this.interfaceLocale;
@@ -616,6 +622,10 @@ public class XWikiContext extends Hashtable<Object, Object>
         setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
     }
 
+    /**
+     * @param interfaceLocale the {@link Locale} to use to display the content
+     * @since 6.0M1
+     */
     public void setInterfaceLocale(Locale interfaceLocale)
     {
         this.interfaceLocale = interfaceLocale;

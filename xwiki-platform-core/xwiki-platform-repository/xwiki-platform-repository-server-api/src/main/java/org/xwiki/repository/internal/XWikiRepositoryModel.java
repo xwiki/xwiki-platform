@@ -32,6 +32,8 @@ public class XWikiRepositoryModel
 
     public static final String EXTENSION_CLASSNAME = "ExtensionCode.ExtensionClass";
 
+    public static final String AVERAGERATING_CLASSNAME = "XWiki.AverageRatingsClass";
+
     public static final String EXTENSIONVERSION_CLASSNAME = "ExtensionCode.ExtensionVersionClass";
 
     public static final String EXTENSIONDEPENDENCY_CLASSNAME = "ExtensionCode.ExtensionDependencyClass";
@@ -115,6 +117,10 @@ public class XWikiRepositoryModel
 
     public static final String PROP_CONFIGURATION_VALIDTYPEs = "validTypes";
 
+    public static final String PROP_RATING_TOTALVOTES = "nbvotes";
+
+    public static final String PROP_RATING_AVERAGEVOTE = "averagevote";
+
     // Consolidation
 
     public static final String PROP_EXTENSION_LASTVERSION = "lastVersion";
@@ -128,7 +134,37 @@ public class XWikiRepositoryModel
 
     public static final String SOLR_STRING = "string";
 
+    public static final String SOLR_INTEGER = "int";
+
     public static final Map<String, SolrField> SOLR_FIELDS = new HashMap<>();
+
+    public static class ExtensionSolrField extends SolrField
+    {
+        public ExtensionSolrField(String name, Float boostValue)
+        {
+            this(name, SOLR_STRING, boostValue);
+        }
+
+        public ExtensionSolrField(String name, String type, Float boostValue)
+        {
+            super(toExtensionClassSolrPropertyName(name, type), type != null ? toExtensionClassSolrPropertyName(name)
+                : null, boostValue);
+        }
+    }
+
+    public static class RatingSolrField extends SolrField
+    {
+        public RatingSolrField(String name, Float boostValue)
+        {
+            this(name, SOLR_STRING, boostValue);
+        }
+
+        public RatingSolrField(String name, String type, Float boostValue)
+        {
+            super(toAverageRatingClassSolrPropertyName(name, type), type != null
+                ? toAverageRatingClassSolrPropertyName(name) : null, boostValue);
+        }
+    }
 
     public static class SolrField
     {
@@ -138,42 +174,43 @@ public class XWikiRepositoryModel
 
         public final Float boostValue;
 
-        public SolrField(String name, Float boostValue)
+        public SolrField(String name, String boostName, Float boostValue)
         {
-            this(name, SOLR_STRING, boostValue);
-        }
-
-        public SolrField(String name, String type, Float boostValue)
-        {
-            this.name = toExtensionClassSolrPropertyName(name, type);
-            this.boostName = type != null ? toExtensionClassSolrPropertyName(name) : null;
+            this.name = name;
+            this.boostName = boostName;
             this.boostValue = boostValue;
         }
     }
 
     static {
-        SOLR_FIELDS.put(Extension.FIELD_ID, new SolrField(PROP_EXTENSION_ID, 10.0f));
-        SOLR_FIELDS.put(Extension.FIELD_FEATURE, new SolrField(PROP_EXTENSION_FEATURES, 9.0f));
+        SOLR_FIELDS.put(Extension.FIELD_ID, new ExtensionSolrField(PROP_EXTENSION_ID, 10.0f));
+        SOLR_FIELDS.put(Extension.FIELD_FEATURE, new ExtensionSolrField(PROP_EXTENSION_FEATURES, 9.0f));
         SOLR_FIELDS.put(Extension.FIELD_FEATURES, SOLR_FIELDS.get(Extension.FIELD_FEATURE));
-        SOLR_FIELDS.put(Extension.FIELD_NAME, new SolrField(PROP_EXTENSION_NAME, 8.0f));
-        SOLR_FIELDS.put(Extension.FIELD_TYPE, new SolrField(PROP_EXTENSION_TYPE, 8.0f));
-        SOLR_FIELDS.put(Extension.FIELD_CATEGORY, new SolrField(PROP_EXTENSION_CATEGORY, 7.0f));
-        SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new SolrField(PROP_EXTENSION_SUMMARY, 6.0f));
+        SOLR_FIELDS.put(Extension.FIELD_NAME, new ExtensionSolrField(PROP_EXTENSION_NAME, 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_TYPE, new ExtensionSolrField(PROP_EXTENSION_TYPE, 8.0f));
+        SOLR_FIELDS.put(Extension.FIELD_CATEGORY, new ExtensionSolrField(PROP_EXTENSION_CATEGORY, 7.0f));
+        SOLR_FIELDS.put(Extension.FIELD_SUMMARY, new ExtensionSolrField(PROP_EXTENSION_SUMMARY, 6.0f));
 
-        // We only search in the description but we don't retrieve it (because it's not stored in a stable field) 
+        // We only search in the description but we don't retrieve it (because it's not stored in a stable field)
         SOLR_FIELDS.put(Extension.FIELD_DESCRIPTION, new SolrField(PROP_EXTENSION_DESCRIPTION, null, 5.0f));
 
         // Not very interesting for fulltext search
-        SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new SolrField(PROP_EXTENSION_AUTHORS, null));
+        SOLR_FIELDS.put(Extension.FIELD_AUTHOR, new ExtensionSolrField(PROP_EXTENSION_AUTHORS, null));
         SOLR_FIELDS.put(Extension.FIELD_AUTHORS, SOLR_FIELDS.get(Extension.FIELD_AUTHOR));
-        SOLR_FIELDS.put(Extension.FIELD_VERSION, new SolrField(PROP_EXTENSION_LASTVERSION, null));
-        SOLR_FIELDS.put(Extension.FIELD_LICENSE, new SolrField(PROP_EXTENSION_LICENSENAME, null));
+        SOLR_FIELDS.put(Extension.FIELD_VERSION, new ExtensionSolrField(PROP_EXTENSION_LASTVERSION, null));
+        SOLR_FIELDS.put(Extension.FIELD_LICENSE, new ExtensionSolrField(PROP_EXTENSION_LICENSENAME, null));
         SOLR_FIELDS.put(Extension.FIELD_LICENSES, SOLR_FIELDS.get(Extension.FIELD_LICENSE));
-        SOLR_FIELDS.put(Extension.FIELD_SCM, new SolrField(PROP_EXTENSION_SCMURL, null));
-        SOLR_FIELDS.put(Extension.FIELD_SCM, new SolrField(PROP_EXTENSION_SCMURL, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new SolrField(PROP_EXTENSION_SCMCONNECTION, null));
-        SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new SolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
-        SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new SolrField(PROP_EXTENSION_WEBSITE, null));
+        SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
+        SOLR_FIELDS.put(Extension.FIELD_SCM, new ExtensionSolrField(PROP_EXTENSION_SCMURL, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_SCMCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMCONNECTION, null));
+        SOLR_FIELDS.put(PROP_EXTENSION_SCMDEVCONNECTION, new ExtensionSolrField(PROP_EXTENSION_SCMDEVCONNECTION, null));
+        SOLR_FIELDS.put(Extension.FIELD_WEBSITE, new ExtensionSolrField(PROP_EXTENSION_WEBSITE, null));
+
+        // Rating
+        SOLR_FIELDS.put(PROP_RATING_TOTALVOTES, new RatingSolrField(PROP_RATING_TOTALVOTES, "int", null));
+        SOLR_FIELDS.put("votes", SOLR_FIELDS.get(PROP_RATING_TOTALVOTES));
+        SOLR_FIELDS.put(PROP_RATING_AVERAGEVOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
+        SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
 
         // Fields not stored
         // Extension.FIELD_REPOSITORY
@@ -187,6 +224,16 @@ public class XWikiRepositoryModel
     public static String toExtensionClassSolrPropertyName(String propertyName, String type)
     {
         return toExtensionClassSolrPropertyName(propertyName) + '_' + type;
+    }
+
+    public static String toAverageRatingClassSolrPropertyName(String propertyName)
+    {
+        return "property." + AVERAGERATING_CLASSNAME + '.' + propertyName;
+    }
+
+    public static String toAverageRatingClassSolrPropertyName(String propertyName, String type)
+    {
+        return toAverageRatingClassSolrPropertyName(propertyName) + '_' + type;
     }
 
     public static String toSolrField(String restField)

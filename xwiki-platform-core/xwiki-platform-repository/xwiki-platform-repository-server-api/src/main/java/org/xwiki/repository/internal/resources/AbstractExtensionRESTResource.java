@@ -473,6 +473,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected <T> T getSolrValue(SolrDocument document, String property, boolean emptyIsNull)
     {
+        return getSolrValue(document, property, emptyIsNull, null);
+    }
+
+    protected <T> T getSolrValue(SolrDocument document, String property, boolean emptyIsNull, T def)
+    {
         Object value = document.getFieldValue(XWikiRepositoryModel.toSolrField(property));
 
         if (value instanceof Collection) {
@@ -480,8 +485,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
             value = collectionValue.size() > 0 ? collectionValue.iterator().next() : null;
         }
 
-        if (emptyIsNull && value instanceof String && ((String) value).isEmpty()) {
-            value = null;
+        if (value == null || (emptyIsNull && value instanceof String && ((String) value).isEmpty())) {
+            value = def;
         }
 
         return (T) value;
@@ -587,12 +592,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         // Rating
-        // FIXME: this adds potentially tons of new DB requests to what used to be carefully crafted to produce a single
-        // request for the whole search... Should be cached in a field of the document (like the last version is for
-        // example).
-        DocumentReference extensionDocumentReference =
-            new DocumentReference(xcontext.getWikiId(), documentSpace, documentName);
-        extension.setRating(getExtensionRating(extensionDocumentReference));
+        ExtensionRating extensionRating = this.extensionObjectFactory.createExtensionRating();
+        extensionRating.setTotalVotes(getSolrValue(document, XWikiRepositoryModel.PROP_RATING_TOTALVOTES, false, 0));
+        extensionRating
+            .setAverageVote(getSolrValue(document, XWikiRepositoryModel.PROP_RATING_AVERAGEVOTE, false, 0.0f));
+        extension.setRating(extensionRating);
 
         // Website
         extension.setWebsite(this.<String>getSolrValue(document, Extension.FIELD_WEBSITE, true));

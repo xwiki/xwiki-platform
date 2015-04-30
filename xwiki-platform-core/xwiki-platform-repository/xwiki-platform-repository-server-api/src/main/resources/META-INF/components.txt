@@ -1,6 +1,6 @@
 org.xwiki.repository.internal.DefaultRepositoryConfiguration
-org.xwiki.repository.internal.DefaultRepositoryManager
 org.xwiki.repository.internal.ExtensionUpdaterListener
+org.xwiki.repository.internal.RepositoryManager
 org.xwiki.repository.internal.reference.ExtensionResourceReferenceTypeParser
 org.xwiki.repository.internal.resources.ExtensionRESTResource
 org.xwiki.repository.internal.resources.ExtensionsRESTResource

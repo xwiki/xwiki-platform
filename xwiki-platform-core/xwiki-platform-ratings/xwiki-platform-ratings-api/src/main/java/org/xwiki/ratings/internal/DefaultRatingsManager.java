@@ -35,6 +35,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.UpdateRatingEvent;
+import org.xwiki.ratings.UpdatingRatingEvent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -79,14 +80,29 @@ public class DefaultRatingsManager extends AbstractRatingsManager
             rating.setVote(vote);
             rating.setDate(new Date());
         }
-        // update rating
-        rating.save();
 
-        // update average rating count
-        updateAverageRatings(documentRef, rating, oldVote);
+        // Indicate that we start modifying the rating
+        this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
 
-        // update reputation
-        observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
+        boolean updateFailed = true;
+        try {
+            // update rating
+            rating.save();
+
+            // update average rating count
+            updateAverageRatings(documentRef, rating, oldVote);
+
+            updateFailed = false;
+        } finally {
+            if (updateFailed) {
+                // Indicate that the we start modifying the rating
+                this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
+            } else {
+                // Indicate that we finished updating the rating
+                this.observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
+            }
+        }
+
         return rating;
     }
 

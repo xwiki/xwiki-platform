@@ -36,6 +36,7 @@ import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.UpdateRatingEvent;
+import org.xwiki.ratings.UpdatingRatingEvent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -147,14 +148,28 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
             rating.setDate(new Date());
         }
 
-        // saving rating
-        rating.save();
+        // Indicate that we start modifying the rating
+        this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
 
-        // update the average rating
-        updateAverageRatings(documentRef, rating, oldVote);
+        boolean updateFailed = true;
+        try {
+            // saving rating
+            rating.save();
 
-        // update reputation
-        observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
+            // update the average rating
+            updateAverageRatings(documentRef, rating, oldVote);
+
+            updateFailed = false;
+        } finally {
+            if (updateFailed) {
+                // Indicate that the we start modifying the rating
+                this.observationManager.notify(new UpdatingRatingEvent(documentRef, rating, oldVote), null);
+            } else {
+                // Indicate that we finished updating the rating
+                this.observationManager.notify(new UpdateRatingEvent(documentRef, rating, oldVote), null);
+            }
+        }
+
         return rating;
     }
 

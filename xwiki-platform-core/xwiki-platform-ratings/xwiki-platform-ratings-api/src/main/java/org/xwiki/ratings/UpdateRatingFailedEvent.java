@@ -24,18 +24,18 @@ import org.xwiki.observation.event.EndEvent;
 import org.xwiki.stability.Unstable;
 
 /**
- * Event fired when updating a Rating.
+ * Event fired when failing to update a Rating.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 7.1M1
  */
 @Unstable
-public class UpdateRatingEvent extends AbstractRatingEvent implements EndEvent
+public class UpdateRatingFailedEvent extends AbstractRatingEvent implements EndEvent
 {
     /**
      * Default UpdateRatingEvent constructor.
      */
-    public UpdateRatingEvent()
+    public UpdateRatingFailedEvent()
     {
     }
 
@@ -46,7 +46,7 @@ public class UpdateRatingEvent extends AbstractRatingEvent implements EndEvent
      * @param newRating the new rating in the shape of a Rating object
      * @param oldRating the old rating value
      */
-    public UpdateRatingEvent(DocumentReference documentRef, Rating newRating, int oldRating)
+    public UpdateRatingFailedEvent(DocumentReference documentRef, Rating newRating, int oldRating)
     {
         super(documentRef, newRating, oldRating);
     }
@@ -54,6 +54,6 @@ public class UpdateRatingEvent extends AbstractRatingEvent implements EndEvent
     @Override
     public boolean matches(Object arg0)
     {
-        return arg0 instanceof UpdateRatingEvent;
+        return arg0 instanceof UpdateRatingFailedEvent;
     }
 }

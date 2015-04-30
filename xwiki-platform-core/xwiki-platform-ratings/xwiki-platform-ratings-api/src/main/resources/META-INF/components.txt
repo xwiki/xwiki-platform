@@ -1,6 +1,7 @@
 org.xwiki.ratings.ConfiguredRatingsManagerProvider
 org.xwiki.ratings.ConfiguredReputationAlgorithmProvider
 org.xwiki.ratings.internal.AverageRatingClassDocumentInitializer
+org.xwiki.ratings.internal.AverageRatingProtectionListener
 org.xwiki.ratings.internal.DefaultRatingsManager
 org.xwiki.ratings.internal.DefaultReputationAlgorithm
 org.xwiki.ratings.internal.RatingClassDocumentInitializer

@@ -216,12 +216,12 @@ widgets.FullScreen = Class.create({
   /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {
     // Create HTML element
-    var fullScreenActivator = new Element('img', {
+    var fullScreenActivator = new Element('img', $jsontool.serialize({
       'class': 'fullScreenEditButton',
-      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
-      alt: "$services.localization.render('core.editors.fullscreen.editFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_out.png')"
-    });
+      'title': $services.localization.render('core.editors.fullscreen.editFullScreen'),
+      'alt': $services.localization.render('core.editors.fullscreen.editFullScreen'),
+      'src': $xwiki.getSkinFile('icons/silk/arrow_out.png')
+    }));
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     fullScreenActivator.observe('mousedown', this.preventDrag.bindAsEventListener(this));
@@ -235,11 +235,11 @@ widgets.FullScreen = Class.create({
     var fullScreenActivatorContainer = new Element('div', {
       'class': 'fullScreenEditLinkContainer'
     });
+    var label = $jsontool.serialize($services.localization.render('core.editors.fullscreen.editFullScreen'));
     var fullScreenActivator = new Element('a', {
       'class': 'fullScreenEditLink',
-      title: "$services.localization.render('core.editors.fullscreen.editFullScreen')"
-    });
-    fullScreenActivator.update("${services.localization.render('core.editors.fullscreen.editFullScreen')} &raquo;")
+      'title': label
+    }).update(label + ' &raquo;');
     // Add functionality
     fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     // Add it to the container
@@ -255,12 +255,12 @@ widgets.FullScreen = Class.create({
   createCloseButtons : function () {
     // Toolbar image button
     // Create HTML element
-    this.closeButton = new Element('img', {
+    this.closeButton = new Element('img', $jsontool.serialize({
       'class': 'fullScreenCloseButton',
-      title: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
-      alt: "$services.localization.render('core.editors.fullscreen.exitFullScreen')",
-      src: "$xwiki.getSkinFile('icons/silk/arrow_in.png')"
-    });
+      'title': $services.localization.render('core.editors.fullscreen.exitFullScreen'),
+      'alt': $services.localization.render('core.editors.fullscreen.exitFullScreen'),
+      'src': $xwiki.getSkinFile('icons/silk/arrow_in.png')
+    }));
     // Add functionality
     this.closeButton.observe('click', this.closeFullScreen.bind(this));
     this.closeButton.observe('mousedown', this.preventDrag.bindAsEventListener(this));
@@ -269,11 +269,11 @@ widgets.FullScreen = Class.create({
 
     // Edit actions button
     // Create HTML element
-    this.actionCloseButton = new Element('input', {
-      "type" : "button",
+    this.actionCloseButton = new Element('input', $jsontool.serialize({
+      'type': 'button',
       'class': 'button',
-      value: "$services.localization.render('core.editors.fullscreen.exitFullScreen')"
-    });
+      'value': $services.localization.render('core.editors.fullscreen.exitFullScreen')
+    }));
     this.actionCloseButtonWrapper = new Element('span', {
       'class': 'buttonwrapper'
     });

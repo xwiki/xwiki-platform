@@ -246,6 +246,7 @@ public class Context extends Api
      *
      * @return The language of the current request.
      * @see #getInterfaceLanguage()
+     * @since 6.0M1
      */
     public Locale getLocale()
     {
@@ -277,6 +278,7 @@ public class Context extends Api
      *
      * @return The interface locale preference of the current user.
      * @see #getLocale()
+     * @since 6.0M1
      */
     public Locale getInterfaceLocale()
     {

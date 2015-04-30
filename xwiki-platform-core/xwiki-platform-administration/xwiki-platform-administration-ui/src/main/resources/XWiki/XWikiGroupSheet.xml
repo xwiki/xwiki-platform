@@ -62,7 +62,6 @@
     &lt;form class="xform" action="$doc.getURL('preview')"&gt;
       &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
   #else
-    #userPicker_import()
     #set ($discard = $xwiki.jsx.use('XWiki.XWikiGroupSheet'))
     ## The form is generated in the edit template.
     &lt;div class="xform"&gt;
@@ -71,11 +70,13 @@
     &lt;dl&gt;
       &lt;dt&gt;&lt;label for="userInput"&gt;$services.localization.render('xe.admin.groups.addUser')&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;
-        &lt;input id="userInput" type="text" name="name" class="suggestUsers#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
+        #set ($parameters = {'id': 'userInput', 'name': 'name'})
+        #userPicker(true $parameters)
       &lt;/dd&gt;
       &lt;dt&gt;&lt;label for="groupInput"&gt;$services.localization.render('xe.admin.groups.addGroup')&lt;/label&gt;&lt;/dt&gt;
       &lt;dd&gt;
-        &lt;input id="groupInput" type="text" name="name" class="suggestGroups#if (!$xcontext.isMainWiki()) withScope#end multipleSelection" /&gt;
+        #set ($parameters = {'id': 'groupInput', 'name': 'name'})
+        #groupPicker(true $parameters)
       &lt;/dd&gt;
     &lt;/dl&gt;
     &lt;div class="buttons"&gt;

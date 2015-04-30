@@ -1,20 +1,15 @@
 #if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  #userPicker_import($isMultiSelect)
-  #set ($id = $escapetool.xml("${prefix}${name}"))
-  #set ($class = 'suggestUsers')
-  #set ($userScope = "$!services.wiki.user.userScope")
-  #if ($userScope == 'LOCAL_AND_GLOBAL')
-    #set ($class = "$class withScope")
-  #elseif ($userScope == 'GLOBAL_ONLY')
-    #set ($class = "$class global")
+  #set ($id = "${prefix}${name}")
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value
+  })
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
   #end
-  #if ($isMultiSelect)
-    #set ($class = "$class multipleSelection")
-  #end
-  #set ($disabled = $field.getProperty('disabled').value == 1)
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="$class"
-    #if ($disabled)disabled="disabled"#end />
+  #userPicker($isMultiSelect $parameters)
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])

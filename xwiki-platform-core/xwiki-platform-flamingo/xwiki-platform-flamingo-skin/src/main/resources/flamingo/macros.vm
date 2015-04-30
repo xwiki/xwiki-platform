@@ -2503,7 +2503,7 @@ $string##
  *
  * @param $sortable whether the list of selected users should be sortable or not
  *#
-#macro(userPicker_import $sortable)
+#macro (userPicker_import $sortable)
   #if ($sortable)
     ## Needed for sorting the selected values.
     #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
@@ -2518,6 +2518,43 @@ $string##
   ## The actual user picker. Provides a custom display for the user suggestions and selected users.
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+#end
+
+#macro (userPicker_input $multiSelect $parameters)
+  #set ($parameters.type = 'text')
+  #if ($multiSelect)
+    #set ($discard = $parameters.put('class', "$!parameters.get('class') multipleSelection"))
+  #end
+  #set ($attributes = [])
+  #foreach ($entry in $parameters.entrySet())
+    #set ($discard = $attributes.add("$escapetool.xml($entry.key)='$!escapetool.xml($entry.value)'"))
+  #end
+  <input $stringtool.join($attributes, ' ') />
+#end
+
+#macro (userPicker $multiSelect $parameters)
+  #userPicker_import($multiSelect)
+  #set ($class = 'suggestUsers')
+  #set ($userScope = "$!services.wiki.user.userScope")
+  #if ($userScope == 'LOCAL_AND_GLOBAL')
+    #set ($class = "$class withScope")
+  #elseif ($userScope == 'GLOBAL_ONLY')
+    #set ($class = "$class global")
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_input($multiSelect $parameters)
+#end
+
+#macro (groupPicker $multiSelect $parameters)
+  #userPicker_import($multiSelect)
+  #set ($class = 'suggestGroups')
+  #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" != 'LOCAL_ONLY')
+    ## We can have both local and global groups in a subwiki that accepts global users. In case the wiki accepts only
+    ## global users, local groups can be used to setup various rights for the global users.
+    #set ($class = "$class withScope")
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') $class"))
+  #userPicker_input($multiSelect $parameters)
 #end
 
 #**

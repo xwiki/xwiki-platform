@@ -1,19 +1,15 @@
 #if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
-  #userPicker_import($isMultiSelect)
-  #set ($id = $escapetool.xml("${prefix}${name}"))
-  #set ($class = 'suggestGroups')
-  #if (!$xcontext.isMainWiki() && "$!services.wiki.user.userScope" != 'LOCAL_ONLY')
-    ## We can have both local and global groups in a subwiki that accepts global users. In case the wiki accepts only
-    ## global users, local groups can be used to setup various rights for the global users.
-    #set ($class = "$class withScope")
+  #set ($id = "${prefix}${name}")
+  #set ($parameters = {
+    'id': $id,
+    'name': $id,
+    'value': $value
+  })
+  #if ($field.getProperty('disabled').value == 1)
+    #set ($parameters.disabled = 'disabled')
   #end
-  #if ($isMultiSelect)
-    #set ($class = "$class multipleSelection")
-  #end
-  #set ($disabled = $field.getProperty('disabled').value == 1)
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="$class"
-    #if ($disabled)disabled="disabled"#end />
+  #groupPicker($isMultiSelect $parameters)
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedGroups = [])

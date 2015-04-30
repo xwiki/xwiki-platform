@@ -437,8 +437,11 @@ public class DBListClass extends ListClass
     // the result of the second query, to retrieve the value
     public String getValue(String val, String sql, XWikiContext context)
     {
+        String lowerCaseSQL = sql.toLowerCase();
+        
         // Make sure the query does not contain ORDER BY, as it will fail in certain databases.
-        int orderByPos = sql.toLowerCase().lastIndexOf("order by");
+        // TODO: dangerous: "order by" could be inside a string in the query
+        int orderByPos = lowerCaseSQL.lastIndexOf("order by ");
         if (orderByPos >= 0) {
             sql = sql.substring(0, orderByPos);
         }
@@ -447,7 +450,8 @@ public class DBListClass extends ListClass
 
         String newsql = sql.substring(0, sql.indexOf(firstCol));
         newsql += secondCol + " ";
-        newsql += sql.substring(sql.indexOf("from"));
+        // TODO: dangerous: "from" could be inside a string in the query
+        newsql += sql.substring(lowerCaseSQL.indexOf("from "));
         newsql += "and " + firstCol + "='" + val + "'";
 
         Object[] list = null;

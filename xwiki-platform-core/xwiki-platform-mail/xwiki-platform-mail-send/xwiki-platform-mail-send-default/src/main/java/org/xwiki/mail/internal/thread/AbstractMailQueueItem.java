@@ -22,6 +22,7 @@ package org.xwiki.mail.internal.thread;
 import javax.mail.Session;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 import org.xwiki.text.XWikiToStringBuilder;
 
@@ -40,20 +41,21 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
 
     private String batchId;
 
-    private String wikiId;
+    private ExecutionContext executionContext;
 
     /**
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
-     * @param wikiId see {@link #getWikiId()}
+     * @param executionContext see {@link #getContext()}
      */
-    public AbstractMailQueueItem(Session session, MailListener listener, String batchId, String wikiId)
+    public AbstractMailQueueItem(Session session, MailListener listener, String batchId,
+        ExecutionContext executionContext)
     {
         this.session = session;
         this.listener = listener;
         this.batchId = batchId;
-        this.wikiId = wikiId;
+        this.executionContext = executionContext;
     }
 
     @Override
@@ -78,7 +80,7 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
         builder.append("batchId", getBatchId());
-        builder.append("wikiId", getWikiId());
+        builder.append("context", getContext() != null ? getContext().getProperties() : null);
         return builder;
     }
 
@@ -89,8 +91,8 @@ public abstract class AbstractMailQueueItem implements MailQueueItem
     }
 
     @Override
-    public String getWikiId()
+    public ExecutionContext getContext()
     {
-        return this.wikiId;
+        return this.executionContext;
     }
 }

@@ -21,6 +21,7 @@ package org.xwiki.mail.internal.thread;
 
 import javax.mail.Session;
 
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 
 /**
@@ -47,7 +48,7 @@ public interface MailQueueItem
     String getBatchId();
 
     /**
-     * @return the id of the wiki that will be used to set the context when preparing and sending the Mime Message
+     * @return the execution context that will be used when preparing and sending the Mime Message
      */
-    String getWikiId();
+    ExecutionContext getContext();
 }

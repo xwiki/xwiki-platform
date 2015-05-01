@@ -21,6 +21,7 @@ package org.xwiki.mail.internal.thread;
 
 import javax.mail.Session;
 
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 
 /**
@@ -38,11 +39,12 @@ public class SendMailQueueItem extends AbstractMailQueueItem
      * @param session see {@link #getSession()}
      * @param listener see {@link #getListener()}
      * @param batchId see {@link #getBatchId()}
-     * @param wikiId see {@link #getWikiId()}
+     * @param executionContext see {@link #getContext()}
      */
-    public SendMailQueueItem(String messageId, Session session, MailListener listener, String batchId, String wikiId)
+    public SendMailQueueItem(String messageId, Session session, MailListener listener, String batchId,
+        ExecutionContext executionContext)
     {
-        super(session, listener, batchId, wikiId);
+        super(session, listener, batchId, executionContext);
         this.messageId = messageId;
     }
 

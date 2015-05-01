@@ -19,27 +19,24 @@
  */
 package org.xwiki.watchlist.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.Date;
-
 import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.MailSender;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.watchlist.internal.DefaultWatchListNotifier}.
@@ -54,6 +51,8 @@ public class DefaultWatchListNotifierTest
     private XWiki xwiki;
 
     private BaseObject userObject;
+
+    private MailSender mockMailSender;
 
     @Rule
     public MockitoComponentMockingRule<WatchListNotifier> mocker = new MockitoComponentMockingRule<WatchListNotifier>(
@@ -71,22 +70,19 @@ public class DefaultWatchListNotifierTest
         this.xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        XWikiDocument subscriberDocument = mock(XWikiDocument.class);
-        when(this.xwiki.getDocument("subscriber", this.xcontext)).thenReturn(subscriberDocument);
+        DocumentReferenceResolver<String> defaultDocumentReferenceResolver =
+            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
 
-        this.userObject = mock(BaseObject.class);
-        when(subscriberDocument.getObject("XWiki.XWikiUsers")).thenReturn(this.userObject);
+        DocumentReferenceResolver<String> currentmixedResolver =
+            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+
+        EntityReferenceSerializer<String> defaultStringEntityReferenceSerializer =
+            mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+
+        Utils.setComponentManager(mocker);
+
+        mockMailSender = mocker.getInstance(MailSender.class);
     }
 
-    @Test
-    public void sendEmailNotificationDoNothingIfEmailAddressDoesntContainAtSymbol() throws Exception
-    {
-        when(this.userObject.getStringValue(DefaultWatchListNotifier.XWIKI_USER_CLASS_EMAIL_PROP)).thenReturn(
-            "invalidemail");
-
-        mocker.getComponentUnderTest().sendNotification("subscriber", Collections.EMPTY_LIST, "emailtemplate",
-            new Date());
-
-        verify(this.xwiki, never()).getPlugin("mailsender", this.xcontext);
-    }
+    // TODO: Add tests since we changed the logic of DefaultWatchListNotifier and it now only delegates.
 }

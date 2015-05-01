@@ -20,37 +20,57 @@
 package org.xwiki.watchlist.internal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 
-import org.apache.velocity.VelocityContext;
+import org.apache.commons.collections4.iterators.IteratorIterable;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.internal.SessionFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
+import org.xwiki.watchlist.internal.api.WatchListException;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
+import org.xwiki.watchlist.internal.notification.EventsAndSubscribersSource;
+import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
 
 /**
  * Default implementation for {@link WatchListNotifier}. The current implementation offers email notifications only.
- * 
+ *
  * @version $Id$
  */
 @Component
 @Singleton
 public class DefaultWatchListNotifier implements WatchListNotifier
 {
+    /**
+     * Previous fire time velocity context variable.
+     */
+    public static final String PREVIOUS_FIRE_TIME_VARIABLE = "previousFireTime";
+
     /**
      * Wiki page which contains the default watchlist email template.
      */
@@ -60,16 +80,6 @@ public class DefaultWatchListNotifier implements WatchListNotifier
      * XWiki User Class.
      */
     public static final String XWIKI_USER_CLASS = "XWiki.XWikiUsers";
-
-    /**
-     * XWiki User Class first name property name.
-     */
-    public static final String XWIKI_USER_CLASS_FIRST_NAME_PROP = "first_name";
-
-    /**
-     * XWiki User Class last name property name.
-     */
-    public static final String XWIKI_USER_CLASS_LAST_NAME_PROP = "last_name";
 
     /**
      * XWiki User Class email property.
@@ -91,60 +101,129 @@ public class DefaultWatchListNotifier implements WatchListNotifier
     @Inject
     private ScriptServiceManager scriptServiceManager;
 
+    @Inject
+    @Named(WatchListEventMimeMessageFactory.FACTORY_ID)
+    private MimeMessageFactory<Iterator<MimeMessage>> messageFactory;
+
+    @Inject
+    private MailSender mailSender;
+
+    @Inject
+    @Named("database")
+    private Provider<MailListener> mailListenerProvider;
+
+    @Inject
+    private SessionFactory sessionFactory;
+
+    @Inject
+    @Named("explicit")
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
+
     @Override
     public void sendNotification(String subscriber, List<WatchListEvent> events, String templateDocument,
         Date previousFireTime) throws XWikiException
     {
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER, templateDocument);
+        notificationData.put(PREVIOUS_FIRE_TIME_VARIABLE, previousFireTime);
+
+        try {
+            this.sendNotification(Arrays.asList(subscriber), events, notificationData);
+        } catch (WatchListException e) {
+            throw new XWikiException("", e);
+        }
+    }
+
+    @Override
+    public void sendNotification(Collection<String> subscribers, List<WatchListEvent> events,
+        Map<String, Object> notificationData) throws WatchListException
+    {
+        try {
+            // FIXME: Temporary, until we move to all references.
+            List<DocumentReference> subscriberReferences = getSubscriberReferences(subscribers);
+
+            // Source
+            Map<String, Object> source = new HashMap<>();
+            source.put(EventsAndSubscribersSource.SUBSCRIBERS_PARAMETER, subscriberReferences);
+            source.put(EventsAndSubscribersSource.EVENTS_PARAMETER, events);
+
+            // Parameters
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put(WatchListEventMimeMessageFactory.HINT_PARAMETER, "template");
+            parameters.put(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER,
+                notificationData.get(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER));
+            parameters.put(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER,
+                notificationData.get(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER));
+            Map<String, Object> templateFactoryParameters = getTemplateFactoryParameters(notificationData);
+            parameters.put(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER, templateFactoryParameters);
+
+            // Create the message iterator and the other mail sender parameters.
+            Iterator<MimeMessage> messageIterator = messageFactory.createMessage(null, source, parameters);
+            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
+            MailListener mailListener = mailListenerProvider.get();
+
+            // Pass it to the message sender to send it asynchronously.
+            // FIXME: !? There must be a better way instead of using IteratorIterable.
+            mailSender.sendAsynchronously(new IteratorIterable<MimeMessage>(messageIterator), session, mailListener);
+        } catch (Exception e) {
+            throw new WatchListException(String.format("Failed to send notification to subscribers [%s]", subscribers),
+                e);
+        }
+    }
+
+    private List<DocumentReference> getSubscriberReferences(Collection<String> subscribers)
+    {
+        List<DocumentReference> result = new ArrayList<>();
+
+        XWikiContext context = contextProvider.get();
+        WikiReference currentWikiReference = new WikiReference(context.getWikiId());
+
+        for (String subscriber : subscribers) {
+            DocumentReference subscriberReference =
+                explicitDocumentReferenceResolver.resolve(subscriber, currentWikiReference);
+            result.add(subscriberReference);
+        }
+        return result;
+    }
+
+    private Map<String, Object> getTemplateFactoryParameters(Map<String, Object> notificationData)
+    {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
         XWikiContext context = contextProvider.get();
 
-        // Get user email
-        XWikiDocument subscriberDocument = context.getWiki().getDocument(subscriber, context);
-        BaseObject userObj = subscriberDocument.getObject(XWIKI_USER_CLASS);
-        String emailAddr = userObj.getStringValue(XWIKI_USER_CLASS_EMAIL_PROP);
-        if (emailAddr == null || emailAddr.length() == 0 || emailAddr.indexOf("@") < 0) {
-            // Invalid email
-            return;
-        }
-
-        List<String> modifiedDocuments = new ArrayList<>();
-        for (WatchListEvent event : events) {
-            if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
-                modifiedDocuments.add(event.getPrefixedFullName());
-            }
-        }
-
         // Prepare email template (wiki page) context
-        VelocityContext vcontext = new VelocityContext();
-        vcontext.put(XWIKI_USER_CLASS_FIRST_NAME_PROP, userObj.getStringValue(XWIKI_USER_CLASS_FIRST_NAME_PROP));
-        vcontext.put(XWIKI_USER_CLASS_LAST_NAME_PROP, userObj.getStringValue(XWIKI_USER_CLASS_LAST_NAME_PROP));
-        vcontext.put("events", events);
-        vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
-        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
-        vcontext.put("msg", context.getMessageTool());
-        vcontext.put("modifiedDocuments", modifiedDocuments);
-        vcontext.put("previousFireTime", previousFireTime);
-        vcontext.put("context", new DeprecatedContext(context));
-        vcontext.put("xcontext", new Context(context));
-        vcontext.put("services", scriptServiceManager);
+        Map<String, Object> velocityVariables = new HashMap<>();
+        velocityVariables.put(PREVIOUS_FIRE_TIME_VARIABLE, notificationData.get(PREVIOUS_FIRE_TIME_VARIABLE));
+        // XWiki API
+        velocityVariables.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
+        velocityVariables.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
+        Context xcontext = new Context(context);
+        velocityVariables.put("xcontext", xcontext);
+        velocityVariables.put("services", scriptServiceManager);
+        // Deprecated XWiki API
+        velocityVariables.put("msg", context.getMessageTool());
+        velocityVariables.put("context", xcontext);
+        // Note: The other variables that are context dependent will be updated for each subscriber by the iterator,
+        // since they are different for each subscriber.
+        // Add to parameters
+        parameters.put("velocityVariables", velocityVariables);
 
-        // Get wiki's default language (default en)
+        // Get the wiki's default language (default en).
         String language = context.getWiki().getXWikiPreference("default_language", "en", context);
+        parameters.put("language", language);
 
-        // Get mailsenderplugin
-        // FIXME: Use the new mail module instead.
-        MailSenderPlugin emailService = (MailSenderPlugin) context.getWiki().getPlugin(MailSenderPlugin.ID, context);
-        if (emailService == null) {
-            return;
-        }
+        // Add the template document's attachments to the email.
+        parameters.put("includeTemplateAttachments", true);
+
+        // Set the mail's type to "watchlist".
+        parameters.put("type", "watchlist");
 
         // Get from email address from the configuration (default : mailer@xwiki.localdomain.com)
         String from = getFromAddress();
+        parameters.put("from", from);
 
-        // Set email template
-        String template = getTemplateDocument(templateDocument, context);
-
-        // Send message from template
-        emailService.sendMailFromTemplate(template, from, emailAddr, null, null, language, vcontext, context);
+        return parameters;
     }
 
     private String getFromAddress()
@@ -155,25 +234,5 @@ public class DefaultWatchListNotifier implements WatchListNotifier
             from = "mailer@xwiki.localdomain.com";
         }
         return from;
-    }
-
-    /**
-     * @param templateDocument
-     * @param context
-     * @return
-     */
-    private String getTemplateDocument(String templateDocument, XWikiContext context)
-    {
-        String result = null;
-
-        if (templateDocument != null && context.getWiki().exists(templateDocument, context)) {
-            result = templateDocument;
-        } else if (context.getWiki().exists(DEFAULT_EMAIL_TEMPLATE, context)) {
-            result = DEFAULT_EMAIL_TEMPLATE;
-        } else {
-            result = context.getMainXWiki() + ":" + DEFAULT_EMAIL_TEMPLATE;
-        }
-
-        return result;
     }
 }

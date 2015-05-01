@@ -23,7 +23,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,7 +38,6 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.event.Event;
@@ -44,13 +45,14 @@ import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.api.WatchListEventType;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
 import org.xwiki.watchlist.internal.api.WatchListStore;
+import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Generates notifications in real time for all the subscribers interested in the currently modified document.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -101,12 +103,6 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     private WatchListEventMatcher watchlistEventMatcher;
 
     /**
-     * Used to resolve user string references.
-     */
-    @Inject
-    private DocumentReferenceResolver<String> resolver;
-
-    /**
      * Used to access xwiki.properties.
      */
     @Inject
@@ -145,12 +141,13 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
             return;
         }
 
-        // XXX: Probably the code below could go in a separate thread to avoid blocking the save operation and the UI.
+        // Prepare the notification and send it for processing in a separate thread so that the UI does not block.
 
         try {
             // Get a corresponding watchlist event.
             WatchListEvent watchListEvent = getWatchListEvent(event, currentDoc, context);
 
+            // Early optimization since this is not related to a user but to the event itself.
             if (watchlistEventMatcher.isEventSkipped(watchListEvent)) {
                 // Stop here if the event is skipped.
                 return;
@@ -164,27 +161,16 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
                 return;
             }
 
-            // Go through each subscriber.
-            for (String subscriber : subscribers) {
-                DocumentReference userReference = resolver.resolve(subscriber);
-                if (userReference.equals(context.getUserReference())) {
-                    // Skip the current user since he does not want to be notified by his own actions.
-                    continue;
-                }
+            // Build the notification parameters.
+            Map<String, Object> notificationData = new HashMap<>();
+            Date previousFireTime = new Date();
+            notificationData.put(DefaultWatchListNotifier.PREVIOUS_FIRE_TIME_VARIABLE, previousFireTime);
+            notificationData.put(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER,
+                DefaultWatchListNotifier.DEFAULT_EMAIL_TEMPLATE);
+            notificationData.put(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER, true);
 
-                if (!watchlistEventMatcher.isEventViewable(watchListEvent, subscriber)) {
-                    // Skip events that are not viewable by the subscriber.
-                    continue;
-                }
-
-                // If the current event matches for the current subscriber, notify him.
-                if (watchlistEventMatcher.isEventMatching(watchListEvent, subscriber)) {
-                    List<WatchListEvent> events = Arrays.asList(watchListEvent);
-                    Date previousDate = new Date();
-                    // Use the default template document.
-                    notifier.sendNotification(subscriber, events, null, previousDate);
-                }
-            }
+            // Send the notification for processing.
+            notifier.sendNotification(subscribers, Arrays.asList(watchListEvent), notificationData);
         } catch (Exception e) {
             logger.error("Failed to send realtime notification to user [{}]", context.getUserReference(), e);
         }

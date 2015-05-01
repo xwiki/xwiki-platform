@@ -37,6 +37,8 @@ public class WatchlistPreferencesEditPage extends EditPage
 
     public static final String AUTOMATICWATCH_NEW = "NEW";
 
+    public static final String NOTIFIER_REALTIME = "realtime";
+
     public static final String NOTIFIER_HOURLY = "Scheduler.WatchListHourlyNotifier";
 
     public static final String NOTIFIER_DAILY = "Scheduler.WatchListDailyNotifier";
@@ -77,6 +79,12 @@ public class WatchlistPreferencesEditPage extends EditPage
     {
         Select select = new Select(this.automaticwatch);
         select.selectByValue(AUTOMATICWATCH_NEW);
+    }
+
+    public void setNotifierRealtime()
+    {
+        Select select = new Select(this.notifier);
+        select.selectByValue(NOTIFIER_REALTIME);
     }
 
     public void setNotifierHourly()

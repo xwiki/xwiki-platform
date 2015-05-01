@@ -21,9 +21,10 @@ package org.xwiki.watchlist.internal.job;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -33,11 +34,12 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.watchlist.internal.DefaultWatchListStore;
+import org.xwiki.watchlist.internal.DefaultWatchListNotifier;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 import org.xwiki.watchlist.internal.api.WatchList;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer;
+import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -48,7 +50,7 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * WatchList abstract implementation of Quartz's Job.
- * 
+ *
  * @version $Id$
  */
 public class WatchListJob extends AbstractJob implements Job
@@ -85,7 +87,7 @@ public class WatchListJob extends AbstractJob implements Job
 
     /**
      * Sets objects required by the Job : XWiki, XWikiContext, WatchListPlugin, etc.
-     * 
+     *
      * @param jobContext Context of the request
      * @throws Exception when the init of components fails
      */
@@ -106,7 +108,7 @@ public class WatchListJob extends AbstractJob implements Job
 
     /**
      * Initialize container context.
-     * 
+     *
      * @param xcontext the XWiki context
      * @throws Exception if the execution context initialization fails
      */
@@ -156,7 +158,7 @@ public class WatchListJob extends AbstractJob implements Job
 
     /**
      * Save the date of the execution in the watchlist job object.
-     * 
+     *
      * @throws XWikiException if the job document can't be retrieved or if the save action fails
      */
     private void setPreviousFireTime() throws XWikiException
@@ -174,32 +176,9 @@ public class WatchListJob extends AbstractJob implements Job
     }
 
     /**
-     * @param userWiki wiki from which the user comes from
-     * @return the name of the page that should be used as email template for this job
-     */
-    private String getEmailTemplate(String userWiki)
-    {
-        String fullName = this.watchListJobObject.getStringValue(WatchListJobClassDocumentInitializer.TEMPLATE_FIELD);
-        String prefixedFullName;
-
-        if (fullName.contains(DefaultWatchListStore.WIKI_SPACE_SEP)) {
-            // If the configured template is already an absolute reference it's meant to force the template.
-            prefixedFullName = fullName;
-        } else {
-            prefixedFullName = userWiki + DefaultWatchListStore.WIKI_SPACE_SEP + fullName;
-            if (this.context.getWiki().exists(prefixedFullName, this.context)) {
-                // If the configured template exists in the user wiki, use it.
-                return prefixedFullName;
-            }
-        }
-
-        return fullName;
-    }
-
-    /**
      * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who have an Object of class
      * WATCHLIST_CLASS attached AND who have chosen the current job for their notifications.
-     * 
+     *
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
      */
     private Collection<String> getSubscribers()
@@ -219,7 +198,7 @@ public class WatchListJob extends AbstractJob implements Job
 
     /**
      * Method called from the scheduler.
-     * 
+     *
      * @param jobContext Context of the request
      * @throws JobExecutionException if the job execution fails.
      */
@@ -251,23 +230,17 @@ public class WatchListJob extends AbstractJob implements Job
                 return;
             }
 
-            // Notify all interested subscribers, one at a time.
-            for (String subscriber : subscribers) {
-                try {
-                    // Determine what happened since the last execution on the watched elements of the current
-                    // subscriber only.
-                    List<WatchListEvent> matchingEvents = eventMatcher.getMatchingVisibleEvents(events, subscriber);
-                    String userWiki = StringUtils.substringBefore(subscriber, DefaultWatchListStore.WIKI_SPACE_SEP);
+            // Notify all the interested subscribers of the events that occurred.
+            // When processing the events, a subscriber will only be notified of events that interest him.
+            Map<String, Object> notificationData = new HashMap<>();
+            notificationData.put(DefaultWatchListNotifier.PREVIOUS_FIRE_TIME_VARIABLE, previousFireTime);
 
-                    // If events have occurred on at least one element watched by the user, send the email
-                    if (matchingEvents.size() > 0) {
-                        this.watchlist.getNotifier().sendNotification(subscriber, matchingEvents,
-                            getEmailTemplate(userWiki), previousFireTime);
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Failed to send watchlist notification to user [{}]", subscriber, e);
-                }
-            }
+            String mailTemplate =
+                this.watchListJobObject.getStringValue(WatchListJobClassDocumentInitializer.TEMPLATE_FIELD);
+            notificationData.put(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER, mailTemplate);
+
+            // Send the notification for processing.
+            this.watchlist.getNotifier().sendNotification(subscribers, events, notificationData);
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
             LOGGER.error("Exception while running job", e);

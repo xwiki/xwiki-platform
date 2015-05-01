@@ -15,4 +15,5 @@ org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer
 org.xwiki.watchlist.internal.documents.WatchListJobClassDocumentInitializer
 org.xwiki.watchlist.internal.documents.WeeklyWatchListJobDocumentInitializer
 org.xwiki.watchlist.internal.migration.R70000XWIKI7339DataMigration
+org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory
 org.xwiki.watchlist.script.WatchListScriptService

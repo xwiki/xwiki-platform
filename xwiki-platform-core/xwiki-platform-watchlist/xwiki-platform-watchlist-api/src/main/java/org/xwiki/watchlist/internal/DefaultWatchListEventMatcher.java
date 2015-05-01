@@ -49,7 +49,7 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 
 /**
  * Default implementation for {@link WatchListEventMatcher}.
- * 
+ *
  * @version $Id$
  */
 @Component

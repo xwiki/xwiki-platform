@@ -41,14 +41,6 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
@@ -58,9 +50,10 @@
       <artifactId>xwiki-platform-scheduler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Default implementation of the mail-send-api. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mailsender</artifactId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -70,25 +63,16 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed in order to be able to mock oldcore's XWikiDocument -->
     <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

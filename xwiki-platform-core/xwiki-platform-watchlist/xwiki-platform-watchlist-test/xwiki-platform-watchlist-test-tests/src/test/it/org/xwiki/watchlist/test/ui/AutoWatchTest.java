@@ -19,7 +19,6 @@
  */
 package org.xwiki.watchlist.test.ui;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,28 +29,28 @@ import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 
 /**
  * Tests Watchlist application features.
- * 
+ *
  * @version $Id$
  */
 public class AutoWatchTest extends AbstractTest
 {
-    private String testSpace;
 
-    private String testUser;
+    private String testUserName = "TestUser";
 
-    private String existingPageName;
+    private String testSpace = testUserName + "Test";
+
+    private String existingPageName = "existingPage";
 
     @Before
     public void setUp()
     {
-        this.testUser = RandomStringUtils.randomAlphanumeric(5);
-        this.testSpace = this.testUser + "Test";
-
-        this.existingPageName = "existingPage";
         getUtil().loginAsSuperAdmin();
         getUtil().createPage(this.testSpace, existingPageName, null, null);
 
-        getUtil().createUserAndLogin(this.testUser, "password");
+        // Delete the user if it already exists.
+        getUtil().deletePage("XWiki", testUserName);
+
+        getUtil().createUserAndLogin(testUserName, "password");
     }
 
     @Test
@@ -61,7 +60,7 @@ public class AutoWatchTest extends AbstractTest
         /*
          * Scenario 1: 'Default' autowatch mode should watch new and modified documents.
          */
-        WatchlistUserProfilePage watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
+        WatchlistUserProfilePage watchlistPage = WatchlistUserProfilePage.gotoPage(testUserName);
 
         String newPageName1 = "testpage";
 
@@ -81,7 +80,7 @@ public class AutoWatchTest extends AbstractTest
         getUtil().gotoPage(this.testSpace, this.existingPageName, "save", "content", "Test content");
 
         // Go back to watchlist profile.
-        watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
+        watchlistPage = WatchlistUserProfilePage.gotoPage(testUserName);
 
         // Check if they are registered in the watchlist.
         Assert.assertTrue("Newly created page is not watched",
@@ -113,7 +112,7 @@ public class AutoWatchTest extends AbstractTest
         getUtil().gotoPage(this.testSpace, this.existingPageName, "save", "content", "Test content");
 
         // Go back to watchlist profile
-        watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUser);
+        watchlistPage = WatchlistUserProfilePage.gotoPage(testUserName);
 
         // Check if it's registered in the watchlist
         Assert.assertFalse("Newly created page is watched even if autowatch is set to 'none'", watchlistPage

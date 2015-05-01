@@ -41,11 +41,11 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
       com.xpn.xwiki.plugin.diff.DiffPlugin,\
       com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
-      com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
       com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiPropertiesAdditionalProperties>watchlist.realtime.enabled = true</xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
@@ -61,13 +61,6 @@
       <artifactId>xwiki-platform-watchlist-ui</artifactId>
       <type>xar</type>
       <version>${project.version}</version>
-    </dependency>
-    <!-- Since we send email in the test we need a Mail Sender API implementation -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mail-send-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <!-- We need the mail UI as well, since we want to configure it in our tests and we need Mail.SendMailConfigClass for that. -->
     <dependency>
@@ -143,11 +136,17 @@
             <artifactId>xwiki-platform-instance</artifactId>
             <version>${project.version}</version>
           </dependency>
-          <!-- need explicit dependency here so the package tool does not fail -->
+          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the classpath. -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-activitystream-api</artifactId>
             <scope>runtime</scope>
+            <version>${project.version}</version>
+          </dependency>
+          <!-- Need explicit dependency here so the package tool does not fail to find mailsender.hbm.xml in the classpath. -->
+          <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-mail-send-storage</artifactId>
             <version>${project.version}</version>
           </dependency>
         </dependencies>

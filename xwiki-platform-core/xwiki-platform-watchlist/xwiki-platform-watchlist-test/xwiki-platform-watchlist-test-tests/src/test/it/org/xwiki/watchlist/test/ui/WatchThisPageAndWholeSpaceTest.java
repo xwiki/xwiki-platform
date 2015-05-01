@@ -19,7 +19,8 @@
  */
 package org.xwiki.watchlist.test.ui;
 
-import org.apache.commons.lang.RandomStringUtils;
+import javax.mail.internet.MimeMessage;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,14 +38,34 @@ import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+import static org.junit.Assert.assertEquals;
+
 public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 {
+    private static final String PASSWORD = "password";
+
     private GreenMail greenMail;
 
-    private WatchlistUserProfilePage watchlistPage;
+    private String testUserName = "TestUser";
+
+    private String testUserName2 = "TestUser2";
+
+    /**
+     * Set the test user's email address to use a localhost domain so that the mail is caught by our GreenMail Mock mail
+     * server.
+     */
+    private String testEmail = "test@localhost";
 
     @Rule
     public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    private String testSinglePageToWatchSpace = "Test";
+
+    private String testSinglePageToWatch = "TestWatchThisPage";
+
+    private String testSpaceToWatch = "TestWatchWholeSpace";
+
+    private String testSpaceToWatchPage = "Test1";
 
     @Before
     public void setUp() throws Exception
@@ -57,19 +78,21 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
         this.greenMail = new GreenMail();
         this.greenMail.start();
 
-        // Create a user for the test
-        String userName = RandomStringUtils.randomAlphanumeric(5);
-        getUtil().createUserAndLogin(userName, "password");
-        WatchlistUserProfilePage profilePage = WatchlistUserProfilePage.gotoPage(userName);
+        // Delete the users if they already exists.
+        getUtil().deletePage("XWiki", testUserName);
+        getUtil().deletePage("XWiki", testUserName2);
 
-        // Set the test user's email address to use a localhost domain so that the mail is caught by our
-        // GreenMail Mock mail server.
-        getUtil().updateObject("XWiki", profilePage.getUsername(), "XWiki.XWikiUsers", 0, "email", "admin@localhost");
+        // Delete the test pages.
+        getUtil().deletePage(testSinglePageToWatchSpace, testSinglePageToWatch);
+        getUtil().deletePage(testSpaceToWatch, testSpaceToWatchPage);
 
-        this.watchlistPage = profilePage.switchToWatchlist();
+        // Create a user for the test.
+        getUtil().createUserAndLogin(testUserName, PASSWORD, "email", testEmail);
 
-        // Disable auto watch
-        WatchlistPreferencesEditPage watchlistPreferences = this.watchlistPage.editPreferences();
+        WatchlistUserProfilePage watchlistPage = WatchlistUserProfilePage.gotoPage(testUserName);
+
+        // Disable auto watch.
+        WatchlistPreferencesEditPage watchlistPreferences = watchlistPage.editPreferences();
         watchlistPreferences.setAutomaticWatchNone();
         watchlistPreferences.clickSaveAndContinue();
     }
@@ -89,29 +112,30 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
     @Test
     @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See http://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See http://jira.xwiki.org/browse/XE-1177")})
+        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See http://jira.xwiki.org/browse/XE-1146"),
+        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See http://jira.xwiki.org/browse/XE-1177")})
     public void testWatchThisPageAndWholeSpace() throws Exception
     {
         // Clear the list of watched documents and spaces
-        getUtil().updateObject("XWiki", this.watchlistPage.getUsername(), "XWiki.WatchListClass", 0, "spaces", "",
-            "documents", "");
+        getUtil().updateObject("XWiki", this.testUserName, "XWiki.WatchListClass", 0, "spaces", "", "documents", "");
 
         // Watch Test.TestWatchThisPage
-        ViewPage page = getUtil().createPage("Test", "TestWatchThisPage", "TestWatchThisPage ui", null);
+        ViewPage page =
+            getUtil().createPage(testSinglePageToWatchSpace, testSinglePageToWatch, "TestWatchThisPage ui", null);
         page.watchDocument();
 
         // Watch TestWatchWholeSpace.Test1
-        page = getUtil().createPage("TestWatchWholeSpace", "Test1", "TestWatchWholeSpace ui", null);
+        page = getUtil().createPage(testSpaceToWatch, testSpaceToWatchPage, "TestWatchWholeSpace ui", null);
         page.watchSpace();
 
         // Verify that the watched page & space are present in the watchlist manager
-        this.watchlistPage = WatchlistUserProfilePage.gotoPage(this.watchlistPage.getUsername());
-        Assert.assertTrue(this.watchlistPage.getWatchlistMacro().isWatched("Test", "TestWatchThisPage"));
-        Assert.assertTrue(this.watchlistPage.getWatchlistMacro().isWatched("TestWatchWholeSpace"));
+        WatchlistUserProfilePage watchlistPage = WatchlistUserProfilePage.gotoPage(this.testUserName);
+        Assert.assertTrue(watchlistPage.getWatchlistMacro()
+            .isWatched(testSinglePageToWatchSpace, testSinglePageToWatch));
+        Assert.assertTrue(watchlistPage.getWatchlistMacro().isWatched(testSpaceToWatch));
 
         // Ensure that the watchlist notified is set to Daily since we're going to trigger that notifier scheduler job
-        WatchlistPreferencesEditPage watchlistPreferences = this.watchlistPage.editPreferences();
+        WatchlistPreferencesEditPage watchlistPreferences = watchlistPage.editPreferences();
         watchlistPreferences.setNotifierDaily();
         watchlistPreferences.clickSaveAndContinue();
 
@@ -123,14 +147,67 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
         schedulerHomePage.clickJobActionTrigger("WatchList daily notifier");
 
         // Wait for the email with a timeout
-        Assert.assertTrue("Mail not received", this.greenMail.waitForIncomingEmail(70000, 1));
+        Assert.assertTrue("Scheduled notification mail not received", this.greenMail.waitForIncomingEmail(70000, 1));
 
         // Verify email content
-        String messageFromXWiki = GreenMailUtil.getBody(this.greenMail.getReceivedMessages()[0]);
+        MimeMessage[] receivedMails = this.greenMail.getReceivedMessages();
+        assertEquals(1, receivedMails.length);
+        String messageFromXWiki = GreenMailUtil.getBody(receivedMails[0]).replaceAll("=\r?\n", "");
         Assert.assertFalse("should have no exception in " + messageFromXWiki, messageFromXWiki.contains("Exception"));
-        Assert.assertTrue("should have test page in message " + messageFromXWiki,
+        Assert.assertTrue("should have test page in the message " + messageFromXWiki,
+            messageFromXWiki.contains(testSinglePageToWatch));
+        Assert.assertTrue("should have test space in the message " + messageFromXWiki,
+            messageFromXWiki.contains(testSpaceToWatch));
+
+        // // Clear the mock inbox for the following step.
+        // GreenMailUser mailUser = this.greenMail.getManagers().getUserManager().getUser("admin@localhost");
+        // this.greenMail.getManagers().getImapHostManager().deleteMailbox(mailUser, "INBOX");
+        // TODO: we might need the commented code above to make sure the mail is destined for our current test user and
+        // not other users created by previous tests.
+
+        /*
+         * Realtime notifications.
+         */
+
+        // Log back in with the user to test realtime notifications.
+        getUtil().login(testUserName, PASSWORD);
+
+        // Set the notifier to 'Realtime'.
+        WatchlistUserProfilePage profilePage = WatchlistUserProfilePage.gotoPage(testUserName);
+        watchlistPage = profilePage.switchToWatchlist();
+
+        watchlistPreferences = watchlistPage.editPreferences();
+        watchlistPreferences.setNotifierRealtime();
+        watchlistPreferences.clickSaveAndContinue();
+
+        // Make a change in a watched document.
+        // Note: Taking a shortcut and just using the save action.
+        String content = "New content that watchlist should ignore.";
+        getUtil().gotoPage(testSinglePageToWatchSpace, testSinglePageToWatch, "save", "content", content);
+
+        // Wait for an email that should never come.
+        Assert.assertFalse("Mail should not be received for own changes", this.greenMail.waitForIncomingEmail(3000, 2));
+
+        // Create a second user that should trigger a realtime notification to the first user.
+        getUtil().createUserAndLogin(testUserName2, PASSWORD);
+
+        // Make a change in a document watched by the first user.
+        // Note: Taking a shortcut and just using the save action.
+        String newContent = "New content that watchlist should notify about.";
+        content += "\n" + newContent;
+        getUtil().gotoPage(testSinglePageToWatchSpace, testSinglePageToWatch, "save", "content", content);
+
+        // Wait for the email with a timeout.
+        Assert.assertTrue("Realtime notification mail not received", this.greenMail.waitForIncomingEmail(70000, 2));
+
+        // Verify email content.
+        receivedMails = this.greenMail.getReceivedMessages();
+        assertEquals(2, receivedMails.length);
+        messageFromXWiki = GreenMailUtil.getBody(receivedMails[1]).replaceAll("=\r?\n", "");
+        Assert.assertFalse("should have no exception in " + messageFromXWiki, messageFromXWiki.contains("Exception"));
+        Assert.assertTrue("should have test page in the message " + messageFromXWiki,
             messageFromXWiki.contains("TestWatchThisPage"));
-        Assert.assertTrue("should have test space in message " + messageFromXWiki,
-            messageFromXWiki.contains("TestWatchWholeSpace"));
+        Assert.assertTrue("should have test content in the message " + messageFromXWiki,
+            messageFromXWiki.contains(newContent));
     }
 }

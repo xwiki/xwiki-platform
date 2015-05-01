@@ -33,18 +33,19 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.internal.thread.MailQueueManager;
-import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
 import org.xwiki.mail.internal.thread.MailRunnable;
+import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
 import org.xwiki.mail.internal.thread.SendMailQueueItem;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 
 /**
- * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails asynchronously.
+ * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails
+ * asynchronously.
  *
  * @version $Id$
  * @since 6.1M2
@@ -59,7 +60,7 @@ public class DefaultMailSender implements MailSender, Initializable
     private ComponentManager componentManager;
 
     @Inject
-    private ModelContext modelContext;
+    private Execution execution;
 
     @Inject
     @Named("prepare")
@@ -103,10 +104,12 @@ public class DefaultMailSender implements MailSender, Initializable
             batchId = UUID.randomUUID().toString();
         }
 
-        // Pass the current wiki so that the mail message will be prepared and later sent in the context of that wiki.
-        String wikiId = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
+        // Pass the current execution context so that the mail message will be prepared and later sent in the same
+        // context.
+        ExecutionContext executionContext = this.execution.getContext();
 
-        this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId, wikiId));
+        this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId,
+            executionContext));
 
         return new DefaultMailResult(batchId, this.sendMailQueueManager);
     }

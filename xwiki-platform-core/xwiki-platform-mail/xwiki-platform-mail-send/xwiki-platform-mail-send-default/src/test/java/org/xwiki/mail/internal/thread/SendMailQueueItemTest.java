@@ -25,6 +25,9 @@ import java.util.UUID;
 import javax.mail.Session;
 
 import org.junit.Test;
+import org.xwiki.context.ExecutionContext;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,8 +44,16 @@ public class SendMailQueueItemTest
     {
         Session session = Session.getDefaultInstance(new Properties());
         String batchId = UUID.randomUUID().toString();
-        SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId, "wiki");
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki], messageId = [messageId]", item.toString());
+        ExecutionContext context = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+
+        SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId, context);
+
+        assertEquals("batchId = [" + batchId
+            + "], context = [[xwikicontext] = [{originalWiki=wiki, wiki=wiki}]], messageId = [messageId]",
+            item.toString());
     }
 }

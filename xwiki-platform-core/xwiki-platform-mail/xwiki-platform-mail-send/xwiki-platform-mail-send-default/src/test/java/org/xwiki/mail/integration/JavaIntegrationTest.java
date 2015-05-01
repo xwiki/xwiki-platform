@@ -28,6 +28,7 @@ import java.util.Properties;
 
 import javax.inject.Provider;
 import javax.mail.BodyPart;
+import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -42,6 +43,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
@@ -49,16 +51,16 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
-import org.xwiki.mail.internal.FileSystemMailContentStore;
-import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory;
+import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
-import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
-import org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory;
-import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -138,6 +140,18 @@ public class JavaIntegrationTest
         this.htmlBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
         this.sender = this.componentManager.getInstance(MailSender.class);
+
+        // Set the EC
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+        when(execution.getContext()).thenReturn(executionContext);
+
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        // Just return the same execution context
+        when(ecm.clone(executionContext)).thenReturn(executionContext);
     }
 
     @After
@@ -157,7 +171,7 @@ public class JavaIntegrationTest
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
-        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
@@ -193,7 +207,7 @@ public class JavaIntegrationTest
         assertEquals("john@doe.com", messages[0].getHeader("To", null));
 
         // Note: We cannot assert that the BCC worked since by definition BCC information are not visible in received
-        // messages ;) But we chekced that we received 9 emails above so that's good enough.
+        // messages ;) But we checked that we received 9 emails above so that's good enough.
     }
 
     @Test
@@ -205,7 +219,7 @@ public class JavaIntegrationTest
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
-        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("alternative");

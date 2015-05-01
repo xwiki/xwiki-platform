@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Collections;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,6 +33,9 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 
+import com.google.common.collect.ImmutableMap;
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Runnable that regularly check for mails on a Queue, and for each mail tries to send it.
  *
@@ -47,6 +48,8 @@ import org.xwiki.mail.MailListener;
 public class SendMailRunnable extends AbstractMailRunnable
 {
     private static final String WIKI_PARAMETER_KEY = "wikiId";
+
+    private static final String CONTEXT_PARAMETER_KEY = "context";
 
     @Inject
     private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
@@ -112,9 +115,12 @@ public class SendMailRunnable extends AbstractMailRunnable
      */
     protected void sendMail(SendMailQueueItem item) throws ExecutionContextException
     {
-        prepareContext(item.getWikiId());
+        prepareContext(item.getContext());
 
         MailListener listener = item.getListener();
+
+        String wikiId =
+            ((XWikiContext) item.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId();
 
         MimeMessage message;
         try {
@@ -147,12 +153,14 @@ public class SendMailRunnable extends AbstractMailRunnable
 
             // Step 4: Notify the user of the success if a listener has been provided
             if (listener != null) {
-                listener.onSuccess(message, Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
+                listener.onSuccess(message,
+                    ImmutableMap.of(WIKI_PARAMETER_KEY, wikiId, CONTEXT_PARAMETER_KEY, item.getContext()));
             }
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided.
             if (listener != null) {
-                listener.onError(message, e, Collections.singletonMap(WIKI_PARAMETER_KEY, (Object) item.getWikiId()));
+                listener.onError(message, e,
+                    ImmutableMap.of(WIKI_PARAMETER_KEY, wikiId, CONTEXT_PARAMETER_KEY, item.getContext()));
             }
         }
     }

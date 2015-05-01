@@ -59,17 +59,30 @@ public abstract class AbstractMailRunnable implements MailRunnable
     @Inject
     private ExecutionContextManager executionContextManager;
 
-    protected void prepareContext(String wikiId) throws ExecutionContextException
+    protected void prepareContext(ExecutionContext executionContext) throws ExecutionContextException
     {
-        // Isolate the context when sending a mail by creating a new context
-        ExecutionContext executionContext = new ExecutionContext();
-        this.executionContextManager.initialize(executionContext);
+        // Isolate the context when sending a mail by cloning it
+        ExecutionContext clonedExecutionContext = this.executionContextManager.clone(executionContext);
 
-        // Since the Execution Context has been created there's no XWikiContext in it and we initialize one
-        XWikiContext xwikiContext = this.xwikiContextProvider.get();
+        // The above clone just creates and initializes an empty XWiki Context, so it needs special handling.
+        XWikiContext xwikiContext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        // This is still a shallow clone, but at least for stuff like wikiID and userReference it gets the job done.
+        XWikiContext clonedXWikiContext = xwikiContext.clone();
+        clonedXWikiContext.setUserReference(xwikiContext.getUserReference());
+        clonedXWikiContext.setWikiId(xwikiContext.getWikiId());
+        clonedXWikiContext.setWiki(xwikiContext.getWiki());
+        clonedXWikiContext.setLocale(xwikiContext.getLocale());
+        clonedXWikiContext.setMainXWiki(xwikiContext.getMainXWiki());
+        // FIXME: We probably need a deeper cloning of XWikiContext and we probably need it in a better place.
+        clonedExecutionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, clonedXWikiContext);
 
-        // Set the wiki in which to execute
-        xwikiContext.setWikiId(wikiId);
+        try {
+            this.execution.setContext(clonedExecutionContext);
+        } catch (Exception e) {
+            // If inheritance fails, we will get an unchecked exception here. So we'll wrap it in an
+            // ExecutionContextException.
+            throw new ExecutionContextException("Failed to set the execution context.", e);
+        }
     }
 
     protected void removeContext()

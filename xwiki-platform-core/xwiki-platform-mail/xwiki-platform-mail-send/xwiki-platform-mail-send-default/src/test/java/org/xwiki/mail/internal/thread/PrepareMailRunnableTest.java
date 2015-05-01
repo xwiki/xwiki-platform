@@ -34,6 +34,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -56,15 +58,12 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4
  */
-@ComponentList({
-    MemoryMailListener.class,
-    PrepareMailQueueManager.class
-})
+@ComponentList({MemoryMailListener.class, PrepareMailQueueManager.class})
 public class PrepareMailRunnableTest
 {
     @Rule
-    public MockitoComponentMockingRule<PrepareMailRunnable> mocker =
-        new MockitoComponentMockingRule<>(PrepareMailRunnable.class);
+    public MockitoComponentMockingRule<PrepareMailRunnable> mocker = new MockitoComponentMockingRule<>(
+        PrepareMailRunnable.class);
 
     @Before
     public void setUp() throws Exception
@@ -90,13 +89,29 @@ public class PrepareMailRunnableTest
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
 
-        PrepareMailQueueItem item1 =
-            new PrepareMailQueueItem(Arrays.asList(message1), session, listener, batchId, "wiki1");
-        PrepareMailQueueItem item2 =
-            new PrepareMailQueueItem(Arrays.asList(message2), session, listener, batchId, "wiki2");
+        ExecutionContext context1 = new ExecutionContext();
+        XWikiContext xContext1 = new XWikiContext();
+        xContext1.setWikiId("wiki1");
+        context1.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext1);
 
-        MailQueueManager mailQueueManager = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MailQueueManager.class, PrepareMailQueueItem.class));
+        ExecutionContext context2 = new ExecutionContext();
+        XWikiContext xContext2 = new XWikiContext();
+        xContext2.setWikiId("wiki2");
+        context2.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext2);
+
+        ExecutionContextManager ecm = this.mocker.getInstance(ExecutionContextManager.class);
+        // Just return the same execution context
+        when(ecm.clone(context1)).thenReturn(context1);
+        when(ecm.clone(context2)).thenReturn(context2);
+
+        PrepareMailQueueItem item1 =
+            new PrepareMailQueueItem(Arrays.asList(message1), session, listener, batchId, context1);
+        PrepareMailQueueItem item2 =
+            new PrepareMailQueueItem(Arrays.asList(message2), session, listener, batchId, context2);
+
+        MailQueueManager mailQueueManager =
+            this.mocker.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
+                PrepareMailQueueItem.class));
 
         // Make the content store save fail
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");

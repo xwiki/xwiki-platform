@@ -27,6 +27,9 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
+import org.xwiki.context.ExecutionContext;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,8 +47,15 @@ public class PrepareMailQueueItemTest
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
         String batchId = UUID.randomUUID().toString();
-        PrepareMailQueueItem item = new PrepareMailQueueItem(Arrays.asList(message), session, null, batchId, "wiki");
 
-        assertEquals("batchId = [" + batchId + "], wikiId = [wiki]", item.toString());
+        ExecutionContext context = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+
+        PrepareMailQueueItem item = new PrepareMailQueueItem(Arrays.asList(message), session, null, batchId, context);
+
+        assertEquals("batchId = [" + batchId + "], context = [[xwikicontext] = [{originalWiki=wiki, wiki=wiki}]]",
+            item.toString());
     }
 }

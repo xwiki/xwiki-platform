@@ -33,6 +33,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -91,8 +93,23 @@ public class SendMailRunnableTest
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
 
-        SendMailQueueItem item1 = new SendMailQueueItem("id1", session, listener, batchId, "wiki1");
-        SendMailQueueItem item2 = new SendMailQueueItem("id2", session, listener, batchId, "wiki2");
+        ExecutionContext context1 = new ExecutionContext();
+        XWikiContext xContext1 = new XWikiContext();
+        xContext1.setWikiId("wiki1");
+        context1.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext1);
+
+        ExecutionContext context2 = new ExecutionContext();
+        XWikiContext xContext2 = new XWikiContext();
+        xContext2.setWikiId("wiki2");
+        context2.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext2);
+
+        ExecutionContextManager ecm = this.mocker.getInstance(ExecutionContextManager.class);
+        // Just return the same execution context
+        when(ecm.clone(context1)).thenReturn(context1);
+        when(ecm.clone(context2)).thenReturn(context2);
+
+        SendMailQueueItem item1 = new SendMailQueueItem("id1", session, listener, batchId, context1);
+        SendMailQueueItem item2 = new SendMailQueueItem("id2", session, listener, batchId, context2);
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));

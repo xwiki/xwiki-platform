@@ -46,15 +46,15 @@ import org.xwiki.environment.internal.StandardEnvironment;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailState;
+import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.DefaultSessionFactory;
 import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
 import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
-import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
-import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
-import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptMailResult;
@@ -140,6 +140,18 @@ public class ScriptingIntegrationTest
     public void initialize() throws Exception
     {
         this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
+
+        // Set the EC
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+        execution.setContext(executionContext);
+
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        // Just return the same execution context
+        when(ecm.clone(executionContext)).thenReturn(executionContext);
     }
 
     @After
@@ -153,10 +165,6 @@ public class ScriptingIntegrationTest
     @Test
     public void sendTextMail() throws Exception
     {
-        // Set the EC
-        Execution execution = this.componentManager.getInstance(Execution.class);
-        execution.setContext(new ExecutionContext());
-
         MimeMessageWrapper message1 = this.scriptService.createMessage("john@doe.com", "subject");
         message1.addPart("text/plain", "some text here");
         MimeMessageWrapper message2 = this.scriptService.createMessage("john@doe.com", "subject");
@@ -198,10 +206,6 @@ public class ScriptingIntegrationTest
     @Test
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
-        // Set the EC
-        Execution execution = this.componentManager.getInstance(Execution.class);
-        execution.setContext(new ExecutionContext());
-
         MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
         String calendarContent = "BEGIN:VCALENDAR\r\n"

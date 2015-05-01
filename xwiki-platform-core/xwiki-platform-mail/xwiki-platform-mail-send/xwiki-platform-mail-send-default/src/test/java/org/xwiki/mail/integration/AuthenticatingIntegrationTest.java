@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import javax.inject.Provider;
 import javax.mail.BodyPart;
+import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -39,6 +40,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.environment.internal.EnvironmentConfiguration;
 import org.xwiki.environment.internal.StandardEnvironment;
@@ -46,16 +48,16 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.XWikiAuthenticator;
-import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
-import org.xwiki.mail.internal.FileSystemMailContentStore;
-import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.DefaultMailSender;
+import org.xwiki.mail.internal.FileSystemMailContentStore;
+import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
+import org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory;
+import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
+import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
-import org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration;
-import org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory;
-import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -159,6 +161,18 @@ public class AuthenticatingIntegrationTest
     @Test
     public void sendTextMail() throws Exception
     {
+        // Set the EC
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContext executionContext = new ExecutionContext();
+        XWikiContext xContext = new XWikiContext();
+        xContext.setWikiId("wiki");
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
+        when(execution.getContext()).thenReturn(executionContext);
+
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        // Just return the same execution context
+        when(ecm.clone(executionContext)).thenReturn(executionContext);
+
         // Step 1: Create a JavaMail Session
         Properties properties = this.configuration.getAllProperties();
         assertEquals("true", properties.getProperty(DefaultMailSenderConfiguration.JAVAMAIL_SMTP_AUTH));
@@ -167,7 +181,7 @@ public class AuthenticatingIntegrationTest
         // Step 2: Create the Message to send
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
-        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");

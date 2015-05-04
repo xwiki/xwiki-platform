@@ -73,15 +73,14 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
     public MimeBodyPart create(DocumentReference documentReference, Map<String, Object> parameters)
         throws MessagingException
     {
-        Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
+        Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
 
         String language = (String) parameters.get("language");
 
         Locale locale = LocaleUtils.toLocale(language);
 
         String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables, locale);
-        String htmlContent =
-            getTemplateManager().evaluate(documentReference, "html", velocityVariables, locale);
+        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables, locale);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);

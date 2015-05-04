@@ -309,7 +309,7 @@ public class DefaultMailTemplateManagerTest
 
         try {
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html",
-                Collections.<String, String>emptyMap());
+                Collections.<String, Object>emptyMap());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals("Failed to evaluate property [html] for Document [wiki:space.page] and locale [null]",

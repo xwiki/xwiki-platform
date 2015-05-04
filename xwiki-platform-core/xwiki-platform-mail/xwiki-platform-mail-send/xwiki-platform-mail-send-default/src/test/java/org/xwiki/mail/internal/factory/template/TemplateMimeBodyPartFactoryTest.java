@@ -65,10 +65,10 @@ public class TemplateMimeBodyPartFactoryTest
     public void setUp() throws Exception
     {
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>(), null))
+        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, Object>(), null))
             .thenReturn(
                 "Hello John Doe, john@doe.com");
-        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>(), null))
+        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, Object>(), null))
             .thenReturn(
                 "Hello <b>John Doe</b> <br />john@doe.com");
     }

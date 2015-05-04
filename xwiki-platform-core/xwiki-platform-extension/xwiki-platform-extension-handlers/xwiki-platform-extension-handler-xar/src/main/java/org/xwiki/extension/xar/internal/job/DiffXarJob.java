@@ -22,6 +22,8 @@ package org.xwiki.extension.xar.internal.job;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -83,6 +85,12 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
     @Inject
     private DocumentUnifiedDiffBuilder documentDiffBuilder;
 
+    /**
+     * The set of features that have been compared. We try to avoid comparing the same feature twice. We assume all the
+     * features are compared on the same namespace.
+     */
+    private Set<String> comparedFeatures = new HashSet<>();
+
     @Override
     public String getType()
     {
@@ -133,6 +141,12 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
 
     private void diff(String feature, String namespace)
     {
+        if (this.comparedFeatures.contains(feature)) {
+            // We already looked at this feature.
+            return;
+        }
+        this.comparedFeatures.add(feature);
+
         InstalledExtension installedExtension =
             this.installedExtensionRepository.getInstalledExtension(feature, namespace);
         if (installedExtension != null) {
@@ -205,7 +219,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         }
         // Use the extension id as the document version.
         XWikiDocument previousDocument =
-            document.duplicate(new DocumentVersionReference(document.getDocumentReferenceWithLocale(), extensionId));
+            document.duplicate(new DocumentVersionReference(document.getDocumentReference(), extensionId));
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument nextDocument =

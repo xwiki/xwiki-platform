@@ -73,7 +73,10 @@ public class ColumnsLayoutManager implements LayoutManager
             return;
         }
 
-        ssfx.use("uicomponents/container/columns.css");
+        Map<String, Object> skinxParams = new HashMap<String, Object>();
+        skinxParams.put("forceSkinAction", true);
+
+        ssfx.use("uicomponents/container/columns.css", skinxParams);
 
         // add styles to all columns inside
         for (int i = 0; i < count; i++) {

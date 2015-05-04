@@ -24,8 +24,8 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * This API is for checking the access rights of current user in the current context. It is aims to replace
- * com.xpn.xwiki.user.api.XWikiRightService.
+ * This API is for checking the access rights of current user in the current context. It replaces
+ * {@code com.xpn.xwiki.user.api.XWikiRightService}.
  *
  * The ContextualAuthorizationManager does not provide any help for authentication. Authentication should have been
  * ensured previously if needed.

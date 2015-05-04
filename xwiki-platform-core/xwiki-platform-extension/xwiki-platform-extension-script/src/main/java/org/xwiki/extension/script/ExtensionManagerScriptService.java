@@ -52,6 +52,7 @@ import org.xwiki.extension.job.internal.UpgradePlanJob;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.VersionRange;
@@ -184,8 +185,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     // Extensions
 
     /**
-     * Search among all {@link org.xwiki.extension.repository.search.Searchable} repositories for extensions matching
-     * the search terms.
+     * Search among all remote (those listed in xwiki.properties)
+     * {@link org.xwiki.extension.repository.search.Searchable} repositories for extensions matching the search terms.
      * 
      * @param pattern the words to search for
      * @param offset the offset from where to start returning search results, 0-based
@@ -197,6 +198,30 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     public IterableResult<Extension> search(String pattern, int offset, int nb)
     {
         return this.repositoryManager.search(pattern, offset, nb);
+    }
+
+    /**
+     * Search among all remote (those listed in xwiki.properties)
+     * {@link org.xwiki.extension.repository.search.Searchable} repositories for extensions matching the search terms.
+     * 
+     * @param query the search query
+     * @return the found extensions descriptors, empty list if nothing could be found
+     * @see org.xwiki.extension.repository.search.Searchable
+     * @since 7.1M1
+     */
+    public IterableResult<Extension> search(ExtensionQuery query)
+    {
+        return this.repositoryManager.search(query);
+    }
+
+    /**
+     * @param query the query to execute
+     * @return a {@link ExtensionQuery} instance
+     * @since 7.1M1
+     */
+    public ExtensionQuery newQuery(String query)
+    {
+        return new ExtensionQuery(query);
     }
 
     /**
@@ -908,7 +933,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<InstalledExtension> getInstalledExtensions()
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions();
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions();
     }
 
     /**
@@ -925,7 +950,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions(
             namespace);
     }
 
@@ -946,7 +971,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtension(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtension(
             feature, namespace);
     }
 
@@ -963,7 +988,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getBackwardDependencies(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getBackwardDependencies(
             feature);
     }
 
@@ -976,7 +1001,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtensions();
+        return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtensions();
     }
 
     /**
@@ -991,7 +1016,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public CoreExtension getCoreExtension(String feature)
     {
-        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtension(feature);
+        return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtension(feature);
     }
 
     /**
@@ -1005,6 +1030,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return this.<LocalExtensionScriptService> get(LocalExtensionScriptService.ID).getLocalExtensions();
+        return this.<LocalExtensionScriptService>get(LocalExtensionScriptService.ID).getLocalExtensions();
     }
 }

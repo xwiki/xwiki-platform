@@ -76,7 +76,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     private Provider<XWikiContext> xwikiContextProvider;
 
     @Override
-    public String evaluate(DocumentReference templateReference, String property, Map<String, String> data,
+    public String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
         Locale locale) throws MessagingException
     {
         Locale computedLocale = locale;
@@ -86,7 +86,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
 
-        VelocityContext velocityContext = createVelocityContext(data);
+        VelocityContext velocityContext = createVelocityContext(velocityVariables);
 
         String templateFullName = this.serializer.serialize(templateReference);
 
@@ -106,7 +106,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     }
 
     @Override
-    public String evaluate(DocumentReference templateReference, String property, Map<String, String> data)
+    public String evaluate(DocumentReference templateReference, String property, Map<String, Object> data)
         throws MessagingException
     {
         return evaluate(templateReference, property, data, null);
@@ -160,7 +160,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         return objectsCount;
     }
 
-    private VelocityContext createVelocityContext(Map<String, String> data)
+    private VelocityContext createVelocityContext(Map<String, Object> velocityVariables)
     {
         // Note: We create an inner Velocity Context to make it read only and try to prevent the script to modify
         // its bindings. We also clone its values to try try to protect them. It's not guaranteed though since the
@@ -174,9 +174,9 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } else {
             velocityContext = new VelocityContext();
         }
-        if (data != null) {
-            for (Map.Entry<String, String> header : data.entrySet()) {
-                velocityContext.put(header.getKey(), header.getValue());
+        if (velocityVariables != null) {
+            for (Map.Entry<String, Object> velocityVariable : velocityVariables.entrySet()) {
+                velocityContext.put(velocityVariable.getKey(), velocityVariable.getValue());
             }
         }
         return velocityContext;

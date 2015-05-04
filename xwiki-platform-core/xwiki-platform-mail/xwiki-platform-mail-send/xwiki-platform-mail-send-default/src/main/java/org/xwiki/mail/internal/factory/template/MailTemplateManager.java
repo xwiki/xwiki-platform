@@ -49,7 +49,7 @@ public interface MailTemplateManager
      * @throws MessagingException when an error occurs
      * @since 6.1
      */
-    String evaluate(DocumentReference templateReference, String property, Map<String, String> velocityVariables,
+    String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
         Locale locale) throws MessagingException;
 
     /**
@@ -62,6 +62,6 @@ public interface MailTemplateManager
      * @return the evaluated property
      * @throws MessagingException when an error occurs
      */
-    String evaluate(DocumentReference templateReference, String property, Map<String, String> velocityVariables)
+    String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables)
         throws MessagingException;
 }

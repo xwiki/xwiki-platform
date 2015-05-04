@@ -71,7 +71,7 @@ public class TemplateMimeMessageFactoryTest
 
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
         when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"),
-            anyMapOf(String.class, String.class), any(Locale.class))).thenReturn("XWiki news");
+            anyMapOf(String.class, Object.class), any(Locale.class))).thenReturn("XWiki news");
 
         MimeBodyPartFactory<DocumentReference> templateBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, DocumentReference.class), "xwiki/template");

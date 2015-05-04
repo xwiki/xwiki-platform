@@ -55,7 +55,7 @@ public class SecureMailTemplateManager implements MailTemplateManager
     private DocumentAccessBridge documentBridge;
 
     @Override
-    public String evaluate(DocumentReference templateReference, String property, Map<String, String> velocityVariables,
+    public String evaluate(DocumentReference templateReference, String property, Map<String, Object> velocityVariables,
         Locale language)
         throws MessagingException
     {
@@ -71,9 +71,9 @@ public class SecureMailTemplateManager implements MailTemplateManager
         return this.templateManager.evaluate(templateReference, property, velocityVariables, language);
     }
 
-    @Override public String evaluate(DocumentReference documentReference, String property,
-        Map<String, String> velocityVariables)
-        throws MessagingException
+    @Override
+    public String evaluate(DocumentReference documentReference, String property,
+        Map<String, Object> velocityVariables) throws MessagingException
     {
         return evaluate(documentReference, property, velocityVariables, null);
     }

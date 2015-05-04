@@ -88,7 +88,7 @@ public abstract class AbstractTemplateMimeMessageFactory extends AbstractMimeMes
         }
 
         // Handle the subject. Get it from the template
-        Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
+        Map<String, Object> velocityVariables = (Map<String, Object>) parameters.get("velocityVariables");
         String language = (String) parameters.get("language");
         Locale locale = LocaleUtils.toLocale(language);
         String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, locale);

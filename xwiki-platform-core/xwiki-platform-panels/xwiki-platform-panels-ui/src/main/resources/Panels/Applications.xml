@@ -526,27 +526,27 @@ document.observe('xwiki:dom:loaded', function(e) {
   height: 24px;
 }
 
-.panel-width-Medium .applicationsPanel > li > a,
-.panel-width-Medium .applicationsPanelMoreList > li > a,
-.panel-width-Medium .applicationPanelMoreContainer ul> li > a,
-.panel-width-Large .applicationsPanel > li > a,
-.panel-width-Large .applicationsPanelMoreList > li > a,
-.panel-width-Large .applicationPanelMoreContainer ul > li > a {
+.panel-width-Medium .applicationsPanel &gt; li &gt; a,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a,
+.panel-width-Large .applicationsPanel &gt; li &gt; a,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a,
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a {
   padding: 0;
 }
 
-.panel-width-Medium .applicationsPanel > li > a:hover,
-.panel-width-Medium .applicationsPanel > li > a:focus,
-.panel-width-Medium .applicationsPanelMoreList > li > a:hover,
-.panel-width-Medium .applicationsPanelMoreList > li > a:focus,
-.panel-width-Medium .applicationPanelMoreContainer ul> li > a:hover,
-.panel-width-Medium .applicationPanelMoreContainer ul> li > a:focus,
-.panel-width-Large .applicationsPanel > li > a:hover,
-.panel-width-Large .applicationsPanel > li > a:focus,
-.panel-width-Large .applicationsPanelMoreList > li > a:hover,
-.panel-width-Large .applicationsPanelMoreList > li > a:focus,
-.panel-width-Large .applicationPanelMoreContainer ul > li > a:hover 
-.panel-width-Large .applicationPanelMoreContainer ul > li > a:focus {
+.panel-width-Medium .applicationsPanel &gt; li &gt; a:hover,
+.panel-width-Medium .applicationsPanel &gt; li &gt; a:focus,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:hover,
+.panel-width-Medium .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:hover,
+.panel-width-Medium .applicationPanelMoreContainer ul&gt; li &gt; a:focus,
+.panel-width-Large .applicationsPanel &gt; li &gt; a:hover,
+.panel-width-Large .applicationsPanel &gt; li &gt; a:focus,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:hover,
+.panel-width-Large .applicationsPanelMoreList &gt; li &gt; a:focus,
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:hover 
+.panel-width-Large .applicationPanelMoreContainer ul &gt; li &gt; a:focus {
   background-color: transparent;
   text-decoration: underline;
 }

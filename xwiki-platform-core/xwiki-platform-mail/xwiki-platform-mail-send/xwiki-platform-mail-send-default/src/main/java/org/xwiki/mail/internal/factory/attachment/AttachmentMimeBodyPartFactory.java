@@ -91,7 +91,7 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
         // Note: According to http://tools.ietf.org/html/rfc2392 the id must be enclosed in angle brackets.
         attachmentPart.setHeader("Content-ID", "<" + attachment.getFilename() + ">");
 
-        attachmentPart.setFileName(source.getName());
+        attachmentPart.setFileName(attachment.getFilename());
 
         // Handle headers passed as parameter
         addHeaders(attachmentPart, parameters);

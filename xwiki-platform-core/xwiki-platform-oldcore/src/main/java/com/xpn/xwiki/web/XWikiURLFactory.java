@@ -26,23 +26,13 @@ import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactory
 {
-    public void init(XWikiContext context);
+    void init(XWikiContext context);
 
-    public URL createURL(String web, String name, XWikiContext context);
+    URL createURL(String web, String name, XWikiContext context);
 
-    public URL createURL(String web, String name, String action, XWikiContext context);
+    URL createURL(String web, String name, String action, XWikiContext context);
 
-    public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
-
-    /**
-     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
-     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
-     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
-     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
-     *        example
-     */
-    public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context);
+    URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
 
     /**
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
@@ -52,7 +42,17 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+    URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context);
+
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
+    URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         XWikiContext context);
 
     /**
@@ -63,7 +63,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+    URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context);
 
     /**
@@ -74,16 +74,16 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+    URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context);
 
-    public URL createSkinURL(String filename, String skin, XWikiContext context);
+    URL createSkinURL(String filename, String skin, XWikiContext context);
 
-    public URL createSkinURL(String filename, String web, String name, XWikiContext context);
+    URL createSkinURL(String filename, String web, String name, XWikiContext context);
 
-    public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
+    URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
 
-    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
+    URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
     /**
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
@@ -93,7 +93,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         XWikiContext context);
 
     /**
@@ -104,32 +104,32 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    URL createAttachmentURL(String filename, String web, String name, String action, String querystring, String xwikidb,
+        XWikiContext context);
+
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
+    URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring,
+        XWikiContext context);
+
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
+    URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring,
         String xwikidb, XWikiContext context);
 
-    /**
-     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
-     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
-     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
-     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
-     *        example
-     */
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
-        String querystring, XWikiContext context);
-
-    /**
-     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
-     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
-     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
-     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
-     *        example
-     */
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
-        String querystring, String xwikidb, XWikiContext context);
-
-    public URL getRequestURL(XWikiContext context);
+    URL getRequestURL(XWikiContext context);
 
     /**
      * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
@@ -139,7 +139,7 @@ public interface XWikiURLFactory
      * @param url the URL to convert
      * @return the converted URL as a string
      */
-    public String getURL(URL url, XWikiContext context);
+    String getURL(URL url, XWikiContext context);
 
     /**
      * Generate the base external URL to access this server.
@@ -148,5 +148,5 @@ public interface XWikiURLFactory
      * @return the URL of the server.
      * @throws MalformedURLException error when creating the {@link URL}.
      */
-    public URL getServerURL(XWikiContext context) throws MalformedURLException;
+    URL getServerURL(XWikiContext context) throws MalformedURLException;
 }

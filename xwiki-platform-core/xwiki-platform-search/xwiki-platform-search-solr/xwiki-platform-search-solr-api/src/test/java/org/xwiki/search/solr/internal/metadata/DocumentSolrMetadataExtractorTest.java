@@ -19,10 +19,6 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +72,10 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for document meta data extraction.
@@ -377,8 +377,11 @@ public class DocumentSolrMetadataExtractorTest
         when(comment.getRelativeXClassReference()).thenReturn(
             commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
+        StringClass stringClass = mock(StringClass.class);
+        when(stringClass.getClassType()).thenReturn("String");
+
         when(xclass.get("comment")).thenReturn(mock(TextAreaClass.class));
-        when(xclass.get("summary")).thenReturn(mock(StringClass.class));
+        when(xclass.get("summary")).thenReturn(stringClass);
         when(xclass.get("password")).thenReturn(mock(PasswordClass.class));
         when(xclass.get("enabled")).thenReturn(mock(BooleanClass.class));
 
@@ -397,7 +400,11 @@ public class DocumentSolrMetadataExtractorTest
             solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.comment", Locale.US)));
         assertNull(solrDocument.getFieldValue("property.space.commentsClass.comment_string"));
 
+        // A String property must be indexed both as localized text and as raw (unanalyzed) text.
+        assertSame(commentSummary,
+            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.summary", Locale.US)));
         assertSame(commentSummary, solrDocument.getFieldValue("property.space.commentsClass.summary_string"));
+
         assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
         assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_date"));
         assertEquals(commentList, solrDocument.getFieldValues("property.space.commentsClass.list_string"));

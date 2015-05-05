@@ -659,7 +659,7 @@
     $welcomeMessage
 
     {{html wiki=false}}
-      &lt;form id="register" action="$doc.getURL()" method="post" class="xform half"&gt;
+      &lt;form id="register" action="$xwiki.relativeRequestURL" method="post" class="xform half"&gt;
       &lt;div&gt;
       &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
       #set ($userDirectoryReference = $services.model.createDocumentReference('', 'Main', 'UserDirectory'))

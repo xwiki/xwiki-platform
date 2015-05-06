@@ -42,7 +42,7 @@ require(['jquery'], function($) {
         select.find('.xwiki-flavor-select-container').fadeIn();
         initSelector();
       }).fail(function(){
-        new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('flavor.selector.website'))', 'error');
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('flavor.selector.website'))", 'error');
         select.removeClass('loading');
         select.find('.xwiki-flavor-select-container').fadeIn();
       });

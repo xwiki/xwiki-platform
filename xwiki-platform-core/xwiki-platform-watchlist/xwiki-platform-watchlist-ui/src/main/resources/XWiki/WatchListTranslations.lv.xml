@@ -44,6 +44,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Ikdienas
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Ikstundas
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Iknedēļas
+XWiki.WatchListClass_interval_realtime=Reāllaikā
 rendering.macro.watchlist.description=Rādīt jūsu vērojumu saturu
 rendering.macro.watchlist.name=Vērojumu saraksts
 </content>

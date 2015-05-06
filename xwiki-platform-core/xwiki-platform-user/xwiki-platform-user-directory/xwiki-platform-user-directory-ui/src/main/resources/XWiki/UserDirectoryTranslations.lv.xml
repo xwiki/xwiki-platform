@@ -21,19 +21,19 @@
 -->
 
 <xwikidoc>
-  <web>IconThemesCode</web>
-  <name>Translations</name>
+  <web>XWiki</web>
+  <name>UserDirectoryTranslations</name>
   <language>lv</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>IconThemes.WebHome</parent>
+  <parent>Main.UserDirectory</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1417707900000</creationDate>
-  <date>1417708092000</date>
-  <contentUpdateDate>1417708092000</contentUpdateDate>
+  <creationDate>1390398450000</creationDate>
+  <date>1390398458000</date>
+  <contentUpdateDate>1390398454000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -41,18 +41,16 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>plain/1.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
-platform.icon.picker.loading=Ielādē
-platform.icon.picker.preview=Priekšskatīt ar\:
-rendering.macro.iconPicker.description=Izvēlieties ikonu no XWiki ikonu krājuma.
-rendering.macro.iconPicker.name=Ikonu izvēle
-rendering.macro.iconPicker.parameter.class.description=Ievadlauka CSS klase, kurai tiks piemērota izvēlne
-rendering.macro.iconPicker.parameter.class.name=Klase
-rendering.macro.iconPicker.parameter.id.description=Ievadlauku DOM identifikators, kuram tiks piemērota izvēlne
-rendering.macro.iconPicker.parameter.id.name=Id
-rendering.macro.iconPicker.parameter.prefix.description=Ievadlauka ikonas nosaukuma priedēklis (noklusētais\: "image\:icon\:")
-rendering.macro.iconPicker.parameter.prefix.name=Priedēklis
+platform.userdirectory.configSheetApplyOnConfiguration=Šī izklājlapa ir jāpielieto Lietotāju saraksta pārvaldības dokumentam.
+platform.userdirectory.configSheetTitle=Lietotāju saraksta pārvaldības izklājlapa
+platform.userdirectory.configTitle=Lietotāju saraksta pārvaldība
+platform.userdirectory.customizeNotAllowed=Jums nav tiesību pielāgot šo lietotāju sarakstu.
+userdirectory.userScopeFilter=Lietotāju apgabals\:
+userdirectory.userScopeFilter.global=Globālie lietotāji, kas ir šī viki dalībnieki
+userdirectory.userScopeFilter.hint=Izvēlieties lietotāju kategoriju, kuru vēlaties parādīt.
+userdirectory.userScopeFilter.local=Lokālie lietotāji
 </content>
 </xwikidoc>

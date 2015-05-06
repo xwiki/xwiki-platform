@@ -1,0 +1,94 @@
+#template('colorThemeInit.vm')
+
+.xwiki-flavor-select {
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+  padding: 5px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.xwiki-flavor-select-small {
+  height: 200px;
+}
+
+.xwiki-flavor-select-medium {
+  height: 400px;
+}
+
+.xwiki-flavor-select-tall {
+  height: 800px;
+}
+
+.xwiki-flavor-select-option input[type="radio"] { 
+  display: none;
+} 
+
+.xwiki-flavor-select-option {
+  float: left;
+  padding: 5px;
+  width: 50%;
+  border: 1px dotted transparent;
+  list-style-type: none;
+}
+
+/* Make sure we create a new line every 2 items (like a grid) */
+.xwiki-flavor-select-option:nth-child(2n+1) {
+  clear: both;
+}
+
+.xwiki-flavor-select-option-selected {
+  background-color: $theme.highlightColor;
+  border: 1px dotted #CCC;
+}
+
+.xwiki-flavor-select-option, .xwiki-flavor-select-option > label {
+  cursor: pointer;
+}
+
+.xwiki-flavor-select-option-icon {
+  display: table-cell;
+  font-size: 30px;
+  padding-right: 10px;
+  vertical-align: top;
+}
+
+.xwiki-flavor-select-option > div{
+  display: table-cell;
+  vertical-align: top;
+}
+
+.xwiki-flavor-select-option-icon > img{
+  height: 30px;
+  width 30px;
+}
+
+.xwiki-flavor-select-option:hover {
+  background-color: $theme.highlightColor;
+}
+
+.xwiki-flavor-select ul {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.xwiki-flavor-select .paginationFilter {
+  clear: both;
+}
+
+.skin-colibri .xwiki-flavor-select-option {
+  width: 47%;
+}
+
+/* Taken from bootstrap */
+.skin-colibri .clearfix:before, .skin-colibri .clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.skin-colibri .clearfix:after{
+  clear: both;
+}
+

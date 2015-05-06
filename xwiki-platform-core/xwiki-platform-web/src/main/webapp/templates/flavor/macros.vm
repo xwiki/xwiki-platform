@@ -1,0 +1,59 @@
+########################################################
+## Display a custom select input to select a flavor.
+## -----------------------------
+##
+## @param $fieldName name of the input field
+## @defaultValue the default flavor to use (extension id, eg: "org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki-6.4.5")
+## @firstIsDefaultIfDefaultNull if defaultValue is null, select the first flavor
+## @cssClass class to add to the div (could be 'xwiki-flavor-select-small', 'xwiki-flavor-select-medium', 'xwiki-flavor-select-tall' or any other class)
+#########################################################
+#macro(displaySelectFlavor $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/selector.css', {'forceSkinAction': true}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/selector.js' , {'forceSkinAction': true}))
+  <div class="xwiki-flavor-select clearfix $!cssClass">
+    #displaySelectFlavor_items($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, $cssClass, 0)
+  </div>
+  <input type="radio" name="$fieldName" value="noFlavor" id="${fieldName}_noFlavor" class="xwiki-flavor-select-noflavor">
+  <label for="${fieldName}_noFlavor">$services.localization.render('flavor.selector.noflavor')</label>
+#end
+##
+#macro(displaySelectFlavor_items $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $offset)
+  #set ($resultsPerPage = 20)
+  #set ($flavorQuery = $services.flavor.createFlavorQuery().setOffset($offset).setLimit($resultsPerPage))
+  #set ($flavors = $services.flavor.getFlavors($flavorQuery))
+  <div class="xwiki-flavor-select-container">
+    <ul>
+    #foreach ($flavor in $flavors)
+      #set ($value = $flavor.extensionId)
+      #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+        #set ($checked = 'checked="checked"')
+        #set ($class = 'xwiki-flavor-select-option-selected')
+      #else
+        #set ($checked = '')
+        #set ($class = '')
+      #end
+      <li class="xwiki-flavor-select-option $class">
+        <input type="radio" name="$fieldName" value="$escapetool.xml($value)" id="${fieldName}_${velocityCount}" $checked/>
+        <span class="xwiki-flavor-select-option-icon">$services.icon.renderHTML('wiki')</span>
+        <div>
+          <label for="${fieldName}_${velocityCount}">$escapetool.xml($flavor.name)</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end<br/>
+          <small><span class="authors">$services.localization.render('flavor.selector.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</span></small>
+          #if ("$!flavor.summary" != '')
+            <span class="xHint">$flavor.summary</span>
+          #end
+          #if ("$!flavor.website" != '')
+          <small><a href="$escapetool.xml($flavor.website)" class="popup">$services.localization.render('flavor.selector.website')</a></small>
+          #end
+        </div>
+      </li>
+    #end
+    </ul>
+    #set($paginationParameters = {
+      'url' : $doc.getURL('view', "xpage=flavor/selector_results&fieldName=$escapetool.url($fieldName)&cssClass=$escapetool.url($cssClass)"),
+      'totalItems' : $flavors.totalHits,
+      'defaultItemsPerPage' : $resultsPerPage,
+      'position': 'top'
+    })
+    #pagination($paginationParameters)
+  </div>
+#end

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -99,25 +100,31 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
+     * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
+     *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
      * @param content the content to include in the mail
      */
-    public void addPart(String mimeType, Object content)
+    public BodyPart addPart(String mimeType, Object content)
     {
-        addPart(mimeType, content, Collections.<String, Object>emptyMap());
+        return addPart(mimeType, content, Collections.<String, Object>emptyMap());
     }
 
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
+     * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
+     *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
      * @param content the content to include in the mail
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
      *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values
      */
-    public void addPart(String mimeType, Object content, Map<String, Object> parameters)
+    public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)
     {
+        BodyPart bodyPart;
+
         try {
             MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
@@ -128,11 +135,15 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
             enhancedParameters.putAll(parameters);
 
             Multipart multipart = getMultipart();
-            multipart.addBodyPart(factory.create(content, enhancedParameters));
+            bodyPart = factory.create(content, enhancedParameters);
+            multipart.addBodyPart(bodyPart);
         } catch (Exception e) {
             // Save the exception for reporting through the script services's getError() API
             setError(e);
+            bodyPart = null;
         }
+
+        return bodyPart;
     }
 
     /**

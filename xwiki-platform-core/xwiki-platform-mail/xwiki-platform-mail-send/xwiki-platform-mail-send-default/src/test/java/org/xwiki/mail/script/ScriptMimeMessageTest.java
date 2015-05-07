@@ -31,23 +31,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.mail.internal.ExtendedMimeMessage;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 /**
- * Unit tests for {@link MimeMessageWrapper}.
+ * Unit tests for {@link ScriptMimeMessage}.
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 7.1M2
  */
-public class MimeMessageWrapperTest
+public class ScriptMimeMessageTest
 {
-    private MimeMessageWrapper messageWrapper;
-
-    private ExtendedMimeMessage extendedMimeMessage;
+    private ScriptMimeMessage scriptMessage;
 
     private Session session;
 
@@ -58,57 +55,44 @@ public class MimeMessageWrapperTest
         ComponentManager componentManager = mock(ComponentManager.class);
 
         this.session = Session.getInstance(new Properties());
-        this.extendedMimeMessage = new ExtendedMimeMessage(session);
-
-        this.messageWrapper =
-            new MimeMessageWrapper(extendedMimeMessage, session, execution, componentManager);
-    }
-
-    @Test
-    public void getMessage() throws Exception
-    {
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
-        assertEquals(message, this.extendedMimeMessage);
+        this.scriptMessage = new ScriptMimeMessage(this.session, execution, componentManager);
     }
 
     @Test
     public void getSession() throws Exception
     {
-        Session session = this.messageWrapper.getSession();
+        Session session = this.scriptMessage.getSession();
         assertEquals(session, this.session);
     }
 
     @Test
     public void setSubject() throws Exception
     {
-        this.messageWrapper.setSubject("lorem ipsum");
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
-        assertEquals(message.getSubject(), "lorem ipsum");
+        this.scriptMessage.setSubject("lorem ipsum");
+        assertEquals("lorem ipsum", this.scriptMessage.getSubject());
     }
 
     @Test
     public void setFrom() throws Exception
     {
-        this.messageWrapper.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
-        assertArrayEquals(message.getFrom(), InternetAddress.parse("john@doe.com"));
+        this.scriptMessage.setFrom(InternetAddress.parse("john@doe.com")[0]);
+        assertArrayEquals(InternetAddress.parse("john@doe.com"), this.scriptMessage.getFrom());
     }
 
     @Test
     public void addRecipients() throws Exception
     {
         Address[] address = InternetAddress.parse("john@doe.com,jane@doe.com,jannie@doe.com");
-        this.messageWrapper.addRecipients(Message.RecipientType.TO, address);
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
-        assertArrayEquals(message.getRecipients(Message.RecipientType.TO), address);
+        this.scriptMessage.addRecipients(Message.RecipientType.TO, address);
+        assertArrayEquals(address, this.scriptMessage.getRecipients(Message.RecipientType.TO));
     }
 
     @Test
     public void addRecipient() throws Exception
     {
-        this.messageWrapper.addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
-        assertArrayEquals(message.getRecipients(Message.RecipientType.TO), InternetAddress.parse("john@doe.com"));
+        this.scriptMessage.addRecipient(Message.RecipientType.TO, InternetAddress.parse("john@doe.com")[0]);
+        assertArrayEquals(InternetAddress.parse("john@doe.com"),
+            this.scriptMessage.getRecipients(Message.RecipientType.TO));
     }
 
     @Test
@@ -117,11 +101,10 @@ public class MimeMessageWrapperTest
         String batchId = UUID.randomUUID().toString();
         String mailId = UUID.randomUUID().toString();
 
-        this.messageWrapper.addHeader("X-BatchID", batchId);
-        this.messageWrapper.addHeader("X-MailID", mailId);
-        ExtendedMimeMessage message = this.messageWrapper.getMessage();
+        this.scriptMessage.addHeader("X-BatchID", batchId);
+        this.scriptMessage.addHeader("X-MailID", mailId);
 
-        assertEquals(message.getHeader("X-BatchID", null), batchId);
-        assertEquals(message.getHeader("X-MailID", null), mailId);
+        assertEquals(batchId, this.scriptMessage.getHeader("X-BatchID", null));
+        assertEquals(mailId, this.scriptMessage.getHeader("X-MailID", null));
     }
 }

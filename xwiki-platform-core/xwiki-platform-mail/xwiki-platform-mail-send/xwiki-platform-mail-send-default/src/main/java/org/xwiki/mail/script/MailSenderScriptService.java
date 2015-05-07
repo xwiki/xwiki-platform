@@ -39,7 +39,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.stability.Unstable;
@@ -80,27 +79,18 @@ public class MailSenderScriptService extends AbstractMailScriptService
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
      * @param source the source from which to prefill the Mime Message (depends on the implementation)
      * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
-     * @return the pre-filled Mime Message wrapped in a {@link org.xwiki.mail.script.MimeMessageWrapper} instance
+     * @return the pre-filled Mime Message wrapped in a {@link ScriptMimeMessage} instance
      */
-    public MimeMessageWrapper createMessage(String hint, Object source, Map<String, Object> parameters)
+    public ScriptMimeMessage createMessage(String hint, Object source, Map<String, Object> parameters)
     {
-        MimeMessageWrapper result;
+        ScriptMimeMessage result;
         try {
             MimeMessageFactory<MimeMessage> factory = MimeMessageFactoryProvider.get(hint, MimeMessage.class,
                 this.componentManagerProvider.get());
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
-            // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
-            // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
-            ExtendedMimeMessage extendedMimeMessage;
             MimeMessage message = factory.createMessage(session, source, parameters);
-            if (message instanceof ExtendedMimeMessage) {
-                extendedMimeMessage = (ExtendedMimeMessage) message;
-            } else {
-                extendedMimeMessage = new ExtendedMimeMessage(message);
-            }
-
-            result = new MimeMessageWrapper(extendedMimeMessage, session, this.execution,
+            result = new ScriptMimeMessage(message, session, this.execution,
                 this.componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
@@ -159,9 +149,9 @@ public class MailSenderScriptService extends AbstractMailScriptService
      *
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
      * @param source the source from which to prefill the Mime Message (depends on the implementation)
-     * @return the pre-filled Mime Message wrapped in a {@link org.xwiki.mail.script.MimeMessageWrapper} instance
+     * @return the pre-filled Mime Message wrapped in a {@link ScriptMimeMessage} instance
      */
-    public MimeMessageWrapper createMessage(String hint, Object source)
+    public ScriptMimeMessage createMessage(String hint, Object source)
     {
         return createMessage(hint, source, Collections.<String, Object>emptyMap());
     }
@@ -173,7 +163,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      *
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage()
+    public ScriptMimeMessage createMessage()
     {
         return createMessage(null, null, (String) null);
     }
@@ -187,7 +177,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage(String to, String subject)
+    public ScriptMimeMessage createMessage(String to, String subject)
     {
         return createMessage(this.senderConfiguration.getFromAddress(), to, subject);
     }
@@ -202,28 +192,27 @@ public class MailSenderScriptService extends AbstractMailScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public MimeMessageWrapper createMessage(String from, String to, String subject)
+    public ScriptMimeMessage createMessage(String from, String to, String subject)
     {
         Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
-        ExtendedMimeMessage message = new ExtendedMimeMessage(session);
-        MimeMessageWrapper messageWrapper = new MimeMessageWrapper(message, session, this.execution,
+        ScriptMimeMessage scriptMessage = new ScriptMimeMessage(session, this.execution,
             this.componentManagerProvider.get());
 
         try {
             if (from != null) {
-                messageWrapper.setFrom(InternetAddress.parse(from)[0]);
+                scriptMessage.setFrom(InternetAddress.parse(from)[0]);
             }
             if (to != null) {
-                messageWrapper.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+                scriptMessage.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             }
-            message.setSubject(subject);
+            scriptMessage.setSubject(subject);
         } catch (Exception e) {
             // An error occurred, save it and return null
             setError(e);
             return null;
         }
 
-        return messageWrapper;
+        return scriptMessage;
     }
 
     /**

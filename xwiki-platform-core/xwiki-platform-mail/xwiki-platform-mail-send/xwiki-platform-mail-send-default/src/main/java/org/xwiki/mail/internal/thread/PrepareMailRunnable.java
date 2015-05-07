@@ -36,7 +36,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.script.MimeMessageWrapper;
 
 import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
@@ -122,7 +121,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
      */
     protected void prepareMail(PrepareMailQueueItem item) throws ExecutionContextException
     {
-        Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
+        Iterator<? extends MimeMessage> messageIterator = item.getMessages().iterator();
 
         // We clone the Execution Context for each mail so that one mail doesn't interfere with another
         // Note that we need to have the hasNext() call after the context is ready since the implementation can need
@@ -131,8 +130,8 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         while (!shouldStop) {
             prepareContext(item.getContext());
             try {
-                if (messages.hasNext()) {
-                    MimeMessage mimeMessage = messages.next();
+                if (messageIterator.hasNext()) {
+                    MimeMessage mimeMessage = messageIterator.next();
                     // Skip message is message has failed to be created.
                     if (mimeMessage != null) {
                         prepareSingleMail(mimeMessage, item);
@@ -182,13 +181,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, String batchId,
         ExecutionContext executionContext) throws Exception
     {
-        MimeMessage message;
-
-        if ((mimeMessage instanceof MimeMessageWrapper)) {
-            message = ((MimeMessageWrapper) mimeMessage).getMessage();
-        } else {
-            message = mimeMessage;
-        }
+        MimeMessage message = mimeMessage;
 
         setCustomHeaders(message, batchId);
 

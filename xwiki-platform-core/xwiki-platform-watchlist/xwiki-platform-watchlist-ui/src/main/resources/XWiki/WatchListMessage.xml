@@ -417,17 +417,15 @@ $services.localization.render('watchlist.notification.email.multipleUpdates.intr
       #set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
       &lt;h4 style="$h4Style"&gt;$services.localization.render('watchlist.event.update.multiple', [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
     #end
-    #if ($showDiff)
-      #if ($event.getType() == "update" || $event.getType() == "create")
-        #set ($htmlDiff = $event.getHTMLDiff())
-        ## If the HTML Diff failed, display some error message
-        #if(!$htmlDiff)
-          &lt;div&gt;$services.localization.render('watchlist.diff.error')&lt;/div&gt;
-        #else
-          &lt;div class="diff"&gt;
-            #displayhtmldiff($htmlDiff)
-          &lt;/div&gt;
-        #end
+    #if ($event.getType() == "update" || $event.getType() == "create")
+      #set ($htmlDiff = $event.getHTMLDiff())
+      ## If the HTML Diff failed, display some error message
+      #if(!$htmlDiff)
+        &lt;div&gt;$services.localization.render('watchlist.diff.error')&lt;/div&gt;
+      #else
+        &lt;div class="diff"&gt;
+          #displayhtmldiff($htmlDiff)
+        &lt;/div&gt;
       #end
     #end
   &lt;/div&gt;

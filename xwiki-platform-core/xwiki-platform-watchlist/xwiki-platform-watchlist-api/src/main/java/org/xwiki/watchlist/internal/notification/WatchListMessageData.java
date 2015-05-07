@@ -47,7 +47,24 @@ public class WatchListMessageData
 
     private List<WatchListEvent> events;
 
-    private boolean showDiff;
+    /**
+     * @param userReference the subscriber's profile document reference
+     * @param templateReference the email template's document reference
+     * @param firstName the subscriber's first name
+     * @param lastName the subscriber's last name
+     * @param address the subscriber's email address
+     * @param events the list of events to notify the subscriber of
+     */
+    public WatchListMessageData(DocumentReference userReference, DocumentReference templateReference, String firstName,
+        String lastName, Address address, List<WatchListEvent> events)
+    {
+        this.userReference = userReference;
+        this.templateReference = templateReference;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.events = events;
+    }
 
     /**
      * @return the subscriber's profile document reference
@@ -55,14 +72,6 @@ public class WatchListMessageData
     public DocumentReference getUserReference()
     {
         return userReference;
-    }
-
-    /**
-     * @param userReference see {@link #getUserReference()}
-     */
-    public void setUserReference(DocumentReference userReference)
-    {
-        this.userReference = userReference;
     }
 
     /**
@@ -74,27 +83,11 @@ public class WatchListMessageData
     }
 
     /**
-     * @param templateReference see {@link #getTemplateReference()}
-     */
-    public void setTemplateReference(DocumentReference templateReference)
-    {
-        this.templateReference = templateReference;
-    }
-
-    /**
      * @return the subscriber's first name
      */
     public String getFirstName()
     {
         return firstName;
-    }
-
-    /**
-     * @param firstName see {@link #getFirstName()}
-     */
-    public void setFirstName(String firstName)
-    {
-        this.firstName = firstName;
     }
 
     /**
@@ -106,14 +99,6 @@ public class WatchListMessageData
     }
 
     /**
-     * @param lastName see {@link #getLastName()}
-     */
-    public void setLastName(String lastName)
-    {
-        this.lastName = lastName;
-    }
-
-    /**
      * @return the subscriber's email address
      */
     public Address getAddress()
@@ -122,43 +107,11 @@ public class WatchListMessageData
     }
 
     /**
-     * @param address {@link #getAddress()}
-     */
-    public void setAddress(Address address)
-    {
-        this.address = address;
-    }
-
-    /**
      * @return the list of events to notify the subscriber of
      */
     public List<WatchListEvent> getEvents()
     {
         return events;
-    }
-
-    /**
-     * @param events see {@link #getEvents()}
-     */
-    public void setEvents(List<WatchListEvent> events)
-    {
-        this.events = events;
-    }
-
-    /**
-     * @return true if the diff for each document will be shown in the WatchList message; false otherwise
-     */
-    public boolean isShowDiff()
-    {
-        return showDiff;
-    }
-
-    /**
-     * @param showDiff see {@link #isShowDiff()}
-     */
-    public void setShowDiff(boolean showDiff)
-    {
-        this.showDiff = showDiff;
     }
 
 }

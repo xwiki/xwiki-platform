@@ -47,8 +47,7 @@ rendering.macro.watchlist.description=Show the content of your current watchlist
 XWiki.WatchListClass_interval_realtime=Realtime
 XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
 XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
-XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
-XWiki.WatchListClass_showDiff=Show Modification Differences</content>
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly</content>
   <object>
     <name>XWiki.WatchListTranslations</name>
     <number>0</number>
@@ -73,7 +72,7 @@ XWiki.WatchListClass_showDiff=Show Modification Differences</content>
         <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>GLOBAL|WIKI|USER|ON_DEMAND</values>

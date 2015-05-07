@@ -64,8 +64,7 @@
 $notifierPrettyName##
 #end
 #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
-#set($watchListClass = $watchOject.xWikiClass)
-{{html clean='false'}}
+{{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     &lt;div class="watchlistManagement"&gt;
@@ -95,15 +94,9 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
             &lt;/select&gt;
           #end
         &lt;/dd&gt;
-
-        &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$watchListClass.get('automaticwatch').translatedPrettyName&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;
-          {{/html}} $watchOject.automaticwatch {{html clean='false'}}
-        &lt;/dd&gt;
-
-        &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_showDiff"#end&gt;$watchListClass.get('showDiff').translatedPrettyName&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;
-          {{/html}} $watchOject.showDiff {{html clean='false'}}
+          $watchOject.automaticwatch
         &lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/div&gt;
@@ -119,11 +112,11 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
         &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
       &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;{{/html}}
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
 
         {{watchlist /}}
 
-      {{html clean='false'}}&lt;/div&gt;
+      &lt;/div&gt;
     &lt;/div&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

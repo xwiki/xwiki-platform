@@ -46,7 +46,7 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Document initializer for {@value #DOCUMENT_FULL_NAME}.
- *
+ * 
  * @version $Id$
  */
 @Component
@@ -107,11 +107,6 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
     public static final String AUTOMATICWATCH_DEFAULT_VALUE = "default";
 
     /**
-     * Property of the watchlist class used to indicate if the watchlist message should show document diffs.
-     */
-    public static final String SHOW_DIFF_PROPERTY = "showDiff";
-
-    /**
      * Used to get the list of possible values for {@value #INTERVAL_PROPERTY}.
      */
     @Inject
@@ -156,9 +151,6 @@ public class WatchListClassDocumentInitializer extends AbstractMandatoryDocument
             String.format("%s%s%s", AUTOMATICWATCH_DEFAULT_VALUE, ListClass.DEFAULT_SEPARATOR,
                 StringUtils.join(AutomaticWatchMode.values(), ListClass.DEFAULT_SEPARATOR));
         needsUpdate |= bclass.addStaticListField(AUTOMATICWATCH_PROPERTY, "Automatic Watching", automaticWatchValues);
-
-        // Show diff property
-        needsUpdate |= bclass.addBooleanField(SHOW_DIFF_PROPERTY, "Show Document Differences", "yesno");
 
         // Handle the fields and the sheet of the document containing the class.
         needsUpdate |= setClassDocumentFields(document, "XWiki WatchList Notification Rules Class");

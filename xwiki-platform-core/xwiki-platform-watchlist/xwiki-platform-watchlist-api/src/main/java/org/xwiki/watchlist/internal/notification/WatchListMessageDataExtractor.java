@@ -36,7 +36,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.watchlist.internal.DefaultWatchListStore;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
-import org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer;
 import org.xwiki.watchlist.internal.job.WatchListJob;
 
 import com.xpn.xwiki.XWiki;
@@ -152,20 +151,10 @@ public class WatchListMessageDataExtractor implements UserDataExtractor<WatchLis
 
             DocumentReference templateReference = getTemplateReference(subscriberReference);
 
-            BaseObject watchListObject = document.getXObject(WatchListClassDocumentInitializer.DOCUMENT_REFERENCE);
-            boolean showDiff =
-                watchListObject.getIntValue(WatchListClassDocumentInitializer.SHOW_DIFF_PROPERTY, 1) == 1 ? true
-                    : false;
+            result =
+                new WatchListMessageData(subscriberReference, templateReference, firstName, lastName, address,
+                    matchingEvents);
 
-            // Build the result.
-            result = new WatchListMessageData();
-            result.setUserReference(subscriberReference);
-            result.setTemplateReference(templateReference);
-            result.setFirstName(firstName);
-            result.setLastName(lastName);
-            result.setAddress(address);
-            result.setEvents(matchingEvents);
-            result.setShowDiff(showDiff);
         } catch (Exception e) {
             LOGGER.error("Failed to retrieve information for user [{}]", subscriberReference, e);
         }

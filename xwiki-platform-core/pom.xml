@@ -437,7 +437,8 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Young API. Rename MimeMessageWrapper into ScriptMimeMessage (not a wrapper anymore) -->
+            <!-- Young API. Rename MimeMessageWrapper into ScriptMimeMessage (not a wrapper anymore). Velocity scripts
+                 are not affected by the change. -->
             <exclude>**/org/xwiki/mail/script/**</exclude>
           </excludes>
         </configuration>

@@ -31,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
+import org.xwiki.watchlist.internal.documents.WatchListClassDocumentInitializer;
 
 /**
  * Generate {@link MimeMessage}s from {@link WatchListMessageData}s extracted by an iterator over a list of subscribers.
@@ -135,6 +136,8 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
 
         velocityVariables.put(XWIKI_USER_CLASS_FIRST_NAME_PROP, watchListMessageData.getFirstName());
         velocityVariables.put(XWIKI_USER_CLASS_LAST_NAME_PROP, watchListMessageData.getLastName());
+
+        velocityVariables.put(WatchListClassDocumentInitializer.SHOW_DIFF_PROPERTY, watchListMessageData.isShowDiff());
     }
 
     @Override

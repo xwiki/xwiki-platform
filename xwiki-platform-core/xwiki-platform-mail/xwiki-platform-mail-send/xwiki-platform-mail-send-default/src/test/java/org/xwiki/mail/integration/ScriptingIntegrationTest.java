@@ -57,7 +57,7 @@ import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
 import org.xwiki.mail.script.MailSenderScriptService;
-import org.xwiki.mail.script.MimeMessageWrapper;
+import org.xwiki.mail.script.ScriptMimeMessage;
 import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
@@ -166,15 +166,15 @@ public class ScriptingIntegrationTest
     @Test
     public void sendTextMail() throws Exception
     {
-        MimeMessageWrapper message1 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message1 = this.scriptService.createMessage("john@doe.com", "subject");
         message1.addPart("text/plain", "some text here");
-        MimeMessageWrapper message2 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message2 = this.scriptService.createMessage("john@doe.com", "subject");
         message2.addPart("text/plain", "some text here");
-        MimeMessageWrapper message3 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message3 = this.scriptService.createMessage("john@doe.com", "subject");
         message3.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        List<MimeMessageWrapper> messagesList = Arrays.asList(message1, message2, message3);
+        List<ScriptMimeMessage> messagesList = Arrays.asList(message1, message2, message3);
         ScriptMailResult result = this.scriptService.sendAsynchronously(messagesList, "memory");
 
         // Verify that there are no errors
@@ -207,7 +207,7 @@ public class ScriptingIntegrationTest
     @Test
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
-        MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
         String calendarContent = "BEGIN:VCALENDAR\r\n"
             + "METHOD:REQUEST\r\n"

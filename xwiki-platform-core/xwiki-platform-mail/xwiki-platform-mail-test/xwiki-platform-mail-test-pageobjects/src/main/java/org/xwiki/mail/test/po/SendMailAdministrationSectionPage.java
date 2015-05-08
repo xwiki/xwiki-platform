@@ -21,6 +21,7 @@ package org.xwiki.mail.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.Select;
 import org.xwiki.administration.test.po.AdministrationSectionPage;
 
 /**
@@ -86,9 +87,8 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
      */
     public void setDiscardSuccessStatuses(boolean discardSuccessStatuses)
     {
-        if (getDiscardSuccessStatuses() != discardSuccessStatuses) {
-            this.discardSuccessStatuses.click();
-        }
+        Select select = new Select(this.discardSuccessStatuses);
+        select.selectByValue((discardSuccessStatuses) ? "1" : "0");
     }
 
     /**
@@ -96,6 +96,6 @@ public class SendMailAdministrationSectionPage extends AdministrationSectionPage
      */
     public boolean getDiscardSuccessStatuses()
     {
-        return this.discardSuccessStatuses.isSelected();
+        return !(new Select(this.discardSuccessStatuses).getFirstSelectedOption().getAttribute("value").equals("0"));
     }
 }

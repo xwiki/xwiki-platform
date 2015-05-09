@@ -21,11 +21,9 @@ package org.xwiki.mail.internal;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.internet.MimeMessage;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -45,9 +43,6 @@ import org.xwiki.mail.MailStatusResult;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class MemoryMailListener implements MailListener
 {
-    @Inject
-    private Logger logger;
-
     private MemoryMailStatusResult mailStatusResult = new MemoryMailStatusResult();
 
     @Override
@@ -62,6 +57,7 @@ public class MemoryMailListener implements MailListener
     {
         MailStatus status = new MailStatus(message, MailState.SENT);
         this.mailStatusResult.setStatus(status);
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
@@ -70,6 +66,7 @@ public class MemoryMailListener implements MailListener
         MailStatus status = new MailStatus(message, MailState.FAILED);
         status.setError(e);
         this.mailStatusResult.setStatus(status);
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override

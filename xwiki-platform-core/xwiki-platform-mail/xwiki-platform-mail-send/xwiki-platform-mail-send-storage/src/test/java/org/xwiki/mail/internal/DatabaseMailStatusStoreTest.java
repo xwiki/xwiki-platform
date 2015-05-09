@@ -20,6 +20,7 @@
 package org.xwiki.mail.internal;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -43,7 +44,7 @@ public class DatabaseMailStatusStoreTest
     @Test
     public void computeSelectQueryString() throws Exception
     {
-        Map<String, Object> filterMap = new HashMap<>();
+        Map<String, Object> filterMap = new LinkedHashMap<>();
         filterMap.put("status", "failed");
         filterMap.put("wiki", "mywiki");
 
@@ -54,7 +55,7 @@ public class DatabaseMailStatusStoreTest
     @Test
     public void computeCountQueryString() throws Exception
     {
-        Map<String, Object> filterMap = new HashMap<>();
+        Map<String, Object> filterMap = new LinkedHashMap<>();
         filterMap.put("status", "failed");
         filterMap.put("wiki", "mywiki");
 

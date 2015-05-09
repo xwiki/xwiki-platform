@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
-import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.AllLogRule;
 
 import static org.mockito.Mockito.*;
@@ -43,33 +42,6 @@ public class DatabaseMailStatusResultTest
 {
     @Rule
     public AllLogRule logRule = new AllLogRule();
-
-    @Test
-    public void getSize() throws Exception
-    {
-        MailStatusStore store = mock(MailStatusStore.class);
-        when(store.count(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenReturn(1L);
-
-        DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
-        result.setBatchId("batchid");
-
-        assertEquals(1, result.getSize());
-    }
-
-    @Test
-    public void getSizeWhenStorageError() throws Exception
-    {
-        MailStatusStore store = mock(MailStatusStore.class);
-        when(store.count(Collections.<String, Object>singletonMap("batchId", "batchid"))).thenThrow(
-            new MailStoreException("error"));
-
-        DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);
-        result.setBatchId("batchid");
-
-        assertEquals(0, result.getSize());
-        assertEquals("Failed to get size of results for batch id [batchid]. Returning an empty result.",
-            this.logRule.getMessage(0));
-    }
 
     @Test
     public void getAll() throws Exception

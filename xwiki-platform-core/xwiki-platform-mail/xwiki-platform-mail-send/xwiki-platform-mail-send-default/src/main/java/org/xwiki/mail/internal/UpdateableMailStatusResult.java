@@ -17,18 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal;
+
+import org.xwiki.mail.MailStatusResult;
 
 /**
- * The result of the batch of emails being sent.
+ * Extension of {@link MailStatusResult} to make it updateable; more specifically to update the number of mails to
+ * send (which can be known only on the Prepare Thread when all mails have been iterated over and prepared) and also
+ * to increment the number of mails sent (successfully or not).
  *
  * @version $Id$
- * @since 6.4M3
+ * @since 7.1M2
  */
-public interface MailResult
+public interface UpdateableMailStatusResult extends MailStatusResult
 {
     /**
-     * @return the batch id for this session of mail sending
+     * @param totalSize the number of mails to send
      */
-    String getBatchId();
+    void setTotalSize(long totalSize);
+
+    /**
+     * Increment by one the number of mails sent (successfully or not).
+     */
+    void incrementCurrentSize();
 }

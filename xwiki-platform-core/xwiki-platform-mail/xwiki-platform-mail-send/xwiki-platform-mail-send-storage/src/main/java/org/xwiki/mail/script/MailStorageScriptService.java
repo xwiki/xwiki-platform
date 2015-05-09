@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.script;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,8 +34,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.mail.script.AbstractMailScriptService;
-import org.xwiki.mail.script.ScriptMailResult;
+import org.xwiki.mail.MailContentStore;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusStore;
+import org.xwiki.mail.MailStorageConfiguration;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
@@ -110,7 +114,7 @@ public class MailStorageScriptService extends AbstractMailScriptService
                 Arrays.asList(message), session, listener), listener.getMailStatusResult());
 
             // Wait for all messages from this batch to have been sent before returning
-            scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
+            scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
 
             return scriptMailResult;
         } catch (MailStoreException e) {
@@ -178,6 +182,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     public void delete(String batchId)
     {
+        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
+        // to be able to call this method and for it to have any effect.
+
         Map<String, Object> filterMap = Collections.<String, Object>singletonMap("batchId", batchId);
         List<MailStatus> statuses = load(filterMap, 0, 0);
         if (statuses != null) {

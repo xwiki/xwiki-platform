@@ -45,6 +45,8 @@ import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
 
 /**
+ * Saves mail statuses in the database.
+ *
  * @version $Id$
  * @since 6.4M3
  */
@@ -119,6 +121,8 @@ public class DatabaseMailListener implements MailListener, Initializable
         } else {
             saveStatus(status, parameters);
         }
+
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
@@ -148,6 +152,8 @@ public class DatabaseMailListener implements MailListener, Initializable
 
         status.setError(exception);
         saveStatus(status, parameters);
+
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override

@@ -19,14 +19,8 @@
  */
 package org.xwiki.mail.internal.thread;
 
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 
 /**
  * Handles all operations on the Mail Queues.
@@ -37,9 +31,6 @@ import org.slf4j.Logger;
  */
 public abstract class AbstractMailQueueManager<T extends MailQueueItem> implements MailQueueManager<T>
 {
-    @Inject
-    private Logger logger;
-
     /**
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
@@ -57,53 +48,24 @@ public abstract class AbstractMailQueueManager<T extends MailQueueItem> implemen
     @Override
     public void addToQueue(T mailQueueItem)
     {
-        this.mailQueue.add(mailQueueItem);
+        getMailQueue().add(mailQueueItem);
     }
 
     @Override
     public boolean hasMessage()
     {
-        return !this.mailQueue.isEmpty();
+        return !getMailQueue().isEmpty();
     }
 
     @Override
     public T peekMessage()
     {
-        return this.mailQueue.peek();
+        return getMailQueue().peek();
     }
 
     @Override
     public boolean removeMessageFromQueue(T mailQueueItem)
     {
-        return this.mailQueue.remove(mailQueueItem);
-    }
-
-    @Override
-    public void waitTillProcessed(String batchId, long timeout)
-    {
-        long startTime = System.currentTimeMillis();
-        while (!isProcessed(batchId) && System.currentTimeMillis() - startTime < timeout) {
-            try {
-                Thread.sleep(100L);
-            } catch (InterruptedException e) {
-                // Ignore but consider that the mail was sent
-                this.logger.warn("Interrupted while waiting for mails to be sent. Reason [{}]",
-                    ExceptionUtils.getRootCauseMessage(e));
-                break;
-            }
-        }
-    }
-
-    @Override
-    public boolean isProcessed(String batchId)
-    {
-        Iterator<? extends MailQueueItem> iterator = getMailQueue().iterator();
-        while (iterator.hasNext()) {
-            MailQueueItem item = iterator.next();
-            if (batchId == item.getBatchId()) {
-                return false;
-            }
-        }
-        return true;
+        return getMailQueue().remove(mailQueueItem);
     }
 }

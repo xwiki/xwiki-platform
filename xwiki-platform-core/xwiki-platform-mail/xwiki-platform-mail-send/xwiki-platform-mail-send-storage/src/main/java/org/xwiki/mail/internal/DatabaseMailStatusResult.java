@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
 
@@ -39,7 +38,7 @@ import org.xwiki.mail.MailStoreException;
  * @version $Id$
  * @since 6.4M3
  */
-public class DatabaseMailStatusResult implements MailStatusResult
+public class DatabaseMailStatusResult extends AbstractMailStatusResult
 {
     private static final String BATCHID_KEY = "batchId";
 
@@ -66,22 +65,6 @@ public class DatabaseMailStatusResult implements MailStatusResult
     public void setBatchId(String batchId)
     {
         this.batchId = batchId;
-    }
-
-    @Override
-    public long getSize()
-    {
-        if (this.batchId == null) {
-            return 0;
-        }
-
-        try {
-            return this.mailStatusStore.count(Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId));
-        } catch (MailStoreException e) {
-            LOGGER.error("Failed to get size of results for batch id [{}]. Returning an empty result.",
-                this.batchId, e);
-            return 0;
-        }
     }
 
     @Override

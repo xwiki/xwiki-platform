@@ -229,7 +229,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
     /**
      * Send the list of mails synchronously, using a Memory {@link }MailListener} to store the results.
      *
-     * @param messages the list of messages that was tried to be sent
+     * @param messages the list of messages to send
      * @return the result and status of the send batch
      */
     public ScriptMailResult send(Iterable<? extends MimeMessage> messages)
@@ -241,7 +241,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by using the
      * returned {@link ScriptMailResult}.
      *
-     * @param messages the list of messages that was tried to be sent
+     * @param messages the list of messages to send
      * @param hint the component hint of a {@link org.xwiki.mail.MailListener} component
      * @return the result and status of the send batch
      */
@@ -250,7 +250,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
         ScriptMailResult scriptMailResult = sendAsynchronously(messages, hint);
 
         // Wait for all messages from this batch to have been sent before returning
-        scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
+        scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
 
         return scriptMailResult;
     }
@@ -275,8 +275,6 @@ public class MailSenderScriptService extends AbstractMailScriptService
         }
         return sendAsynchronously(messages, listener, true);
     }
-
-
 
     private MailListener getListener(String hint) throws MessagingException
     {

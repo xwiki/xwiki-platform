@@ -3078,8 +3078,8 @@ public class XWiki implements EventListener
             message.setHeader("X-MailType", "Account Validation");
             MailSender mailSender = Utils.getComponent(MailSender.class);
             MailListener mailListener = Utils.getComponent(MailListener.class, "database");
-            MailResult mailResult = mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
-            mailResult.waitTillProcessed(Long.MAX_VALUE);
+            mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
+            mailListener.getMailStatusResult().waitTillProcessed(Long.MAX_VALUE);
             String errorMessage = MailStatusResultSerializer.serializeErrors(mailListener.getMailStatusResult());
             if (errorMessage != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,

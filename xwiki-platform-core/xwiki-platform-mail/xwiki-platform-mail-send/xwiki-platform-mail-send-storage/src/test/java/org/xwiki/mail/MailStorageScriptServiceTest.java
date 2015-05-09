@@ -38,8 +38,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.internal.DefaultMailResult;
 import org.xwiki.mail.internal.MemoryMailListener;
-import org.xwiki.mail.internal.thread.MailQueueManager;
-import org.xwiki.mail.internal.thread.SendMailQueueItem;
+import org.xwiki.mail.internal.UpdateableMailStatusResult;
+import org.xwiki.mail.script.MailStorageScriptService;
 import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -51,7 +51,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.mail.MailStorageScriptService}.
+ * Unit tests for {@link MailStorageScriptService}.
  *
  * @version $Id$
  * @since 6.4
@@ -106,7 +106,7 @@ public class MailStorageScriptServiceTest
     @Test
     public void resend() throws Exception
     {
-        MailListener memoryMailListener = this.mocker.getInstance(MailListener.class, "memory");
+        MemoryMailListener memoryMailListener = this.mocker.getInstance(MailListener.class, "memory");
         this.mocker.registerComponent(MailListener.class, "database", memoryMailListener);
 
         Session session = Session.getInstance(new Properties());
@@ -118,12 +118,14 @@ public class MailStorageScriptServiceTest
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(any(Session.class), eq(batchId), eq("messageId"))).thenReturn(message);
 
-        MailQueueManager<SendMailQueueItem> mailQueueManager = this.mocker.registerMockComponent(
-            new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
-
         MailSender sender = this.mocker.getInstance(MailSender.class);
         when(sender.sendAsynchronously(eq(Arrays.asList(message)), any(Session.class),
-            same(memoryMailListener))).thenReturn(new DefaultMailResult(batchId, mailQueueManager));
+            same(memoryMailListener))).thenReturn(new DefaultMailResult(batchId));
+
+        // Since resend() will wait indefinitely for the message count to be correct, we need to configure it here
+        // as we're mocking the MailSender.
+        ((UpdateableMailStatusResult) memoryMailListener.getMailStatusResult()).setTotalSize(1);
+        ((UpdateableMailStatusResult) memoryMailListener.getMailStatusResult()).incrementCurrentSize();
 
         ScriptMailResult result = this.mocker.getComponentUnderTest().resend(batchId, "messageId");
 

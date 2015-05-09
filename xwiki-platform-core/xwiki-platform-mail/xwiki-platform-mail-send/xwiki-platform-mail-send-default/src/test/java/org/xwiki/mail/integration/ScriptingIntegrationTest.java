@@ -74,6 +74,7 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -180,7 +181,8 @@ public class ScriptingIntegrationTest
         assertNull(this.scriptService.getLastError());
 
         // Wait for all mails to be sent
-        result.waitTillProcessed(10000L);
+        result.getStatusResult().waitTillProcessed(10000L);
+        assertTrue(result.getStatusResult().isProcessed());
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",
@@ -240,11 +242,10 @@ public class ScriptingIntegrationTest
 
         ScriptMailResult result = this.scriptService.send(Arrays.asList(message));
 
-        // Verify that there are no errors
+        // Verify that there are no errors and that 1 mail was sent
         assertNull(this.scriptService.getLastError());
-
-        // Wait for all mails to be sent
-        result.waitTillProcessed(10000L);
+        assertTrue(result.getStatusResult().isProcessed());
+        assertEquals(1, result.getStatusResult().getProcessedMailCount());
 
         // Verify that all mails have been sent properly
         assertFalse("There should not be any failed result!",

@@ -130,7 +130,9 @@ public class SendMailRunnableTest
 
         // Wait for the mails to have been processed.
         try {
-            mailQueueManager.waitTillProcessed(batchId, 10000L);
+            while(listener.getMailStatusResult().getProcessedMailCount() != 2) {
+                Thread.sleep(100L);
+            }
         } finally {
             runnable.stopProcessing();
             thread.interrupt();

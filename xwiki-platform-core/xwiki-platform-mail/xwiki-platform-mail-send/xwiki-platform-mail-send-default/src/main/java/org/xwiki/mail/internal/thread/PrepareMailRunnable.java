@@ -36,6 +36,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.internal.UpdateableMailStatusResult;
 
 import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
@@ -123,6 +124,9 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     {
         Iterator<? extends MimeMessage> messageIterator = item.getMessages().iterator();
 
+        // Count the total number of messages to process
+        long messageCounter = 0;
+
         // We clone the Execution Context for each mail so that one mail doesn't interfere with another
         // Note that we need to have the hasNext() call after the context is ready since the implementation can need
         // a valid XWiki Context.
@@ -139,8 +143,15 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                         // We can't call a listener here because the message is null. Thus we simply log an error.
                         this.logger.error("Failed to prepare message for [{}]", item);
                     }
+                    messageCounter++;
                 } else {
                     shouldStop = true;
+                    // Update the listener with the total number of messages to process so that the user can known when
+                    // all the messages have been processed for the batch.
+                    MailListener listener = item.getListener();
+                    if (listener != null && listener.getMailStatusResult() instanceof UpdateableMailStatusResult) {
+                        ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(messageCounter);
+                    }
                 }
             } finally {
                 removeContext();

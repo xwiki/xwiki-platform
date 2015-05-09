@@ -41,7 +41,6 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.internal.thread.MailQueueManager;
 import org.xwiki.mail.internal.thread.MailRunnable;
 import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
-import org.xwiki.mail.internal.thread.SendMailQueueItem;
 
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails
@@ -72,9 +71,6 @@ public class DefaultMailSender implements MailSender, Initializable
 
     @Inject
     private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
-
-    @Inject
-    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
 
     private Thread prepareMailThread;
 
@@ -111,7 +107,7 @@ public class DefaultMailSender implements MailSender, Initializable
         this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId,
             executionContext));
 
-        return new DefaultMailResult(batchId, this.sendMailQueueManager);
+        return new DefaultMailResult(batchId);
     }
 
     /**

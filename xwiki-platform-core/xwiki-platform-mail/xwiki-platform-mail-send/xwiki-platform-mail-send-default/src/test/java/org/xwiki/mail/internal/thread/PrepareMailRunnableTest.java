@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal.thread;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -86,7 +85,6 @@ public class PrepareMailRunnableTest
         message2.setSubject("subject2");
         message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
 
-        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
 
         ExecutionContext context1 = new ExecutionContext();
@@ -104,10 +102,12 @@ public class PrepareMailRunnableTest
         when(ecm.clone(context1)).thenReturn(context1);
         when(ecm.clone(context2)).thenReturn(context2);
 
+        MemoryMailListener listener1 = this.mocker.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item1 =
-            new PrepareMailQueueItem(Arrays.asList(message1), session, listener, batchId, context1);
+            new PrepareMailQueueItem(Arrays.asList(message1), session, listener1, batchId, context1);
+        MemoryMailListener listener2 = this.mocker.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item2 =
-            new PrepareMailQueueItem(Arrays.asList(message2), session, listener, batchId, context2);
+            new PrepareMailQueueItem(Arrays.asList(message2), session, listener2, batchId, context2);
 
         MailQueueManager mailQueueManager =
             this.mocker.getInstance(new DefaultParameterizedType(null, MailQueueManager.class,
@@ -128,7 +128,8 @@ public class PrepareMailRunnableTest
 
         // Wait for the mails to have been processed.
         try {
-            mailQueueManager.waitTillProcessed(batchId, 10000L);
+            listener1.getMailStatusResult().waitTillProcessed(10000L);
+            listener2.getMailStatusResult().waitTillProcessed(10000L);
         } finally {
             runnable.stopProcessing();
             thread.interrupt();
@@ -136,13 +137,9 @@ public class PrepareMailRunnableTest
         }
 
         // This is the real test: we verify that there's been an error while sending each email.
-        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.FAILED);
-        int errorCount = 0;
-        while (statuses.hasNext()) {
-            MailStatus status = statuses.next();
-            assertEquals("MailStoreException: error", status.getErrorSummary());
-            errorCount++;
-        }
-        assertEquals(2, errorCount);
+        MailStatus status1 = listener1.getMailStatusResult().getByState(MailState.FAILED).next();
+        assertEquals("MailStoreException: error", status1.getErrorSummary());
+        MailStatus status2 = listener2.getMailStatusResult().getByState(MailState.FAILED).next();
+        assertEquals("MailStoreException: error", status2.getErrorSummary());
     }
 }

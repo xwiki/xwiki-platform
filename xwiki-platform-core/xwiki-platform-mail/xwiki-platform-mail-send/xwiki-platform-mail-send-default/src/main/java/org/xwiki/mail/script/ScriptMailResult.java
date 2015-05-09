@@ -56,20 +56,34 @@ public class ScriptMailResult implements MailResult
     }
 
     @Override
-    public void waitTillProcessed(long timeout)
-    {
-        this.wrappedMailResult.waitTillProcessed(timeout);
-    }
-
-    @Override
-    public boolean isProcessed()
-    {
-        return this.wrappedMailResult.isProcessed();
-    }
-
-    @Override
     public String getBatchId()
     {
         return this.wrappedMailResult.getBatchId();
+    }
+
+    /**
+     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     * @since 6.4
+     * @deprecated since 7.1M2 use {@link MailStatusResult#waitTillProcessed(long)} instead. Kept to not break
+     *             script backward compatibility
+     */
+    @Deprecated
+    public void waitTillProcessed(long timeout)
+    {
+        getStatusResult().waitTillProcessed(timeout);
+    }
+
+    /**
+     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
+     * @since 6.4RC1
+     * @deprecated since 7.1M2 use {@link MailStatusResult#isProcessed()} instead. Kept to not break
+     *             script backward compatibility
+     */
+    @Deprecated
+    public boolean isProcessed()
+    {
+        return getStatusResult().isProcessed();
     }
 }

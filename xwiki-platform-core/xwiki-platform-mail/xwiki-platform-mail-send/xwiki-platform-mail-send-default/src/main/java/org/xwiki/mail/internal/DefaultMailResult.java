@@ -20,8 +20,6 @@
 package org.xwiki.mail.internal;
 
 import org.xwiki.mail.MailResult;
-import org.xwiki.mail.internal.thread.MailQueueManager;
-import org.xwiki.mail.internal.thread.SendMailQueueItem;
 
 /**
  * Default implementation used when using the Mail Sender Java API.
@@ -33,29 +31,14 @@ public class DefaultMailResult implements MailResult
 {
     private String batchId;
 
-    private MailQueueManager<SendMailQueueItem> sendMailQueueManager;
-
     /**
      * @param batchId the unique id for the batch of emails being sent together, used to verify when they've all been
      *        sent
-     * @param sendMailQueueManager the class we used to check when the emails have been sent
+     * @since 7.1M2
      */
-    public DefaultMailResult(String batchId, MailQueueManager<SendMailQueueItem> sendMailQueueManager)
+    public DefaultMailResult(String batchId)
     {
         this.batchId = batchId;
-        this.sendMailQueueManager = sendMailQueueManager;
-    }
-
-    @Override
-    public void waitTillProcessed(long timeout)
-    {
-        this.sendMailQueueManager.waitTillProcessed(getBatchId(), timeout);
-    }
-
-    @Override
-    public boolean isProcessed()
-    {
-        return this.sendMailQueueManager.isProcessed(getBatchId());
     }
 
     @Override

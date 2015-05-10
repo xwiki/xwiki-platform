@@ -18,6 +18,7 @@ org.xwiki.mail.internal.DefaultSessionFactory
 org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory
 org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory
 org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory
+org.xwiki.mail.internal.factory.message.MessageMimeMessageFactory
 org.xwiki.mail.internal.factory.template.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.factory.template.SecureTemplateMimeBodyPartFactory
 org.xwiki.mail.internal.factory.template.TemplateMimeMessageFactory

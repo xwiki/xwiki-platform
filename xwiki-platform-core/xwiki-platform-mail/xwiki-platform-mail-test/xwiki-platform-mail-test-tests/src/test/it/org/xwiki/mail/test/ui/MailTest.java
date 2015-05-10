@@ -20,6 +20,9 @@
 package org.xwiki.mail.test.ui;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 
@@ -56,6 +59,8 @@ public class MailTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
     private GreenMail mail;
+
+    private List<String> alreadyAssertedMessages = new ArrayList<>();
 
     @Before
     public void startMail()
@@ -122,14 +127,24 @@ public class MailTest extends AbstractTest
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
-        // Note: we use the $xwiki binding in the content to verify that standard variables are correctly bound.
-        // Note: we use the $doc binding to show that the user can add new bindings ($doc is not bound by default).
+        // Note: We use the following bindings in the Template subject and content so that we ensure that they are
+        // provided by default:
+        // - "$xwiki"
+        // - "$xcontext"
+        // - "$escapetool"
+        // - "$services"
+        // - "$request"
+        // Note: We also use the $name and $doc bindings to show that the user can add new bindings ($doc is not bound
+        // by default since there isn't always a notion of current doc in all places where mail sending is done).
+        String velocityContent = "Hello $name from $escapetool.xml($services.model.resolveDocument("
+            + "$xcontext.getUser()).getName()) - Served from $request.getRequestURL().toString()";
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
             "subject", "#if ($xwiki.exists($doc.documentReference))Status for $name on $doc.fullName#{else}wrong#end",
             "language", "en",
-            "html", "<strong>Hello $name</strong>",
-            "text", "Hello $name");
-        ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
+            "html", "<strong>" + velocityContent + "</strong>",
+            "text", velocityContent);
+        // We also add an attachment to the Mail Template page to verify that it is sent in the mail
+        ByteArrayInputStream bais = new ByteArrayInputStream("Content of attachment".getBytes());
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
@@ -137,7 +152,8 @@ public class MailTest extends AbstractTest
         sendTemplateMailToEmail();
 
         // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
-        // two other users (however since they're part of the group they'll receive only one mail each).
+        // two other users (however since they're part of the group they'll receive only one mail each, we thus test
+        // deduplicatio!).
         sendTemplateMailToUsersAndGroup();
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
@@ -161,10 +177,14 @@ public class MailTest extends AbstractTest
         getUtil().deletePage(getTestClassName(), "SendMail");
 
         // Create another page with the Velocity script to send the template email
+        // Note that we didn't need to bind the "$doc" velocity variable because the send is done synchronously and
+        // thus the current XWiki Context is cloned before being passed to the template evaluation, and thus it
+        // already contains the "$doc" binding!
         String velocity = "{{velocity}}\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
-            + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en'})\n"
+            + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en', "
+                + "'includeTemplateAttachments' : true})\n"
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
@@ -189,7 +209,16 @@ public class MailTest extends AbstractTest
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
-        assertNumberOfReceivedMessagesWithSubject(1, "Status for John on " + getTestClassName() + ".SendMail");
+        assertReceivedMessages(1,
+            "Subject: Status for John on " + getTestClassName() + ".SendMail",
+            "Hello John from superadmin - Served from http://localhost:8080/xwiki/bin/view/MailTest/SendMail",
+            "<strong>Hello John from superadmin - Served from "
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMail</strong>",
+            "X-MailType: Test",
+            "Content-Type: text/plain; name=something.txt",
+            "Content-ID: <something.txt>",
+            "Content-Disposition: attachment; filename=something.txt",
+            "Content of attachment");
     }
 
     private void sendTemplateMailToUsersAndGroup() throws Exception
@@ -202,9 +231,15 @@ public class MailTest extends AbstractTest
         getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
 
         // Create another page with the Velocity script to send the template email
+        // Note: when sending asynchronously the request and response are faked, hence
+        // "$request.getRequestURL().toString()" would return "".
+        // That's why we explicitely pass 'request' as a velocity binding.
+        // OTOH the $xcontext binding is present and has the content of the context at the moment the call to send the
+        // mail asynchronously was done.
         String velocity = "{{velocity}}\n"
-            + "#set ($templateParameters = {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
-            + "'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
+            + "#set ($templateParameters = "
+            + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc, 'request' : $request }, "
+            + "  'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'hint' : 'template', 'source' : $templateReference, "
@@ -234,21 +269,44 @@ public class MailTest extends AbstractTest
         // Verify that the mails have been received (first mail above + the 2 mails sent to the group)
         this.mail.waitForIncomingEmail(10000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
-        assertNumberOfReceivedMessagesWithSubject(2,
-            "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers");
+        assertReceivedMessages(2,
+            "Subject: Status for John on " + getTestClassName() + ".SendMailGroupAndUsers",
+            "Hello John from superadmin - Served from "
+                + "http://localhost:8080/xwiki/bin/view/MailTest/SendMailGroupAndUsers");
     }
 
-    private void assertNumberOfReceivedMessagesWithSubject(int nb, String subject) throws Exception
+    private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines)
+        throws Exception
     {
         StringBuilder builder = new StringBuilder();
         int count = 0;
         for (MimeMessage message : this.mail.getReceivedMessages()) {
-            builder.append('[').append(message.getSubject()).append(']').append('\n');
-            if (message.getSubject().equals(subject)) {
+            if (this.alreadyAssertedMessages.contains(message.getMessageID())) {
+                continue;
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            message.writeTo(baos);
+            String fullContent = baos.toString();
+            boolean match = true;
+            for (int i = 0; i < expectedLines.length; i++) {
+                if (!fullContent.contains(expectedLines[i])) {
+                    match = false;
+                    break;
+                }
+            }
+            if (!match) {
+                builder.append("- Content [" + fullContent + "]").append('\n');
+            } else {
                 count++;
             }
+            this.alreadyAssertedMessages.add(message.getMessageID());
         }
-        assertEquals("We got the following subjects instead of the required " + nb + " for [" + subject + "]:\n"
-            + builder.toString(), nb, count);
+        StringBuilder expected = new StringBuilder();
+        for (int i = 0; i < expectedLines.length; i++) {
+            expected.append("- '" + expectedLines[i] + "'").append('\n');
+        }
+        assertEquals(String.format("We got [%s] mails matching the expected content instead of [%s]. We were expecting "
+            + "the following content:\n%s\nWe got the following:\n%s", count, expectedMatchingCount,
+            expected.toString(), builder.toString()), expectedMatchingCount, count);
     }
 }

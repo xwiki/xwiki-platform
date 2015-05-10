@@ -20,11 +20,7 @@
 package org.xwiki.mail.test.ui;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -46,8 +42,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * UI tests for the Mail application.
@@ -145,10 +140,7 @@ public class MailTest extends AbstractTest
         // two other users (however since they're part of the group they'll receive only one mail each).
         sendTemplateMailToUsersAndGroup();
 
-        // Step 7: Send a simple mime message email to XWikiAllGroup Group.
-        sendMimeMessageToGroup();
-
-        // Step 8: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
+        // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
         administrationPage = AdministrationPage.gotoPage();
         administrationPage.clickSection("Email", "Mail Sending Status");
@@ -248,62 +240,6 @@ public class MailTest extends AbstractTest
         assertEquals(3, this.mail.getReceivedMessages().length);
         assertNumberOfReceivedMessagesWithSubject(2,
             "Status for John on " + getTestClassName() + ".SendMailGroupAndUsers");
-    }
-
-    private void sendMimeMessageToGroup() throws Exception
-    {
-        // Remove existing pages (for pages that we create below)
-        getUtil().deletePage(getTestClassName(), "SendMimeMessageToGroup");
-
-        // Create 2 users
-        getUtil().createUser("user1", "password1", getUtil().getURLToNonExistentPage(), "email", "user1@doe.com");
-        getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
-
-        // Create another page with the Velocity script to send the template email
-        String velocity = "{{velocity}}\n"
-            + "#set ($message = $services.mailsender.createMessage(\"localhost@xwiki.org\", null, \"SendMimeMessageToGroup\"))\n"
-            + "#set ($discard = $message.addPart(\"text/plain\", \"text content\"))\n"
-            + "#set ($parameters = {'hint' : 'message', 'source' : $message})\n"
-            + "#set ($source = {'groups' : [$services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup')]})\n"
-            + "#set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))\n"
-            + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
-            + "#end\n"
-            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
-            + "  {{error}}\n"
-            + "    $status.messageId - $status.errorSummary\n"
-            + "    $status.errorDescription\n"
-            + "  {{/error}}\n"
-            + "#end\n"
-            + "{{/velocity}}";
-        // This will create the page and execute its content and thus send the mail
-        ViewPage vp = getUtil().createPage(getTestClassName(), "SendMimeMessageToGroup", velocity, "");
-
-        // Verify that the page doesn't display any content (unless there's an error!)
-        assertEquals("", vp.getContent());
-
-        // Verify that the mails have been received (first three mail above + the 2 mails sent to allgroups)
-        this.mail.waitForIncomingEmail(10000L, 5);
-        assertEquals(5, this.mail.getReceivedMessages().length);
-        assertNumberOfReceivedMessagesWithOneToRecipient(2, new InternetAddress("user1@doe.com"));
-        assertNumberOfReceivedMessagesWithOneToRecipient(2, new InternetAddress("user2@doe.com"));
-        assertNumberOfReceivedMessagesWithSubject(2, "SendMimeMessageToGroup");
-    }
-
-    private void assertNumberOfReceivedMessagesWithOneToRecipient(int nb, Address address) throws Exception
-    {
-        StringBuilder builder = new StringBuilder();
-        int count = 0;
-        for (MimeMessage message : this.mail.getReceivedMessages()) {
-            Address[] recipients = message.getRecipients(Message.RecipientType.TO);
-            builder.append('[').append(Arrays.toString(recipients)).append(']').append('\n');
-            if (recipients.length == 1 && recipients[0].equals(address)) {
-                count++;
-            }
-        }
-        assertEquals("We got the following address instead of the required " + nb + " for [" + address + "]:\n"
-            + builder.toString(), nb, count);
     }
 
     private void assertNumberOfReceivedMessagesWithSubject(int nb, String subject) throws Exception

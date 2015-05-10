@@ -31,10 +31,27 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
 
 /**
- * Generate a new MimeMessage by cloning the given mime message. This factory is useful with an iterator one.
+ * This factory is useful when used by another MimeMessageFactory which delegates the creation of MimeMessages
+ * to another MimeMessageFactory, such as with a UserAndGroup Iterator MimeMessageFactory. For example:
+ *
+ * <code>
+ * {{velocity}}
+ * ## Create a mime message, the way you like it, adding any part you like, without recipient.
+ * #set ($message = $services.mailsender.createMessage("localhost@xwiki.org", null, "SendMimeMessageToGroup"))
+ * #set ($discard = $message.addPart(\"text/plain\", \"text content\"))
+ *
+ * ## Use the mime message cloning factory as message factory to duplicate the created message
+ * #set ($parameters = {'hint' : 'message', 'source' : $message})
+ *
+ * #set ($source = {'groups' : [$services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup')]})
+ *
+ * #set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))
+ * #set ($result = $services.mailsender.send($messages, 'database'))
+ * {{/velocity}}
+ * </code>
  *
  * @version $Id$
- * @since 7.1M2, 6.4.5
+ * @since 7.1M2
  */
 @Component
 @Named("message")

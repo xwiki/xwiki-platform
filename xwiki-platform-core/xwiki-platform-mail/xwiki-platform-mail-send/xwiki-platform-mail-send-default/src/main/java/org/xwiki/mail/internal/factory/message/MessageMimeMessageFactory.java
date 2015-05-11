@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
@@ -37,8 +36,8 @@ import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
  * <code>
  * {{velocity}}
  * ## Create a mime message, the way you like it, adding any part you like, without recipient.
- * #set ($message = $services.mailsender.createMessage("localhost@xwiki.org", null, "SendMimeMessageToGroup"))
- * #set ($discard = $message.addPart(\"text/plain\", \"text content\"))
+ * #set ($message = $services.mailsender.createMessage('localhost@xwiki.org', null, 'SendMimeMessageToGroup'))
+ * #set ($discard = $message.addPart('text/plain', 'text content'))
  *
  * ## Use the mime message cloning factory as message factory to duplicate the created message
  * #set ($parameters = {'hint' : 'message', 'source' : $message})
@@ -59,7 +58,7 @@ import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
 public class MessageMimeMessageFactory extends AbstractMimeMessageFactory<MimeMessage>
 {
     @Override
-    public MimeMessage createMessage(Session session, Object source, Map<String, Object> parameters)
+    public MimeMessage createMessage(Object source, Map<String, Object> parameters)
         throws MessagingException
     {
         if (!(source instanceof MimeMessage)) {

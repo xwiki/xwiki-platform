@@ -60,9 +60,8 @@ public class UsersAndGroupsMimeMessageFactoryTest
     @Test
     public void createMessageWhenNullParametersPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(), null);
+            this.mocker.getComponentUnderTest().createMessage(Collections.<String, Object>emptyMap(), null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("You must pass parameters for this Mime Message Factory to work!", expected.getMessage());
@@ -72,9 +71,8 @@ public class UsersAndGroupsMimeMessageFactoryTest
     @Test
     public void createMessageWhenNoHintParameterPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         try {
-            this.mocker.getComponentUnderTest().createMessage(session,
+            this.mocker.getComponentUnderTest().createMessage(
                 Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap());
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -85,9 +83,8 @@ public class UsersAndGroupsMimeMessageFactoryTest
     @Test
     public void createMessageWhenNoSourceParameterPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(),
+            this.mocker.getComponentUnderTest().createMessage(Collections.<String, Object>emptyMap(),
                 Collections.<String, Object>singletonMap("hint", "factoryHint"));
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -108,7 +105,7 @@ public class UsersAndGroupsMimeMessageFactoryTest
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Collections.<String, Object>emptyMap(),
+            this.mocker.getComponentUnderTest().createMessage(Collections.<String, Object>emptyMap(),
                 parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -120,7 +117,6 @@ public class UsersAndGroupsMimeMessageFactoryTest
     @Test
     public void createMessage() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         Map<String, Object> source = Collections.<String, Object>singletonMap("users",
             Collections.singletonList(userReference));
@@ -141,7 +137,7 @@ public class UsersAndGroupsMimeMessageFactoryTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xwikiContext);
         when(execution.getContext()).thenReturn(executionContext);
 
-        Iterator<MimeMessage> iterator = this.mocker.getComponentUnderTest().createMessage(session, source, parameters);
+        Iterator<MimeMessage> iterator = this.mocker.getComponentUnderTest().createMessage(source, parameters);
         assertNotNull(iterator);
     }
 }

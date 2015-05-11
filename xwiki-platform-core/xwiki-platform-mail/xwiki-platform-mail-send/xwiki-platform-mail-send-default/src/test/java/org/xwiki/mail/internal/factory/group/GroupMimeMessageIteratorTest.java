@@ -77,9 +77,9 @@ public class GroupMimeMessageIteratorTest
         MimeMessageFactory<MimeMessage> factory = new MimeMessageFactory<MimeMessage>()
         {
             @Override
-            public MimeMessage createMessage(Session session, Object source, Map parameters) throws MessagingException
+            public MimeMessage createMessage(Object source, Map parameters) throws MessagingException
             {
-                return new MimeMessage(session);
+                return new MimeMessage((Session) null);
             }
         };
 

@@ -24,12 +24,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -40,7 +38,6 @@ import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.script.MimeMessageFactoryProvider;
-import org.xwiki.properties.ConverterManager;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -69,9 +66,6 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     static final String ERROR_KEY = "scriptservice.mailsender.error";
 
-    @Inject
-    private ConverterManager converterManager;
-
     /**
      * Creates a pre-filled Mime Message by running the Component implementation of {@link
      * org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
@@ -87,11 +81,9 @@ public class MailSenderScriptService extends AbstractMailScriptService
         try {
             MimeMessageFactory<MimeMessage> factory = MimeMessageFactoryProvider.get(hint, MimeMessage.class,
                 this.componentManagerProvider.get());
-            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
 
-            MimeMessage message = factory.createMessage(session, source, parameters);
-            result = new ScriptMimeMessage(message, session, this.execution,
-                this.componentManagerProvider.get());
+            MimeMessage message = factory.createMessage(source, parameters);
+            result = new ScriptMimeMessage(message, this.execution, this.componentManagerProvider.get());
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -131,8 +123,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
             MimeMessageFactory<Iterator<MimeMessage>> factory = MimeMessageFactoryProvider.get(hint,
                 new DefaultParameterizedType(null, Iterator.class, MimeMessage.class),
                 this.componentManagerProvider.get());
-            Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
-            result = factory.createMessage(session, source, parameters);
+            result = factory.createMessage(source, parameters);
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -194,9 +185,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
      */
     public ScriptMimeMessage createMessage(String from, String to, String subject)
     {
-        Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
-        ScriptMimeMessage scriptMessage = new ScriptMimeMessage(session, this.execution,
-            this.componentManagerProvider.get());
+        ScriptMimeMessage scriptMessage = new ScriptMimeMessage(this.execution, this.componentManagerProvider.get());
 
         try {
             if (from != null) {

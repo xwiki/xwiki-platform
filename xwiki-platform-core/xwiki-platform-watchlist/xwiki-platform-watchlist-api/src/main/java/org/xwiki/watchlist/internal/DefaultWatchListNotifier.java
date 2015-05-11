@@ -158,7 +158,7 @@ public class DefaultWatchListNotifier implements WatchListNotifier
             parameters.put(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER, templateFactoryParameters);
 
             // Create the message iterator and the other mail sender parameters.
-            Iterator<MimeMessage> messageIterator = messageFactory.createMessage(null, source, parameters);
+            Iterator<MimeMessage> messageIterator = messageFactory.createMessage(source, parameters);
             Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
             MailListener mailListener = mailListenerProvider.get();
 

@@ -100,7 +100,7 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
             DocumentReference factorySource = watchListMessageData.getTemplateReference();
 
             // Use the factory to create the message.
-            message = this.factory.createMessage(null, factorySource, factoryParameters);
+            message = this.factory.createMessage(factorySource, factoryParameters);
             message.addRecipient(Message.RecipientType.TO, watchListMessageData.getAddress());
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to create Mime Message, aborting mail sending for this batch", e);

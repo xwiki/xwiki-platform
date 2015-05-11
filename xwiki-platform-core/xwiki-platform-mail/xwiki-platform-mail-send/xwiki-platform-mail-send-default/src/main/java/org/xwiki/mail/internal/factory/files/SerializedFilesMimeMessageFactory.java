@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
@@ -44,7 +43,7 @@ import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 public class SerializedFilesMimeMessageFactory extends AbstractIteratorMimeMessageFactory
 {
     @Override
-    public Iterator<MimeMessage> createMessage(Session session, Object batchIdObject, Map<String, Object> parameters)
+    public Iterator<MimeMessage> createMessage(Object batchIdObject, Map<String, Object> parameters)
         throws MessagingException
     {
         String batchId = getTypedSource(batchIdObject, String.class);

@@ -480,6 +480,12 @@
               <className>com/xpn/xwiki/plugin/scheduler/StatusListener</className>
               <justification>Never supposed to be an API</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MimeMessageFactory</className>
+              <method>java.lang.Object createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
+              <justification>Young API. Remove useless Session argument since the MimeMessage will be given a valid Session when it's deserialized from the mail content store for sending.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

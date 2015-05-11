@@ -23,11 +23,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.inject.Provider;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,11 +53,10 @@ public class UsersMimeMessageFactoryTest
     @Test
     public void createMessageWhenNullParametersPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference), null);
+            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("You must pass parameters for this Mime Message Factory to work!", expected.getMessage());
@@ -69,11 +66,10 @@ public class UsersMimeMessageFactoryTest
     @Test
     public void createMessageWhenNoHintParameterPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference),
+            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference),
                 Collections.<String, Object>emptyMap());
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -84,11 +80,10 @@ public class UsersMimeMessageFactoryTest
     @Test
     public void createMessageWhenNoSourceParameterPassed() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference),
+            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference),
                 Collections.<String, Object>singletonMap("hint", "factoryHint"));
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
@@ -99,7 +94,6 @@ public class UsersMimeMessageFactoryTest
     @Test
     public void createMessageWhenNotExistingMimeMessageFactory() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("hint", "factoryHint");
@@ -110,7 +104,7 @@ public class UsersMimeMessageFactoryTest
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, Arrays.asList(userReference), parameters);
+            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), parameters);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("Failed to find a [MimeMessageFactory<MimeMessage>] for hint [factoryHint]",

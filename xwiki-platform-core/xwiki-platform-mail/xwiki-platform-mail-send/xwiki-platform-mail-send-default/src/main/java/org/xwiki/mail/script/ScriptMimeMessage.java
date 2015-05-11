@@ -29,7 +29,6 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -54,47 +53,33 @@ public class ScriptMimeMessage extends ExtendedMimeMessage
 
     private Execution execution;
 
-    private Session session;
-
     /**
-     * @param session the JavaMail session used to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
     // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
-    ScriptMimeMessage(MimeMessage sourceMessage, Session session, Execution execution,
-        ComponentManager componentManager) throws MessagingException
+    ScriptMimeMessage(MimeMessage sourceMessage, Execution execution, ComponentManager componentManager)
+        throws MessagingException
     {
         super(sourceMessage);
-        this.session = session;
         this.execution = execution;
         this.componentManager = componentManager;
     }
 
     /**
-     * @param session the JavaMail session used to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
     // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
-    ScriptMimeMessage(Session session, Execution execution, ComponentManager componentManager)
+    ScriptMimeMessage(Execution execution, ComponentManager componentManager)
     {
-        super(session);
-        this.session = session;
+        super();
         this.execution = execution;
         this.componentManager = componentManager;
-    }
-
-    /**
-     * @return the JavaMail session used to send the mail
-     */
-    public Session getSession()
-    {
-        return this.session;
     }
 
     /**

@@ -51,7 +51,7 @@ public class MessageMimeMessageFactoryTest
     public void createMessageWithBadSource() throws Exception
     {
         try {
-            this.mocker.getComponentUnderTest().createMessage(null, "source", null);
+            this.mocker.getComponentUnderTest().createMessage("source", null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("Failed to create mime message from source [class java.lang.String]", expected.getMessage());
@@ -67,7 +67,7 @@ public class MessageMimeMessageFactoryTest
         source.setSubject("Subject");
         source.setText("Content");
 
-        MimeMessage first = mocker.getComponentUnderTest().createMessage(null, source, null);
+        MimeMessage first = mocker.getComponentUnderTest().createMessage(source, null);
 
         assertEqualMimeMessage(first, source);
 
@@ -76,7 +76,7 @@ public class MessageMimeMessageFactoryTest
         first.setSubject("First subject");
         first.setText("First content");
 
-        MimeMessage second = mocker.getComponentUnderTest().createMessage(null, source, null);
+        MimeMessage second = mocker.getComponentUnderTest().createMessage(source, null);
 
         assertEqualMimeMessage(second, source);
     }

@@ -19,12 +19,10 @@
  */
 package org.xwiki.mail.script;
 
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.mail.Address;
 import javax.mail.Message;
-import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.Before;
@@ -46,23 +44,13 @@ public class ScriptMimeMessageTest
 {
     private ScriptMimeMessage scriptMessage;
 
-    private Session session;
-
     @Before
     public void setUp() throws Exception
     {
         Execution execution = mock(Execution.class);
         ComponentManager componentManager = mock(ComponentManager.class);
 
-        this.session = Session.getInstance(new Properties());
-        this.scriptMessage = new ScriptMimeMessage(this.session, execution, componentManager);
-    }
-
-    @Test
-    public void getSession() throws Exception
-    {
-        Session session = this.scriptMessage.getSession();
-        assertEquals(session, this.session);
+        this.scriptMessage = new ScriptMimeMessage(execution, componentManager);
     }
 
     @Test

@@ -86,11 +86,9 @@ public class UsersAndGroupsMimeMessageIterator implements Iterator<MimeMessage>,
         MimeMessage message;
         Address address = this.addressIterator.next();
 
-        // Note: We don't create a Session here ATM since it's not required. The returned MimeMessage will be
-        // given a valid Session when it's deserialized from the mail content store for sending.
         try {
             Map<String, Object> factoryParameters = (Map<String, Object>) this.parameters.get("parameters");
-            message = this.factory.createMessage(null, this.parameters.get("source"), factoryParameters);
+            message = this.factory.createMessage(this.parameters.get("source"), factoryParameters);
             message.addRecipient(Message.RecipientType.TO, address);
 
             // Set the Message Type if passed in parameters

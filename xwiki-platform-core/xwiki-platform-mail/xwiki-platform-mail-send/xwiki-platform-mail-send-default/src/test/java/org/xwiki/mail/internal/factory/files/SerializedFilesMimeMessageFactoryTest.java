@@ -19,11 +19,8 @@
  */
 package org.xwiki.mail.internal.factory.files;
 
-import java.util.Properties;
-
 import javax.inject.Provider;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,14 +47,12 @@ public class SerializedFilesMimeMessageFactoryTest
     @Test
     public void createMessageWhenNoExecution() throws Exception
     {
-        Session session = Session.getInstance(new Properties());
-
         Provider<ComponentManager> componentManagerProvider = this.mocker.registerMockComponent(
             new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
         when(componentManagerProvider.get()).thenReturn(this.mocker);
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(session, "batchId", null);
+            this.mocker.getComponentUnderTest().createMessage("batchId", null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("Failed to find an Environment Component", expected.getMessage());

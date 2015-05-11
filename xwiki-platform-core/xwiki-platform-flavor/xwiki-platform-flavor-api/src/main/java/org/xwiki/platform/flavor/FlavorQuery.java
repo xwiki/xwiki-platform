@@ -70,37 +70,45 @@ public class FlavorQuery extends ExtensionQuery
     /**
      * Add a filter on the flavors' name. 
      * @param name name of the flavor to find
+     * @return this query.
      */
-    public void filterByName(String name)
+    public FlavorQuery filterByName(String name)
     {
         addFilter(XWikiRepositoryModel.PROP_EXTENSION_NAME, name, COMPARISON.MATCH);
+        return this;
     }
 
     /**
      * Add a filter on the flavors' summary.
      * @param summary a summary to find on the extension repository
+     * @return this query.
      */
-    public void filterBySummary(String summary)
+    public FlavorQuery filterBySummary(String summary)
     {
         addFilter(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, summary, COMPARISON.MATCH);
+        return this;
     }
 
     /**
      * Order the results by name. 
      * @param order asc or desc
+     * @return this query.
      */
-    public void orderByName(ORDER order)
+    public FlavorQuery orderByName(ORDER order)
     {
         addSort(XWikiRepositoryModel.PROP_EXTENSION_NAME, order);
+        return this;
     }
 
     /**
      * Order the results by rating.
      * @param order asc or desc
+     * @return this query.
      */
-    public void orderByRating(ORDER order)
+    public FlavorQuery orderByRating(ORDER order)
     {
         addSort(XWikiRepositoryModel.PROP_RATING_AVERAGEVOTE, order);
+        return this;
     }
     
 }

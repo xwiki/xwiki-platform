@@ -56,6 +56,16 @@ public class FlavorManagerScriptService implements ScriptService
     }
 
     /**
+     * Creates a flavor query.
+     * @param query the query to execute
+     * @return a new flavor query
+     */
+    public FlavorQuery createFlavorQuery(String query)
+    {
+        return new FlavorQuery(query);
+    }
+
+    /**
      * Get all flavors matching a query.
      * @param query query to execute
      * @return flavors matching the query

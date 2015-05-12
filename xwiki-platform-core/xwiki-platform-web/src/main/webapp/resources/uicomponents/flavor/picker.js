@@ -1,13 +1,23 @@
 require(['jquery'], function($) {
 
+  /**
+   * Count the ajax calls;
+   */
+  var ajaxCalls = 0;
+
   /** 
    * Perform an ajax query and refresh the picker's results container with the results.
    */
   var refreshResults = function(picker, url, parameters) {
+    var thisAjaxCall = ++ajaxCalls;
     var resultsContainer = picker.find('.xwiki-flavor-picker-results-container');
     resultsContainer.addClass('loading');
     resultsContainer.find('.xwiki-flavor-picker-results').fadeOut();
     $.ajax(url, {data: parameters}).done(function(data) {
+      // Exit if the ajax call is not the last one (kill old requests)
+      if (thisAjaxCall != ajaxCalls) {
+        return;
+      }
       resultsContainer[0].innerHTML = data;
       resultsContainer.removeClass('loading');
       var results = picker.find('.xwiki-flavor-picker-results');
@@ -59,11 +69,19 @@ require(['jquery'], function($) {
     // Called when the picker's filter is updated on keyboard pressed
     $('input.xwiki-flavor-picker-filter').keyup(function() {
       var filter = $(this);
-      var picker = filter.parents('.xwiki-flavor-picker');
-      var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_results'))";
-      var fieldName = picker.find("input[type='radio']").attr('name');
-      var parameters = {'fieldName': fieldName, 'firstIndex': 0, 'filter': filter.val()};
-      refreshResults(picker, url, parameters);
+      var filterValue = filter.val();
+      // To avoid having too much requests when the user is typing, we only do a research 500ms after the content has changed
+      setTimeout(function(){
+        // We do the request only if the content has not changed since the last event
+        if (filter.val() == filterValue) {
+          var picker = filter.parents('.xwiki-flavor-picker');
+          var url = "$escapetool.javascript($doc.getURL('view', 'xpage=flavor/picker_results'))";
+          var fieldName = picker.find("input[type='radio']").attr('name');
+          var parameters = {'fieldName': fieldName, 'firstIndex': 0, 'filter': filter.val()};
+          refreshResults(picker, url, parameters);
+        }
+      }, 500);
+
     });
     
     // Called when the "no flavor" option is clicked

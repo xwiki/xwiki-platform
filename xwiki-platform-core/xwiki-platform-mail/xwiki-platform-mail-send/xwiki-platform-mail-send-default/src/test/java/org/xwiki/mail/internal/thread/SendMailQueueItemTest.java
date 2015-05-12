@@ -50,10 +50,8 @@ public class SendMailQueueItemTest
         xContext.setWikiId("wiki");
         context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
 
-        SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId, context);
+        SendMailQueueItem item = new SendMailQueueItem("messageId", session, null, batchId);
 
-        assertEquals("batchId = [" + batchId
-            + "], context = [[xwikicontext] = [{originalWiki=wiki, wiki=wiki}]], messageId = [messageId]",
-            item.toString());
+        assertEquals("batchId = [" + batchId + "], messageId = [messageId]", item.toString());
     }
 }

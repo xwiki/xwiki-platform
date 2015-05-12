@@ -56,9 +56,10 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
+import org.xwiki.mail.internal.thread.context.Cloner;
 import org.xwiki.mail.script.MailSenderScriptService;
-import org.xwiki.mail.script.ScriptMimeMessage;
 import org.xwiki.mail.script.ScriptMailResult;
+import org.xwiki.mail.script.ScriptMimeMessage;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
@@ -85,21 +86,10 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
-@ComponentList({
-    MailSenderScriptService.class,
-    StandardEnvironment.class,
-    DefaultMailSender.class,
-    DefaultExecution.class,
-    ContextComponentManagerProvider.class,
-    TextMimeBodyPartFactory.class,
-    MemoryMailListener.class,
-    DefaultSessionFactory.class,
-    SendMailRunnable.class,
-    PrepareMailRunnable.class,
-    PrepareMailQueueManager.class,
-    SendMailQueueManager.class,
-    FileSystemMailContentStore.class
-})
+@ComponentList({MailSenderScriptService.class, StandardEnvironment.class, DefaultMailSender.class,
+    DefaultExecution.class, ContextComponentManagerProvider.class, TextMimeBodyPartFactory.class,
+    MemoryMailListener.class, DefaultSessionFactory.class, SendMailRunnable.class, PrepareMailRunnable.class,
+    PrepareMailQueueManager.class, SendMailQueueManager.class, FileSystemMailContentStore.class})
 public class ScriptingIntegrationTest
 {
     @Rule
@@ -113,8 +103,8 @@ public class ScriptingIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
-        MailSenderConfiguration configuration = new TestMailSenderConfiguration(
-            this.mail.getSmtp().getPort(), null, null, new Properties());
+        MailSenderConfiguration configuration =
+            new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
 
         // Register a test Permission Checker that allows sending mails
@@ -125,11 +115,13 @@ public class ScriptingIntegrationTest
         ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
         Mockito.when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
-        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Cloner.class,
+            ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
@@ -151,9 +143,10 @@ public class ScriptingIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         execution.setContext(executionContext);
 
-        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        Cloner<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Cloner.class, ExecutionContext.class));
         // Just return the same execution context
-        when(ecm.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.clone(executionContext)).thenReturn(executionContext);
     }
 
     @After
@@ -186,8 +179,8 @@ public class ScriptingIntegrationTest
         assertTrue(result.getStatusResult().isProcessed());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!",
-            result.getStatusResult().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.FAILED)
+            .hasNext());
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.READY).hasNext());
 
@@ -211,33 +204,18 @@ public class ScriptingIntegrationTest
     {
         ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
-        String calendarContent = "BEGIN:VCALENDAR\r\n"
-            + "METHOD:REQUEST\r\n"
-            + "PRODID: Meeting\r\n"
-            + "VERSION:2.0\r\n"
-            + "BEGIN:VEVENT\r\n"
-            + "DTSTAMP:20140616T164100\r\n"
-            + "DTSTART:20140616T164100\r\n"
-            + "DTEND:20140616T194100\r\n"
-            + "SUMMARY:test request\r\n"
-            + "UID:324\r\n"
-            + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
-            + "ORGANIZER:MAILTO:john@doe.com\r\n"
-            + "LOCATION:on the net\r\n"
-            + "DESCRIPTION:learn some stuff\r\n"
-            + "SEQUENCE:0\r\n"
-            + "PRIORITY:5\r\n"
-            + "CLASS:PUBLIC\r\n"
-            + "STATUS:CONFIRMED\r\n"
-            + "TRANSP:OPAQUE\r\n"
-            + "BEGIN:VALARM\r\n"
-            + "ACTION:DISPLAY\r\n"
-            + "DESCRIPTION:REMINDER\r\n"
-            + "TRIGGER;RELATED=START:-PT00H15M00S\r\n"
-            + "END:VALARM\r\n"
-            + "END:VEVENT\r\n"
-            + "END:VCALENDAR";
-        message.addPart("text/calendar;method=CANCEL", calendarContent,
+        String calendarContent =
+            "BEGIN:VCALENDAR\r\n" + "METHOD:REQUEST\r\n" + "PRODID: Meeting\r\n" + "VERSION:2.0\r\n"
+                + "BEGIN:VEVENT\r\n" + "DTSTAMP:20140616T164100\r\n" + "DTSTART:20140616T164100\r\n"
+                + "DTEND:20140616T194100\r\n" + "SUMMARY:test request\r\n" + "UID:324\r\n"
+                + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
+                + "ORGANIZER:MAILTO:john@doe.com\r\n" + "LOCATION:on the net\r\n" + "DESCRIPTION:learn some stuff\r\n"
+                + "SEQUENCE:0\r\n" + "PRIORITY:5\r\n" + "CLASS:PUBLIC\r\n" + "STATUS:CONFIRMED\r\n"
+                + "TRANSP:OPAQUE\r\n" + "BEGIN:VALARM\r\n" + "ACTION:DISPLAY\r\n" + "DESCRIPTION:REMINDER\r\n"
+                + "TRIGGER;RELATED=START:-PT00H15M00S\r\n" + "END:VALARM\r\n" + "END:VEVENT\r\n" + "END:VCALENDAR";
+        message.addPart(
+            "text/calendar;method=CANCEL",
+            calendarContent,
             Collections.<String, Object>singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
@@ -249,8 +227,8 @@ public class ScriptingIntegrationTest
         assertEquals(1, result.getStatusResult().getProcessedMailCount());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!",
-            result.getStatusResult().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.FAILED)
+            .hasNext());
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.READY).hasNext());
 

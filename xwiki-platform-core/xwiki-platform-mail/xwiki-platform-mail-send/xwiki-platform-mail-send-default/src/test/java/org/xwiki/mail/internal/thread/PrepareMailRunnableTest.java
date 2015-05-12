@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -97,11 +96,6 @@ public class PrepareMailRunnableTest
         XWikiContext xContext2 = new XWikiContext();
         xContext2.setWikiId("wiki2");
         context2.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext2);
-
-        ExecutionContextManager ecm = this.mocker.getInstance(ExecutionContextManager.class);
-        // Just return the same execution context
-        when(ecm.clone(context1)).thenReturn(context1);
-        when(ecm.clone(context2)).thenReturn(context2);
 
         MemoryMailListener listener1 = this.mocker.getInstance(MailListener.class, "memory");
         PrepareMailQueueItem item1 =

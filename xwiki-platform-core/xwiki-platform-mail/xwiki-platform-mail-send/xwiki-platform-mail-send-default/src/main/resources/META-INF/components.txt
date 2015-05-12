@@ -9,6 +9,8 @@ org.xwiki.mail.internal.thread.PrepareMailQueueManager
 org.xwiki.mail.internal.thread.SendMailQueueManager
 org.xwiki.mail.internal.thread.PrepareMailRunnable
 org.xwiki.mail.internal.thread.SendMailRunnable
+org.xwiki.mail.internal.thread.context.ExecutionContexCloner
+org.xwiki.mail.internal.thread.context.XWikiContextCloner
 org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration

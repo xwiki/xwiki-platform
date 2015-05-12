@@ -48,7 +48,7 @@ public class DatabaseMailStatusResultTest
     {
         MailStatusStore store = mock(MailStatusStore.class);
         MailStatus status = new MailStatus();
-        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"), 0, 0, "date", false))
+        when(store.load(Collections.<String, Object>singletonMap("batchId", "batchid"), 0, 0, "date", true))
             .thenReturn(Arrays.asList(status));
 
         DatabaseMailStatusResult result = new DatabaseMailStatusResult(store);

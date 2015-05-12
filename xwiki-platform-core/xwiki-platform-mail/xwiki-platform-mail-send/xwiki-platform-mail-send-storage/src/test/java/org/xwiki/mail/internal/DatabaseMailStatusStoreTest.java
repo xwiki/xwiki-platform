@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,8 +47,8 @@ public class DatabaseMailStatusStoreTest
         filterMap.put("status", "failed");
         filterMap.put("wiki", "mywiki");
 
-        assertEquals("from org.xwiki.mail.MailStatus where mail_status like :status and mail_wiki like :wiki",
-            this.mocker.getComponentUnderTest().computeSelectQueryString(filterMap));
+        assertEquals("from org.xwiki.mail.MailStatus where mail_status like :status and mail_wiki like :wiki order by date desc",
+            this.mocker.getComponentUnderTest().computeSelectQueryString(filterMap, "date", false));
     }
 
     @Test

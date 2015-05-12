@@ -46,15 +46,29 @@ public interface MailStatusStore
     void save(MailStatus status, Map<String, Object> parameters) throws MailStoreException;
 
     /**
+     * Load message status for the message matching the given message Id.
+     *
+     * @param messageId the identifier of the message.
+     * @return the status of the message, or null if no status was found.
+     * @throws MailStoreException when an error occurs while loading the data
+     * @since 7.1M2
+     */
+    MailStatus load(String messageId) throws MailStoreException;
+
+    /**
      * Loads all message statuses matching the passed filters.
      *
      * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
      * @param offset the number of rows to skip (0 means don't skip any row)
      * @param count the number of rows to return. If 0 then all rows are returned
+     * @param sortField the name of the field used to order returned status
+     * @param sortAscending when true, sort is done in ascending order of sortField, else in descending order
      * @return the loaded {@link org.xwiki.mail.MailStatus} instances
-     * @throws MailStoreException when an error occurs when loading the data
+     * @throws MailStoreException when an error occurs while loading the data
+     * @since 7.1M2
      */
-    List<MailStatus> load(Map<String, Object> filterMap, int offset, int count) throws MailStoreException;
+    List<MailStatus> load(Map<String, Object> filterMap, int offset, int count, String sortField, boolean sortAscending)
+        throws MailStoreException;
 
     /**
      * Count the number of message statuses matching the passed filters.

@@ -141,7 +141,7 @@ public class MailStorageScriptServiceTest
         when(authorizationManager.hasAccess(Right.ADMIN)).thenReturn(false);
 
         List<MailStatus> result = this.mocker.getComponentUnderTest().load(
-            Collections.<String, Object>emptyMap(), 0, 0);
+            Collections.<String, Object>emptyMap(), 0, 0, null, false);
 
         assertNull(result);
         assertEquals("You need Admin rights to load mail statuses",

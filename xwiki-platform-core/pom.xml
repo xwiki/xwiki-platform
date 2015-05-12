@@ -486,6 +486,25 @@
               <method>java.lang.Object createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
               <justification>Young API. Remove useless Session argument since the MimeMessage will be given a valid Session when it's deserialized from the mail content store for sending.</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int)</method>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int)</method>
+              <to>org.xwiki.mail.MailStatus</to>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int, java.lang.String, boolean)</method>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

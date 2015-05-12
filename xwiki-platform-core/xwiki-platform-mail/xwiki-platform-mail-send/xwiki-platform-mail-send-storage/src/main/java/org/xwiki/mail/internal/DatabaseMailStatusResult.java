@@ -44,6 +44,8 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMailStatusResult.class);
 
+    private static final String DATE_FIELD = "date";
+
     private MailStatusStore mailStatusStore;
 
     private String batchId;
@@ -75,8 +77,8 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
         }
 
         try {
-            return this.mailStatusStore.load(
-                Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId), 0, Integer.MAX_VALUE).iterator();
+            return this.mailStatusStore.load(Collections.<String, Object>singletonMap(BATCHID_KEY, this.batchId),
+                0, 0, DATE_FIELD, true).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get all results. Returning an empty result.", e);
             return Collections.emptyIterator();
@@ -94,7 +96,7 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
             Map<String, Object> filterMap = new HashMap<>();
             filterMap.put(BATCHID_KEY, this.batchId);
             filterMap.put("state", state.toString());
-            return this.mailStatusStore.load(filterMap, 0, Integer.MAX_VALUE).iterator();
+            return this.mailStatusStore.load(filterMap, 0, 0, DATE_FIELD, true).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get results by state. Returning an empty result.", e);
             return Collections.emptyIterator();

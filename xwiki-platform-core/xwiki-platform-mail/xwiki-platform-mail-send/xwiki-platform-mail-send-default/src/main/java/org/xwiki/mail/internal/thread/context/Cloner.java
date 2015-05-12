@@ -17,44 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal.thread;
+package org.xwiki.mail.internal.thread.context;
 
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.xwiki.context.Execution;
-import org.xwiki.mail.MailSenderConfiguration;
+import org.apache.commons.lang3.exception.CloneFailedException;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Common code that sets up a XWiki Context in a Thread.
+ * Generic component in charge of cloning a given object of a given type. The main purpose of this is to add
+ * {@link java.lang.Cloneable}-like behavior on objects that don't implement it.
  *
+ * @param <T> the type of object to clone
  * @version $Id$
- * @since 6.4
+ * @since 7.1M2
  */
-public abstract class AbstractMailRunnable implements MailRunnable
+@Role
+public interface Cloner<T>
 {
-    @Inject
-    protected Logger logger;
-
-    @Inject
-    protected MailSenderConfiguration configuration;
-
     /**
-     * Allows to stop this thread, used in {@link #stopProcessing()}.
+     * @param original the original object to clone
+     * @return a clone of the original object
+     * @throws CloneFailedException if problems occur
      */
-    protected volatile boolean shouldStop;
-
-    @Inject
-    protected Execution execution;
-
-    protected void removeContext()
-    {
-        this.execution.removeContext();
-    }
-
-    @Override
-    public void stopProcessing()
-    {
-        this.shouldStop = true;
-    }
+    T clone(T original) throws CloneFailedException;
 }

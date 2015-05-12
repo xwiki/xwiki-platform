@@ -36,6 +36,8 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
 {
     private Iterable<? extends MimeMessage> messages;
 
+    private ExecutionContext executionContext;
+
     /**
      * @param messages see {@link #getMessages()}
      * @param session see {@link #getSession()}
@@ -46,8 +48,9 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
     public PrepareMailQueueItem(Iterable<? extends MimeMessage> messages, Session session, MailListener listener,
         String batchId, ExecutionContext executionContext)
     {
-        super(session, listener, batchId, executionContext);
+        super(session, listener, batchId);
         this.messages = messages;
+        this.executionContext = executionContext;
     }
 
     /**
@@ -56,5 +59,19 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
     public Iterable<? extends MimeMessage> getMessages()
     {
         return this.messages;
+    }
+
+    /**
+     * @return the execution context that will be used when preparing and sending the Mime Message
+     */
+    public ExecutionContext getContext()
+    {
+        return this.executionContext;
+    }
+
+    @Override
+    public String toString()
+    {
+        return prepareToString().append("context", this.executionContext.getProperties()).toString();
     }
 }

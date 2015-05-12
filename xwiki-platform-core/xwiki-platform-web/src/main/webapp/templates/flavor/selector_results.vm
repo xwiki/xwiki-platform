@@ -1,2 +1,0 @@
-#template('flavor/macros.vm')
-#displaySelectFlavor_items($request.fieldName, '', false, $request.cssClass, $mathtool.toInteger($request.firstIndex))

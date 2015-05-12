@@ -1,55 +1,71 @@
 ########################################################
-## Display a custom select input to select a flavor.
+## Display a custom picker to select a flavor.
 ## -----------------------------
 ##
 ## @param $fieldName name of the input field
-## @defaultValue the default flavor to use (extension id, eg: "org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki-6.4.5")
-## @firstIsDefaultIfDefaultNull if defaultValue is null, select the first flavor
-## @cssClass class to add to the div (could be 'xwiki-flavor-select-small', 'xwiki-flavor-select-medium', 'xwiki-flavor-select-tall' or any other class)
+## @param $defaultValue the default flavor to use (extension id, eg: "org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki-6.4.5")
+## @param $firstIsDefaultIfDefaultNull if defaultValue is null, select the first flavor
+## @param $cssClass class to add to the div (could be 'xwiki-flavor-select-small', 'xwiki-flavor-select-medium', 'xwiki-flavor-select-tall' or any other class)
+## @param $noFlavorButton display the no flavor button
 #########################################################
-#macro(displaySelectFlavor $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/selector.css', {'forceSkinAction': true}))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/selector.js' , {'forceSkinAction': true}))
-  <div class="xwiki-flavor-select clearfix $!cssClass">
-    #displaySelectFlavor_items($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, $cssClass, 0)
+#macro(displayFlavorPicker $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $noFlavorButton)
+  ## TODO: put this in a webjar instead
+  #set ($discard = $xwiki.ssfx.use('uicomponents/flavor/picker.css', {'forceSkinAction': true}))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/flavor/picker.js' , {'forceSkinAction': true}))
+  <div class="xwiki-flavor-picker $!cssClass">
+    ## Filter
+    <input type="text" id="${fieldName}_filter" class="xwiki-flavor-picker-filter" placeholder="$escapetool.xml($services.localization.render('flavor.picker.filterPlaceHolder'))" style="margin-bottom: 2px;"/>
+    ## Results
+    <div class="xwiki-flavor-picker-results-container">
+      #displayFlavorPicker_results($fieldName, $defaultValue, $firstIsDefaultIfDefaultNull, 0)
+    </div>
+    ## No flavor option
+    #if($noFlavorButton)
+      <input type="radio" name="$fieldName" value="noFlavor" id="${fieldName}_noFlavor" class="xwiki-flavor-picker-noflavor">
+      <label for="${fieldName}_noFlavor">$services.localization.render('flavor.picker.noflavor')</label>
+    #end
   </div>
-  <input type="radio" name="$fieldName" value="noFlavor" id="${fieldName}_noFlavor" class="xwiki-flavor-select-noflavor">
-  <label for="${fieldName}_noFlavor">$services.localization.render('flavor.selector.noflavor')</label>
 #end
 ##
-#macro(displaySelectFlavor_items $fieldName $defaultValue $firstIsDefaultIfDefaultNull $cssClass $offset)
+#macro(displayFlavorPicker_results $fieldName $defaultValue $firstIsDefaultIfDefaultNull $offset)
   #set ($resultsPerPage = 20)
-  #set ($flavorQuery = $services.flavor.createFlavorQuery().setOffset($offset).setLimit($resultsPerPage))
+  #if ("$!request.filter" != '')
+    #set ($flavorQuery = $services.flavor.createFlavorQuery($request.filter))
+  #else
+    #set ($flavorQuery = $services.flavor.createFlavorQuery())
+  #end
+  #set ($flavorQuery = $flavorQuery.setOffset($offset).setLimit($resultsPerPage))
   #set ($flavors = $services.flavor.getFlavors($flavorQuery))
-  <div class="xwiki-flavor-select-container">
+  <div class="xwiki-flavor-picker-results">
     <ul>
     #foreach ($flavor in $flavors)
       #set ($value = $flavor.extensionId)
       #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
         #set ($checked = 'checked="checked"')
-        #set ($class = 'xwiki-flavor-select-option-selected')
+        #set ($class = 'xwiki-flavor-picker-option-selected')
       #else
         #set ($checked = '')
         #set ($class = '')
       #end
-      <li class="xwiki-flavor-select-option $class">
+      <li class="xwiki-flavor-picker-option $class">
         <input type="radio" name="$fieldName" value="$escapetool.xml($value)" id="${fieldName}_${velocityCount}" $checked/>
-        <span class="xwiki-flavor-select-option-icon">$services.icon.renderHTML('wiki')</span>
+        <span class="xwiki-flavor-picker-option-icon">$services.icon.renderHTML('wiki')</span>
         <div>
-          <label for="${fieldName}_${velocityCount}">$escapetool.xml($flavor.name)</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end<br/>
-          <small><span class="authors">$services.localization.render('flavor.selector.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</span></small>
+          <label for="${fieldName}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end$escapetool.xml($flavor.name)#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end<br/>
+          <small><span class="authors">$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</span></small>
           #if ("$!flavor.summary" != '')
             <span class="xHint">$flavor.summary</span>
-          #end
-          #if ("$!flavor.website" != '')
-          <small><a href="$escapetool.xml($flavor.website)" class="popup">$services.localization.render('flavor.selector.website')</a></small>
           #end
         </div>
       </li>
     #end
     </ul>
+    #set ($url = $doc.getURL('view', "xpage=flavor/picker_results&fieldName=$escapetool.url($fieldName)"))
+    #if ("$!request.filter" != '')
+      #set ($url = $url + "&filter=$escapetool.url($request.filter)")
+    #end
     #set($paginationParameters = {
-      'url' : $doc.getURL('view', "xpage=flavor/selector_results&fieldName=$escapetool.url($fieldName)&cssClass=$escapetool.url($cssClass)"),
+      'url' : $url,
       'totalItems' : $flavors.totalHits,
       'defaultItemsPerPage' : $resultsPerPage,
       'position': 'top'

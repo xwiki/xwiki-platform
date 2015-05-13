@@ -1183,7 +1183,7 @@ require(['jquery'], function($) {
                 &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
               &lt;/dt&gt;
               #set ($currentTab = 'flavors')
-              #if ("$!request.template" != '')
+              #if ("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
                 #set ($currentTab = 'templates')
               #end
               &lt;dd class="flavor_template"&gt;

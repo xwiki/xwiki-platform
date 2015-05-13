@@ -71,7 +71,6 @@ public class XWikiContextClonerTest
 
         originalRequest = new XWikiServletRequestStub();
         originalRequest.setHost("host");
-        originalRequest.setContextPath("contextPath");
         originalRequest.setScheme("scheme");
         originalRequest.setAttribute("attribute", "value");
 

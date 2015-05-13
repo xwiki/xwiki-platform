@@ -64,7 +64,6 @@ public class XWikiContextCloner implements Cloner<XWikiContext>
         XWikiRequest originalRequest = originalXWikiContext.getRequest();
         dummy.setHost(((HttpServletRequest) originalRequest).getHeader("x-forwarded-host"));
         dummy.setScheme(((HttpServletRequest) originalRequest).getScheme());
-        dummy.setContextPath(((HttpServletRequest) originalRequest).getContextPath());
         // TODO: include the original parameters map?
 
         XWikiServletRequest request = new XWikiServletRequest(dummy);

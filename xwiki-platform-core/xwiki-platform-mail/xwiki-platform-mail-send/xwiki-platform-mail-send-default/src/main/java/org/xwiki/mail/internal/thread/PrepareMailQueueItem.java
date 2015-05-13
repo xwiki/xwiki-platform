@@ -71,6 +71,8 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @since 7.1M2
      */
     @Override

@@ -66,7 +66,7 @@
       components (e.g. DefaultXWikiStubContextProvider) -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

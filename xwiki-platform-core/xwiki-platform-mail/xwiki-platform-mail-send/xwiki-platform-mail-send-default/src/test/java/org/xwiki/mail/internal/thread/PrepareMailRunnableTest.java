@@ -23,15 +23,12 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.inject.Provider;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailContentStore;
@@ -48,7 +45,6 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.thread.PrepareMailRunnable}.
@@ -62,14 +58,6 @@ public class PrepareMailRunnableTest
     @Rule
     public MockitoComponentMockingRule<PrepareMailRunnable> mocker = new MockitoComponentMockingRule<>(
         PrepareMailRunnable.class);
-
-    @Before
-    public void setUp() throws Exception
-    {
-        Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
-    }
 
     @Test
     public void prepareMailWhenContentStoreFails() throws Exception

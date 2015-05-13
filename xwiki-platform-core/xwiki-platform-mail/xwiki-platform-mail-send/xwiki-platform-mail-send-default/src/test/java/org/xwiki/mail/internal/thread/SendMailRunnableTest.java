@@ -23,15 +23,12 @@ import java.util.Iterator;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.inject.Provider;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
@@ -40,8 +37,6 @@ import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.internal.MemoryMailListener;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -62,14 +57,6 @@ public class SendMailRunnableTest
     @Rule
     public MockitoComponentMockingRule<SendMailRunnable> mocker =
         new MockitoComponentMockingRule<>(SendMailRunnable.class);
-
-    @Before
-    public void setUp() throws Exception
-    {
-        Provider<XWikiContext> xwikiContextProvider = this.mocker.getInstance(
-            new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
-    }
 
     @Test
     public void sendMailWhenSendingFails() throws Exception

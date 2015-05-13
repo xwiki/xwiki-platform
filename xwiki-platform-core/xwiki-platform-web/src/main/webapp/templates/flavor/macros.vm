@@ -21,7 +21,7 @@
     </div>
     ## No flavor option
     #if($noFlavorButton)
-      <input type="radio" name="$fieldName" value="noFlavor" id="${fieldName}_noFlavor" class="xwiki-flavor-picker-noflavor">
+      <input type="radio" name="$fieldName" value="noFlavor" id="${fieldName}_noFlavor" class="xwiki-flavor-picker-noflavor" #if($defaultValue=='noFlavor')checked="checked"#end>
       <label for="${fieldName}_noFlavor">$services.localization.render('flavor.picker.noflavor')</label>
     #end
   </div>
@@ -39,7 +39,7 @@
   <div class="xwiki-flavor-picker-results">
     <ul>
     #foreach ($flavor in $flavors)
-      #set ($value = $flavor.extensionId)
+      #set ($value = "${flavor.id.id}:::${flavor.id.version}")
       #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
         #set ($checked = 'checked="checked"')
         #set ($class = 'xwiki-flavor-picker-option-selected')
@@ -51,10 +51,10 @@
         <input type="radio" name="$fieldName" value="$escapetool.xml($value)" id="${fieldName}_${velocityCount}" $checked/>
         <span class="xwiki-flavor-picker-option-icon">$services.icon.renderHTML('wiki')</span>
         <div>
-          <label for="${fieldName}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end$escapetool.xml($flavor.name)#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end<br/>
-          <small><span class="authors">$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</span></small>
+          <label for="${fieldName}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end$escapetool.xml($flavor.name)#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
+          <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
           #if ("$!flavor.summary" != '')
-            <span class="xHint">$flavor.summary</span>
+            <p class="xHint">$flavor.summary</p>
           #end
         </div>
       </li>

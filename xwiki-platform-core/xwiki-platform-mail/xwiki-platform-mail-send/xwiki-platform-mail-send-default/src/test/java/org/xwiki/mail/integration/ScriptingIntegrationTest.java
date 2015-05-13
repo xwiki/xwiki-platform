@@ -86,10 +86,23 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
-@ComponentList({MailSenderScriptService.class, StandardEnvironment.class, DefaultMailSender.class,
-    DefaultExecution.class, ContextComponentManagerProvider.class, TextMimeBodyPartFactory.class,
-    MemoryMailListener.class, DefaultSessionFactory.class, SendMailRunnable.class, PrepareMailRunnable.class,
-    PrepareMailQueueManager.class, SendMailQueueManager.class, FileSystemMailContentStore.class})
+// @formatter:off
+@ComponentList({
+    MailSenderScriptService.class,
+    StandardEnvironment.class,
+    DefaultMailSender.class,
+    DefaultExecution.class,
+    ContextComponentManagerProvider.class,
+    TextMimeBodyPartFactory.class,
+    MemoryMailListener.class,
+    DefaultSessionFactory.class,
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
+})
+// @formatter:on
 public class ScriptingIntegrationTest
 {
     @Rule
@@ -204,15 +217,34 @@ public class ScriptingIntegrationTest
     {
         ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
-        String calendarContent =
-            "BEGIN:VCALENDAR\r\n" + "METHOD:REQUEST\r\n" + "PRODID: Meeting\r\n" + "VERSION:2.0\r\n"
-                + "BEGIN:VEVENT\r\n" + "DTSTAMP:20140616T164100\r\n" + "DTSTART:20140616T164100\r\n"
-                + "DTEND:20140616T194100\r\n" + "SUMMARY:test request\r\n" + "UID:324\r\n"
-                + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
-                + "ORGANIZER:MAILTO:john@doe.com\r\n" + "LOCATION:on the net\r\n" + "DESCRIPTION:learn some stuff\r\n"
-                + "SEQUENCE:0\r\n" + "PRIORITY:5\r\n" + "CLASS:PUBLIC\r\n" + "STATUS:CONFIRMED\r\n"
-                + "TRANSP:OPAQUE\r\n" + "BEGIN:VALARM\r\n" + "ACTION:DISPLAY\r\n" + "DESCRIPTION:REMINDER\r\n"
-                + "TRIGGER;RELATED=START:-PT00H15M00S\r\n" + "END:VALARM\r\n" + "END:VEVENT\r\n" + "END:VCALENDAR";
+        // @formatter:off
+        String calendarContent = "BEGIN:VCALENDAR\r\n"
+            + "METHOD:REQUEST\r\n"
+            + "PRODID: Meeting\r\n"
+            + "VERSION:2.0\r\n"
+            + "BEGIN:VEVENT\r\n"
+            + "DTSTAMP:20140616T164100\r\n"
+            + "DTSTART:20140616T164100\r\n"
+            + "DTEND:20140616T194100\r\n"
+            + "SUMMARY:test request\r\n"
+            + "UID:324\r\n"
+            + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
+            + "ORGANIZER:MAILTO:john@doe.com\r\n"
+            + "LOCATION:on the net\r\n"
+            + "DESCRIPTION:learn some stuff\r\n"
+            + "SEQUENCE:0\r\n"
+            + "PRIORITY:5\r\n"
+            + "CLASS:PUBLIC\r\n"
+            + "STATUS:CONFIRMED\r\n"
+            + "TRANSP:OPAQUE\r\n"
+            + "BEGIN:VALARM\r\n"
+            + "ACTION:DISPLAY\r\n"
+            + "DESCRIPTION:REMINDER\r\n"
+            + "TRIGGER;RELATED=START:-PT00H15M00S\r\n"
+            + "END:VALARM\r\n"
+            + "END:VEVENT\r\n"
+            + "END:VCALENDAR";
+        // @formatter:on
         message.addPart(
             "text/calendar;method=CANCEL",
             calendarContent,

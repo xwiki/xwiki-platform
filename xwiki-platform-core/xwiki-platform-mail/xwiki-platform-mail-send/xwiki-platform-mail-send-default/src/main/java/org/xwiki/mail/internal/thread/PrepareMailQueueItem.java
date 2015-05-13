@@ -63,12 +63,16 @@ public class PrepareMailQueueItem extends AbstractMailQueueItem
 
     /**
      * @return the execution context that will be used when preparing and sending the Mime Message
+     * @since 7.1M2
      */
     public ExecutionContext getContext()
     {
         return this.executionContext;
     }
 
+    /**
+     * @since 7.1M2
+     */
     @Override
     public String toString()
     {

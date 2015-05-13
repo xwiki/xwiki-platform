@@ -80,9 +80,20 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4M1
  */
-@ComponentList({TextMimeBodyPartFactory.class, AttachmentMimeBodyPartFactory.class, StandardEnvironment.class,
-    DefaultMailSender.class, MemoryMailListener.class, SendMailRunnable.class, PrepareMailRunnable.class,
-    PrepareMailQueueManager.class, SendMailQueueManager.class, FileSystemMailContentStore.class})
+// @formatter:off
+@ComponentList({
+    TextMimeBodyPartFactory.class,
+    AttachmentMimeBodyPartFactory.class,
+    StandardEnvironment.class,
+    DefaultMailSender.class,
+    MemoryMailListener.class,
+    SendMailRunnable.class,
+    PrepareMailRunnable.class,
+    PrepareMailQueueManager.class,
+    SendMailQueueManager.class,
+    FileSystemMailContentStore.class
+})
+// @formatter:on
 public class AuthenticatingIntegrationTest
 {
     // Required by GreenMail.

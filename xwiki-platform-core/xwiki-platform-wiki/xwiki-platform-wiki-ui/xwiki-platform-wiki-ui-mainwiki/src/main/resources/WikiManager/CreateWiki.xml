@@ -497,8 +497,12 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>WikiManager.CreateWiki</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bc5c00d1-8408-441d-bd15-8ba694dd7613</guid>
     <class>
-      <name>XWiki.StyleSheetExtension</name>
+      <name>XWiki.JavaScriptExtension</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -568,32 +572,227 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManager.CreateWiki</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
-      <code>#contentmenu, #hierarchy, #document-info, #xdocFooter{
+      <code>## TODO: remove this test when the flavor API will be bundled with XWiki
+#if ("$!services.flavor" != '')
+/**************************************************************
+ * Code to make the dynamic "flavor/template" tab bar
+ **************************************************************/
+require(['jquery'], function($) {
+  $(window).ready(function(){
+    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').click(function(event) {
+      var thisTabWidget = $(this).parents('.flavor_template');
+      // Change the tab bar
+      var activeTab = thisTabWidget.find('.xwikitabbar .active');
+      activeTab.removeClass('active');
+      var targetTab = $(this).parents('li');
+      targetTab.addClass('active');
+      // Change the tab content
+      var activeTabContent = thisTabWidget.find('.xwiki-createwiki-tab.active');
+      var targetTabContent = thisTabWidget.find($(this).attr('href') + '-tab');
+      activeTabContent.removeClass('active').fadeOut(400, function() {
+        // Display the new tab container when the old one is completly hidden
+        targetTabContent.hide().fadeIn().removeClass('hidden').addClass('active');
+      });
+      // Do not follow the link
+      return false;
+    });
+  });
+});
+/**************************************************************
+ * Code to only have a flavor or a template used, never both
+ **************************************************************/
+require(['jquery'], function($) {
+  $(window).ready(function(){
+    /**
+     * When a template is selected, unselect the flavor
+     */
+    $('#'+'template').change(function(event) {
+      if (this.value != 'xwikinotemplate') {
+        $('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
+        $('input[name="flavor"]:radio:checked').prop('checked', false);
+      }
+    });
+    
+    /**
+     * When a flavor is selected, unselect the template
+     */
+    var onFlavorChanged = function(event) {
+      $('#'+'template').val('xwikinotemplate');
+    }
+    $('input[name="flavor"]:radio').change(onFlavorChanged);
+    $('.xwiki-flavor-picker-option').click(onFlavorChanged);
+  });
+});
+#end
+</code>
+    </property>
+    <property>
+      <name>Tabs</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>WikiManager.CreateWiki</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#contentmenu, #hierarchy, #document-info, #xdocFooter {
   display: none;
 }
 
-#label_set_as_template, #set_as_template{
+#label_set_as_template, #set_as_template {
   display: inline;
   text-transform: none;
 }
 
-.whatnext{
+.whatnext {
   margin: 1em;
-}</code>
+}
+
+## Flavor/Template section
+## TODO: remove this test when the flavor API will be bundled with XWiki
+#if ("$!services.flavor" != '')
+
+.flavor_template {
+  margin-top: 10px;
+}
+
+.xwiki-createwiki-tabs{
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.xwiki-createwiki-tabs li {
+  float: left;
+  display: block;
+  width: 50%;
+  text-align: center;
+  padding: 1em;
+  border: 1px solid #ccc;
+}
+
+.xwiki-createwiki-tabs-content {
+  border: 1px solid #ccc;
+  border-top: 0;
+  clear: both;
+  padding: 5px;
+}
+
+.xwiki-createwiki-flavor-picker .xwiki-flavor-picker-results-container{
+  height: 233px;
+}
+
+#end
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>CSS</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -635,6 +834,22 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -732,6 +947,9 @@ return XWiki;
   -moz-background-size: 50px 50px;
 }
       </code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Progress Bar stylesheet</name>
@@ -847,6 +1065,37 @@ return XWiki;
 ##################################
 #macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;#end
 ##################################
+##        TEMPLATE FIELDS
+##
+## Display the 'template' fields
+##################################
+#macro(displayTemplateFields $templates)
+  #if ($templates.size() &gt; 0)
+    &lt;select name="template" id="template"&gt;
+      &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
+      #foreach ($template in $templates)
+        #set ($name = $template.id)
+        #if ($stringtool.isNotBlank("$!template.prettyName"))
+          #set($name = "${template.prettyName} (${name})")
+        #end
+        #set($selected = '')
+        #if($request.template == $template.id)
+          #set($selected = 'selected="selected"')
+        #end
+        &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
+      #end
+    &lt;/select&gt;
+  #end
+  &lt;p class="xformInline"&gt;
+    #set ($isTemplate = '')
+    #if ("$!request.set_as_template" != '')
+      #set ($isTemplate = 'checked="checked"')
+    #end
+    &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
+    &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
+  &lt;/p&gt;
+#end
+##################################
 ##          STEP TYPE
 ##
 ## The type is the first step on the creation
@@ -922,9 +1171,41 @@ return XWiki;
         &lt;/div&gt;
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
-          ### TEMPLATE ###
+          ### TEMPLATE / FLAVOR ###
           #set ($templates = $services.wiki.template.getTemplates())
-          &lt;div&gt;
+          #set ($hasFlavorAPI = ("$!services.flavor" != ''))
+          #if ($hasFlavorAPI)
+            ## TODO: remove this test when the flavor API will be bundled in XWiki
+            #template('flavor/macros.vm')
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.label')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
+              &lt;/dt&gt;
+              #set ($currentTab = 'flavors')
+              #if ("$!request.template" != '')
+                #set ($currentTab = 'templates')
+              #end
+              &lt;dd class="flavor_template"&gt;
+                &lt;ul class="xwikitabbar"&gt;
+                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
+                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;div class="xwiki-createwiki-tabs-content"&gt;
+                  #set ($defaultFlavor = "$!request.flavor")
+                  #if ($defaultFlavor == '')
+                    #set ($defaultFlavor = 'noFlavor')
+                  #end
+                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='flavors')active#{else}hidden#end" id="flavors-tab"&gt;
+                    #displayFlavorPicker('flavor', $defaultFlavor, false, 'xwiki-createwiki-flavor-picker', true)
+                  &lt;/div&gt;
+                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='templates')active#{else}hidden#end" id="templates-tab"&gt;
+                    #displayTemplateFields($templates)
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          #else
             &lt;dl&gt;
               &lt;dt&gt;
                 #if ($templates.size() &gt; 0)
@@ -935,33 +1216,10 @@ return XWiki;
                 #end
               &lt;/dt&gt;
               &lt;dd&gt;
-                #if ($templates.size() &gt; 0)
-                  &lt;select name="template" id="template"&gt;
-                    &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
-                    #foreach ($template in $templates)
-                      #set ($name = $template.id)
-                      #if ($stringtool.isNotBlank("$!template.prettyName"))
-                        #set($name = "${template.prettyName} (${name})")
-                      #end
-                      #set($selected = '')
-                      #if($request.template == $template.id)
-                        #set($selected = 'selected="selected"')
-                      #end
-                      &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
-                    #end
-                  &lt;/select&gt;
-                #end
+                #displayTemplateFields($templates)
               &lt;/dd&gt;
             &lt;/dl&gt;
-            &lt;p class="xformInline"&gt;
-              #set ($isTemplate = '')
-              #if ("$!request.set_as_template" != '')
-                #set ($isTemplate = 'checked="checked"')
-              #end
-              &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
-              &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
-            &lt;/p&gt;
-          &lt;/div&gt;
+          #end
         ### END OF WIZARD SECOND HALF
         &lt;/div&gt;
       ### END OF WIZARD BODY
@@ -991,6 +1249,7 @@ return XWiki;
         &lt;input type="hidden" name="wikialias" value="$!escapetool.xml($request.wikialias)" /&gt;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
+        &lt;input type="hidden" name="flavor" value="$!escapetool.xml($request.flavor)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
         &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
         #userPicker_import(true)
@@ -1186,8 +1445,13 @@ return XWiki;
     ## Create a wiki from a template
     #set($discard = $wikiCreationRequest.setWikiSource('template'))
     #set($discard = $wikiCreationRequest.setTemplateId($request.template))
-  #else
+  #elseif("$!request.flavor" != '' &amp;&amp; $request.flavor != 'noFlavor')
     ## Create a wiki from an extension
+    #set($discard = $wikiCreationRequest.setWikiSource('extension'))
+    #set($flavorExtension = $request.flavor.split(':::'))
+    #set($discard = $wikiCreationRequest.setExtensionId($flavorExtension[0], $flavorExtension[1]))
+  #elseif("$!services.flavor" == '')
+    ## Default action when the flavor API is not installed
     #set($discard = $wikiCreationRequest.setWikiSource('extension'))
     #set($discard = $wikiCreationRequest.setExtensionId($services.wiki.creationjob.defaultWikiExtensionId))
   #end

@@ -62,9 +62,6 @@ public class FlavorQuery extends ExtensionQuery
     private void init()
     {
         addFilter(XWikiRepositoryModel.PROP_EXTENSION_CATEGORY, "flavor", ExtensionQuery.COMPARISON.EQUAL);
-        // A flavor must be a XAR, but we add this filter to be extra-sure (someone could have filled bad values in
-        // the repository)
-        addFilter(XWikiRepositoryModel.PROP_EXTENSION_TYPE, "xar", ExtensionQuery.COMPARISON.EQUAL);
     }
 
     /**

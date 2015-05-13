@@ -51,6 +51,7 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.input.ReaderInputSource;
 import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.properties.BeanManager;
@@ -154,6 +155,9 @@ public class InternalTemplateManager
 
     @Inject
     private InternalSkinManager skins;
+
+    @Inject
+    private JobProgressManager progress;
 
     @Inject
     private Logger logger;
@@ -484,6 +488,8 @@ public class InternalTemplateManager
         try {
             xdom = getXDOM(templateName);
         } catch (Throwable e) {
+            this.logger.error("Error while getting template [{}] XDOM", templateName, e);
+
             xdom = generateError(e);
         }
 
@@ -535,64 +541,72 @@ public class InternalTemplateManager
         return writer.toString();
     }
 
-    public void renderNoException(String template, Writer writer)
+    public void renderNoException(String templateName, Writer writer)
     {
         try {
-            render(template, writer);
+            render(templateName, writer);
         } catch (Exception e) {
+            this.logger.error("Error while rendering template [{}]", templateName, e);
+
             renderError(e, writer);
         }
     }
 
-    public String render(String template) throws Exception
+    public String render(String templateName) throws Exception
     {
-        return renderFromSkin(template, (Skin) null);
+        return renderFromSkin(templateName, (Skin) null);
     }
 
-    public String renderFromSkin(String template, String skinId) throws Exception
+    public String renderFromSkin(String templateName, String skinId) throws Exception
     {
         Skin skin = this.skins.getSkin(skinId);
 
-        return skin != null ? renderFromSkin(template, skin) : null;
+        return skin != null ? renderFromSkin(templateName, skin) : null;
     }
 
-    public String renderFromSkin(String template, Skin skin) throws Exception
+    public String renderFromSkin(String templateName, Skin skin) throws Exception
     {
         Writer writer = new StringWriter();
 
-        renderFromSkin(template, skin, writer);
+        renderFromSkin(templateName, skin, writer);
 
         return writer.toString();
     }
 
-    public void render(String template, Writer writer) throws Exception
+    public void render(String templateName, Writer writer) throws Exception
     {
-        renderFromSkin(template, null, writer);
+        renderFromSkin(templateName, null, writer);
     }
 
     public void renderFromSkin(final String templateName, ResourceRepository reposirory, final Writer writer)
         throws Exception
     {
-        final Template template =
-            reposirory != null ? getTemplate(templateName, reposirory) : getTemplate(templateName);
+        this.progress.startStep(templateName, "template.render.message", "Render template [{}]", templateName);
 
-        if (template != null) {
-            final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+        try {
+            final Template template =
+                reposirory != null ? getTemplate(templateName, reposirory) : getTemplate(templateName);
 
-            if (content.authorProvided) {
-                this.suExecutor.call(new Callable<Void>()
-                {
-                    @Override
-                    public Void call() throws Exception
+            if (template != null) {
+                final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+
+                if (content.authorProvided) {
+                    this.suExecutor.call(new Callable<Void>()
                     {
-                        render(template, content, writer);
+                        @Override
+                        public Void call() throws Exception
+                        {
+                            render(template, content, writer);
 
-                        return null;
-                    }
-                }, content.getAuthorReference());
-            } else {
-                render(template, content, writer);
+                            return null;
+                        }
+                    }, content.getAuthorReference());
+                } else {
+                    render(template, content, writer);
+                }
             }
+        } finally {
+            this.progress.endStep(templateName);
         }
     }
 
@@ -629,13 +643,15 @@ public class InternalTemplateManager
         blockRenderer.render(xdom, printer);
     }
 
-    public XDOM executeNoException(String template)
+    public XDOM executeNoException(String templateName)
     {
         XDOM xdom;
 
         try {
-            xdom = execute(template);
+            xdom = execute(templateName);
         } catch (Throwable e) {
+            this.logger.error("Error while executing template [{}]", templateName, e);
+
             xdom = generateError(e);
         }
 

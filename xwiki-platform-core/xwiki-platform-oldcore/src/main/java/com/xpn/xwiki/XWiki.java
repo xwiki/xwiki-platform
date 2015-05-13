@@ -841,6 +841,8 @@ public class XWiki implements EventListener
         progress.pushLevelProgress(4, this);
 
         try {
+            progress.startStep(this);
+
             setDatabase(context.getMainXWiki());
 
             setEngineContext(engine_context);
@@ -899,7 +901,7 @@ public class XWiki implements EventListener
             // potential document changes can use it
             Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
 
-            progress.stepPropress(this);
+            progress.startStep(this);
 
             // Make sure these classes exists
             if (noupdate) {
@@ -907,12 +909,12 @@ public class XWiki implements EventListener
                 getStatsService(context);
             }
 
-            progress.stepPropress(this);
+            progress.startStep(this);
 
             // Prepare the Plugin Engine
             preparePlugins(context);
 
-            progress.stepPropress(this);
+            progress.startStep(this);
 
             String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));

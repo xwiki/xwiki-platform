@@ -45,12 +45,16 @@ import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
+import org.xwiki.job.event.status.JobProgressManager;
+import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.WrappedThreadEventListener;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -67,7 +71,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
@@ -106,6 +109,8 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  */
 public abstract class XWikiAction extends Action
 {
+    public static final String ACTION_PROGRESS = "actionprogress";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAction.class);
 
     /**
@@ -122,6 +127,8 @@ public abstract class XWikiAction extends Action
 
     private ContextualLocalizationManager localization;
 
+    private JobProgressManager progress;
+
     protected ContextualLocalizationManager getLocalization()
     {
         if (this.localization == null) {
@@ -134,6 +141,15 @@ public abstract class XWikiAction extends Action
     protected String localizePlainOrKey(String key, Object... parameters)
     {
         return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
+    }
+
+    protected JobProgressManager getProgress()
+    {
+        if (this.progress == null) {
+            this.progress = Utils.getComponent(JobProgressManager.class);            
+        }
+
+        return this.progress;
     }
 
     /**
@@ -172,12 +188,32 @@ public abstract class XWikiAction extends Action
 
     public ActionForward execute(XWikiContext context) throws Exception
     {
-        MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
+        DefaultJobProgress actionProgress = null;
+        ObservationManager om = Utils.getComponent(ObservationManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
         String docName = "";
+
+        boolean debug = StringUtils.equals(context.getRequest().get("debug"), "true");
 
         try {
             String action = context.getAction();
+
+            // Start progress
+            if (debug && om != null && execution != null) {
+                actionProgress = new DefaultJobProgress(context.getURL().toExternalForm());
+                om.addListener(new WrappedThreadEventListener(actionProgress));
+
+                // Register the action progress in the context
+                ExecutionContext econtext = execution.getContext();
+                if (econtext != null) {
+                    econtext.setProperty(XWikiAction.ACTION_PROGRESS, actionProgress);
+                }
+            }
+
+            getProgress().pushLevelProgress(2, this);
+
+            getProgress().startStep(this, "Get XWiki instance");
 
             // Initialize context.getWiki() with the main wiki
             XWiki xwiki;
@@ -273,47 +309,33 @@ public abstract class XWikiAction extends Action
 
             // Any error before this will be treated using a redirection to an error page
 
-            if (monitor != null) {
-                monitor.startTimer("request");
-            }
+            getProgress().startStep(this, "Execute request");
 
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
 
+            getProgress().pushLevelProgress(7, this);
+
             boolean eventSent = false;
             try {
+                getProgress().startStep(this, "Prepare documents and put them in the context");
+
                 // Prepare documents and put them in the context
                 if (!xwiki.prepareDocuments(context.getRequest(), context, vcontext)) {
                     return null;
                 }
 
-                // Start monitoring timer
-                monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
-                if (monitor != null) {
-                    monitor.startRequest("", context.getAction(), context.getURL());
-                    monitor.startTimer("multipart");
-                }
+                getProgress().startStep(this, "Parses multipart");
 
                 // Parses multipart so that params in multipart are available for all actions
                 fileupload = Utils.handleMultipart(context.getRequest().getHttpServletRequest(), context);
-                if (monitor != null) {
-                    monitor.endTimer("multipart");
-                }
 
-                if (monitor != null) {
-                    monitor.setWikiPage(context.getDoc().getFullName());
-                }
-
-                // Let's handle the notification and make sure it never fails
-                if (monitor != null) {
-                    monitor.startTimer("prenotify");
-                }
+                getProgress().startStep(this, "Send [" + context.getAction() + "] action start event");
 
                 // For the moment we're sending the XWiki context as the data, but this will be
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context.
                 try {
-                    ObservationManager om = Utils.getComponent(ObservationManager.class);
                     ActionExecutingEvent event = new ActionExecutingEvent(context.getAction());
                     om.notify(event, context.getDoc(), context);
                     eventSent = true;
@@ -327,11 +349,9 @@ public abstract class XWikiAction extends Action
                         + " using action [" + context.getAction() + "]", ex);
                 }
 
-                if (monitor != null) {
-                    monitor.endTimer("prenotify");
-                }
-
                 // Call the Actions
+
+                getProgress().startStep(this, "Search and execute entity resource handler");
 
                 // Call the new Entity Resource Reference Handler.
                 ResourceReferenceHandler entityResourceReferenceHandler =
@@ -353,6 +373,8 @@ public abstract class XWikiAction extends Action
                     LOGGER.error("Failed to handle Action for Resource [{}]", resourceReference, e);
                 }
 
+                getProgress().startStep(this, "Execute action render");
+
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been
                 // migrated to new Actions yet).
                 String renderResult = null;
@@ -366,9 +388,13 @@ public abstract class XWikiAction extends Action
                     if (doc.isNew() && "view".equals(context.getAction())
                         && !"recyclebin".equals(context.getRequest().get("viewer"))) {
                         String page = Utils.getPage(context.getRequest(), "docdoesnotexist");
+
+                        getProgress().startStep(this, "Execute template [" + page + "]");
                         Utils.parseTemplate(page, context);
                     } else {
                         String page = Utils.getPage(context.getRequest(), renderResult);
+
+                        getProgress().startStep(this, "Execute template [" + page + "]");
                         Utils.parseTemplate(page, !page.equals("direct"), context);
                     }
                 }
@@ -448,17 +474,11 @@ public abstract class XWikiAction extends Action
                     // If we can't flush, then there's nothing more we can send to the client.
                 }
 
-                if (monitor != null) {
-                    monitor.endTimer("request");
-                    monitor.startTimer("notify");
-                }
-
                 if (eventSent) {
                     // For the moment we're sending the XWiki context as the data, but this will be
                     // changed in the future, when the whole platform will be written using components
                     // and there won't be a need for the context.
                     try {
-                        ObservationManager om = Utils.getComponent(ObservationManager.class);
                         om.notify(new ActionExecutedEvent(context.getAction()), context.getDoc(), context);
                     } catch (Throwable ex) {
                         LOGGER.error("Cannot send action notifications for document [" + docName + " using action ["
@@ -466,27 +486,24 @@ public abstract class XWikiAction extends Action
                     }
                 }
 
-                if (monitor != null) {
-                    monitor.endTimer("notify");
-                }
+                getProgress().startStep(this, "Cleanup database connections");
 
                 // Make sure we cleanup database connections
                 // There could be cases where we have some
-                if ((context != null) && (xwiki != null)) {
-                    xwiki.getStore().cleanUp(context);
-                }
+                xwiki.getStore().cleanUp(context);
+
+                getProgress().popLevelProgress(this);
             }
         } finally {
-            // End request
-            if (monitor != null) {
-                monitor.endRequest();
+            // Stop progress
+            if (actionProgress != null) {
+                getProgress().popLevelProgress(this);
+
+                om.removeListener(actionProgress.getName());
             }
 
-            if (context != null) {
-
-                if (fileupload != null) {
-                    fileupload.cleanFileList(context);
-                }
+            if (fileupload != null) {
+                fileupload.cleanFileList(context);
             }
         }
     }
@@ -663,7 +680,7 @@ public abstract class XWikiAction extends Action
                 response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
-            Object[] args = { url };
+            Object[] args = {url};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);

@@ -1122,16 +1122,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context)
         throws XWikiException
-    {
+    {   
         // Note: We are currently duplicating code from the other getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
         XWikiDocument tdoc = getTranslatedDocument(context);
-        String content = tdoc.getContent();
+        String translatedContent = tdoc.getContent();
 
-        String renderedContent = getRenderingCache().getRenderedContent(getDocumentReference(), content, context);
+        String renderedContent = getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, context);
 
         if (renderedContent == null) {
             DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
@@ -1141,7 +1141,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             parameters.setTargetSyntax(targetSyntax);
             XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
-            getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
+            getRenderingCache().setRenderedContent(getDocumentReference(), translatedContent, renderedContent, context);
         }
 
         return renderedContent;

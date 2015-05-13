@@ -669,6 +669,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
             int errorCount = 0;
             for (String database : databasesToMigrate) {
+                this.progress.startStep(this);
+
                 if (!migrateDatabase(database)) {
                     errorCount++;
                 }
@@ -834,6 +836,8 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
         try {
             for (XWikiMigration migration : migrations) {
+                this.progress.startStep(this);
+
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("Starting data migration [{}] with version [{}] on database [{}]",
                         migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
@@ -853,8 +857,6 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
                     this.logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
                         migration.dataMigration.getName(), database, getDBVersion());
                 }
-
-                this.progress.stepPropress(this);
             }
         } finally {
             this.progress.popLevelProgress(this);

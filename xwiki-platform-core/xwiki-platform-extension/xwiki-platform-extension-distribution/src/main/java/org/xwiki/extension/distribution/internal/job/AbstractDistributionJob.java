@@ -133,7 +133,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     {
         List<DistributionStep> steps = getDistributionJobStatus().getSteps();
 
-        notifyPushLevelProgress(steps.size());
+        this.progressManager.pushLevelProgress(steps.size(), this);
 
         // Initialize steps
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
@@ -156,6 +156,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
         // Execute steps
         try {
             for (int index = 0; index < steps.size(); ++index) {
+                this.progressManager.startStep(this);
+
                 getDistributionJobStatus().setCurrentStateIndex(index);
 
                 DistributionStep step = steps.get(index);
@@ -186,11 +188,9 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     // Save the status so that we remember the answer even if the DW is stopped before the end
                     this.store.storeAsync(this.status);
                 }
-
-                notifyStepPropress();
             }
         } finally {
-            notifyPopLevelProgress();
+            this.progressManager.popLevelProgress(this);
         }
     }
 

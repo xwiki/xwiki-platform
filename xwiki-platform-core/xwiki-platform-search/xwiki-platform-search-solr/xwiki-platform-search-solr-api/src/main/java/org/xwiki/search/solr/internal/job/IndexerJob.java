@@ -103,11 +103,13 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(solrIterator, databaseIterator);
         iterator.setRootReference(getRequest().getRootReference());
 
-        notifyPushLevelProgress((int) iterator.size());
+        this.progressManager.pushLevelProgress((int) iterator.size(), this);
 
         try {
             long[] counter = new long[4];
             while (iterator.hasNext()) {
+                this.progressManager.startStep(this);
+
                 Pair<DocumentReference, Action> entry = iterator.next();
                 if (entry.getValue() == Action.ADD || entry.getValue() == Action.UPDATE) {
                     // The database entry has not been indexed or the indexed version doesn't match the latest version
@@ -117,13 +119,14 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
                     // The index entry doesn't exist anymore in the database.
                     this.indexer.delete(entry.getKey(), true);
                 }
+
                 counter[entry.getValue().ordinal()]++;
-                notifyStepPropress();
             }
+
             logger.info("{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
                 counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
         } finally {
-            notifyPopLevelProgress();
+            this.progressManager.popLevelProgress(this);
         }
     }
 }

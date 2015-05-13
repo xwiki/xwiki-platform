@@ -28,13 +28,10 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.job.event.status.PopLevelProgressEvent;
-import org.xwiki.job.event.status.PushLevelProgressEvent;
-import org.xwiki.job.event.status.StepProgressEvent;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -65,8 +62,8 @@ public class DefaultWikiCopier implements WikiCopier
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    private ObservationManager observationManager;
-    
+    private JobProgressManager progress;
+
     @Inject
     private Logger logger;
 
@@ -81,10 +78,13 @@ public class DefaultWikiCopier implements WikiCopier
             query.setWiki(fromWikiId);
             List<String> documentFullnames = query.execute();
 
-            observationManager.notify(new PushLevelProgressEvent(documentFullnames.size()), this);
-
             WikiReference fromWikiReference = new WikiReference(fromWikiId);
+
+            this.progress.pushLevelProgress(documentFullnames.size(), this);
+
             for (String documentFullName : documentFullnames) {
+                this.progress.startStep(this);
+
                 DocumentReference origDocReference = documentReferenceResolver.resolve(documentFullName,
                         fromWikiReference);
                 DocumentReference newDocReference = new DocumentReference(toWikiId,
@@ -93,11 +93,9 @@ public class DefaultWikiCopier implements WikiCopier
                 logger.info("Copying document [{}] to [{}].", origDocReference, newDocReference);
                 xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
                 logger.info("Done copying document [{}] to [{}].", origDocReference, newDocReference);
-                
-                observationManager.notify(new StepProgressEvent(), this);
             }
 
-            observationManager.notify(new PopLevelProgressEvent(), this);
+            this.progress.popLevelProgress(this);
         } catch (QueryException e) {
             WikiManagerException thrownException = 
                 new WikiManagerException("Unable to get the list of wiki documents to copy.", e);

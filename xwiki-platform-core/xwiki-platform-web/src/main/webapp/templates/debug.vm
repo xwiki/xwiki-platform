@@ -1,0 +1,4 @@
+#template('progress_macros.vm')
+<div id="actiondebug" class="debug">
+#printProgress($services.debug.actionProgress)
+</div>

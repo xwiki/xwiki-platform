@@ -1,9 +1,12 @@
+$services.progress.pushLevel(4)
+
 ###
 ### Display document contents in "view" mode.
 ###
 ## -------------------------------
 ## Compute the content to display 
 ## -------------------------------
+$services.progress.startStep('Compute the content to display')
 ## Honor the syntax if it's passed in the request.
 #try()
   #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
@@ -22,13 +25,17 @@
     #set ($renderedContent = $tdoc.getRenderedContent())
   #end
 #end
+
 ## ----------------------------------------------------------------------------
-## Compute title to display and modify rendered content accordingly.
+## Compute title to display and modify rendered content accordingly
 ## ----------------------------------------------------------------------------
+$services.progress.startStep('Compute title to display and modify rendered content accordingly')
 #template("titlevars.vm")
+
 ## ----------------------------
 ## Display the title
 ## ----------------------------
+$services.progress.startStep('Display the title')
 <div class="xcontent">
   <div class="row document-header">
     <div class="document-info col-xs-12 #if($displayContentMenu)col-md-7#end">
@@ -68,11 +75,15 @@
     </div>
   </div>
 </div>
+
 ## -----------------------------------------------------------------------------------
 ## Display the footnotes if the document is in 1.0 syntax and if there are any defined
 ## -----------------------------------------------------------------------------------
 ## TODO: move that in a place common to old and new rendering footnotes
 #if ($doc.syntax.toIdString() == 'xwiki/1.0')
+$services.progress.startStep('Display the footnotes')
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
 #end
+
+$services.progress.popLevel()

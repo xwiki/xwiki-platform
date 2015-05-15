@@ -52,7 +52,6 @@ com.xpn.xwiki.internal.skin.DefaultSkinManager
 com.xpn.xwiki.internal.skin.InternalSkinConfiguration
 com.xpn.xwiki.internal.skin.InternalSkinManager
 com.xpn.xwiki.internal.skin.WikiSkinUtils
-com.xpn.xwiki.internal.script.DebugScriptService
 com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager
@@ -72,6 +71,7 @@ com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
+com.xpn.xwiki.script.DebugScriptService
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor
 com.xpn.xwiki.store.hibernate.query.DefaultQueryExecutor

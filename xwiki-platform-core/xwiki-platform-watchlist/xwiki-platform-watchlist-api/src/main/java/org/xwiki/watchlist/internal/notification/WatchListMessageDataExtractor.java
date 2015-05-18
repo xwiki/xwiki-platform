@@ -166,9 +166,9 @@ public class WatchListMessageDataExtractor implements UserDataExtractor<WatchLis
     {
         DocumentReference result = null;
 
-        // In the case of WatchListJob for example, this is filled in by the user so we must interpret it to determine
+        // In the case of WatchListJob for example, this is filled in by the admin so we must interpret it to determine
         // which actual document to use as template.
-        String templateStringReference = (String) parameters.get("template");
+        String templateStringReference = (String) parameters.get(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER);
 
         if (templateStringReference.contains(DefaultWatchListStore.WIKI_SPACE_SEP)) {
             // If the configured template is already an absolute reference it's meant to force the template.

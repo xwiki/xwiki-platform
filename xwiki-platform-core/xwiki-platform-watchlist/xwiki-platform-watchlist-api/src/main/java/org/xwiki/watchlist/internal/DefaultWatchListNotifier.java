@@ -55,7 +55,6 @@ import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactor
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
 
 /**
  * Default implementation for {@link WatchListNotifier}. The current implementation offers email notifications only.
@@ -195,17 +194,8 @@ public class DefaultWatchListNotifier implements WatchListNotifier
         // Prepare email template (wiki page) context
         Map<String, Object> velocityVariables = new HashMap<>();
         velocityVariables.put(PREVIOUS_FIRE_TIME_VARIABLE, notificationData.get(PREVIOUS_FIRE_TIME_VARIABLE));
-        // XWiki API
-        velocityVariables.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
-        velocityVariables.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
-        Context xcontext = new Context(context);
-        velocityVariables.put("xcontext", xcontext);
-        velocityVariables.put("services", scriptServiceManager);
-        // Deprecated XWiki API
-        velocityVariables.put("msg", context.getMessageTool());
-        velocityVariables.put("context", xcontext);
-        // Note: The other variables that are context dependent will be updated for each subscriber by the iterator,
-        // since they are different for each subscriber.
+        // Note: The remaining bindings / variables that are context dependent will be updated for each subscriber by
+        // the iterator, since they are different for each subscriber.
         // Add to parameters
         parameters.put("velocityVariables", velocityVariables);
 

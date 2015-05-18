@@ -68,8 +68,8 @@ public interface MailListener
      * @return the status of all the mails from the batch (whether they were sent successfully, failed to be sent,
      *         ready to be sent but not sent yet, etc). Note that since mails can be sent asynchronously it's possible
      *         that when calling this method, not all mails have been processed yet for sending and thus users or this
-     *         method should call {@link MailStatusResult#getSize()} to ensure that they get the expected number and if
-     *         not wait some more
+     *         method should call {@link MailStatusResult#waitTillProcessed(long)}
+     *         or {@link MailStatusResult#isProcessed()} to ensure that all mails have been processed
      * @since 6.4M3
      */
     MailStatusResult getMailStatusResult();

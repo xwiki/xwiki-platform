@@ -50,11 +50,11 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
-public class XWikiContextClonerTest
+public class XWikiContextCopierTest
 {
     @Rule
-    public MockitoComponentMockingRule<XWikiContextCloner> mocker = new MockitoComponentMockingRule<>(
-        XWikiContextCloner.class);
+    public MockitoComponentMockingRule<XWikiContextCopier> mocker = new MockitoComponentMockingRule<>(
+        XWikiContextCopier.class);
 
     XWikiServletRequestStub originalRequest;
 
@@ -113,43 +113,43 @@ public class XWikiContextClonerTest
     }
 
     @Test
-    public void cloneContext() throws Exception
+    public void copyContext() throws Exception
     {
-        XWikiContext clone = mocker.getComponentUnderTest().clone(original);
+        XWikiContext copy = mocker.getComponentUnderTest().copy(original);
 
         // Check that the request is not the same.
-        XWikiRequest clonedRequest = clone.getRequest();
-        assertNotSame(original.getRequest(), clonedRequest);
+        XWikiRequest copiedRequest = copy.getRequest();
+        assertNotSame(original.getRequest(), copiedRequest);
 
         // Check that each value on the cloned request are equal.
-        assertEquals(originalRequest.getHeader("x-forwarded-host"), clonedRequest.getHeader("x-forwarded-host"));
-        assertEquals(originalRequest.getContextPath(), clonedRequest.getContextPath());
-        assertEquals(originalRequest.getScheme(), clonedRequest.getScheme());
-        assertEquals(originalRequest.getAttributeNames(), clonedRequest.getAttributeNames());
-        assertEquals(originalRequest.getAttribute("attribute"), clonedRequest.getAttribute("attribute"));
+        assertEquals(originalRequest.getHeader("x-forwarded-host"), copiedRequest.getHeader("x-forwarded-host"));
+        assertEquals(originalRequest.getContextPath(), copiedRequest.getContextPath());
+        assertEquals(originalRequest.getScheme(), copiedRequest.getScheme());
+        assertEquals(originalRequest.getAttributeNames(), copiedRequest.getAttributeNames());
+        assertEquals(originalRequest.getAttribute("attribute"), copiedRequest.getAttribute("attribute"));
 
         // Check that the response is not the same.
-        assertNotSame(originalResponse, clone.getResponse());
+        assertNotSame(originalResponse, copy.getResponse());
 
         // Check that the context values are cloned.
-        assertEquals(original.getUserReference(), clone.getUserReference());
-        assertEquals(original.getWikiId(), clone.getWikiId());
+        assertEquals(original.getUserReference(), copy.getUserReference());
+        assertEquals(original.getWikiId(), copy.getWikiId());
         // No URL was present in the original context so a stub is used.
         // Note: for some reason, comparing 2 URLs takes ages (~19 seconds) on my machine. Comparing strings instead for
         // performance.
-        assertEquals("http://www.mystuburl.com/", clone.getURL().toString());
+        assertEquals("http://www.mystuburl.com/", copy.getURL().toString());
         // Actually, all the context keys should be copied.
-        assertNotSame(original.entrySet(), clone.entrySet());
-        assertEquals(original.entrySet(), clone.entrySet());
+        assertNotSame(original.entrySet(), copy.entrySet());
+        assertEquals(original.entrySet(), copy.entrySet());
 
         // Some things are not cloned.
-        assertSame(original.getWiki(), clone.getWiki());
+        assertSame(original.getWiki(), copy.getWiki());
 
         // Verify that the store cache has been cleaned for the original context.
         verify(store, times(1)).cleanUp(original);
 
         // Check that the URLFactory is cloned.
-        assertNotNull(clone.getURLFactory());
-        assertNotSame(original.getURLFactory(), clone.getURLFactory());
+        assertNotNull(copy.getURLFactory());
+        assertNotSame(original.getURLFactory(), copy.getURLFactory());
     }
 }

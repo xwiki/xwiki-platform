@@ -47,10 +47,10 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 @Component
 @Singleton
-public class XWikiContextCloner implements Cloner<XWikiContext>
+public class XWikiContextCopier implements Copier<XWikiContext>
 {
     @Override
-    public XWikiContext clone(XWikiContext originalXWikiContext)
+    public XWikiContext copy(XWikiContext originalXWikiContext)
     {
         // This is still a shallow clone, but at least for stuff like wikiID and userReference it gets the job done.
         XWikiContext clonedXWikiContext = originalXWikiContext.clone();

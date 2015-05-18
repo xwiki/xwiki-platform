@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Additionally to {@link ExecutionContextManager#clone(ExecutionContext)}, this method also clones the
- * {@link XWikiContext} by using {@link XWikiContextCloner} and thus the resulting {@link ExecutionContext} should be
+ * {@link XWikiContext} by using {@link XWikiContextCopier} and thus the resulting {@link ExecutionContext} should be
  * usable in a new thread.
  *
  * @version $Id$
@@ -44,7 +44,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class ExecutionContexCloner implements Cloner<ExecutionContext>
+public class ExecutionContextCopier implements Copier<ExecutionContext>
 {
     @Inject
     private ExecutionContextManager executionContextManager;
@@ -59,10 +59,10 @@ public class ExecutionContexCloner implements Cloner<ExecutionContext>
     private Execution execution;
 
     @Inject
-    private Cloner<XWikiContext> xwikiContextCloner;
+    private Copier<XWikiContext> xwikiContextCloner;
 
     @Override
-    public ExecutionContext clone(ExecutionContext originalExecutionContext) throws CloneFailedException
+    public ExecutionContext copy(ExecutionContext originalExecutionContext) throws CloneFailedException
     {
         try {
             ExecutionContext clonedExecutionContext = this.executionContextManager.clone(originalExecutionContext);
@@ -71,7 +71,7 @@ public class ExecutionContexCloner implements Cloner<ExecutionContext>
             // The above clone just creates and initializes an empty XWiki Context, so it needs special handling.
             XWikiContext xwikiContext =
                 (XWikiContext) originalExecutionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-            XWikiContext clonedXWikiContext = xwikiContextCloner.clone(xwikiContext);
+            XWikiContext clonedXWikiContext = xwikiContextCloner.copy(xwikiContext);
             clonedExecutionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, clonedXWikiContext);
 
             // We have just set the clonedXWikiContext. We can now use our clonedExecutionContext as base for the

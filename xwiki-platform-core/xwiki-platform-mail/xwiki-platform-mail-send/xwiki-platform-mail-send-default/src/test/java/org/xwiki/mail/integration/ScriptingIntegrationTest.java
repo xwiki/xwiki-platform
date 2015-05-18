@@ -56,7 +56,7 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
-import org.xwiki.mail.internal.thread.context.Cloner;
+import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.mail.script.ScriptMimeMessage;
@@ -133,7 +133,7 @@ public class ScriptingIntegrationTest
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
-        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Cloner.class,
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
             ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
@@ -156,10 +156,10 @@ public class ScriptingIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         execution.setContext(executionContext);
 
-        Cloner<ExecutionContext> executionContextCloner =
-            this.componentManager.getInstance(new DefaultParameterizedType(null, Cloner.class, ExecutionContext.class));
+        Copier<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
-        when(executionContextCloner.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
     }
 
     @After

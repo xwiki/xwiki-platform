@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.script;
+package com.xpn.xwiki.internal.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.XWikiAction;
 
 /**
  * Various internal debug tools.
- *
+ * 
  * @version $Id$
  * @since 7.1M2
  */
@@ -45,9 +45,6 @@ public class DebugScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    /**
-     * @return true if detailed progress is available for the current action, false otherwise
-     */
     public boolean isEnabled()
     {
         return getActionProgress() != null;

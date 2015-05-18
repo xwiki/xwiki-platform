@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
-      <version>7.1.1.Final</version>
+      <version>7.2.1.Final</version>
       <exclusions>
         <!-- Use javax.transaction:jta instead to not have duplicate JARs in generated WARs -->
         <exclusion>

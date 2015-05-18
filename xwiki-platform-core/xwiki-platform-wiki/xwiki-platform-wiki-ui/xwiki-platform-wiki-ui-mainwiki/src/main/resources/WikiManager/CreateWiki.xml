@@ -977,13 +977,14 @@ require(['jquery'], function($) {
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
+
 ## If all dependencies are OK, we call the controller
 #if ($services.wiki &amp;&amp; $services.wiki.creationjob)
   #controller()
 #else
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
-
 #end
+
 ##################################
 ##         CONTROLLER
 ##################################
@@ -1102,7 +1103,6 @@ require(['jquery'], function($) {
 ##################################
 #macro(stepType)
   #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.nameAndType'), 1)
@@ -1228,7 +1228,6 @@ require(['jquery'], function($) {
       #wizardFooter('', 'members', '')
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##          STEP MEMBERS
@@ -1236,8 +1235,7 @@ require(['jquery'], function($) {
 ## The members step is the lasy
 ##################################
 #macro(stepMembers)
-#set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
@@ -1365,7 +1363,6 @@ require(['jquery'], function($) {
       #wizardFooter('type', '', 'create')
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##       GET REQUEST LIST
@@ -1398,7 +1395,6 @@ require(['jquery'], function($) {
   #end
   ## CSRF checkFailed to execute the [velocity] macro. Click on this m
   #if (!$services.csrf.isTokenValid($request.form_token))
-
     {{warning}}
       {{translation key="platform.wiki.csrf.error" /}}
     {{/warning}}
@@ -1434,7 +1430,7 @@ require(['jquery'], function($) {
   #if("$!ownerId" == '')
     ## If the ownerId is null, then set the current user
     #set($ownerId = $services.model.serialize($xcontext.userReference, 'default'))
-  #else 
+  #else
     #set($ownerId = $services.model.serialize($services.model.resolveDocument($ownerId), 'default'))
   #end
   #set($discard = $wikiCreationRequest.setOwnerId($ownerId))
@@ -1451,7 +1447,7 @@ require(['jquery'], function($) {
     #set($flavorExtension = $request.flavor.split(':::'))
     #set($discard = $wikiCreationRequest.setExtensionId($flavorExtension[0], $flavorExtension[1]))
   #elseif("$!services.flavor" == '')
-    ## Default action when the flavor API is not installed
+    ## Default action when the flavor API is not installed
     #set($discard = $wikiCreationRequest.setWikiSource('extension'))
     #set($discard = $wikiCreationRequest.setExtensionId($services.wiki.creationjob.defaultWikiExtensionId))
   #end
@@ -1474,9 +1470,7 @@ require(['jquery'], function($) {
   ## Start the creation job
   #set($job = $services.wiki.creationjob.createWiki($wikiCreationRequest))
   #if (!$job)
-
     {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.creationjob.lastError]){{/error}}
-    
   #else
     #creation()
   #end
@@ -1508,7 +1502,6 @@ require(['jquery'], function($) {
   #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
   #set ($errors = $status.log.getLogs('ERROR'))
   #set ($hasError = ($errors.size() &gt; 0))
-  
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
@@ -1557,7 +1550,6 @@ require(['jquery'], function($) {
     #wizardFooter('', '', '', 'finalize', $finalizeHidden, 'cleanUp', $cleanUpHidden)
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##           FINALIZE
@@ -1599,7 +1591,6 @@ require(['jquery'], function($) {
     #end
   #else
     #set($wikiId = $request.wikiId)
-
     {{html}}
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
       &lt;div class="wizard-body"&gt;
@@ -1615,7 +1606,6 @@ require(['jquery'], function($) {
       &lt;/div&gt;
       &lt;/form&gt;
     {{/html}}
-
   #end
 #end
 #macro (getExtensionURL $extensionId $extensionVersion $extraParams)
@@ -1657,6 +1647,5 @@ require(['jquery'], function($) {
 #end
 $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section=XWiki.AddExtensions&amp;${queryString.substring(1)}")##
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

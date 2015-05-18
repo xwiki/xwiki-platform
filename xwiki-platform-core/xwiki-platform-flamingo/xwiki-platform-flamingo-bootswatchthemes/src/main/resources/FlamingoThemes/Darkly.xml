@@ -20,78 +20,40 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>Darkly</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414591072000</creationDate>
-  <date>1418726862000</date>
-  <contentUpdateDate>1418668181000</contentUpdateDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1431947745000</date>
+  <contentUpdateDate>1431940822000</contentUpdateDate>
   <version>1.1</version>
   <title>Darkly</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <attachment>
     <filename>logo.png</filename>
-    <filesize>2228</filesize>
     <author>xwiki:XWiki.Admin</author>
     <date>1414594421000</date>
     <version>1.1</version>
     <comment/>
-    <content>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
-RK5CYII=
-</content>
+    <content>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</content>
+    <filesize>2228</filesize>
   </attachment>
   <object>
+    <name>FlamingoThemes.Darkly</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>8e0ce202-38f5-4242-9273-0e800ae70117</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -549,6 +511,15 @@ RK5CYII=
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </font-size-base>
+      <headings-color>
+        <disabled>0</disabled>
+        <name>headings-color</name>
+        <number>59</number>
+        <prettyName>headings-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </headings-color>
       <input-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -825,10 +796,6 @@ RK5CYII=
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </xwiki-page-content-bg>
     </class>
-    <name>FlamingoThemes.Darkly</name>
-    <number>0</number>
-    <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>8e0ce202-38f5-4242-9273-0e800ae70117</guid>
     <property>
       <body-bg>#222222</body-bg>
     </property>
@@ -938,6 +905,9 @@ RK5CYII=
       <font-size-base/>
     </property>
     <property>
+      <headings-color/>
+    </property>
+    <property>
       <input-bg/>
     </property>
     <property>
@@ -959,7 +929,7 @@ RK5CYII=
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Darkly 3.3.1
+      <lessCode>// Darkly 3.3.4
 // Variables
 // --------------------------------------------------
 
@@ -1062,7 +1032,7 @@ RK5CYII=
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
 
-@line-height-large:         1.33;
+@line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
 @line-height-small:         1.5;
 
 @border-radius-base:        4px;
@@ -1072,7 +1042,7 @@ RK5CYII=
 //** Global color for active items (e.g., navs or dropdowns).
 @component-active-color:    #fff;
 //** Global background color for active items (e.g., navs or dropdowns).
-@component-active-bg:       @brand-success;
+@component-active-bg:       @brand-primary;
 
 //** Width of the `border` for generating carets that indicator dropdowns.
 @caret-width-base:          4px;
@@ -1150,6 +1120,7 @@ RK5CYII=
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
+// This has no effect on `&lt;select&gt;`s in some browsers, due to the limited stylability of `&lt;select&gt;`s in CSS.
 @input-border-radius:            @border-radius-base;
 //** Large `.form-control` border radius
 @input-border-radius-large:      @border-radius-large;
@@ -1163,11 +1134,14 @@ RK5CYII=
 @input-color-placeholder:        @gray-light;
 
 //** Default `.form-control` height
-@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 2);
+@input-height-base:              (@line-height-computed + (@padding-base-vertical * 2) + 4);
 //** Large `.form-control` height
-@input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);
+@input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 4);
 //** Small `.form-control` height
-@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);
+@input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 4);
+
+//** `.form-group` margin
+@form-group-margin-bottom:       15px;
 
 @legend-color:                   @text-color;
 @legend-border-color:            transparent;
@@ -1186,16 +1160,16 @@ RK5CYII=
 //## Dropdown menu container and contents.
 
 //** Background for the dropdown menu.
-@dropdown-bg:                    #fff;
+@dropdown-bg:                    @gray-dark;
 //** Dropdown menu `border-color`.
 @dropdown-border:                rgba(0,0,0,.15);
 //** Dropdown menu `border-color` **for IE8**.
 @dropdown-fallback-border:       #ccc;
 //** Divider color for between dropdown items.
-@dropdown-divider-bg:            #e5e5e5;
+@dropdown-divider-bg:            @gray;
 
 //** Dropdown link text color.
-@dropdown-link-color:            @brand-primary;
+@dropdown-link-color:            @gray-lighter;
 //** Hover color for dropdown links.
 @dropdown-link-hover-color:      #fff;
 //** Hover background for dropdown links.
@@ -1228,7 +1202,8 @@ RK5CYII=
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal:             1040;
+@zindex-modal-background:  1040;
+@zindex-modal:             1050;
 
 
 //== Media queries breakpoints
@@ -1474,7 +1449,7 @@ RK5CYII=
 //** Tooltip text color
 @tooltip-color:               #fff;
 //** Tooltip background color
-@tooltip-bg:                  rgba(0,0,0,.9);
+@tooltip-bg:                  #000;
 @tooltip-opacity:             .9;
 
 //** Tooltip arrow width
@@ -1819,11 +1794,11 @@ RK5CYII=
 @hr-border:                   @gray;
 
 
-// Darkly 3.3.1
+// Darkly 3.3.4
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("//fonts.googleapis.com/css?family=Lato:400,700,400italic");
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700,400italic");
 
 // Navbar =====================================================================
 
@@ -1847,7 +1822,7 @@ RK5CYII=
   }
 
   &amp;-brand {
-    padding: 18.5px 15px 20.5px;
+    line-height: 1;
   }
 
   &amp;-form {
@@ -1862,6 +1837,10 @@ RK5CYII=
 }
 
 // Buttons ====================================================================
+
+.btn {
+  border-width: 2px;
+}
 
 .btn:active {
   .box-shadow(none);
@@ -1917,7 +1896,9 @@ table,
   .info {
     color: #fff;
 
-    a {
+    &gt; th &gt; a,
+    &gt; td &gt; a,
+    &gt; a {
       color: #fff;
     }
   }
@@ -1951,7 +1932,7 @@ textarea {
 .form-control,
 input,
 textarea {
-  border: none;
+  border: 2px hidden transparent;
   .box-shadow(none);
 
   &amp;:focus {
@@ -2198,5 +2179,4 @@ a.list-group-item {
       <xwiki-page-content-bg>#222222</xwiki-page-content-bg>
     </property>
   </object>
-  <content/>
 </xwikidoc>

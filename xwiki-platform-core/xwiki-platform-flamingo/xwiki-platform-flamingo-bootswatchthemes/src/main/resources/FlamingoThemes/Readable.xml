@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>Readable</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414592810000</creationDate>
-  <date>1418729493000</date>
-  <contentUpdateDate>1418727729000</contentUpdateDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1431948719000</date>
+  <contentUpdateDate>1431940818000</contentUpdateDate>
   <version>1.1</version>
   <title>Readable</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>FlamingoThemes.Readable</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>defd7d62-96f0-4a89-8469-33d11c721e4c</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -500,6 +502,15 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </font-size-base>
+      <headings-color>
+        <disabled>0</disabled>
+        <name>headings-color</name>
+        <number>59</number>
+        <prettyName>headings-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </headings-color>
       <input-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -776,10 +787,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </xwiki-page-content-bg>
     </class>
-    <name>FlamingoThemes.Readable</name>
-    <number>0</number>
-    <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>defd7d62-96f0-4a89-8469-33d11c721e4c</guid>
     <property>
       <body-bg/>
     </property>
@@ -889,6 +896,9 @@
       <font-size-base/>
     </property>
     <property>
+      <headings-color/>
+    </property>
+    <property>
       <input-bg/>
     </property>
     <property>
@@ -910,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Readable 3.3.1
+      <lessCode>// Readable 3.3.4
 // Variables
 // --------------------------------------------------
 
@@ -1011,7 +1021,7 @@
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
 
-@line-height-large:         1.33;
+@line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
 @line-height-small:         1.5;
 
 @border-radius-base:        4px;
@@ -1099,6 +1109,7 @@
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
+// This has no effect on `&lt;select&gt;`s in some browsers, due to the limited stylability of `&lt;select&gt;`s in CSS.
 @input-border-radius:            @border-radius-base;
 //** Large `.form-control` border radius
 @input-border-radius-large:      @border-radius-large;
@@ -1117,6 +1128,9 @@
 @input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);
 //** Small `.form-control` height
 @input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);
+
+//** `.form-group` margin
+@form-group-margin-bottom:       15px;
 
 @legend-color:                   @text-color;
 @legend-border-color:            #e5e5e5;
@@ -1177,7 +1191,8 @@
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal:             1040;
+@zindex-modal-background:  1040;
+@zindex-modal:             1050;
 
 
 //== Media queries breakpoints
@@ -1423,7 +1438,7 @@
 //** Tooltip text color
 @tooltip-color:               #fff;
 //** Tooltip background color
-@tooltip-bg:                  rgba(0,0,0,.9);
+@tooltip-bg:                  #000;
 @tooltip-opacity:             .9;
 
 //** Tooltip arrow width
@@ -1618,23 +1633,23 @@
 @panel-default-heading-bg:    #f5f5f5;
 
 @panel-primary-text:          #fff;
-@panel-primary-border:        transparent;
+@panel-primary-border:        @brand-primary;
 @panel-primary-heading-bg:    @brand-primary;
 
-@panel-success-text:          @state-success-text;
-@panel-success-border:        transparent;
+@panel-success-text:          #fff;
+@panel-success-border:        @state-success-border;
 @panel-success-heading-bg:    @state-success-border;
 
-@panel-info-text:             @state-info-text;
-@panel-info-border:           transparent;
+@panel-info-text:             #fff;
+@panel-info-border:           @state-info-border;
 @panel-info-heading-bg:       @state-info-border;
 
-@panel-warning-text:          @state-warning-text;
-@panel-warning-border:        transparent;
+@panel-warning-text:          #fff;
+@panel-warning-border:        @state-warning-border;
 @panel-warning-heading-bg:    @state-warning-border;
 
-@panel-danger-text:           @state-danger-text;
-@panel-danger-border:         transparent;
+@panel-danger-text:           #fff;
+@panel-danger-border:         @state-danger-border;
 @panel-danger-heading-bg:     @state-danger-border;
 
 
@@ -1767,11 +1782,11 @@
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Readable 3.3.1
+// Readable 3.3.4
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("//fonts.googleapis.com/css?family=Raleway:400,700");
+@import url("https://fonts.googleapis.com/css?family=Raleway:400,700");
 
 // Navbar =====================================================================
 
@@ -1785,8 +1800,9 @@
   }
 
   &amp;-nav &gt; li &gt; a {
+    @margin-vertical: ((@navbar-height - 2*@padding-base-vertical - @line-height-computed - 2px) / 2);
+    margin: @margin-vertical 6px;
     padding: @padding-base-vertical @padding-base-horizontal;
-    margin: 12px 6px;
     border: 1px solid transparent;
     border-radius: @border-radius-base;
 
@@ -1809,11 +1825,21 @@
   }
 
   &amp;-brand {
-    padding-top: 20px;
+    padding-top: ((@navbar-height - 2*@font-size-large) / 2);
+    padding-bottom: ((@navbar-height - 2*@font-size-large) / 2);
+    line-height: 1.9;
   }
 }
 
-@media (max-width: @grid-float-breakpoint) {
+@media (min-width: @grid-float-breakpoint) {
+  .navbar {
+    .navbar-nav &gt; li &gt; a {
+      padding: @padding-base-vertical @padding-base-horizontal;
+    }
+  }
+}
+
+@media (max-width: @grid-float-breakpoint - 1) {
   .navbar {
     .navbar-nav &gt; li &gt; a {
       margin: 0;
@@ -1931,22 +1957,6 @@ legend {
       color: @text-color;
     }
   }
-
-  &amp;-primary,
-  &amp;-success,
-  &amp;-warning,
-  &amp;-danger,
-  &amp;-info {
-    .panel-heading {
-      color: #fff;
-    }
-
-    .panel-body {
-      border: 1px solid #ddd;
-      border-top-width: 0;
-      border-radius: 0 0 @border-radius-base @border-radius-base;
-    }
-  }
 }
 
 .modal {
@@ -2012,5 +2022,4 @@ legend {
       <xwiki-page-content-bg/>
     </property>
   </object>
-  <content/>
 </xwikidoc>

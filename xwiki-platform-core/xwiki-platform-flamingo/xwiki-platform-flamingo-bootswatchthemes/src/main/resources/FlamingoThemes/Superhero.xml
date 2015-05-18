@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>Superhero</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414593764000</creationDate>
-  <date>1418728934000</date>
-  <contentUpdateDate>1418668179000</contentUpdateDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1431949198000</date>
+  <contentUpdateDate>1431940817000</contentUpdateDate>
   <version>1.1</version>
   <title>Superhero</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>FlamingoThemes.Superhero</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>200038f6-676e-4d02-9213-5b2b5e9a969f</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -500,6 +502,15 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </font-size-base>
+      <headings-color>
+        <disabled>0</disabled>
+        <name>headings-color</name>
+        <number>59</number>
+        <prettyName>headings-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </headings-color>
       <input-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -776,10 +787,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </xwiki-page-content-bg>
     </class>
-    <name>FlamingoThemes.Superhero</name>
-    <number>0</number>
-    <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>200038f6-676e-4d02-9213-5b2b5e9a969f</guid>
     <property>
       <body-bg>#2b3e50</body-bg>
     </property>
@@ -889,6 +896,9 @@
       <font-size-base/>
     </property>
     <property>
+      <headings-color/>
+    </property>
+    <property>
       <input-bg/>
     </property>
     <property>
@@ -910,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Superhero 3.3.1
+      <lessCode>// Superhero 3.3.4
 // Variables
 // --------------------------------------------------
 
@@ -1013,7 +1023,7 @@
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
 
-@line-height-large:         1.33;
+@line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
 @line-height-small:         1.5;
 
 @border-radius-base:        0;
@@ -1101,6 +1111,7 @@
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
+// This has no effect on `&lt;select&gt;`s in some browsers, due to the limited stylability of `&lt;select&gt;`s in CSS.
 @input-border-radius:            @border-radius-base;
 //** Large `.form-control` border radius
 @input-border-radius-large:      @border-radius-large;
@@ -1119,6 +1130,9 @@
 @input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);
 //** Small `.form-control` height
 @input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);
+
+//** `.form-group` margin
+@form-group-margin-bottom:       15px;
 
 @legend-color:                   @text-color;
 @legend-border-color:            @gray-light;
@@ -1179,7 +1193,8 @@
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal:             1040;
+@zindex-modal-background:  1040;
+@zindex-modal:             1050;
 
 
 //== Media queries breakpoints
@@ -1767,13 +1782,13 @@
 //** Width of horizontal description list titles
 @dl-horizontal-offset:        @component-offset-horizontal;
 //** Horizontal line color.
-@hr-border:                   @gray-light;
+@hr-border:                   lighten(@gray-light, 5%);
 
-// Superhero 3.3.1
+// Superhero 3.3.4
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("//fonts.googleapis.com/css?family=Lato:300,400,700");
+@import url("https://fonts.googleapis.com/css?family=Lato:300,400,700");
 
 // Navbar =====================================================================
 
@@ -2155,5 +2170,4 @@ div.main {
       <xwiki-page-content-bg>#2b3e50</xwiki-page-content-bg>
     </property>
   </object>
-  <content/>
 </xwikidoc>

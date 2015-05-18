@@ -231,14 +231,11 @@ public class MailTest extends AbstractTest
         getUtil().createUser("user2", "password2", getUtil().getURLToNonExistentPage(), "email", "user2@doe.com");
 
         // Create another page with the Velocity script to send the template email
-        // Note: when sending asynchronously the request and response are faked, hence
-        // "$request.getRequestURL().toString()" would return "".
-        // That's why we explicitely pass 'request' as a velocity binding.
-        // OTOH the $xcontext binding is present and has the content of the context at the moment the call to send the
-        // mail asynchronously was done.
+        // Note: the $xcontext and $request bindings are present and have their values at the moment the call to send
+        // the mail asynchronously was done.
         String velocity = "{{velocity}}\n"
             + "#set ($templateParameters = "
-            + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc, 'request' : $request }, "
+            + "  {'velocityVariables' : { 'name' : 'John', 'doc' : $doc }, "
             + "  'language' : 'en', 'from' : 'localhost@xwiki.org'})\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"

@@ -45,6 +45,9 @@ public class DebugScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    /**
+     * @return is debug enabled in the current execution context
+     */
     public boolean isEnabled()
     {
         return getActionProgress() != null;

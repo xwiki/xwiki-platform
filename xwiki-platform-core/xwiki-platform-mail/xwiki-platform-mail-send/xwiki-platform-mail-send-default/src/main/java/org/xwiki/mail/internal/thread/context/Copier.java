@@ -23,20 +23,23 @@ import org.apache.commons.lang3.exception.CloneFailedException;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Generic component in charge of cloning a given object of a given type. The main purpose of this is to add
+ * Generic component in charge of copying a given object of a given type. The main purpose of this is to add
  * {@link java.lang.Cloneable}-like behavior on objects that don't implement it.
+ * <p/>
+ * Depending on the implementation, this can be different from {@link Object#clone()} as the result might need to be
+ * modified to make sense on its own (e.g.: cloning a {@link javax.servlet.http.HttpServletRequest HttpServletRequest}).
  *
- * @param <T> the type of object to clone
+ * @param <T> the type of object to copy
  * @version $Id$
  * @since 7.1M2
  */
 @Role
-public interface Cloner<T>
+public interface Copier<T>
 {
     /**
-     * @param original the original object to clone
-     * @return a clone of the original object
+     * @param original the original object to copy
+     * @return a copy of the original object
      * @throws CloneFailedException if problems occur
      */
-    T clone(T original) throws CloneFailedException;
+    T copy(T original) throws CloneFailedException;
 }

@@ -61,7 +61,7 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
-import org.xwiki.mail.internal.thread.context.Cloner;
+import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -128,7 +128,7 @@ public class JavaIntegrationTest
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);
 
-        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Cloner.class,
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
             ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
@@ -153,10 +153,10 @@ public class JavaIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         when(execution.getContext()).thenReturn(executionContext);
 
-        Cloner<ExecutionContext> executionContextCloner =
-            this.componentManager.getInstance(new DefaultParameterizedType(null, Cloner.class, ExecutionContext.class));
+        Copier<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
-        when(executionContextCloner.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
     }
 
     @After

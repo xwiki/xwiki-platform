@@ -1363,9 +1363,7 @@ ${Msz}Mb##
     <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
       <div>
         <div class="xwiki-livetable-tagcloud-container">
-          <h2>$services.localization.render('platform.livetable.tagsHelp')
-            <span>$services.localization.render('platform.livetable.tagsHelpCancel')</span>
-          </h2>
+          <h2>$services.localization.render('platform.livetable.tagsHelp') $services.localization.render('platform.livetable.tagsHelpCancel')</h2>
           <div class="xwiki-livetable-tagcloud"></div>
         </div>
         <div class="tippointer">

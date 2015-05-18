@@ -40,7 +40,7 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <!-- The bootstrap version is used is several places -->
-    <bootstrap.version>3.3.2</bootstrap.version>
+    <bootstrap.version>3.3.4</bootstrap.version>
   </properties>
   <dependencies>
     <!-- Adds an Annotation Processor to automatically verify Component declarations.

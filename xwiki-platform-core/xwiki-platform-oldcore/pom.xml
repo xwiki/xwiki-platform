@@ -713,6 +713,7 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
+              **/internal/script/DebugScriptService.java,
               **/internal/skin/*.java,
               **/internal/template/InternalTemplateManager.java,
               **/internal/template/TemplateEnvironmentResource.java,

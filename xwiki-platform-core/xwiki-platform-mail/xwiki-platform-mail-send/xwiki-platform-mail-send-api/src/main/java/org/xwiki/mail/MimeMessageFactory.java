@@ -43,7 +43,7 @@ import org.xwiki.stability.Unstable;
 public interface MimeMessageFactory<T>
 {
     /**
-     * Create a {@link javax.mail.internet.MimeMessage}.
+     * Create one or several {@link javax.mail.internet.MimeMessage}.
      *
      * @param source the source from which to prefill the Mime Message(s) (depends on the implementation)
      * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation

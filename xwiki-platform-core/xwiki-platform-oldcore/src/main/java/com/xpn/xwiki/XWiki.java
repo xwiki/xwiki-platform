@@ -415,6 +415,8 @@ public class XWiki implements EventListener
 
     private ParseGroovyFromString parseGroovyFromString;
 
+    private JobProgressManager progress;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -524,13 +526,22 @@ public class XWiki implements EventListener
         return this.oldRenderingProvider.get();
     }
 
-    public ParseGroovyFromString getParseGroovyFromString()
+    private ParseGroovyFromString getParseGroovyFromString()
     {
         if (this.parseGroovyFromString == null) {
             this.parseGroovyFromString = Utils.getComponent(ParseGroovyFromString.class);
         }
 
         return this.parseGroovyFromString;
+    }
+
+    private JobProgressManager getProgress()
+    {
+        if (this.progress == null) {
+            this.progress = Utils.getComponent(JobProgressManager.class);
+        }
+
+        return this.progress;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -835,12 +846,10 @@ public class XWiki implements EventListener
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
-        JobProgressManager progress = Utils.getComponent(JobProgressManager.class);
-
-        progress.pushLevelProgress(4, this);
+        getProgress().pushLevelProgress(4, this);
 
         try {
-            progress.startStep(this);
+            getProgress().startStep(this);
 
             setDatabase(context.getMainXWiki());
 
@@ -900,7 +909,7 @@ public class XWiki implements EventListener
             // potential document changes can use it
             Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
 
-            progress.startStep(this);
+            getProgress().startStep(this);
 
             // Make sure these classes exists
             if (noupdate) {
@@ -908,12 +917,12 @@ public class XWiki implements EventListener
                 getStatsService(context);
             }
 
-            progress.startStep(this);
+            getProgress().startStep(this);
 
             // Prepare the Plugin Engine
             preparePlugins(context);
 
-            progress.startStep(this);
+            getProgress().startStep(this);
 
             String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
@@ -924,7 +933,7 @@ public class XWiki implements EventListener
 
             getObservationManager().addListener(this);
         } finally {
-            progress.popLevelProgress(this);
+            getProgress().popLevelProgress(this);
         }
     }
 

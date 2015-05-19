@@ -84,6 +84,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
@@ -544,6 +545,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private Provider<OldRendering> oldRenderingProvider;
 
+    private JobProgressManager progress;
+
     /**
      * @see #getSyntaxFactory()
      */
@@ -744,6 +747,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return this.oldRenderingProvider.get();
+    }
+
+    private JobProgressManager getProgress()
+    {
+        if (this.progress == null) {
+            this.progress = Utils.getComponent(JobProgressManager.class);
+        }
+
+        return this.progress;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -1122,29 +1134,47 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getRenderedContent(Syntax targetSyntax, boolean isolateVelocityMacros, XWikiContext context)
         throws XWikiException
-    {   
+    {
         // Note: We are currently duplicating code from the other getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        XWikiDocument tdoc = getTranslatedDocument(context);
-        String translatedContent = tdoc.getContent();
+        getProgress().startStep(getDocumentReference(), "document.progress.render", "Render document [{}] in syntax [{}]",
+            getDocumentReference(), targetSyntax);
 
-        String renderedContent = getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, context);
+        try {
+            getProgress().pushLevelProgress(3, getDocumentReference());
 
-        if (renderedContent == null) {
-            DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
-            parameters.setTransformationContextIsolated(isolateVelocityMacros);
-            // Render the translated content (matching the current language) using this document's syntax.
-            parameters.setContentTranslated(tdoc != this);
-            parameters.setTargetSyntax(targetSyntax);
-            XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
-            renderedContent = renderXDOM(contentXDOM, targetSyntax);
-            getRenderingCache().setRenderedContent(getDocumentReference(), translatedContent, renderedContent, context);
+            getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent", "Get translated content");
+
+            XWikiDocument tdoc = getTranslatedDocument(context);
+            String translatedContent = tdoc.getContent();
+
+            getProgress().startStep(getDocumentReference(), "document.progress.render.cache", "Try to get content from the cache");
+
+            String renderedContent =
+                getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, context);
+
+            if (renderedContent == null) {
+                getProgress().startStep(getDocumentReference(), "document.progress.render.execute", "Execute content");
+
+                DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
+                parameters.setTransformationContextIsolated(isolateVelocityMacros);
+                // Render the translated content (matching the current language) using this document's syntax.
+                parameters.setContentTranslated(tdoc != this);
+                parameters.setTargetSyntax(targetSyntax);
+                XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
+                renderedContent = renderXDOM(contentXDOM, targetSyntax);
+                getRenderingCache().setRenderedContent(getDocumentReference(), translatedContent, renderedContent,
+                    context);
+            }
+
+            return renderedContent;
+        } finally {
+            getProgress().popLevelProgress(getDocumentReference());
+            getProgress().endStep(getDocumentReference());
         }
-
-        return renderedContent;
     }
 
     public String getRenderedContent(XWikiContext context) throws XWikiException

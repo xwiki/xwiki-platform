@@ -109,7 +109,6 @@ import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailStatusResultSerializer;

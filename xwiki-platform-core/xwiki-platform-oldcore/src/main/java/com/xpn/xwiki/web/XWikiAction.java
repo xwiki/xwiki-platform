@@ -71,6 +71,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
@@ -188,6 +189,7 @@ public abstract class XWikiAction extends Action
 
     public ActionForward execute(XWikiContext context) throws Exception
     {
+        MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
         DefaultJobProgress actionProgress = null;
         ObservationManager om = Utils.getComponent(ObservationManager.class);
@@ -309,6 +311,10 @@ public abstract class XWikiAction extends Action
 
             // Any error before this will be treated using a redirection to an error page
 
+            if (monitor != null) {
+                monitor.startTimer("request");
+            }
+
             getProgress().startStep(this, "Execute request");
 
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
@@ -325,10 +331,24 @@ public abstract class XWikiAction extends Action
                     return null;
                 }
 
+                // Start monitoring timer
+                monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+                if (monitor != null) {
+                    monitor.startRequest("", context.getAction(), context.getURL());
+                    monitor.startTimer("multipart");
+                }
+
                 getProgress().startStep(this, "Parses multipart");
 
                 // Parses multipart so that params in multipart are available for all actions
                 fileupload = Utils.handleMultipart(context.getRequest().getHttpServletRequest(), context);
+                if (monitor != null) {
+                    monitor.endTimer("multipart");
+                }
+
+                if (monitor != null) {
+                    monitor.setWikiPage(context.getDoc().getFullName());
+                }
 
                 getProgress().startStep(this, "Send [" + context.getAction() + "] action start event");
 
@@ -347,6 +367,10 @@ public abstract class XWikiAction extends Action
                 } catch (Throwable ex) {
                     LOGGER.error("Cannot send action notifications for document [" + context.getDoc()
                         + " using action [" + context.getAction() + "]", ex);
+                }
+
+                if (monitor != null) {
+                    monitor.endTimer("prenotify");
                 }
 
                 // Call the Actions
@@ -474,6 +498,11 @@ public abstract class XWikiAction extends Action
                     // If we can't flush, then there's nothing more we can send to the client.
                 }
 
+                if (monitor != null) {
+                    monitor.endTimer("request");
+                    monitor.startTimer("notify");
+                }
+
                 if (eventSent) {
                     // For the moment we're sending the XWiki context as the data, but this will be
                     // changed in the future, when the whole platform will be written using components
@@ -486,6 +515,10 @@ public abstract class XWikiAction extends Action
                     }
                 }
 
+                if (monitor != null) {
+                    monitor.endTimer("notify");
+                }
+
                 getProgress().startStep(this, "Cleanup database connections");
 
                 // Make sure we cleanup database connections
@@ -495,6 +528,11 @@ public abstract class XWikiAction extends Action
                 getProgress().popLevelProgress(this);
             }
         } finally {
+            // End request
+            if (monitor != null) {
+                monitor.endRequest();
+            }
+
             // Stop progress
             if (actionProgress != null) {
                 getProgress().popLevelProgress(this);

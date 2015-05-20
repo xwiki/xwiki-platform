@@ -160,7 +160,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(2).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));
@@ -256,7 +256,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(2).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));
@@ -315,7 +315,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(2).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));

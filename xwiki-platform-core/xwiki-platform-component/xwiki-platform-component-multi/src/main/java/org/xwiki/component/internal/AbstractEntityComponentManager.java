@@ -22,7 +22,10 @@ package org.xwiki.component.internal;
 import javax.inject.Inject;
 
 import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -36,10 +39,51 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  */
 public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable
 {
+    private static class EntityComponentManagerInstance
+    {
+        protected final EntityReference entityReference;
+
+        protected final ComponentManager componentManager;
+
+        public EntityComponentManagerInstance(EntityReference entityReference, ComponentManager componentManager)
+        {
+            this.entityReference = entityReference;
+            this.componentManager = componentManager;
+        }
+    }
+
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    private Execution execution;
+
     protected abstract EntityReference getCurrentReference();
+
+    @Override
+    protected ComponentManager getComponentManagerInternal()
+    {
+        // Get current user reference
+        EntityReference entityReference = getCurrentReference();
+        if (entityReference == null) {
+            return null;
+        }
+
+        // Try to find the user component manager in the context
+        ExecutionContext econtext = this.execution.getContext();
+        String contextKey = getClass().getName();
+        EntityComponentManagerInstance contextComponentManager =
+            (EntityComponentManagerInstance) econtext.getProperty(contextKey);
+        if (contextComponentManager != null && contextComponentManager.entityReference.equals(entityReference)) {
+            return contextComponentManager.componentManager;
+        }
+
+        // Fallback on regular user component manager search
+        ComponentManager componentManager = super.getComponentManagerInternal();
+        econtext.setProperty(contextKey, new EntityComponentManagerInstance(entityReference, componentManager));
+
+        return componentManager;
+    }
 
     @Override
     protected String getKey()

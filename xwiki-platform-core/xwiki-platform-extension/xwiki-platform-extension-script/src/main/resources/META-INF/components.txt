@@ -1,4 +1,5 @@
 org.xwiki.extension.script.CoreExtensionScriptService
+org.xwiki.extension.script.ExtensionHistoryScriptService
 org.xwiki.extension.script.ExtensionManagerScriptService
 org.xwiki.extension.script.ExtensionRatingScriptService
 org.xwiki.extension.script.InstalledExtensionScriptService

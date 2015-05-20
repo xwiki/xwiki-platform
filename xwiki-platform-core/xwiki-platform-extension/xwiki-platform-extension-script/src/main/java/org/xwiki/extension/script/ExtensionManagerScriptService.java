@@ -26,11 +26,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.DefaultExtensionDependency;
@@ -40,7 +38,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.job.AbstractExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
@@ -60,17 +57,13 @@ import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersionRange;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -107,17 +100,21 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public static final String EXTENSIONPLAN_JOBID_PREFIX = "plan";
 
-    private static final String PROPERTY_USERREFERENCE = "user.reference";
-
-    private static final String PROPERTY_CALLERREFERENCE = "caller.reference";
-
-    private static final String PROPERTY_CHECKRIGHTS = "checkrights";
-
     /**
      * This property is set on requests to create an install or uninstall plan in order to specify which type of job
      * generated the plan.
      */
     private static final String PROPERTY_JOB_TYPE = "job.type";
+
+    /**
+     * Extension request property that specifies from which wiki the job was started.
+     */
+    private static final String PROPERTY_CONTEXT_WIKI = "context.wiki";
+
+    /**
+     * Extension request property that specifies from which document action the job was started.
+     */
+    private static final String PROPERTY_CONTEXT_ACTION = "context.action";
 
     /**
      * The real extension manager bridged by this script service.
@@ -126,37 +123,20 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     private ExtensionManager extensionManager;
 
     /**
-     * Needed for checking programming rights.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
      * Repository manager, needed for cross-repository operations.
      */
     @Inject
     private ExtensionRepositoryManager repositoryManager;
 
     @Inject
-    private JobExecutor jobExecutor;
-
-    @Inject
-    private JobStatusStore jobStore;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
     private ScriptServiceManager scriptServiceManager;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
 
     /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
      * @return the {@link ScriptService} or null of none could be found
      */
+    @SuppressWarnings("unchecked")
     public <S extends ScriptService> S get(String serviceName)
     {
         return (S) this.scriptServiceManager.get(ExtensionManagerScriptService.ROLEHINT + '.' + serviceName);
@@ -307,17 +287,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     // Actions
 
-    private XWikiDocument getCallerDocument()
-    {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
-        if (sdoc == null) {
-            sdoc = xcontext.getDoc();
-        }
-
-        return sdoc;
-    }
-
     private List<String> getJobId(String prefix, String extensionId, String namespace)
     {
         List<String> jobId;
@@ -418,24 +387,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         }
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
 
         setRightsProperties(installRequest);
 
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallPlanJob.JOBTYPE);
 
         return installRequest;
-    }
-
-    private void setRightsProperties(AbstractExtensionRequest extensionRequest)
-    {
-        extensionRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        extensionRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            extensionRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
     }
 
     /**
@@ -540,7 +499,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * Create an {@link UninstallRequest} instance based on passed parameters.
      * 
-     * @param extensionId the identifier of the extension to uninstall
+     * @param id the identifier of the extension to uninstall
      * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
      *            extension will be uninstalled globally
      * @return the {@link UninstallRequest}
@@ -579,8 +538,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         }
 
         // Provide informations on what started the job
-        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
-        uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+        uninstallRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        uninstallRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
 
         setRightsProperties(uninstallRequest);
 
@@ -661,8 +620,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.addNamespace(namespace);
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
 
         return installRequest;
     }
@@ -673,8 +632,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
-        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+        installRequest.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        installRequest.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
 
         return installRequest;
     }
@@ -764,24 +723,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         }
 
         return job;
-    }
-
-    private JobStatus getJobStatus(List<String> jobId)
-    {
-        JobStatus jobStatus;
-
-        Job job = this.jobExecutor.getJob(jobId);
-        if (job == null) {
-            jobStatus = this.jobStore.getJobStatus(jobId);
-        } else {
-            jobStatus = job.getStatus();
-        }
-
-        if (jobStatus != null && !this.authorization.hasAccess(Right.PROGRAM)) {
-            jobStatus = safe(jobStatus);
-        }
-
-        return jobStatus;
     }
 
     /**
@@ -908,7 +849,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<InstalledExtension> getInstalledExtensions()
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions();
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions();
     }
 
     /**
@@ -925,7 +866,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<InstalledExtension> getInstalledExtensions(String namespace)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtensions(
             namespace);
     }
 
@@ -946,7 +887,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public InstalledExtension getInstalledExtension(String feature, String namespace)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtension(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getInstalledExtension(
             feature, namespace);
     }
 
@@ -963,7 +904,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
     {
-        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getBackwardDependencies(
+        return this.<InstalledExtensionScriptService>get(InstalledExtensionScriptService.ID).getBackwardDependencies(
             feature);
     }
 
@@ -976,7 +917,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<CoreExtension> getCoreExtensions()
     {
-        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtensions();
+        return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtensions();
     }
 
     /**
@@ -991,7 +932,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public CoreExtension getCoreExtension(String feature)
     {
-        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtension(feature);
+        return this.<CoreExtensionScriptService>get(CoreExtensionScriptService.ID).getCoreExtension(feature);
     }
 
     /**
@@ -1005,6 +946,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Deprecated
     public Collection<LocalExtension> getLocalExtensions()
     {
-        return this.<LocalExtensionScriptService> get(LocalExtensionScriptService.ID).getLocalExtensions();
+        return this.<LocalExtensionScriptService>get(LocalExtensionScriptService.ID).getLocalExtensions();
     }
 }

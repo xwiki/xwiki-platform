@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>ExtensionHistory</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1431711802000</creationDate>
+  <parent>XWiki.AdminSheet</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1432098651000</date>
+  <contentUpdateDate>1432097736000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('extension.history')</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{template name="extension.vm" output="false"/}}
+
+{{velocity output="false"}}
+#macro (handleExtensionHistoryRequest)
+  #if ($request.action == 'more')
+    #getExtensionHistoryRecords
+    #if ($records &amp;&amp; $records.size() &gt; 0)
+      #displayExtensionHistoryRecords($records)
+    #end
+  #elseif ($request.action == 'export')
+    #exportExtensionHistory
+  #elseif ($request.action == 'replay')
+    #replayExtensionHistory
+  #elseif ($request.data == 'sources')
+    #displayExtensionHistorySourcesList
+  #else
+    #set ($discard = $xwiki.ssx.use('XWiki.ExtensionHistory'))
+    #set ($discard = $xwiki.jsx.use('XWiki.ExtensionHistory'))
+    &lt;div class="extension-history"&gt;
+      #displayExtensionHistorySourcesForm
+      #maybeDisplayExtensionHistoryRecordsForm
+    &lt;/div&gt;
+  #end
+#end
+
+#macro (exportExtensionHistory)
+  #set ($discard = $response.setContentType('application/xml'))
+  #set ($discard = $response.addHeader('Content-disposition', "attachment; filename*=utf-8''extensionHistory.xml"))
+  $stringtool.join($request.getParameterValues('extensionHistoryRecord'))
+#end
+
+#macro (replayExtensionHistory)
+  #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
+  #set ($records = $services.extension.history.deserialize($serializedRecords))
+  #set ($discard = $services.extension.history.replay($records))
+  ## TODO: handle errors
+#end
+
+#macro (displayExtensionHistorySourcesForm)
+  #set ($sourceLabel = $request.source)
+  #if (!$sourceLabel)
+    #set ($sourceLabel = 'local history')
+  #end
+  &lt;div class="extension-history-sources-selector opened"&gt;
+    &lt;div class="extension-history-sources-header"&gt;
+      &lt;span class="icon-closed"&gt;$services.icon.renderHTML('caret-right')&lt;/span&gt;
+      &lt;span class="icon-opened"&gt;$services.icon.renderHTML('caret-down')&lt;/span&gt;
+      Showing records from &lt;em&gt;$escapetool.xml($sourceLabel)&lt;/em&gt;
+    &lt;/div&gt;
+    &lt;div class="extension-history-sources-body"&gt;
+      #displayExtensionHistorySources
+      &lt;div class="extension-history-source"&gt;
+        &lt;div&gt;
+          $services.icon.renderHTML('add')
+          &lt;span class="extension-history-source-name"&gt;Import history file&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"
+            class="extension-history-source-upload"&gt;
+          &lt;div class="hidden"&gt;
+            &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
+            &lt;input type="hidden" name="xredirect" value="$xwiki.relativeRequestURL" /&gt;
+          &lt;/div&gt;
+          &lt;input type="file" name="filepath" /&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (displayExtensionHistorySources)
+  &lt;ul class="extension-history-sources"&gt;
+    #displayExtensionHistorySourcesList
+  &lt;/ul&gt;
+#end
+
+#macro (displayExtensionHistorySourcesList)
+  #set ($params = {})
+  #set ($discard = $params.putAll($request.parameterMap))
+  #set ($discard = $params.remove('source'))
+  &lt;li class="extension-history-source#if (!$request.source) selected#end"&gt;
+    $services.icon.renderHTML('database')
+    #if ($request.source)
+      &lt;a href="$doc.getURL('view', $escapetool.url($params))" class="extension-history-source-name"&gt;
+        Local history
+      &lt;/a&gt;
+    #else
+      &lt;span class="extension-history-source-name"&gt;Local history&lt;/span&gt;
+    #end
+  &lt;/li&gt;
+  #displayExtensionHistoryFileSources
+#end
+
+#macro (displayExtensionHistoryFileSources)
+  #set ($uploadDoc = $xwiki.getDocument('XWiki.ExtensionHistoryUploads'))
+  #foreach ($attachment in $uploadDoc.attachmentList)
+    #if ($attachment.mimeType == 'application/xml')
+      #displayExtensionHistoryFileSource($attachment)
+    #end
+  #end
+#end
+
+#macro (displayExtensionHistoryFileSource $attachment)
+  #set ($params = {})
+  #set ($discard = $params.putAll($request.parameterMap))
+  #set ($params.source = $attachment.filename)
+  &lt;li class="extension-history-source#if ($request.source == $attachment.filename) selected#end"&gt;
+    &lt;div&gt;
+      $services.icon.renderHTML('attach')
+      #if ($request.source != $attachment.filename)
+        &lt;a href="$doc.getURL('view', $escapetool.url($params))" class="extension-history-source-name"&gt;
+          $escapetool.xml($attachment.filename)&lt;/a&gt;
+      #else
+        &lt;span class="extension-history-source-name"&gt;$escapetool.xml($attachment.filename)&lt;/span&gt;
+      #end
+      &lt;span class="extension-history-source-version"&gt;$attachment.version&lt;/span&gt;
+      #if ($services.security.authorization.hasAccess('edit', $uploadDoc.documentReference))
+        #set ($deleteURL = $uploadDoc.getAttachmentURL($attachment.filename, 'delattachment', $escapetool.url({
+          'form_token': $services.csrf.token,
+          'xredirect': $xwiki.relativeRequestURL
+        })))
+        #set ($deleteHint = $services.localization.render('core.viewers.attachments.delete.title'))
+        &lt;a class="deleteLink" href="$deleteURL" title="$escapetool.xml($deleteHint)"&gt;
+          $services.icon.renderHTML('cross')
+        &lt;/a&gt;
+      #end
+    &lt;/div&gt;
+    &lt;div class="extension-history-source-author"&gt;
+      Added by $xwiki.getUserName($attachment.author) on $xwiki.formatDate($attachment.date)
+      (#dynamicsize($attachment.filesize))
+    &lt;/div&gt;
+  &lt;/li&gt;
+#end
+
+#macro (maybeDisplayExtensionHistoryRecordsForm)
+  #getExtensionHistoryRecords
+  #if ($records &amp;&amp; $records.size() &gt; 0)
+    #displayExtensionHistoryRecordsForm($records)
+  #else
+    &lt;div class="box infomessage"&gt;
+      $services.icon.renderHTML('info')
+      $services.localization.render('extension.history.noRecords')
+    &lt;/div&gt;
+  #end
+#end
+
+#macro (displayExtensionHistoryRecordsForm $records)
+  &lt;form method="post" action="$doc.getURL('get', $request.queryString)"&gt;
+    #displayExtensionHistoryRecords($records)
+    &lt;div class="extension-history-actions"&gt;
+      &lt;button class="btn btn-default" name="action" value="export" type="submit"&gt;
+        &lt;span class="glyphicon glyphicon-download-alt"&gt;&lt;/span&gt;
+        Export
+      &lt;/button&gt;
+      &lt;button class="btn btn-default" name="action" value="replay" type="submit"&gt;
+        $services.icon.renderHTML('repeat')
+        Replay
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#end
+
+#macro (getExtensionHistoryRecords)
+  #if ($request.source)
+    ## History File
+    #set ($sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
+    #set ($records = [])
+    #set ($limit = $NULL)
+    #if ($sourceFile.mimeType == 'application/xml')
+      #set ($records = $services.extension.history.read($sourceFile.contentInputStream))
+    #end
+  #else
+    ## Local History
+    ## Show by default only the jobs that affect the wiki.
+    #set ($jobTypes = ['install', 'uninstall', 'repairxar'])
+    #set ($limit = 10)
+    #set ($recordsFilter = $services.extension.history.records)
+    #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $limit))
+  #end
+#end
+
+#macro (displayExtensionHistoryRecords $records)
+  &lt;ul class="extension-history-records"&gt;
+    #foreach ($record in $records)
+      &lt;li class="extension-history-record $!escapetool.xml($record.jobType)"&gt;
+        #displayExtensionHistoryRecord($record)
+      &lt;/li&gt;
+    #end
+    #if ($limit &amp;&amp; $records.size() &gt;= $limit)
+      #set ($moreURL = $doc.getURL('get', $escapetool.url({
+        'action': 'more',
+        'offsetRecordId': $records.get($mathtool.sub($records.size(), 1)).id
+      })))
+      &lt;li&gt;&lt;a href="$moreURL"&gt;more...&lt;/a&gt;&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displayExtensionHistoryRecord $record)
+  &lt;div&gt;
+    ##
+    ## Selector
+    ##
+    &lt;input type="checkbox" name="extensionHistoryRecord"
+      value="$escapetool.xml($services.extension.history.serialize($record))" /&gt;
+    ##
+    ## Icon
+    ##
+    #set ($iconByJobType = {
+      'install': 'add',
+      'uninstall': 'delete',
+      'repairxar': 'wrench'
+    })
+    #set ($icon = $iconByJobType.get($record.jobType))
+    &lt;span class="extension-history-record-icon"&gt;
+      #if ($icon)
+        $services.icon.renderHTML($icon)
+      #end
+    &lt;/span&gt;
+    ##
+    ## Extensions
+    ##
+    #set ($extensions = [])
+    #foreach ($extensionId in $record.request.extensions)
+      #set ($discard = $extensions.add("#displayExtensionHistoryRecord_extension($extensionId)"))
+    #end
+    &lt;span&gt;$stringtool.join($extensions, ', ')&lt;/span&gt;
+    ##
+    ## Namespaces
+    ##
+    #set ($namespaces = [])
+    #if (!$record.request.hasNamespaces())
+      #set ($discard = $namespaces.add($services.localization.render('global namespace')))
+    #elseif ($record.request.namespaces.size() &gt; 1 || $record.request.namespaces.get(0) != "wiki:$xcontext.database")
+      #foreach ($namespace in $record.request.namespaces)
+        #set ($discard = $namespaces.add("#displayExtensionNamespace($namespace)"))
+      #end
+    #end
+    #if ($namespaces.size() &gt; 0)
+      &lt;span class="extension-history-record-namespaces"&gt;(in $stringtool.join($namespaces, ', '))&lt;/span&gt;
+    #end
+  &lt;/div&gt;
+  ##
+  ## User &amp; Date
+  ##
+  #set ($userReference = $record.request.getProperty('user.reference'))
+  &lt;div class="extension-history-record-user"&gt;
+    $services.localization.render("extension.history.record.${record.jobType}By", [
+      $xwiki.getUserName("$userReference"),
+      $xwiki.formatDate($record.endDate)
+    ])
+  &lt;/div&gt;
+#end
+
+#macro (displayExtensionHistoryRecord_extension $extensionId)
+  #set ($extension = $services.extension.resolve($extensionId.id, $extensionId.version))
+  #if ($extension)
+    #set ($extensionURL = "#getExtensionURL($extensionId.id, $extensionId.version)")
+    &lt;a href="$extensionURL" class="extension-link"&gt;#displayExtensionName($extension)&lt;/a&gt;
+  #else
+    $extensionId.id
+  #end
+  &lt;span class="extension-history-record-version"&gt;$!extensionId.version&lt;/span&gt;
+#end
+{{/velocity}}
+
+{{velocity}}
+{{html clean="false"}}
+#if ($request.extensionId &amp;&amp; $request.extensionVersion)
+  #handleExtensionRequest
+#else
+  #handleExtensionHistoryRequest
+#end
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.ExtensionHistory</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0dc17094-9ffb-47b2-b276-8baf50e533d7</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  $('.extension-history-sources-header').click(function() {
+    $(this).closest('.extension-history-sources-selector').toggleClass('opened');
+  });
+
+  $('.extension-history-sources-selector').removeClass('opened');
+
+  if (typeof(XWiki.FileUploader) != 'undefined') {
+    $('.extension-history-source-upload input[type="file"]').each(function() {
+      this.multiple = true;
+      new XWiki.FileUploader(this, {
+        'maxFilesize': 1000000,
+        'fileFilter': /application\/xml|text\/xml/i,
+        'progressAutohide': true,
+        'responseContainer' : $('.extension-history-sources')[0],
+        'responseURL' : XWiki.currentDocument.getURL('get', 'data=sources')
+      });
+    });
+  }
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.ExtensionHistory</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>96634ab8-da72-4f1c-9e50-6d200616412f</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.extension-history-sources-header {
+  cursor: pointer;
+  margin: .5em 0;
+}
+
+.extension-history-sources-header .icon-opened {
+  display: none;
+}
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-opened {
+  display: inline-block;
+}
+.extension-history-sources-header .icon-closed {
+  display: inline-block;
+}
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-closed {
+  display: none;
+}
+
+.extension-history-sources-header .icon-opened,
+.extension-history-sources-header .icon-closed {
+  width: 10px;
+}
+
+.extension-history-sources-body {
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+  display: none;
+  font-size: 95%;
+  margin: 2px 0 1.5em;
+  padding: .5em 0;
+}
+.extension-history-sources-selector.opened .extension-history-sources-body {
+  display: block;
+}
+
+ul.extension-history-sources {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.extension-history-source {
+  padding: .5em 1.3em;
+  position: relative;
+}
+
+.extension-history-source.selected {
+  background-color: $theme.backgroundSecondaryColor;
+}
+
+.extension-history-source .deleteLink {
+  color: $theme.textSecondaryColor;
+  position: absolute;
+  right: 1.3em;
+}
+.extension-history-source .deleteLink:hover {
+  color: $theme.notificationErrorColor;
+}
+
+ul.extension-history-records {
+  border-bottom: 1px dotted $theme.borderColor;
+  border-top: 1px dotted $theme.borderColor;
+  list-style-type: none;
+  padding: 0;
+}
+
+li.extension-history-record {
+  padding: .5em 0 .5em 20px;
+}
+
+.extension-history-source:hover,
+li.extension-history-record:hover {
+  background-color: $theme.highlightColor;
+}
+
+li.extension-history-record input[type="checkbox"] {
+  margin: 0;
+  margin-left: -20px;
+  vertical-align: middle;
+}
+
+.extension-history-source-version,
+.extension-history-source-author,
+.extension-history-source-upload,
+.extension-history-record-version,
+.extension-history-record-namespaces,
+.extension-history-record-user {
+  color: $theme.textSecondaryColor;
+  font-size: 80%;
+}
+
+.extension-history-actions {
+  margin: 10px 0;
+}
+
+.extension-history .box.infomessage {
+  margin: .5em 0;
+}</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

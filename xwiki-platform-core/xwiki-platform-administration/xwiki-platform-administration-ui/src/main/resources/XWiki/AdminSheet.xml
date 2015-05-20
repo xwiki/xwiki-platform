@@ -98,7 +98,8 @@
        {'id' : 'XWiki.AddExtensions', 'order' : 100},
        {'id' : 'XWiki.InstalledExtensions', 'order' : 200},
        {'id' : 'XWiki.CoreExtensions', 'order' : 300},
-       {'id' : 'XWiki.ExtensionUpdater', 'order' : 400}
+       {'id' : 'XWiki.ExtensionUpdater', 'order' : 400},
+       {'id' : 'XWiki.ExtensionHistory', 'order' : 500}
     ]
   },
   {

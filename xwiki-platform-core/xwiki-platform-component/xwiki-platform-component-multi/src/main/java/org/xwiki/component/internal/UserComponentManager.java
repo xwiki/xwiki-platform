@@ -29,6 +29,8 @@ import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -52,6 +54,21 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
 
     private static final String KEY_PREFIX = ID + ':';
 
+    private static final String CONTEXT_KEY = UserComponentManager.class.getName();
+
+    private static class UserComponentManagerInstance
+    {
+        protected final DocumentReference userReference;
+
+        protected final ComponentManager componentManager;
+
+        public UserComponentManagerInstance(DocumentReference userReference, ComponentManager componentManager)
+        {
+            this.userReference = userReference;
+            this.componentManager = componentManager;
+        }
+    }
+
     /**
      * Used to access the current user in the Execution Context.
      */
@@ -71,6 +88,9 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     @Named(DocumentComponentManager.ID)
     private ComponentManager documentComponentManager;
 
+    @Inject
+    private Execution execution;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -78,6 +98,37 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
         // we want to check if it's available in the current wiki and if not then in the Wiki Component Manager's
         // parent.
         setInternalParent(this.documentComponentManager);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Speed up a bit component manager resolution by keeping it in the execution context.
+     * 
+     * @see org.xwiki.component.internal.multi.AbstractGenericComponentManager#getComponentManagerInternal()
+     */
+    @Override
+    public ComponentManager getComponentManagerInternal()
+    {
+        // Get current user reference
+        DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
+        if (userReference == null) {
+            return null;
+        }
+
+        // Try to find the user component manager in the context
+        ExecutionContext econtext = this.execution.getContext();
+        UserComponentManagerInstance contextComponentManager =
+            (UserComponentManagerInstance) econtext.getProperty(CONTEXT_KEY);
+        if (contextComponentManager != null && contextComponentManager.userReference == userReference) {
+            return contextComponentManager.componentManager;
+        }
+
+        // Fallback on regular user component manager search
+        ComponentManager componentManager = super.getComponentManagerInternal();
+        econtext.setProperty(CONTEXT_KEY, new UserComponentManagerInstance(userReference, componentManager));
+
+        return componentManager;
     }
 
     @Override

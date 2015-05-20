@@ -13,12 +13,80 @@
       #end
       <title>$services.localization.render('platform.web.init.message.intializing', $percent)</title>
       <meta http-equiv="refresh" content="1"/>
-    #elseif ($hasErrors)
-      <title>$services.localization.render('platform.web.init.message.intializationFailure')</title>
     #else
-      <title>$services.localization.render('platform.web.init.message.intializationSuccess')</title>
-      <meta http-equiv="refresh" content="1"/>
+      #if ($hasErrors)
+        <title>$services.localization.render('platform.web.init.message.intializationFailure')</title>
+      #else
+        <title>$services.localization.render('platform.web.init.message.intializationSuccess')</title>
+        <meta http-equiv="refresh" content="1"/>
+      #end
+
+      <style type="text/css">
+        ul.log {
+          list-style-type: none;
+          margin: .5em 0 0;
+        }
+        ul.log li:hover {
+          background-color: $theme.highlightColor;
+        }
+        .log-item {
+          background: transparent none no-repeat left;
+          padding: 0.3em 0 0.3em 20px;
+          position: relative;
+        }
+        .log-item > div {
+          line-height: 1.4em;
+        }
+        .log-item {
+          background-position: left .3em;
+        }
+        .log-item-loading {
+          background-image: url("/xwiki/resources/icons/xwiki/spinner.gif");
+          color: #336699;
+        }
+        .log-item-trace {
+          background-image: url("/xwiki/resources/icons/silk/bug.png");
+          color: #336699;
+        }
+        .log-item-debug {
+          background-image: url("/xwiki/resources/icons/silk/bug.png");
+          color: #336699;
+        }
+        .log-item-info {
+          background-image: url("/xwiki/resources/icons/silk/information.png");
+          color: #336699;
+        }
+        .log-item-warn {
+          background-image: url("/xwiki/resources/icons/silk/error.png");
+          color: #D09000;
+        }
+        .log-item-error {
+          background-image: url("/xwiki/resources/icons/silk/exclamation.png");
+          color: #CC3333;
+        }
+        .log-item .stacktrace {
+          white-space: pre;
+        }
+      </style>
+
+      ## The URL factory is not available until XWiki is fully initialized. The WebJar script service uses the URL factory.
+      <script type="text/javascript" src="/xwiki/bin/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
+      <script type='text/javascript' src='/xwiki/resources/uicomponents/logging/logging.js'></script>
+      <script type="text/javascript">
+      // <![CDATA[
+        require.config({
+          baseUrl: '/',
+            paths: { 'jquery': '/xwiki/bin/webjars/resources/path?value=jquery%2F1.11.1%2Fjquery.min.js' },
+          map: {
+            '*': { 'jquery': 'jQueryNoConflict' },
+            'jQueryNoConflict': { 'jquery': 'jquery' }
+          }
+        });
+      define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
+      // ]]>
+      </script>
     #end
+
     <style type="text/css">
       body{
         background-color: gray;
@@ -35,70 +103,7 @@
         box-shadow: 0px 0px 7px #E8E8E8;
         padding: 1em;
       }
-
-      ul.log {
-        list-style-type: none;
-        margin: .5em 0 0;
-      }
-      ul.log li:hover {
-        background-color: $theme.highlightColor;
-      }
-      .log-item {
-        background: transparent none no-repeat left;
-        padding: 0.3em 0 0.3em 20px;
-        position: relative;
-      }
-      .log-item > div {
-        line-height: 1.4em;
-      }
-      .log-item {
-        background-position: left .3em;
-      }
-      .log-item-loading {
-        background-image: url("/xwiki/resources/icons/xwiki/spinner.gif");
-        color: #336699;
-      }
-      .log-item-trace {
-        background-image: url("/xwiki/resources/icons/silk/bug.png");
-        color: #336699;
-      }
-      .log-item-debug {
-        background-image: url("/xwiki/resources/icons/silk/bug.png");
-        color: #336699;
-      }
-      .log-item-info {
-        background-image: url("/xwiki/resources/icons/silk/information.png");
-        color: #336699;
-      }
-      .log-item-warn {
-        background-image: url("/xwiki/resources/icons/silk/error.png");
-        color: #D09000;
-      }
-      .log-item-error {
-        background-image: url("/xwiki/resources/icons/silk/exclamation.png");
-        color: #CC3333;
-      }
-      .log-item .stacktrace {
-        white-space: pre;
-      }
     </style>
-
-    ## The URL factory is not available until XWiki is fully initialized. The WebJar script service uses the URL factory.
-    <script type="text/javascript" src="/xwiki/bin/webjars/resources/path?value=requirejs%2F2.1.15%2Frequire.min.js"></script>
-    <script type='text/javascript' src='/xwiki/resources/uicomponents/logging/logging.js'></script>
-    <script type="text/javascript">
-    // <![CDATA[
-      require.config({
-        baseUrl: '/',
-          paths: { 'jquery': '/xwiki/bin/webjars/resources/path?value=jquery%2F1.11.1%2Fjquery.min.js' },
-        map: {
-          '*': { 'jquery': 'jQueryNoConflict' },
-          'jQueryNoConflict': { 'jquery': 'jquery' }
-        }
-      });
-    define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
-    // ]]>
-    </script>
   </head>
   <body>
     <div id="content">

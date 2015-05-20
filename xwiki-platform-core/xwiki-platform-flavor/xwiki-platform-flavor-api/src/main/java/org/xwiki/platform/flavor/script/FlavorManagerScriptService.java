@@ -24,7 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.platform.flavor.FlavorQuery;
@@ -43,8 +45,16 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class FlavorManagerScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String ERROR_KEY = "scriptservice.flavor.error";
+    
     @Inject
     private FlavorManager flavorManager;
+
+    @Inject
+    private Execution execution;
 
     /**
      * Creates a flavor query.
@@ -73,5 +83,37 @@ public class FlavorManagerScriptService implements ScriptService
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
         return flavorManager.getFlavors(query);
+    }
+
+    /**
+     * Get the flavor installed on a given wiki.
+     * @param wikiId id of the wiki
+     * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
+     */
+    public ExtensionId getFlavorOfWiki(String wikiId)
+    {
+        return flavorManager.getFlavorOfWiki(wikiId);
+    }
+
+    /**
+     * Get the error generated while performing the previously called action.
+     * @return an eventual exception or {@code null} if no exception was thrown
+     * @since 1.1
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     * @since 1.1
+     */
+    private void setLastError(Exception e)
+    {
+        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

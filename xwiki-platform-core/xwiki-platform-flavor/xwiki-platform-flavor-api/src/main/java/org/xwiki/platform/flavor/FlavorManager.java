@@ -21,6 +21,7 @@ package org.xwiki.platform.flavor;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
 
 /**
@@ -38,4 +39,12 @@ public interface FlavorManager
      * @return flavors matching the query
      */
     IterableResult<Extension> getFlavors(FlavorQuery query);
+
+    /**
+     * Get the flavor installed on a given wiki.
+     * @param wikiId id of the wiki
+     * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
+     */
+    ExtensionId getFlavorOfWiki(String wikiId);
+
 }

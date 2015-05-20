@@ -3,68 +3,101 @@
 
 {{template name="distribution/macros.vm" output="false"/}}
 
+{{template name="flavor/macros.vm" output="false"/}}
+
 {{velocity output="false"}}
-#macro (displayDefaultUIExtension $distributionUIId)
-  (% class="xLabel" %)
-  {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
+## Globals
+#set ($flavorId = $services.flavor.getFlavorOfWiki($services.wiki.currentWikiId))
+#set ($extensionNamespace = "wiki:${services.wiki.currentWikiId}")
+#set ($isFlavorValid = $flavor && $services.extension.installed.getInstalledExtension($flavorId.id, $extensionNamespace).isValid($extensionNamespace))
 
-  #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
-  {{html}}#maybeRepairPreviousUI($xcontext.database $distributionUIExtension){{/html}}
-  (% class="recommendedUI" %)(((
-    (% class="xHint" %)
-    {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
-
-    #if ($distributionUIExtension)
-      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
-
-      ## Allow the user to install, upgrade or downgrade the UI.
-      {{html}}#displayExtensionAndUpdateStepButtons($distributionUIExtension){{/html}}
-    #else
-      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
-        ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}
-    #end
-  )))
-  #set ($showCompleteStepButton = $services.extension.installed.getInstalledExtension($distributionUIId.id,
-    $extensionNamespace).isValid($extensionNamespace))
+#macro(controller)
+  #if ($flavorId && !$isFlavorValid)
+    ## TODO: propose an upgrade of the flavor
+  #elseif ($request.noFlavor)
+    ## Let the wiki be empty
+    #displayNoFlavor()
+  #elseif ($request.installFlavor && $request.flavor)
+    ## The user has selected a flavor, let's propose him to install it
+    #displayFlavorInstallationStep()
+  #else
+    ## No flavor is currently installed or even selected by the user, display the flavor picker
+    #displayFlavorPickerStep()
+  #end
 #end
 
-#macro (displayDefaultUIStep)
-  #set ($distributionState = $services.distribution.state)
-  #if (!$distributionState || $distributionState == 'NONE')
-    {{error}}{{translation key="platform.extension.distributionWizard.uiStepNoStateError"/}}{{/error}}
-  #else
-    {{translation key="platform.extension.distributionWizard.uiStepDescription"/}}
+#macro(createUpdateFlavorPlan)
+  ## TODO: this code is not working, fix it
+  #set($installRequest = $services.extension.createUpgradePlanRequest($extensionNamespace))
+  #set($discard = $installRequest.addExtension($flavorId))
+  #set($job = $services.extension.createUpgradePlan($installRequest))
+    
+  {{html}}
+    #displayExtensionUpdaterPlan($job.status)
+  {{/html}}
+#end
 
-    (% class="xLabel" %)
-    {{translation key="platform.extension.distributionWizard.uiStepDistributionLabel"/}}
+#macro(displayFlavorLabel $message $backButtonMessage)
+  <div>
+    <label class="xLabel">Flavor</label>
+  </div>
+  <div class="flavorRow">
+    <div class="flavorLeft">
+      <p class="xHint">$services.localization.render($message)</p>
+    </div>
+    <div class="flavorRight buttonwrapper">
+      <form class="xform" action="$xwiki.relativeRequestURL" method="post">
+        #if ($request.flavor)
+          <input type="hidden" name="flavor" value="$escapetool.xml($request.flavor)" />
+        #end
+        <input class="button secondary" type="submit" value="$escapetool.xml($services.localization.render($backButtonMessage))" />
+      </form>
+    </div>
+  </div>
+#end
 
-    (% class="xHint" %)
-    {{translation key="platform.extension.distributionWizard.uiStepDistributionHint"/}}
+#macro(displayNoFlavor)
+  {{html}}
+    #displayFlavorLabel('platform.extension.distributionWizard.flavorStepNoFlavorConfirm', 'platform.extension.distributionWizard.flavorStepNoFlavorBack')
+  {{/html}}
+  #set ($showCompleteStepButton = true)
+#end
 
-    #set ($distributionExtension = $services.distribution.distributionExtension)
-    #if ($distributionExtension)
-      ## Wrap the extension in a DIV so that its bottom border is displayed.
-      ((({{html}}#displayExtension($distributionExtension){{/html}})))
-    #else
-      {{info}}$services.localization.render('extensions.advancedSearch.noResults',
-        ["**$!escapetool.xml($distributionExtension.id.id)**",
-        "**$!escapetool.xml($distributionExtension.id.version)**"]){{/info}}
-    #end
+#macro(displayFlavorPickerStep)
+  {{html}}
+    <form action="$xwiki.relativeRequestURL" method="post">
+      <div><label for="flavor" class="xLabel">Flavor</label></div>
+      <div class="flavorRow">
+        <div class="flavorLeft">
+          <p class="xHint">$services.localization.render('platform.extension.distributionWizard.flavorStepDescription')</p>
+        </div>
+        <div class="flavorRight buttonwrapper">
+          <input class="button secondary" type="submit" value="Let the wiki be empty" name="noFlavor" />
+          <input class="button" type="submit" value="Install this flavor" name="installFlavor" />
+        </div>
+      </div>
+      <div class="xform">
+        #displayFlavorPicker('flavor', "$!request.flavor", true, 'xwiki-flavor-picker-medium', false)
+      </div>
+    </form>
+  {{/html}}
+#end
 
-    #set ($distributionUIId = $services.distribution.getUIExtensionId())
-    #if ($distributionUIId)
-      #displayDefaultUIExtension($distributionUIId)
-    #else
-      {{warning}}{{translation key="platform.extension.distributionWizard.uiStepUIUnspecifiedError"/}}{{/warning}}
-      ## TODO: Display the Extension Manager search bar so that the user can search for an extension that provides the
-      ## default UI.
-    #end
-  #end
+#macro(displayFlavorInstallationStep)
+  #set ($flavorSplitted = $request.flavor.split(':::'))
+  #set ($requestFlavorId = $flavorSplitted[0])
+  #set ($requestFlavorVersion = $flavorSplitted[1])
+  #set ($requestFlavorExtension = $services.extension.resolve($requestFlavorId, $requestFlavorVersion))
+  
+  {{html}}
+    #displayFlavorLabel('platform.extension.distributionWizard.flavorStepConfirm', 'platform.extension.distributionWizard.flavorStepSelectOtherFlavor')
+    #displayExtensionAndUpdateStepButtons($requestFlavorExtension)
+  {{/html}}
+  
+  #set ($showCompleteStepButton = $isFlavorInstalled)
 #end
 {{/velocity}}
 
 {{velocity}}
-#if ("$!request.action" == '')
-  #displayDefaultUIStep()
-#end
+  #controller()
 {{/velocity}}

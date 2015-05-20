@@ -28,7 +28,10 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -41,19 +44,33 @@ import org.xwiki.wiki.manager.WikiManagerException;
 @Component
 @Named(WikisFlavorDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WikisFlavorDistributionStep extends FlavorDistributionStep
+public class WikisFlavorDistributionStep extends AbstractDistributionStep
 {
+    /**
+     * ID of the distribution step. 
+     */
     public static final String ID = "extension.flavor.wikis";
 
     /**
      * The component used to get information about the current distribution.
      */
     @Inject
-    protected transient DistributionManager distributionManager;
+    private transient DistributionManager distributionManager;
+
+    /**
+     * The flavor manager.
+     */
+    private transient FlavorManager flavorManager;
+
+    @Inject
+    private transient InstalledExtensionRepository installedRepository;
 
     @Inject
     private transient Logger logger;
 
+    /**
+     * Constructs a new WikisFlavorDistributionStep.
+     */
     public WikisFlavorDistributionStep()
     {
         super(ID);
@@ -64,31 +81,34 @@ public class WikisFlavorDistributionStep extends FlavorDistributionStep
     {
         if (getState() == null) {
             setState(State.COMPLETED);
+            
+            if (!isMainWiki()) {
+                return;
+            }
+            
+            WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
 
-            if (isMainWiki()) {
-                WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
+            Collection<String> wikiIds;
+            try {
+                wikiIds = wikiDescriptorManager.getAllIds();
+            } catch (WikiManagerException e) {
+                this.logger.error("Failed to get the list of wikis", e);
+                setState(null);
+                return;
+            }
 
-                Collection<String> wikiIds;
-                try {
-                    wikiIds = wikiDescriptorManager.getAllIds();
-                } catch (WikiManagerException e) {
-                    this.logger.error("Failed to get the list of wikis", e);
+            String mainWiki = wikiDescriptorManager.getMainWikiId();
+
+            // Enable if any of the wikis has no valid top level flavor extension
+            for (String wikiId : wikiIds) {
+                if (mainWiki.equals(wikiId)) {
+                    continue;
+                }
+                String namespace = "wiki:" + wikiId;
+                ExtensionId flavor = flavorManager.getFlavorOfWiki(getWiki());
+                if (flavor == null || !installedRepository.getInstalledExtension(flavor).isValid(namespace)) {
                     setState(null);
                     return;
-                }
-
-                String mainWiki = wikiDescriptorManager.getMainWikiId();
-
-                // Enable if any of the wikis has no valid top level flavor extension
-                for (String wikiId : wikiIds) {
-                    if (!mainWiki.equals(wikiId)) {
-                        String namespace = "wiki:" + wikiId;
-
-                        if (!hasValidFlavor(namespace)) {
-                            setState(null);
-                            return;
-                        }
-                    }
                 }
             }
         }

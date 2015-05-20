@@ -22,18 +22,12 @@ package org.xwiki.extension.distribution.internal.job.step;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.result.IterableResult;
-import org.xwiki.extension.repository.search.ExtensionQuery;
-import org.xwiki.extension.repository.search.ExtensionQuery.COMPARISON;
-import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.platform.flavor.FlavorManager;
 
 /**
  * Install and upgrade flavor extension.
@@ -46,20 +40,23 @@ import org.xwiki.extension.repository.search.SearchException;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class FlavorDistributionStep extends AbstractDistributionStep
 {
+    /**
+     * ID of the distribution step. 
+     */
     public static final String ID = "extension.flavor";
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
 
     /**
-     * The component used to get information about the current distribution.
+     * The flavor manager.
      */
     @Inject
-    protected transient DistributionManager distributionManager;
+    private transient FlavorManager flavorManager;
 
-    @Inject
-    private transient Logger logger;
-
+    /**
+     * Constructs a new FlavorDistributionStep.
+     */
     public FlavorDistributionStep()
     {
         super(ID);
@@ -69,31 +66,10 @@ public class FlavorDistributionStep extends AbstractDistributionStep
     public void prepare()
     {
         if (getState() == null) {
-            InstalledExtension flavor = getFlavor();
-
-            // If the extension is invalid it probably means it needs to be upgraded
-            if (flavor.isValid(getNamespace())) {
+            ExtensionId flavor = flavorManager.getFlavorOfWiki(getWiki());
+            if (flavor != null && installedRepository.getInstalledExtension(flavor).isValid(getNamespace())) {
                 setState(State.COMPLETED);
             }
         }
-    }
-
-    private InstalledExtension getFlavor()
-    {
-        IterableResult<InstalledExtension> result;
-        try {
-            ExtensionQuery extensionQuery = new ExtensionQuery();
-            extensionQuery.addFilter(Extension.FIELD_CATEGORY, "flavor", COMPARISON.EQUAL);
-            result = this.installedRepository.searchInstalledExtensions(getNamespace(), extensionQuery);
-        } catch (SearchException e) {
-            this.logger.error("Failed to search installed extension", e);
-            return null;
-        }
-
-        if (result.getSize() > 0) {
-            return result.iterator().next();
-        }
-
-        return null;
     }
 }

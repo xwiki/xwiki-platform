@@ -45,6 +45,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -55,9 +56,6 @@ import com.xpn.xwiki.XWikiContext;
  * 
  * @version $Id$
  * @since 4.2M3
- */
-/**
- * @version $Id$
  */
 @Component
 @Named("distribution")
@@ -142,6 +140,24 @@ public class DistributionScriptService implements ScriptService
     public CoreExtension getDistributionExtension()
     {
         return this.distributionManager.getDistributionExtension();
+    }
+
+    /** 
+     * @return if the main wiki has a default UI configured
+     */
+    public boolean hasMainDefaultUIExtension()
+    {
+        ExtensionId extension = this.distributionManager.getMainUIExtensionId();
+        return extension != null && StringUtils.isNoneBlank(extension.getId());
+    }
+
+    /**
+     * @return if wikis have a default UI configured
+     */
+    public boolean hasWikiDefaultUIExtension()
+    {
+        ExtensionId extension = this.distributionManager.getWikiUIExtensionId();
+        return extension != null && StringUtils.isNoneBlank(extension.getId());
     }
 
     /**

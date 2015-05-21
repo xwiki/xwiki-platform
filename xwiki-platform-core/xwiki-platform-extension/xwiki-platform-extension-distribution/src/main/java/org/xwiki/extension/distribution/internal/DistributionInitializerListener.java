@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -59,7 +58,7 @@ public class DistributionInitializerListener implements EventListener
     private DistributionManager distributionManager;
 
     @Inject
-    private ConfigurationSource configurationSource;
+    private DistributionConfiguration distributionConfiguration;
 
     @Override
     public List<Event> getEvents()
@@ -105,9 +104,8 @@ public class DistributionInitializerListener implements EventListener
      */
     private boolean isAutoDistributionWizardEnabled(XWikiContext xcontext)
     {
-        return configurationSource.getProperty(
-            xcontext.isMainWiki() ? "distribution.automaticStartOnMainWiki" : "distribution.automaticStartOnWiki",
-                true);
+        return xcontext.isMainWiki() ? distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
+                : distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
     }
 
     private synchronized void startFarmJob()

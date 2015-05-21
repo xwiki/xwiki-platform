@@ -1,4 +1,5 @@
 org.xwiki.extension.distribution.internal.DefaultDistributionManager
+org.xwiki.extension.distribution.internal.DistributionConfiguration
 org.xwiki.extension.distribution.internal.DistributionInitializerListener
 org.xwiki.extension.distribution.internal.DistributionScriptService
 org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener

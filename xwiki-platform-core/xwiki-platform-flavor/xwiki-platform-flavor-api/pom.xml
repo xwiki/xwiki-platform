@@ -31,6 +31,10 @@
   <name>XWiki Platform - Flavor - API</name>
   <packaging>jar</packaging>
   <description>API to get flavors from the repositories.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Flavor API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

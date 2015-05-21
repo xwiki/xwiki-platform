@@ -486,6 +486,16 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.userAgent=XWikiExtensionManager
 
 #-------------------------------------------------------------------------------------
+# Distribution Wizard
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.1RC1] Enable or disable the automatic start of Distribution Wizard on empty/outdated wiki.
+#-#
+#-# The default is:
+# distribution.automaticStartOnMainWiki=true
+# distribution.automaticStartOnWiki=true
+
+#-------------------------------------------------------------------------------------
 # Solr Search
 #-------------------------------------------------------------------------------------
 

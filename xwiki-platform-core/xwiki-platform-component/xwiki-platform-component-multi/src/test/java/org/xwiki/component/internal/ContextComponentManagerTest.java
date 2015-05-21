@@ -108,7 +108,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         cd.setImplementation(RoleImpl.class);
         userCM.registerComponent(cd);
 
-        // Verify we can lookup the component from the Context CM        
+        // Verify we can lookup the component from the Context CM
         Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context

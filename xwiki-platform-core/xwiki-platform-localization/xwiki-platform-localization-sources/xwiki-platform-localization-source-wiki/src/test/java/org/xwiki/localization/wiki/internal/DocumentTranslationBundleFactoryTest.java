@@ -81,13 +81,14 @@ public class DocumentTranslationBundleFactoryTest
         this.oldcore.getXWikiContext().setMainXWiki("xwiki");
         this.oldcore.getXWikiContext().setWikiId("xwiki");
 
-        when(this.oldcore.getMockXWiki().getCurrentContentSyntaxId(Mockito.any(String.class),
-            Mockito.any(XWikiContext.class))).thenReturn("plain/1.0");
+        when(
+            this.oldcore.getMockXWiki().getCurrentContentSyntaxId(Mockito.any(String.class),
+                Mockito.any(XWikiContext.class))).thenReturn("plain/1.0");
 
         this.mockQuery = mock(Query.class);
 
-        when(this.mockQueryManager.createQuery(Mockito.any(String.class),
-            Mockito.any(String.class))).thenReturn(this.mockQuery);
+        when(this.mockQueryManager.createQuery(Mockito.any(String.class), Mockito.any(String.class))).thenReturn(
+            this.mockQuery);
         when(this.mockQuery.execute()).thenReturn(Collections.EMPTY_LIST);
 
         when(this.mockWikiDescriptorManager.getMainWikiId()).thenReturn(this.oldcore.getXWikiContext().getMainXWiki());
@@ -156,7 +157,7 @@ public class DocumentTranslationBundleFactoryTest
         Translation translation = this.localization.getTranslation(key, locale);
 
         if (message != null) {
-            Assert.assertNotNull(translation);
+            Assert.assertNotNull("No translation could be found for key [" + key + "]", translation);
             Assert.assertEquals(message, translation.getRawSource());
         } else {
             Assert.assertNull(translation);
@@ -180,6 +181,7 @@ public class DocumentTranslationBundleFactoryTest
 
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
+        // Reset the cache of translation bundles associated to the current context
         resetContext();
 
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);

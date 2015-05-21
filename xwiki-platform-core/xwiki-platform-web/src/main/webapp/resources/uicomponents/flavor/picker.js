@@ -5,6 +5,11 @@ require(['jquery'], function($) {
    */
   var ajaxCalls = 0;
 
+  /**
+   * The last ajax request
+   */
+  var lastAjaxRequest = false;
+    
   /** 
    * Perform an ajax query and refresh the picker's results container with the results.
    */
@@ -13,8 +18,13 @@ require(['jquery'], function($) {
     var resultsContainer = picker.find('.xwiki-flavor-picker-results-container');
     resultsContainer.addClass('loading');
     resultsContainer.find('.xwiki-flavor-picker-results').fadeOut();
+    // Kill the previous request
+    if (lastAjaxRequest) {
+        lastAjaxRequest.abort();
+    }
     $.ajax(url, {data: parameters}).done(function(data) {
       // Exit if the ajax call is not the last one (kill old requests)
+      // Probably not usefull since we called lastAjaxRequest.abort() just before.
       if (thisAjaxCall != ajaxCalls) {
         return;
       }

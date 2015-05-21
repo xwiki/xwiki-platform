@@ -71,8 +71,14 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
             return null;
         }
 
-        // Try to find the user component manager in the context
         ExecutionContext econtext = this.execution.getContext();
+
+        // If there is no don't try to find or register the component manager
+        if (econtext == null) {
+            return super.getComponentManagerInternal();
+        }
+
+        // Try to find the user component manager in the context
         String contextKey = getClass().getName();
         EntityComponentManagerInstance contextComponentManager =
             (EntityComponentManagerInstance) econtext.getProperty(contextKey);

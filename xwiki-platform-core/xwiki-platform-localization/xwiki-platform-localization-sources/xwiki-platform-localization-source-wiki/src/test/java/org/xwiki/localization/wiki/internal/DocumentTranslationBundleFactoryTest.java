@@ -197,6 +197,7 @@ public class DocumentTranslationBundleFactoryTest
 
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
+        // Reset the cache of translation bundles associated to the current context
         resetContext();
 
         assertTranslation("wiki.translation", null, Locale.ROOT);
@@ -213,6 +214,7 @@ public class DocumentTranslationBundleFactoryTest
 
         addTranslation("wiki.translation", "Wiki translation", translationDocument, Locale.ROOT, Scope.ON_DEMAND);
 
+        // Reset the cache of translation bundles associated to the current context
         resetContext();
 
         this.localization.use(DocumentTranslationBundleFactory.ID, translationDocument.toString());

@@ -70,6 +70,19 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
     }
 
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        // Enabled component registration events
+        StackingComponentEventManager eventManager = new StackingComponentEventManager();
+        eventManager.setObservationManager(getComponentManager().<ObservationManager>getInstance(
+            ObservationManager.class));
+        eventManager.shouldStack(false);
+        getComponentManager().setComponentEventManager(eventManager);
+    }
+
     @Test
     public void testRegisterComponentInUserComponentManager() throws Exception
     {

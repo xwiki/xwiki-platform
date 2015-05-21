@@ -100,6 +100,9 @@ public class DocumentTranslationBundleFactoryTest
         this.localization = this.oldcore.getMocker().getInstance(LocalizationManager.class);
 
         this.oldcore.getMocker().registerMockComponent(ConfigurationSource.class);
+
+        // We want to be notified about new components registrations
+        this.oldcore.notifyComponentDescriptorEvent();
     }
 
     @AfterComponent

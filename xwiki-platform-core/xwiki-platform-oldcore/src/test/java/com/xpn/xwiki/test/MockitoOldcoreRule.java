@@ -152,6 +152,16 @@ public class MockitoOldcoreRule implements MethodRule
         this.notifyDocumentDeletedEvent = notifyDocumentDeletedEvent;
     }
 
+    /**
+     * Enabled notification of component descriptor registration/unregistration.
+     * 
+     * @throws ComponentLookupException when failing to lookup {@link ObservationManager} component
+     */
+    public void notifyComponentDescriptorEvent() throws ComponentLookupException
+    {
+        this.componentManager.notifyComponentDescriptorEvent();
+    }
+
     @Override
     public Statement apply(final Statement base, final FrameworkMethod method, final Object target)
     {

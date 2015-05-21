@@ -73,6 +73,8 @@ public class UserComponentManager extends AbstractEntityComponentManager impleme
     @Override
     public void initialize() throws InitializationException
     {
+        super.initialize();
+
         // Set the parent to the Wiki Component Manager since if a component isn't found for a particular user
         // we want to check if it's available in the current wiki and if not then in the Wiki Component Manager's
         // parent.

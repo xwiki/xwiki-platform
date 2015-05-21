@@ -133,7 +133,7 @@
         </executions>
         <configuration>
           <basedir>${basedir}/target/xwiki/</basedir>
-          <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml</filesToInclude>
+          <filesToInclude>webapps/xwiki/META-INF/maven/org.xwiki.platform/xwiki-platform-web/pom.xml,webapps/xwiki/WEB-INF/xwiki.properties</filesToInclude>
           <regex>false</regex>
           <commentsEnabled>false</commentsEnabled>
           <skip>${skipTests}</skip>
@@ -142,6 +142,10 @@
               <token>&lt;/properties&gt;</token>
               <value>    &lt;xwiki.extension.distribution.wikiui&gt;org.xwiki.platform:xwiki-platform-wiki-ui-wiki&lt;/xwiki.extension.distribution.wikiui&gt;
   &lt;/properties&gt;</value>
+            </replacement>
+            <replacement>
+              <token># distribution.automaticStartOnMainWiki=true</token>
+              <value>distribution.automaticStartOnMainWiki=false</value>
             </replacement>
           </replacements>
         </configuration>

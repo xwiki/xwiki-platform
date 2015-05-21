@@ -131,8 +131,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
     private CoreExtension distributionExtension;
 
-    private boolean flavorBased = true;
-
     private ExtensionId mainUIExtensionId;
 
     private ExtensionId wikiUIExtensionId;
@@ -151,22 +149,22 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         // Extract various configuration from the distribution extension
         if (this.distributionExtension != null) {
             // Distribution UI
-            String mainUIId = (String) this.distributionExtension.getProperty("xwiki.extension.distribution.ui");
+            String mainUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.ui");
 
             if (mainUIId != null) {
                 String mainUIVersion =
-                    (String) this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
+                    this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
 
                 this.mainUIExtensionId =
                     new ExtensionId(mainUIId, mainUIVersion != null ? new DefaultVersion(mainUIVersion)
                         : this.distributionExtension.getId().getVersion());
             }
 
-            String wikiUIId = (String) this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
+            String wikiUIId = this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
 
             if (wikiUIId != null) {
                 String wikiUIVersion =
-                    (String) this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
+                    this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
 
                 this.wikiUIExtensionId =
                     new ExtensionId(wikiUIId, wikiUIVersion != null ? new DefaultVersion(wikiUIVersion)

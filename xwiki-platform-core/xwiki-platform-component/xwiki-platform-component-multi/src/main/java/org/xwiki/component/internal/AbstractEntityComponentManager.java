@@ -97,14 +97,14 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
         throws ComponentRepositoryException
     {
-        super.registerComponent(componentDescriptor, componentInstance);
-
         // Reset context component manager cache
         // TODO: improve granularity of the reset
         ExecutionContext econtext = this.execution.getContext();
         if (econtext != null) {
             econtext.removeProperty(getClass().getName());
         }
+
+        super.registerComponent(componentDescriptor, componentInstance);
     }
 
     @Override

@@ -25,12 +25,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
@@ -45,7 +42,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 @Component
 @Named(UserComponentManager.ID)
 @Singleton
-public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
+public class UserComponentManager extends AbstractEntityComponentManager implements Initializable
 {
     /**
      * The identifier of this {@link ComponentManager}.
@@ -53,21 +50,6 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     public static final String ID = "user";
 
     private static final String KEY_PREFIX = ID + ':';
-
-    private static final String CONTEXT_KEY = UserComponentManager.class.getName();
-
-    private static class UserComponentManagerInstance
-    {
-        protected final DocumentReference userReference;
-
-        protected final ComponentManager componentManager;
-
-        public UserComponentManagerInstance(DocumentReference userReference, ComponentManager componentManager)
-        {
-            this.userReference = userReference;
-            this.componentManager = componentManager;
-        }
-    }
 
     /**
      * Used to access the current user in the Execution Context.
@@ -88,9 +70,6 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     @Named(DocumentComponentManager.ID)
     private ComponentManager documentComponentManager;
 
-    @Inject
-    private Execution execution;
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -103,39 +82,21 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
     /**
      * {@inheritDoc}
      * <p>
-     * Speed up a bit component manager resolution by keeping it in the execution context.
+     * Override {@link AbstractEntityComponentManager#getKey()} because the prefix is not the reference type here.
      * 
-     * @see org.xwiki.component.internal.multi.AbstractGenericComponentManager#getComponentManagerInternal()
+     * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
      */
-    @Override
-    public ComponentManager getComponentManagerInternal()
-    {
-        // Get current user reference
-        DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
-        if (userReference == null) {
-            return null;
-        }
-
-        // Try to find the user component manager in the context
-        ExecutionContext econtext = this.execution.getContext();
-        UserComponentManagerInstance contextComponentManager =
-            (UserComponentManagerInstance) econtext.getProperty(CONTEXT_KEY);
-        if (contextComponentManager != null && contextComponentManager.userReference == userReference) {
-            return contextComponentManager.componentManager;
-        }
-
-        // Fallback on regular user component manager search
-        ComponentManager componentManager = super.getComponentManagerInternal();
-        econtext.setProperty(CONTEXT_KEY, new UserComponentManagerInstance(userReference, componentManager));
-
-        return componentManager;
-    }
-
     @Override
     protected String getKey()
     {
-        DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
+        DocumentReference userReference = getCurrentReference();
 
         return userReference != null ? KEY_PREFIX + this.referenceSerializer.serialize(userReference) : null;
+    }
+
+    @Override
+    protected DocumentReference getCurrentReference()
+    {
+        return this.documentAccessBridge.getCurrentUserReference();
     }
 }

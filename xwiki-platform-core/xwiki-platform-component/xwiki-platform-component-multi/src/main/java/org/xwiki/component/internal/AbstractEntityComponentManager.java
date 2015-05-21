@@ -21,8 +21,10 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -83,6 +85,20 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
         econtext.setProperty(contextKey, new EntityComponentManagerInstance(entityReference, componentManager));
 
         return componentManager;
+    }
+
+    @Override
+    public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
+        throws ComponentRepositoryException
+    {
+        super.registerComponent(componentDescriptor, componentInstance);
+
+        // Reset context component manager cache
+        // TODO: improve granularity of the reset
+        ExecutionContext econtext = this.execution.getContext();
+        if (econtext != null) {
+            econtext.removeProperty(getClass().getName());
+        }
     }
 
     @Override

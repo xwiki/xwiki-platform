@@ -36,7 +36,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.RegexEventFilter;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -71,9 +70,6 @@ public class CheckAnnotationClassEventListener implements EventListener
 
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    protected WikiDescriptorManager wikiManager;
 
     /**
      * The Annotation Application's configuration.

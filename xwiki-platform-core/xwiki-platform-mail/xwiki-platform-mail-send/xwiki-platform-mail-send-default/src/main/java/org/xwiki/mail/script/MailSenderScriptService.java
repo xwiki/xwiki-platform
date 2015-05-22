@@ -125,7 +125,7 @@ public class MailSenderScriptService extends AbstractMailScriptService
                 this.componentManagerProvider.get());
             result = factory.createMessage(source, parameters);
         } catch (Exception e) {
-            // No factory found, set an error
+            // No factory found or error in constructing the message iterator, set an error
             // An error occurred, save it and return null
             setError(e);
             return null;

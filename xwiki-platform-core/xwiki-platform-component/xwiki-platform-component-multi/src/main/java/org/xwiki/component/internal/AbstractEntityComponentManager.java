@@ -25,7 +25,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
-import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
@@ -51,8 +50,7 @@ import org.xwiki.observation.event.Event;
 public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable,
     Disposable
 {
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new ComponentDescriptorAddedEvent(),
-        new ComponentDescriptorRemovedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new ComponentDescriptorAddedEvent());
 
     private static class EntityComponentManagerInstance
     {
@@ -117,7 +115,7 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
         ComponentManager componentManager = super.getComponentManagerInternal();
 
         // Cache the component manager
-        if (this.listener == null) {
+        if (this.listener == null && componentManager == null) {
             startListening();
         }
         econtext.setProperty(this.contextKey, new EntityComponentManagerInstance(entityReference, componentManager));

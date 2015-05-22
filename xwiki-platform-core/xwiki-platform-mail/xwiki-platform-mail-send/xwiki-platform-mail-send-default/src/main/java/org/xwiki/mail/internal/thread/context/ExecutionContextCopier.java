@@ -20,17 +20,18 @@
 package org.xwiki.mail.internal.thread.context;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.exception.CloneFailedException;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -53,13 +54,17 @@ public class ExecutionContextCopier implements Copier<ExecutionContext>
     private ScriptContextManager scriptContextManager;
 
     @Inject
-    private VelocityManager velociyManager;
+    private VelocityManager velocityManager;
 
     @Inject
     private Execution execution;
 
     @Inject
     private Copier<XWikiContext> xwikiContextCloner;
+
+    @Inject
+    @Named("velocity")
+    private ExecutionContextInitializer velocityExecutionContextInitializer;
 
     @Override
     public ExecutionContext copy(ExecutionContext originalExecutionContext) throws CloneFailedException
@@ -74,26 +79,13 @@ public class ExecutionContextCopier implements Copier<ExecutionContext>
             XWikiContext clonedXWikiContext = xwikiContextCloner.copy(xwikiContext);
             clonedExecutionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, clonedXWikiContext);
 
-            // We have just set the clonedXWikiContext. We can now use our clonedExecutionContext as base for the
-            // initialization of the ScriptContext and the VelocityContext by pushing it in the Execution.
-            try {
-                this.execution.pushContext(clonedExecutionContext);
-
-                // The managers will also run the initializers on the returned contexts, thus using the XWikiContext
-                // from the execution.
-                ScriptContext reInitializedScriptContext = scriptContextManager.getScriptContext();
-                // Note: scriptContextManager.getScriptContext() is already called by
-                // velociyManager.getVelocityContext() internally, so we could avoid running it twice just for the sake
-                // of code readability.
-                VelocityContext reInitializedVelocityContext = velociyManager.getVelocityContext();
-                // Note2: we could even argue that velociyManager.getVelocityContext() will eventually be called by a
-                // client willing to use it, since it should generally not be used directly from the ExecutionContext,
-                // but it should be always used through the VelocityManager. Could this entire inner try-catch block be
-                // removed and deemed not needed? Would it be safe enough?
-            } finally {
-                // Remember to pop it, since we don`t want it to replace our current ExecutionContext.
-                this.execution.popContext();
-            }
+            // VelocityContext
+            // Reset the VelocityContext from the EC by removing it and calling the Velocity ECInitializer which is
+            // normally called by the execution of the ECInitializers by ECManager.clone(). This ensures a clean new
+            // VC is created. It'll get filled when VelocityContextManager.getVelocityContext() is called by whatever
+            // code need the VC.
+            clonedExecutionContext.removeProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID);
+            this.velocityExecutionContextInitializer.initialize(clonedExecutionContext);
 
             return clonedExecutionContext;
         } catch (Exception e) {

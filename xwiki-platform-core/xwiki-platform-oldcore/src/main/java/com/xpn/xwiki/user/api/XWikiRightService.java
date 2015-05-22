@@ -69,7 +69,7 @@ public interface XWikiRightService
      *         case of a form authenticator, for example) when no user is logged in. </strong>
      * @throws XWikiException if something goes wrong during the rights checking process
      */
-    public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
+    boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
      * Verifies if the user identified by {@code username} has the access level identified by {@code right} on the
@@ -86,7 +86,7 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
+    boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -100,7 +100,7 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    public boolean hasProgrammingRights(XWikiContext context);
+    boolean hasProgrammingRights(XWikiContext context);
 
     /**
      * Checks if the author of the passed document (last editor of the content of the document) has programming rights
@@ -114,7 +114,7 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
+    boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
 
     /**
      * Checks that the current user in the context (the currently authenticated user) has administration rights either
@@ -127,7 +127,7 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    public boolean hasAdminRights(XWikiContext context);
+    boolean hasAdminRights(XWikiContext context);
 
     /**
      * Checks that the current user in the context (the currently authenticated user) has administration rights on the
@@ -141,12 +141,12 @@ public interface XWikiRightService
      *             instead
      */
     @Deprecated
-    public boolean hasWikiAdminRights(XWikiContext context);
+    boolean hasWikiAdminRights(XWikiContext context);
 
     /**
      * @param context the xwiki context of this request
      * @return the list of all the known access levels
      * @throws XWikiException if something goes wrong during the rights checking process
      */
-    public List<String> listAllLevels(XWikiContext context) throws XWikiException;
+    List<String> listAllLevels(XWikiContext context) throws XWikiException;
 }

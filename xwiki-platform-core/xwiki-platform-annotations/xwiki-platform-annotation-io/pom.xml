@@ -63,13 +63,6 @@
       <version>${commons.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    
     <!-- Test dependencies -->
     <!-- For some tests we need to have the Servlet API JAR available -->
     <dependency>

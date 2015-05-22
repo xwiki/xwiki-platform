@@ -51,6 +51,7 @@ public interface TranslationMessage extends TranslationMessageElement
             return "";
         }
 
+        @Override
         public String toString()
         {
             return getRawSource();

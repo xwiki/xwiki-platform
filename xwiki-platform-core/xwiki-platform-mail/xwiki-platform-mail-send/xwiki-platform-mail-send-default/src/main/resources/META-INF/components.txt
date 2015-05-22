@@ -11,6 +11,7 @@ org.xwiki.mail.internal.thread.PrepareMailRunnable
 org.xwiki.mail.internal.thread.SendMailRunnable
 org.xwiki.mail.internal.thread.context.ExecutionContextCopier
 org.xwiki.mail.internal.thread.context.XWikiContextCopier
+org.xwiki.mail.internal.thread.context.XWikiRequestCopier
 org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration

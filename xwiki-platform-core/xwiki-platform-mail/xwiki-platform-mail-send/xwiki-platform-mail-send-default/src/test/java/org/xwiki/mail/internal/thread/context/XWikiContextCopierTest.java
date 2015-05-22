@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -33,7 +34,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
@@ -48,6 +48,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests for {@link XWikiContextCopier}.
+ *
  * @version $Id$
  */
 public class XWikiContextCopierTest
@@ -56,9 +58,9 @@ public class XWikiContextCopierTest
     public MockitoComponentMockingRule<XWikiContextCopier> mocker = new MockitoComponentMockingRule<>(
         XWikiContextCopier.class);
 
-    XWikiServletRequestStub originalRequest;
-
     XWikiServletResponseStub originalResponse;
+
+    XWikiRequest originalRequest;
 
     XWikiStoreInterface store;
 
@@ -68,12 +70,6 @@ public class XWikiContextCopierTest
     public void setup() throws Exception
     {
         Utils.setComponentManager(mocker);
-
-        originalRequest = new XWikiServletRequestStub();
-        originalRequest.setHost("host");
-        originalRequest.setContextPath("contextPath");
-        originalRequest.setScheme("scheme");
-        originalRequest.setAttribute("attribute", "value");
 
         originalResponse = new XWikiServletResponseStub();
 
@@ -87,13 +83,18 @@ public class XWikiContextCopierTest
             mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         when(serializer.serialize(userReference)).thenReturn("wiki:Space.Page");
 
-        DocumentReferenceResolver<String> resolver =
-            mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
         original.setUserReference(userReference);
 
-        // Set the mock request & response
-        original.setRequest(originalRequest);
+        // Set the mock request
+        this.originalRequest = mock(XWikiRequest.class);
+        original.setRequest(this.originalRequest);
+        Copier<XWikiRequest> requestCopier =
+            mocker.getInstance(new DefaultParameterizedType(null, Copier.class, XWikiRequest.class));
+        when(requestCopier.copy(this.originalRequest)).thenReturn(this.originalRequest);
+
+        // Set the stubbed response
         original.setResponse(originalResponse);
 
         // XWiki mock
@@ -117,17 +118,6 @@ public class XWikiContextCopierTest
     public void copyContext() throws Exception
     {
         XWikiContext copy = mocker.getComponentUnderTest().copy(original);
-
-        // Check that the request is not the same.
-        XWikiRequest copiedRequest = copy.getRequest();
-        assertNotSame(original.getRequest(), copiedRequest);
-
-        // Check that each value on the cloned request are equal.
-        assertEquals(originalRequest.getHeader("x-forwarded-host"), copiedRequest.getHeader("x-forwarded-host"));
-        assertEquals(originalRequest.getContextPath(), copiedRequest.getContextPath());
-        assertEquals(originalRequest.getScheme(), copiedRequest.getScheme());
-        assertEquals(originalRequest.getAttributeNames(), copiedRequest.getAttributeNames());
-        assertEquals(originalRequest.getAttribute("attribute"), copiedRequest.getAttribute("attribute"));
 
         // Check that the response is not the same.
         assertNotSame(originalResponse, copy.getResponse());

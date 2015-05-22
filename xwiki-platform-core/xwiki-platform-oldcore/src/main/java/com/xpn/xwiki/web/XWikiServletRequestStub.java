@@ -62,6 +62,10 @@ public class XWikiServletRequestStub implements XWikiRequest
      */
     private String contextPath;
 
+    private StringBuffer requestURL;
+
+    private String serverName;
+
     public XWikiServletRequestStub()
     {
         this.host = "";
@@ -80,6 +84,22 @@ public class XWikiServletRequestStub implements XWikiRequest
     public void setScheme(String scheme)
     {
         this.scheme = scheme;
+    }
+
+    /**
+     * @since 7.1RC1, 6.4.5
+     */
+    public void setrequestURL(StringBuffer requestURL)
+    {
+        this.requestURL = requestURL;
+    }
+
+    /**
+     * @since 7.1RC1, 6.4.5
+     */
+    public void setServerName(String serverName)
+    {
+        this.serverName = serverName;
     }
 
     @Override
@@ -208,7 +228,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public StringBuffer getRequestURL()
     {
-        return new StringBuffer();
+        return this.requestURL == null ? new StringBuffer() : this.requestURL;
     }
 
     @Override
@@ -338,7 +358,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getServerName()
     {
-        return null;
+        return this.serverName;
     }
 
     @Override

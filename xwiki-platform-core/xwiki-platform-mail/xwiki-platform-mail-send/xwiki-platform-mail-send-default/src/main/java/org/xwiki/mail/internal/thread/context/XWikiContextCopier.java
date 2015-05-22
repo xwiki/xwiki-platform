@@ -21,16 +21,14 @@ package org.xwiki.mail.internal.thread.context;
 
 import java.net.URL;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiServletRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
@@ -49,6 +47,9 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 @Singleton
 public class XWikiContextCopier implements Copier<XWikiContext>
 {
+    @Inject
+    private Copier<XWikiRequest> xwikiRequestCloner;
+
     @Override
     public XWikiContext copy(XWikiContext originalXWikiContext)
     {
@@ -58,17 +59,8 @@ public class XWikiContextCopier implements Copier<XWikiContext>
         // lets now build the stub context
         clonedXWikiContext.getWiki().getStore().cleanUp(originalXWikiContext);
 
-        // We are sure the context request is a real servlet request
-        // So we force the dummy request with the current host
-        XWikiServletRequestStub dummy = new XWikiServletRequestStub();
-        XWikiRequest originalRequest = originalXWikiContext.getRequest();
-        dummy.setHost(((HttpServletRequest) originalRequest).getHeader("x-forwarded-host"));
-        dummy.setScheme(((HttpServletRequest) originalRequest).getScheme());
-        dummy.setContextPath(((HttpServletRequest) originalRequest).getContextPath());
-        // TODO: include the original parameters map?
-
-        XWikiServletRequest request = new XWikiServletRequest(dummy);
-        clonedXWikiContext.setRequest(request);
+        // Copy the request from the context.
+        clonedXWikiContext.setRequest(this.xwikiRequestCloner.copy(originalXWikiContext.getRequest()));
 
         // Force forged context response to a stub response, since the current context response
         // will not mean anything anymore when running in the scheduler's thread, and can cause

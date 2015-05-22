@@ -84,3 +84,19 @@
 .document-tree .modified.document.node, .document-tree .modified.locale.node {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')")
 }
+#distributionWizard .flavorRow {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  margin: 0 0 0.5em 0;
+}
+#distributionWizard .flavorLeft {
+  display: table-cell;
+  vertical-align: middle;
+  width: 60%;
+}
+#distributionWizard .flavorRight {
+  display: table-cell;
+  text-align: right;
+  width: 40%;
+}

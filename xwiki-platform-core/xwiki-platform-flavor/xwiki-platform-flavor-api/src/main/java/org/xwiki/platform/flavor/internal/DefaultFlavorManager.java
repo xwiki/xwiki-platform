@@ -19,13 +19,21 @@
  */
 package org.xwiki.platform.flavor.internal;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
+import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.platform.flavor.FlavorManager;
 import org.xwiki.platform.flavor.FlavorQuery;
 
@@ -42,9 +50,55 @@ public class DefaultFlavorManager implements FlavorManager
     @Inject
     private ExtensionRepositoryManager extensionRepositoryManager;
 
+    @Inject
+    private InstalledExtensionRepository installedRepository;
+    
+    @Inject
+    private ConfigurationSource configurationSource;
+
     @Override
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
         return extensionRepositoryManager.search(query);
+    }
+
+    @Override
+    public ExtensionId getFlavorOfWiki(String wikiId)
+    {
+        String namespace = "wiki:" + wikiId;
+        try {
+            for (InstalledExtension extension
+                : installedRepository.searchInstalledExtensions(namespace, new FlavorQuery())) {
+                // Don't consider a dependency as the top level flavor, because a flavor can be a combination of other
+                // flavors
+                if (!extension.isDependency(namespace)) {
+                    // There should be only one flavor per wiki
+                    return extension.getId();
+                }
+            }
+        } catch (SearchException e) {
+            // It should never happen with the local repository
+        }
+        
+        // If nothing has been found, look for extensions that was not tagged as flavors but that are in the list of 
+        // old flavors
+        for (String oldFlavor : getExtensionsConsideredAsFlavors()) {
+            InstalledExtension installedExtension = installedRepository.getInstalledExtension(oldFlavor, namespace);
+            if (installedExtension != null) {
+                return installedExtension.getId();
+            }
+        }
+        
+        // It seems there is no known UI on this wiki
+        return null;
+    }
+
+
+    /**
+     * @return the list of old extensions that can be considered as flavors even if they are not tagged
+     */
+    private Collection<String> getExtensionsConsideredAsFlavors()
+    {
+        return configurationSource.getProperty("extension.oldflavors", Collections.<String>emptyList());
     }
 }

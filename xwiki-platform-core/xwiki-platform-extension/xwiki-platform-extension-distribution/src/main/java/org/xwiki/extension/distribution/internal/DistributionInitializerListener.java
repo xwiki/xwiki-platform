@@ -57,6 +57,9 @@ public class DistributionInitializerListener implements EventListener
     @Inject
     private DistributionManager distributionManager;
 
+    @Inject
+    private DistributionConfiguration distributionConfiguration;
+
     @Override
     public List<Event> getEvents()
     {
@@ -72,11 +75,17 @@ public class DistributionInitializerListener implements EventListener
     @Override
     public void onEvent(Event event, Object arg1, Object arg2)
     {
+        XWikiContext xcontext = (XWikiContext) arg2;
+        
+        // Do nothing if the automatic start of DW is disabled
+        if (!isAutoDistributionWizardEnabled(xcontext)) {
+            return;
+        }
+        
         DistributionState distributionState = this.distributionManager.getFarmDistributionState();
 
         // Start the Distribution Wizard only if the current user has the right to access it
         if (distributionState != DistributionState.NONE && this.distributionManager.canDisplayDistributionWizard()) {
-            XWikiContext xcontext = (XWikiContext) arg2;
             if (xcontext.isMainWiki()) {
                 if (this.distributionManager.getFarmJob() == null) {
                     startFarmJob();
@@ -88,6 +97,15 @@ public class DistributionInitializerListener implements EventListener
                 }
             }
         }
+    }
+
+    /**
+     * @return if the automatic launch of DW is enabled
+     */
+    private boolean isAutoDistributionWizardEnabled(XWikiContext xcontext)
+    {
+        return xcontext.isMainWiki() ? distributionConfiguration.isAutoDistributionWizardEnabledForMainWiki()
+                : distributionConfiguration.isAutoDistributionWizardEnabledForWiki();
     }
 
     private synchronized void startFarmJob()

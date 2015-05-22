@@ -576,8 +576,8 @@ return XWiki;
       <cache>long</cache>
     </property>
     <property>
-      <code>## TODO: remove this test when the flavor API will be bundled with XWiki
-#if ("$!services.flavor" != '')
+      <code>
+#if (!$services.distribution.hasWikiDefaultUIExtension())
 /**************************************************************
  * Code to make the dynamic "flavor/template" tab bar
  **************************************************************/
@@ -750,8 +750,7 @@ require(['jquery'], function($) {
 }
 
 ## Flavor/Template section
-## TODO: remove this test when the flavor API will be bundled with XWiki
-#if ("$!services.flavor" != '')
+#if (!$services.distribution.hasWikiDefaultUIExtension())
 
 .flavor_template {
   margin-top: 10px;
@@ -1173,9 +1172,7 @@ require(['jquery'], function($) {
         &lt;div class="half"&gt;
           ### TEMPLATE / FLAVOR ###
           #set ($templates = $services.wiki.template.getTemplates())
-          #set ($hasFlavorAPI = ("$!services.flavor" != ''))
-          #if ($hasFlavorAPI)
-            ## TODO: remove this test when the flavor API will be bundled in XWiki
+          #if (!$services.distribution.hasWikiDefaultUIExtension())
             #template('flavor/macros.vm')
             &lt;dl&gt;
               &lt;dt&gt;
@@ -1206,6 +1203,7 @@ require(['jquery'], function($) {
               &lt;/dd&gt;
             &lt;/dl&gt;
           #else
+            ## There is a default UI configured, so we do not display the flavor picker
             &lt;dl&gt;
               &lt;dt&gt;
                 #if ($templates.size() &gt; 0)
@@ -1446,8 +1444,8 @@ require(['jquery'], function($) {
     #set($discard = $wikiCreationRequest.setWikiSource('extension'))
     #set($flavorExtension = $request.flavor.split(':::'))
     #set($discard = $wikiCreationRequest.setExtensionId($flavorExtension[0], $flavorExtension[1]))
-  #elseif("$!services.flavor" == '')
-    ## Default action when the flavor API is not installed
+  #elseif($services.distribution.hasWikiDefaultUIExtension())
+    ## Default action when a default UI is configured for subwikis
     #set($discard = $wikiCreationRequest.setWikiSource('extension'))
     #set($discard = $wikiCreationRequest.setExtensionId($services.wiki.creationjob.defaultWikiExtensionId))
   #end

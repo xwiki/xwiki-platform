@@ -17,34 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.platform.flavor;
+package org.xwiki.extension.distribution.internal;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.extension.Extension;
-import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.result.IterableResult;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Find the flavors into the repositories, applying filters according to the configuration.
+ * Configuration for the Distribution Wizard.
  *  
  * @version $Id$
- * @since 7.1M2 
+ * @since 7.1RC1
  */
-@Role
-public interface FlavorManager
+@Component(roles = DistributionConfiguration.class)
+@Singleton
+public class DistributionConfiguration
 {
-    /**
-     * Get all flavors matching a query.
-     * @param query query to execute
-     * @return flavors matching the query
-     */
-    IterableResult<Extension> getFlavors(FlavorQuery query);
+    @Inject
+    private ConfigurationSource configurationSource;
 
     /**
-     * Get the flavor installed on a given wiki.
-     * @param wikiId id of the wiki
-     * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
+     * @return if the automatic launch of DW is enabled on main wiki
      */
-    ExtensionId getFlavorOfWiki(String wikiId);
+    public boolean isAutoDistributionWizardEnabledForMainWiki()
+    {
+        return configurationSource.getProperty("distribution.automaticStartOnMainWiki", true);
+    }
 
+    /**
+     * @return if the automatic launch of DW is enabled on wiki
+     */
+    public boolean isAutoDistributionWizardEnabledForWiki()
+    {
+        return configurationSource.getProperty("distribution.automaticStartOnWiki", true);
+    }
 }

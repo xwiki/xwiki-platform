@@ -142,12 +142,6 @@
       <artifactId>tika-core</artifactId>
     </dependency>
 
-    <!-- XML processing -->
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
-
     <!-- The platform -->
     <!-- Web part -->
     <dependency>
@@ -218,6 +212,12 @@
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <!-- Only needed at runtime -->
+      <scope>runtime</scope>
     </dependency>
     <!-- Used to generate XHTML in Java (generally in object property displayer) -->
     <!-- TODO: We should drop ECS -->

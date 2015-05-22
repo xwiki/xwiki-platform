@@ -31,12 +31,12 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
@@ -76,32 +76,18 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     @Inject
     private Execution execution;
 
+    private EventListener listener;
+
     private final String contextKey = getClass().getName();
 
     protected abstract EntityReference getCurrentReference();
 
     @Override
-    public void initialize() throws InitializationException
-    {
-        this.observation.addListener(new AbstractEventListener(this.contextKey, EVENTS)
-        {
-            @Override
-            public void onEvent(Event event, Object source, Object data)
-            {
-                // Reset context component manager cache
-                // TODO: improve a bit granularity of the reset
-                ExecutionContext econtext = execution.getContext();
-                if (econtext != null) {
-                    econtext.removeProperty(contextKey);
-                }
-            }
-        });
-    }
-
-    @Override
     public void dispose() throws ComponentLifecycleException
     {
-        this.observation.removeListener(this.contextKey);
+        if (this.listener != null) {
+            this.observation.removeListener(this.listener.getName());
+        }
     }
 
     @Override
@@ -129,9 +115,33 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
 
         // Fallback on regular user component manager search
         ComponentManager componentManager = super.getComponentManagerInternal();
+
+        // Cache the component manager
+        startListening();
         econtext.setProperty(this.contextKey, new EntityComponentManagerInstance(entityReference, componentManager));
 
         return componentManager;
+    }
+
+    private void startListening()
+    {
+        if (this.listener == null) {
+            this.listener = new AbstractEventListener(this.contextKey, EVENTS)
+            {
+                @Override
+                public void onEvent(Event event, Object source, Object data)
+                {
+                    // Reset context component manager cache
+                    // TODO: improve a bit granularity of the reset
+                    ExecutionContext econtext = execution.getContext();
+                    if (econtext != null) {
+                        econtext.removeProperty(contextKey);
+                    }
+                }
+            };
+
+            this.observation.addListener(this.listener);
+        }
     }
 
     @Override

@@ -76,7 +76,7 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     @Inject
     private Execution execution;
 
-    private EventListener listener;
+    private volatile EventListener listener;
 
     private final String contextKey = getClass().getName();
 
@@ -117,13 +117,15 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
         ComponentManager componentManager = super.getComponentManagerInternal();
 
         // Cache the component manager
-        startListening();
+        if (this.listener == null) {
+            startListening();
+        }
         econtext.setProperty(this.contextKey, new EntityComponentManagerInstance(entityReference, componentManager));
 
         return componentManager;
     }
 
-    private void startListening()
+    private synchronized void startListening()
     {
         if (this.listener == null) {
             this.listener = new AbstractEventListener(this.contextKey, EVENTS)

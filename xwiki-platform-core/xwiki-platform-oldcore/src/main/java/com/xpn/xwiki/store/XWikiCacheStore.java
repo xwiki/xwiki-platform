@@ -63,7 +63,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 
     private Cache<Boolean> pageExistCache;
 
-    private int cacheCapacity = 100;
+    private int cacheCapacity = 500;
 
     private int pageExistCacheCapacity = 10000;
 

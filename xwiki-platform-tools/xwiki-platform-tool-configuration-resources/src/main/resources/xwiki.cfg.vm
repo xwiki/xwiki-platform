@@ -131,8 +131,8 @@ xwiki.tags=1
 # xwiki.store.cache=1
 
 #-# Maximum number of documents to keep in the cache.
-#-# The default is 100.
-# xwiki.store.cache.capacity=100
+#-# The default is 500.
+# xwiki.store.cache.capacity=500
 
 #-# Maximum number of documents to keep in the cache indicating if a document exist.
 #-# Since this cache contain only boolean it can be very big without taking much memory.

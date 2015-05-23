@@ -29,7 +29,7 @@ $response.setContentType("application/x-json")
     #if($docProps.contains($key))
       ## Each filter is: key=>[propType, value], where propType is null for document properties
       #set($arr = [])
-      #set($discard = $arr.add(null))## null => document property
+      #set($discard = $arr.add($NULL))## null => document property
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
 ## Question: Why do we order using the filter fields?

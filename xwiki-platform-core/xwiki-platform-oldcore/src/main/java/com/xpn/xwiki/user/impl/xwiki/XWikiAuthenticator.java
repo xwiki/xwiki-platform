@@ -31,12 +31,12 @@ import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiAuthenticator extends Authenticator
 {
-    public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
+    boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
         throws Exception;
 
-    public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
+    boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
         HttpServletResponse response, XWikiContext context) throws Exception;
 
-    public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
+    void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
         throws IOException;
 }

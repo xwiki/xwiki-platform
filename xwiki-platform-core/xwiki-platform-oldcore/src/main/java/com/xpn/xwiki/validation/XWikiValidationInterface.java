@@ -25,7 +25,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public interface XWikiValidationInterface
 {
-    public boolean validateDocument(XWikiDocument doc, XWikiContext context);
+    boolean validateDocument(XWikiDocument doc, XWikiContext context);
 
-    public boolean validateObject(BaseObject object, XWikiContext context);
+    boolean validateObject(BaseObject object, XWikiContext context);
 }

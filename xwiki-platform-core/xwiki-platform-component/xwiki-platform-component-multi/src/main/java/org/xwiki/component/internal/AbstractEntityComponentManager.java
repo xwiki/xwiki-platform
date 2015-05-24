@@ -28,7 +28,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current entity in the
@@ -52,9 +51,6 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
             this.componentManager = componentManager;
         }
     }
-
-    @Inject
-    protected ObservationManager observation;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;

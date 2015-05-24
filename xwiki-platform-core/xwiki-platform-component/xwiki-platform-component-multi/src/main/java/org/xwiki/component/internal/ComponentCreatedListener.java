@@ -21,7 +21,9 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.event.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.AbstractEventListener;
@@ -34,6 +36,9 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 7.1RC1
  */
+@Component
+@Named("org.xwiki.component.internal.ComponentCreatedListener")
+@Singleton
 public class ComponentCreatedListener extends AbstractEventListener
 {
     @Inject

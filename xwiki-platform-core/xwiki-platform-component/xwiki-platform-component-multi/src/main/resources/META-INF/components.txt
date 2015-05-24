@@ -1,3 +1,4 @@
+org.xwiki.component.internal.ComponentCreatedListener
 org.xwiki.component.internal.ContextComponentManager
 org.xwiki.component.internal.ContextRootComponentManager
 org.xwiki.component.internal.DocumentComponentManager

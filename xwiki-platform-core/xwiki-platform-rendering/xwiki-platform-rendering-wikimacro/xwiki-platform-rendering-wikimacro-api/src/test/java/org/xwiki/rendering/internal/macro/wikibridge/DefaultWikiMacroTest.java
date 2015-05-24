@@ -37,7 +37,9 @@ import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.macro.MacroId;
@@ -82,6 +84,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private WikiDescriptorManager mockWikiDescriptorManager;
 
+    private EntityReferenceValueProvider mockCurrentValueProvider;
+
     private Map<String, Object> xcontext;
 
     @Override
@@ -109,8 +113,12 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocBridge).getCurrentWiki();
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
                 allowing(mockDocBridge).getCurrentUser();
                 will(returnValue("dummy"));
                 allowing(mockDocBridge).setCurrentUser(with(any(String.class)));
@@ -134,6 +142,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
 
         // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);

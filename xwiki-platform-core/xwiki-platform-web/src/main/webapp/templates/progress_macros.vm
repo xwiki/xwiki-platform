@@ -19,7 +19,7 @@
     #set($elapsedTimePercent = 100)
   #end
 
-  <li>$progressStep.message #printElapsedTime($elapsedTime) ($mathtool.toInteger($elapsedTimePercent)%)
+  <li>$progressStep.message <em>#printElapsedTime($elapsedTime)</em> ($mathtool.toInteger($elapsedTimePercent)%)
   #if ($progressStep.children.size() > 0)
     <ul>
       #foreach($child in $progressStep.children)

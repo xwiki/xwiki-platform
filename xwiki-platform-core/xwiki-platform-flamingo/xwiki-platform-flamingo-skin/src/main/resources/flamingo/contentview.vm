@@ -25,12 +25,14 @@ $services.progress.startStep('Compute the content to display')
     #set ($renderedContent = $tdoc.getRenderedContent())
   #end
 #end
+$services.progress.endStep()
 
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly
 ## ----------------------------------------------------------------------------
 $services.progress.startStep('Compute title to display and modify rendered content accordingly')
 #template("titlevars.vm")
+$services.progress.endStep()
 
 ## ----------------------------
 ## Display the title
@@ -75,6 +77,7 @@ $services.progress.startStep('Display the title')
     </div>
   </div>
 </div>
+$services.progress.endStep()
 
 ## -----------------------------------------------------------------------------------
 ## Display the footnotes if the document is in 1.0 syntax and if there are any defined
@@ -84,6 +87,7 @@ $services.progress.startStep('Display the title')
 $services.progress.startStep('Display the footnotes')
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
+$services.progress.endStep()
 #end
 
 $services.progress.popLevel()

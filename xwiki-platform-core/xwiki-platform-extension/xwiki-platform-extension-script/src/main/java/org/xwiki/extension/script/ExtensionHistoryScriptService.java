@@ -158,6 +158,24 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
     }
 
     /**
+     * Deserializes a list of history records.
+     * 
+     * @param serializedHistoryRecords the serialized list of history records
+     * @return the list of history records
+     */
+    public List<ExtensionJobHistoryRecord> deserialize(String serializedHistoryRecords)
+    {
+        setError(null);
+
+        try {
+            return this.serializer.deserialize(serializedHistoryRecords);
+        } catch (Exception e) {
+            setError(e);
+            return null;
+        }
+    }
+
+    /**
      * Reads a list of history records from a given input stream (e.g. the attachment content input stream).
      * 
      * @param inputStream an input stream that provides a list of serialized history records

@@ -84,7 +84,7 @@ public class FileSystemMailContentStore implements MailContentStore
             batchDirectory = getBatchDirectory(batchId);
             File file = new File(batchDirectory, messageId);
             InputStream is = new FileInputStream(file);
-            MimeMessage message = new MimeMessage(session, is);
+            MimeMessage message = new ExtendedMimeMessage(session, is);
             return message;
         } catch (Exception e) {
             throw new MailStoreException(String.format(

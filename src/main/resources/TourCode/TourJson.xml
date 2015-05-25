@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>TourCode</web>
+  <name>TourJson</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1432303705000</creationDate>
+  <parent>TourCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1432546484000</date>
+  <contentUpdateDate>1432541912000</contentUpdateDate>
+  <version>1.1</version>
+  <title>TourJson</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content>{{velocity}}
+$response.setContentType('application/json')
+  #set($discard = $doc.use('TourCode.StepClass'))
+  #set($tourDoc = $xwiki.getDocument($request.tourDoc))
+  #set($objects = $tourDoc.getObjects('TourCode.StepClass'))
+  { "steps" : [
+  #foreach($object in $objects)
+    #set($element = $object.getProperty('element').value)
+    #set($title = $object.getProperty('title').value)
+    #set($content = $object.getProperty('content').value)
+    #set($placement = $object.getProperty('placement').value)
+    #set($order = $object.getProperty('order').value)
+    {
+     "element": "$escapetool.json($element)",
+     "title" : "$escapetool.json($title)",
+     "placement" : "$escapetool.json($placement)",
+     "content": "$escapetool.json($content)",
+     "order": "$escapetool.json($order)"
+    }##
+    #if($velocityHasNext)
+    ,
+    #end
+  #end
+  ]}
+{{/velocity}}</content>
+</xwikidoc>

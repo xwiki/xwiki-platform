@@ -742,4 +742,13 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
 # watchlist.realtime.enabled = false
 
+#-------------------------------------------------------------------------------------
+# Debug
+#-------------------------------------------------------------------------------------
+
+#-# Indicate if web resources should be loaded minified by default.
+#-# It's enabled by default which can make js/css hard to read.
+# debug.minify=false
+
+
 $!xwikiPropertiesAdditionalProperties

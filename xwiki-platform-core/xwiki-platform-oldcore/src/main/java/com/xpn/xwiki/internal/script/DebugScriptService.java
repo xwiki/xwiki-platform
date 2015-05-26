@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.event.status.JobProgress;
@@ -45,6 +47,13 @@ public class DebugScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    @Inject
+    @Named("xwikiproperties")
+    private ConfigurationSource properties;
+
+    @Inject
+    private Container container;
+
     /**
      * @return is debug enabled in the current execution context
      */
@@ -65,5 +74,18 @@ public class DebugScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    /**
+     * @return true if resources should be minified when possible
+     */
+    public boolean isMinify()
+    {
+        String minifyString = (String) this.container.getRequest().getProperty("minify");
+        if (minifyString == null) {
+            return Boolean.valueOf(minifyString);
+        }
+
+        return this.properties.getProperty("debug.minify", true);
     }
 }

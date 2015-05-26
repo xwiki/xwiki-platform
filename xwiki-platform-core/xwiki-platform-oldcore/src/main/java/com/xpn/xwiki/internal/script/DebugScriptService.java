@@ -78,6 +78,7 @@ public class DebugScriptService implements ScriptService
 
     /**
      * @return true if resources should be minified when possible
+     * @since 7.1RC1
      */
     public boolean isMinify()
     {

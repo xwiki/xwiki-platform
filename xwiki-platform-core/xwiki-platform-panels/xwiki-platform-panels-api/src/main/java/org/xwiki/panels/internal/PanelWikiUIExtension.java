@@ -20,10 +20,10 @@
 package org.xwiki.panels.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -190,7 +190,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     @Override
     public Map<String, String> getParameters()
     {
-        return MapUtils.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override

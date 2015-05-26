@@ -103,7 +103,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
     private final SUExecutor suExecutor;
 
-    private JobProgressManager progress;
+    private final JobProgressManager progress;
 
     /**
      * Default constructor.

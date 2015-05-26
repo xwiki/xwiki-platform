@@ -82,7 +82,7 @@ public class DebugScriptService implements ScriptService
     public boolean isMinify()
     {
         String minifyString = (String) this.container.getRequest().getProperty("minify");
-        if (minifyString == null) {
+        if (minifyString != null) {
             return Boolean.valueOf(minifyString);
         }
 

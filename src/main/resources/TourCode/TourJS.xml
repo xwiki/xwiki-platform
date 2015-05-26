@@ -152,7 +152,7 @@
 
 define(["bootstrap-tour", "jquery"], function(Tour, $){
   $.ajax({
-    url: 'http://localhost:8084/xwiki/bin/get/TourCode/TourJson?xpage=plain&amp;outputSyntax=plain&amp;tourDoc=Tour.WebHome',
+    url: "$xwiki.getURL('TourCode.TourJson', 'get', 'xpage=plain&amp;outputSyntax=plain&amp;tourDoc=Tour.WebHome')",
     dataType: 'json',
     success: function(response){
       var jsonData = response;

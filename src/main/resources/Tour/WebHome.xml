@@ -618,7 +618,7 @@
       <name/>
     </property>
     <property>
-      <parameters>label=Tour
+      <parameters>label=$services.localization.render('tour.app.title')
 target=Tour.WebHome
 icon=icon:information</parameters>
     </property>

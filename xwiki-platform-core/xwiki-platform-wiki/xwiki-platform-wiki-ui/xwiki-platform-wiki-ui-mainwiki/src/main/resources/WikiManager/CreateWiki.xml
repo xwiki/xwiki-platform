@@ -1162,7 +1162,7 @@ require(['jquery'], function($) {
                 &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
-                &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!request.getParameter('description')&lt;/textarea&gt;
+                &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!escapetool.xml($!request.getParameter('description'))&lt;/textarea&gt;
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;

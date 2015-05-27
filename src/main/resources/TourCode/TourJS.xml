@@ -151,28 +151,35 @@
 });
 
 define(["bootstrap-tour", "jquery"], function(Tour, $){
-  $.ajax({
-    url: "$xwiki.getURL('TourCode.TourJson', 'get', 'xpage=plain&amp;outputSyntax=plain&amp;tourDoc=Tour.WebHome')",
-    dataType: 'json',
-    success: function(response){
-      var jsonData = response;
-      var i, n = jsonData.steps.length;
-      var tour = new Tour ({
-        backdrop: true,
-        storage: false
-      });
-      for(i=0; i&lt;n; i++) {
-        tour.addStep({
-          element: jsonData.steps[i].element,
-          title: jsonData.steps[i].title,
-          content: jsonData.steps[i].content,
-          placement: jsonData.steps[i].placement
+  return {createTour : function(doc){
+    var ajaxOptions = {
+      url: "$xwiki.getURL('TourCode.TourJson', 'get', 'xpage=plain&amp;outputSyntax=plain&amp;tourDoc="+ doc +"')",
+      dataType: 'json',
+      success: function(response){
+        var jsonData = response;
+        var i, n = jsonData.steps.length;
+        var tour = new Tour ({
+          backdrop: true,
+          storage: false
         });
+        for(i=0; i&lt;n; i++) {
+          tour.addStep({
+            element: jsonData.steps[i].element,
+            title: jsonData.steps[i].title,
+            content: jsonData.steps[i].content,
+            placement: jsonData.steps[i].placement
+          });
+        }
+        tour.init();
+        tour.restart();
       }
-      tour.init();
-      tour.restart();
-    }
-  });
+    };
+    var executeAjax = function(doc) {
+      $.ajax(ajaxOptions);
+    };
+    executeAjax(doc);
+  }
+         };
 });</code>
     </property>
     <property>

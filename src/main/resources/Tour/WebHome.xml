@@ -415,7 +415,10 @@
     </property>
     <property>
       <code>if(XWiki.contextaction == 'view'){
-  require([new XWiki.Document('TourJS', 'TourCode').getURL('jsx')], function(){});
+  require([new XWiki.Document('TourJS', 'TourCode').getURL('jsx')], function(Tour, $){
+    var tour = Tour.createTour;
+    tour("$doc");
+  });
 }</code>
     </property>
     <property>

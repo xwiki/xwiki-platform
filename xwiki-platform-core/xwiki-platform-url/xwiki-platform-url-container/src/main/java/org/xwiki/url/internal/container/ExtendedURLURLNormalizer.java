@@ -73,6 +73,8 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
 
             // If there's no request (e.g. the code is executed by a daemon thread), extract the context path from the
             // URL specified by the current execution context.
+            // TODO: Instead of trying to extract from the URL, save the context path at webapp init (using a
+            // ServlettContextListener for example).
             if (contextPath == null) {
                 contextPath = getExecutionContextPath();
 

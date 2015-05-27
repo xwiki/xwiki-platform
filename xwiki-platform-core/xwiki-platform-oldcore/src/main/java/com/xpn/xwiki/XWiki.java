@@ -4095,6 +4095,8 @@ public class XWiki implements EventListener
         if (contextPath == null) {
             // Try getting the context path by asking the request for it (if a request exists!) and if it doesn't
             // work try extracting it from the context URL.
+            // TODO: Instead of trying to extract from the URL, save the context path at webapp init (using a
+            // ServlettContextListener for example).
             XWikiRequest request = context.getRequest();
             if (request != null) {
                 contextPath = request.getContextPath();

@@ -148,7 +148,7 @@ public class DistributionScriptService implements ScriptService
     public boolean hasMainDefaultUIExtension()
     {
         ExtensionId extension = this.distributionManager.getMainUIExtensionId();
-        return extension != null && StringUtils.isNoneBlank(extension.getId());
+        return extension != null && StringUtils.isNotBlank(extension.getId());
     }
 
     /**
@@ -157,7 +157,7 @@ public class DistributionScriptService implements ScriptService
     public boolean hasWikiDefaultUIExtension()
     {
         ExtensionId extension = this.distributionManager.getWikiUIExtensionId();
-        return extension != null && StringUtils.isNoneBlank(extension.getId());
+        return extension != null && StringUtils.isNotBlank(extension.getId());
     }
 
     /**

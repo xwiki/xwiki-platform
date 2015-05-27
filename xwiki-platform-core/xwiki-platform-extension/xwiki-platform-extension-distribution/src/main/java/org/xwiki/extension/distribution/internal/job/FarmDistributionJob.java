@@ -73,7 +73,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
 
         // Step 2: Upgrade other wikis
         ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
-        if (wikiUI != null && StringUtils.isNoneBlank(wikiUI.getId())) {
+        if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
             // ... but only if the wiki extension ID is defined
             try {
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,

@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content/>
+  <content>{{velocity}}
+#set($docextras = [])
+{{/velocity}}</content>
   <object>
     <name>Tour.WebHome</name>
     <number>0</number>

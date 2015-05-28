@@ -7,6 +7,19 @@ XWiki.FlavorOrDefaultUIStep = Class.create({
   initialize : function (isFlavorStep) {
     this.isFlavorStep = isFlavorStep;
     document.observe('xwiki:extension:statusChanged', this._onExtensionStatusChanged.bindAsEventListener(this));
+    
+    // Disable the install button if no flavor is selected (and do it every time the picker is updated)
+    require(['jquery'], function ($) {
+      $('.xwiki-flavor-picker').on('xwiki:flavorpicker:updated', function() {
+        var selectedItems = $(this).find('input[name="flavor"]:checked').length;
+        var installButton = $('input[name="installFlavor"]');
+        if (selectedItems > 0) {
+          installButton.removeAttr('disabled');
+        } else {
+          installButton.attr('disabled', 'disabled');
+        }
+      });
+    });
   },
 
   /**

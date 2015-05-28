@@ -202,12 +202,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     /**
      * Search among all remote (those listed in xwiki.properties)
-     * {@link org.xwiki.extension.repository.search.Searchable} repositories for extensions matching the search terms.
+     * {@link org.xwiki.extension.repository.search.AdvancedSearchable} repositories for extensions matching the search
+     * query.
      * 
      * @param query the search query
      * @return the found extensions descriptors, empty list if nothing could be found
      * @see org.xwiki.extension.repository.search.Searchable
-     * @since 7.1M1
+     * @since 7.1RC1
      */
     public IterableResult<Extension> search(ExtensionQuery query)
     {
@@ -215,9 +216,11 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     }
 
     /**
+     * Create a new instance of a {@link ExtensionQuery} to be used in other APIs.
+     * 
      * @param query the query to execute
      * @return a {@link ExtensionQuery} instance
-     * @since 7.1M1
+     * @since 7.1RC1
      */
     public ExtensionQuery newQuery(String query)
     {

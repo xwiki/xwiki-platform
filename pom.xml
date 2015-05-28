@@ -30,7 +30,7 @@
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-tour</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1</version>
   <packaging>xar</packaging>
   <name>Tour Application</name>
   <description>This application provides for the users a possibility to create tour guides for every page they want.</description>
@@ -44,7 +44,7 @@
     <connection>scm:git:git://github.com/xwiki-contrib/application-tour.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/application-tour.git</developerConnection>
     <url>https://github.com/xwiki-contrib/application-tour</url>
-    <tag>HEAD</tag>
+    <tag>application-tour-0.1</tag>
   </scm>
   <distributionManagement>
    <repository>

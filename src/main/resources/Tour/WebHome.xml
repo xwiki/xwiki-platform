@@ -125,10 +125,10 @@
       </title>
     </class>
     <property>
-      <content>Let's begin our journey</content>
+      <content>Search inside pages for relevant content</content>
     </property>
     <property>
-      <element>#tmUser</element>
+      <element>.globalsearch .input-group</element>
     </property>
     <property>
       <order>1</order>
@@ -137,7 +137,7 @@
       <placement>left</placement>
     </property>
     <property>
-      <title>User Info</title>
+      <title>Search content</title>
     </property>
   </object>
   <object>

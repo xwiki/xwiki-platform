@@ -497,8 +497,12 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>WikiManager.CreateWiki</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bc5c00d1-8408-441d-bd15-8ba694dd7613</guid>
     <class>
-      <name>XWiki.StyleSheetExtension</name>
+      <name>XWiki.JavaScriptExtension</name>
       <customClass/>
       <customMapping/>
       <defaultViewSheet/>
@@ -568,32 +572,226 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManager.CreateWiki</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
-      <code>#contentmenu, #hierarchy, #document-info, #xdocFooter{
+      <code>
+#if (!$services.distribution.hasWikiDefaultUIExtension())
+/**************************************************************
+ * Code to make the dynamic "flavor/template" tab bar
+ **************************************************************/
+require(['jquery'], function($) {
+  $(window).ready(function(){
+    $('.flavor_template  &gt; .xwikitabbar &gt; li &gt; a').click(function(event) {
+      var thisTabWidget = $(this).parents('.flavor_template');
+      // Change the tab bar
+      var activeTab = thisTabWidget.find('.xwikitabbar .active');
+      activeTab.removeClass('active');
+      var targetTab = $(this).parents('li');
+      targetTab.addClass('active');
+      // Change the tab content
+      var activeTabContent = thisTabWidget.find('.xwiki-createwiki-tab.active');
+      var targetTabContent = thisTabWidget.find($(this).attr('href') + '-tab');
+      activeTabContent.removeClass('active').fadeOut(400, function() {
+        // Display the new tab container when the old one is completly hidden
+        targetTabContent.hide().fadeIn().removeClass('hidden').addClass('active');
+      });
+      // Do not follow the link
+      return false;
+    });
+  });
+});
+/**************************************************************
+ * Code to only have a flavor or a template used, never both
+ **************************************************************/
+require(['jquery'], function($) {
+  $(window).ready(function(){
+    /**
+     * When a template is selected, unselect the flavor
+     */
+    $('#'+'template').change(function(event) {
+      if (this.value != 'xwikinotemplate') {
+        $('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
+        $('input[name="flavor"]:radio:checked').prop('checked', false);
+      }
+    });
+    
+    /**
+     * When a flavor is selected, unselect the template
+     */
+    var onFlavorChanged = function(event) {
+      $('#'+'template').val('xwikinotemplate');
+    }
+    $('input[name="flavor"]:radio').change(onFlavorChanged);
+    $('.xwiki-flavor-picker-option').click(onFlavorChanged);
+  });
+});
+#end
+</code>
+    </property>
+    <property>
+      <name>Tabs</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <name>WikiManager.CreateWiki</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#contentmenu, #hierarchy, #document-info, #xdocFooter {
   display: none;
 }
 
-#label_set_as_template, #set_as_template{
+#label_set_as_template, #set_as_template {
   display: inline;
   text-transform: none;
 }
 
-.whatnext{
+.whatnext {
   margin: 1em;
-}</code>
+}
+
+## Flavor/Template section
+#if (!$services.distribution.hasWikiDefaultUIExtension())
+
+.flavor_template {
+  margin-top: 10px;
+}
+
+.xwiki-createwiki-tabs{
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.xwiki-createwiki-tabs li {
+  float: left;
+  display: block;
+  width: 50%;
+  text-align: center;
+  padding: 1em;
+  border: 1px solid #ccc;
+}
+
+.xwiki-createwiki-tabs-content {
+  border: 1px solid #ccc;
+  border-top: 0;
+  clear: both;
+  padding: 5px;
+}
+
+.xwiki-createwiki-flavor-picker .xwiki-flavor-picker-results-container{
+  height: 233px;
+}
+
+#end
+</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>CSS</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>currentPage</use>
@@ -635,6 +833,22 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -734,6 +948,9 @@ return XWiki;
       </code>
     </property>
     <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
       <name>Progress Bar stylesheet</name>
     </property>
     <property>
@@ -759,13 +976,14 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
+
 ## If all dependencies are OK, we call the controller
 #if ($services.wiki &amp;&amp; $services.wiki.creationjob)
   #controller()
 #else
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
-
 #end
+
 ##################################
 ##         CONTROLLER
 ##################################
@@ -847,13 +1065,43 @@ return XWiki;
 ##################################
 #macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;#end
 ##################################
+##        TEMPLATE FIELDS
+##
+## Display the 'template' fields
+##################################
+#macro(displayTemplateFields $templates)
+  #if ($templates.size() &gt; 0)
+    &lt;select name="template" id="template"&gt;
+      &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
+      #foreach ($template in $templates)
+        #set ($name = $template.id)
+        #if ($stringtool.isNotBlank("$!template.prettyName"))
+          #set($name = "${template.prettyName} (${name})")
+        #end
+        #set($selected = '')
+        #if($request.template == $template.id)
+          #set($selected = 'selected="selected"')
+        #end
+        &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
+      #end
+    &lt;/select&gt;
+  #end
+  &lt;p class="xformInline"&gt;
+    #set ($isTemplate = '')
+    #if ("$!request.set_as_template" != '')
+      #set ($isTemplate = 'checked="checked"')
+    #end
+    &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
+    &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
+  &lt;/p&gt;
+#end
+##################################
 ##          STEP TYPE
 ##
 ## The type is the first step on the creation
 ##################################
 #macro(stepType)
   #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.nameAndType'), 1)
@@ -914,7 +1162,7 @@ return XWiki;
                 &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
-                &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!request.getParameter('description')&lt;/textarea&gt;
+                &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!escapetool.xml($request.getParameter('description'))&lt;/textarea&gt;
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
@@ -922,9 +1170,40 @@ return XWiki;
         &lt;/div&gt;
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
-          ### TEMPLATE ###
+          ### TEMPLATE / FLAVOR ###
           #set ($templates = $services.wiki.template.getTemplates())
-          &lt;div&gt;
+          #if (!$services.distribution.hasWikiDefaultUIExtension())
+            #template('flavor/macros.vm')
+            &lt;dl&gt;
+              &lt;dt&gt;
+                &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.label')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.hint')&lt;/span&gt;
+              &lt;/dt&gt;
+              #set ($currentTab = 'flavors')
+              #if ("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+                #set ($currentTab = 'templates')
+              #end
+              &lt;dd class="flavor_template"&gt;
+                &lt;ul class="xwikitabbar"&gt;
+                  &lt;li #if($currentTab=='flavors')class="active"#end&gt;&lt;a href="#flavors"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.flavorTab')&lt;/a&gt;&lt;/li&gt;
+                  &lt;li #if($currentTab=='templates')class="active"#end&gt;&lt;a href="#templates"&gt;$services.localization.render('platform.wiki.create.wizard.flavortemplate.templateTab')&lt;/a&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+                &lt;div class="xwiki-createwiki-tabs-content"&gt;
+                  #set ($defaultFlavor = "$!request.flavor")
+                  #if ($defaultFlavor == '')
+                    #set ($defaultFlavor = 'noFlavor')
+                  #end
+                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='flavors')active#{else}hidden#end" id="flavors-tab"&gt;
+                    #displayFlavorPicker('flavor', $defaultFlavor, false, 'xwiki-createwiki-flavor-picker', true)
+                  &lt;/div&gt;
+                  &lt;div class="xwiki-createwiki-tab #if($currentTab=='templates')active#{else}hidden#end" id="templates-tab"&gt;
+                    #displayTemplateFields($templates)
+                  &lt;/div&gt;
+                &lt;/div&gt;
+              &lt;/dd&gt;
+            &lt;/dl&gt;
+          #else
+            ## There is a default UI configured, so we do not display the flavor picker
             &lt;dl&gt;
               &lt;dt&gt;
                 #if ($templates.size() &gt; 0)
@@ -935,33 +1214,10 @@ return XWiki;
                 #end
               &lt;/dt&gt;
               &lt;dd&gt;
-                #if ($templates.size() &gt; 0)
-                  &lt;select name="template" id="template"&gt;
-                    &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
-                    #foreach ($template in $templates)
-                      #set ($name = $template.id)
-                      #if ($stringtool.isNotBlank("$!template.prettyName"))
-                        #set($name = "${template.prettyName} (${name})")
-                      #end
-                      #set($selected = '')
-                      #if($request.template == $template.id)
-                        #set($selected = 'selected="selected"')
-                      #end
-                      &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
-                    #end
-                  &lt;/select&gt;
-                #end
+                #displayTemplateFields($templates)
               &lt;/dd&gt;
             &lt;/dl&gt;
-            &lt;p class="xformInline"&gt;
-              #set ($isTemplate = '')
-              #if ("$!request.set_as_template" != '')
-                #set ($isTemplate = 'checked="checked"')
-              #end
-              &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
-              &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
-            &lt;/p&gt;
-          &lt;/div&gt;
+          #end
         ### END OF WIZARD SECOND HALF
         &lt;/div&gt;
       ### END OF WIZARD BODY
@@ -970,7 +1226,6 @@ return XWiki;
       #wizardFooter('', 'members', '')
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##          STEP MEMBERS
@@ -978,8 +1233,7 @@ return XWiki;
 ## The members step is the lasy
 ##################################
 #macro(stepMembers)
-#set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
@@ -991,6 +1245,7 @@ return XWiki;
         &lt;input type="hidden" name="wikialias" value="$!escapetool.xml($request.wikialias)" /&gt;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
+        &lt;input type="hidden" name="flavor" value="$!escapetool.xml($request.flavor)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
         &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
         #userPicker_import(true)
@@ -1106,7 +1361,6 @@ return XWiki;
       #wizardFooter('type', '', 'create')
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##       GET REQUEST LIST
@@ -1139,7 +1393,6 @@ return XWiki;
   #end
   ## CSRF checkFailed to execute the [velocity] macro. Click on this m
   #if (!$services.csrf.isTokenValid($request.form_token))
-
     {{warning}}
       {{translation key="platform.wiki.csrf.error" /}}
     {{/warning}}
@@ -1175,7 +1428,7 @@ return XWiki;
   #if("$!ownerId" == '')
     ## If the ownerId is null, then set the current user
     #set($ownerId = $services.model.serialize($xcontext.userReference, 'default'))
-  #else 
+  #else
     #set($ownerId = $services.model.serialize($services.model.resolveDocument($ownerId), 'default'))
   #end
   #set($discard = $wikiCreationRequest.setOwnerId($ownerId))
@@ -1186,8 +1439,13 @@ return XWiki;
     ## Create a wiki from a template
     #set($discard = $wikiCreationRequest.setWikiSource('template'))
     #set($discard = $wikiCreationRequest.setTemplateId($request.template))
-  #else
+  #elseif("$!request.flavor" != '' &amp;&amp; $request.flavor != 'noFlavor')
     ## Create a wiki from an extension
+    #set($discard = $wikiCreationRequest.setWikiSource('extension'))
+    #set($flavorExtension = $request.flavor.split(':::'))
+    #set($discard = $wikiCreationRequest.setExtensionId($flavorExtension[0], $flavorExtension[1]))
+  #elseif($services.distribution.hasWikiDefaultUIExtension())
+    ## Default action when a default UI is configured for subwikis
     #set($discard = $wikiCreationRequest.setWikiSource('extension'))
     #set($discard = $wikiCreationRequest.setExtensionId($services.wiki.creationjob.defaultWikiExtensionId))
   #end
@@ -1210,9 +1468,7 @@ return XWiki;
   ## Start the creation job
   #set($job = $services.wiki.creationjob.createWiki($wikiCreationRequest))
   #if (!$job)
-
     {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.creationjob.lastError]){{/error}}
-    
   #else
     #creation()
   #end
@@ -1244,7 +1500,6 @@ return XWiki;
   #set ($status = $services.wiki.creationjob.getJobStatus($request.wikiname))
   #set ($errors = $status.log.getLogs('ERROR'))
   #set ($hasError = ($errors.size() &gt; 0))
-  
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($request.wikiname)" /&gt;
@@ -1293,7 +1548,6 @@ return XWiki;
     #wizardFooter('', '', '', 'finalize', $finalizeHidden, 'cleanUp', $cleanUpHidden)
     &lt;/form&gt;
   {{/html}}
-
 #end
 ##################################
 ##           FINALIZE
@@ -1335,7 +1589,6 @@ return XWiki;
     #end
   #else
     #set($wikiId = $request.wikiId)
-
     {{html}}
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
       &lt;div class="wizard-body"&gt;
@@ -1351,7 +1604,6 @@ return XWiki;
       &lt;/div&gt;
       &lt;/form&gt;
     {{/html}}
-
   #end
 #end
 #macro (getExtensionURL $extensionId $extensionVersion $extraParams)
@@ -1393,6 +1645,5 @@ return XWiki;
 #end
 $xwiki.getURL('XWiki.XWikiPreferences', 'admin', "editor=globaladmin&amp;section=XWiki.AddExtensions&amp;${queryString.substring(1)}")##
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

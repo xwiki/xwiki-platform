@@ -30,10 +30,32 @@ import java.util.Iterator;
 public interface MailStatusResult
 {
     /**
-     * @return the number of emails that have started the sending process (i.e. that have been through the "ready to
-     *         send" state at least.
+     * @return the total number of mails to be sent in this batch. Note that this value is known only once all mails
+     *         have been prepared on the Prepare Queue. Until then, the value returned is -1 signifying that the total
+     *         number is currently unknown.
+     * @since 7.1M2
      */
-    long getSize();
+    long getTotalMailCount();
+
+    /**
+     * @return the current number of mails that have been sent (successfully or not).
+     * @since 7.1M2
+     */
+    long getProcessedMailCount();
+
+    /**
+     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     * @since 7.1M2
+     */
+    void waitTillProcessed(long timeout);
+
+    /**
+     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
+     * @since 7.1M2
+     */
+    boolean isProcessed();
 
     /**
      * @return the status for all mails

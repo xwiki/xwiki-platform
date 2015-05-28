@@ -114,9 +114,7 @@ public class GroupMimeMessageIterator extends AbstractMessageIterator
 
             Map<String, Object> parameters = (Map<String, Object>) this.parameters.get("parameters");
 
-            // Note: We don't create a Session here ATM since it's not required. The returned MimeMessage will be
-            // given a valid Session when it's deserialized from the mail content store for sending.
-            mimeMessage = this.factory.createMessage(null, this.parameters.get("source"), parameters);
+            mimeMessage = this.factory.createMessage(this.parameters.get("source"), parameters);
             mimeMessage.addRecipients(Message.RecipientType.TO, email);
         } else {
             getLogger().warn("User [{}] has no email defined. Email has not been sent to that user.", userReference);

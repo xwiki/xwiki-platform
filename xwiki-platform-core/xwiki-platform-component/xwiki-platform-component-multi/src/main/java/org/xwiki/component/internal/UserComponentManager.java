@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -43,7 +42,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 @Component
 @Named(UserComponentManager.ID)
 @Singleton
-public class UserComponentManager extends AbstractGenericComponentManager implements Initializable
+public class UserComponentManager extends AbstractEntityComponentManager implements Initializable
 {
     /**
      * The identifier of this {@link ComponentManager}.
@@ -80,11 +79,24 @@ public class UserComponentManager extends AbstractGenericComponentManager implem
         setInternalParent(this.documentComponentManager);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override {@link AbstractEntityComponentManager#getKey()} because the prefix is not the reference type here.
+     * 
+     * @see org.xwiki.component.internal.AbstractEntityComponentManager#getKey()
+     */
     @Override
     protected String getKey()
     {
-        DocumentReference userReference = this.documentAccessBridge.getCurrentUserReference();
+        DocumentReference userReference = getCurrentReference();
 
         return userReference != null ? KEY_PREFIX + this.referenceSerializer.serialize(userReference) : null;
+    }
+
+    @Override
+    protected DocumentReference getCurrentReference()
+    {
+        return this.documentAccessBridge.getCurrentUserReference();
     }
 }

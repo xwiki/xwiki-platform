@@ -9,6 +9,9 @@ org.xwiki.mail.internal.thread.PrepareMailQueueManager
 org.xwiki.mail.internal.thread.SendMailQueueManager
 org.xwiki.mail.internal.thread.PrepareMailRunnable
 org.xwiki.mail.internal.thread.SendMailRunnable
+org.xwiki.mail.internal.thread.context.ExecutionContextCopier
+org.xwiki.mail.internal.thread.context.XWikiContextCopier
+org.xwiki.mail.internal.thread.context.XWikiRequestCopier
 org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration
@@ -18,6 +21,7 @@ org.xwiki.mail.internal.DefaultSessionFactory
 org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory
 org.xwiki.mail.internal.factory.text.TextMimeBodyPartFactory
 org.xwiki.mail.internal.factory.html.HTMLMimeBodyPartFactory
+org.xwiki.mail.internal.factory.message.MessageMimeMessageFactory
 org.xwiki.mail.internal.factory.template.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.factory.template.SecureTemplateMimeBodyPartFactory
 org.xwiki.mail.internal.factory.template.TemplateMimeMessageFactory

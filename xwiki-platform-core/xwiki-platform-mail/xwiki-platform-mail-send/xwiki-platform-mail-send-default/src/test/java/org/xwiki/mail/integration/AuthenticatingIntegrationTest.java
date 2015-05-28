@@ -58,6 +58,7 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
+import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -79,6 +80,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.4M1
  */
+// @formatter:off
 @ComponentList({
     TextMimeBodyPartFactory.class,
     AttachmentMimeBodyPartFactory.class,
@@ -91,6 +93,7 @@ import static org.mockito.Mockito.when;
     SendMailQueueManager.class,
     FileSystemMailContentStore.class
 })
+// @formatter:on
 public class AuthenticatingIntegrationTest
 {
     // Required by GreenMail.
@@ -119,20 +122,23 @@ public class AuthenticatingIntegrationTest
         // Required by GreenMail. When using XWiki with Gmail for example this is not required.
         properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
-        this.configuration = new TestMailSenderConfiguration(
-            this.mail.getSmtps().getPort(), "peter", "password", properties);
+        this.configuration =
+            new TestMailSenderConfiguration(this.mail.getSmtps().getPort(), "peter", "password", properties);
         this.componentManager.registerComponent(MailSenderConfiguration.class, this.configuration);
 
         // Set the current wiki in the Context
         ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
-        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);
+
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
+            ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
@@ -145,8 +151,9 @@ public class AuthenticatingIntegrationTest
         // Create a user in the SMTP server.
         this.mail.setUser("peter@doe.com", "peter", "password");
 
-        this.defaultBodyPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
+        this.defaultBodyPartFactory =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
+                String.class));
         this.sender = this.componentManager.getInstance(MailSender.class);
     }
 
@@ -169,9 +176,10 @@ public class AuthenticatingIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         when(execution.getContext()).thenReturn(executionContext);
 
-        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        Copier<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
-        when(ecm.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
 
         // Step 1: Create a JavaMail Session
         Properties properties = this.configuration.getAllProperties();

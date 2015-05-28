@@ -33,11 +33,14 @@ import javax.mail.internet.MimeMessage;
 public class ExtendedMimeMessage extends MimeMessage
 {
     /**
-     * @param session see javadoc for {@link MimeMessage#MimeMessage(javax.mail.Session)}
+     * Create a new extended MimeMessage.
+     *
+     * Note: We don't care about supporting Session here ATM since it's not required. MimeMessages will be
+     * given a valid Session when it's deserialized from the mail content store for sending.
      */
-    public ExtendedMimeMessage(Session session)
+    public ExtendedMimeMessage()
     {
-        super(session);
+        super((Session) null);
     }
 
     /**

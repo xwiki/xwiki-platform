@@ -96,6 +96,10 @@ public class MockitoOldcoreRule implements MethodRule
 
     private XWiki mockXWiki;
 
+    protected File permanentDirectory;
+
+    protected File temporaryDirectory;
+
     private XWikiStoreInterface mockStore;
 
     private XWikiRightService mockRightService;
@@ -150,6 +154,16 @@ public class MockitoOldcoreRule implements MethodRule
     public void notifyDocumentDeletedEvent(boolean notifyDocumentDeletedEvent)
     {
         this.notifyDocumentDeletedEvent = notifyDocumentDeletedEvent;
+    }
+
+    /**
+     * Enabled notification of component descriptor registration/unregistration.
+     * 
+     * @throws ComponentLookupException when failing to lookup {@link ObservationManager} component
+     */
+    public void notifyComponentDescriptorEvent() throws ComponentLookupException
+    {
+        this.componentManager.notifyComponentDescriptorEvent();
     }
 
     @Override
@@ -215,6 +229,12 @@ public class MockitoOldcoreRule implements MethodRule
             environment.setServletContext(servletContextMock);
             when(servletContextMock.getAttribute("javax.servlet.context.tempdir")).thenReturn(
                 new File(System.getProperty("java.io.tmpdir")));
+
+            File testDirectory = new File("target/test-" + new Date().getTime());
+            this.temporaryDirectory = new File(testDirectory, "temporary-dir");
+            this.permanentDirectory = new File(testDirectory, "permanent-dir");
+            environment.setTemporaryDirectory(this.temporaryDirectory);
+            environment.setPermanentDirectory(this.permanentDirectory);
         }
 
         // Initialize the Execution Context
@@ -609,6 +629,16 @@ public class MockitoOldcoreRule implements MethodRule
     public XWiki getMockXWiki()
     {
         return this.mockXWiki;
+    }
+
+    public File getPermanentDirectory()
+    {
+        return this.permanentDirectory;
+    }
+
+    public File getTemporaryDirectory()
+    {
+        return this.temporaryDirectory;
     }
 
     public XWikiRightService getMockRightService()

@@ -125,12 +125,12 @@ public class WikiCreationJobTest
         InOrder inOrder = inOrder(step1, step2, step3, progressManager);
         // Verify that the steps are executed in the good order
         inOrder.verify(progressManager).pushLevelProgress(eq(3), any(Object.class));
+        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step2).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager, calls(1)).stepPropress(any(Object.class));
+        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step3).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager, calls(1)).stepPropress(any(Object.class));
+        inOrder.verify(progressManager, calls(1)).startStep(any(Object.class));
         inOrder.verify(step1).execute(any(WikiCreationRequest.class));
-        inOrder.verify(progressManager, calls(1)).stepPropress(any(Object.class));
         inOrder.verify(progressManager).popLevelProgress(any(Object.class));
     }
 

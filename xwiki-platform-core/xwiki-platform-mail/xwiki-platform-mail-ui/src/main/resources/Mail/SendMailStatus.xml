@@ -95,7 +95,9 @@
 #set($options = {
    'resultPage': 'Mail.SendMailStatusJSON',
    'translationPrefix' : 'Mail.SendMailStatus_livetable.',
-   'tagCloud' : false
+   'tagCloud' : false,
+   'selectedColumn' : 'date',
+   'defaultOrder' : 'desc'
 })
 #livetable('sendmailstatus' $columns $columnsProperties $options)
 {{/velocity}}</content>

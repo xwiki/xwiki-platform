@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>Lumen</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414591903000</creationDate>
-  <date>1418727264000</date>
-  <contentUpdateDate>1418668181000</contentUpdateDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1431948342000</date>
+  <contentUpdateDate>1431940821000</contentUpdateDate>
   <version>1.1</version>
   <title>Lumen</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>FlamingoThemes.Lumen</name>
+    <number>0</number>
+    <className>FlamingoThemesCode.ThemeClass</className>
+    <guid>8223dbc4-8e2c-4c4a-bdbd-09594e436d88</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -500,6 +502,15 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </font-size-base>
+      <headings-color>
+        <disabled>0</disabled>
+        <name>headings-color</name>
+        <number>59</number>
+        <prettyName>headings-color</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </headings-color>
       <input-bg>
         <customDisplay/>
         <disabled>0</disabled>
@@ -776,10 +787,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </xwiki-page-content-bg>
     </class>
-    <name>FlamingoThemes.Lumen</name>
-    <number>0</number>
-    <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>8223dbc4-8e2c-4c4a-bdbd-09594e436d88</guid>
     <property>
       <body-bg/>
     </property>
@@ -889,6 +896,9 @@
       <font-size-base/>
     </property>
     <property>
+      <headings-color/>
+    </property>
+    <property>
       <input-bg/>
     </property>
     <property>
@@ -910,7 +920,7 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode>// Lumen 3.3.1
+      <lessCode>// Lumen 3.3.4
 // Variables
 // --------------------------------------------------
 
@@ -1013,7 +1023,7 @@
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
 
-@line-height-large:         1.33;
+@line-height-large:         1.3333333; // extra decimals for Win 8.1 Chrome
 @line-height-small:         1.5;
 
 @border-radius-base:        4px;
@@ -1101,6 +1111,7 @@
 
 // TODO: Rename `@input-border-radius` to `@input-border-radius-base` in v4
 //** Default `.form-control` border radius
+// This has no effect on `&lt;select&gt;`s in some browsers, due to the limited stylability of `&lt;select&gt;`s in CSS.
 @input-border-radius:            @border-radius-base;
 //** Large `.form-control` border radius
 @input-border-radius-large:      @border-radius-large;
@@ -1119,6 +1130,9 @@
 @input-height-large:             (ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2);
 //** Small `.form-control` height
 @input-height-small:             (floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2);
+
+//** `.form-group` margin
+@form-group-margin-bottom:       15px;
 
 @legend-color:                   @gray-dark;
 @legend-border-color:            #e5e5e5;
@@ -1179,7 +1193,8 @@
 @zindex-popover:           1060;
 @zindex-tooltip:           1070;
 @zindex-navbar-fixed:      1030;
-@zindex-modal:             1040;
+@zindex-modal-background:  1040;
+@zindex-modal:             1050;
 
 
 //== Media queries breakpoints
@@ -1769,11 +1784,11 @@
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-// Lumen 3.3.1
+// Lumen 3.3.4
 // Bootswatch
 // -----------------------------------------------------
 
-@import url("//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic");
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic");
 
 .shadow (@width: 4px) {
   border-width: 0 1px @width 1px;
@@ -1788,7 +1803,7 @@
 // Buttons ====================================================================
 
 .btn {
-  padding: @padding-base-vertical+2 @padding-base-horizontal @padding-base-vertical;
+  padding: (@padding-base-vertical + 2) @padding-base-horizontal @padding-base-vertical;
   .shadow();
   font-size: 12px;
   font-weight: bold;
@@ -1807,18 +1822,18 @@
 
   &amp;-lg,
   &amp;-group-lg &gt; .btn {
-    padding: @padding-large-vertical+2 @padding-large-horizontal @padding-large-vertical;
+    padding: (@padding-large-vertical + 2) @padding-large-horizontal @padding-large-vertical;
     line-height: 15px;
   }
 
   &amp;-sm,
   &amp;-group-sm &gt; .btn {
-    padding: @padding-small-vertical+2 @padding-small-horizontal @padding-small-vertical;
+    padding: (@padding-small-vertical + 2) @padding-small-horizontal @padding-small-vertical;
   }
 
   &amp;-xs,
   &amp;-group-xs &gt; .btn {
-    padding: @padding-xs-vertical+2 @padding-xs-horizontal @padding-xs-vertical;
+    padding: (@padding-xs-vertical + 2) @padding-xs-horizontal @padding-xs-vertical;
   }
 
   &amp;-default:hover,
@@ -1894,6 +1909,18 @@
 
     &amp;:active {
       margin-top: 16px
+    }
+  }
+}
+
+.btn-group-vertical {
+  .btn + .btn {
+    &amp;:hover {
+      border-top-width: 1px;
+    }
+
+    &amp;:active {
+      border-top-width: 2px;
     }
   }
 }
@@ -2050,8 +2077,7 @@ label {
   .open &gt; a,
   .open &gt; a:hover,
   .open &gt; a:focus {
-    padding-top: @padding-large-vertical + 3px;
-    padding-bottom: @padding-large-vertical + 3px;
+    padding-bottom: (@padding-large-vertical + 3);
     margin-top: 0;
   }
 
@@ -2063,9 +2089,13 @@ label {
 
   &gt; li.disabled &gt; a:hover,
   &gt; li.disabled &gt; a:focus {
-    padding-top: @padding-large-vertical;
-    padding-bottom: @padding-large-vertical;
+    padding-top: 10px;
+    padding-bottom: 10px;
     margin-top: 6px;
+  }
+
+  &amp;.nav-justified &gt; li {
+    vertical-align: bottom;
   }
 }
 
@@ -2294,5 +2324,4 @@ a.list-group-item {
       <xwiki-page-content-bg/>
     </property>
   </object>
-  <content/>
 </xwikidoc>

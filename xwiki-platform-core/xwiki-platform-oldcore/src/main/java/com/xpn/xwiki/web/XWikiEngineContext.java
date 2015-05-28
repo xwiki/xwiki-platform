@@ -27,23 +27,23 @@ import org.xwiki.environment.Environment;
 
 public interface XWikiEngineContext
 {
-    public Object getAttribute(String name);
+    Object getAttribute(String name);
 
-    public void setAttribute(String name, Object value);
+    void setAttribute(String name, Object value);
 
-    public String getRealPath(String path);
+    String getRealPath(String path);
 
-    public String getMimeType(String filename);
+    String getMimeType(String filename);
 
     /**
      * @deprecated since 3.5M1, use {@link Environment#getResource(String)} instead
      */
     @Deprecated
-    public URL getResource(String name) throws MalformedURLException;
+    URL getResource(String name) throws MalformedURLException;
 
     /**
      * @deprecated since 3.5M1, use {@link Environment#getResourceAsStream(String)} instead
      */
     @Deprecated
-    public InputStream getResourceAsStream(String name);
+    InputStream getResourceAsStream(String name);
 }

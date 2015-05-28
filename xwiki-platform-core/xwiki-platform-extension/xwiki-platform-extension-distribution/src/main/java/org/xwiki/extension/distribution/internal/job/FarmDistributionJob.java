@@ -31,8 +31,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WikisFlavorDistributionStep;
+import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -47,29 +50,51 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
     protected List<DistributionStep> createSteps()
     {
         List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
-
+        
         // Step 1: Install/upgrade main wiki UI
-
-        try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                DefaultUIDistributionStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get default UI step instance");
+        ExtensionId mainUI = getUIExtensionId();
+        if (mainUI != null && StringUtils.isNotBlank(mainUI.getId())) {
+            // ... but only if the main extension ID is defined
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        DefaultUIDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get default UI step instance");
+            }
+        } else {
+            // Display the flavor step
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        FlavorDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get flavor step instance");   
+            }
         }
 
         // Step 2: Upgrade other wikis
-
-        try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                WikisDefaultUIDistributionStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get all in one default UI step instance");
+        ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
+        if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
+            // ... but only if the wiki extension ID is defined
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        WikisDefaultUIDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get all in one default UI step instance");
+            }
+        } else {
+            // Display the wikis flavor step
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        WikisFlavorDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get all in one flavor step instance");
+            }
         }
 
         // Step 3: Upgrade outdated extensions
 
         try {
-            steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
+            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                 OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to get outdated extensions step instance");
@@ -79,7 +104,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
     }
 
     @Override
-    public DistributionJobStatus< ? > getPreviousStatus()
+    public DistributionJobStatus<?> getPreviousStatus()
     {
         return this.distributionManager.getPreviousFarmJobStatus();
     }

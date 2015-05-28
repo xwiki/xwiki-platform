@@ -63,12 +63,16 @@
   ##===============
   #set($order = "$!request.sort")
   #if($order != '')
-    #set($orderDirection = "$!{request.get('dir')}")
-    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
-      #set($orderDirection = 'desc')
+    #if($order == 'error')
+      #set($order = 'errorSummary')
+    #end
+    #set($orderDirection = true)
+    #if("$!{request.get('dir')}" != '' &amp;&amp; "$!{request.get('dir')}" != 'asc')
+      #set($orderDirection = false)
     #end
   #else
     #set($order = "date")
+    #set($orderDirection = false)
   #end
   ## ===========
   ## Filter Data
@@ -101,7 +105,7 @@
     #set ($discard = $filterMap.put('errorSummary', "%${filterError.trim()}%"))
   #end
   #set ($totalrows = $services.mailstorage.count($filterMap))
-  #set ($results = $services.mailstorage.load($filterMap, $offset, $limit))
+  #set ($results = $services.mailstorage.load($filterMap, $offset, $limit, $order, $orderDirection))
   ## ===============
   ## JSON Generation
   ## ===============

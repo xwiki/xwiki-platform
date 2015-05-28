@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -35,16 +33,18 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
 
 /**
+ * Saves mail statuses in the database.
+ *
  * @version $Id$
  * @since 6.4M3
  */
@@ -91,7 +91,7 @@ public class DatabaseMailListener implements MailListener, Initializable
         String messageId = getMessageId(message);
         MailStatus status;
         try {
-            status = loadMailStatus(messageId, parameters);
+            status = this.mailStatusStore.load(messageId);
             if (status == null) {
                 // It's not normal to have no status in the mail status store since onPrepare should have been called
                 // before.
@@ -119,6 +119,8 @@ public class DatabaseMailListener implements MailListener, Initializable
         } else {
             saveStatus(status, parameters);
         }
+
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
@@ -127,7 +129,7 @@ public class DatabaseMailListener implements MailListener, Initializable
         String messageId = getMessageId(message);
         MailStatus status;
         try {
-            status = loadMailStatus(messageId, parameters);
+            status = this.mailStatusStore.load(messageId);
             if (status == null) {
                 // It's not normal to have no status in the mail status store since onPrepare should have been called
                 // before.
@@ -148,6 +150,8 @@ public class DatabaseMailListener implements MailListener, Initializable
 
         status.setError(exception);
         saveStatus(status, parameters);
+
+        this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
@@ -159,19 +163,6 @@ public class DatabaseMailListener implements MailListener, Initializable
     private String getMessageId(MimeMessage message)
     {
         return getSafeHeader("X-MailID", message);
-    }
-
-    private MailStatus loadMailStatus(String messageId, Map<String, Object> parameters) throws MailStoreException
-    {
-        MailStatus status;
-        List<MailStatus> statuses = this.mailStatusStore.load(
-            Collections.<String, Object>singletonMap("id", messageId), 0, 0);
-        if (statuses.isEmpty()) {
-            status = null;
-        } else {
-            status = statuses.get(0);
-        }
-        return status;
     }
 
     private void saveStatus(MailStatus status, Map<String, Object> parameters)

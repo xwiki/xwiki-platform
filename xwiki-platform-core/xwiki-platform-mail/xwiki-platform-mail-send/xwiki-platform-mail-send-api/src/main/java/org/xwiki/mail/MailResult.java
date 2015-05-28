@@ -28,20 +28,6 @@ package org.xwiki.mail;
 public interface MailResult
 {
     /**
-     * Wait till all messages on the sending queue have been sent (for this batch) before returning.
-     *
-     * @param timeout the maximum amount of time to wait in milliseconds
-     * @since 6.4
-     */
-    void waitTillProcessed(long timeout);
-
-    /**
-     * @return true if all the mails from this batch have been processed (sent successfully or not) or false otherwise
-     * @since 6.4RC1
-     */
-    boolean isProcessed();
-
-    /**
      * @return the batch id for this session of mail sending
      */
     String getBatchId();

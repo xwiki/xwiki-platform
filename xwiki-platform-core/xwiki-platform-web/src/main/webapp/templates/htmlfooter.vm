@@ -1,6 +1,9 @@
 </div>## xwikimaincontainerinner
 </div>## xwikimaincontainer
 #if($isInServletMode)
+#if ($services.debug.isEnabled())
+#template('debug.vm')
+#end
 </body>
 </html>
 #else ## Portlet Mode

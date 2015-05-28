@@ -40,7 +40,7 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
     <!-- The bootstrap version is used is several places -->
-    <bootstrap.version>3.3.2</bootstrap.version>
+    <bootstrap.version>3.3.4</bootstrap.version>
   </properties>
   <dependencies>
     <!-- Adds an Annotation Processor to automatically verify Component declarations.
@@ -480,6 +480,31 @@
               <className>com/xpn/xwiki/plugin/scheduler/StatusListener</className>
               <justification>Never supposed to be an API</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MimeMessageFactory</className>
+              <method>java.lang.Object createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
+              <justification>Young API. Remove useless Session argument since the MimeMessage will be given a valid Session when it's deserialized from the mail content store for sending.</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int)</method>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int)</method>
+              <to>org.xwiki.mail.MailStatus</to>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailStatusStore</className>
+              <method>java.util.List load(java.util.Map, int, int, java.lang.String, boolean)</method>
+              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -499,6 +524,15 @@
             <exclude>com/xpn/xwiki/plugin/charts/wizard/DatasourceDefaultsHelper</exclude>
             <!-- Young API. Large refactoring for adding the ability to register new URL Resource Types -->
             <exclude>**/org/xwiki/resource/**</exclude>
+            <!-- Young API. Rename MimeMessageWrapper into ScriptMimeMessage (not a wrapper anymore). Velocity scripts
+                 are not affected by the change. -->
+            <exclude>**/org/xwiki/mail/script/**</exclude>
+            <!-- Young API. Change of API to fix bug in waitForProcessin(). Scripting API has not been broken, only the
+                 Java API has -->
+            <exclude>**/org/xwiki/mail/MailResult*</exclude>
+            <exclude>**/org/xwiki/mail/MailStatusResult*</exclude>
+            <!-- Young API. Class moved to the "script" package. Script service usage is unchanged. -->
+            <exclude>**/org/xwiki/mail/MailStorageScriptService*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -543,6 +577,7 @@
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
+    <module>xwiki-platform-flavor</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>

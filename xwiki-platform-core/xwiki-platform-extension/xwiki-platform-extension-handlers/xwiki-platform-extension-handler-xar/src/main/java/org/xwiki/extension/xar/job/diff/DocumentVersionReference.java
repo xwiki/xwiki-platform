@@ -58,7 +58,7 @@ public class DocumentVersionReference extends DocumentReference
     /**
      * @return the document version
      */
-    Serializable getVersion()
+    public Serializable getVersion()
     {
         return getParameter(VERSION);
     }

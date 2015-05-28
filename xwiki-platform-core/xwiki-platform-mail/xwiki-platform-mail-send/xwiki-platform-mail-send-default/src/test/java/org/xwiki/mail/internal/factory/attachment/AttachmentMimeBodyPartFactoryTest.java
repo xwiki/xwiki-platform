@@ -73,10 +73,10 @@ public class AttachmentMimeBodyPartFactoryTest
 
         assertEquals("<image.png>", part.getContentID());
         // JavaMail adds some extra params to the content-type header
-        // (e.g. image/png; name=attachment8219195155963823979.tmp) , we just verify the content type that we passed.
+        // (e.g. image/png; name=image.png) , we just verify the content type that we passed.
         assertTrue(part.getContentType().startsWith("image/png"));
-        // We verify the format of the generated temporary file containing our attachment data
-        assertTrue(part.getFileName().matches("attachment.*\\.tmp"));
+        // We verify that the Content-Disposition has the correct file namr
+        assertTrue(part.getFileName().matches("image\\.png"));
 
         assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream()));
     }
@@ -99,10 +99,10 @@ public class AttachmentMimeBodyPartFactoryTest
 
         assertEquals("<image.png>", part.getContentID());
         // JavaMail adds some extra params to the content-type header
-        // (e.g. image/png; name=attachment8219195155963823979.tmp) , we just verify the content type that we passed.
+        // (e.g. image/png; name=image.png) , we just verify the content type that we passed.
         assertTrue(part.getContentType().startsWith("image/png"));
-        // We verify the format of the generated temporary file containing our attachment data
-        assertTrue(part.getFileName().matches("attachment.*\\.tmp"));
+        // We verify that the Content-Disposition has the correct file namr
+        assertTrue(part.getFileName().matches("image\\.png"));
 
         assertArrayEquals(new String[]{ "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
 

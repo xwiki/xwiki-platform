@@ -55,18 +55,4 @@ public interface MailQueueManager<T extends MailQueueItem>
      * @return true if the removal was successful, false otherwise
      */
     boolean removeMessageFromQueue(T mailQueueItem);
-
-    /**
-     * Wait till all mails from the batch referenced by the passed batch id have been processed.
-     *
-     * @param batchId the batch id for the batch we're inspecting
-     * @param timeout the maximum number of seconds to wait till we consider there's been an error
-     */
-    void waitTillProcessed(String batchId, long timeout);
-
-    /**
-     * @param batchId the batch id for the batch we're inspecting
-     * @return true if all mails from the passed batch id have been processed or false otherwise
-     */
-    boolean isProcessed(String batchId);
 }

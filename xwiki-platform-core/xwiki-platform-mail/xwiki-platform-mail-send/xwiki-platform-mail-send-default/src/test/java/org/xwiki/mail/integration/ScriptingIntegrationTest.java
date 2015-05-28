@@ -37,6 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -55,9 +56,10 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
+import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.mail.script.MailSenderScriptService;
-import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.mail.script.ScriptMailResult;
+import org.xwiki.mail.script.ScriptMimeMessage;
 import org.xwiki.mail.script.ScriptServicePermissionChecker;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
@@ -74,6 +76,7 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -83,6 +86,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M2
  */
+// @formatter:off
 @ComponentList({
     MailSenderScriptService.class,
     StandardEnvironment.class,
@@ -98,6 +102,7 @@ import static org.mockito.Mockito.when;
     SendMailQueueManager.class,
     FileSystemMailContentStore.class
 })
+// @formatter:on
 public class ScriptingIntegrationTest
 {
     @Rule
@@ -111,8 +116,8 @@ public class ScriptingIntegrationTest
     @BeforeComponent
     public void registerConfiguration() throws Exception
     {
-        MailSenderConfiguration configuration = new TestMailSenderConfiguration(
-            this.mail.getSmtp().getPort(), null, null, new Properties());
+        MailSenderConfiguration configuration =
+            new TestMailSenderConfiguration(this.mail.getSmtp().getPort(), null, null, new Properties());
         this.componentManager.registerComponent(MailSenderConfiguration.class, configuration);
 
         // Register a test Permission Checker that allows sending mails
@@ -123,11 +128,13 @@ public class ScriptingIntegrationTest
         ModelContext modelContext = this.componentManager.registerMockComponent(ModelContext.class);
         Mockito.when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
 
-        Provider<XWikiContext> xwikiContextProvider = this.componentManager.registerMockComponent(
-            XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xwikiContextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xwikiContextProvider.get()).thenReturn(Mockito.mock(XWikiContext.class));
 
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
+            ExecutionContext.class));
 
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
@@ -149,9 +156,10 @@ public class ScriptingIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         execution.setContext(executionContext);
 
-        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        Copier<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
-        when(ecm.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
     }
 
     @After
@@ -165,26 +173,27 @@ public class ScriptingIntegrationTest
     @Test
     public void sendTextMail() throws Exception
     {
-        MimeMessageWrapper message1 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message1 = this.scriptService.createMessage("john@doe.com", "subject");
         message1.addPart("text/plain", "some text here");
-        MimeMessageWrapper message2 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message2 = this.scriptService.createMessage("john@doe.com", "subject");
         message2.addPart("text/plain", "some text here");
-        MimeMessageWrapper message3 = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message3 = this.scriptService.createMessage("john@doe.com", "subject");
         message3.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        List<MimeMessageWrapper> messagesList = Arrays.asList(message1, message2, message3);
+        List<ScriptMimeMessage> messagesList = Arrays.asList(message1, message2, message3);
         ScriptMailResult result = this.scriptService.sendAsynchronously(messagesList, "memory");
 
         // Verify that there are no errors
         assertNull(this.scriptService.getLastError());
 
         // Wait for all mails to be sent
-        result.waitTillProcessed(10000L);
+        result.getStatusResult().waitTillProcessed(10000L);
+        assertTrue(result.getStatusResult().isProcessed());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!",
-            result.getStatusResult().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.FAILED)
+            .hasNext());
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.READY).hasNext());
 
@@ -206,8 +215,9 @@ public class ScriptingIntegrationTest
     @Test
     public void sendHTMLAndCalendarInvitationMail() throws Exception
     {
-        MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
+        ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
+        // @formatter:off
         String calendarContent = "BEGIN:VCALENDAR\r\n"
             + "METHOD:REQUEST\r\n"
             + "PRODID: Meeting\r\n"
@@ -234,21 +244,23 @@ public class ScriptingIntegrationTest
             + "END:VALARM\r\n"
             + "END:VEVENT\r\n"
             + "END:VCALENDAR";
-        message.addPart("text/calendar;method=CANCEL", calendarContent,
+        // @formatter:on
+        message.addPart(
+            "text/calendar;method=CANCEL",
+            calendarContent,
             Collections.<String, Object>singletonMap("headers",
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
         ScriptMailResult result = this.scriptService.send(Arrays.asList(message));
 
-        // Verify that there are no errors
+        // Verify that there are no errors and that 1 mail was sent
         assertNull(this.scriptService.getLastError());
-
-        // Wait for all mails to be sent
-        result.waitTillProcessed(10000L);
+        assertTrue(result.getStatusResult().isProcessed());
+        assertEquals(1, result.getStatusResult().getProcessedMailCount());
 
         // Verify that all mails have been sent properly
-        assertFalse("There should not be any failed result!",
-            result.getStatusResult().getByState(MailState.FAILED).hasNext());
+        assertFalse("There should not be any failed result!", result.getStatusResult().getByState(MailState.FAILED)
+            .hasNext());
         assertFalse("There should not be any mails in the ready state!",
             result.getStatusResult().getByState(MailState.READY).hasNext());
 

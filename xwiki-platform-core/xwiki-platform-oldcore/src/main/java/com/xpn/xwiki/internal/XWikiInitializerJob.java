@@ -110,6 +110,8 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
         this.progressManager.pushLevelProgress(2, this);
 
         try {
+            this.progressManager.startStep(this);
+
             XWikiContext xcontext = this.xcontextProvider.get();
 
             XWiki xwiki = new XWiki(xcontext, xcontext.getEngineContext(), true);
@@ -119,7 +121,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
             // contains XWiki object) which make it unusable
             this.stubContextProvider.initialize(xcontext);
 
-            this.progressManager.stepPropress(this);
+            this.progressManager.startStep(this);
 
             this.logger.info("XWiki initialization done");
 

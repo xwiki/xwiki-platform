@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
-import org.xwiki.mail.MailStatusResult;
 
 /**
  * Implementation that saves all mail statuses in a Map in memory.
@@ -38,7 +37,7 @@ import org.xwiki.mail.MailStatusResult;
  * @version $Id$
  * @since 6.4M3
  */
-public class MemoryMailStatusResult implements MailStatusResult
+public class MemoryMailStatusResult extends AbstractMailStatusResult
 {
     /**
      * The Map's key is the unique message ID.
@@ -56,12 +55,6 @@ public class MemoryMailStatusResult implements MailStatusResult
     public void setStatus(MailStatus status)
     {
         this.statusMap.put(status.getMessageId(), status);
-    }
-
-    @Override
-    public long getSize()
-    {
-        return this.statusMap.size();
     }
 
     @Override

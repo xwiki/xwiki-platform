@@ -35,9 +35,9 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>4.8</luceneMatchVersion>
+  <luceneMatchVersion>4.10.4</luceneMatchVersion>
 
-  <!-- <lib/> directives can be used to instruct Solr to load an Jars
+  <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
        your solrconfig.xml or schema.xml (ie: Analyzers, Request
        Handlers, etc...).
@@ -74,17 +74,17 @@
     -->
 
   <!-- Commented out for XWiki.
-  <lib dir="../../../contrib/extraction/lib" regex=".*\.jar" />
-  <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/contrib/extraction/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/dist/" regex="solr-cell-\d.*\.jar" />
 
-  <lib dir="../../../contrib/clustering/lib/" regex=".*\.jar" />
-  <lib dir="../../../dist/" regex="solr-clustering-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/contrib/clustering/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/dist/" regex="solr-clustering-\d.*\.jar" />
 
-  <lib dir="../../../contrib/langid/lib/" regex=".*\.jar" />
-  <lib dir="../../../dist/" regex="solr-langid-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/contrib/langid/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/dist/" regex="solr-langid-\d.*\.jar" />
 
-  <lib dir="../../../contrib/velocity/lib" regex=".*\.jar" />
-  <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/contrib/velocity/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
     -->
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
@@ -121,8 +121,8 @@
     -->
   <directoryFactory name="DirectoryFactory" 
                     class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}">
-
-
+    
+         
     <!-- These will be used if you are using the solr.HdfsDirectoryFactory,
          otherwise they will be ignored. If you don't plan on using hdfs,
          you can safely remove this section. -->      
@@ -135,8 +135,8 @@
     <!-- Enable/Disable using one global cache for all SolrCores. 
          The settings used will be from the first HdfsDirectoryFactory created. -->    
     <str name="solr.hdfs.blockcache.global">${solr.hdfs.blockcache.global:true}</str>
-
-  </directoryFactory>
+    
+  </directoryFactory> 
 
   <!-- The CodecFactory for defining the format of the inverted index.
        The default implementation is SchemaCodecFactory, which is the official Lucene
@@ -331,6 +331,13 @@
          this is enabled here, and controlled through log4j.properties.
       -->
      <infoStream>true</infoStream>
+    
+    <!--
+        Use true to enable this safety check, which can help
+        reduce the risk of propagating index corruption from older segments 
+        into new ones, at the expense of slower merging.
+    -->
+     <checkIntegrityAtMerge>false</checkIntegrityAtMerge>
   </indexConfig>
 
 
@@ -1009,7 +1016,28 @@
      </lst>
   </requestHandler>
 
- 
+  <!--
+    The export request handler is used to export full sorted result sets.
+    Do not change these defaults.
+  -->
+
+  <requestHandler name="/export" class="solr.SearchHandler">
+    <lst name="invariants">
+      <str name="rq">{!xport}</str>
+      <str name="wt">xsort</str>
+      <str name="distrib">false</str>
+    </lst>
+
+    <arr name="components">
+      <str>query</str>
+    </arr>
+  </requestHandler>
+
+
+
+
+
+
   <!-- A Robust Example 
        
        This example SearchHandler declaration shows off usage of the
@@ -1050,6 +1078,7 @@
 
        <!-- Faceting defaults -->
        <str name="facet">on</str>
+       <str name="facet.missing">true</str>
        <str name="facet.field">cat</str>
        <str name="facet.field">manu_exact</str>
        <str name="facet.field">content_type</str>
@@ -1077,6 +1106,7 @@
        <!-- Highlighting defaults -->
        <str name="hl">on</str>
        <str name="hl.fl">content features title name</str>
+       <str name="hl.preserveMulti">true</str>
        <str name="hl.encoder">html</str>
        <str name="hl.simple.pre">&lt;b&gt;</str>
        <str name="hl.simple.post">&lt;/b&gt;</str>
@@ -1108,8 +1138,8 @@
   </requestHandler>
 
 
-  <!-- Update Request Handler.  
-       
+  <!-- Update Request Handler.
+
        http://wiki.apache.org/solr/UpdateXmlMessages
 
        The canonical Request Handler for Modifying the Index through
@@ -1118,18 +1148,18 @@
        Note: Since solr1.1 requestHandlers requires a valid content
        type header if posted in the body. For example, curl now
        requires: -H 'Content-type:text/xml; charset=utf-8'
-       
-       To override the request content type and force a specific 
-       Content-type, use the request parameter: 
+
+       To override the request content type and force a specific
+       Content-type, use the request parameter:
          ?update.contentType=text/csv
-       
+
        This handler will pick a response format to match the input
        if the 'wt' parameter is not explicit
     -->
   <!-- Commented out in order to fix XWIKI-11991 (SOLR-related warning in the logs at XWiki startup) -->
   <!--<requestHandler name="/update" class="solr.UpdateRequestHandler">-->
-    <!-- See below for information on defining 
-         updateRequestProcessorChains that can be used by name 
+    <!-- See below for information on defining
+         updateRequestProcessorChains that can be used by name
          on each Update Request
       -->
     <!--
@@ -1139,7 +1169,7 @@
        -->
   <!--</requestHandler>-->
 
-  <!-- for back compat with clients using /update/json and /update/csv
+  <!-- The following are implicitly added
   <requestHandler name="/update/json" class="solr.UpdateRequestHandler">
         <lst name="defaults">
          <str name="stream.contentType">application/json</str>
@@ -1398,7 +1428,7 @@
       <!-- maximum threshold of documents a query term can appear to be considered for correction -->
       <float name="maxQueryFrequency">0.01</float>
       <!-- uncomment this to require suggestions to occur in 1% of the documents
-      	<float name="thresholdTokenFrequency">.01</float>
+        <float name="thresholdTokenFrequency">.01</float>
       -->
     </lst>
     
@@ -1450,7 +1480,7 @@
        </lst>
       -->
   </searchComponent>
-
+  
   <!-- A request handler for demonstrating the spellcheck component.  
 
        NOTE: This is purely as an example.  The whole purpose of the
@@ -1488,11 +1518,12 @@
     </arr>
   </requestHandler>
 
+  <!-- This causes long startup times on big indexes, even when never used.  See SOLR-6679
   <searchComponent name="suggest" class="solr.SuggestComponent">
     <lst name="suggester">
       <str name="name">mySuggester</str>
-      <str name="lookupImpl">FuzzyLookupFactory</str>      <!-- org.apache.solr.spelling.suggest.fst -->
-      <str name="dictionaryImpl">DocumentDictionaryFactory</str>     <!-- org.apache.solr.spelling.suggest.HighFrequencyDictionaryFactory --> 
+      <str name="lookupImpl">FuzzyLookupFactory</str>
+      <str name="dictionaryImpl">DocumentDictionaryFactory</str>
       <str name="field">cat</str>
       <str name="weightField">price</str>
       <str name="suggestAnalyzerFieldType">string</str>
@@ -1508,6 +1539,8 @@
       <str>suggest</str>
     </arr>
   </requestHandler>
+  -->
+
   <!-- Term Vector Component
 
        http://wiki.apache.org/solr/TermVectorComponent

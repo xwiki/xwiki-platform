@@ -1,0 +1,6 @@
+#set ($discard = $xwiki.jsfx.use('uicomponents/debug/debug.js', true))
+#set ($discard = $xwiki.linkx.use($services.webjars.url('jstree', 'themes/default/style.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+#template('progress_macros.vm')
+<div id="debug_performance_tree" class="debug">
+#printProgress($services.debug.actionProgress)
+</div>

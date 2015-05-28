@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,19 @@ public class DatabaseMailStatusStore implements MailStatusStore
     }
 
     @Override
-    public List<MailStatus> load(final Map<String, Object> filterMap, final int offset, final int count)
+    public MailStatus load(String messageId) throws MailStoreException
+    {
+        List<MailStatus> statuses = load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, messageId), 0, 0,
+            null, false);
+        if (statuses.isEmpty()) {
+            return null;
+        }
+        return statuses.get(0);
+    }
+
+    @Override
+    public List<MailStatus> load(final Map<String, Object> filterMap, final int offset, final int count,
+        String sortField, boolean sortAscending)
         throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
@@ -103,7 +116,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
         xwikiContext.setWikiId(xwikiContext.getMainXWiki());
 
         // Compute the Query string based on the passed filter map
-        final String queryString = computeSelectQueryString(filterMap);
+        final String queryString = computeSelectQueryString(filterMap, sortField, sortAscending);
 
         try {
             return store.executeRead(xwikiContext,
@@ -198,7 +211,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
         }
     }
 
-    protected String computeQueryString(String prefix, Map<String, Object> filterMap)
+    protected String computeQueryString(String prefix,
+        Map<String, Object> filterMap, String sortField, boolean sortAscending)
     {
         StringBuilder queryBuilder = new StringBuilder(prefix);
         if (!filterMap.isEmpty()) {
@@ -212,16 +226,25 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 }
             }
         }
+        if (sortField != null) {
+            queryBuilder.append(" order by ");
+            queryBuilder.append(sortField);
+            if (!sortAscending) {
+                queryBuilder.append(" desc");
+            }
+        }
         return queryBuilder.toString();
     }
 
     protected String computeCountQueryString(Map<String, Object> filterMap)
     {
-        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()), filterMap);
+        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()),
+            filterMap, null, false);
     }
 
-    protected String computeSelectQueryString(Map<String, Object> filterMap)
+    protected String computeSelectQueryString(Map<String, Object> filterMap, String sortField, boolean sortAscending)
     {
-        return computeQueryString(String.format("from %s", MailStatus.class.getName()), filterMap);
+        return computeQueryString(String.format("from %s", MailStatus.class.getName()),
+            filterMap, sortField, sortAscending);
     }
 }

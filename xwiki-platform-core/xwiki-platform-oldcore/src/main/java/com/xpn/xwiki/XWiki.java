@@ -109,7 +109,6 @@ import org.xwiki.job.annotation.Serializable;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.MailResult;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailStatusResultSerializer;
@@ -416,6 +415,8 @@ public class XWiki implements EventListener
 
     private ParseGroovyFromString parseGroovyFromString;
 
+    private JobProgressManager progress;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -525,13 +526,22 @@ public class XWiki implements EventListener
         return this.oldRenderingProvider.get();
     }
 
-    public ParseGroovyFromString getParseGroovyFromString()
+    private ParseGroovyFromString getParseGroovyFromString()
     {
         if (this.parseGroovyFromString == null) {
             this.parseGroovyFromString = Utils.getComponent(ParseGroovyFromString.class);
         }
 
         return this.parseGroovyFromString;
+    }
+
+    private JobProgressManager getProgress()
+    {
+        if (this.progress == null) {
+            this.progress = Utils.getComponent(JobProgressManager.class);
+        }
+
+        return this.progress;
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -836,11 +846,11 @@ public class XWiki implements EventListener
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
-        JobProgressManager progress = Utils.getComponent(JobProgressManager.class);
-
-        progress.pushLevelProgress(4, this);
+        getProgress().pushLevelProgress(4, this);
 
         try {
+            getProgress().startStep(this);
+
             setDatabase(context.getMainXWiki());
 
             setEngineContext(engine_context);
@@ -899,7 +909,7 @@ public class XWiki implements EventListener
             // potential document changes can use it
             Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
 
-            progress.stepPropress(this);
+            getProgress().startStep(this);
 
             // Make sure these classes exists
             if (noupdate) {
@@ -907,12 +917,12 @@ public class XWiki implements EventListener
                 getStatsService(context);
             }
 
-            progress.stepPropress(this);
+            getProgress().startStep(this);
 
             // Prepare the Plugin Engine
             preparePlugins(context);
 
-            progress.stepPropress(this);
+            getProgress().startStep(this);
 
             String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
@@ -923,7 +933,7 @@ public class XWiki implements EventListener
 
             getObservationManager().addListener(this);
         } finally {
-            progress.popLevelProgress(this);
+            getProgress().popLevelProgress(this);
         }
     }
 
@@ -3078,8 +3088,8 @@ public class XWiki implements EventListener
             message.setHeader("X-MailType", "Account Validation");
             MailSender mailSender = Utils.getComponent(MailSender.class);
             MailListener mailListener = Utils.getComponent(MailListener.class, "database");
-            MailResult mailResult = mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
-            mailResult.waitTillProcessed(Long.MAX_VALUE);
+            mailSender.sendAsynchronously(Arrays.asList(message), session, mailListener);
+            mailListener.getMailStatusResult().waitTillProcessed(Long.MAX_VALUE);
             String errorMessage = MailStatusResultSerializer.serializeErrors(mailListener.getMailStatusResult());
             if (errorMessage != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
@@ -4085,6 +4095,8 @@ public class XWiki implements EventListener
         if (contextPath == null) {
             // Try getting the context path by asking the request for it (if a request exists!) and if it doesn't
             // work try extracting it from the context URL.
+            // TODO: Instead of trying to extract from the URL, save the context path at webapp init (using a
+            // ServlettContextListener for example).
             XWikiRequest request = context.getRequest();
             if (request != null) {
                 contextPath = request.getContextPath();

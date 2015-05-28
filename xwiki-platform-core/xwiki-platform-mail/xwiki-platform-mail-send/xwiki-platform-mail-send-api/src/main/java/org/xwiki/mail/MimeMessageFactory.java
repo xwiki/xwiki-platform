@@ -22,7 +22,6 @@ package org.xwiki.mail;
 import java.util.Map;
 
 import javax.mail.MessagingException;
-import javax.mail.Session;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -44,14 +43,12 @@ import org.xwiki.stability.Unstable;
 public interface MimeMessageFactory<T>
 {
     /**
-     * Create a {@link javax.mail.internet.MimeMessage}.
+     * Create one or several {@link javax.mail.internet.MimeMessage}.
      *
-     * @param session the JavaMail Session needed to create the instance(s) of {@link javax.mail.internet.MimeMessage}
-     *        (contains all configuration such as SMTP server, SMTP port, etc)
      * @param source the source from which to prefill the Mime Message(s) (depends on the implementation)
      * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
      * @return the pre-filled {@link javax.mail.internet.MimeMessage}(s) that can then be further modified by the user
      * @throws MessagingException in case of an error while creating the {@link javax.mail.internet.MimeMessage}(s)
      */
-    T createMessage(Session session, Object source, Map<String, Object> parameters) throws MessagingException;
+    T createMessage(Object source, Map<String, Object> parameters) throws MessagingException;
 }

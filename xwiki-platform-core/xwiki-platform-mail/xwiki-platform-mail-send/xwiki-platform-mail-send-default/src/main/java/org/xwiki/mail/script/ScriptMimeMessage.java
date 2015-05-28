@@ -25,10 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -41,78 +41,75 @@ import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
 
 /**
- * Simulates a, {@link javax.mail.internet.MimeMessage} with additional helper methods to add body part content and to
- * send the message.
+ * Extends {@link javax.mail.internet.MimeMessage} with additional helper methods for scripts.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 7.1M2
  */
 @Unstable
-public class MimeMessageWrapper extends MimeMessage
+public class ScriptMimeMessage extends ExtendedMimeMessage
 {
     private ComponentManager componentManager;
 
     private Execution execution;
 
-    private Session session;
-
-    private ExtendedMimeMessage message;
     /**
-     * @param message the wrapped {@link javax.mail.internet.MimeMessage}
-     * @param session the JavaMail session used to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
     // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
     // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
     // of it!
-    MimeMessageWrapper(ExtendedMimeMessage message, Session session, Execution execution,
-        ComponentManager componentManager)
+    ScriptMimeMessage(MimeMessage sourceMessage, Execution execution, ComponentManager componentManager)
+        throws MessagingException
     {
-        super(session);
-        this.message = message;
-        this.session = session;
+        super(sourceMessage);
         this.execution = execution;
         this.componentManager = componentManager;
     }
 
     /**
-     * @return the wrapped {@link javax.mail.internet.MimeMessage}
+     * @param execution used to get the Execution Context and store an error in it if the send fails
+     * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
-    public ExtendedMimeMessage getMessage()
+    // Note: This method is package private voluntarily so that it's not part of the API (as this class is public),
+    // since it's only needed by the MailSenderScriptService and nobody else should be able to construct an instance
+    // of it!
+    ScriptMimeMessage(Execution execution, ComponentManager componentManager)
     {
-        return this.message;
+        super();
+        this.execution = execution;
+        this.componentManager = componentManager;
     }
 
     /**
-     * @return the JavaMail session used to send the mail
-     */
-    public Session getSession()
-    {
-        return this.session;
-    }
-    /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
+     * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
+     *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
      * @param content the content to include in the mail
      */
-    public void addPart(String mimeType, Object content)
+    public BodyPart addPart(String mimeType, Object content)
     {
-        addPart(mimeType, content, Collections.<String, Object>emptyMap());
+        return addPart(mimeType, content, Collections.<String, Object>emptyMap());
     }
 
     /**
      * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
      *
+     * @return the Mime Body Part object that was added. Returning it allows script to make modifications to that body
+     *         part after it's been set (get/set some headers, etc)
      * @param mimeType the mime type of the content parameter
      * @param content the content to include in the mail
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
      *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values
      */
-    public void addPart(String mimeType, Object content, Map<String, Object> parameters)
+    public BodyPart addPart(String mimeType, Object content, Map<String, Object> parameters)
     {
+        BodyPart bodyPart;
+
         try {
             MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
@@ -123,20 +120,25 @@ public class MimeMessageWrapper extends MimeMessage
             enhancedParameters.putAll(parameters);
 
             Multipart multipart = getMultipart();
-            multipart.addBodyPart(factory.create(content, enhancedParameters));
+            bodyPart = factory.create(content, enhancedParameters);
+            multipart.addBodyPart(bodyPart);
         } catch (Exception e) {
             // Save the exception for reporting through the script services's getError() API
             setError(e);
+            bodyPart = null;
         }
+
+        return bodyPart;
     }
 
     /**
      * @param subject the subject to set in the Mime Message
      */
+    @Override
     public void setSubject(String subject)
     {
         try {
-            getMessage().setSubject(subject);
+            super.setSubject(subject);
         } catch (Exception e) {
             setError(e);
         }
@@ -145,10 +147,11 @@ public class MimeMessageWrapper extends MimeMessage
     /**
      * @param address the address from which this message will be sent
      */
+    @Override
     public void setFrom(Address address)
     {
         try {
-            getMessage().setFrom(address);
+            super.setFrom(address);
         } catch (Exception e) {
             setError(e);
         }
@@ -158,10 +161,11 @@ public class MimeMessageWrapper extends MimeMessage
      * @param type the type of recipients (to, cc, bcc, newsgroups)
      * @param addresses the email addresses of the recipients
      */
+    @Override
     public void addRecipients(Message.RecipientType type, Address[] addresses)
     {
         try {
-            getMessage().addRecipients(type, addresses);
+            super.addRecipients(type, addresses);
         } catch (Exception e) {
             setError(e);
         }
@@ -171,10 +175,11 @@ public class MimeMessageWrapper extends MimeMessage
      * @param type the type of recipient (to, cc, bcc, newsgroups)
      * @param address the email address of the recipient
      */
+    @Override
     public void addRecipient(Message.RecipientType type, Address address)
     {
         try {
-            getMessage().addRecipient(type, address);
+            super.addRecipient(type, address);
         } catch (Exception e) {
             setError(e);
         }
@@ -186,10 +191,11 @@ public class MimeMessageWrapper extends MimeMessage
      * @param name the header's name  (eg "Message-Id")
      * @param value the header's value
      */
+    @Override
     public void addHeader(String name, String value)
     {
         try {
-            getMessage().addHeader(name, value);
+            super.addHeader(name, value);
         } catch (Exception e) {
             setError(e);
         }
@@ -210,7 +216,6 @@ public class MimeMessageWrapper extends MimeMessage
     {
         this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
     }
-
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException
     {
@@ -261,12 +266,11 @@ public class MimeMessageWrapper extends MimeMessage
     private Multipart getMultipart() throws MessagingException, IOException
     {
         Multipart multipart;
-        ExtendedMimeMessage mimeMessage = getMessage();
-        if (mimeMessage.isEmpty()) {
+        if (isEmpty()) {
             multipart = new MimeMultipart("mixed");
-            mimeMessage.setContent(multipart);
+            setContent(multipart);
         } else {
-            Object contentObject = mimeMessage.getContent();
+            Object contentObject = getContent();
             if (contentObject instanceof Multipart) {
                 multipart = (Multipart) contentObject;
             } else {

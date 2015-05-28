@@ -27,13 +27,13 @@ import com.xpn.xwiki.criteria.impl.ScopeFactory;
 
 public interface XWikiCriteriaService
 {
-    public DurationFactory getDurationFactory();
+    DurationFactory getDurationFactory();
 
-    public PeriodFactory getPeriodFactory();
+    PeriodFactory getPeriodFactory();
 
-    public RangeFactory getRangeFactory();
+    RangeFactory getRangeFactory();
 
-    public RevisionCriteriaFactory getRevisionCriteriaFactory();
+    RevisionCriteriaFactory getRevisionCriteriaFactory();
 
-    public ScopeFactory getScopeFactory();
+    ScopeFactory getScopeFactory();
 }

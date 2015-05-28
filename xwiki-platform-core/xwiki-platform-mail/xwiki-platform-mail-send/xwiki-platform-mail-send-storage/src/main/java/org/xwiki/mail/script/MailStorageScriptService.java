@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.script;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,8 +34,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.mail.script.AbstractMailScriptService;
-import org.xwiki.mail.script.ScriptMailResult;
+import org.xwiki.mail.MailContentStore;
+import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusStore;
+import org.xwiki.mail.MailStorageConfiguration;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
@@ -110,9 +114,30 @@ public class MailStorageScriptService extends AbstractMailScriptService
                 Arrays.asList(message), session, listener), listener.getMailStatusResult());
 
             // Wait for all messages from this batch to have been sent before returning
-            scriptMailResult.waitTillProcessed(Long.MAX_VALUE);
+            scriptMailResult.getStatusResult().waitTillProcessed(Long.MAX_VALUE);
 
             return scriptMailResult;
+        } catch (MailStoreException e) {
+            // Save the exception for reporting through the script services's getLastError() API
+            setError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Load message status for the message matching the given message Id.
+     *
+     * @param messageId the identifier of the message.
+     * @return the loaded {@link org.xwiki.mail.MailStatus} or null if not allowed or an error happens
+     * @since 7.1M2
+     */
+    public MailStatus load(String messageId)
+    {
+        // Note: We don't need to check permissions since the caller already needs to know the message id
+        // to be able to call this method and for it to have any effect.
+
+        try {
+            return this.mailStatusStore.load(messageId);
         } catch (MailStoreException e) {
             // Save the exception for reporting through the script services's getLastError() API
             setError(e);
@@ -126,14 +151,19 @@ public class MailStorageScriptService extends AbstractMailScriptService
      * @param filterMap the map of Mail Status parameters to match (e.g. "status", "wiki", "batchId", etc)
      * @param offset the number of rows to skip (0 means don't skip any row)
      * @param count the number of rows to return. If 0 then all rows are returned
+     * @param sortField the name of the field used to order returned status
+     * @param sortAscending when true, sort is done in ascending order of sortField, else in descending order
      * @return the loaded {@link org.xwiki.mail.MailStatus} instances or null if not allowed or an error happens
+     * @since 7.1M2
      */
-    public List<MailStatus> load(Map<String, Object> filterMap, int offset, int count)
+    public List<MailStatus> load(Map<String, Object> filterMap, int offset, int count, String sortField,
+        boolean sortAscending)
     {
         // Only admins are allowed
         if (this.authorizationManager.hasAccess(Right.ADMIN)) {
             try {
-                return this.mailStatusStore.load(normalizeFilterMap(filterMap), offset, count);
+                return this.mailStatusStore.load(normalizeFilterMap(filterMap), offset, count,
+                    sortField, sortAscending);
             } catch (MailStoreException e) {
                 // Save the exception for reporting through the script services's getLastError() API
                 setError(e);
@@ -178,8 +208,11 @@ public class MailStorageScriptService extends AbstractMailScriptService
      */
     public void delete(String batchId)
     {
+        // Note: We don't need to check permissions since the caller already needs to know the batch id and mail id
+        // to be able to call this method and for it to have any effect.
+
         Map<String, Object> filterMap = Collections.<String, Object>singletonMap("batchId", batchId);
-        List<MailStatus> statuses = load(filterMap, 0, 0);
+        List<MailStatus> statuses = load(filterMap, 0, 0, null, false);
         if (statuses != null) {
             for (MailStatus status : statuses) {
                 delete(batchId, status.getMessageId());

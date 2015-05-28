@@ -1,0 +1,38 @@
+#macro(printElapsedTime $elapsedTime)
+  #if ($elapsedTime > 1000000)
+    #set($elapsedTimeMilli = $elapsedTime / 1000000)
+    ${elapsedTimeMilli}ms
+  #elseif ($elapsedTime > 1000)
+    #set($elapsedTimeMicro = $elapsedTime / 1000)
+    ${elapsedTimeMicro}μs
+  #else
+    ${elapsedTime}ns
+  #end
+#end
+
+#macro (printProgressStep $progressStep $totalElapsedTime)
+  #if ($progressStep.parent)
+    #set($elapsedTime = $progressStep.elapsedTime)
+    #set($elapsedTimePercent = $mathtool.div($elapsedTime, $totalElapsedTime) * 100)
+  #else
+    #set($elapsedTime = $totalElapsedTime)
+    #set($elapsedTimePercent = 100)
+  #end
+
+  <li>$progressStep.message <em>#printElapsedTime($elapsedTime)</em> ($mathtool.toInteger($elapsedTimePercent)%)
+  #if ($progressStep.children.size() > 0)
+    <ul>
+      #foreach($child in $progressStep.children)
+        #printProgressStep($child $totalElapsedTime)
+      #end
+    </ul>
+  #end
+  </li>
+#end
+
+#macro (printProgress $progress)
+  #set($rootStep = $services.debug.actionProgress.rootStep)
+  <ul>
+  #printProgressStep($rootStep $rootStep.elapsedTime)
+  </ul>
+#end

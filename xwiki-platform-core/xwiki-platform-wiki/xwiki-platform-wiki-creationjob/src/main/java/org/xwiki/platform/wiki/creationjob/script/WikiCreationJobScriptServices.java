@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -115,8 +116,15 @@ public class WikiCreationJobScriptServices implements ScriptService
 
     private boolean isAuthorizedExtension(ExtensionId extensionId)
     {
-        // For now, only the extension declared in the WAR is authorized
-        return getDefaultWikiExtensionId().equals(extensionId);
+        ExtensionId defaultExtension = getDefaultWikiExtensionId(); 
+        if (defaultExtension != null && StringUtils.isNotBlank(defaultExtension.getId())) {
+            // For now, only the extension declared in the WAR is authorized
+            return defaultExtension.equals(extensionId);
+        } else {
+            // Unless there is nothing set, and so we allow everything
+            // TODO: work with flavor manager instead
+            return true;
+        }
     }
 
     /**

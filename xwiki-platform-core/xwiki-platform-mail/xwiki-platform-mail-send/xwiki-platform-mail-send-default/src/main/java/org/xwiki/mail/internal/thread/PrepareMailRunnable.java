@@ -36,7 +36,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
-import org.xwiki.mail.script.MimeMessageWrapper;
+import org.xwiki.mail.internal.UpdateableMailStatusResult;
 
 import com.google.common.collect.ImmutableMap;
 import com.xpn.xwiki.XWikiContext;
@@ -122,7 +122,10 @@ public class PrepareMailRunnable extends AbstractMailRunnable
      */
     protected void prepareMail(PrepareMailQueueItem item) throws ExecutionContextException
     {
-        Iterator<? extends MimeMessage> messages = item.getMessages().iterator();
+        Iterator<? extends MimeMessage> messageIterator = item.getMessages().iterator();
+
+        // Count the total number of messages to process
+        long messageCounter = 0;
 
         // We clone the Execution Context for each mail so that one mail doesn't interfere with another
         // Note that we need to have the hasNext() call after the context is ready since the implementation can need
@@ -131,8 +134,8 @@ public class PrepareMailRunnable extends AbstractMailRunnable
         while (!shouldStop) {
             prepareContext(item.getContext());
             try {
-                if (messages.hasNext()) {
-                    MimeMessage mimeMessage = messages.next();
+                if (messageIterator.hasNext()) {
+                    MimeMessage mimeMessage = messageIterator.next();
                     // Skip message is message has failed to be created.
                     if (mimeMessage != null) {
                         prepareSingleMail(mimeMessage, item);
@@ -140,12 +143,30 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                         // We can't call a listener here because the message is null. Thus we simply log an error.
                         this.logger.error("Failed to prepare message for [{}]", item);
                     }
+                    messageCounter++;
                 } else {
                     shouldStop = true;
+                    // Update the listener with the total number of messages to process so that the user can known when
+                    // all the messages have been processed for the batch.
+                    MailListener listener = item.getListener();
+                    if (listener != null && listener.getMailStatusResult() instanceof UpdateableMailStatusResult) {
+                        ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(messageCounter);
+                    }
                 }
             } finally {
                 removeContext();
             }
+        }
+    }
+
+    protected void prepareContext(ExecutionContext executionContext) throws ExecutionContextException
+    {
+        try {
+            this.execution.setContext(executionContext);
+        } catch (Exception e) {
+            // If inheritance fails, we will get an unchecked exception here. So we'll wrap it in an
+            // ExecutionContextException.
+            throw new ExecutionContextException("Failed to set the execution context.", e);
         }
     }
 
@@ -163,7 +184,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
                 this.mailContentStore.save(message);
                 // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
                 this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getHeader(HEADER_MAIL_ID, null),
-                    item.getSession(), listener, item.getBatchId(), item.getContext()));
+                    item.getSession(), listener, item.getBatchId()));
                 // Step 4: Notify the user that the MimeMessage is prepared
                 if (listener != null) {
                     listener.onPrepare(message,
@@ -182,13 +203,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, String batchId,
         ExecutionContext executionContext) throws Exception
     {
-        MimeMessage message;
-
-        if ((mimeMessage instanceof MimeMessageWrapper)) {
-            message = ((MimeMessageWrapper) mimeMessage).getMessage();
-        } else {
-            message = mimeMessage;
-        }
+        MimeMessage message = mimeMessage;
 
         setCustomHeaders(message, batchId);
 

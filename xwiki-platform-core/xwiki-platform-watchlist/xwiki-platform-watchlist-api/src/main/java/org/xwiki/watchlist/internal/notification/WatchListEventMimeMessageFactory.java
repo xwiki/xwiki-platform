@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
@@ -92,7 +91,7 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
     private WatchListEventMatcher eventMatcher;
 
     @Override
-    public Iterator<MimeMessage> createMessage(Session session, Object sourceObject, Map<String, Object> parameters)
+    public Iterator<MimeMessage> createMessage(Object sourceObject, Map<String, Object> parameters)
         throws MessagingException
     {
         Map<String, Object> source = getTypedSource(sourceObject, Map.class);

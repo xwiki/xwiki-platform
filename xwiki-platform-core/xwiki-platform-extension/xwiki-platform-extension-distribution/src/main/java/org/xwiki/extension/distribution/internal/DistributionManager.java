@@ -162,7 +162,7 @@ public interface DistributionManager
     DistributionJob getCurrentDistributionJob();
 
     /**
-     * @return true it's allowed to display the Distribution Wizard in the current context
+     * @return true if it's allowed to display the Distribution Wizard in the current context
      */
     boolean canDisplayDistributionWizard();
 }

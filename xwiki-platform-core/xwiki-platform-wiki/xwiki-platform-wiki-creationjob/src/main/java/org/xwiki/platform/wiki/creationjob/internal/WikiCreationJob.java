@@ -73,12 +73,15 @@ public class WikiCreationJob extends AbstractJob<WikiCreationRequest, DefaultJob
                 }
             });
             // Now we can execute these extra steps
-            this.notifyPushLevelProgress(wikiCreationStepList.size());
+            this.progressManager.pushLevelProgress(wikiCreationStepList.size(), this);
+
             for (WikiCreationStep step : wikiCreationStepList) {
+                this.progressManager.startStep(this);
+
                 step.execute(request);
-                this.notifyStepPropress();
             }
-            this.notifyPopLevelProgress();
+
+            this.progressManager.popLevelProgress(this);
         } catch (WikiCreationException | ComponentLookupException e) {
             throw new WikiCreationException(
                 String.format("Failed to execute creation steps on the wiki [%s].", request.getWikiId()), e);

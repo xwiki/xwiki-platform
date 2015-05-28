@@ -70,6 +70,19 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
     }
 
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        // Enabled component registration events
+        StackingComponentEventManager eventManager = new StackingComponentEventManager();
+        eventManager.setObservationManager(getComponentManager().<ObservationManager>getInstance(
+            ObservationManager.class));
+        eventManager.shouldStack(false);
+        getComponentManager().setComponentEventManager(eventManager);
+    }
+
     @Test
     public void testRegisterComponentInUserComponentManager() throws Exception
     {
@@ -81,19 +94,34 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otheruser"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user1")));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue("wiki"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
             }
         });
 
+        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
+
+        // Lookup not yet registered component (and feel the caches with null CMs)
+
+        try {
+            contextCM.getInstance(Role.class);
+            Assert.fail("Should have raised an exception");
+        } catch (ComponentLookupException expected) {
+            // No need to assert the message, we just want to ensure an exception is raised.
+        }
+
+        // Register component for the current user
         ComponentManager userCM = getComponentManager().getInstance(ComponentManager.class, "user");
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
         cd.setImplementation(RoleImpl.class);
-
-        // Register component for the current user
         userCM.registerComponent(cd);
 
         // Verify we can lookup the component from the Context CM
-        ComponentManager contextCM = getComponentManager().getInstance(ComponentManager.class, "context");
         Assert.assertNotNull(contextCM.getInstance(Role.class));
 
         // Now verify that we cannot look it up anymore if there's another user in the context
@@ -160,7 +188,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));
@@ -256,7 +284,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));
@@ -315,7 +343,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getCurrentUserReference();
+                exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
                 allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki2"));

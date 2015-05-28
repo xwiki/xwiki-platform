@@ -486,6 +486,16 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.userAgent=XWikiExtensionManager
 
 #-------------------------------------------------------------------------------------
+# Distribution Wizard
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.1RC1] Enable or disable the automatic start of Distribution Wizard on empty/outdated wiki.
+#-#
+#-# The default is:
+# distribution.automaticStartOnMainWiki=true
+# distribution.automaticStartOnWiki=true
+
+#-------------------------------------------------------------------------------------
 # Solr Search
 #-------------------------------------------------------------------------------------
 
@@ -731,5 +741,15 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause performance issues.
 #-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
 # watchlist.realtime.enabled = false
+
+#-------------------------------------------------------------------------------------
+# Debug
+#-------------------------------------------------------------------------------------
+
+#-# [Since 7.0RC1]
+#-# Indicate if web resources should be loaded minified by default.
+#-# It's enabled by default which can make js/css hard to read.
+# debug.minify=false
+
 
 $!xwikiPropertiesAdditionalProperties

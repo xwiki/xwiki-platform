@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
@@ -53,8 +52,8 @@ public class UsersMimeMessageFactory extends AbstractIteratorMimeMessageFactory
     private static final String SOURCE = "source";
 
     @Override
-    public Iterator<MimeMessage> createMessage(Session session, Object userReferencesObject,
-        Map<String, Object> parameters) throws MessagingException
+    public Iterator<MimeMessage> createMessage(Object userReferencesObject, Map<String, Object> parameters)
+        throws MessagingException
     {
         List<DocumentReference> userReferences = getTypedSource(userReferencesObject, List.class);
 

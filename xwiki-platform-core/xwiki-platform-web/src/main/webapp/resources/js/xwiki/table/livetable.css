@@ -304,14 +304,6 @@ div.xwikigwt-editfield tr.dialogMiddle td.dialogMiddleCenter div.xwikigwt-editfi
   color: $theme.textPrimaryColor;
   padding-left: 25px;
 }
-.xwiki-livetable-tagcloud-container h2 span {
-  color: $theme.textPrimaryColor;
-  font-size: 0.8em;
-  font-weight: normal;
-  line-height: 2em;
-  margin: 0 0 10px;
-  border: none;
-}
 .xwiki-livetable-tagcloud-container div.clearfloats {
   background-color: transparent;
   margin: 0;

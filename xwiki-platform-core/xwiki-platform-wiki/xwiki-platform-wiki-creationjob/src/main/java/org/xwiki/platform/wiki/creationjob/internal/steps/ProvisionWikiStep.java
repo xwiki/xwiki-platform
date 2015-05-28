@@ -67,6 +67,10 @@ public class ProvisionWikiStep implements WikiCreationStep
     public void execute(WikiCreationRequest request) throws WikiCreationException
     {
         try {
+            if (request.getWikiSource() == null) {
+                // No source is defined, we let the wiki empty and DW will do the rest
+                return;
+            }
             switch (request.getWikiSource()) {
                 case EXTENSION:
                     sendWikiProvisioningEvent(request);

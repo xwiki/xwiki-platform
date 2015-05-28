@@ -267,7 +267,10 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
         // We need to be able to query all properties of a specific type of object at once.
         String serializedClassReference = fieldNameEncoder.encode(fieldNameSerializer.serialize(classReference));
         String objectOfTypeFieldName = "object." + serializedClassReference;
-        solrDocument.addField(FieldUtils.getFieldName(objectOfTypeFieldName, locale), value);
+        // The current method can be called multiple times for the same property value (but with a different type).
+        // Since we don't care about the value type here (all the values are collected in a localized field) we need to
+        // make sure we don't add the same value twice.
+        addFieldValueOnce(solrDocument, FieldUtils.getFieldName(objectOfTypeFieldName, locale), value);
 
         // We need to be able to query all objects from a document at once.
         super.setPropertyValue(solrDocument, property, typedValue, locale);

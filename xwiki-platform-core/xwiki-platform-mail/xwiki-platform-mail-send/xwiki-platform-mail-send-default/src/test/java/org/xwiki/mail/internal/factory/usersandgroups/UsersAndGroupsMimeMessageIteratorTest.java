@@ -95,7 +95,7 @@ public class UsersAndGroupsMimeMessageIteratorTest
         Map<String, Object> parameters = Collections.<String, Object>singletonMap("source", templateReference);
 
         MimeMessage message = mock(MimeMessage.class);
-        when(this.factory.createMessage(null, templateReference, null)).thenReturn(message);
+        when(this.factory.createMessage(templateReference, null)).thenReturn(message);
 
         Iterator<MimeMessage> iterator = new UsersAndGroupsMimeMessageIterator(source, this.factory, parameters,
             this.resolver, this.execution);
@@ -120,7 +120,7 @@ public class UsersAndGroupsMimeMessageIteratorTest
         DocumentReference templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
         Map<String, Object> parameters = Collections.<String, Object>singletonMap("source", templateReference);
 
-        when(this.factory.createMessage(null, templateReference, null)).thenThrow(
+        when(this.factory.createMessage(templateReference, null)).thenThrow(
             new MessagingException("error"));
 
         Iterator<MimeMessage> iterator = new UsersAndGroupsMimeMessageIterator(source, this.factory, parameters,

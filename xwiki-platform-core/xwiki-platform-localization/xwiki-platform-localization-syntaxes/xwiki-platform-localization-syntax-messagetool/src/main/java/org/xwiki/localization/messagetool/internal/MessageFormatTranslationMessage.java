@@ -57,6 +57,11 @@ public class MessageFormatTranslationMessage implements TranslationMessage
     private Parser plainParser;
 
     /**
+     * Keep a cache of parsed version of the message without parameters.
+     */
+    private Block noParamCache;
+
+    /**
      * @param message the message
      * @param plainParser the plain text parser
      */
@@ -69,6 +74,12 @@ public class MessageFormatTranslationMessage implements TranslationMessage
     @Override
     public Block render(Locale locale, Collection<TranslationBundle> bundles, Object... parameters)
     {
+        // Directly return cache if any available
+        if (parameters.length == 0 && this.noParamCache != null) {
+            return this.noParamCache.clone();
+        }
+
+        // Format the message
         String result;
         if (parameters.length > 0) {
             try {
@@ -81,8 +92,8 @@ public class MessageFormatTranslationMessage implements TranslationMessage
             result = this.message;
         }
 
+        // Parse it to rendering blocks
         Block block;
-
         try {
             List<Block> blocks = this.plainParser.parse(new StringReader(result)).getChildren();
 
@@ -94,6 +105,11 @@ public class MessageFormatTranslationMessage implements TranslationMessage
                 block = blocks.get(0);
             } else {
                 block = new CompositeBlock(blocks);
+            }
+
+            // Store cache of the message if there is no parameters
+            if (parameters.length == 0) {
+                this.noParamCache = block.clone();
             }
         } catch (ParseException e) {
             // Should never happen since plain text parser cannot fail

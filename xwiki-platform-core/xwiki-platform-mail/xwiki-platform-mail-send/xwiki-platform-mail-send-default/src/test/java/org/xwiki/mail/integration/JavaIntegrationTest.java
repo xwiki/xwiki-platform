@@ -61,6 +61,7 @@ import org.xwiki.mail.internal.thread.PrepareMailQueueManager;
 import org.xwiki.mail.internal.thread.PrepareMailRunnable;
 import org.xwiki.mail.internal.thread.SendMailQueueManager;
 import org.xwiki.mail.internal.thread.SendMailRunnable;
+import org.xwiki.mail.internal.thread.context.Copier;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -127,6 +128,9 @@ public class JavaIntegrationTest
         this.componentManager.registerMockComponent(ExecutionContextManager.class);
         this.componentManager.registerMockComponent(Execution.class);
 
+        this.componentManager.registerMockComponent(new DefaultParameterizedType(null, Copier.class,
+            ExecutionContext.class));
+
         EnvironmentConfiguration environmentConfiguration =
             this.componentManager.registerMockComponent(EnvironmentConfiguration.class);
         when(environmentConfiguration.getPermanentDirectoryPath()).thenReturn(System.getProperty("java.io.tmpdir"));
@@ -149,9 +153,10 @@ public class JavaIntegrationTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xContext);
         when(execution.getContext()).thenReturn(executionContext);
 
-        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        Copier<ExecutionContext> executionContextCloner =
+            this.componentManager.getInstance(new DefaultParameterizedType(null, Copier.class, ExecutionContext.class));
         // Just return the same execution context
-        when(ecm.clone(executionContext)).thenReturn(executionContext);
+        when(executionContextCloner.copy(executionContext)).thenReturn(executionContext);
     }
 
     @After

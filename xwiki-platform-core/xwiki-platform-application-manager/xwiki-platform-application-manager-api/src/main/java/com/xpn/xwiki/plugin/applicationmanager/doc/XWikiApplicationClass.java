@@ -20,6 +20,13 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.doc;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,12 +38,6 @@ import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
 import com.xpn.xwiki.web.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jfree.util.Log;
-import org.xwiki.localization.ContextualLocalizationManager;
 
 /**
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
@@ -191,6 +192,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
 
     // ///
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiApplicationClass.class);
+
     /**
      * Space of class document.
      */
@@ -283,7 +286,7 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
             XWikiApplicationClass xclass = getInstance(null, false);
             isApplication = xclass.isInstance(doc);
         } catch (XWikiException e) {
-            Log.error("Fail to get unique instance of " + XWikiApplicationClass.class.getName(), e);
+            LOGGER.error("Fail to get unique instance of " + XWikiApplicationClass.class.getName(), e);
         }
 
         return isApplication;

@@ -80,7 +80,7 @@
 #end
 
 #macro (displaySearchDebugInfo)
-  (% class="search-debug row" %)(((
+  (% class="search-debug" %)(((
     === Debug Information ===
     #set ($debugMap = $searchResponse.debugMap)
     #if ($debugMap)

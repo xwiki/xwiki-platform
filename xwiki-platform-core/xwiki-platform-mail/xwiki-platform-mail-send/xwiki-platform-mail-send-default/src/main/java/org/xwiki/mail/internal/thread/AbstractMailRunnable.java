@@ -20,16 +20,10 @@
 package org.xwiki.mail.internal.thread;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.mail.MailSenderConfiguration;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Common code that sets up a XWiki Context in a Thread.
@@ -51,39 +45,7 @@ public abstract class AbstractMailRunnable implements MailRunnable
     protected volatile boolean shouldStop;
 
     @Inject
-    private Provider<XWikiContext> xwikiContextProvider;
-
-    @Inject
-    private Execution execution;
-
-    @Inject
-    private ExecutionContextManager executionContextManager;
-
-    protected void prepareContext(ExecutionContext executionContext) throws ExecutionContextException
-    {
-        // Isolate the context when sending a mail by cloning it
-        ExecutionContext clonedExecutionContext = this.executionContextManager.clone(executionContext);
-
-        // The above clone just creates and initializes an empty XWiki Context, so it needs special handling.
-        XWikiContext xwikiContext = (XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        // This is still a shallow clone, but at least for stuff like wikiID and userReference it gets the job done.
-        XWikiContext clonedXWikiContext = xwikiContext.clone();
-        clonedXWikiContext.setUserReference(xwikiContext.getUserReference());
-        clonedXWikiContext.setWikiId(xwikiContext.getWikiId());
-        clonedXWikiContext.setWiki(xwikiContext.getWiki());
-        clonedXWikiContext.setLocale(xwikiContext.getLocale());
-        clonedXWikiContext.setMainXWiki(xwikiContext.getMainXWiki());
-        // FIXME: We probably need a deeper cloning of XWikiContext and we probably need it in a better place.
-        clonedExecutionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, clonedXWikiContext);
-
-        try {
-            this.execution.setContext(clonedExecutionContext);
-        } catch (Exception e) {
-            // If inheritance fails, we will get an unchecked exception here. So we'll wrap it in an
-            // ExecutionContextException.
-            throw new ExecutionContextException("Failed to set the execution context.", e);
-        }
-    }
+    protected Execution execution;
 
     protected void removeContext()
     {

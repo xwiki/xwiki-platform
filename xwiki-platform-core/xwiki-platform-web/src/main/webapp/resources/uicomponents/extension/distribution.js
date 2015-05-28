@@ -1,11 +1,25 @@
 var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 /**
- * Enhances the distribution step where the default UI is installed, upgraded or downgraded.
+ * Enhances the distribution step where the flavor or the default UI is installed, upgraded or downgraded.
  */
-XWiki.DefaultUIStep = Class.create({
-  initialize : function () {
+XWiki.FlavorOrDefaultUIStep = Class.create({
+  initialize : function (isFlavorStep) {
+    this.isFlavorStep = isFlavorStep;
     document.observe('xwiki:extension:statusChanged', this._onExtensionStatusChanged.bindAsEventListener(this));
+    
+    // Disable the install button if no flavor is selected (and do it every time the picker is updated)
+    require(['jquery'], function ($) {
+      $('.xwiki-flavor-picker').on('xwiki:flavorpicker:updated', function() {
+        var selectedItems = $(this).find('input[name="flavor"]:checked').length;
+        var installButton = $('input[name="installFlavor"]');
+        if (selectedItems > 0) {
+          installButton.removeAttr('disabled');
+        } else {
+          installButton.attr('disabled', 'disabled');
+        }
+      });
+    });
   },
 
   /**
@@ -22,8 +36,8 @@ XWiki.DefaultUIStep = Class.create({
     } else {
       // Enable all step buttons after an extension job is finished.
       stepButtons.invoke('enable');
-      if (extension.getId() == '$services.distribution.getUIExtensionId().id'
-          && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value') {
+      if (this.isFlavorStep || (extension.getId() == '$services.distribution.getUIExtensionId().id'
+          && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value')) {
         this._onDefaultUiExtensionStatusChanged(stepButtons, status);
       }
     }
@@ -322,7 +336,8 @@ function init() {
     new PreviousUIForm(previousUIForm);
   });
 
-  $('extension.defaultui') && new XWiki.DefaultUIStep();
+  $('extension.flavor') && new XWiki.FlavorOrDefaultUIStep(true);
+  $('extension.defaultui') && new XWiki.FlavorOrDefaultUIStep(false);
   $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
 

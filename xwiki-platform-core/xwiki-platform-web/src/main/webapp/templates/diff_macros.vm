@@ -530,6 +530,15 @@ $escapedChunk##
 diff$id.hashCode()##
 #end
 
+#macro (diffVersion $version)
+#if ($version.id && $version.version)
+## Seems to be an extension id.
+$services.extension.local.repository.resolve($version).name ${version.version}##
+#else
+$!version##
+#end
+#end
+
 #macro (displayDocumentUnifiedDiffsWithSummary $documentDiffs $headingLevel)
   <h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
   #displayDocumentUnifiedDiffsSummary($documentDiffs)
@@ -579,6 +588,11 @@ diff$id.hashCode()##
   <div class="diff-summary-item">
     #diffIcon('page' $documentDiff.type)
     <a href="#details">$escapetool.xml($services.model.serialize($documentDiff.reference, 'local'))</a>
+    <span class="diff-summary-item-hint">
+      (#diffVersion($documentDiff.previousReference.version)
+      $services.icon.renderHTML('right')
+      #diffVersion($documentDiff.nextReference.version))
+    </span>
   </div>
   <ul>
     #if ($documentDiff.size() > 0)
@@ -649,6 +663,11 @@ diff$id.hashCode()##
     <h$mathtool.add($headingLevel, 1) id="#diffAnchor($documentReference)">
       #diffIcon('page' $documentDiff.type)
       $escapetool.xml($services.model.serialize($documentReference, 'local'))
+      <span class="diff-item-hint">
+        #diffVersion($documentDiff.previousReference.version)
+        $services.icon.renderHTML('right')
+        #diffVersion($documentDiff.nextReference.version)
+      </span>
     </h$mathtool.add($headingLevel, 1)>
     #displayDocumentUnifiedDiff($documentDiff)
   #end

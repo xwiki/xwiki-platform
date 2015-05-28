@@ -29,12 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-watchlist-api</artifactId>
   <name>XWiki Platform - WatchList - API</name>
-  <description>XWiki Platform - WatchList - API</description>
+  <description>API to manipulate a user's WatchList.</description>
   <properties>
-    <!-- Name to display by the Extension Manager -->
+    <!-- Name to display in the Extension Manager -->
     <xwiki.extension.name>Watchlist API</xwiki.extension.name>
-  <!-- This module is currently under refactoring. The ratio has been lowered to avoid noise. Need to bring it back to at 
-    least 0.11 which was before the refactoring started. -->
+    <!-- This module is currently under refactoring. The ratio has been lowered to avoid noise. Need to bring it back to at
+      least 0.11 which was before the refactoring started. -->
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

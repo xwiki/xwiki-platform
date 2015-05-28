@@ -22,6 +22,8 @@ package org.xwiki.extension.xar.internal.job;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -83,6 +85,12 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
     @Inject
     private DocumentUnifiedDiffBuilder documentDiffBuilder;
 
+    /**
+     * The set of features that have been compared. We try to avoid comparing the same feature twice. We assume all the
+     * features are compared on the same namespace.
+     */
+    private Set<String> comparedFeatures = new HashSet<>();
+
     @Override
     public String getType()
     {
@@ -107,18 +115,19 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         String namespace = request.getNamespaces().iterator().next();
 
         Collection<ExtensionId> extensionIds = request.getExtensions();
-        notifyPushLevelProgress(extensionIds.size());
+        this.progressManager.pushLevelProgress(extensionIds.size(), this);
         try {
             for (ExtensionId extensionId : extensionIds) {
+                this.progressManager.startStep(this);
+
                 InstalledExtension installedExtension = getInstalledExtension(extensionId, namespace);
                 // Make sure the specified extension is installed on the specified namespace.
                 if (installedExtension != null && installedExtension.isInstalled(namespace)) {
                     diff(extensionId.getId(), namespace);
                 }
-                notifyStepPropress();
             }
         } finally {
-            notifyPopLevelProgress();
+            this.progressManager.popLevelProgress(this);
         }
     }
 
@@ -133,20 +142,28 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
 
     private void diff(String feature, String namespace)
     {
+        if (this.comparedFeatures.contains(feature)) {
+            // We already looked at this feature.
+            return;
+        }
+        this.comparedFeatures.add(feature);
+
         InstalledExtension installedExtension =
             this.installedExtensionRepository.getInstalledExtension(feature, namespace);
         if (installedExtension != null) {
             diff(installedExtension, namespace);
 
             Collection<? extends ExtensionDependency> dependencies = installedExtension.getDependencies();
-            notifyPushLevelProgress(dependencies.size());
+
+            this.progressManager.pushLevelProgress(dependencies.size(), this);
             try {
                 for (ExtensionDependency dependency : dependencies) {
+                    this.progressManager.startStep(this);
+
                     diff(dependency.getId(), namespace);
-                    notifyStepPropress();
                 }
             } finally {
-                notifyPopLevelProgress();
+                this.progressManager.popLevelProgress(this);
             }
         }
     }
@@ -177,16 +194,17 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
     private void diff(XarFile xarFile, WikiReference wikiReference, ExtensionId extensionId)
     {
         Collection<XarEntry> xarEntries = xarFile.getEntries();
-        notifyPushLevelProgress(xarEntries.size());
+        this.progressManager.pushLevelProgress(xarEntries.size(), this);
         try {
             for (XarEntry xarEntry : xarEntries) {
+                this.progressManager.startStep(this);
+
                 try {
                     diff(this.packager.getXWikiDocument(xarFile.getInputStream(xarEntry), wikiReference), extensionId);
                 } catch (Exception e) {
                     // Skip this document and continue.
                     this.logger.error("Failed to parse document [{}] from XAR.", xarEntry.getDocumentName(), e);
                 }
-                notifyStepPropress();
             }
         } finally {
             try {
@@ -194,7 +212,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
             } catch (IOException e) {
                 // Ignore.
             }
-            notifyPopLevelProgress();
+            this.progressManager.popLevelProgress(this);
         }
     }
 
@@ -205,7 +223,7 @@ public class DiffXarJob extends AbstractExtensionJob<InstallRequest, DiffXarJobS
         }
         // Use the extension id as the document version.
         XWikiDocument previousDocument =
-            document.duplicate(new DocumentVersionReference(document.getDocumentReferenceWithLocale(), extensionId));
+            document.duplicate(new DocumentVersionReference(document.getDocumentReference(), extensionId));
         XWikiContext xcontext = this.xcontextProvider.get();
         try {
             XWikiDocument nextDocument =

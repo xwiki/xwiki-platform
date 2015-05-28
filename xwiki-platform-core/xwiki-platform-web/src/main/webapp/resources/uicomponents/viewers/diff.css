@@ -113,6 +113,13 @@ dl.diff-group > dd > dl {
   color: #D0B44C;
 }
 
+.diff-item-hint {
+  color: $theme.textSecondaryColor;
+  display: block;
+  font-size: 65%;
+  margin-top: .3em;
+}
+
 ul.diff-summary {
   padding-left: 0;
 }

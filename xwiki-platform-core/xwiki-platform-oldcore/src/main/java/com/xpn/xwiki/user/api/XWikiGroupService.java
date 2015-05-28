@@ -35,24 +35,24 @@ import com.xpn.xwiki.XWikiException;
  */
 public interface XWikiGroupService
 {
-    public void init(XWiki xwiki, XWikiContext context) throws XWikiException;
+    void init(XWiki xwiki, XWikiContext context) throws XWikiException;
 
-    public void initCache(XWikiContext context) throws XWikiException;
+    void initCache(XWikiContext context) throws XWikiException;
 
-    public void initCache(int iCapacity, XWikiContext context) throws XWikiException;
+    void initCache(int iCapacity, XWikiContext context) throws XWikiException;
 
-    public void flushCache();
+    void flushCache();
 
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */
     @Deprecated
-    public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
+    Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
     /**
      * Adding the user to the group cache.
      */
-    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
+    void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
 
     /**
      * Remove user or group name from all groups.
@@ -64,20 +64,20 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
+    void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
      */
     @Deprecated
-    public List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
+    List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
      */
     @Deprecated
-    public List<String> listAllGroups(XWikiContext context) throws XWikiException;
+    List<String> listAllGroups(XWikiContext context) throws XWikiException;
 
     /**
      * Search for all users with provided constraints and in a provided order.
@@ -179,7 +179,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
+    Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -193,7 +193,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since 2.4M2
      */
-    public Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
+    Collection<DocumentReference> getAllGroupsReferencesForMember(DocumentReference memberReference, int limit,
         int offset, XWikiContext context) throws XWikiException;
 
     /**
@@ -207,7 +207,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
+    Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -223,7 +223,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since 1.6M1
      */
-    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+    Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException;
 
     /**

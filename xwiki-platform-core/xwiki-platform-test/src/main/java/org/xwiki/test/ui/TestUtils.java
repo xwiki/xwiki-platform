@@ -831,7 +831,13 @@ public class TestUtils
     public void updateObject(String space, String page, String className, int objectNumber, Object... properties)
     {
         // TODO: would be even quicker using REST
-        gotoPage(space, page, "save", toQueryParameters(className, objectNumber, properties));
+        Map<String, Object> queryParameters =
+            (Map<String, Object>) toQueryParameters(className, objectNumber, properties);
+
+        // Append the updateOrCreate objectPolicy since we always want this in our tests.
+        queryParameters.put("objectPolicy", "updateOrCreate");
+
+        gotoPage(space, page, "save", queryParameters);
     }
 
     public ClassEditPage addClassProperty(String space, String page, String propertyName, String propertyType)

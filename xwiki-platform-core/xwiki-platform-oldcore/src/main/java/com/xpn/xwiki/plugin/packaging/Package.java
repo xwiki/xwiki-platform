@@ -54,8 +54,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
+import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -750,7 +752,11 @@ public class Package
                 }
 
                 // Register the extension as installed
-                installedRepository.installExtension(localExtension, namespace, false);
+                InstalledExtension installedExtension = installedRepository.installExtension(localExtension, namespace, false);
+
+                // Tell the world about it
+                Utils.getComponent(ObservationManager.class).notify(
+                    new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension);
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }

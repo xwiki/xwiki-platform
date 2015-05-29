@@ -46,7 +46,6 @@ import org.xwiki.mail.internal.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 import org.xwiki.watchlist.internal.api.WatchListException;
 import org.xwiki.watchlist.internal.api.WatchListNotifier;
@@ -55,6 +54,7 @@ import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactor
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Attachment;
 
 /**
  * Default implementation for {@link WatchListNotifier}. The current implementation offers email notifications only.
@@ -74,6 +74,11 @@ public class DefaultWatchListNotifier implements WatchListNotifier
      * Wiki page which contains the default watchlist email template.
      */
     public static final String DEFAULT_EMAIL_TEMPLATE = "XWiki.WatchListMessage";
+
+    /**
+     * Extra attachments to use when rendering the message template.
+     */
+    public static final String TEMPLATE_ATTACHMENTS = "attachments";
 
     /**
      * XWiki User Class.
@@ -96,9 +101,6 @@ public class DefaultWatchListNotifier implements WatchListNotifier
      */
     @Inject
     private MailSenderConfiguration mailConfiguration;
-
-    @Inject
-    private ScriptServiceManager scriptServiceManager;
 
     @Inject
     @Named(WatchListEventMimeMessageFactory.FACTORY_ID)
@@ -193,7 +195,10 @@ public class DefaultWatchListNotifier implements WatchListNotifier
 
         // Prepare email template (wiki page) context
         Map<String, Object> velocityVariables = new HashMap<>();
-        velocityVariables.put(PREVIOUS_FIRE_TIME_VARIABLE, notificationData.get(PREVIOUS_FIRE_TIME_VARIABLE));
+        Date previousFireTime = (Date) notificationData.get(PREVIOUS_FIRE_TIME_VARIABLE);
+        if (previousFireTime != null) {
+            velocityVariables.put(PREVIOUS_FIRE_TIME_VARIABLE, previousFireTime);
+        }
         // Note: The remaining bindings / variables that are context dependent will be updated for each subscriber by
         // the iterator, since they are different for each subscriber.
         // Add to parameters
@@ -205,6 +210,10 @@ public class DefaultWatchListNotifier implements WatchListNotifier
 
         // Add the template document's attachments to the email.
         parameters.put("includeTemplateAttachments", true);
+        List<Attachment> attachments = (List<Attachment>) notificationData.get(TEMPLATE_ATTACHMENTS);
+        if (attachments != null) {
+            parameters.put(TEMPLATE_ATTACHMENTS, attachments);
+        }
 
         // Set the mail's type to "watchlist".
         parameters.put("type", "watchlist");

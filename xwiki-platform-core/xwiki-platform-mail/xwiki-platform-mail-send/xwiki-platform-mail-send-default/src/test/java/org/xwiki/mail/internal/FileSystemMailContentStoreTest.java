@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.MailStoreException;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
@@ -76,32 +78,36 @@ public class FileSystemMailContentStoreTest
             new File(TEMPORARY_DIRECTORY, this.mocker.getComponentUnderTest().ROOT_DIRECTORY));
     }
 
+    @BeforeComponent
+    public void registerMockComponents() throws Exception
+    {
+        Environment environment = this.mocker.registerMockComponent(Environment.class);
+        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+    }
+
     @Test
     public void saveMessage() throws Exception
     {
-        Environment environment = this.mocker.getInstance(Environment.class);
-        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setHeader("X-BatchID", batchId);
-        message.setHeader("X-MailID", mailId);
+        message.saveChanges();
+        message.setHeader("Message-ID", messageId);
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
-        this.mocker.getComponentUnderTest().save(message);
+        this.mocker.getComponentUnderTest().save(batchId, message);
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchId);
-        File messageFile = new File(batchDirectory, mailId);
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
+                URLEncoder.encode(batchId, "UTF-8"));
+        File messageFile = new File(batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in);
 
-        assertTrue(messageContent.contains("X-BatchID: " + batchId));
-        assertTrue(messageContent.contains("X-MailID: " + mailId));
+        assertTrue(messageContent.contains("Message-ID: " + message.getMessageID()));
         assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
     }
 
@@ -112,55 +118,49 @@ public class FileSystemMailContentStoreTest
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
         MimeMessage message = mock(MimeMessage.class);
+        when(message.getMessageID()).thenReturn(messageId);
 
         this.thrown.expect(MailStoreException.class);
         this.thrown.expectMessage(
-            "Failed to save message (id [" + mailId + "], batch id ["+ batchId +"]) to the file system at");
+            "Failed to save message (id [" + messageId + "], batch id [" + batchId + "]) into file");
 
-        when(message.getHeader("X-BatchID", null)).thenReturn(batchId);
-        when(message.getHeader("X-MailID", null)).thenReturn(mailId);
         when(message.getContent()).thenReturn("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         doThrow(new IOException()).when(message).writeTo(any(OutputStream.class));
-        this.mocker.getComponentUnderTest().save(message);
+        this.mocker.getComponentUnderTest().save(batchId, message);
     }
 
     @Test
     public void loadMessage() throws Exception
     {
-        Environment environment = this.mocker.getInstance(Environment.class);
-        when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchId);
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
+                     URLEncoder.encode(batchId,"UTF-8"));
         batchDirectory.mkdirs();
-        File messageFile = new File(batchDirectory, mailId);
+        File messageFile = new File(batchDirectory, URLEncoder.encode(messageId,"UTF-8"));
         messageFile.createNewFile();
 
         String newLine = System.getProperty("line.separator");
 
         FileWriter fileWriter = new FileWriter(messageFile, true);
         // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
-        fileWriter.append("Message-ID: <1128820400.0.1419205781342.JavaMail.contact@xwiki.org>" + newLine);
+        fileWriter.append("Message-ID: " + messageId + newLine);
         fileWriter.append("MIME-Version: 1.0" + newLine);
         fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
-        fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
-        fileWriter.append("X-MailID: " + mailId + newLine);
-        fileWriter.append("X-BatchID: " + batchId + newLine + newLine);
+        fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine + newLine);
         fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         fileWriter.close();
 
         Session session = Session.getInstance(new Properties());
-        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, mailId);
+        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, messageId);
 
-        assertEquals(batchId, message.getHeader("X-BatchID", null));
-        assertEquals(mailId, message.getHeader("X-MailID", null));
+        assertEquals(messageId, message.getMessageID());
         assertEquals("Lorem ipsum dolor sit amet, consectetur adipiscing elit", message.getContent());
     }
 
@@ -168,14 +168,14 @@ public class FileSystemMailContentStoreTest
     public void loadMessageThrowsMailStoreExceptionWhenError() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
         Session session = Session.getInstance(new Properties());
 
         this.thrown.expect(MailStoreException.class);
         this.thrown.expectMessage(
-            "Failed to load message (id [" + mailId + "], batch id [" + batchId + "]) from the file system at");
+            "Failed to load message (id [" + messageId + "], batch id [" + batchId + "]) from file");
 
-        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, mailId);
+        MimeMessage message = this.mocker.getComponentUnderTest().load(session, batchId, messageId);
         fail("Should have thrown an exception here");
     }
 
@@ -186,16 +186,16 @@ public class FileSystemMailContentStoreTest
         when(environment.getPermanentDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
         File batchDirectory =
-            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), batchId);
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY), URLEncoder.encode(batchId, "UTF-8"));
         batchDirectory.mkdirs();
-        File messageFile = new File(batchDirectory, mailId);
+        File messageFile = new File(batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
         messageFile.createNewFile();
 
-        this.mocker.getComponentUnderTest().delete(batchId, mailId);
+        this.mocker.getComponentUnderTest().delete(batchId, messageId);
 
         assertTrue(!messageFile.exists());
     }

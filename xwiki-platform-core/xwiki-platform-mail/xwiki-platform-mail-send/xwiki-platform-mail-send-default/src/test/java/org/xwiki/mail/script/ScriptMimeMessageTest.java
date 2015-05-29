@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.script;
 
-import java.util.UUID;
-
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
@@ -86,13 +84,10 @@ public class ScriptMimeMessageTest
     @Test
     public void addHeader() throws Exception
     {
-        String batchId = UUID.randomUUID().toString();
-        String mailId = UUID.randomUUID().toString();
+        String testHeader = "test";
 
-        this.scriptMessage.addHeader("X-BatchID", batchId);
-        this.scriptMessage.addHeader("X-MailID", mailId);
+        this.scriptMessage.addHeader("X-Test", testHeader);
 
-        assertEquals(batchId, this.scriptMessage.getHeader("X-BatchID", null));
-        assertEquals(mailId, this.scriptMessage.getHeader("X-MailID", null));
+        assertEquals(testHeader, this.scriptMessage.getHeader("X-Test", null));
     }
 }

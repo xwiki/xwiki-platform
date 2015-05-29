@@ -48,6 +48,17 @@ public class MemoryMailStatusResult extends AbstractMailStatusResult
     private Map<String, MailStatus> statusMap = new LinkedHashMap<>();
 
     /**
+     * Retrieve the status for the given message identifier.
+     *
+     * @param messageId the message-ID of the message.
+     * @return the mail status for the given message, or null if none were found.
+     */
+    public MailStatus getStatus(String messageId)
+    {
+        return this.statusMap.get(messageId);
+    }
+
+    /**
      * Changes the status for the message referenced in the passed status object.
      *
      * @param status the new status. Also contains the message id representing the target message

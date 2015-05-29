@@ -163,7 +163,7 @@ public class MailTest extends AbstractTest
         MailStatusAdministrationSectionPage statusPage = new MailStatusAdministrationSectionPage();
         LiveTableElement liveTableElement = statusPage.getLiveTable();
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-3", "Test");
-        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "sent");
+        liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-5", "send_success");
         liveTableElement.filterColumn("xwiki-livetable-sendmailstatus-filter-6", "xwiki");
 
         // Let's wait till we have at least 3 rows. Note that we wait because we could have received the mails above
@@ -197,7 +197,7 @@ public class MailTest extends AbstractTest
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
             + "#end\n"
-            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
+            + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"
             + "    $status.messageId - $status.errorSummary\n"
             + "    $status.errorDescription\n"
@@ -254,7 +254,7 @@ public class MailTest extends AbstractTest
             + "#if ($services.mailsender.lastError)\n"
             + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
             + "#end\n"
-            + "#foreach ($status in $result.statusResult.getByState('FAILED'))\n"
+            + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"
             + "    $status.messageId - $status.errorSummary\n"
             + "    $status.errorDescription\n"

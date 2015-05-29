@@ -97,7 +97,7 @@ public class UsersAndGroupsMimeMessageIterator implements Iterator<MimeMessage>,
                 message.addHeader("X-MailType", type);
             }
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to create Mime Message, aborting mail sending for this batch", e);
+            throw new RuntimeException("Failed to create Mime Message for recipient " + address, e);
         }
 
         return message;

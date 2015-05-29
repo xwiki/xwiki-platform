@@ -33,6 +33,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
@@ -41,6 +42,8 @@ import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStorageConfiguration;
 import org.xwiki.mail.MailStoreException;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Saves mail statuses in the database.
@@ -57,6 +60,9 @@ public class DatabaseMailListener implements MailListener, Initializable
     private Logger logger;
 
     @Inject
+    private Execution execution;
+
+    @Inject
     @Named("filesystem")
     private MailContentStore mailContentStore;
 
@@ -69,145 +75,204 @@ public class DatabaseMailListener implements MailListener, Initializable
 
     private DatabaseMailStatusResult mailStatusResult;
 
+    private String batchId;
+
     @Override
     public void initialize() throws InitializationException
     {
-        this.mailStatusResult = new DatabaseMailStatusResult(this.mailStatusStore);
+        mailStatusResult = new DatabaseMailStatusResult(this.mailStatusStore);
     }
 
     @Override
-    public void onPrepare(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareBegin(String batchId, Map<String, Object> parameters)
     {
-        MailStatus status = createMailStatus(message, MailState.READY, parameters);
-        saveStatus(status, parameters);
-
-        // Initialize the DatabaseMailStatusResult on first execution by passing the batch id
-        this.mailStatusResult.setBatchId(status.getBatchId());
-    }
-
-    @Override
-    public void onSuccess(MimeMessage message, Map<String, Object> parameters)
-    {
-        String messageId = getMessageId(message);
-        MailStatus status;
-        try {
-            status = this.mailStatusStore.load(messageId);
-            if (status == null) {
-                // It's not normal to have no status in the mail status store since onPrepare should have been called
-                // before.
-                this.logger.warn("Failed to find a previous mail status for message id [{}]. However the mail was sent "
-                    + "successfully. Forcing status to [{}]", messageId, MailState.SENT);
-            }
-        } catch (MailStoreException e) {
-            this.logger.error("Error when looking for a previous mail status for message id [{}]. However the mail was "
-                + "sent successfully. Forcing status to [{}]", messageId, MailState.SENT, e);
-            status = null;
+        if (this.batchId != null) {
+            throw new RuntimeException("A mail listener cannot be reused. This listener has been used for batch ["
+                + this.batchId + "] and is now called for batch [" + batchId + "].");
         }
 
+        logger.debug("Mail preparation begins for batch [{}].", batchId);
+
+        this.batchId = batchId;
+        mailStatusResult.setBatchId(batchId);
+    }
+
+    @Override
+    public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Mail preparation succeed for message [{}] of batch [{}].", getMessageId(message), batchId);
+        }
+
+        MailStatus status = new MailStatus(batchId, message, MailState.PREPARE_SUCCESS);
+        status.setWiki(
+            ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId());
+        saveStatus(status, parameters);
+    }
+
+    @Override
+    public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Mail preparation failed for message [{}] of batch [{}].", getMessageId(message), batchId,
+                exception);
+        }
+
+        MailStatus status = new MailStatus(batchId, message, MailState.PREPARE_ERROR);
+        status.setWiki(
+            ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId());
+        status.setError(exception);
+        saveStatus(status, parameters);
+
+        // This mail will not reach the send queue, so its processing is done now.
+        mailStatusResult.incrementCurrentSize();
+    }
+
+    @Override
+    public void onPrepareFatalError(Exception e, Map<String, Object> parameters)
+    {
+        //TODO: Store failure exception
+        logger.error("Failure during preparation phase of thread [" + batchId + "]");
+    }
+
+    @Override
+    public void onPrepareEnd(Map<String, Object> parameters)
+    {
+        logger.debug("Mail preparation ended for batch [{}].", batchId);
+    }
+
+    @Override
+    public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    {
+        String messageId = getMessageId(message);
+
+        logger.debug("Mail sent successfully for message [{}] of batch [{}].", messageId, batchId);
+
+        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_SUCCESS);
+
         if (status != null) {
-            status.setState(MailState.SENT);
+            status.setState(MailState.SEND_SUCCESS);
         } else {
-            status = createMailStatus(message, MailState.SENT, parameters);
+            this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_success state.",
+                messageId, batchId);
+            status = new MailStatus(batchId, message, MailState.SEND_SUCCESS);
         }
 
         // Since the mail was sent successfully we don't need to keep its serialized content
         deleteMailContent(status);
 
-        // If the user doesn't want to keep it for tracability we remove the mail status, otherwise we just update it
-        if (this.configuration.discardSuccessStatuses()) {
+        // If the user doesn't want to keep success status, we remove the mail status, otherwise we just update it
+        if (configuration.discardSuccessStatuses()) {
             deleteStatus(status, parameters);
         } else {
             saveStatus(status, parameters);
+        }
+
+        mailStatusResult.incrementCurrentSize();
+    }
+
+    @Override
+    public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
+    {
+        logger.debug("Mail loading failed for message [{}] of batch [{}].", messageId, batchId, exception);
+
+        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_FATAL_ERROR);
+
+        if (status != null) {
+            status.setState(MailState.SEND_FATAL_ERROR);
+            status.setError(exception);
+            saveStatus(status, parameters);
+        } else {
+            this.logger.error("Unable to report the fatal error encountered during mail sending for message [{}] "
+                    + "of batch [{}].", messageId, batchId, exception);
         }
 
         this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
-    public void onError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
         String messageId = getMessageId(message);
-        MailStatus status;
-        try {
-            status = this.mailStatusStore.load(messageId);
-            if (status == null) {
-                // It's not normal to have no status in the mail status store since onPrepare should have been called
-                // before.
-                this.logger.warn("Failed to find a previous mail status for message id [{}]. In addition the mail has "
-                    + "failed to be sent successfully. Forcing status to [{}]", messageId, MailState.FAILED);
-            }
-        } catch (MailStoreException e) {
-            this.logger.error("Error when looking for a previous mail status for message id [{}]. In addition the mail "
-                + "has failed to be sent successfully. Forcing status to [{}]", messageId, MailState.FAILED, e);
-            status = null;
-        }
+
+        logger.debug("Mail sending failed for message [{}] of batch [{}].", messageId, batchId, exception);
+
+        MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_ERROR);
 
         if (status != null) {
-            status.setState(MailState.FAILED);
+            status.setState(MailState.SEND_ERROR);
         } else {
-            status = createMailStatus(message, MailState.FAILED, parameters);
+            this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_error state.",
+                messageId, batchId);
+            status = new MailStatus(batchId, message, MailState.SEND_ERROR);
         }
-
         status.setError(exception);
         saveStatus(status, parameters);
 
         this.mailStatusResult.incrementCurrentSize();
     }
 
+    private MailStatus retrieveExistingMailStatus(String messageId, MailState state)
+    {
+        MailStatus status;
+        try {
+            status = mailStatusStore.load(messageId);
+            if (status == null) {
+                // It's not normal to have no status in the mail status store since onPrepare should have been called
+                // before.
+                this.logger.error("Failed to find a previous mail status for message [{}] of batch [{}].",
+                    messageId, batchId, state);
+            }
+        } catch (MailStoreException e) {
+            this.logger.error("Error when looking for a previous mail status for message [{}] of batch [{}].",
+                messageId, batchId, state, e);
+            status = null;
+        }
+        return status;
+    }
+
     @Override
     public MailStatusResult getMailStatusResult()
     {
-        return this.mailStatusResult;
+        return mailStatusResult;
     }
 
     private String getMessageId(MimeMessage message)
     {
-        return getSafeHeader("X-MailID", message);
+        try {
+            return message.getMessageID();
+        } catch (MessagingException e) {
+            // This cannot happen in practice since the implementation never throws any exception!
+            logger.error("Failed to retrieve messageID from the message.", e);
+            return null;
+        }
     }
 
     private void saveStatus(MailStatus status, Map<String, Object> parameters)
     {
         try {
-            this.mailStatusStore.save(status, parameters);
+            mailStatusStore.save(status, parameters);
         } catch (MailStoreException e) {
             // Failed to save the status in the DB, we continue but log an error
-            this.logger.error("Failed to save mail status [{}] to the database", status, e);
+            logger.error("Failed to save mail status [{}] to the database", status, e);
         }
     }
 
     private void deleteStatus(MailStatus status, Map<String, Object> parameters)
     {
         try {
-            this.mailStatusStore.delete(status.getMessageId(), parameters);
+            mailStatusStore.delete(status.getMessageId(), parameters);
         } catch (MailStoreException e) {
             // Failed to delete the status in the DB, we continue but log an error
-            this.logger.error("Failed to delete mail status [{}] from the database", status, e);
+            logger.error("Failed to delete mail status [{}] from the database", status, e);
         }
-    }
-
-    private String getSafeHeader(String headerName, MimeMessage message)
-    {
-        try {
-            return message.getHeader(headerName, null);
-        } catch (MessagingException e) {
-            // This cannot happen in practice since the implementation never throws any exception!
-            this.logger.error("Failed to retrieve [{}] header from the message.", headerName, e);
-            return null;
-        }
-    }
-
-    private MailStatus createMailStatus(MimeMessage message, MailState state, Map<String, Object> parameters)
-    {
-        MailStatus status = new MailStatus(message, state);
-        status.setWiki((String) parameters.get("wikiId"));
-        return status;
     }
 
     private void deleteMailContent(MailStatus currentStatus)
     {
         if (currentStatus != null) {
             try {
-                this.mailContentStore.delete(currentStatus.getBatchId(), currentStatus.getMessageId());
+                mailContentStore.delete(currentStatus.getBatchId(), currentStatus.getMessageId());
             } catch (MailStoreException e) {
                 // Failed to delete saved mail, raise a warning but continue since it's not critical
                 this.logger.warn("Failed to remove previously failing message [{}] (batch id [{}]) from the file "

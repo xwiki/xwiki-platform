@@ -54,17 +54,16 @@ public class MailStatusTest
     {
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setHeader("X-MailID", "mailid");
-        message.setHeader("X-BatchID", "batchid");
+        message.setHeader("Message-ID", "<local@domain>");
         message.setHeader("X-MailType", "type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
-        MailStatus status = new MailStatus(message, MailState.READY);
+        MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
         Date date = new Date();
         status.setDate(date);
 
-        assertEquals("messageId = [mailid], batchId = [batchid], state = [ready], date = [" + date.toString()
-            + "], recipients = [john@doe.com], type = [type]", status.toString());
+        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+            + date.toString() + "], recipients = [john@doe.com], type = [type]", status.toString());
     }
 
     @Test
@@ -72,19 +71,18 @@ public class MailStatusTest
     {
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setHeader("X-MailID", "mailid");
-        message.setHeader("X-BatchID", "batchid");
+        message.setHeader("Message-ID", "<local@domain>");
         message.setHeader("X-MailType", "type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
-        MailStatus status = new MailStatus(message, MailState.READY);
+        MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
         Date date = new Date();
         status.setDate(date);
         status.setError(new Exception("outer", new Exception("inner")));
 
-        assertTrue(status.toString().startsWith("messageId = [mailid], batchId = [batchid], state = [ready], "
-            + "date = [" + date.toString() + "], recipients = [john@doe.com], type = [type], "
-            + "errorSummary = [Exception: inner], errorDescription = ["));
+        assertTrue(status.toString().startsWith("messageId = [<local@domain>], batchId = [batchid], "
+            + "state = [prepare_success], date = [" + date.toString() + "], recipients = [john@doe.com], "
+            + "type = [type], errorSummary = [Exception: inner], errorDescription = ["));
     }
 
     @Test
@@ -92,17 +90,16 @@ public class MailStatusTest
     {
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.setHeader("X-MailID", "mailid");
-        message.setHeader("X-BatchID", "batchid");
+        message.setHeader("Message-ID", "<local@domain>");
         message.setHeader("X-MailType", "type");
         message.setRecipients(Message.RecipientType.TO, "john@doe.com");
 
-        MailStatus status = new MailStatus(message, MailState.READY);
+        MailStatus status = new MailStatus("batchid", message, MailState.PREPARE_SUCCESS);
         Date date = new Date();
         status.setDate(date);
         status.setWiki("wiki");
 
-        assertEquals("messageId = [mailid], batchId = [batchid], state = [ready], date = [" + date.toString()
-            + "], recipients = [john@doe.com], type = [type], wiki = [wiki]", status.toString());
+        assertEquals("messageId = [<local@domain>], batchId = [batchid], state = [prepare_success], date = ["
+            + date.toString() + "], recipients = [john@doe.com], type = [type], wiki = [wiki]", status.toString());
     }
 }

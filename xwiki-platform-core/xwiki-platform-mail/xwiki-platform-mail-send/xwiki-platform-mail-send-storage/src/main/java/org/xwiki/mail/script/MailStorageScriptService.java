@@ -106,10 +106,11 @@ public class MailStorageScriptService extends AbstractMailScriptService
 
         MimeMessage message;
         try {
-            message = loadMessage(batchId, messageId);
-
             // Set the batch id so that no new batch id is generated when re-sending the mail
             Session session = this.sessionFactory.create(Collections.singletonMap(SESSION_BATCHID_KEY, batchId));
+
+            message = loadMessage(session, batchId, messageId);
+
             ScriptMailResult scriptMailResult = new ScriptMailResult(this.mailSender.sendAsynchronously(
                 Arrays.asList(message), session, listener), listener.getMailStatusResult());
 
@@ -262,10 +263,9 @@ public class MailStorageScriptService extends AbstractMailScriptService
         return normalizedMap;
     }
 
-    private MimeMessage loadMessage(String batchId, String mailId) throws MailStoreException
+    private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException
     {
-        MimeMessage message = this.mailContentStore.load(this.sessionFactory.create(
-            Collections.<String, String>emptyMap()), batchId, mailId);
+        MimeMessage message = this.mailContentStore.load(session, batchId, mailId);
         return message;
     }
 

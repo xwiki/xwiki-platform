@@ -19,15 +19,14 @@
  */
 package org.xwiki.mail.internal.thread;
 
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.Address;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -36,10 +35,8 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
+import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.internal.UpdateableMailStatusResult;
-
-import com.google.common.collect.ImmutableMap;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Runnable that regularly check for mail items on a Prepare Queue, and for each mail item there, generate the message
@@ -53,28 +50,6 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class PrepareMailRunnable extends AbstractMailRunnable
 {
-    /**
-     * Name of the custom JavaMail header used by XWiki to uniquely identify a mail. This header allows us to follow the
-     * state of the mail (prepared, sent successfully or failed to be sent).
-     * <p/>
-     * Note that we wanted to use the standard "Message-ID" header but unfortunately the JavaMail implementation
-     * modifies this header's value when the mail is sent (even if you have called
-     * {@link javax.mail.internet.MimeMessage#saveChanges()}!). Thus if we want to save the mail's state before the mail
-     * is sent and then update it after it's been sent we won't find the same id...
-     */
-    private static final String HEADER_MAIL_ID = "X-MailID";
-
-    /**
-     * Name of the custom JavaMail header used by XWiki to uniquely identify a group of emails being sent together. This
-     * can be seen as representing a mail sending session. This makes it easier to list the status of all mails sent
-     * together in a session for example or to resend failed mails from a specific session.
-     */
-    private static final String HEADER_BATCH_ID = "X-BatchID";
-
-    private static final String WIKI_PARAMETER_KEY = "wikiId";
-
-    private static final String CONTEXT_PARAMETER_KEY = "context";
-
     @Inject
     private MailQueueManager<PrepareMailQueueItem> prepareMailQueueManager;
 
@@ -123,38 +98,47 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     protected void prepareMail(PrepareMailQueueItem item) throws ExecutionContextException
     {
         Iterator<? extends MimeMessage> messageIterator = item.getMessages().iterator();
+        MailListener listener = item.getListener();
+
+        if (listener != null) {
+            listener.onPrepareBegin(item.getBatchId(), Collections.<String, Object>emptyMap());
+        }
 
         // Count the total number of messages to process
         long messageCounter = 0;
 
-        // We clone the Execution Context for each mail so that one mail doesn't interfere with another
-        // Note that we need to have the hasNext() call after the context is ready since the implementation can need
-        // a valid XWiki Context.
-        boolean shouldStop = false;
-        while (!shouldStop) {
-            prepareContext(item.getContext());
-            try {
-                if (messageIterator.hasNext()) {
-                    MimeMessage mimeMessage = messageIterator.next();
-                    // Skip message is message has failed to be created.
-                    if (mimeMessage != null) {
+        try {
+            boolean shouldStop = false;
+            while (!shouldStop) {
+                // Note that we need to have the hasNext() call after the context is ready since the implementation can
+                // need a valid XWiki Context.
+                prepareContext(item.getContext());
+                try {
+                    if (messageIterator.hasNext()) {
+                        MimeMessage mimeMessage = messageIterator.next();
                         prepareSingleMail(mimeMessage, item);
+                        messageCounter++;
                     } else {
-                        // We can't call a listener here because the message is null. Thus we simply log an error.
-                        this.logger.error("Failed to prepare message for [{}]", item);
+                        shouldStop = true;
                     }
-                    messageCounter++;
-                } else {
-                    shouldStop = true;
-                    // Update the listener with the total number of messages to process so that the user can known when
-                    // all the messages have been processed for the batch.
-                    MailListener listener = item.getListener();
-                    if (listener != null && listener.getMailStatusResult() instanceof UpdateableMailStatusResult) {
-                        ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(messageCounter);
-                    }
+                } finally {
+                    removeContext();
                 }
-            } finally {
-                removeContext();
+            }
+        } catch (Exception e) {
+            if (listener != null) {
+                listener.onPrepareFatalError(e, Collections.<String, Object>emptyMap());
+            }
+        } finally {
+            if (listener != null) {
+                MailStatusResult result = listener.getMailStatusResult();
+                // Update the listener with the total number of messages prepared so that the user can known when
+                // all the messages have been processed for the batch. We update here, even in case of failure
+                // so that waiting process have a chance to see an end.
+                if (result instanceof UpdateableMailStatusResult) {
+                    ((UpdateableMailStatusResult) result).setTotalSize(messageCounter);
+                }
+                listener.onPrepareEnd(Collections.<String, Object>emptyMap());
             }
         }
     }
@@ -174,81 +158,53 @@ public class PrepareMailRunnable extends AbstractMailRunnable
     {
         MimeMessage message = mimeMessage;
         MailListener listener = item.getListener();
-        String wikiId = ((XWikiContext) item.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId();
 
         try {
-            // Step 1: Create the MimeMessage
-            message = initializeMessage(mimeMessage, listener, item.getBatchId(), item.getContext());
-            if (message != null) {
-                // Step 2: Persist the MimeMessage
-                this.mailContentStore.save(message);
-                // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
-                this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getHeader(HEADER_MAIL_ID, null),
-                    item.getSession(), listener, item.getBatchId()));
-                // Step 4: Notify the user that the MimeMessage is prepared
-                if (listener != null) {
-                    listener.onPrepare(message,
-                        ImmutableMap.of(WIKI_PARAMETER_KEY, wikiId, CONTEXT_PARAMETER_KEY, item.getContext()));
-                }
+            // Step 1: Complete message with From and Bcc from configuration if needed
+            message = initializeMessage(mimeMessage);
+            // Step 2: Persist the MimeMessage
+            this.mailContentStore.save(item.getBatchId(), message);
+            // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
+            this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getMessageID(),
+                item.getSession(), listener, item.getBatchId()));
+            // Step 4: Notify the user that the MimeMessage is prepared
+            if (listener != null) {
+                listener.onPrepareMessageSuccess(message, Collections.<String, Object>emptyMap());
             }
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
-                listener.onError(message, e,
-                    ImmutableMap.of(WIKI_PARAMETER_KEY, wikiId, CONTEXT_PARAMETER_KEY, item.getContext()));
+                listener.onPrepareMessageError(message, e, Collections.<String, Object>emptyMap());
             }
         }
     }
 
-    private MimeMessage initializeMessage(MimeMessage mimeMessage, MailListener listener, String batchId,
-        ExecutionContext executionContext) throws Exception
+    private MimeMessage initializeMessage(MimeMessage mimeMessage)
+        throws Exception
     {
-        MimeMessage message = mimeMessage;
-
-        setCustomHeaders(message, batchId);
-
         // Note: We don't cache the default From and BCC addresses because they can be modified at runtime
         // (from the Admin UI for example) and we need to always get the latest configured values.
 
         // If the user has not set the From header then use the default value from configuration and if it's not
         // set then raise an error since a message must have a from set!
         // Perform some basic verification to avoid NPEs in JavaMail
-        if (message.getFrom() == null) {
+        if (mimeMessage.getFrom() == null) {
             // Try using the From address in the Session
             String from = this.configuration.getFromAddress();
             if (from != null) {
-                message.setFrom(new InternetAddress(from));
-            } else {
-                // JavaMail won't be able to send the mail but we'll get the error in the status.
+                mimeMessage.setFrom(new InternetAddress(from));
             }
+            // Else JavaMail won't be able to send the mail but we'll get the error in the status.
         }
 
         // If the user has not set the BCC header then use the default value from configuration
-        Address[] bccAddresses = message.getRecipients(Message.RecipientType.BCC);
+        Address[] bccAddresses = mimeMessage.getRecipients(Message.RecipientType.BCC);
         if (bccAddresses == null || bccAddresses.length == 0) {
             for (String address : this.configuration.getBCCAddresses()) {
-                message.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
+                mimeMessage.addRecipient(Message.RecipientType.BCC, new InternetAddress(address));
             }
         }
 
-        return message;
-    }
-
-    private void setCustomHeaders(MimeMessage message, String batchId) throws MessagingException
-    {
-        // Set custom XWiki mail headers.
-        // See #HEADER_MAIL_ID and #HEADER_BATCH_ID
-        // If the Batch Id is already set, then don't generate one. This is what happens for example when a serialized
-        // MimeMessage is loaded to be resent. This allows for example to remove the serialized messages after it's
-        // resent.
-        if (message.getHeader(HEADER_BATCH_ID, null) == null) {
-            message.setHeader(HEADER_BATCH_ID, batchId);
-        }
-
-        // If the message Id is already set, then don't generate an id. This is what happens for example when a
-        // serialized MimeMessage is loaded to be resent.
-        if (message.getHeader(HEADER_MAIL_ID, null) == null) {
-            message.setHeader(HEADER_MAIL_ID, UUID.randomUUID().toString());
-        }
+        return mimeMessage;
     }
 }

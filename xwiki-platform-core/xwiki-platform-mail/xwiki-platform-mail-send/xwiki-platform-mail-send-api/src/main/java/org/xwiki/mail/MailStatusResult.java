@@ -32,13 +32,15 @@ public interface MailStatusResult
     /**
      * @return the total number of mails to be sent in this batch. Note that this value is known only once all mails
      *         have been prepared on the Prepare Queue. Until then, the value returned is -1 signifying that the total
-     *         number is currently unknown.
+     *         number is currently unknown. WARNING: If the preparation fails, this number will not reflect the total
+     *         number of mails that should have been processed, but the number of mail that have been prepared with
+     *         or without success.
      * @since 7.1M2
      */
     long getTotalMailCount();
 
     /**
-     * @return the current number of mails that have been sent (successfully or not).
+     * @return the current number of mails that have been processed (sent with success or failed at any stage).
      * @since 7.1M2
      */
     long getProcessedMailCount();
@@ -63,7 +65,7 @@ public interface MailStatusResult
     Iterator<MailStatus> getAll();
 
     /**
-     * @param state the stats to match (ready to send, sent successfully or failed to send)
+     * @param state the state to match (prepare_success, prepare_error, send_success, send_error or send_fatal_error)
      * @return the status for all mails matching the passed state
      */
     Iterator<MailStatus> getByState(MailState state);

@@ -46,7 +46,7 @@ public class MailStatusResultSerializerTest
         MailStatus status2 = new MailStatus();
         status2.setErrorSummary("errorsummary2");
         status2.setErrorDescription("errordescription2");
-        when(statusResult.getByState(MailState.FAILED)).thenReturn(Arrays.asList(status1, status2).iterator());
+        when(statusResult.getByState(MailState.SEND_ERROR)).thenReturn(Arrays.asList(status1, status2).iterator());
 
         assertEquals("Some messages have failed to be sent for the following reasons: "
             + "[[[errorsummary1],[errordescription1]][[errorsummary2],[errordescription2]]]",

@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.thread;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.UUID;
@@ -37,7 +38,9 @@ import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
+import org.xwiki.mail.internal.UpdateableMailStatusResult;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -81,26 +84,30 @@ public class SendMailRunnableTest
         MimeMessage message1 = new MimeMessage(session);
         message1.setSubject("subject1");
         message1.setFrom(InternetAddress.parse("john1@doe.com")[0]);
-        message1.setHeader("X-MailID", "id1");
+        message1.saveChanges();
+        String id1 = message1.getMessageID();
 
         MimeMessage message2 = new MimeMessage(session);
         message2.setSubject("subject2");
         message2.setFrom(InternetAddress.parse("john2@doe.com")[0]);
-        message2.setHeader("X-MailID", "id2");
+        message2.saveChanges();
+        String id2 = message2.getMessageID();
 
         MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
         String batchId = UUID.randomUUID().toString();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
 
-        SendMailQueueItem item1 = new SendMailQueueItem("id1", session, listener, batchId);
-        SendMailQueueItem item2 = new SendMailQueueItem("id2", session, listener, batchId);
+        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId);
+        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId);
 
         MailQueueManager mailQueueManager = this.mocker.getInstance(
             new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
 
         // Simulate loading the message from the content store
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        when(contentStore.load(session, batchId, "id1")).thenReturn(message1);
-        when(contentStore.load(session, batchId, "id2")).thenReturn(message2);
+        when(contentStore.load(session, batchId, id1)).thenReturn(message1);
+        when(contentStore.load(session, batchId, id2)).thenReturn(message2);
 
         // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
         // one failed.
@@ -113,9 +120,7 @@ public class SendMailRunnableTest
 
         // Wait for the mails to have been processed.
         try {
-            while(listener.getMailStatusResult().getProcessedMailCount() != 2) {
-                Thread.sleep(100L);
-            }
+            listener.getMailStatusResult().waitTillProcessed(10000L);
         } finally {
             runnable.stopProcessing();
             thread.interrupt();
@@ -123,7 +128,7 @@ public class SendMailRunnableTest
         }
 
         // This is the real test: we verify that there's been an error while sending each email.
-        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.FAILED);
+        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.SEND_ERROR);
         int errorCount = 0;
         while (statuses.hasNext()) {
             MailStatus status = statuses.next();
@@ -134,6 +139,71 @@ public class SendMailRunnableTest
             // Thus for now I only assert that there's an error set, but not its content.
             assertTrue(status.getErrorSummary() != null);
             errorCount++;
+        }
+        assertEquals(2, errorCount);
+    }
+
+    @Test
+    public void sendMailWhenMailRetrievalFails() throws Exception
+    {
+        // Create a Session with an invalid host so that it generates an error
+        Properties properties = new Properties();
+        Session session = Session.getDefaultInstance(properties);
+
+        MimeMessage message1 = new MimeMessage(session);
+        message1.saveChanges();
+        String id1 = message1.getMessageID();
+        MimeMessage message2 = new MimeMessage(session);
+        message2.saveChanges();
+        String id2 = message2.getMessageID();
+
+        MemoryMailListener listener = this.mocker.getInstance(MailListener.class, "memory");
+        String batchId = UUID.randomUUID().toString();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        ((UpdateableMailStatusResult) listener.getMailStatusResult()).setTotalSize(2);
+
+        listener.onPrepareMessageSuccess(message1, Collections.<String, Object>emptyMap());
+        SendMailQueueItem item1 = new SendMailQueueItem(id1, session, listener, batchId);
+        listener.onPrepareMessageSuccess(message2, Collections.<String, Object>emptyMap());
+        SendMailQueueItem item2 = new SendMailQueueItem(id2, session, listener, batchId);
+
+        MailQueueManager mailQueueManager = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MailQueueManager.class, SendMailQueueItem.class));
+
+        // Simulate loading the message from the content store
+        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        when(contentStore.load(session, batchId, id1)).thenThrow(new MailStoreException("Store failure on message 1"));
+        when(contentStore.load(session, batchId, id2)).thenThrow(new MailStoreException("Store failure on message 2"));
+
+        // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
+        // one failed.
+        mailQueueManager.addToQueue(item1);
+        mailQueueManager.addToQueue(item2);
+
+        MailRunnable runnable = this.mocker.getComponentUnderTest();
+        Thread thread = new Thread(runnable);
+        thread.start();
+
+        // Wait for the mails to have been processed.
+        try {
+            listener.getMailStatusResult().waitTillProcessed(10000L);
+        } finally {
+            runnable.stopProcessing();
+            thread.interrupt();
+            thread.join();
+        }
+
+        // This is the real test: we verify that there's been an error while sending each email.
+        Iterator<MailStatus> statuses = listener.getMailStatusResult().getByState(MailState.SEND_FATAL_ERROR);
+        int errorCount = 0;
+        while (statuses.hasNext()) {
+            MailStatus status = statuses.next();
+            // Note: I would have liked to assert the exact message but it seems there can be different ones returned.
+            // During my tests I got 2 different ones:
+            // "UnknownHostException: xwiki-unknown"
+            // "ConnectException: Connection refused"
+            // Thus for now I only assert that there's an error set, but not its content.
+            assertEquals("MailStoreException: Store failure on message " + ++errorCount, status.getErrorSummary());
         }
         assertEquals(2, errorCount);
     }

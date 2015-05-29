@@ -29,6 +29,7 @@ import java.util.Properties;
 import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -285,5 +286,32 @@ public class JavaIntegrationTest
         assertEquals("text/calendar;method=CANCEL", calendarBodyPart.getHeader("Content-Type")[0]);
         InputStream is = (InputStream) calendarBodyPart.getContent();
         assertEquals(calendarContent, IOUtils.toString(is));
+    }
+
+    @Test
+    public void sendMailWithCustomMessageId() throws Exception
+    {
+        Session session = Session.getInstance(this.configuration.getAllProperties());
+        MimeMessage message = new MimeMessage(session) {
+            @Override
+            protected void updateMessageID() throws MessagingException
+            {
+                if (getMessageID() == null) {
+                    super.updateMessageID();
+                }
+            }
+        };
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
+        message.setText("Test message Id support");
+        message.setHeader("Message-ID", "<custom@domain>");
+
+        MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
+        this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
+
+        // Verify that the mails have been received (wait maximum 10 seconds).
+        this.mail.waitForIncomingEmail(10000L, 1);
+        MimeMessage[] messages = this.mail.getReceivedMessages();
+
+        assertEquals("<custom@domain>", messages[0].getMessageID());
     }
 }

@@ -38,10 +38,12 @@ public interface MailContentStore
     /**
      * Save MimeMessage to the store.
      *
+     * @param batchId the batch id of the message to be saved
      * @param message the message to serialize in the store
      * @throws MailStoreException when an error occurs when saving the message to the store
+     * @since 7.1RC1
      */
-    void save(MimeMessage message) throws MailStoreException;
+    void save(String batchId, MimeMessage message) throws MailStoreException;
 
     /**
      * Load message from the store.

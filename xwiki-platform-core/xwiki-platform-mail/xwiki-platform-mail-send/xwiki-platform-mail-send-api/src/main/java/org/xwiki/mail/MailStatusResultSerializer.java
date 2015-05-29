@@ -42,16 +42,13 @@ public final class MailStatusResultSerializer
     {
         String result;
 
-        Iterator<MailStatus> statuses = statusResult.getByState(MailState.SEND_ERROR);
+        Iterator<MailStatus> statuses = statusResult.getAllErrors();
         if (statuses.hasNext()) {
             StringBuilder builder =
-                new StringBuilder("Some messages have failed to be sent for the following reasons: [");
+                new StringBuilder("Some messages have failed to be sent: [");
             while (statuses.hasNext()) {
                 MailStatus status = statuses.next();
-                builder.append('[');
-                builder.append('[').append(status.getErrorSummary()).append(']').append(',');
-                builder.append('[').append(status.getErrorDescription()).append(']');
-                builder.append(']');
+                builder.append('[').append(status.toString()).append(']');
             }
             builder.append(']');
             result = builder.toString();

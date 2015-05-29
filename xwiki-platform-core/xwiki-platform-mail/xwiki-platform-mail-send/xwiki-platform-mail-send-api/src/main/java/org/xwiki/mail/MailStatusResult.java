@@ -65,6 +65,12 @@ public interface MailStatusResult
     Iterator<MailStatus> getAll();
 
     /**
+     * @return the status for all messages in error.
+     * @since 7.1RC1
+     */
+    Iterator<MailStatus> getAllErrors();
+
+    /**
      * @param state the state to match (prepare_success, prepare_error, send_success, send_error or send_fatal_error)
      * @return the status for all mails matching the passed state
      */

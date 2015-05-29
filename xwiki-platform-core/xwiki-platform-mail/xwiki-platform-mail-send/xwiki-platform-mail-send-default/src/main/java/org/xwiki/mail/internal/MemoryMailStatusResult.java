@@ -19,18 +19,17 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 
 /**
  * Implementation that saves all mail statuses in a Map in memory.
- * <p/>
+ *
  * This implementation is not meant for scalability. Don't use it if you're sending a large number of emails. Instead
  * use a Database Mail Listener for example.
  *
@@ -39,6 +38,46 @@ import org.xwiki.mail.MailStatus;
  */
 public class MemoryMailStatusResult extends AbstractMailStatusResult
 {
+    private abstract class AbstractMailStatusIterator implements Iterator<MailStatus>
+    {
+        private final Iterator<MailStatus> it = statusMap.values().iterator();
+        private MailStatus nextStatus;
+
+        abstract boolean match(MailStatus status);
+
+        @Override
+        public boolean hasNext()
+        {
+            while (nextStatus == null && it.hasNext())  {
+                nextStatus = it.next();
+                if (!match(nextStatus)) {
+                    nextStatus = null;
+                }
+            }
+            return (nextStatus != null);
+        }
+
+        @Override
+        public MailStatus next()
+        {
+            hasNext();
+            if (nextStatus == null) {
+                throw new NoSuchElementException();
+            }
+            try {
+                return nextStatus;
+            } finally {
+                nextStatus = null;
+            }
+        }
+
+        @Override
+        public void remove()
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     /**
      * The Map's key is the unique message ID.
      *
@@ -75,16 +114,26 @@ public class MemoryMailStatusResult extends AbstractMailStatusResult
     }
 
     @Override
-    public Iterator<MailStatus> getByState(MailState state)
+    public Iterator<MailStatus> getAllErrors()
     {
-        List<MailStatus> results = new ArrayList<>();
-        Iterator<MailStatus> iterator = this.statusMap.values().iterator();
-        while (iterator.hasNext()) {
-            MailStatus status = iterator.next();
-            if (MailState.parse(status.getState()).equals(state)) {
-                results.add(status);
+        return new AbstractMailStatusIterator() {
+            @Override
+            boolean match(MailStatus status)
+            {
+                return status.getState().endsWith("_error");
             }
-        }
-        return results.iterator();
+        };
+    }
+
+    @Override
+    public Iterator<MailStatus> getByState(final MailState state)
+    {
+        return new AbstractMailStatusIterator() {
+            @Override
+            boolean match(MailStatus status)
+            {
+                return MailState.parse(status.getState()).equals(state);
+            }
+        };
     }
 }

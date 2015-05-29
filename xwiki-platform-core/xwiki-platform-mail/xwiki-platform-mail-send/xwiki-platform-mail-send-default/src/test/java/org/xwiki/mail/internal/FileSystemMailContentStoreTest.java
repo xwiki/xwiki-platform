@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
@@ -89,11 +90,41 @@ public class FileSystemMailContentStoreTest
     public void saveMessage() throws Exception
     {
         String batchId = UUID.randomUUID().toString();
-        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
-        message.saveChanges();
+        message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
+
+        this.mocker.getComponentUnderTest().save(batchId, message);
+
+        File tempDir = new File(TEMPORARY_DIRECTORY);
+        File batchDirectory =
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
+                URLEncoder.encode(batchId, "UTF-8"));
+        File messageFile = new File(batchDirectory, URLEncoder.encode(message.getMessageID(), "UTF-8"));
+        InputStream in = new FileInputStream(messageFile);
+        String messageContent = IOUtils.toString(in);
+
+        assertTrue(messageContent.contains("Message-ID: " + message.getMessageID()));
+        assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
+    }
+
+    @Test
+    public void saveMessageWithCustomMessageId() throws Exception
+    {
+        String batchId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
+
+        Session session = Session.getInstance(new Properties());
+        MimeMessage message = new MimeMessage(session) {
+            @Override
+            protected void updateMessageID() throws MessagingException
+            {
+                if (getMessageID() == null) {
+                    super.updateMessageID();
+                }
+            }
+        };
         message.setHeader("Message-ID", messageId);
         message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
 
@@ -104,6 +135,31 @@ public class FileSystemMailContentStoreTest
             new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
                 URLEncoder.encode(batchId, "UTF-8"));
         File messageFile = new File(batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
+        InputStream in = new FileInputStream(messageFile);
+        String messageContent = IOUtils.toString(in);
+
+        assertTrue(messageContent.contains("Message-ID: " + message.getMessageID()));
+        assertTrue(messageContent.contains("Lorem ipsum dolor sit amet, consectetur adipiscing elit"));
+    }
+
+    @Test
+    public void saveMessageWhenInstableCustomMessageID() throws Exception
+    {
+        String batchId = UUID.randomUUID().toString();
+        String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
+
+        Session session = Session.getInstance(new Properties());
+        MimeMessage message = new MimeMessage(session);
+        message.setHeader("Message-ID", messageId);
+        message.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
+
+        this.mocker.getComponentUnderTest().save(batchId, message);
+
+        File tempDir = new File(TEMPORARY_DIRECTORY);
+        File batchDirectory =
+            new File(new File(tempDir, this.mocker.getComponentUnderTest().ROOT_DIRECTORY),
+                URLEncoder.encode(batchId, "UTF-8"));
+        File messageFile = new File(batchDirectory, URLEncoder.encode(message.getMessageID(), "UTF-8"));
         InputStream in = new FileInputStream(messageFile);
         String messageContent = IOUtils.toString(in);
 

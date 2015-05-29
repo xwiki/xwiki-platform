@@ -103,7 +103,7 @@ public class MailStatus
     public MailStatus(String batchId, MimeMessage message, MailState state)
     {
         try {
-            setMessageId(message.getMessageID());
+            setMessageId(getMessageId(message));
             setBatchId(batchId);
             setType(message.getHeader("X-MailType", null));
             setRecipients(InternetAddress.toString(message.getAllRecipients()));
@@ -336,5 +336,16 @@ public class MailStatus
             builder.append("wiki", getWiki());
         }
         return builder.toString();
+    }
+
+    private String getMessageId(MimeMessage message) throws MessagingException
+    {
+        String id = message.getMessageID();
+        if (id == null) {
+            message.saveChanges();
+            id = message.getMessageID();
+        }
+
+        return id;
     }
 }

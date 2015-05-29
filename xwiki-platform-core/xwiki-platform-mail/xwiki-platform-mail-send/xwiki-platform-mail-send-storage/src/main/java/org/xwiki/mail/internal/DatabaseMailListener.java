@@ -23,11 +23,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -35,7 +33,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailContentStore;
-import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
@@ -54,11 +51,8 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("database")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DatabaseMailListener implements MailListener, Initializable
+public class DatabaseMailListener extends AbstractMailListener implements Initializable
 {
-    @Inject
-    private Logger logger;
-
     @Inject
     private Execution execution;
 
@@ -75,8 +69,6 @@ public class DatabaseMailListener implements MailListener, Initializable
 
     private DatabaseMailStatusResult mailStatusResult;
 
-    private String batchId;
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -86,25 +78,16 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepareBegin(String batchId, Map<String, Object> parameters)
     {
-        if (this.batchId != null) {
-            throw new RuntimeException("A mail listener cannot be reused. This listener has been used for batch ["
-                + this.batchId + "] and is now called for batch [" + batchId + "].");
-        }
-
-        logger.debug("Mail preparation begins for batch [{}].", batchId);
-
-        this.batchId = batchId;
+        super.onPrepareBegin(batchId, parameters);
         mailStatusResult.setBatchId(batchId);
     }
 
     @Override
     public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation succeed for message [{}] of batch [{}].", getMessageId(message), batchId);
-        }
+        super.onPrepareMessageSuccess(message, parameters);
 
-        MailStatus status = new MailStatus(batchId, message, MailState.PREPARE_SUCCESS);
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.PREPARE_SUCCESS);
         status.setWiki(
             ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId());
         saveStatus(status, parameters);
@@ -113,12 +96,9 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Mail preparation failed for message [{}] of batch [{}].", getMessageId(message), batchId,
-                exception);
-        }
+        super.onPrepareMessageError(message, exception, parameters);
 
-        MailStatus status = new MailStatus(batchId, message, MailState.PREPARE_ERROR);
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.PREPARE_ERROR);
         status.setWiki(
             ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId());
         status.setError(exception);
@@ -129,33 +109,28 @@ public class DatabaseMailListener implements MailListener, Initializable
     }
 
     @Override
-    public void onPrepareFatalError(Exception e, Map<String, Object> parameters)
+    public void onPrepareFatalError(Exception exception, Map<String, Object> parameters)
     {
-        //TODO: Store failure exception
-        logger.error("Failure during preparation phase of thread [" + batchId + "]");
-    }
+        super.onPrepareFatalError(exception, parameters);
 
-    @Override
-    public void onPrepareEnd(Map<String, Object> parameters)
-    {
-        logger.debug("Mail preparation ended for batch [{}].", batchId);
+        //TODO: Store failure exception
+        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]");
     }
 
     @Override
     public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
     {
+        super.onSendMessageSuccess(message, parameters);
+
         String messageId = getMessageId(message);
-
-        logger.debug("Mail sent successfully for message [{}] of batch [{}].", messageId, batchId);
-
         MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_SUCCESS);
 
         if (status != null) {
             status.setState(MailState.SEND_SUCCESS);
         } else {
             this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_success state.",
-                messageId, batchId);
-            status = new MailStatus(batchId, message, MailState.SEND_SUCCESS);
+                messageId, getBatchId());
+            status = new MailStatus(getBatchId(), message, MailState.SEND_SUCCESS);
         }
 
         // Since the mail was sent successfully we don't need to keep its serialized content
@@ -174,7 +149,7 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
     {
-        logger.debug("Mail loading failed for message [{}] of batch [{}].", messageId, batchId, exception);
+        super.onSendMessageFatalError(messageId, exception, parameters);
 
         MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_FATAL_ERROR);
 
@@ -184,7 +159,7 @@ public class DatabaseMailListener implements MailListener, Initializable
             saveStatus(status, parameters);
         } else {
             this.logger.error("Unable to report the fatal error encountered during mail sending for message [{}] "
-                    + "of batch [{}].", messageId, batchId, exception);
+                    + "of batch [{}].", messageId, getBatchId(), exception);
         }
 
         this.mailStatusResult.incrementCurrentSize();
@@ -193,18 +168,17 @@ public class DatabaseMailListener implements MailListener, Initializable
     @Override
     public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
+        super.onSendMessageError(message, exception, parameters);
+
         String messageId = getMessageId(message);
-
-        logger.debug("Mail sending failed for message [{}] of batch [{}].", messageId, batchId, exception);
-
         MailStatus status = retrieveExistingMailStatus(messageId, MailState.SEND_ERROR);
 
         if (status != null) {
             status.setState(MailState.SEND_ERROR);
         } else {
             this.logger.warn("Forcing a new mail status for message [{}] of batch [{}] to send_error state.",
-                messageId, batchId);
-            status = new MailStatus(batchId, message, MailState.SEND_ERROR);
+                messageId, getBatchId());
+            status = new MailStatus(getBatchId(), message, MailState.SEND_ERROR);
         }
         status.setError(exception);
         saveStatus(status, parameters);
@@ -221,11 +195,11 @@ public class DatabaseMailListener implements MailListener, Initializable
                 // It's not normal to have no status in the mail status store since onPrepare should have been called
                 // before.
                 this.logger.error("Failed to find a previous mail status for message [{}] of batch [{}].",
-                    messageId, batchId, state);
+                    messageId, getBatchId(), state);
             }
         } catch (MailStoreException e) {
             this.logger.error("Error when looking for a previous mail status for message [{}] of batch [{}].",
-                messageId, batchId, state, e);
+                messageId, getBatchId(), state, e);
             status = null;
         }
         return status;
@@ -235,17 +209,6 @@ public class DatabaseMailListener implements MailListener, Initializable
     public MailStatusResult getMailStatusResult()
     {
         return mailStatusResult;
-    }
-
-    private String getMessageId(MimeMessage message)
-    {
-        try {
-            return message.getMessageID();
-        } catch (MessagingException e) {
-            // This cannot happen in practice since the implementation never throws any exception!
-            logger.error("Failed to retrieve messageID from the message.", e);
-            return null;
-        }
     }
 
     private void saveStatus(MailStatus status, Map<String, Object> parameters)

@@ -189,10 +189,16 @@ public class JavaIntegrationTest
         // We also test using some default BCC addresses from configuration in this test
         this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
 
+        // Ensure we do not reuse the same message identifier for multiple similar messages in this test
+        MimeMessage message2 = new MimeMessage(message);
+        message2.saveChanges();
+        MimeMessage message3 = new MimeMessage(message);
+        message3.saveChanges();
+
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, memoryMailListener);
+        this.sender.sendAsynchronously(Arrays.asList(message, message2, message3), session, memoryMailListener);
 
         // Note: we don't test status reporting from the listener since this is already tested in the
         // ScriptingIntegrationTest test class.

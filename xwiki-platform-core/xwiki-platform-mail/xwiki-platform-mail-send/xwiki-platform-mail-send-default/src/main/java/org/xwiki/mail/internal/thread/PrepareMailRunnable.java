@@ -163,6 +163,7 @@ public class PrepareMailRunnable extends AbstractMailRunnable
             // Step 1: Complete message with From and Bcc from configuration if needed
             message = initializeMessage(mimeMessage);
             // Step 2: Persist the MimeMessage
+            // Note: Message identifier is stabilized at this step by the serialization process
             this.mailContentStore.save(item.getBatchId(), message);
             // Step 3: Put the MimeMessage id on the Mail Send Queue for sending
             this.sendMailQueueManager.addToQueue(new SendMailQueueItem(message.getMessageID(),

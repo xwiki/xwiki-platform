@@ -78,6 +78,19 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
             messageFile = getMessageFile(batchId, messageId);
             OutputStream os = new FileOutputStream(messageFile);
             message.writeTo(os);
+            // Since message#writeTo() may call message#updateMessageID() before serializing in some cases,
+            // we ensure that the messageId is unchanged after the serialization process.
+            if (!messageId.equals(message.getMessageID())) {
+                // If the messageId has changed, we move the serialized file to the new identifier
+                File oldMessageFile = messageFile;
+                messageId = message.getMessageID();
+                messageFile = getMessageFile(batchId, messageId);
+                if (!oldMessageFile.renameTo(messageFile)) {
+                    throw new MailStoreException(String.format(
+                        "Failed to rename saved message (id [%s], batch id [%s]) from file [%s] into file [%s]",
+                        messageId, batchId, oldMessageFile, messageFile));
+                }
+            }
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to save message (id [%s], batch id [%s]) into file [%s]",

@@ -19,13 +19,19 @@
  */
 package org.xwiki.mail.internal;
 
+import java.io.InputStream;
+
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 /**
- * Since there's no easy way to verify if the content of a {@link javax.mail.internet.MimeMessage} has been set we
- * need to extend it to allow for this.
+ * Since there's no easy way to verify if the content of a {@link MimeMessage} has been set we need to extend it to
+ * allow for this.
+ * <p/>
+ * Another useful thing we are able to do because of this subclass is allowing custom Message-ID headers, which would
+ * otherwise be overridden with an automatically generated ID by the default {@link MimeMessage#updateMessageID()}
+ * implementation.
  *
  * @version $Id$
  * @since 6.2M1
@@ -34,9 +40,9 @@ public class ExtendedMimeMessage extends MimeMessage
 {
     /**
      * Create a new extended MimeMessage.
-     *
-     * Note: We don't care about supporting Session here ATM since it's not required. MimeMessages will be
-     * given a valid Session when it's deserialized from the mail content store for sending.
+     * <p/>
+     * Note: We don't care about supporting Session here ATM since it's not required. MimeMessages will be given a valid
+     * Session when it's deserialized from the mail content store for sending.
      */
     public ExtendedMimeMessage()
     {
@@ -44,12 +50,40 @@ public class ExtendedMimeMessage extends MimeMessage
     }
 
     /**
-     * @param source see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
-     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(javax.mail.internet.MimeMessage)}
+     * @param source see javadoc for {@link MimeMessage#MimeMessage(MimeMessage)}
+     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(MimeMessage)}
+     * @since 7.1RC1
      */
     public ExtendedMimeMessage(MimeMessage source) throws MessagingException
     {
         super(source);
+
+        // Mark this message as not yet saved, to make sure that updateMessageID() will get triggered when the message
+        // is saved. Otherwise, JavaMail overrides the MessageID in the default MimeMessage implementation.
+        saved = false;
+    }
+
+    /**
+     * @param session see javadoc for {@link MimeMessage#MimeMessage(Session, InputStream)}
+     * @param is see javadoc for {@link MimeMessage#MimeMessage(Session, InputStream)}
+     * @throws MessagingException see javadoc for {@link MimeMessage#MimeMessage(Session, InputStream)}
+     * @since 7.1RC1
+     */
+    public ExtendedMimeMessage(Session session, InputStream is) throws MessagingException
+    {
+        super(session, is);
+    }
+
+    /**
+     * @since 7.1RC1
+     */
+    @Override
+    protected void updateMessageID() throws MessagingException
+    {
+        // Only automatically generate a random Message-ID if a custom / manual one is not already set.
+        if (getHeader("Message-ID") == null) {
+            super.updateMessageID();
+        }
     }
 
     /**

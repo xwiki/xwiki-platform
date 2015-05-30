@@ -52,7 +52,7 @@ public class DiffXarJobStatus extends DefaultJobStatus<InstallRequest>
      */
     public DiffXarJobStatus(InstallRequest request, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(request, observationManager, loggerManager, false);
+        super(request, observationManager, loggerManager, null);
     }
 
     /**

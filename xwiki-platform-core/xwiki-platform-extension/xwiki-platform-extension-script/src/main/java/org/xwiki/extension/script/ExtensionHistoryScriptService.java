@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,14 +36,16 @@ import javax.inject.Singleton;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.PredicateUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.job.AbstractExtensionRequest;
 import org.xwiki.extension.job.history.ExtensionJobHistory;
 import org.xwiki.extension.job.history.ExtensionJobHistoryRecord;
 import org.xwiki.extension.job.history.ExtensionJobHistorySerializer;
+import org.xwiki.extension.job.history.ReplayJobStatus;
 import org.xwiki.extension.job.history.ReplayRequest;
-import org.xwiki.extension.job.internal.InstallJob;
+import org.xwiki.extension.job.history.internal.ReplayJob;
+import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
@@ -93,7 +97,7 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
          */
         public ExtensionHistoryFilter fromThisWiki()
         {
-            final String currentWikiNamespace = "wiki:" + xcontextProvider.get().getWikiId();
+            final String currentWikiNamespace = WIKI_NAMESPACE_PREFIX + xcontextProvider.get().getWikiId();
             this.constraints.add(new Predicate<ExtensionJobHistoryRecord>()
             {
                 @Override
@@ -204,36 +208,84 @@ public class ExtensionHistoryScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        ReplayRequest request = createReplayRequest(records);
-
-        if (!this.authorization.hasAccess(Right.PROGRAM)) {
-            // Only the users that have PR can preserve the rights-related properties of the original extension request.
-            setRightsProperties(request);
-        }
+        ReplayRequest request = createReplayRequest(createReplayPlan(records, true, null));
 
         try {
-            return this.jobExecutor.execute(InstallJob.JOBTYPE, request);
+            return this.jobExecutor.execute(ReplayJob.JOB_TYPE, request);
         } catch (JobException e) {
             setError(e);
             return null;
         }
     }
 
+    /**
+     * Prepares a list of history records for replay.
+     * 
+     * @param records the history records to prepare for replay
+     * @param preserveUsers {@code true} if the given history records should be replayed using their original users,
+     *            {@code false} if the current user should be used instead
+     * @param namespaces the namespaces where to replay the given history records; pass {@code null} or an empty
+     *            collection if you want to preserve the original namespaces
+     * @return the modified history records, prepared to be replayed
+     */
+    public List<ExtensionJobHistoryRecord> createReplayPlan(List<ExtensionJobHistoryRecord> records,
+        boolean preserveUsers, Collection<String> namespaces)
+    {
+        String currentWiki = this.xcontextProvider.get().getWikiId();
+        if (!this.authorization.hasAccess(Right.ADMIN, new WikiReference(currentWiki))) {
+            return Collections.emptyList();
+        } else if (!this.authorization.hasAccess(Right.PROGRAM)) {
+            // Replay on the current wiki using the current user.
+            return createReplayPlanInternal(records, false, Arrays.asList(WIKI_NAMESPACE_PREFIX + currentWiki));
+        } else {
+            // Only the users that have PR can preserve the rights-related properties of the original extension request.
+            return createReplayPlanInternal(records, preserveUsers, namespaces);
+        }
+    }
+
+    /**
+     * @param id identifies the replay job
+     * @return the status of the specified replay job
+     */
+    public ReplayJobStatus getReplayJobStatus(String id)
+    {
+        return (ReplayJobStatus) getJobStatus(getReplayJobId(id));
+    }
+
+    private List<ExtensionJobHistoryRecord> createReplayPlanInternal(List<ExtensionJobHistoryRecord> records,
+        boolean preserveUsers, Collection<String> namespaces)
+    {
+        for (ExtensionJobHistoryRecord record : records) {
+            if (!preserveUsers) {
+                setRightsProperties((AbstractRequest) record.getRequest());
+            }
+            if (record.getRequest().hasNamespaces() && namespaces != null && namespaces.size() > 0) {
+                ((AbstractRequest) record.getRequest()).setProperty("namespaces", namespaces);
+            }
+        }
+        return records;
+    }
+
     private ReplayRequest createReplayRequest(List<ExtensionJobHistoryRecord> records)
     {
         ReplayRequest request = new ReplayRequest();
         String suffix = new Date().getTime() + "-" + ThreadLocalRandom.current().nextInt(100, 1000);
-        request.setId(Arrays.asList(ExtensionManagerScriptService.EXTENSION_JOBID_PREFIX, ID, suffix));
+        request.setId(getReplayJobId(suffix));
         // There may be questions for which there isn't a specified answer.
         request.setInteractive(true);
         request.setRecords(records);
+
+        // Provide information on what started the job.
+        request.setProperty(PROPERTY_CONTEXT_WIKI, this.xcontextProvider.get().getWikiId());
+        request.setProperty(PROPERTY_CONTEXT_ACTION, this.xcontextProvider.get().getAction());
+
+        setRightsProperties(request);
+
         return request;
     }
 
-    private void setRightsProperties(ReplayRequest request)
+    private List<String> getReplayJobId(String suffix)
     {
-        for (ExtensionJobHistoryRecord record : request.getRecords()) {
-            setRightsProperties((AbstractExtensionRequest) record.getRequest());
-        }
+        return Arrays.asList(ExtensionManagerScriptService.EXTENSION_JOBID_PREFIX, ID, suffix);
     }
 }

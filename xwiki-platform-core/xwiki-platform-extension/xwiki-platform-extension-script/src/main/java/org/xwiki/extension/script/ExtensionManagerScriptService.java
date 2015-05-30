@@ -107,16 +107,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     private static final String PROPERTY_JOB_TYPE = "job.type";
 
     /**
-     * Extension request property that specifies from which wiki the job was started.
-     */
-    private static final String PROPERTY_CONTEXT_WIKI = "context.wiki";
-
-    /**
-     * Extension request property that specifies from which document action the job was started.
-     */
-    private static final String PROPERTY_CONTEXT_ACTION = "context.action";
-
-    /**
      * The real extension manager bridged by this script service.
      */
     @Inject
@@ -707,14 +697,19 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         setError(null);
 
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
-            setError(new JobException("Need programming right to get current job"));
+            setError(new JobException("You need programming rights to get the current job."));
             return null;
         }
 
+        return getCurrentJobInternal();
+    }
+
+    private Job getCurrentJobInternal()
+    {
         // TODO: probably check current user namespace
 
         // Check current wiki namespace
-        String namespace = "wiki:" + this.xcontextProvider.get().getWikiId();
+        String namespace = WIKI_NAMESPACE_PREFIX + this.xcontextProvider.get().getWikiId();
         Job job = this.jobExecutor.getCurrentJob(new JobGroupPath(namespace, AbstractExtensionJob.ROOT_GROUP));
 
         // Check root namespace
@@ -756,7 +751,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public JobStatus getCurrentJobStatus()
     {
-        Job job = this.jobExecutor.getCurrentJob(AbstractExtensionJob.ROOT_GROUP);
+        Job job = getCurrentJobInternal();
 
         JobStatus jobStatus;
         if (job != null) {

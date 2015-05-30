@@ -27,7 +27,7 @@ import javax.inject.Provider;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.job.AbstractExtensionRequest;
+import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.JobStatusStore;
@@ -57,6 +57,21 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected static final String PROPERTY_CALLERREFERENCE = "caller.reference";
 
     protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
+
+    /**
+     * Extension request property that specifies from which wiki the job was started.
+     */
+    protected static final String PROPERTY_CONTEXT_WIKI = "context.wiki";
+
+    /**
+     * Extension request property that specifies from which document action the job was started.
+     */
+    protected static final String PROPERTY_CONTEXT_ACTION = "context.action";
+
+    /**
+     * The prefix used for wiki namespace id.
+     */
+    protected static final String WIKI_NAMESPACE_PREFIX = "wiki:";
 
     @Inject
     @SuppressWarnings("rawtypes")
@@ -97,7 +112,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
         return (T) this.scriptProvider.get(unsafe);
     }
 
-    protected <T extends AbstractExtensionRequest> void setRightsProperties(T extensionRequest)
+    protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)
     {
         extensionRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
         extensionRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());

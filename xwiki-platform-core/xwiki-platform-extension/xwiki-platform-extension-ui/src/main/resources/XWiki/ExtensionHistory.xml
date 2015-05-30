@@ -31,8 +31,8 @@
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1432550024000</date>
-  <contentUpdateDate>1432550024000</contentUpdateDate>
+  <date>1432912162000</date>
+  <contentUpdateDate>1432912071000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('extension.history')</title>
   <comment/>
@@ -46,7 +46,17 @@
   #if ($request.action == 'export')
     #exportExtensionHistory
   #elseif ($request.action == 'replay')
-    #replayExtensionHistory
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #replayExtensionHistory
+    #else
+      $response.sendError(401, 'The CSRF token is not valid!')
+    #end
+  #elseif ($request.action == 'continue')
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #continueExtensionHistoryReplay($request.jobId)
+    #else
+      $response.sendError(401, 'The CSRF token is not valid!')
+    #end
   #elseif ($request.data == 'sources')
     #displayExtensionHistorySourcesList
   #elseif ($request.data == 'records')
@@ -56,10 +66,15 @@
     #end
   #elseif ($request.data == 'replayPlan')
     #displayExtensionHistoryReplayPlan
+  #elseif ($request.data == 'replayStatus')
+    #maybeDisplayExtensionHistoryReplayStatus($request.jobId)
+  #elseif ($xcontext.action == 'get' &amp;&amp; $isAjaxRequest)
+    #maybeDisplayExtensionHistoryRecordsForm
   #else
     #set ($discard = $xwiki.ssx.use('XWiki.ExtensionHistory'))
     #set ($discard = $xwiki.jsx.use('XWiki.ExtensionHistory'))
     &lt;div class="extension-history"&gt;
+      #displayCurrentJobInfo
       #displayExtensionHistorySourcesForm
       #maybeDisplayExtensionHistoryRecordsForm
     &lt;/div&gt;
@@ -82,8 +97,51 @@
   ## The history records should be in the right order (oldest first) in the replay plan.
   #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
   #set ($records = $services.extension.history.deserialize($serializedRecords))
-  ##set ($discard = $services.extension.history.replay($records))
-  ## TODO: handle errors
+  #set ($job = $services.extension.history.replay($records))
+  #if ($job)
+    #if ($isAjaxRequest)
+      #set ($discard = $response.setContentType('application/json'))
+      $jsontool.serialize({'jobId': $job.request.id.get(2)})
+    #else
+      #getExtensionHistoryURL($redirectURL 'view' {
+        'data': 'replayStatus',
+        'jobId': $job.request.id.get(2)
+      })
+      $response.sendRedirect($redirectURL)
+    #end
+  #else
+    $response.sendError(400, $exceptiontool.getRootCauseMessage($services.extension.history.lastError))
+  #end
+#end
+
+#macro (continueExtensionHistoryReplay $replayJobId)
+  #set ($replayJobStatus = $services.extension.history.getReplayJobStatus($replayJobId))
+  #if ($hasGlobalAdmin &amp;&amp; $replayJobStatus &amp;&amp; $replayJobStatus.state == 'WAITING')
+    #answerExtensionJobQuestion($replayJobStatus)
+  #end
+  #getExtensionHistoryURL($redirectURL "#if ($isAjaxRequest)get#{else}view#end" {
+    'data': 'replayStatus',
+    'jobId': $replayJobId
+  })
+  $response.sendRedirect($redirectURL)
+#end
+
+#macro (displayCurrentJobInfo)
+  #set ($currentJobStatus = $services.extension.currentJobStatus)
+  #if ($currentJobStatus)
+    #set ($jobId = $stringtool.join($currentJobStatus.request.id, '/'))
+    #if ($jobId.startsWith('extension/history'))
+      #set ($jobStatusURL = $doc.getURL('view', $escapetool.url({
+        'data': 'replayStatus',
+        'jobId': $stringtool.substringAfterLast($jobId, '/')
+      })))
+      #set ($message = "There is a &lt;a href='$jobStatusURL'&gt;replay job&lt;/a&gt; in progress.")
+    #else
+      #set ($jobType = $currentJobStatus.request.getProperty('job.type'))
+      #set ($message = "There is a job of type &lt;strong&gt;$jobType&lt;/strong&gt; with id &lt;strong&gt;$jobId&lt;/strong&gt; in progress.")
+    #end
+    &lt;div class="box infomessage"&gt;$services.icon.renderHTML('info') $message&lt;/div&gt;
+  #end
 #end
 
 #macro (displayExtensionHistorySourcesForm)
@@ -104,11 +162,17 @@
           $services.icon.renderHTML('add')
           &lt;span class="extension-history-source-name"&gt;Import history file&lt;/span&gt;
         &lt;/div&gt;
+        #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/upload.js', {
+          'forceSkinAction': true,
+          'language': $xcontext.language
+        }))
+        #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/upload.css', true))
         &lt;form action="$uploadDoc.getURL('upload')" enctype="multipart/form-data" method="post"
             class="extension-history-source-upload"&gt;
           &lt;div class="hidden"&gt;
             &lt;input type="hidden" name="form_token" value="$!services.csrf.token" /&gt;
-            &lt;input type="hidden" name="xredirect" value="$xwiki.relativeRequestURL" /&gt;
+            #getExtensionHistoryURL($xredirect 'get' {'data': 'sources'})
+            &lt;input type="hidden" name="xredirect" value="$xredirect" /&gt;
           &lt;/div&gt;
           &lt;input type="file" name="filepath" /&gt;
         &lt;/form&gt;
@@ -124,18 +188,13 @@
 #end
 
 #macro (displayExtensionHistorySourcesList)
-  #set ($params = {})
-  #set ($discard = $params.putAll($request.parameterMap))
-  #set ($discard = $params.remove('source'))
-  &lt;li class="extension-history-source#if (!$request.source) selected#end"&gt;
+  #getExtensionHistoryURL($recordsURL 'get' {})
+  &lt;li class="extension-history-source#if (!$request.source) selected#end" data-recordsURL="$recordsURL"&gt;
     $services.icon.renderHTML('database')
-    #if ($request.source)
-      &lt;a href="$doc.getURL('view', $escapetool.url($params))" class="extension-history-source-name"&gt;
-        Local history
-      &lt;/a&gt;
-    #else
-      &lt;span class="extension-history-source-name"&gt;Local history&lt;/span&gt;
-    #end
+    #getExtensionHistoryURL($sourceURL 'view' {})
+    &lt;a href="$sourceURL" class="extension-history-source-name"&gt;
+      Local history
+    &lt;/a&gt;
   &lt;/li&gt;
   #displayExtensionHistoryFileSources
 #end
@@ -150,23 +209,20 @@
 #end
 
 #macro (displayExtensionHistoryFileSource $attachment)
-  #set ($params = {})
-  #set ($discard = $params.putAll($request.parameterMap))
-  #set ($params.source = $attachment.filename)
-  &lt;li class="extension-history-source#if ($request.source == $attachment.filename) selected#end"&gt;
+  #getExtensionHistoryURL($recordsURL 'get' {'source': $attachment.filename})
+  &lt;li class="extension-history-source#if ($request.source == $attachment.filename) selected#end"
+      data-recordsURL="$recordsURL" data-fileName="$escapetool.xml($attachment.filename)"&gt;
     &lt;div&gt;
       $services.icon.renderHTML('attach')
-      #if ($request.source != $attachment.filename)
-        &lt;a href="$doc.getURL('view', $escapetool.url($params))" class="extension-history-source-name"&gt;
-          $escapetool.xml($attachment.filename)&lt;/a&gt;
-      #else
-        &lt;span class="extension-history-source-name"&gt;$escapetool.xml($attachment.filename)&lt;/span&gt;
-      #end
+      #getExtensionHistoryURL($sourceURL 'view' {'source': $attachment.filename})
+      &lt;a href="$sourceURL" class="extension-history-source-name"&gt;
+        $escapetool.xml($attachment.filename)&lt;/a&gt;
       &lt;span class="extension-history-source-version"&gt;$attachment.version&lt;/span&gt;
       #if ($services.security.authorization.hasAccess('edit', $uploadDoc.documentReference))
+        #getExtensionHistoryURL($xredirect 'view' {})
         #set ($deleteURL = $uploadDoc.getAttachmentURL($attachment.filename, 'delattachment', $escapetool.url({
           'form_token': $services.csrf.token,
-          'xredirect': $xwiki.relativeRequestURL
+          'xredirect': $xredirect
         })))
         #set ($deleteHint = $services.localization.render('core.viewers.attachments.delete.title'))
         &lt;a class="deleteLink" href="$deleteURL" title="$escapetool.xml($deleteHint)"&gt;
@@ -185,29 +241,41 @@
   #getExtensionHistoryRecords
   #if ($records &amp;&amp; $records.size() &gt; 0)
     #displayExtensionHistoryRecordsForm($records)
-    #if ($hasProgramming)
+    #if ($hasProgramming &amp;&amp; !$isAjaxRequest)
        #displayExtensionHistoryReplayOptions()
     #end
   #else
-    &lt;div class="box infomessage"&gt;
-      $services.icon.renderHTML('info')
-      $services.localization.render('extension.history.noRecords')
+    &lt;div class="extension-history-records-form"&gt;
+      &lt;ul class="extension-history-records"&gt;
+        &lt;li class="extension-history-record"&gt;
+          &lt;div class="box infomessage"&gt;
+            $services.icon.renderHTML('info')
+            $services.localization.render('extension.history.noRecords')
+          &lt;/div&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
     &lt;/div&gt;
   #end
 #end
 
 #macro (displayExtensionHistoryRecordsForm $records)
-  &lt;form method="post" action="$doc.getURL('get', $request.queryString)" class="extension-history-records-form"&gt;
+  #getExtensionHistoryURL($recordsFormActionURL 'get' {})
+  &lt;form method="post" action="$recordsFormActionURL" class="extension-history-records-form"&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+    &lt;/div&gt;
     #displayExtensionHistoryRecords($records)
     &lt;div class="extension-history-actions"&gt;
       &lt;button class="btn btn-default" name="action" value="export" type="submit"&gt;
         &lt;span class="glyphicon glyphicon-download-alt"&gt;&lt;/span&gt;
         Export
       &lt;/button&gt;
-      &lt;button class="btn btn-default" name="data" value="replayPlan" type="submit"&gt;
-        $services.icon.renderHTML('repeat')
-        Replay
-      &lt;/button&gt;
+      #if ($hasGlobalAdmin)
+        &lt;button class="btn btn-default" name="data" value="replayPlan" type="submit"&gt;
+          $services.icon.renderHTML('repeat')
+          Replay
+        &lt;/button&gt;
+      #end
     &lt;/div&gt;
   &lt;/form&gt;
 #end
@@ -241,10 +309,10 @@
       &lt;/li&gt;
     #end
     #if ($limit &amp;&amp; $records.size() &gt;= $limit)
-      #set ($moreURL = $doc.getURL('get', $escapetool.url({
+      #getExtensionHistoryURL($moreURL 'get' {
         'data': 'records',
         'offsetRecordId': $records.get($mathtool.sub($records.size(), 1)).id
-      })))
+      })
       &lt;li class="extension-history-record"&gt;
         &lt;a href="$moreURL" class="more"&gt;more...&lt;/a&gt;
       &lt;/li&gt;
@@ -322,20 +390,20 @@
 #end
 
 #macro (displayExtensionHistoryReplayOptions)
-  &lt;form method="post" action="$doc.getURL('get', $request.queryString)"
-      class="hidden extension-history-replay-options xform"&gt;
+  #getExtensionHistoryURL($replayOptionsSubmitURL 'get' {})
+  &lt;form method="post" action="$replayOptionsSubmitURL" class="hidden extension-history-replay-options xform"&gt;
     &lt;h2&gt;Replay Options&lt;/h2&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label&gt;&lt;input type="checkbox" name="preserveUser"/&gt; Preserve the users&lt;/label&gt;
+        &lt;label&gt;&lt;input type="checkbox" name="preserveUsers" value="true"/&gt; Preserve the users&lt;/label&gt;
         &lt;span class="xHint"&gt;Replay the selected history records using their original users,
           rather than the current user.&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dt&gt;
-        &lt;label&gt;&lt;input type="checkbox" name="preserveNamespaces"/&gt; Preserve the namespaces&lt;/label&gt;
-        &lt;span class="xHint"&gt;Replay the selected history records on their original namespaces,
-          rather than on the current wiki.&lt;/span&gt;
+        &lt;label for="namespaces"&gt;Namespaces&lt;/label&gt;
+        &lt;span class="xHint"&gt;A space-separated list of namespaces where to replay the selected history records. Leave empty if you want to preserve the original namespaces.&lt;/span&gt;
       &lt;/dt&gt;
+      &lt;dd&gt;&lt;input type="text" id="namespaces" name="namespaces" value="$xcontext.database" /&gt;&lt;/dd&gt;
     &lt;/dl&gt;
     &lt;div&gt;
       &lt;button class="btn btn-primary" name="data" value="replayPlan" type="submit"&gt;
@@ -351,15 +419,29 @@
   #set ($records = $services.extension.history.deserialize($serializedRecords))
   ## The replay plan should include the oldest history records first (because the oldest records are replayed first).
   #set ($discard = $collectionstool.reverse($records))
-  ## TODO: modify the records based on the replay options.
-  &lt;form method="post" action="$doc.getURL('get', $request.queryString)" class="extension-history-replay-plan"&gt;
+  ## Modify the records based on the replay options.
+  #set ($preserveUsers = $request.preserveUsers == 'true')
+  #set ($namespaces = [])
+  #foreach ($namespace in $request.namespaces.split('\s+'))
+    #if ($namespace.indexOf(':') &lt; 0)
+      #set ($discard = $namespaces.add("wiki:$namespace"))
+    #end
+  #end
+  #set ($records = $services.extension.history.createReplayPlan($records, $preserveUsers, $namespaces))
+  #getExtensionHistoryURL($replayPlanSubmitURL 'get' {})
+  &lt;form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan"&gt;
     &lt;h2&gt;Replay Plan&lt;/h2&gt;
     #if ($records &amp;&amp; $records.size() &gt; 0)
+      &lt;div class="hidden"&gt;
+        &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+      &lt;/div&gt;
       &lt;div class="xHint"&gt;The following actions will be taken in order:&lt;/div&gt;
       &lt;ul class="extension-history-records"&gt;
         #foreach ($record in $records)
           &lt;li class="extension-history-record $!escapetool.xml($record.jobType)"&gt;
-            #displayExtensionHistoryRecord($record '' true)
+            #set ($selector = "&lt;input type='hidden' name='extensionHistoryRecord'
+              value='$escapetool.xml($services.extension.history.serialize($record))' /&gt;")
+            #displayExtensionHistoryRecord($record $selector true)
           &lt;/li&gt;
         #end
       &lt;/ul&gt;
@@ -370,7 +452,7 @@
       &lt;/div&gt;
     #end
     &lt;div class="extension-history-actions"&gt;
-      #if ($records &amp;&amp; $records.size() &gt; 0)
+      #if ($hasGlobalAdmin &amp;&amp; $records &amp;&amp; $records.size() &gt; 0)
         &lt;button class="btn btn-primary" name="action" value="replay" type="submit"&gt;
           Start
         &lt;/button&gt;
@@ -380,6 +462,93 @@
       &lt;/a&gt;
     &lt;/div&gt;
   &lt;/form&gt;
+#end
+
+#macro (maybeDisplayExtensionHistoryReplayStatus $replayJobId)
+  #set ($replayJobStatus = $services.extension.history.getReplayJobStatus($replayJobId))
+  #if ($replayJobStatus)
+    #set ($discard = $xwiki.ssx.use('XWiki.ExtensionHistory'))
+    #set ($discard = $xwiki.jsx.use('XWiki.ExtensionHistory'))
+    #displayExtensionHistoryReplayStatus($replayJobStatus)
+  #else
+    &lt;h2&gt;Replay Status&lt;/h2&gt;
+    &lt;div class="box infomessage"&gt;
+      $services.icon.renderHTML('info')
+      There is no replay job with id [$replayJobId].
+    &lt;/div&gt;
+  #end
+#end
+
+#macro (displayExtensionHistoryReplayStatus $replayJobStatus)
+  #set ($currentRecordNumber = $replayJobStatus.currentRecordNumber)
+  #set ($replayJobState = $replayJobStatus.state)
+  #set ($finished = $replayJobState == 'FINISHED')
+  #set ($waiting = $replayJobState == 'WAITING')
+  #set ($success = $finished &amp;&amp; $replayJobStatus.log.getLogs('ERROR').isEmpty())
+  #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
+  &lt;div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"&gt;
+    &lt;h2&gt;Replay Status&lt;/h2&gt;
+    &lt;div class="xHint"&gt;The following actions have been scheduled by $xwiki.getUserName($userReference) on $xwiki.formatDate($replayJobStatus.startDate)&lt;/div&gt;
+    &lt;ul class="extension-history-records"&gt;
+      #foreach ($record in $replayJobStatus.request.records)
+        #set ($classNames = ['extension-history-record', $escapetool.xml($record.jobType)])
+        #if (!$finished &amp;&amp; $foreach.index == $currentRecordNumber)
+          #set ($discard = $classNames.add('loading'))
+        #end
+        &lt;li class="$stringtool.join($classNames, ' ')"&gt;
+          #set ($selector = '')
+          #if ($foreach.index &lt; $replayJobStatus.currentRecordNumber)
+            #set ($selector = 'check')
+          #elseif ($foreach.index == $currentRecordNumber &amp;&amp; $finished)
+            #if ($success)
+              #set ($selector = 'check')
+            #else
+              #set ($selector = 'error')
+            #end
+          #end
+          #if ($selector != '')
+            #set ($selector = "&lt;span class='extension-history-record-status
+              $selector'&gt;$services.icon.renderHTML($selector)&lt;/span&gt;")
+          #end
+          #displayExtensionHistoryRecord($record $selector true)
+        &lt;/li&gt;
+      #end
+    &lt;/ul&gt;
+    #if (!$finished)
+      #displayJobProgressBar($replayJobStatus)
+    #end
+    &lt;div class="extension-history-replay-log"&gt;
+      &lt;div class="xHint"&gt;
+        &lt;span class="icon-closed"&gt;$services.icon.renderHTML('caret-right')&lt;/span&gt;
+        &lt;span class="icon-opened"&gt;$services.icon.renderHTML('caret-down')&lt;/span&gt;
+        Replay log
+      &lt;/div&gt;
+      #printStatusLog($replayJobStatus)
+    &lt;/div&gt;
+    #if ($waiting)
+      #getExtensionHistoryURL($continueURL 'get' {})
+      &lt;form class="extension-question xform" action="$continueURL" method="post"&gt;
+        &lt;div class="hidden"&gt;
+          &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+          &lt;input type="hidden" name="jobId" value="$escapetool.xml($replayJobId)" /&gt;
+        &lt;/div&gt;
+        #displayExtensionDetails_progressQuestion($NULL $replayJobStatus)
+        #if ($hasGlobalAdmin)
+          &lt;div class="extension-history-actions"&gt;
+            &lt;button class="btn btn-primary" name="action" value="continue" type="submit"&gt;
+              Continue
+            &lt;/button&gt;
+          &lt;/div&gt;
+        #end
+      &lt;/form&gt;
+    #end
+  &lt;/div&gt;
+#end
+
+#macro (getExtensionHistoryURL $return $action $params)
+  #set ($_url = $xwiki.getURL('XWiki.ExtensionHistory', $action, $escapetool.url($params)))
+  #set ($return = $NULL)
+  #setVariable("$return" $_url)
 #end
 {{/velocity}}
 
@@ -472,7 +641,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
   //
   // Extension History Sources
   //
@@ -483,15 +652,88 @@
 
   $('.extension-history-sources-selector').removeClass('opened');
 
+  var onDeleteHistorySource = function(event) {
+    event.preventDefault();
+    if (!window.confirm('Are you sure you want to delete this source?')) {
+      return;
+    }
+    var deleteLink = $(this);
+    deleteLink.addClass('loading').children().hide();
+    // Reduce the cost of the request by disabling the redirect.
+    var deleteURL = deleteLink.attr('href').replace(/xredirect=/, 'xfoo=');
+    $.get(deleteURL).done(function() {
+      var source = deleteLink.closest('.extension-history-source');
+      if (source.hasClass('selected')) {
+        // Select the 'local history' source.
+        var localHistorySource = source.parent().children().first();
+        onSelectHistorySource.call(localHistorySource.children('.extension-history-source-name'));
+      }
+      source.remove();
+    }).fail(function() {
+      deleteLink.removeClass('loading').children().show();
+    });
+  };
+
+  var onSelectHistorySource = function(event) {
+    event &amp;&amp; event.preventDefault();
+    var source = $(this).closest('.extension-history-source');
+    if (source.hasClass('selected')) {
+      // Source already selected.
+      return;
+    }
+    // Clear the selection.
+    source.parent().children('.selected').removeClass('selected');
+    // Select the new source.
+    source.addClass('selected');
+    // Close the source selector and update the source list hint.
+    var sourceSelector = source.closest('.extension-history-sources-selector');
+    sourceSelector.removeClass('opened').find('.extension-history-sources-header em').text($(this).text());
+    // Update the list of history records.
+    var recordsForm = sourceSelector.next('.extension-history-records-form');
+    // Hide the history records from the currently selected source.
+    recordsForm.find('.extension-history-record').hide();
+    // Also hide the records form action buttons.
+    recordsForm.find('.extension-history-actions').hide();
+    // Add a loading history record.
+    recordsForm.children('.extension-history-records')
+      .append('&lt;li class="extension-history-record loading"&gt;&lt;span style="visibility:hidden"&gt;Loading&lt;/span&gt;&lt;/li&gt;');
+    // Request the history records.
+    $.get(source.attr('data-recordsURL')).done(function(html) {
+      recordsForm.replaceWith(html);
+      recordsForm = sourceSelector.next('.extension-history-records-form');
+      recordsForm.size() &gt; 0 &amp;&amp; $(document).trigger('xwiki:dom:updated', {'elements': recordsForm.toArray()});
+    }).fail(function() {
+      // TODO
+    });
+  };
+
+  var enhanceHistorySources = function(container) {
+    container.find('.extension-history-source a.deleteLink').click(onDeleteHistorySource);
+    container.find('a.extension-history-source-name').click(onSelectHistorySource);
+  };
+  enhanceHistorySources($('.extension-history-sources'));
+
+  var onUploadMessage = function(event, message) {
+    if (message.type === 'done') {
+      var sourcesContainer = $(event.target).closest('.extension-history-sources-body');
+      enhanceHistorySources(sourcesContainer);
+      // Select the uploaded source.
+      var sourceFileName = message.parameters.name;
+      var source = sourcesContainer.find('.extension-history-source').filter(function() {
+        return $(this).attr('data-fileName') === sourceFileName;
+      }).first();
+      onSelectHistorySource.call(source.find('.extension-history-source-name'));
+    }
+  };
+
   if (typeof(XWiki.FileUploader) != 'undefined') {
     $('.extension-history-source-upload input[type="file"]').each(function() {
-      this.multiple = true;
+      $(this).on('xwiki:html5upload:message', onUploadMessage);
       new XWiki.FileUploader(this, {
         'maxFilesize': 1000000,
         'fileFilter': /application\/xml|text\/xml/i,
         'progressAutohide': true,
-        'responseContainer' : $('.extension-history-sources')[0],
-        'responseURL' : XWiki.currentDocument.getURL('get', 'data=sources')
+        'responseContainer' : $('.extension-history-sources')[0]
       });
     });
   }
@@ -516,21 +758,54 @@
     });
   };
 
-  $('.extension-history-records a.more').click(loadMoreHistoryRecords);
+  var enableDisableActions = function() {
+    var recordsForm = $(this).closest('.extension-history-records-form');
+    var selectedRecordsCount = recordsForm.find('input[name="extensionHistoryRecord"]:checked').length;
+    recordsForm.find('button').prop('disabled', selectedRecordsCount == 0);
+  };
+
+  var fixLink = function() {
+    var queryString = $(this).attr('href').replace(/^.*\?/, '');
+    if (XWiki.contextaction === 'admin' &amp;&amp; queryString.indexOf('section=') &lt; 0) {
+      queryString += '&amp;section=XWiki.ExtensionHistory';
+    }
+    $(this).attr('href', XWiki.currentDocument.getURL(XWiki.contextaction, queryString));
+  };
+
+  var enhanceHistoryRecordsForm = function(recordsForm) {
+    // Enhance the 'more' link.
+    recordsForm.find('.extension-history-records a.more').click(loadMoreHistoryRecords);
+    // Enable/Disable the history actions based on the number of records selected.
+    enableDisableActions.call(recordsForm);
+    recordsForm.find('.extension-history-record input[type="checkbox"]').click(enableDisableActions);
+  };
+
+  enhanceHistoryRecordsForm($('.extension-history-records-form'));
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    enhanceHistoryRecordsForm($(data.elements));
+    // Fix the extension links.
+    $(data.elements).find('.extension-history-record .extension-link').each(fixLink);
+  });
 
   //
   // Extension History Replay
   //
 
-  $('.extension-history-actions button[value="replayPlan"]').click(function(event) {
+  var onPreviewReplayPlan = function(event) {
     event.preventDefault();
     var extensionHistory = $(event.target).closest('.extension-history');
     var replayOptions = extensionHistory.find('.extension-history-replay-options');
     if (replayOptions.length &gt; 0) {
       replayOptions.removeClass('hidden').prevAll().hide();
+      replayOptions.get(0).scrollIntoView();
     } else {
       getReplayPlan(extensionHistory);
     }
+  };
+
+  $('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
+  $(document).on('xwiki:dom:updated', function(event, data) {
+    $(data.elements).find('.extension-history-actions button[value="replayPlan"]').click(onPreviewReplayPlan);
   });
 
   $('.extension-history-replay-options button[value="replayPlan"]').click(function(event) {
@@ -544,6 +819,11 @@
     $(event.target).closest('.extension-history-replay-options').addClass('hidden').prevAll().show();
   });
 
+  var enhanceReplayPlan = function(replayPlan) {
+    replayPlan.find('a.btn-default').click(cancelReplayPlan);
+    replayPlan.find('button[value="replay"]').click(submitReplayPlan);
+  };
+
   var replayPlanRequest;
   var getReplayPlan = function(extensionHistory) {
     var forms = extensionHistory.children('form');
@@ -555,7 +835,9 @@
       extensionHistory.children().hide();
       extensionHistory.find('.extension-history-replay-options').show().addClass('hidden');
       extensionHistory.append(html);
-      extensionHistory.find('.extension-history-replay-plan a.btn-default').click(cancelReplayPlan);
+      var replayPlan = extensionHistory.find('.extension-history-replay-plan');
+      replayPlan.size() &gt; 0 &amp;&amp; $(document).trigger('xwiki:dom:updated', {'elements': replayPlan.toArray()});
+      enhanceReplayPlan(replayPlan);
     }).fail(function() {
       // TODO
     });
@@ -567,6 +849,74 @@
     extensionHistory.children('.extension-history-replay-plan').remove();
     extensionHistory.children().show();
   };
+
+  var submitReplayPlan = function(event) {
+    event.preventDefault();
+    var replayButton = $(this).prop('disabled', true);
+    var form = replayButton.closest('form');
+    var data = form.serialize() + '&amp;action=replay';
+    $.post(form.attr('action'), data).done(function(data) {
+      // Make sure we remove the document fragment identifier from the end of the URL.
+      var replayStatusURL = window.location.href.replace(/#.*$/, '');
+      replayStatusURL += replayStatusURL.indexOf('?') &lt; 0 ? '?' : '&amp;';
+      window.location = replayStatusURL + $.param({
+        'data': 'replayStatus',
+        'jobId': data.jobId
+      });
+    }).fail(function() {
+      replayButton.prop('disabled', false);
+      // TODO: Display the error message.
+    });
+  };
+
+  //
+  // Extension History Replay Status
+  //
+
+  var enhanceReplayStatus = function(container, uiState) {
+    container.find('.extension-history-replay-log .xHint').click(function() {
+      $(this).closest('.extension-history-replay-log').toggleClass('opened');
+    });
+
+    uiState = uiState || {};
+    container.find('.extension-history-replay-log').toggleClass('opened', !!uiState.logOpened);
+
+    var jobState = container.attr('data-jobState');
+    if (jobState == 'WAITING') {
+      container.find('form.extension-question button[value="continue"]').click(function(event) {
+        event.preventDefault();
+        var data = $(event.target).closest('form').serialize();
+        updateReplayStatus(container, data + '&amp;action=continue');
+      });
+    } else if (typeof jobState == 'string' &amp;&amp; jobState != 'FINISHED') {
+      setTimeout($.proxy(updateReplayStatus, this, container), 1000);
+    }
+  };
+
+  var getReplayStatusUIState = function(container) {
+    return {
+      'logOpened': container.find('.extension-history-replay-log.opened').size() &gt; 0
+    };
+  };
+
+  var updateReplayStatus = function(container, data) {
+    $.post(new XWiki.Document('ExtensionHistory', 'XWiki').getURL('get'), data || {
+      'data': 'replayStatus',
+      'jobId': container.attr('data-jobId')
+    }).done(function(html) {
+      var uiState = getReplayStatusUIState(container);
+      var wrapper = $(document.createElement('div'));
+      wrapper.append(html);
+      enhanceReplayStatus(wrapper.find('.extension-history-replay-status'), uiState);
+      var newElements = wrapper.children();
+      container.replaceWith(newElements);
+      $(document).trigger('xwiki:dom:updated', {'elements': newElements.toArray()});
+    }).fail(function() {
+      // TODO
+    })
+  };
+
+  enhanceReplayStatus($('.extension-history-replay-status'));
 });</code>
     </property>
     <property>
@@ -677,26 +1027,36 @@
     <property>
       <code>#template('colorThemeInit.vm')
 
+/**
+ * Extension History Sources
+ */
+
 .extension-history-sources-header {
   cursor: pointer;
   margin: .5em 0;
 }
 
-.extension-history-sources-header .icon-opened {
+.extension-history-sources-header .icon-opened,
+.extension-history-replay-log .icon-opened {
   display: none;
 }
-.extension-history-sources-selector.opened .extension-history-sources-header .icon-opened {
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-opened,
+.extension-history-replay-log.opened .icon-opened {
   display: inline-block;
 }
-.extension-history-sources-header .icon-closed {
+.extension-history-sources-header .icon-closed,
+.extension-history-replay-log .icon-closed {
   display: inline-block;
 }
-.extension-history-sources-selector.opened .extension-history-sources-header .icon-closed {
+.extension-history-sources-selector.opened .extension-history-sources-header .icon-closed,
+.extension-history-replay-log.opened .icon-closed {
   display: none;
 }
 
 .extension-history-sources-header .icon-opened,
-.extension-history-sources-header .icon-closed {
+.extension-history-sources-header .icon-closed,
+.extension-history-replay-log .icon-opened,
+.extension-history-replay-log .icon-closed {
   width: 10px;
 }
 
@@ -728,15 +1088,31 @@ ul.extension-history-sources {
 .extension-history-source.selected {
   background-color: $theme.backgroundSecondaryColor;
 }
+.extension-history-source.selected .extension-history-source-name {
+  color: $theme.textColor;
+  cursor: text;
+  outline: 0;
+  text-decoration: none;
+}
 
 .extension-history-source .deleteLink {
   color: $theme.textSecondaryColor;
+  min-height: 16px;
+  min-width: 16px;
+  outline: 0;
   position: absolute;
-  right: 1.3em;
+  right: 1em;
+  text-align: center;
 }
-.extension-history-source .deleteLink:hover {
+.extension-history-source .deleteLink:hover,
+.extension-history-source .deleteLink:active,
+.extension-history-source .deleteLink:focus {
   color: $theme.notificationErrorColor;
 }
+
+/**
+ * Extension History Records
+ */
 
 ul.extension-history-records {
   border-bottom: 1px dotted $theme.borderColor;
@@ -750,7 +1126,7 @@ li.extension-history-record {
 }
 
 li.extension-history-record.loading {
-  background-position: left center;
+  background-position: left .7em;
 }
 
 .extension-history-source:hover,
@@ -778,9 +1154,32 @@ li.extension-history-record input[type="checkbox"] {
   margin: 10px 0;
 }
 
+/**
+ * Extension History Replay
+ */
+
 .extension-history-replay-plan li.extension-history-record {
   padding-left: 0;
 }
+
+.extension-history-record-status {
+  margin-left: -20px;
+}
+
+.extension-history-replay-log .xHint {
+  cursor: pointer;
+}
+
+.extension-history-replay-log ul.log {
+  display: none;
+}
+.extension-history-replay-log.opened ul.log {
+  display: block;
+}
+
+/**
+ * Misc
+ */
 
 .extension-history .box.infomessage {
   margin: .5em 0;

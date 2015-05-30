@@ -20,16 +20,17 @@
 package org.xwiki.panels.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
@@ -102,6 +103,8 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
     private final SUExecutor suExecutor;
 
+    private final JobProgressManager progress;
+
     /**
      * Default constructor.
      *
@@ -123,6 +126,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.renderingContext = componentManager.getInstance(RenderingContext.class);
         this.suExecutor = componentManager.getInstance(SUExecutor.class);
+        this.progress = componentManager.getInstance(JobProgressManager.class);
     }
 
     @Override
@@ -156,6 +160,9 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         // transformation
         final XDOM transformedXDOM = xdom.clone();
 
+        this.progress.startStep(getDocumentReference(), "panel.progress.execute", "Execute panel [{}]",
+            getDocumentReference());
+
         // Perform panel transformations with the right of the panel author
         try {
             this.suExecutor.call(new Callable<Void>()
@@ -173,6 +180,8 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
             }, getAuthorReference());
         } catch (Exception e) {
             LOGGER.error("Error while executing transformation for panel [{}]", this.documentReference.toString());
+        } finally {
+            this.progress.endStep(getDocumentReference());
         }
 
         return new CompositeBlock(transformedXDOM.getChildren());
@@ -181,7 +190,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     @Override
     public Map<String, String> getParameters()
     {
-        return MapUtils.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override

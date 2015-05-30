@@ -130,7 +130,7 @@ public class UsersAndGroupsMimeMessageIteratorTest
         try {
             iterator.next();
         } catch (RuntimeException expected) {
-            assertEquals("Failed to create Mime Message, aborting mail sending for this batch", expected.getMessage());
+            assertEquals("Failed to create Mime Message for recipient john@doe.com", expected.getMessage());
         }
     }
 

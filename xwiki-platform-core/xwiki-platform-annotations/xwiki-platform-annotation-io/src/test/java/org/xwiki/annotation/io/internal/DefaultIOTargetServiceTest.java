@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.web.Utils;
 
@@ -72,6 +73,9 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
             }
         });
         this.classResolver = registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
+
+        // We don't really need those but there supposed to be injected
+        registerMockComponent(WikiDescriptorManager.class);
     }
 
     @Override

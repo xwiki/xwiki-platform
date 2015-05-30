@@ -20,6 +20,8 @@
 package com.xpn.xwiki.test;
 
 import java.io.File;
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
@@ -50,6 +52,10 @@ import com.xpn.xwiki.web.XWikiResponse;
 public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
+
+    protected File permanentDirectory;
+
+    protected File temporaryDirectory;
 
     @Override
     protected void setUp() throws Exception
@@ -98,6 +104,12 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         mockServletContext.stubs().method("getResource").will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+
+        File testDirectory = new File("target/test-" + new Date().getTime());
+        this.temporaryDirectory = new File(testDirectory, "temporary-dir");
+        this.permanentDirectory = new File(testDirectory, "permanent-dir");
+        environment.setTemporaryDirectory(this.temporaryDirectory);
+        environment.setPermanentDirectory(this.permanentDirectory);
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

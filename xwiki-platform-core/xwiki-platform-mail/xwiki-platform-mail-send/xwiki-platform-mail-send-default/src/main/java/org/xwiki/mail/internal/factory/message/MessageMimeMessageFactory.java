@@ -66,6 +66,10 @@ public class MessageMimeMessageFactory extends AbstractMimeMessageFactory<MimeMe
                 String.format("Failed to create mime message from source [%s]", source.getClass()));
         }
 
-        return new MimeMessage((MimeMessage) source);
+        MimeMessage message = new MimeMessage((MimeMessage) source);
+        // Update MessageId to distinct all generated messages properly
+        message.saveChanges();
+
+        return message;
     }
 }

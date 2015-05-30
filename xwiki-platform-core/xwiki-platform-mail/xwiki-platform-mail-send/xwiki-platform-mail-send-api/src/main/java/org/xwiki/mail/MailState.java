@@ -29,18 +29,34 @@ package org.xwiki.mail;
 public enum MailState
 {
     /**
-     *  Mail ready to be sent.
+     * Mail prepared successfully and ready to be sent.
+     * @since 7.1RC1
      */
-    READY,
+    PREPARE_SUCCESS,
+
+    /**
+     * Error was encountered during mail preparation, no message available for sending.
+     * @since 7.1RC1
+     */
+    PREPARE_ERROR,
 
     /**
      * Mail sent with success.
+     * @since 7.1RC1
      */
-    SENT,
+    SEND_SUCCESS,
+
     /**
      * Error was encountered during sending mail.
+     * @since 7.1RC1
      */
-    FAILED;
+    SEND_ERROR,
+
+    /**
+     * Error was encountered while retrieving mail for sending.
+     * @since 7.1RC1
+     */
+    SEND_FATAL_ERROR;
 
     /**
      * @return the lower case String version of the enum, to use lowercase String on database
@@ -60,13 +76,20 @@ public enum MailState
      */
     public static MailState parse(String state)
     {
+        // We support the old enum values READY, SENT, and FAILED from the old API, so that existing script code
+        // using filtering continue to work properly.
+
         MailState result;
-        if (state.equalsIgnoreCase(READY.toString())) {
-            result = READY;
-        } else if (state.equalsIgnoreCase(SENT.toString())) {
-            result = SENT;
-        } else if (state.equalsIgnoreCase(FAILED.toString())) {
-            result = FAILED;
+        if (state.equalsIgnoreCase(PREPARE_SUCCESS.toString()) || state.equalsIgnoreCase("READY")) {
+            result = PREPARE_SUCCESS;
+        } else if (state.equalsIgnoreCase(PREPARE_ERROR.toString())) {
+            result = PREPARE_ERROR;
+        } else if (state.equalsIgnoreCase(SEND_SUCCESS.toString()) || state.equalsIgnoreCase("SENT")) {
+            result = SEND_SUCCESS;
+        } else if (state.equalsIgnoreCase(SEND_ERROR.toString()) || state.equalsIgnoreCase("FAILED")) {
+            result = SEND_ERROR;
+        } else if (state.equalsIgnoreCase(SEND_FATAL_ERROR.toString())) {
+            result = SEND_FATAL_ERROR;
         } else {
             throw new IllegalArgumentException(String.format("Invalid mail state [%s]", state));
         }

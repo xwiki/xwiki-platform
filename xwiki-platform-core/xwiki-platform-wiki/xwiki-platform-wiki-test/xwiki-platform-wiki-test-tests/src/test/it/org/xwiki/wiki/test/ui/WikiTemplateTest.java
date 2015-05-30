@@ -133,7 +133,9 @@ public class WikiTemplateTest extends AbstractTest
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
         WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
         assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
-        wikiCreationPage.waitForFinalizeButton(30);
+        // Wait for the finalize button to be displayed, with a 1 minute limit
+        // (it's a lot but we often have problems on ci.xwiki.org).
+        wikiCreationPage.waitForFinalizeButton(60);
         // Ensure there is no error in the log
         assertFalse(wikiCreationPage.hasLogError());
 

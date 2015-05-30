@@ -9,6 +9,13 @@ require(['jquery'], function($) {
    * The last ajax request
    */
   var lastAjaxRequest = false;
+
+  /**
+   * Send an event when the selection change or when the results are refreshed
+   */
+  var sendRefreshEvent = function (picker) {
+    picker.trigger('xwiki:flavorpicker:updated', {'elements': picker[0]});
+  }
     
   /** 
    * Perform an ajax query and refresh the picker's results container with the results.
@@ -53,6 +60,7 @@ require(['jquery'], function($) {
       picker.find('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
       thisOption.find('input').prop('checked', true);
       thisOption.addClass('xwiki-flavor-picker-option-selected');
+      sendRefreshEvent(picker);
     });
     
     // Called when a flavor's link is clicked
@@ -68,6 +76,8 @@ require(['jquery'], function($) {
       refreshResults(picker, this.href, {});
       return false;
     });
+    
+    sendRefreshEvent(picker);
   }
   
   /**
@@ -98,6 +108,7 @@ require(['jquery'], function($) {
     $('.xwiki-flavor-picker-noflavor').click(function (event) {
       var picker = $(this).parents('.xwiki-flavor-picker');
       picker.find('.xwiki-flavor-picker-option-selected').removeClass('xwiki-flavor-picker-option-selected');
+      sendRefreshEvent(picker);
     });
   }
 

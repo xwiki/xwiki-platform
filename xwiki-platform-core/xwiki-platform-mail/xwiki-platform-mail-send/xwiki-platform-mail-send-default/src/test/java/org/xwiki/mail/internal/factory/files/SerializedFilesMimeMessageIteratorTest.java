@@ -22,6 +22,7 @@ package org.xwiki.mail.internal.factory.files;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,7 +76,7 @@ public class SerializedFilesMimeMessageIteratorTest
         this.batchId = UUID.randomUUID().toString();
 
         File tempDir = new File(TEMPORARY_DIRECTORY);
-        this.batchDirectory = new File(new File(tempDir, "mailstore"), this.batchId);
+        this.batchDirectory = new File(new File(tempDir, "mailstore"), URLEncoder.encode(this.batchId, "UTF-8"));
         this.batchDirectory.mkdirs();
     }
 
@@ -101,14 +102,14 @@ public class SerializedFilesMimeMessageIteratorTest
         when(componentManager.getInstance(eq(Environment.class))).thenReturn(environment);
 
         // Create a serialized file before the iterator is initialized
-        UUID mailID = UUID.randomUUID();
+        String mailID = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
         createSerializedMessage(mailID);
 
         SerializedFilesMimeMessageIterator iterator = new SerializedFilesMimeMessageIterator(this.batchId,
             Collections.<String, Object>emptyMap(), componentManager);
 
         // Remove the file before next() is called to generate the error
-        File messageFile = new File(this.batchDirectory, mailID.toString());
+        File messageFile = new File(this.batchDirectory, URLEncoder.encode(mailID, "UTF-8"));
         messageFile.delete();
 
         MimeMessage message = iterator.next();
@@ -123,9 +124,9 @@ public class SerializedFilesMimeMessageIteratorTest
     @Test
     public void createMessage() throws Exception
     {
-        UUID mailID1 = UUID.randomUUID();
-        UUID mailID2 = UUID.randomUUID();
-        UUID mailID3 = UUID.randomUUID();
+        String mailID1 = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
+        String mailID2 = "<1128820400.1.1419205781342.JavaMail.contact@xwiki.org>";
+        String mailID3 = "<1128820400.2.1419205781342.JavaMail.contact@xwiki.org>";
 
         createSerializedMessage(mailID1);
         createSerializedMessage(mailID2);
@@ -144,42 +145,40 @@ public class SerializedFilesMimeMessageIteratorTest
             new SerializedFilesMimeMessageIterator(this.batchId, parameters, componentManager);
 
         ArrayList<String> listID = new ArrayList<>();
-        listID.add(mailID1.toString());
-        listID.add(mailID2.toString());
-        listID.add(mailID3.toString());
+        listID.add(mailID1);
+        listID.add(mailID2);
+        listID.add(mailID3);
 
         assertTrue(iterator.hasNext());
         MimeMessage message1 = iterator.next();
-        assertTrue(listID.contains(message1.getHeader("X-MailID", null)));
-        listID.remove(message1.getHeader("X-MailID", null));
+        assertTrue(listID.contains(message1.getMessageID()));
+        listID.remove(message1.getMessageID());
 
         assertTrue(iterator.hasNext());
         MimeMessage message2 = iterator.next();
-        assertTrue(listID.contains(message2.getHeader("X-MailID", null)));
-        listID.remove(message2.getHeader("X-MailID", null));
+        assertTrue(listID.contains(message2.getMessageID()));
+        listID.remove(message1.getMessageID());
 
         assertTrue(iterator.hasNext());
         MimeMessage message3 = iterator.next();
-        assertTrue(listID.contains(message3.getHeader("X-MailID", null)));
-        listID.remove(message3.getHeader("X-MailID", null));
+        assertTrue(listID.contains(message2.getMessageID()));
+        listID.remove(message3.getMessageID());
 
         assertFalse(iterator.hasNext());
     }
 
-    private void createSerializedMessage(UUID mailID) throws IOException
+    private void createSerializedMessage(String messageId) throws IOException
     {
-        File messageFile = new File(this.batchDirectory, mailID.toString());
+        File messageFile = new File(this.batchDirectory, URLEncoder.encode(messageId, "UTF-8"));
         messageFile.createNewFile();
         String newLine = System.getProperty("line.separator");
 
         FileWriter fileWriter = new FileWriter(messageFile, true);
         // Unique string is <hashcode>.<id>.<currentTime>.JavaMail.<suffix>
-        fileWriter.append("Message-ID: <1128820400.0.1419205781342.JavaMail.contact@xwiki.org>" + newLine);
+        fileWriter.append("Message-ID: " + messageId + newLine);
         fileWriter.append("MIME-Version: 1.0" + newLine);
         fileWriter.append("Content-Type: text/plain; charset=us-ascii" + newLine);
         fileWriter.append("Content-Transfer-Encoding: 7bit" + newLine);
-        fileWriter.append("X-MailID: " + mailID.toString() + newLine);
-        fileWriter.append("X-BatchID: " + this.batchId + newLine + newLine);
         fileWriter.append("Lorem ipsum dolor sit amet, consectetur adipiscing elit");
         fileWriter.close();
     }

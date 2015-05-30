@@ -95,14 +95,16 @@ public class MailStatus
      * from the passed message, the date is set as now and the state is passed).
      * Also sets the Type if set in the passed message.
      *
+     * @param batchId the identifier of the batch sending the message
      * @param message the message for which to construct a status
      * @param state the state of the referenced mail (ready, failed to send, success)
+     * @since 7.1RC1
      */
-    public MailStatus(MimeMessage message, MailState state)
+    public MailStatus(String batchId, MimeMessage message, MailState state)
     {
         try {
-            setMessageId(message.getHeader("X-MailID", null));
-            setBatchId(message.getHeader("X-BatchID", null));
+            setMessageId(getMessageId(message));
+            setBatchId(batchId);
             setType(message.getHeader("X-MailType", null));
             setRecipients(InternetAddress.toString(message.getAllRecipients()));
             setState(state);
@@ -113,7 +115,7 @@ public class MailStatus
             // exception since the only reason would be if an address is malformed but there's a check when setting
             // it already in the MimeMessage and thus in practice it cannot happen.
             throw new RuntimeException(String.format(
-                "Unexpected exception constructing the Mail Status for state [%s]", state, e));
+                "Unexpected exception constructing the Mail Status for state [%s]", state), e);
         }
     }
 
@@ -334,5 +336,16 @@ public class MailStatus
             builder.append("wiki", getWiki());
         }
         return builder.toString();
+    }
+
+    private String getMessageId(MimeMessage message) throws MessagingException
+    {
+        String id = message.getMessageID();
+        if (id == null) {
+            message.saveChanges();
+            id = message.getMessageID();
+        }
+
+        return id;
     }
 }

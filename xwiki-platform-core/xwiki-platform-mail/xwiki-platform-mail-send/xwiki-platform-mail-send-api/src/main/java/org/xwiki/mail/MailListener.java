@@ -37,32 +37,79 @@ import org.xwiki.stability.Unstable;
 public interface MailListener
 {
     /**
-     * Called when the mail is ready to be sent but before it is actually sent.
+     * Called when the preparation phase begins.
+     *
+     * @param batchId identifier of the batch being prepared
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
+     */
+    void onPrepareBegin(String batchId, Map<String, Object> parameters);
+
+    /**
+     * Called when a mail has been prepared with success.
      *
      * @param message the message to be sent
-     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
-     *        the {@code wiki} key)
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
      */
-    void onPrepare(MimeMessage message, Map<String, Object> parameters);
+    void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters);
 
     /**
-     * Called when the mail has been sent successfully.
+     * Called when a mail has failed to be prepared.
+     *
+     * @param message the message that was tried to be prepared
+     * @param e the exception explaining why the message couldn't be sent
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
+     */
+    void onPrepareMessageError(MimeMessage message, Exception e, Map<String, Object> parameters);
+
+    /**
+     * Called when the preparation phase has encounter a fatal error.
+     * The batch in progress has been incompletely processed.
+     *
+     * @param exception the exception explaining why messages couldn't be prepared
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
+     */
+    void onPrepareFatalError(Exception exception, Map<String, Object> parameters);
+
+    /**
+     * Called when the preparation phase is finished.
+     *
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
+     */
+    void onPrepareEnd(Map<String, Object> parameters);
+
+    /**
+     * Called when a mail has been sent successfully.
      *
      * @param message the message sent
-     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
-     *        the {@code wiki} key)
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
      */
-    void onSuccess(MimeMessage message, Map<String, Object> parameters);
+    void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters);
 
     /**
-     * Called when the mail has failed to be sent.
+     * Called when a mail has failed to be sent.
      *
      * @param message the message that was tried to be sent
-     * @param e the exception explaining why the message couldn't be sent
-     * @param parameters some parameters specifying addition context data (for example the current wiki is stored under
-     *        the {@code wiki} key)
+     * @param exception the exception explaining why the message couldn't be sent
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
      */
-    void onError(MimeMessage message, Exception e, Map<String, Object> parameters);
+    void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters);
+
+    /**
+     * Called when a message could not be retrieve for sending.
+     *
+     * @param messageId the message identifier that was tried to be load for sending
+     * @param exception the exception explaining why the message couldn't be sent
+     * @param parameters some parameters specifying addition context data
+     * @since 7.1RC1
+     */
+    void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters);
 
     /**
      * @return the status of all the mails from the batch (whether they were sent successfully, failed to be sent,

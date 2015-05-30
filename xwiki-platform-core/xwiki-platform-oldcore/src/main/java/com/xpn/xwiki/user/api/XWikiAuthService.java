@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiException;
 
 public interface XWikiAuthService
 {
-    public XWikiUser checkAuth(XWikiContext context) throws XWikiException;
+    XWikiUser checkAuth(XWikiContext context) throws XWikiException;
 
     /**
      * Authenticates the user.
@@ -38,15 +38,14 @@ public interface XWikiAuthService
      *         authenticated user if successful
      * @throws XWikiException in case of authentication error
      */
-    public XWikiUser checkAuth(String username, String password, String rememberme,
-        XWikiContext context) throws XWikiException;
+    XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context)
+        throws XWikiException;
 
-    public void showLogin(XWikiContext context) throws XWikiException;
+    void showLogin(XWikiContext context) throws XWikiException;
 
     /**
      * @return a null Principal Object if the user hasn't been authenticated or a valid Principal Object if the user is
      *         correctly authenticated
      */
-    public Principal authenticate(String username, String password, XWikiContext context)
-        throws XWikiException;
+    Principal authenticate(String username, String password, XWikiContext context) throws XWikiException;
 }

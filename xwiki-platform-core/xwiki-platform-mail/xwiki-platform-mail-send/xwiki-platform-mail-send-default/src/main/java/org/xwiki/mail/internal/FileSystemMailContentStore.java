@@ -24,14 +24,19 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailStoreException;
@@ -45,73 +50,113 @@ import org.xwiki.mail.MailStoreException;
 @Component
 @Named("filesystem")
 @Singleton
-public class FileSystemMailContentStore implements MailContentStore
+public class FileSystemMailContentStore implements MailContentStore, Initializable
 {
     /**
      * The subdirectory in the permanent directory where we store mails.
      */
     public static final String ROOT_DIRECTORY = "mails";
 
+    private File rootDirectory;
+
     @Inject
     private Environment environment;
 
     @Override
-    public void save(MimeMessage message) throws MailStoreException
+    public void initialize() throws InitializationException
+    {
+        rootDirectory = new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY);
+    }
+
+    @Override
+    public void save(String batchId, MimeMessage message) throws MailStoreException
     {
         String messageId = null;
-        String batchId = null;
-        File batchDirectory = null;
+        File messageFile = null;
         try {
-            messageId = message.getHeader("X-MailID", null);
-            batchId = message.getHeader("X-BatchID", null);
-            batchDirectory = getBatchDirectory(batchId);
-            batchDirectory.mkdirs();
-            File file = new File(batchDirectory, messageId);
-            OutputStream os = new FileOutputStream(file);
+            messageId = getMessageId(message);
+            messageFile = getMessageFile(batchId, messageId);
+            OutputStream os = new FileOutputStream(messageFile);
             message.writeTo(os);
+            // Since message#writeTo() may call message#updateMessageID() before serializing in some cases,
+            // we ensure that the messageId is unchanged after the serialization process.
+            if (!messageId.equals(message.getMessageID())) {
+                // If the messageId has changed, we move the serialized file to the new identifier
+                File oldMessageFile = messageFile;
+                messageId = message.getMessageID();
+                messageFile = getMessageFile(batchId, messageId);
+                if (!oldMessageFile.renameTo(messageFile)) {
+                    throw new MailStoreException(String.format(
+                        "Failed to rename saved message (id [%s], batch id [%s]) from file [%s] into file [%s]",
+                        messageId, batchId, oldMessageFile, messageFile));
+                }
+            }
         } catch (Exception e) {
             throw new MailStoreException(String.format(
-                "Failed to save message (id [%s], batch id [%s]) to the file system at [%s]",
-                messageId, batchId, batchDirectory), e);
+                "Failed to save message (id [%s], batch id [%s]) into file [%s]",
+                messageId, batchId, messageFile), e);
         }
     }
 
     @Override
     public MimeMessage load(Session session, String batchId, String messageId) throws MailStoreException
     {
-        File batchDirectory = null;
+        File messageFile = null;
         try {
-            batchDirectory = getBatchDirectory(batchId);
-            File file = new File(batchDirectory, messageId);
-            InputStream is = new FileInputStream(file);
-            MimeMessage message = new MimeMessage(session, is);
-            return message;
+            messageFile = getMessageFile(batchId, messageId);
+            InputStream is = new FileInputStream(messageFile);
+            return new MimeMessage(session, is);
         } catch (Exception e) {
             throw new MailStoreException(String.format(
-                "Failed to load message (id [%s], batch id [%s]) from the file system at [%s]",
-                messageId, batchId, batchDirectory), e);
+                "Failed to load message (id [%s], batch id [%s]) from file [%s]",
+                messageId, batchId, messageFile), e);
         }
     }
 
     @Override
     public void delete(String batchId, String messageId) throws MailStoreException
     {
-        File batchDirectory = null;
+        File messageFile = null;
         try {
-            batchDirectory = getBatchDirectory(batchId);
-            File file = new File(batchDirectory, messageId);
-            file.delete();
+            messageFile = getMessageFile(batchId, messageId);
+            messageFile.delete();
             // Also remove the directory. Note that it'll succeed only the directory is empty which is what we want.
-            batchDirectory.delete();
+            getBatchDirectory(batchId).delete();
         } catch (Exception e) {
             throw new MailStoreException(String.format(
-                "Failed to delete message (id [%s], batch id [%s]) from the file system at [%s]",
-                messageId, batchId, batchDirectory), e);
+                "Failed to delete message (id [%s], batch id [%s]) file [%s]",
+                messageId, batchId, messageFile), e);
         }
     }
 
     private File getBatchDirectory(String batchId)
     {
-        return new File(new File(this.environment.getPermanentDirectory(), ROOT_DIRECTORY), batchId);
+        File batchDirectory = new File(rootDirectory, getURLEncoded(batchId));
+        batchDirectory.mkdirs();
+        return batchDirectory;
+    }
+
+    private File getMessageFile(String batchId, String messageId) {
+        return new File(getBatchDirectory(batchId), getURLEncoded(messageId));
+    }
+
+    private String getMessageId(MimeMessage message) throws MessagingException
+    {
+        String messageId = message.getMessageID();
+        if (messageId == null) {
+            message.saveChanges();
+            messageId = message.getMessageID();
+        }
+
+        return messageId;
+    }
+
+    private static String getURLEncoded(final String toEncode)
+    {
+        try {
+            return URLEncoder.encode(toEncode, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException("UTF-8 not available, this Java VM is not standards compliant!");
+        }
     }
 }

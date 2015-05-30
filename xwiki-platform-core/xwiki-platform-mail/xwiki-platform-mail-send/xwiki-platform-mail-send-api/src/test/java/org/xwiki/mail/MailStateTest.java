@@ -45,30 +45,50 @@ public class MailStateTest
     }
 
     @Test
-    public void parseWhenFailedState()
+    public void parseWhenOldFailedState()
     {
         MailState state = MailState.parse("failed");
-        assertEquals(MailState.FAILED, state);
+        assertEquals(MailState.SEND_ERROR, state);
     }
 
     @Test
-    public void parseWhenFailedStateUppercase()
+    public void parseWhenPrepareSuccessState()
     {
-        MailState state = MailState.parse("FAILED");
-        assertEquals(MailState.FAILED, state);
+        MailState state = MailState.parse("prepare_success");
+        assertEquals(MailState.PREPARE_SUCCESS, state);
+    }
+
+    public void parseWhenPrepareErrorsState()
+    {
+        MailState state = MailState.parse("prepare_error");
+        assertEquals(MailState.PREPARE_ERROR, state);
     }
 
     @Test
-    public void parseWhenReadyState()
+    public void parseWhenSendSuccessState()
     {
-        MailState state = MailState.parse("ready");
-        assertEquals(MailState.READY, state);
+        MailState state = MailState.parse("send_success");
+        assertEquals(MailState.SEND_SUCCESS, state);
     }
 
     @Test
-    public void parseWhenSentState()
+    public void parseWhenSendErrorLowercase()
     {
-        MailState state = MailState.parse("sent");
-        assertEquals(MailState.SENT, state);
+        MailState state = MailState.parse("send_error");
+        assertEquals(MailState.SEND_ERROR, state);
+    }
+
+    @Test
+    public void parseWhenSendErrorStateUppercase()
+    {
+        MailState state = MailState.parse("SEND_ERROR");
+        assertEquals(MailState.SEND_ERROR, state);
+    }
+
+    @Test
+    public void parseWhenSendFatalErrorState()
+    {
+        MailState state = MailState.parse("send_fatal_error");
+        assertEquals(MailState.SEND_FATAL_ERROR, state);
     }
 }

@@ -67,14 +67,13 @@ public class PackageTest extends AbstractPackageTest
 
         XWikiDocument docs[] = {doc1, doc2};
 
-        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}), getContext());
+        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}, null), getContext());
 
         assertEquals(2, this.pack.getFiles().size());
         assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(), (this.pack.getFiles().get(1)).getDoc().getTitle());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(),
-            this.pack.getFiles().get(1).getDoc().getContent());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(), this.pack.getFiles().get(1).getDoc()
+            .getContent());
     }
-
 
     public void testImportWithHeterogeneousEncodingInFilesUsingCommonsCompress() throws Exception
     {
@@ -91,13 +90,13 @@ public class PackageTest extends AbstractPackageTest
 
         XWikiDocument docs[] = {doc1, doc2};
 
-        this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] {"ISO-8859-1", "UTF-8"}), getContext());
+        this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] {"ISO-8859-1", "UTF-8"}, null),
+            getContext());
 
         assertEquals(2, this.pack.getFiles().size());
         assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(), (this.pack.getFiles().get(1)).getDoc().getTitle());
-        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(),
-            this.pack.getFiles().get(1).getDoc().getContent());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(), this.pack.getFiles().get(1).getDoc()
+            .getContent());
     }
-
 
 }

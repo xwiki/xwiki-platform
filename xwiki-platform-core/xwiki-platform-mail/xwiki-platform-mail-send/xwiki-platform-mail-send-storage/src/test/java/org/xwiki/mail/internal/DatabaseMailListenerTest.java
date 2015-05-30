@@ -21,7 +21,6 @@ package org.xwiki.mail.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -33,8 +32,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailContentStore;
+import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
@@ -42,9 +45,16 @@ import org.xwiki.mail.MailStoreException;
 import org.xwiki.test.AllLogRule;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DatabaseMailListener}.
@@ -65,27 +75,47 @@ public class DatabaseMailListenerTest
 
     private String batchId = UUID.randomUUID().toString();
 
-    private UUID mailId = UUID.randomUUID();
+    private String messageId = "<1128820400.0.1419205781342.JavaMail.contact@xwiki.org>";
 
     @Before
     public void setUp() throws Exception
     {
         Session session = Session.getInstance(new Properties());
         this.message = new MimeMessage(session);
-        this.message.setHeader("X-MailID", this.mailId.toString());
-        this.message.setHeader("X-BatchID", this.batchId);
         this.message.setHeader("X-MailType", "type");
+        this.message.saveChanges();
+        this.message.setHeader("Message-ID", messageId);
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = Mockito.mock(ExecutionContext.class);
+        XWikiContext xcontext = Mockito.mock(XWikiContext.class);
+        when(xcontext.getWikiId()).thenReturn("mywiki");
+        when(executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xcontext);
+        when(execution.getContext()).thenReturn(executionContext);
     }
 
     @Test
-    public void onPrepare() throws Exception
+    public void onPrepareSuccess() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
 
-        this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
-        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.READY, "mywiki")), eq(parameters));
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.PREPARE_SUCCESS, "mywiki")), anyMap());
+    }
+
+    @Test
+    public void onPrepareError() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageError(this.message, new Exception("Error"), Collections.<String, Object>emptyMap());
+
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.PREPARE_ERROR, "mywiki")), anyMap());
     }
 
     @Test
@@ -94,48 +124,51 @@ public class DatabaseMailListenerTest
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
         doThrow(new MailStoreException("error")).when(mailStatusStore).save(any(MailStatus.class), anyMap());
 
-        Map < String, Object > parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-
-        this.mocker.getComponentUnderTest().onPrepare(this.message, parameters);
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onPrepareMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
         ArgumentCaptor<MailStatus> statusCapture = ArgumentCaptor.forClass(MailStatus.class);
         verify(mailStatusStore).save(statusCapture.capture(), anyMap());
 
-        assertEquals("Failed to save mail status [messageId = [" + this.mailId.toString() + "], batchId = ["
-            + this.batchId + "], state = [ready], date = [" + statusCapture.getValue().getDate() + "], "
+        assertEquals("Failed to save mail status [messageId = [" + this.messageId.toString() + "], batchId = ["
+            + this.batchId + "], state = [prepare_success], date = [" + statusCapture.getValue().getDate() + "], "
             + "recipients = [<null>], type = [type], wiki = [mywiki]] to the database", this.logRule.getMessage(0));
     }
 
     @Test
-    public void onSuccess() throws Exception
+    public void onSendMessageSuccess() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        MailStatus status = new MailStatus(this.message, MailState.READY);
+        MailStatus status = new MailStatus(this.batchId, this.message, MailState.PREPARE_SUCCESS);
         status.setWiki("otherwiki");
-        when(mailStatusStore.load(this.mailId.toString())).thenReturn(status);
+        when(mailStatusStore.load(this.messageId)).thenReturn(status);
 
-        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onSendMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
-        verify(mailStatusStore).load(this.mailId.toString());
-        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SENT, "otherwiki")), eq(parameters));
+        verify(mailStatusStore).load(this.messageId);
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SEND_SUCCESS, "otherwiki")), anyMap());
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        verify(mailContentStore).delete(this.batchId, this.mailId.toString());
+        verify(mailContentStore).delete(this.batchId, this.messageId);
     }
 
     @Test
     public void onSuccessWhenStatusLoadFails() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        when(mailStatusStore.load(this.mailId.toString())).thenThrow(new MailStoreException("error"));
+        when(mailStatusStore.load(this.messageId)).thenThrow(new MailStoreException("error"));
 
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onSendMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
-        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
-
-        assertEquals("Error when looking for a previous mail status for message id [" + this.mailId + "]. However the "
-            + "mail was sent successfully. Forcing status to [sent]", this.logRule.getMessage(0));
+        assertEquals("Error when looking for a previous mail status for message [" + this.messageId + "] of batch ["
+            + batchId + "].", this.logRule.getMessage(0));
+        assertEquals("Forcing a new mail status for message [" + this.messageId + "] of batch [" + batchId
+            + "] to send_success state.", this.logRule.getMessage(1));
 
         // Verify that save and delete happened
         verify(mailStatusStore).save(any(MailStatus.class), anyMap());
@@ -147,34 +180,52 @@ public class DatabaseMailListenerTest
     public void onSuccessWhenMailContentDeletionFails() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        MailStatus status = new MailStatus(this.message, MailState.READY);
+        MailStatus status = new MailStatus(this.batchId, this.message, MailState.PREPARE_SUCCESS);
         status.setWiki("otherwiki");
-        when(mailStatusStore.load(this.mailId.toString())).thenReturn(status);
+        when(mailStatusStore.load(this.messageId)).thenReturn(status);
 
         MailContentStore mailContentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
-        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId, this.mailId.toString());
+        doThrow(new MailStoreException("error")).when(mailContentStore).delete(this.batchId, this.messageId);
 
-        this.mocker.getComponentUnderTest().onSuccess(this.message, parameters);
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onSendMessageSuccess(this.message, Collections.<String, Object>emptyMap());
 
-        assertEquals("Failed to remove previously failing message [" + this.mailId.toString() + "] (batch id ["
-            + this.batchId + "]) from the file system. Reason [MailStoreException: error].",
+        assertEquals("Failed to remove previously failing message [" + this.messageId.toString() + "] (batch id ["
+                + this.batchId + "]) from the file system. Reason [MailStoreException: error].",
             this.logRule.getMessage(0));
     }
 
     @Test
-    public void onError() throws Exception
+    public void onSendMessageError() throws Exception
     {
         MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
-        Map<String, Object> parameters = Collections.singletonMap("wikiId", (Object) "mywiki");
-        MailStatus status = new MailStatus(this.message, MailState.READY);
+        MailStatus status = new MailStatus(this.batchId, this.message, MailState.PREPARE_SUCCESS);
         status.setWiki("otherwiki");
-        when(mailStatusStore.load(this.mailId.toString())).thenReturn(status);
+        when(mailStatusStore.load(this.messageId)).thenReturn(status);
 
-        this.mocker.getComponentUnderTest().onError(this.message, new Exception("Error"), parameters);
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onSendMessageError(this.message, new Exception("Error"), Collections.<String, Object>emptyMap());
 
-        verify(mailStatusStore).load(this.mailId.toString());
-        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.FAILED, "otherwiki")), eq(parameters));
+        verify(mailStatusStore).load(this.messageId);
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SEND_ERROR, "otherwiki")), anyMap());
+    }
+
+    @Test
+    public void onSendMessageFatalError() throws Exception
+    {
+        MailStatusStore mailStatusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        MailStatus status = new MailStatus(this.batchId, this.message, MailState.PREPARE_SUCCESS);
+        status.setWiki("otherwiki");
+        when(mailStatusStore.load(this.messageId)).thenReturn(status);
+
+        MailListener listener = this.mocker.getComponentUnderTest();
+        listener.onPrepareBegin(batchId, Collections.<String, Object>emptyMap());
+        listener.onSendMessageFatalError(this.messageId, new Exception("Error"), Collections.<String, Object>emptyMap());
+
+        verify(mailStatusStore).load(this.messageId);
+        verify(mailStatusStore).save(argThat(new isSameMailStatus(MailState.SEND_FATAL_ERROR, "otherwiki")), anyMap());
     }
 
     /**
@@ -197,7 +248,7 @@ public class DatabaseMailListenerTest
         {
             MailStatus statusArgument = (MailStatus) argument;
             return statusArgument.getBatchId().equals(batchId) &&
-                statusArgument.getMessageId().equals(mailId.toString()) &&
+                statusArgument.getMessageId().equals(messageId) &&
                 statusArgument.getType().equals("type") &&
                 statusArgument.getState().equals(state) &&
                 statusArgument.getWiki().equals(wikiId);

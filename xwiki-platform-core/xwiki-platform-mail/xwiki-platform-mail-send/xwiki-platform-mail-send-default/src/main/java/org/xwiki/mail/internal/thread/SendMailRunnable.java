@@ -132,10 +132,11 @@ public class SendMailRunnable extends AbstractMailRunnable
         MimeMessage message;
         try {
             // Step 1: Load the message from the filesystem store
-            message = this.mailContentStore.load(item.getSession(), item.getBatchId().toString(), item.getMessageId());
+            message = this.mailContentStore.load(item.getSession(), item.getBatchId(), item.getMessageId());
         } catch (Exception e) {
-            // Simply log an error since we cannot call the listener as the message is null.
-            this.logger.error("Failed to load the message [{}] from the content store", item, e);
+            if (listener != null) {
+                listener.onSendMessageFatalError(item.getMessageId(), e, Collections.<String, Object>emptyMap());
+            }
             return;
         }
 
@@ -144,7 +145,6 @@ public class SendMailRunnable extends AbstractMailRunnable
             // the current Transport, get a new one and reconnect.
             // Also do that every 100 mails sent.
             // TODO: explain why!
-            // TODO: Also explain why we don't use Transport.send()
             if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
                 closeTransport();
                 this.currentSession = item.getSession();
@@ -155,17 +155,19 @@ public class SendMailRunnable extends AbstractMailRunnable
             }
 
             // Step 3: Send the mail
+            // Unlike the static send method, the sendMessage method does not call the saveChanges method on the
+            // message; this prevent the MessageID header to be changed.
             this.currentTransport.sendMessage(message, message.getAllRecipients());
             this.count++;
 
             // Step 4: Notify the user of the success if a listener has been provided
             if (listener != null) {
-                listener.onSuccess(message, Collections.<String, Object>emptyMap());
+                listener.onSendMessageSuccess(message, Collections.<String, Object>emptyMap());
             }
         } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided.
             if (listener != null) {
-                listener.onError(message, e, Collections.<String, Object>emptyMap());
+                listener.onSendMessageError(message, e, Collections.<String, Object>emptyMap());
             }
         }
     }

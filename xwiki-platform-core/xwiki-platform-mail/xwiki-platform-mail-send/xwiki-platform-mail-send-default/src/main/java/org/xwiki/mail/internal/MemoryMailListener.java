@@ -27,7 +27,6 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
@@ -41,31 +40,80 @@ import org.xwiki.mail.MailStatusResult;
 @Component
 @Named("memory")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class MemoryMailListener implements MailListener
+public class MemoryMailListener extends AbstractMailListener
 {
     private MemoryMailStatusResult mailStatusResult = new MemoryMailStatusResult();
 
     @Override
-    public void onPrepare(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareMessageSuccess(MimeMessage message, Map<String, Object> parameters)
     {
-        MailStatus status = new MailStatus(message, MailState.READY);
+        super.onPrepareMessageSuccess(message, parameters);
+
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.PREPARE_SUCCESS);
         this.mailStatusResult.setStatus(status);
     }
 
     @Override
-    public void onSuccess(MimeMessage message, Map<String, Object> parameters)
+    public void onPrepareMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
     {
-        MailStatus status = new MailStatus(message, MailState.SENT);
+        super.onPrepareMessageError(message, exception, parameters);
+
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.PREPARE_ERROR);
+        status.setError(exception);
+        this.mailStatusResult.setStatus(status);
+
+        // This mail will not reach the send queue, so its processing is done now.
+        this.mailStatusResult.incrementCurrentSize();
+    }
+
+    @Override
+    public void onPrepareFatalError(Exception exception, Map<String, Object> parameters)
+    {
+        super.onPrepareFatalError(exception, parameters);
+
+        //TODO: Store failure exception
+        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]");
+    }
+
+    @Override
+    public void onSendMessageSuccess(MimeMessage message, Map<String, Object> parameters)
+    {
+        super.onPrepareMessageSuccess(message, parameters);
+
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.SEND_SUCCESS);
         this.mailStatusResult.setStatus(status);
         this.mailStatusResult.incrementCurrentSize();
     }
 
     @Override
-    public void onError(MimeMessage message, Exception e, Map<String, Object> parameters)
+    public void onSendMessageFatalError(String messageId, Exception exception, Map<String, Object> parameters)
     {
-        MailStatus status = new MailStatus(message, MailState.FAILED);
-        status.setError(e);
+        super.onSendMessageFatalError(messageId, exception, parameters);
+
+        MailStatus status = this.mailStatusResult.getStatus(messageId);
+        if (status != null) {
+            status.setState(MailState.SEND_FATAL_ERROR);
+            status.setError(exception);
+            this.mailStatusResult.setStatus(status);
+        } else {
+            this.logger.error("Failed to find a previous mail status for message id [{}] of batch [{}]. "
+                + "Unable to report the fatal error encountered during mail sending.", messageId, getBatchId(),
+                exception);
+        }
+
+        this.mailStatusResult.incrementCurrentSize();
+    }
+
+    @Override
+    public void onSendMessageError(MimeMessage message, Exception exception, Map<String, Object> parameters)
+    {
+        super.onSendMessageError(message, exception, parameters);
+
+        MailStatus status = new MailStatus(getBatchId(), message, MailState.SEND_ERROR);
+        status.setError(exception);
         this.mailStatusResult.setStatus(status);
+
+        // This mail will not reach the send queue, so its processing is done now.
         this.mailStatusResult.incrementCurrentSize();
     }
 

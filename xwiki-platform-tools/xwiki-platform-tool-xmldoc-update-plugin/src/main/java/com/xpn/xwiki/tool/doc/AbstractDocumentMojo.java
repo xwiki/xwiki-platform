@@ -95,6 +95,9 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
         ecm.initialize(this.getClass().getClassLoader());
         Utils.setComponentManager(ecm);
 
+        // Context component manager is totally useless here
+        ecm.unregisterComponent(ComponentManager.class, "context");
+
         // We need to initialize the Component Manager so that the components can be looked up
         XWikiContext xcontext = new XWikiContext();
         xcontext.put(ComponentManager.class.getName(), ecm);

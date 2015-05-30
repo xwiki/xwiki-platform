@@ -86,7 +86,18 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
     }
 
     @Override
+    public Iterator<MailStatus> getAllErrors()
+    {
+        return getFilteredState("*_error");
+    }
+
+    @Override
     public Iterator<MailStatus> getByState(MailState state)
+    {
+        return getFilteredState(state.toString());
+    }
+
+    private Iterator<MailStatus> getFilteredState(String state)
     {
         if (this.batchId == null) {
             return Collections.emptyIterator();
@@ -95,7 +106,7 @@ public class DatabaseMailStatusResult extends AbstractMailStatusResult
         try {
             Map<String, Object> filterMap = new HashMap<>();
             filterMap.put(BATCHID_KEY, this.batchId);
-            filterMap.put("state", state.toString());
+            filterMap.put("state", state);
             return this.mailStatusStore.load(filterMap, 0, 0, DATE_FIELD, true).iterator();
         } catch (MailStoreException e) {
             LOGGER.error("Failed to get results by state. Returning an empty result.", e);

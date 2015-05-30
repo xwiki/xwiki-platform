@@ -69,7 +69,7 @@ public abstract class AbstractMailScriptService implements ScriptService
      * @param checkPermissions if true then we check authorization to send mail.
      * @return the result and status of the send batch
      */
-    public ScriptMailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, MailListener listener,
+    protected ScriptMailResult sendAsynchronously(Iterable<? extends MimeMessage> messages, MailListener listener,
         boolean checkPermissions)
     {
         if (checkPermissions)

@@ -19,116 +19,87 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
-import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.AllComponents;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
-import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Various general tests on wiki macros.
  * 
  * @version $Id$
  */
-public class WikiMacrosTest extends AbstractBridgedComponentTestCase
+@AllComponents
+public class WikiMacrosTest
 {
-    private XWiki xwiki;
-
-    private XWikiRightService rightService;
-
-    private EventListener wikiMacroEventListener;
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     private XWikiDocument macroDocument;
 
     private BaseObject macroObject;
 
     @Before
-    @Override
-    public void setUp() throws Exception
+    public void before() throws Exception
     {
-        super.setUp();
-
-        this.wikiMacroEventListener = getComponentManager().getInstance(EventListener.class, "wikimacrolistener");
-
-        this.xwiki = getMockery().mock(XWiki.class);
-        this.rightService = getMockery().mock(XWikiRightService.class);
-        getContext().setWiki(this.xwiki);
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(xwiki).getRightService();
-                will(returnValue(rightService));
-            }
-        });
-
         this.macroDocument = new XWikiDocument(new DocumentReference("wiki", "Space", "Page"));
         this.macroDocument.setSyntax(Syntax.XWIKI_2_0);
-        this.macroDocument.setNew(false);
         this.macroObject = new BaseObject();
         this.macroObject.setXClassReference(new DocumentReference("wiki", "XWiki", "WikiMacroClass"));
         this.macroObject.setStringValue("id", "macroid");
         this.macroObject.setLargeStringValue("code", "code");
         this.macroDocument.addXObject(macroObject);
 
-        getContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+
+        // We need component related events
+        this.oldcore.notifyComponentDescriptorEvent();
+        this.oldcore.notifyDocumentCreatedEvent(true);
+        this.oldcore.notifyDocumentUpdatedEvent(true);
     }
 
     private ComponentManager getWikiComponentManager() throws Exception
     {
-        return getComponentManager().getInstance(ComponentManager.class, "wiki");
+        return this.oldcore.getMocker().getInstance(ComponentManager.class, "wiki");
     }
 
     private ComponentManager getUserComponentManager() throws Exception
     {
-        return getComponentManager().getInstance(ComponentManager.class, "user");
+        return this.oldcore.getMocker().getInstance(ComponentManager.class, "user");
     }
 
     @Test
     public void testSaveWikiMacro() throws Exception
     {
-        final DocumentCreatedEvent documentCreatedEvent =
-            new DocumentCreatedEvent(new DocumentReference("wiki", "Space", "Name"));
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
-                    with(any(XWikiContext.class)));
-                will(returnValue(macroDocument));
-                allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
-                    with(any(String.class)), with(any(XWikiContext.class)));
-                will(returnValue(true));
-                allowing(rightService).hasWikiAdminRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-                allowing(rightService).hasProgrammingRights(with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(String.class), any(String.class), any(String.class), any(XWikiContext.class))).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasWikiAdminRights(any(XWikiContext.class))).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasProgrammingRights(any(XWikiContext.class))).thenReturn(true);
 
         this.macroObject.setStringValue("visibility", "Current Wiki");
 
-        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
+        // Save wiki macro
+        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
 
         Macro testMacro = getWikiComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         try {
-            testMacro = getComponentManager().getInstance(Macro.class, "macroid");
+            testMacro = this.oldcore.getMocker().getInstance(Macro.class, "macroid");
 
             Assert.fail("Found macro with wiki visibility in global componenet manager");
         } catch (ComponentLookupException expected) {
@@ -138,46 +109,40 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
     @Test
     public void testUnRegisterWikiMacroWithDifferentVisibilityKeys() throws Exception
     {
-        final DocumentCreatedEvent documentCreatedEvent =
-            new DocumentCreatedEvent(new DocumentReference("wiki", "Space", "Name"));
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(xwiki).getDocument(with(equal(macroDocument.getDocumentReference())),
-                    with(any(XWikiContext.class)));
-                will(returnValue(macroDocument));
-                allowing(rightService).hasAccessLevel(with(any(String.class)), with(any(String.class)),
-                    with(any(String.class)), with(any(XWikiContext.class)));
-                will(returnValue(true));
-            }
-        });
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(String.class), any(String.class), any(String.class), any(XWikiContext.class))).thenReturn(true);
 
         this.macroObject.setStringValue("visibility", "Current User");
 
-        getContext().setWikiId("wiki");
-        getContext().setUser("XWiki.user");
+        DocumentReference user1 = new DocumentReference("wiki", "Wiki", "user1");
 
-        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
+        this.macroDocument.setAuthorReference(user1);
 
+        // Save wiki macro
+        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
+
+        // Try to lookup the macro
+        this.oldcore.getXWikiContext().setUserReference(user1);
         Macro testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // register with another user
 
-        getContext().setWikiId("wik2");
-        getContext().setUser("XWiki.user2");
+        DocumentReference user2 = new DocumentReference("wiki", "Wiki", "user2");
 
-        this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
+        this.macroDocument.setAuthorReference(user2);
 
+        // Save wiki macro
+        this.oldcore.getMockXWiki().saveDocument(this.macroDocument, this.oldcore.getXWikiContext());
+
+        // Try to lookup the macro
+        this.oldcore.getXWikiContext().setUserReference(user2);
         testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");
 
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // validate that the macro as been properly unregistered for former user
-        getContext().setWikiId("wik1");
-        getContext().setUser("XWiki.user");
+        this.oldcore.getXWikiContext().setUserReference(user1);
 
         try {
             testMacro = getUserComponentManager().getInstance(Macro.class, "macroid");

@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.macro.Macro;
@@ -43,7 +44,9 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager}.
@@ -81,6 +84,9 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
         registerMockComponent(LinkLabelGenerator.class);
+        registerMockComponent(WikiDescriptorManager.class);
+        registerMockComponent(ContextualAuthorizationManager.class);
+        registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
     }
 
     @Before

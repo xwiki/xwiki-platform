@@ -46,7 +46,6 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
@@ -1026,7 +1025,7 @@ public class XWikiAttachment implements Cloneable
                 modified = true;
             }
         } catch (Exception e) {
-            Log.error("Failed to compare content of attachments", e);
+            LOGGER.error("Failed to compare content of attachments", e);
         }
 
         return modified;

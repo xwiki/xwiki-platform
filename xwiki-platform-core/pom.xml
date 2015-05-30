@@ -505,6 +505,18 @@
               <method>java.util.List load(java.util.Map, int, int, java.lang.String, boolean)</method>
               <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MailContentStore</className>
+              <method>void save(javax.mail.internet.MimeMessage)</method>
+              <justification>Young API. Added explicit batchId argument to stop storing batchId in mime headers.</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/mail/MailStatus</className>
+              <method>MailStatus(javax.mail.internet.MimeMessage, org.xwiki.mail.MailState)</method>
+              <justification>Young API. Added explicit batchId argument to stop storing batchId in mime headers.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -533,6 +545,9 @@
             <exclude>**/org/xwiki/mail/MailStatusResult*</exclude>
             <!-- Young API. Class moved to the "script" package. Script service usage is unchanged. -->
             <exclude>**/org/xwiki/mail/MailStorageScriptService*</exclude>
+            <!-- Young API. Improve states and listener to provide more detailled and better reporting. -->
+            <exclude>**/org/xwiki/mail/MailListener</exclude>
+            <exclude>**/org/xwiki/mail/MailState</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -75,8 +75,6 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
     @Override
     public void initialize() throws InitializationException
     {
-        super.initialize();
-
         // Set the parent to the Root Component Manager since if a component isn't found for a particular wiki
         // we want to check if it's available in the Root Component Manager.
         setInternalParent(this.spaceComponentManager);

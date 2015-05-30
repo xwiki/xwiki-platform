@@ -4,8 +4,6 @@ $response.setContentType("application/x-json")
 #set ($off = $offset - 1)
 #set ($limit = $mathtool.toInteger($request.get('limit')))
 
-#set( $rm = $xwiki.rightsmanager.usersApi )
-
 #### get all the request parameters which are filters
 #set( $params = $request.getParameterMap() )
 #set( $keys = $params.keySet() )
@@ -20,7 +18,7 @@ $response.setContentType("application/x-json")
      #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
      #if( $docProps.contains( $key ))
         #set ($arr = [])
-        #set( $discard = $arr.add( null ) ) ## this may be variable...
+        #set( $discard = $arr.add( $NULL ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr))
         #set( $discard = $orderList.add( "$key" ))
@@ -42,18 +40,24 @@ $response.setContentType("application/x-json")
 #end
 
 #foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
-#if( $value == "local" )
-  #set( $users = $rm.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedLocalUsers( $filterMap ) )
-#elseif( $value == "global" )
-  #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedGlobalUsers( $filterMap ) )
+## If the Rights Manager Plugin is not enabled, then return an empty JSON result
+#set( $rm = $xwiki.rightsmanager.usersApi )
+#if ("$!rm" != '')
+  #if( $value == "local" )
+    #set( $users = $rm.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.countAllMatchedLocalUsers( $filterMap ) )
+  #elseif( $value == "global" )
+    #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.countAllMatchedGlobalUsers( $filterMap ) )
+  #else
+    ## get both local and global users
+    #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
+  #end
 #else
-  ## get both local and global users
-  #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
+  #set ($users = [])
+  #set ($countUsers = 0)
 #end
-
 ### json starts
 {
 "totalrows": $countUsers,

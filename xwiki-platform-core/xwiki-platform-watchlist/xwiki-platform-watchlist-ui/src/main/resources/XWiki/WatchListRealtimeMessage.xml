@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>WatchListRealtimeMessage</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <creationDate>1432050453000</creationDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1432926327000</date>
+  <contentUpdateDate>1432050453000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>XWiki.WatchListRealtimeMessage</name>
+    <number>0</number>
+    <className>XWiki.Mail</className>
+    <guid>597cf72a-594b-48e8-802d-d1c91942c01b</guid>
+    <class>
+      <name>XWiki.Mail</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <html>
+        <disabled>0</disabled>
+        <name>html</name>
+        <number>4</number>
+        <prettyName>HTML</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </html>
+      <language>
+        <disabled>0</disabled>
+        <name>language</name>
+        <number>2</number>
+        <prettyName>Language</prettyName>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </language>
+      <subject>
+        <disabled>0</disabled>
+        <name>subject</name>
+        <number>1</number>
+        <prettyName>Subject</prettyName>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </subject>
+      <text>
+        <disabled>0</disabled>
+        <name>text</name>
+        <number>3</number>
+        <prettyName>Text</prettyName>
+        <rows>15</rows>
+        <size>80</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </text>
+    </class>
+    <property>
+      <html>#set ($event = $events[0])
+#set ($eventDocument = $xwiki.getDocument($event.documentReference))
+#set ($document = $xwiki.getDocument($eventDocument, $event.version))
+#set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
+##
+## Document type, if applicable
+#set ($documentType = 'document')
+#if ($event.type == 'delete')
+  #set ($xobjects = $originalDocument.xWikiObjects)
+#else
+  #set ($xobjects = $document.xWikiObjects)
+#end
+#foreach ($classFullName in $xobjects.keySet())
+  #set ($classDocument = $xwiki.getDocument($classFullName))
+  #set ($sheets = $services.sheet.getClassSheets($classDocument))
+  #if ($sheets &amp;&amp; $sheets.size() &gt; 0)
+    ## Determine the class pretty name
+    ## Note: Code taken from "Main.SolrClassFacet"
+    #set ($classPrettyName = $stringtool.removeEnd($classDocument.name, 'Class'))
+    #set ($translationKey = "solr.field.class.$classPrettyName")
+    #if ($services.localization.get($translationKey))
+      #set ($classPrettyName = $services.localization.render('$translationKey'))
+    #else
+      ## Some of the default classes have names starting with 'XWiki'.
+      #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
+      #set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
+      ## Make sure we don't have isolated upper case letters.
+      #set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
+    #end
+    #set ($documentType = $classPrettyName.toLowerCase())
+    #break
+  #end
+#end
+##
+## Attachment displayer, specific to the Attachment handling below.
+#macro (displayAttachments $attachments)
+  &lt;ul&gt;
+  #foreach ($attachment in $attachments)
+    &lt;li&gt;$attachment.filename ($attachment.mimeType)&lt;/li&gt;
+  #end
+  &lt;/ul&gt;
+#end
+
+&lt;div&gt;
+
+&lt;table&gt;
+  &lt;tr style='vertical-align: top'&gt;
+    ## User
+    #set ($userURL = $xwiki.getDocument($event.authorReference).externalURL)
+    &lt;td colspan='2'&gt;
+      &lt;table&gt;
+        &lt;tr&gt;
+          ## User Avatar
+          &lt;td rowspan='2' &gt;
+            ## The string returned by XWiki#getUserName() is XML encoded.
+            &lt;a href="$userURL"&gt;
+              ## Note: We are currently attaching the user's avatar to the current mail. This is now done in the java side, but we should be able to do it
+              ## from the template in the future when http://jira.xwiki.org/browse/XWIKI-10638 gets implemented.
+              ###getUserAvatarURL($event.authorReference $avatarURL 30)
+              ##&lt;img src="${escapetool.xml($avatarURL.url)}" alt="${xwiki.getUserName($event.author, false)}" /&gt;
+              &lt;img src='cid:userAvatar.png' alt="${xwiki.getUserName($event.author, false)}" /&gt;
+            &lt;/a&gt;
+          &lt;/td&gt;
+          ## User Name
+          ## Note: xwiki.getUserName(userName) does not generate an external URL, so we need to add the link manually.
+          &lt;td style='vertical-align: bottom;'&gt;&lt;a href="$userURL"&gt;${xwiki.getUserName($event.author, false)}&lt;/a&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          ## User ID (Wiki)
+          &lt;td style='color: gray; vertical-align: top;'&gt;
+            ${escapetool.xml($event.authorReference.name)}
+            #if ($event.authorReference.wikiReference.name != $xcontext.getMainWikiName())
+              (${escapetool.xml($event.authorReference.wikiReference.name)})
+            #end
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  ## Action
+#if ($event.type == 'create')
+  &lt;tr&gt;&lt;td&gt;created the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+#elseif ($event.type == 'delete')
+  &lt;tr&gt;&lt;td&gt;deleted the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+#elseif ($event.type == 'update')
+  #set ($contentDiff = $document.getContentDiff($originalDocument, $document))
+  #set ($metadataDiff = $document.getMetaDataDiff($originalDocument, $document))
+  #set ($attachmentDiff = $document.getAttachmentDiff($originalDocument, $document))
+  #set ($objectDiff = $document.getObjectDiff($originalDocument, $document))
+  #set ($classDiff = $document.getClassDiff($originalDocument, $document))
+  ## Metadata
+  #if ($metadataDiff.size() &gt; 0)
+    #set ($metadataDiffHeaderDisplayed = false)
+    ## Skip fields that obviously are changed automatically during an update, since we only care about fields that are explicitly changed.
+    #set ($skippedFields = ['contentAuthor', 'author', 'date'])
+    #set ($metadataDiffsToDisplay = [])
+    #foreach ($metadataDiffItem in $metadataDiff)
+      #if (!$skippedFields.contains($metadataDiffItem.field))
+        #set ($discard = $metadataDiffsToDisplay.add($metadataDiffItem))
+      #end
+    #end
+    #if ($metadataDiffsToDisplay.size() &gt; 0)
+      &lt;tr&gt;&lt;td&gt;
+        &lt;p&gt;updated the metadata of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/p&gt;
+        &lt;ul&gt;
+        #foreach ($metadataDiffToDisplay in $metadataDiffsToDisplay)
+          &lt;li&gt;$metadataDiffToDisplay&lt;/li&gt;
+        #end
+        &lt;/ul&gt;
+      &lt;/tr&gt;&lt;/td&gt;
+      ## Mark displayed
+      #set ($displayed = true)
+    #end
+  #end
+  ## Content
+  #if ($contentDiff.size() &gt; 0)
+    &lt;tr&gt;&lt;td&gt;updated the content of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    ## Mark displayed
+    #set ($displayed = true)
+  #end
+  ## Class
+  #if ($classDiff.size() &gt; 0)
+    &lt;tr&gt;&lt;td&gt;updated $classDiff.size() properties of the class &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;
+      &lt;ul&gt;
+      #foreach ($classDiffItems in $classDiff)
+        #set ($classDiffItem = $classDiffItems[0])
+        ## FIXME: Handle propetry renames which show up as added (because an add+delete is performed in the database, i.e. no rename action).
+        &lt;li&gt;$classDiffItem.action "$classDiffItem.propName" ($classDiffItem.propType)&lt;/li&gt;
+      #end
+      &lt;/ul&gt;
+    &lt;/td&gt;&lt;/tr&gt;
+    ## Mark displayed
+    #set ($displayed = true)
+  #end
+  ## Attachments
+  #if ($attachmentDiff.size() &gt; 0)
+    #set ($newAttachments = [])
+    #set ($updatedAttachments = [])
+    #set ($deletedAttachments = [])
+    #foreach ($attachmentDiffItem in $attachmentDiff)
+      #if ($attachmentDiffItem.type == 'insert')
+        #set ($discard = $newAttachments.add($attachmentDiffItem.newAttachment))
+      #elseif ($attachmentDiffItem.type == 'change')
+        #set ($discard = $updatedAttachments.add($attachmentDiffItem.newAttachment))
+      #elseif ($attachmentDiffItem.type == 'delete')
+        #set ($discard = $deletedAttachments.add($attachmentDiffItem.origAttachment))
+      #end
+    #end
+    #if ($newAttachments.size() &gt; 0)
+      &lt;tr&gt;&lt;td&gt;added $newAttachments.size() attachment(s) to the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;#displayAttachments($newAttachments)&lt;/td&gt;&lt;/tr&gt;
+    #end
+    #if ($updatedAttachments.size() &gt; 0)
+      &lt;tr&gt;&lt;td&gt;updated $updatedAttachments.size() attachment(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;#displayAttachments($updatedAttachments)&lt;/td&gt;&lt;/tr&gt;
+    #end
+    #if ($deletedAttachments.size() &gt; 0)
+      &lt;tr&gt;&lt;td&gt;deleted $deletedAttachments.size() attachment(s) from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;#displayAttachments($deletedAttachments)&lt;/td&gt;&lt;/tr&gt;
+    #end
+    ## Mark displayed
+    #set ($displayed = true)
+  #end
+  ## Objects
+  #if ($objectDiff.size() &gt; 0)
+    ## How many objects?
+    #if ($objectDiff.size() &gt; 1)
+      ## Many, don`t bother displaying here.
+      &lt;tr&gt;&lt;td&gt;updated $objectDiff.size() object(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;
+        &lt;ul&gt;
+          #foreach ($objectDiffItems in $objectDiff)
+            #set ($objectDiffItem = $objectDiffItems[0])
+            &lt;li&gt;$objectDiffItem.action ${objectDiffItem.className}[$objectDiffItem.number]&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/td&gt;&lt;/tr&gt;
+      ## Mark displayed
+      #set ($displayed = true)
+    #else
+      ## Just one, try to understand what it was, based on the class.
+      #set ($objectDiffItem = $objectDiff[0][0])
+      #set ($objectClass = $objectDiffItem.className)
+      #if ($objectDiffItem.action == 'object-removed')
+        #set ($object = $originalDocument.getObject($objectClass, $objectDiffItem.number))
+      #else
+        #set ($object = $document.getObject($objectClass, $objectDiffItem.number))
+      #end
+      #set ($originalObject = $originalDocument.getObject($objectClass, $objectDiffItem.number))
+      #if ($objectClass == 'XWiki.XWikiComments')
+        #set ($commentAuthorReference = $services.model.resolveDocument($object.getValue('author'), $document.documentReference.wikiReference))
+        #set ($commentAuthorSerialized = $services.model.serialize($commentAuthorReference))
+        #set ($commentAuthorURL = $xwiki.getDocument($commentAuthorReference).getExternalURL())
+        ## Comment or annotation?
+        #set ($commentType = 'comment')
+        #if ("$!object.getValue('selection')" != '')
+          #set ($commentType = 'annotation')
+        #end
+        #if ($objectDiffItem.action == 'object-added')
+          ## New comment
+          #set ($replyToCommentObject = $document.getObject($objectClass, $object.getValue('replyto')))
+          #if ("$!replyToCommentObject" != '')
+            ## A new reply comment.
+            #set ($replyToAuthorReference = $services.model.resolveDocument($replyToCommentObject.getValue('author'), $document.documentReference.wikiReference))
+            #set ($replyToAuthorSerialized = $services.model.serialize($replyToAuthorReference))
+            #set ($replyToAuthorURL = $xwiki.getDocument($replyToAuthorReference).getExternalURL())
+            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to &lt;a href="$replyToAuthorURL"&gt;$xwiki.getUserName($replyToAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #else
+            ## A regular new comment.
+            &lt;tr&gt;&lt;td&gt;added a $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #end
+          &lt;tr&gt;&lt;td style='padding-left: 2em'&gt;
+            #if ($commentType == 'annotation')
+              &lt;blockquote style='padding-left: 1em;
+                                 border-left: 0.25em solid lightgray;
+                                 margin-left: 0px'&gt;
+                $object.selection
+              &lt;/blockquote&gt;
+            #end
+            $object.comment
+          &lt;/td&gt;&lt;/tr&gt;
+        #elseif ($objectDiffItem.action == 'added' || $objectDiffItem.action == 'changed')
+          ## Existing comment modified (property added or property modified)
+          ## Their own comment?
+          #if ($event.authorReference == $commentAuthorReference)
+            &lt;tr&gt;&lt;td&gt;updated their $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #else
+            &lt;tr&gt;&lt;td&gt;updated a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #end
+          #if ($objectDiffItem.propName == 'comment')
+            &lt;tr&gt;&lt;td&gt;from: &lt;blockquote&gt;$objectDiffItem.prevValue&lt;/blockquote&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;to: &lt;blockquote&gt;$objectDiffItem.newValue&lt;/blockquote&gt;&lt;/td&gt;&lt;/tr&gt;
+          #end
+        #elseif ($objectDiffItem.action == 'object-removed')
+          #if ($event.authorReference == $commentAuthorReference)
+            &lt;tr&gt;&lt;td&gt;removed their $commentType from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #else
+            &lt;tr&gt;&lt;td&gt;removed a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+          #end
+        #end
+        ## View all comments link
+        &lt;tr&gt;&lt;td&gt;
+          &lt;a href="${document.getExternalURL('view')}#Comments"&gt;View all comments&lt;/a&gt;
+        &lt;/td&gt;&lt;/tr&gt;
+        ## Mark object displayed
+        #set ($objectDisplayed = true)
+      #elseif ($objectClass == 'XWiki.XWikiRights')
+        &lt;tr&gt;&lt;td&gt;updated the rights of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        ## Mark object displayed
+        #set ($objectDisplayed = true)
+      #elseif ($objectClass == 'Blog.BlogPostClass')
+        ## Interested just in add or update
+        #if ($objectDiffItem.action != 'object-removed')
+          #set ($originalPublished = $originalObject.getValue('published'))
+          #set ($newPublished = $object.getValue('published'))
+          #if ($newPublished == '1' &amp;&amp; $originalPublished != '1')
+            &lt;tr&gt;&lt;td&gt;published the blog post &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            ## Mark object displayed
+            #set ($objectDisplayed = true)
+          #end
+        #end
+      #end
+      ## Generic object fallback for when no object displayer is available for the object's class or when the displayer did not output anything.
+      #if (!$objectDisplayed)
+        &lt;tr&gt;&lt;td&gt;updated an object of type "$objectClass" on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        ## Mark displayed
+        #set ($displayed = true)
+      #end
+    #end
+  #end
+  ## Generic update event fallback for when no output was produced by the current displayers (content, metadata, objects, etc.).
+  #if (!$displayed &amp;&amp; !$objectDisplayed)
+    &lt;tr&gt;&lt;td&gt;updated the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  #end
+#end
+
+&lt;/table&gt;
+
+&lt;hr/&gt;
+
+#set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
+&lt;p&gt;Full change details are available in the &lt;a href="$changeURL"&gt;Changes View of the affected document&lt;/a&gt;.&lt;/p&gt;
+
+#*
+## Unsubscribe / Remove from WatchList.
+FIXME: we need a way for an admin/script to check the watchlist of a user.
+#if ($services.watchlist.isWatched($services.model.serialize($document.documentReference), "DOCUMENT"))
+  #set ($watchType = 'document')
+  #set ($watchedEntityReference = $services.model.serialize($document.documentReference))
+  #set ($watchedEntity = "$document.displayTitle (${watchedEntityReference})")
+#elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.lastSpaceReference), "SPACE"))
+#elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.wikiReference.name), "WIKI"))
+#elseif ($services.watchlist.isWatched($services.model.serialize($event.authorReference), "USER"))
+#end
+#set ($unsubscribeLink = $xwiki.getURL($event.authorReference, 'view', "xpage=watch&amp;do=remove${watchType}&amp;reference=${escapetool.url($watchedEntityReference)}&amp;xredirect=${escapetool.url($xwiki.getURL($event.authorReference))}"))
+&lt;p&gt;
+  You are receiving this message because you are currently watching the activity for the $watchType "$watchedEntity".&lt;br/&gt;
+  To stop receiving WatchList messages for this $watchType, you can &lt;a href="$unsubscribeLink"&gt;remove "$watchedEntity" from your WatchList&lt;/a&gt;.
+&lt;/p&gt;
+
+*#
+&lt;/div&gt;</html>
+    </property>
+    <property>
+      <language>en</language>
+    </property>
+    <property>
+      <subject>Watchlist for document "$xwiki.getDocument($events[0].documentReference).displayTitle" ($events[0].documentReference)</subject>
+    </property>
+    <property>
+      <text>## Note: ASCII formatting applies here since no whitespace cleaning is performed.
+##       Indentation is not allowed, but faked through velocity comments.
+##
+#set ($event = $events[0])
+#set ($eventDocument = $xwiki.getDocument($event.documentReference))
+#set ($document = $xwiki.getDocument($eventDocument, $event.version))
+#set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
+##
+## Document type, if applicable
+#set ($documentType = 'document')
+#if ($event.type == 'delete')
+#**##set ($xobjects = $originalDocument.xWikiObjects)
+#else
+#**##set ($xobjects = $document.xWikiObjects)
+#end
+#foreach ($classFullName in $xobjects.keySet())
+#**##set ($classDocument = $xwiki.getDocument($classFullName))
+#**##set ($sheets = $services.sheet.getClassSheets($classDocument))
+#**##if ($sheets &amp;&amp; $sheets.size() &gt; 0)
+#****### Determine the class pretty name
+#****### Note: Code taken from "Main.SolrClassFacet"
+#****##set ($classPrettyName = $stringtool.removeEnd($classDocument.name, 'Class'))
+#****##set ($translationKey = "solr.field.class.$classPrettyName")
+#****##if ($services.localization.get($translationKey))
+#******##set ($classPrettyName = $services.localization.render('$translationKey'))
+#****##else
+#******### Some of the default classes have names starting with 'XWiki'.
+#******##set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
+#******##set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
+#******### Make sure we don't have isolated upper case letters.
+#******##set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
+#****##end
+#****##set ($documentType = $classPrettyName.toLowerCase())
+#****##break
+#**##end
+#end
+##
+##
+#set ($userWiki = $event.authorReference.wikiReference.name)
+#set ($output = "$xwiki.getUserName($event.author, false) (#if ($userWiki != $xcontext.getMainWikiName())${userWiki}:#end${event.authorReference.name})")
+#if ($event.type == 'create')
+#**##set ($output = "$output created the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#elseif ($event.type == 'delete')
+#**##set ($output = "$output deleted the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#elseif ($event.type == 'update')
+#**##set ($output = "$output updated the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#end
+
+$output
+
+----------
+#set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
+Full change details are available in the Changes View of the affected document: $changeURL
+## TODO: Some more details, or is this level of information enough for the plain text message?</text>
+    </property>
+  </object>
+</xwikidoc>

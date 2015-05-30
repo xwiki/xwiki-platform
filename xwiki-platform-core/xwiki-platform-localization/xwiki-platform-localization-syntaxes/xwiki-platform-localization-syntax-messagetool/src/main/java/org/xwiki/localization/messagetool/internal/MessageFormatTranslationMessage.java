@@ -57,7 +57,7 @@ public class MessageFormatTranslationMessage implements TranslationMessage
     private Parser plainParser;
 
     /**
-     * Keep a cache of parsed version of the message without parameters;
+     * Keep a cache of parsed version of the message without parameters.
      */
     private Block noParamCache;
 

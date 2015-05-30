@@ -29,6 +29,7 @@ import java.util.Properties;
 import javax.inject.Provider;
 import javax.mail.BodyPart;
 import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -188,10 +189,16 @@ public class JavaIntegrationTest
         // We also test using some default BCC addresses from configuration in this test
         this.configuration.setBCCAddresses(Arrays.asList("bcc1@doe.com", "bcc2@doe.com"));
 
+        // Ensure we do not reuse the same message identifier for multiple similar messages in this test
+        MimeMessage message2 = new MimeMessage(message);
+        message2.saveChanges();
+        MimeMessage message3 = new MimeMessage(message);
+        message3.saveChanges();
+
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
-        this.sender.sendAsynchronously(Arrays.asList(message, message, message), session, memoryMailListener);
+        this.sender.sendAsynchronously(Arrays.asList(message, message2, message3), session, memoryMailListener);
 
         // Note: we don't test status reporting from the listener since this is already tested in the
         // ScriptingIntegrationTest test class.
@@ -285,5 +292,32 @@ public class JavaIntegrationTest
         assertEquals("text/calendar;method=CANCEL", calendarBodyPart.getHeader("Content-Type")[0]);
         InputStream is = (InputStream) calendarBodyPart.getContent();
         assertEquals(calendarContent, IOUtils.toString(is));
+    }
+
+    @Test
+    public void sendMailWithCustomMessageId() throws Exception
+    {
+        Session session = Session.getInstance(this.configuration.getAllProperties());
+        MimeMessage message = new MimeMessage(session) {
+            @Override
+            protected void updateMessageID() throws MessagingException
+            {
+                if (getMessageID() == null) {
+                    super.updateMessageID();
+                }
+            }
+        };
+        message.setRecipient(RecipientType.TO, new InternetAddress("john@doe.com"));
+        message.setText("Test message Id support");
+        message.setHeader("Message-ID", "<custom@domain>");
+
+        MailListener memoryMailListener = this.componentManager.getInstance(MailListener.class, "memory");
+        this.sender.sendAsynchronously(Arrays.asList(message), session, memoryMailListener);
+
+        // Verify that the mails have been received (wait maximum 10 seconds).
+        this.mail.waitForIncomingEmail(10000L, 1);
+        MimeMessage[] messages = this.mail.getReceivedMessages();
+
+        assertEquals("<custom@domain>", messages[0].getMessageID());
     }
 }

@@ -31,5 +31,5 @@ public interface DocumentFilter
      * @param doc document you want to filter
      * @param context xwiki context
      */
-    public void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException;
+    void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException;
 }

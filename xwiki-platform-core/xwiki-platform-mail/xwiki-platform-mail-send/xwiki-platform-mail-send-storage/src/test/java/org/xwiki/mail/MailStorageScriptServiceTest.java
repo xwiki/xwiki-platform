@@ -112,8 +112,6 @@ public class MailStorageScriptServiceTest
         Session session = Session.getInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
         String batchId = UUID.randomUUID().toString();
-        message.setHeader("X-BatchID", batchId);
-        message.setHeader("X-MailID", "messageId");
 
         MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
         when(contentStore.load(any(Session.class), eq(batchId), eq("messageId"))).thenReturn(message);

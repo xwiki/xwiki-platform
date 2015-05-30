@@ -19,26 +19,15 @@
  */
 package org.xwiki.component.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
 
-import org.xwiki.component.event.ComponentDescriptorAddedEvent;
-import org.xwiki.component.event.ComponentDescriptorRemovedEvent;
 import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.Event;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current entity in the
@@ -48,12 +37,8 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 5.0M2
  */
-public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable,
-    Disposable
+public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable
 {
-    private static final List<Event> EVENTS = Arrays.<Event>asList(new ComponentDescriptorAddedEvent(),
-        new ComponentDescriptorRemovedEvent());
-
     private static class EntityComponentManagerInstance
     {
         protected final EntityReference entityReference;
@@ -68,41 +53,17 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     }
 
     @Inject
-    protected ObservationManager observation;
-
-    @Inject
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
     private Execution execution;
 
+    /**
+     * The key used to access the cache {@link ComponentManager} in the {@link ExecutionContext}.
+     */
     private final String contextKey = getClass().getName();
 
     protected abstract EntityReference getCurrentReference();
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.observation.addListener(new AbstractEventListener(this.contextKey, EVENTS)
-        {
-            @Override
-            public void onEvent(Event event, Object source, Object data)
-            {
-                // Reset context component manager cache
-                // TODO: improve a bit granularity of the reset
-                ExecutionContext econtext = execution.getContext();
-                if (econtext != null) {
-                    econtext.removeProperty(contextKey);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void dispose() throws ComponentLifecycleException
-    {
-        this.observation.removeListener(this.contextKey);
-    }
 
     @Override
     protected ComponentManager getComponentManagerInternal()
@@ -129,6 +90,8 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
 
         // Fallback on regular user component manager search
         ComponentManager componentManager = super.getComponentManagerInternal();
+
+        // Cache the component manager
         econtext.setProperty(this.contextKey, new EntityComponentManagerInstance(entityReference, componentManager));
 
         return componentManager;
@@ -141,5 +104,21 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
 
         return reference != null ? reference.getType().getLowerCase() + ':' + this.serializer.serialize(reference)
             : null;
+    }
+
+    protected void onComponentAdded()
+    {
+        ExecutionContext econtext = this.execution.getContext();
+
+        // Remove any null cached ComponentManager in the context
+        // Note: namespace based component managers aren't deleted yet so the opposite is not needed but it could
+        // change)
+        if (econtext != null) {
+            EntityComponentManagerInstance contextComponentManager =
+                (EntityComponentManagerInstance) econtext.getProperty(this.contextKey);
+            if (contextComponentManager != null && contextComponentManager.componentManager == null) {
+                econtext.removeProperty(this.contextKey);
+            }
+        }
     }
 }

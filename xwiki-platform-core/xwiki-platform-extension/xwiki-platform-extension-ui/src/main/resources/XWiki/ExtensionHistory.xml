@@ -31,8 +31,8 @@
   <parent>XWiki.AdminSheet</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1432912162000</date>
-  <contentUpdateDate>1432912071000</contentUpdateDate>
+  <date>1433072083000</date>
+  <contentUpdateDate>1433071978000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('extension.history')</title>
   <comment/>
@@ -49,13 +49,13 @@
     #if ($services.csrf.isTokenValid($request.form_token))
       #replayExtensionHistory
     #else
-      $response.sendError(401, 'The CSRF token is not valid!')
+      $response.sendError(401, $services.localization.render('extension.history.invalidCSRFToken'))
     #end
   #elseif ($request.action == 'continue')
     #if ($services.csrf.isTokenValid($request.form_token))
       #continueExtensionHistoryReplay($request.jobId)
     #else
-      $response.sendError(401, 'The CSRF token is not valid!')
+      $response.sendError(401, $services.localization.render('extension.history.invalidCSRFToken'))
     #end
   #elseif ($request.data == 'sources')
     #displayExtensionHistorySourcesList
@@ -135,10 +135,12 @@
         'data': 'replayStatus',
         'jobId': $stringtool.substringAfterLast($jobId, '/')
       })))
-      #set ($message = "There is a &lt;a href='$jobStatusURL'&gt;replay job&lt;/a&gt; in progress.")
+      #set ($message = $services.localization.render('extension.history.currentJobInfo.replay',
+        ["&lt;a href='$jobStatusURL'&gt;", '&lt;/a&gt;']))
     #else
       #set ($jobType = $currentJobStatus.request.getProperty('job.type'))
-      #set ($message = "There is a job of type &lt;strong&gt;$jobType&lt;/strong&gt; with id &lt;strong&gt;$jobId&lt;/strong&gt; in progress.")
+      #set ($message = $services.localization.render('extension.history.currentJobInfo',
+        ["&lt;strong&gt;$jobType&lt;/strong&gt;", "&lt;strong&gt;$jobId&lt;/strong&gt;"]))
     #end
     &lt;div class="box infomessage"&gt;$services.icon.renderHTML('info') $message&lt;/div&gt;
   #end
@@ -147,20 +149,22 @@
 #macro (displayExtensionHistorySourcesForm)
   #set ($sourceLabel = $request.source)
   #if (!$sourceLabel)
-    #set ($sourceLabel = 'local history')
+    #set ($sourceLabel = $services.localization.render('extension.history.sources.localHistory'))
   #end
   &lt;div class="extension-history-sources-selector opened"&gt;
     &lt;div class="extension-history-sources-header"&gt;
       &lt;span class="icon-closed"&gt;$services.icon.renderHTML('caret-right')&lt;/span&gt;
       &lt;span class="icon-opened"&gt;$services.icon.renderHTML('caret-down')&lt;/span&gt;
-      Showing records from &lt;em&gt;$escapetool.xml($sourceLabel)&lt;/em&gt;
+      $services.localization.render('extension.history.records.source', ["&lt;em&gt;$escapetool.xml($sourceLabel)&lt;/em&gt;"])
     &lt;/div&gt;
     &lt;div class="extension-history-sources-body"&gt;
       #displayExtensionHistorySources
       &lt;div class="extension-history-source"&gt;
         &lt;div&gt;
           $services.icon.renderHTML('add')
-          &lt;span class="extension-history-source-name"&gt;Import history file&lt;/span&gt;
+          &lt;span class="extension-history-source-name"&gt;
+            $services.localization.render('extension.history.sources.importHistoryFile')
+          &lt;/span&gt;
         &lt;/div&gt;
         #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/upload.js', {
           'forceSkinAction': true,
@@ -193,7 +197,7 @@
     $services.icon.renderHTML('database')
     #getExtensionHistoryURL($sourceURL 'view' {})
     &lt;a href="$sourceURL" class="extension-history-source-name"&gt;
-      Local history
+      $services.localization.render('extension.history.sources.localHistory')
     &lt;/a&gt;
   &lt;/li&gt;
   #displayExtensionHistoryFileSources
@@ -224,15 +228,20 @@
           'form_token': $services.csrf.token,
           'xredirect': $xredirect
         })))
-        #set ($deleteHint = $services.localization.render('core.viewers.attachments.delete.title'))
-        &lt;a class="deleteLink" href="$deleteURL" title="$escapetool.xml($deleteHint)"&gt;
+        #set ($deleteHint = $services.localization.render('extension.history.source.deleteHint'))
+        #set ($deleteConfirmation = $services.localization.render('extension.history.source.deleteConfirmation'))
+        &lt;a class="deleteLink" href="$deleteURL" title="$escapetool.xml($deleteHint)"
+            data-confirmation="$escapetool.xml($deleteConfirmation)"&gt;
           $services.icon.renderHTML('cross')
         &lt;/a&gt;
       #end
     &lt;/div&gt;
     &lt;div class="extension-history-source-author"&gt;
-      Added by $xwiki.getUserName($attachment.author) on $xwiki.formatDate($attachment.date)
-      (#dynamicsize($attachment.filesize))
+      $services.localization.render('extension.history.source.authorDateAndSize', [
+        $xwiki.getUserName($attachment.author),
+        $xwiki.formatDate($attachment.date),
+        "#dynamicsize($attachment.filesize)"
+      ])
     &lt;/div&gt;
   &lt;/li&gt;
 #end
@@ -268,12 +277,12 @@
     &lt;div class="extension-history-actions"&gt;
       &lt;button class="btn btn-default" name="action" value="export" type="submit"&gt;
         &lt;span class="glyphicon glyphicon-download-alt"&gt;&lt;/span&gt;
-        Export
+        $services.localization.render('extension.history.records.export')
       &lt;/button&gt;
       #if ($hasGlobalAdmin)
         &lt;button class="btn btn-default" name="data" value="replayPlan" type="submit"&gt;
           $services.icon.renderHTML('repeat')
-          Replay
+          $services.localization.render('extension.history.records.replay')
         &lt;/button&gt;
       #end
     &lt;/div&gt;
@@ -314,7 +323,7 @@
         'offsetRecordId': $records.get($mathtool.sub($records.size(), 1)).id
       })
       &lt;li class="extension-history-record"&gt;
-        &lt;a href="$moreURL" class="more"&gt;more...&lt;/a&gt;
+        &lt;a href="$moreURL" class="more"&gt;$services.localization.render('extension.history.records.more')&lt;/a&gt;
       &lt;/li&gt;
     #end
   &lt;/ul&gt;
@@ -392,24 +401,28 @@
 #macro (displayExtensionHistoryReplayOptions)
   #getExtensionHistoryURL($replayOptionsSubmitURL 'get' {})
   &lt;form method="post" action="$replayOptionsSubmitURL" class="hidden extension-history-replay-options xform"&gt;
-    &lt;h2&gt;Replay Options&lt;/h2&gt;
+    &lt;h2&gt;$services.localization.render('extension.history.replayOptions.title')&lt;/h2&gt;
     &lt;dl&gt;
       &lt;dt&gt;
-        &lt;label&gt;&lt;input type="checkbox" name="preserveUsers" value="true"/&gt; Preserve the users&lt;/label&gt;
-        &lt;span class="xHint"&gt;Replay the selected history records using their original users,
-          rather than the current user.&lt;/span&gt;
+        &lt;label&gt;
+          &lt;input type="checkbox" name="preserveUsers" value="true"/&gt;
+          $services.localization.render('extension.history.replayOptions.preserveUsers.label')
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('extension.history.replayOptions.preserveUsers.hint')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dt&gt;
-        &lt;label for="namespaces"&gt;Namespaces&lt;/label&gt;
-        &lt;span class="xHint"&gt;A space-separated list of namespaces where to replay the selected history records. Leave empty if you want to preserve the original namespaces.&lt;/span&gt;
+        &lt;label for="namespaces"&gt;
+          $services.localization.render('extension.history.replayOptions.namespaces.label')
+        &lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('extension.history.replayOptions.namespaces.hint')&lt;/span&gt;
       &lt;/dt&gt;
       &lt;dd&gt;&lt;input type="text" id="namespaces" name="namespaces" value="$xcontext.database" /&gt;&lt;/dd&gt;
     &lt;/dl&gt;
     &lt;div&gt;
       &lt;button class="btn btn-primary" name="data" value="replayPlan" type="submit"&gt;
-        Continue
+        $services.localization.render('extension.history.replayOptions.continue')
       &lt;/button&gt;
-      &lt;a href="#" class="btn btn-default"&gt;Cancel&lt;/a&gt;
+      &lt;a href="#" class="btn btn-default"&gt;$services.localization.render('extension.history.replayOptions.cancel')&lt;/a&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 #end
@@ -430,12 +443,12 @@
   #set ($records = $services.extension.history.createReplayPlan($records, $preserveUsers, $namespaces))
   #getExtensionHistoryURL($replayPlanSubmitURL 'get' {})
   &lt;form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan"&gt;
-    &lt;h2&gt;Replay Plan&lt;/h2&gt;
+    &lt;h2&gt;$services.localization.render('extension.history.replayPlan.title')&lt;/h2&gt;
     #if ($records &amp;&amp; $records.size() &gt; 0)
       &lt;div class="hidden"&gt;
         &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
       &lt;/div&gt;
-      &lt;div class="xHint"&gt;The following actions will be taken in order:&lt;/div&gt;
+      &lt;div class="xHint"&gt;$services.localization.render('extension.history.replayPlan.hint')&lt;/div&gt;
       &lt;ul class="extension-history-records"&gt;
         #foreach ($record in $records)
           &lt;li class="extension-history-record $!escapetool.xml($record.jobType)"&gt;
@@ -448,17 +461,17 @@
     #else
       &lt;div class="box infomessage"&gt;
         $services.icon.renderHTML('info')
-        There are no history records selected for replay.
+        $services.localization.render('extension.history.replayPlan.empty')
       &lt;/div&gt;
     #end
     &lt;div class="extension-history-actions"&gt;
       #if ($hasGlobalAdmin &amp;&amp; $records &amp;&amp; $records.size() &gt; 0)
         &lt;button class="btn btn-primary" name="action" value="replay" type="submit"&gt;
-          Start
+          $services.localization.render('extension.history.replayPlan.start')
         &lt;/button&gt;
       #end
       &lt;a href="#" class="btn btn-default"&gt;
-        Cancel
+        $services.localization.render('extension.history.replayPlan.cancel')
       &lt;/a&gt;
     &lt;/div&gt;
   &lt;/form&gt;
@@ -471,10 +484,10 @@
     #set ($discard = $xwiki.jsx.use('XWiki.ExtensionHistory'))
     #displayExtensionHistoryReplayStatus($replayJobStatus)
   #else
-    &lt;h2&gt;Replay Status&lt;/h2&gt;
+    &lt;h2&gt;$services.localization.render('extension.history.replayStatus.title')&lt;/h2&gt;
     &lt;div class="box infomessage"&gt;
       $services.icon.renderHTML('info')
-      There is no replay job with id [$replayJobId].
+      $services.localization.render('extension.history.replayStatus.notFound', [$replayJobId])
     &lt;/div&gt;
   #end
 #end
@@ -487,8 +500,11 @@
   #set ($success = $finished &amp;&amp; $replayJobStatus.log.getLogs('ERROR').isEmpty())
   #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
   &lt;div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"&gt;
-    &lt;h2&gt;Replay Status&lt;/h2&gt;
-    &lt;div class="xHint"&gt;The following actions have been scheduled by $xwiki.getUserName($userReference) on $xwiki.formatDate($replayJobStatus.startDate)&lt;/div&gt;
+    &lt;h2&gt;$services.localization.render('extension.history.replayStatus.title')&lt;/h2&gt;
+    &lt;div class="xHint"&gt;
+      $services.localization.render('extension.history.replayStatus.hint',
+        [$xwiki.getUserName($userReference), $xwiki.formatDate($replayJobStatus.startDate)])
+    &lt;/div&gt;
     &lt;ul class="extension-history-records"&gt;
       #foreach ($record in $replayJobStatus.request.records)
         #set ($classNames = ['extension-history-record', $escapetool.xml($record.jobType)])
@@ -521,7 +537,7 @@
       &lt;div class="xHint"&gt;
         &lt;span class="icon-closed"&gt;$services.icon.renderHTML('caret-right')&lt;/span&gt;
         &lt;span class="icon-opened"&gt;$services.icon.renderHTML('caret-down')&lt;/span&gt;
-        Replay log
+        $services.localization.render('extension.history.replayStatus.replayLog')
       &lt;/div&gt;
       #printStatusLog($replayJobStatus)
     &lt;/div&gt;
@@ -536,7 +552,7 @@
         #if ($hasGlobalAdmin)
           &lt;div class="extension-history-actions"&gt;
             &lt;button class="btn btn-primary" name="action" value="continue" type="submit"&gt;
-              Continue
+              $services.localization.render('extension.history.replayStatus.continue')
             &lt;/button&gt;
           &lt;/div&gt;
         #end
@@ -654,10 +670,10 @@
 
   var onDeleteHistorySource = function(event) {
     event.preventDefault();
-    if (!window.confirm('Are you sure you want to delete this source?')) {
+    var deleteLink = $(this);
+    if (!window.confirm(deleteLink.attr('data-confirmation'))) {
       return;
     }
-    var deleteLink = $(this);
     deleteLink.addClass('loading').children().hide();
     // Reduce the cost of the request by disabling the redirect.
     var deleteURL = deleteLink.attr('href').replace(/xredirect=/, 'xfoo=');

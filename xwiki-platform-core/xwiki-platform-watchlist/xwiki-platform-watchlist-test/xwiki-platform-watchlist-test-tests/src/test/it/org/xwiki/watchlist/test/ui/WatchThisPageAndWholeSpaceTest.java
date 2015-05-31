@@ -165,18 +165,22 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
         // TODO: we might need the commented code above to make sure the mail is destined for our current test user and
         // not other users created by previous tests.
 
-        /*
-         * Realtime notifications.
-         */
+        testRealtimeNotifier();
+    }
 
+    /**
+     * Realtime notifications.
+     */
+    private void testRealtimeNotifier() throws Exception
+    {
         // Log back in with the user to test realtime notifications.
         getUtil().login(testUserName, PASSWORD);
 
         // Set the notifier to 'Realtime'.
         WatchlistUserProfilePage profilePage = WatchlistUserProfilePage.gotoPage(testUserName);
-        watchlistPage = profilePage.switchToWatchlist();
+        WatchlistUserProfilePage watchlistPage = profilePage.switchToWatchlist();
 
-        watchlistPreferences = watchlistPage.editPreferences();
+        WatchlistPreferencesEditPage watchlistPreferences = watchlistPage.editPreferences();
         watchlistPreferences.setNotifierRealtime();
         watchlistPreferences.clickSaveAndContinue();
 
@@ -201,13 +205,14 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
         Assert.assertTrue("Realtime notification mail not received", this.greenMail.waitForIncomingEmail(70000, 2));
 
         // Verify email content.
-        receivedMails = this.greenMail.getReceivedMessages();
+        MimeMessage[] receivedMails = this.greenMail.getReceivedMessages();
+        // Second mail we`ve received, including the previous one from the daily notifier.
         assertEquals(2, receivedMails.length);
-        messageFromXWiki = GreenMailUtil.getBody(receivedMails[1]).replaceAll("=\r?\n", "");
+        String messageFromXWiki = GreenMailUtil.getBody(receivedMails[1]).replaceAll("=\r?\n", "");
         Assert.assertFalse("should have no exception in " + messageFromXWiki, messageFromXWiki.contains("Exception"));
         Assert.assertTrue("should have test page in the message " + messageFromXWiki,
             messageFromXWiki.contains("TestWatchThisPage"));
-        Assert.assertTrue("should have test content in the message " + messageFromXWiki,
-            messageFromXWiki.contains(newContent));
+        Assert.assertTrue("should have second user in the message " + messageFromXWiki,
+            messageFromXWiki.contains(testUserName2));
     }
 }

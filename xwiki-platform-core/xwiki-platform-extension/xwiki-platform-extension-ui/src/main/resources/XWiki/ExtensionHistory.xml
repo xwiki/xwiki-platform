@@ -901,8 +901,14 @@
     if (jobState == 'WAITING') {
       container.find('form.extension-question button[value="continue"]').click(function(event) {
         event.preventDefault();
-        var data = $(event.target).closest('form').serialize();
+        var data = $(this).closest('form').serialize();
         updateReplayStatus(container, data + '&amp;action=continue');
+      });
+      // Some questions have their own buttons (e.g. the "Show changes" button on the merge conflict question).
+      container.find('form.extension-question button[name="extensionAction"]').click(function(event) {
+        event.preventDefault();
+        var data = $(this).closest('form').serialize();
+        updateReplayStatus(container, data + '&amp;data=replayStatus');
       });
     } else if (typeof jobState == 'string' &amp;&amp; jobState != 'FINISHED') {
       setTimeout($.proxy(updateReplayStatus, this, container), 1000);

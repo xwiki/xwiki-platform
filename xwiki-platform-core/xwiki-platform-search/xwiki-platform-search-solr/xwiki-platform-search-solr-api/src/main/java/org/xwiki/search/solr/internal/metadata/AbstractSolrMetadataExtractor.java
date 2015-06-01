@@ -372,7 +372,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
         } else if (propertyClass instanceof TextAreaClass
             || (propertyClass != null && "String".equals(propertyClass.getClassType()))
-            || String.valueOf(propertyValue).length() > SHORT_TEXT_LIMIT) {
+            || (propertyValue instanceof CharSequence && String.valueOf(propertyValue).length() > SHORT_TEXT_LIMIT)) {
             // Index TextArea and String properties as text, based on the document locale. We didn't check if the
             // property class is an instance of StringClass because it has subclasses that don't store free text (like
             // the EmailClass). Plus we didn't want to include the PasswordClass (which extends StringClass).
@@ -381,7 +381,11 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // extend TextArea but still have large strings as value, and also the case when a TextArea property is
             // removed from an XClass but there are still objects that have a (large) value set for it (the property
             // class is null in this case). The 255 limit is defined in xwiki.hbm.xml for string properties.
-            setPropertyValue(solrDocument, property, new TypedValue(propertyValue, TypedValue.TEXT), locale);
+
+            // It's important here to make sure we give strings to Solr, as it can mutate the value we give it, 
+            // so we need to make sure we don't endanger the state of the document 
+            setPropertyValue(solrDocument, property, new TypedValue(String.valueOf(propertyValue), TypedValue.TEXT),
+                locale);
         } else if (propertyValue instanceof Collection) {
             // We iterate the collection instead of giving it to Solr because, although it supports passing collections,
             // it reuses the collection in some cases, when the value of a field is set for the first time for instance,

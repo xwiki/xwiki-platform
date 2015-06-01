@@ -388,7 +388,9 @@ public class MockitoOldcoreRule implements MethodRule
                     document.setOriginalDocument(originalDocument);
                 }
 
-                documents.put(document.getDocumentReferenceWithLocale(), document.clone());
+                XWikiDocument savedDocument = document.clone();
+
+                documents.put(document.getDocumentReferenceWithLocale(), savedDocument);
 
                 if (isNew) {
                     if (notifyDocumentCreatedEvent) {
@@ -402,7 +404,8 @@ public class MockitoOldcoreRule implements MethodRule
                     }
                 }
 
-                document.setOriginalDocument(document.clone());
+                // Set the document as it's original document
+                savedDocument.setOriginalDocument(savedDocument.clone());
 
                 return null;
             }

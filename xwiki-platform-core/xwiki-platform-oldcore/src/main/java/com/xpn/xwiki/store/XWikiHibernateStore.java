@@ -84,29 +84,18 @@ import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.internal.render.OldRendering;
-import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.BaseStringProperty;
-import com.xpn.xwiki.objects.DBStringListProperty;
-import com.xpn.xwiki.objects.DoubleProperty;
-import com.xpn.xwiki.objects.FloatProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.DBListClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.stats.impl.XWikiStats;
@@ -135,12 +124,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /** Needed so we can register an event to trap logout and delete held locks. */
     @Inject
     private ObservationManager observationManager;
-
-    /**
-     * Used for migrating the property values after a class is modified.
-     */
-    @Inject
-    private PropertyConverter propertyConverter;
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
@@ -629,8 +612,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.setDocumentReference(doc.getDocumentReference());
                 // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
                 context.addBaseClass(bclass);
-                // Update instances of the class, in case some properties have changed their storage type.
-                migrateXClassInstances(doc, session);
             }
 
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
@@ -682,117 +663,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // End monitoring timer
             if (monitor != null) {
                 monitor.endTimer("hibernate");
-            }
-        }
-    }
-
-    /**
-     * Migrate instances (objects) of the specified class, in case some properties have changed their storage type.
-     * 
-     * @param classDocument the document that defines the class
-     * @param session the session used to retrieve and update the class instances
-     * @throws XWikiException in case the migration fails
-     */
-    private void migrateXClassInstances(XWikiDocument classDocument, Session session) throws XWikiException
-    {
-        BaseClass xclass = classDocument.getXClass();
-
-        // In case the current document has both a class and instances of that class, we have to take care
-        // not to insert duplicate entities in the session.
-        Map<Long, BaseObject> localClassObjects = new HashMap<Long, BaseObject>();
-        if (classDocument.hasElement(XWikiDocument.HAS_OBJECTS)
-            && classDocument.getXObjects(classDocument.getDocumentReference()) != null) {
-            for (BaseObject object : classDocument.getXObjects(classDocument.getDocumentReference())) {
-                if (object != null) {
-                    localClassObjects.put(object.getId(), object);
-                }
-            }
-        }
-
-        for (PropertyClass propertyClass : (Collection<PropertyClass>) xclass.getFieldList()) {
-            if (propertyClass instanceof StaticListClass || propertyClass instanceof DBListClass) {
-                // Migrate the values of list properties.
-                ListClass listClass = (ListClass) propertyClass;
-                // @see ListClass#newProperty()
-                String[] classes = {DBStringListProperty.class.getName(), StringListProperty.class.getName(),
-                    StringProperty.class.getName()};
-                for (String oldClass : classes) {
-                    if (!oldClass.equals(listClass.newProperty().getClass().getName())) {
-                        Query query = session.createQuery("select p from " + oldClass
-                            + " as p, BaseObject as o where o.className = ? and p.id = o.id and p.name = ?");
-                        query.setString(0, xclass.getName()).setString(1, listClass.getName());
-                        migrateProperties(query, listClass, session, localClassObjects);
-                    }
-                }
-            } else if (propertyClass instanceof NumberClass) {
-                // Migrate the values of number properties.
-                NumberClass numberClass = (NumberClass) propertyClass;
-                // @see NumberClass#newProperty()
-                String[] numberPropertyTypes = {IntegerProperty.class.getName(), LongProperty.class.getName(),
-                    FloatProperty.class.getName(), DoubleProperty.class.getName()};
-                for (String numberPropertyType : numberPropertyTypes) {
-                    if (!numberPropertyType.equals(numberClass.newProperty().getClass().getName())) {
-                        Query query = session.createQuery("select p from " + numberPropertyType
-                            + " as p, BaseObject as o where o.className = ? and p.id = o.id and p.name = ?");
-                        query.setString(0, xclass.getName()).setString(1, numberClass.getName());
-                        migrateProperties(query, numberClass, session, localClassObjects);
-                    }
-                }
-            } else {
-                // General migration of properties.
-                Query query = session.createQuery("select p from BaseProperty as p, BaseObject as o"
-                    + " where o.className = ? and p.id = o.id and p.name = ? and p.classType <> ?");
-                query.setString(0, xclass.getName());
-                query.setString(1, propertyClass.getName());
-                query.setString(2, propertyClass.newProperty().getClassType());
-                migrateProperties(query, propertyClass, session, localClassObjects);
-            }
-        }
-    }
-
-    private void migrateProperties(Query query, PropertyClass propertyClass, Session session,
-        Map<Long, BaseObject> localObjects) throws XWikiException
-    {
-        @SuppressWarnings("unchecked")
-        List<BaseProperty<?>> storedProperties = query.list();
-        for (BaseProperty<?> storedProperty : storedProperties) {
-            migrateProperty(storedProperty, propertyClass, session, localObjects);
-        }
-    }
-
-    private void migrateProperty(BaseProperty<?> storedProperty, PropertyClass modifiedPropertyClass, Session session,
-        Map<Long, BaseObject> localObjects) throws XWikiException
-    {
-        BaseObject localObject = localObjects.get(storedProperty.getId());
-        if (localObject == null) {
-            // The stored property to be migrated is from a different document which is not saved in the current
-            // session (the current session saves the class document).
-            BaseProperty<?> newProperty = this.propertyConverter.convertProperty(storedProperty, modifiedPropertyClass);
-            session.delete(storedProperty);
-            // Don't save the new property if it's null (it means the property is not set).
-            if (newProperty != null) {
-                session.save(newProperty);
-            }
-        } else {
-            // The property to migrate is from an object attached to the class document that is being saved in the
-            // current session. We don't have to save the property in this case, we just need to update the object.
-            //
-            // Discard the stored property because the local object has a property with the same identifier.
-            session.evict(storedProperty);
-            // We need to migrate the value from the object (that is not saved yet).
-            BaseProperty<?> currentProperty = (BaseProperty<?>) localObject.get(modifiedPropertyClass.getName());
-            if (currentProperty != null) {
-                BaseProperty<?> newProperty =
-                    this.propertyConverter.convertProperty(currentProperty, modifiedPropertyClass);
-                if (newProperty != null) {
-                    localObject.put(modifiedPropertyClass.getName(), newProperty);
-                } else {
-                    // If the new property is null it means the property is not set.
-                    localObject.removeField(modifiedPropertyClass.getName());
-                }
-            } else {
-                // The property has probably been removed from the object (see localObject.getFieldsToRemove()).
-                // No migration is needed in this case.
             }
         }
     }

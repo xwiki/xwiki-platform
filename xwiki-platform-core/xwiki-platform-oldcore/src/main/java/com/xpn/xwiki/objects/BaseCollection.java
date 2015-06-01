@@ -883,9 +883,16 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             PropertyInterface newField = (PropertyInterface) entry.getValue();
 
             if (field == null) {
+                // If the field does not exist add it
+                addField(entry.getKey(), newField);
+                modified = true;
+            } else if (field.getClass() != newField.getClass()) {
+                // If the field is of different type, remove it first
+                removeField(entry.getKey());
                 addField(entry.getKey(), newField);
                 modified = true;
             } else {
+                // Otherwise try to merge the fields
                 modified |= field.apply(newField, clean);
             }
         }

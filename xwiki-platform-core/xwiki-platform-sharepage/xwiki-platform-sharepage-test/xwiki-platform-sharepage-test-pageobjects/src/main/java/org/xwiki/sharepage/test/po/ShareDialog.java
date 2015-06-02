@@ -19,6 +19,7 @@
  */
 package org.xwiki.sharepage.test.po;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
@@ -31,8 +32,14 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class ShareDialog extends BaseElement
 {
-    @FindBy(id = "shareTarget")
-    private WebElement emailField;
+    @FindBy(id = "shareTargetEmails")
+    private WebElement emailsField;
+
+    @FindBy(id = "shareTargetUsers")
+    private WebElement usersField;
+
+    @FindBy(id = "shareTargetGroups")
+    private WebElement groupsField;
 
     @FindBy(xpath = "//textarea[@name = 'message']")
     private WebElement emailMessage;
@@ -40,10 +47,24 @@ public class ShareDialog extends BaseElement
     @FindBy(xpath = "//input[@type = 'submit' and @class = 'button']")
     private WebElement sendButton;
 
-    public void setEmailField(String email)
+    public void addEmail(String email)
     {
-        this.emailField.clear();
-        this.emailField.sendKeys(email);
+        this.emailsField.clear();
+        this.emailsField.sendKeys(email);
+    }
+
+    public void addUser(String user)
+    {
+        this.usersField.clear();
+        this.usersField.sendKeys(user);
+        this.usersField.sendKeys(Keys.RETURN);
+    }
+
+    public void addGroup(String group)
+    {
+        this.groupsField.clear();
+        this.groupsField.sendKeys(group);
+        this.groupsField.sendKeys(Keys.RETURN);
     }
 
     public void setMessage(String message)

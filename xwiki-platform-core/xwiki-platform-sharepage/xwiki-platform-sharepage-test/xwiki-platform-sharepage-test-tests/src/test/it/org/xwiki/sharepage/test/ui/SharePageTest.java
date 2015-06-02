@@ -19,6 +19,9 @@
  */
 package org.xwiki.sharepage.test.ui;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.mail.internet.MimeMessage;
 
 import org.junit.After;
@@ -31,12 +34,13 @@ import org.xwiki.sharepage.test.po.ShareableViewPage;
 import org.xwiki.test.ui.AbstractTest;
 
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.ViewPage;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * UI tests for the Share by Email application.
@@ -57,7 +61,7 @@ public class SharePageTest extends AbstractTest
         this.mail = new GreenMail(ServerSetupTest.SMTP);
         this.mail.start();
         getUtil().updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
-            "3025", "sendWaitTime", "0");
+            "3025", "sendWaitTime", "0", "discardSuccessStatuses", "0");
     }
 
     @After
@@ -71,24 +75,39 @@ public class SharePageTest extends AbstractTest
     @Test
     public void testShareByEmail() throws Exception
     {
-        // Delete any existing test page
+        // Delete existing test pages
         getUtil().deletePage(getTestClassName(), getTestMethodName());
 
-        ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), "something", "title");
+        // Create a user to share with
+        String userName = getTestClassName() + "_" + getTestMethodName();
+        // Note: We need to set the first and last name as otherwise the suggest picker won't list the user
+        // (it does an order by first name and last name).
+        getUtil().createUser(userName, "pass", getUtil().getURLToNonExistentPage(),
+            "first_name", "John", "last_name", "Doe", "email", "mail1@doe.com");
+
+        // Create the page to share
+        getUtil().createPage(getTestClassName(), getTestMethodName(), "something", "title");
         ShareableViewPage svp = new ShareableViewPage();
+
+        // Share the page
         svp.clickShareByEmail();
         ShareDialog sd = new ShareDialog();
-
-        sd.setEmailField("john@doe.com");
+        sd.addUser("XWiki." + userName);
+        sd.addEmail("mail2@doe.com");
         sd.setMessage("test");
         ShareResultDialog srd = sd.sendMail();
-        assertEquals("The message has been sent to john.", srd.getResultMessage());
+
+        assertEquals("The page is being sent asynchronously to all specified recipients.", srd.getResultMessage());
         srd.clickBackLink();
 
         // Verify we received the email and that its content is valid
-        this.mail.waitForIncomingEmail(10000L, 1);
+        this.mail.waitForIncomingEmail(10000L, 2);
 
-        MimeMessage mimeMessage = this.mail.getReceivedMessages()[0];
-        assertEquals("superadmin wants to share a document with you", mimeMessage.getSubject());
+        MimeMessage[] messages = this.mail.getReceivedMessages();
+        List<String> tos = Arrays.asList(messages[0].getHeader("to", ","), messages[1].getHeader("to", ","));
+        assertThat(tos, hasItems("mail1@doe.com", "mail2@doe.com"));
+
+        assertEquals("superadmin wants to share a document with you", messages[0].getSubject());
+        assertEquals("superadmin wants to share a document with you", messages[1].getSubject());
     }
 }

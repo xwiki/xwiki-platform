@@ -37,10 +37,21 @@
     <xwiki.extension.name>Share Page Application</xwiki.extension.name>
   </properties>
   <dependencies>
+    <!-- We don't need the Admin Mail UI to work but we do need the Mail Sender API, including the ability to save
+         the mail results to the database -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-mailsender</artifactId>
+      <artifactId>xwiki-platform-mail-send-storage</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- TODO: Not needed, remove -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-sheet-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

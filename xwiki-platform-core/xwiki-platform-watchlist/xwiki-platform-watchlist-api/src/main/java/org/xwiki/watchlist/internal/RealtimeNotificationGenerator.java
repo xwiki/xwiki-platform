@@ -48,7 +48,6 @@ import org.xwiki.watchlist.internal.api.WatchListStore;
 import org.xwiki.watchlist.internal.notification.WatchListEventMimeMessageFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -115,9 +114,6 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
     @Named("xwikiproperties")
     private ConfigurationSource xwikiProperties;
 
-    @Inject
-    private UserAvatarAttachmentExtractor avatarExtractor;
-
     /**
      * Default constructor.
      */
@@ -174,13 +170,7 @@ public class RealtimeNotificationGenerator extends AbstractEventListener
             Map<String, Object> notificationData = new HashMap<>();
             notificationData.put(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER, REALTIME_EMAIL_TEMPLATE);
             notificationData.put(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER, true);
-
-            // Note: This might be a bit expensive on the performance side. A cache would be most welcomed at this
-            // point.
-            Attachment avatarAttachment = avatarExtractor.getUserAvatar(watchListEvent.getAuthorReference());
-            if (avatarAttachment != null) {
-                notificationData.put(DefaultWatchListNotifier.TEMPLATE_ATTACHMENTS, Arrays.asList(avatarAttachment));
-            }
+            notificationData.put(WatchListEventMimeMessageFactory.ATTACH_AUTHOR_AVATARS_PARAMETER, true);
 
             // Send the notification for processing.
             notifier.sendNotification(subscribers, Arrays.asList(watchListEvent), notificationData);

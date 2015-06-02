@@ -20,9 +20,11 @@
 package org.xwiki.watchlist.internal.notification;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -30,7 +32,10 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
+
+import com.xpn.xwiki.api.Attachment;
 
 /**
  * Generate {@link MimeMessage}s from {@link WatchListMessageData}s extracted by an iterator over a list of subscribers.
@@ -50,24 +55,47 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
      */
     public static final String XWIKI_USER_CLASS_LAST_NAME_PROP = "last_name";
 
+    /**
+     * Template factory "attachments" parameter.
+     */
+    public static final String TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER = "attachments";
+
     private MimeMessageFactory<MimeMessage> factory;
 
     private Iterator<WatchListMessageData> subscriberIterator;
 
     private Map<String, Object> parameters;
 
+    private Map<String, Object> factoryParameters;
+
+    private UserAvatarAttachmentExtractor avatarExtractor;
+
+    private List<Attachment> originalTemplateExtraParameters;
+
     /**
      * @param subscriberIterator the iterator used to go through each subscriber and extract the
      *            {@link WatchListMessageData}
      * @param factory the factory to use to create a single MimeMessage
      * @param parameters the parameters from which to extract the factory source and factory parameters
+     * @param avatarExtractor the {@link UserAvatarAttachmentExtractor} used once per message to extract an author's
+     *            avatar attachment
      */
     public WatchListEventMimeMessageIterator(Iterator<WatchListMessageData> subscriberIterator,
-        MimeMessageFactory<MimeMessage> factory, Map<String, Object> parameters)
+        MimeMessageFactory<MimeMessage> factory, Map<String, Object> parameters,
+        UserAvatarAttachmentExtractor avatarExtractor)
     {
         this.subscriberIterator = subscriberIterator;
         this.factory = factory;
         this.parameters = parameters;
+        this.avatarExtractor = avatarExtractor;
+
+        this.factoryParameters =
+            (Map<String, Object>) this.parameters.get(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER);
+
+        // Save the list of attachments initially provided by the caller, since we will be constantly updating the
+        // template factory's parameters for each message and we want to remember these to apply them on each message.
+        this.originalTemplateExtraParameters =
+            (List<Attachment>) this.factoryParameters.get(TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER);
     }
 
     @Override
@@ -88,12 +116,7 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
         MimeMessage message;
         WatchListMessageData watchListMessageData = this.subscriberIterator.next();
 
-        // Note: We don't create a Session here ATM since it's not required. The returned MimeMessage will be
-        // given a valid Session when it's deserialized from the mail content store for sending.
         try {
-            Map<String, Object> factoryParameters =
-                (Map<String, Object>) this.parameters.get(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER);
-
             // Update the values for this new message.
             updateFactoryParameters(factoryParameters, watchListMessageData);
 
@@ -120,7 +143,7 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
     {
         Map<String, Object> velocityVariables = (Map<String, Object>) factoryParameters.get("velocityVariables");
 
-        // Set the list of events.
+        // Set the list of events, containing 1 event per document.
         List<WatchListEvent> events = watchListMessageData.getEvents();
         velocityVariables.put("events", events);
 
@@ -135,6 +158,40 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
 
         velocityVariables.put(XWIKI_USER_CLASS_FIRST_NAME_PROP, watchListMessageData.getFirstName());
         velocityVariables.put(XWIKI_USER_CLASS_LAST_NAME_PROP, watchListMessageData.getLastName());
+
+        // Attach the avatars of the authors of the events we are notifying about.
+        if (parameters.get(WatchListEventMimeMessageFactory.ATTACH_AUTHOR_AVATARS_PARAMETER) == Boolean.TRUE) {
+            List<Attachment> templateExtraAttachments = getTemplateExtraAttachments(factoryParameters, events);
+            factoryParameters.put(TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER, templateExtraAttachments);
+        }
+
+    }
+
+    private List<Attachment> getTemplateExtraAttachments(Map<String, Object> factoryParameters,
+        List<WatchListEvent> events)
+    {
+        // Append to any existing list of extra attachments specified by the caller.
+        List<Attachment> templateExtraAttachments = new ArrayList<>();
+        if (originalTemplateExtraParameters != null) {
+            templateExtraAttachments.addAll(originalTemplateExtraParameters);
+        }
+
+        Set<DocumentReference> processedAuthors = new HashSet<DocumentReference>();
+        for (WatchListEvent event : events) {
+            for (DocumentReference authorReference : event.getAuthorReferences()) {
+                // TODO: We do a minimal performance improvement here by not extracting a user's avatar twice for the
+                // same message, but it should probably be the UserAvatarExtractor's job to support some caching
+                // instead since that would also work across messages and would be much more useful.
+                if (!processedAuthors.contains(authorReference)) {
+                    Attachment avatarAttachment = avatarExtractor.getUserAvatar(authorReference);
+                    if (avatarAttachment != null) {
+                        templateExtraAttachments.add(avatarAttachment);
+                    }
+                    processedAuthors.add(authorReference);
+                }
+            }
+        }
+        return templateExtraAttachments;
     }
 
     @Override

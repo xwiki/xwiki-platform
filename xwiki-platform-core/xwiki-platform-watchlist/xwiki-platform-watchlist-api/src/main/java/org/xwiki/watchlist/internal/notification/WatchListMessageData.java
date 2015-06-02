@@ -48,12 +48,12 @@ public class WatchListMessageData
     private List<WatchListEvent> events;
 
     /**
-     * @param userReference the subscriber's profile document reference
-     * @param templateReference the email template's document reference
-     * @param firstName the subscriber's first name
-     * @param lastName the subscriber's last name
-     * @param address the subscriber's email address
-     * @param events the list of events to notify the subscriber of
+     * @param userReference seee {@link #getUserReference()}
+     * @param templateReference see {@link #getTemplateReference()}
+     * @param firstName see {@link #getFirstName()}
+     * @param lastName see {@link #getLastName()}
+     * @param address see {@link #getAddress()}
+     * @param events see {@link #getEvents()}
      */
     public WatchListMessageData(DocumentReference userReference, DocumentReference templateReference, String firstName,
         String lastName, Address address, List<WatchListEvent> events)

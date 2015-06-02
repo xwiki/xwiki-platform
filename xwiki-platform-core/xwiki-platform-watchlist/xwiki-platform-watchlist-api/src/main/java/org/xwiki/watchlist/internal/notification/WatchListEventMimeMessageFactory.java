@@ -33,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 
 import com.xpn.xwiki.internal.plugin.rightsmanager.UserIterator;
@@ -70,9 +71,15 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
 
     /**
      * SkipContxtUser parameter name. Boolean used to skip notifying the current context user if he should be found in
-     * the list of subscribers to be notified.
+     * the list of subscribers to be notified. Default is {@code false}.
      */
     public static final String SKIP_CONTEXT_USER_PARAMETER = "skipContextUser";
+
+    /**
+     * Attach author avatars parameter name. Boolean used to specify if the avatars of the authors of the events we are
+     * notifying about should be attached to the message. Default is {@code false}.
+     */
+    public static final String ATTACH_AUTHOR_AVATARS_PARAMETER = "attachAuthorAvatars";
 
     /**
      * Parameters parameter name. Map used as parameters for the
@@ -89,6 +96,9 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
 
     @Inject
     private WatchListEventMatcher eventMatcher;
+
+    @Inject
+    private UserAvatarAttachmentExtractor avatarExtractor;
 
     @Override
     public Iterator<MimeMessage> createMessage(Object sourceObject, Map<String, Object> parameters)
@@ -118,7 +128,7 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
 
         // The iterator that will be producing a MimeMessage for each WatchListMessageData produced by the userIterator.
         WatchListEventMimeMessageIterator messageIterator =
-            new WatchListEventMimeMessageIterator(userIterator, factory, parameters);
+            new WatchListEventMimeMessageIterator(userIterator, factory, parameters, avatarExtractor);
 
         return messageIterator;
     }

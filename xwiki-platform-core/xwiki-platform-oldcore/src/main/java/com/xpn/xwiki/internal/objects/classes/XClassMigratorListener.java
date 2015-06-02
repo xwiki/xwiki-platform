@@ -80,6 +80,9 @@ public class XClassMigratorListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    /**
+     * Setup the listener.
+     */
     public XClassMigratorListener()
     {
         super(XClassMigratorListener.class.getName(), new XClassPropertyUpdatedEvent());

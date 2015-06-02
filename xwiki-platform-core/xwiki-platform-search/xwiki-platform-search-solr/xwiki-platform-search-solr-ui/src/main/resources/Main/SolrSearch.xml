@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -31,8 +30,8 @@
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384924669000</date>
-  <contentUpdateDate>1384924669000</contentUpdateDate>
+  <date>1433258989000</date>
+  <contentUpdateDate>1432915830000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
   <comment/>
@@ -49,7 +48,7 @@
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
     <author>xwiki:XWiki.Admin</author>
-    <date>1368007370000</date>
+    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJAwACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==</content>
@@ -58,7 +57,7 @@
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
     <author>xwiki:XWiki.Admin</author>
-    <date>1368432948000</date>
+    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJ0lEQVQI1y3GMQEAIAwDsGy4RCCiMDOOciU1Nsy6MHSgA33qh7RJH1DfCDMFeFsmAAAAAElFTkSuQmCC</content>
@@ -67,7 +66,7 @@
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
     <author>xwiki:XWiki.Admin</author>
-    <date>1368007370000</date>
+    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
@@ -76,7 +75,7 @@
   <attachment>
     <filename>light-grey-disclosure-arrow-left.png</filename>
     <author>xwiki:XWiki.Admin</author>
-    <date>1389774699000</date>
+    <date>1412172041000</date>
     <version>1.1</version>
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJUlEQVQI1zXKsQ0AIADDMLf//8ZJMFRMzpAc4HbQQQeVH5abwwPlkgTcUkPn+AAAAABJRU5ErkJggg==</content>
@@ -106,7 +105,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -151,7 +150,7 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -335,6 +334,7 @@
     $('.search-facets').each(enhanceSearchFacets);
     $([
       '.search-results-sort a.sort-item',
+      '.search-options a.options-item',
       '.pagination a',
       '.controlPagination a',
       'a.search-facets-action-reset',
@@ -380,7 +380,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -406,7 +406,7 @@
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>CSS|LESS</values>
@@ -441,7 +441,7 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -510,6 +510,38 @@ a.sort-item.active, a.sort-item.active:hover {
 }
 .sort-item-order {
   margin-left: .3em;
+}
+
+/**
+ * Options
+ */
+
+ul.search-options {
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+  padding: 5px 0 2px 0;
+  margin: 0;
+}
+.search-options li {
+  display: inline;
+  list-style-type: none;
+  padding-left: 1.5em;
+}
+.search-options li:first-of-type {
+  padding: 0;
+}
+a.options-item {
+  color: inherit;
+  text-decoration: none;
+}
+a.options-item:hover {
+  color: $theme.linkColor;
+  text-decoration: underline;
+}
+a.options-item.active, a.options-item.active:hover{
+  font-weight: bold;
+  color: $theme.textColor;
+  text-decoration: none;
 }
 
 /**

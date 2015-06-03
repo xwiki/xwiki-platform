@@ -9,7 +9,7 @@
 ## Globals
 #set ($flavorId = $services.flavor.getFlavorOfWiki($services.wiki.currentWikiId))
 #set ($extensionNamespace = "wiki:${services.wiki.currentWikiId}")
-#set ($isFlavorValid = $flavor && $services.extension.installed.getInstalledExtension($flavorId.id, $extensionNamespace).isValid($extensionNamespace))
+#set ($isFlavorValid = $flavorId && $services.extension.installed.getInstalledExtension($flavorId.id, $extensionNamespace).isValid($extensionNamespace))
 
 #macro(controller)
   #if ($flavorId && !$isFlavorValid)
@@ -94,7 +94,7 @@
     #displayExtensionAndUpdateStepButtons($requestFlavorExtension)
   {{/html}}
   
-  #set ($showCompleteStepButton = $isFlavorInstalled)
+  #set ($showCompleteStepButton = $isFlavorValid)
 #end
 {{/velocity}}
 

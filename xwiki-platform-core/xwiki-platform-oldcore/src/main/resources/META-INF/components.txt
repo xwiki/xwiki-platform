@@ -45,6 +45,7 @@ com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
+com.xpn.xwiki.internal.objects.classes.XClassMigratorListener
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter

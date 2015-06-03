@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -75,10 +76,13 @@ public class DefaultUserAvatarAttachmentExtractor implements UserAvatarAttachmen
     @Inject
     private Provider<XWikiContext> xwikiContextProvider;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public Attachment getUserAvatar(DocumentReference userReference)
     {
-        return getUserAvatar(userReference, 50, 50, "userAvatar.png");
+        return getUserAvatar(userReference, 50, 50, String.format("%s.png", serializer.serialize(userReference)));
     }
 
     @Override

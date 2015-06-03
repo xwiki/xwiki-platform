@@ -31,8 +31,8 @@
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1427988176000</date>
-  <contentUpdateDate>1427984976000</contentUpdateDate>
+  <date>1433258899000</date>
+  <contentUpdateDate>1433258899000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Macros</title>
   <comment/>
@@ -320,21 +320,31 @@
     'asc': $services.icon.render('caret-up'),
     'desc': $services.icon.render('caret-down')
   })
-  (% class="search-results-sort" %)
-  * {{translation key="solr.sortBy"/}}
-  #foreach ($entry in $defaultSortOrder.entrySet())
-    #set ($class = 'sort-item')
-    #set ($sortOrderIndicator = $NULL)
-    #set ($targetSortOrder = $entry.value)
-    #if ($sort == $entry.key)
-      #set ($class = "$class active")
-      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+  (% class="search-results-sort" %)(((
+    (% class="search-results-sort" %)
+    * {{translation key="solr.sortBy"/}}
+    #foreach ($entry in $defaultSortOrder.entrySet())
+      #set ($class = 'sort-item')
+      #set ($sortOrderIndicator = $NULL)
+      #set ($targetSortOrder = $entry.value)
+      #if ($sort == $entry.key)
+        #set ($class = "$class active")
+        #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
+        #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
+        #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+      #end
+      #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
+      * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
     #end
-    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
-  #end
+  )))
+  (% class="search-options" %)(((
+    (% class="search-options" %)
+    * {{translation key="solr.options"/}}
+    #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
+    * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+    #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
+    * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+  )))
 #end
 
 #macro (extendQueryString $url $extraParameters)
@@ -601,6 +611,7 @@
   #setQueryFields($query)
   #setFacetFields($query)
   #setFilterQuery($query)
+  #setHighlightQuery($query)
   #if ($debug)
     #set ($discard = $query.bindValue('debugQuery', 'on'))
   #end
@@ -627,21 +638,24 @@
 #end
 
 #macro (setFacetFields $query)
-  ## The facets are displayed in this order so keep the most important facets first.
-  #set ($facetFields = $solrConfig.facetFields)
-  ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
-  ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
-  #set ($facetFieldsWithFilterExcludes = [])
-  #foreach ($facet in $facetFields)
-    #set ($excludeTaggedFilter = '')
-    ## The type facet doesn't support multiple selection because we use different query fields for different result
-    ## types so the number of matches for the type facet changes when a result type is selected/unselected.
-    #if ($facet != 'type')
-      #set ($excludeTaggedFilter = "{!ex=$facet}")
+  #set ($discard = $query.bindValue('facet', $facetEnabled))
+  #if ($facetEnabled)
+    ## The facets are displayed in this order so keep the most important facets first.
+    #set ($facetFields = $solrConfig.facetFields)
+    ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
+    ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
+    #set ($facetFieldsWithFilterExcludes = [])
+    #foreach ($facet in $facetFields)
+      #set ($excludeTaggedFilter = '')
+      ## The type facet doesn't support multiple selection because we use different query fields for different result
+      ## types so the number of matches for the type facet changes when a result type is selected/unselected.
+      #if ($facet != 'type')
+        #set ($excludeTaggedFilter = "{!ex=$facet}")
+      #end
+      #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))
     #end
-    #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))
+    #set ($discard = $query.bindValue('facet.field', $facetFieldsWithFilterExcludes))
   #end
-  #set ($discard = $query.bindValue('facet.field', $facetFieldsWithFilterExcludes))
 #end
 
 #macro (setFilterQuery $query)
@@ -691,6 +705,10 @@
   #set ($discard = $query.bindValue('fq', $filterQuery))
 #end
 
+#macro(setHighlightQuery $query)
+  #set ($discard = $query.bindValue('hl', $highlightEnabled))
+#end
+
 #macro (escapeFilterValue $value)
 ## Check if the given value is a range.
 #if ($rangePattern.matcher($value).matches() || $wildcardPattern.matcher($value).matches())##
@@ -704,6 +722,46 @@ $value##
   #set ($text = "$!request.text")
   #set ($boost = "$!request.boost")
   #set ($debug = "$!request.debug" != '')
+  ##
+  ## Highlight enabled
+  ## First check the request, then the configuration and enable it by default
+  #if ($request.highlight)
+    #if ($request.highlight == 'false')
+      #set ($highlightEnabled = false)
+    #else
+      #set ($highlightEnabled = true)
+    #end
+  #elseif ($request.highlightHidden)
+    #if ($request.highlightHidden == 'true')
+      #set ($highlightEnabled = true)
+    #else
+      #set ($highlightEnabled = false)
+    #end
+  #elseif ($solrConfig.containsKey('highlightEnabled'))
+    #set ($highlightEnabled = $solrConfig.highlightEnabled)
+  #else
+    #set ($highlightEnabled = true)
+  #end
+  ##
+  ## Facet enabled
+  ## First check the request, then the configuration and enable it by default
+  #if ($request.facet)
+    #if ($request.facet == 'false')
+      #set ($facetEnabled = false)
+    #else
+      #set ($facetEnabled = true)
+    #end
+  #elseif ($request.facetHidden)
+    #if ($request.facetHidden == 'true')
+      #set ($facetEnabled = true)
+    #else
+      #set ($facetEnabled = false)
+    #end
+  #elseif ($solrConfig.containsKey('facetEnabled'))
+    #set ($facetEnabled = $solrConfig.facetEnabled)
+  #else
+    #set ($facetEnabled = true)
+  #end
   ##
   ## Pagination
   #set ($rows = $numbertool.integer($request.rows))
@@ -767,7 +825,9 @@ $value##
       #end
       (% class="search-results-container row" %)(((
         (% class="col-xs-12 col-sm-4 col-sm-push-8 col-md-3 col-md-push-9" %)(((
-          #displaySearchFacets($searchResponse)
+          #if ($facetEnabled)
+            #displaySearchFacets($searchResponse)
+          #end
         )))
         (% class="search-results-left col-xs-12 col-sm-8 col-sm-pull-4 col-md-9 col-md-pull-3" %)(((
           #displaySearchResultsSort()

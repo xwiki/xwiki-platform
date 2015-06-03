@@ -155,6 +155,8 @@ public class DefaultWatchListNotifier implements WatchListNotifier
                 notificationData.get(WatchListEventMimeMessageFactory.TEMPLATE_PARAMETER));
             parameters.put(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER,
                 notificationData.get(WatchListEventMimeMessageFactory.SKIP_CONTEXT_USER_PARAMETER));
+            parameters.put(WatchListEventMimeMessageFactory.ATTACH_AUTHOR_AVATARS_PARAMETER,
+                notificationData.get(WatchListEventMimeMessageFactory.ATTACH_AUTHOR_AVATARS_PARAMETER));
             Map<String, Object> templateFactoryParameters = getTemplateFactoryParameters(notificationData);
             parameters.put(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER, templateFactoryParameters);
 

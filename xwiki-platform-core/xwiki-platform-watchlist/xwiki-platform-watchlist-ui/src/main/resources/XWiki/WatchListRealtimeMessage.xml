@@ -154,7 +154,7 @@
               ## from the template in the future when http://jira.xwiki.org/browse/XWIKI-10638 gets implemented.
               ###getUserAvatarURL($event.authorReference $avatarURL 30)
               ##&lt;img src="${escapetool.xml($avatarURL.url)}" alt="${xwiki.getUserName($event.author, false)}" /&gt;
-              &lt;img src='cid:userAvatar.png' alt="${xwiki.getUserName($event.author, false)}" /&gt;
+              &lt;img src="cid:${event.author}.png" alt="${xwiki.getUserName($event.author, false)}" /&gt;
             &lt;/a&gt;
           &lt;/td&gt;
           ## User Name
@@ -458,6 +458,7 @@ $output
 ----------
 #set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
 Full change details are available in the Changes View of the affected document: $changeURL
+##
 ## TODO: Some more details, or is this level of information enough for the plain text message?</text>
     </property>
   </object>

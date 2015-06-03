@@ -485,6 +485,17 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # extension.userAgent=XWikiExtensionManager
 
+#-# [Since 7.1RC1]
+#-# Some extensions considered now as flavor but released before the category exists
+#-#
+#if ($xwikiPropertiesExtensionOldFlavors)
+#foreach($oldFlavor in $xwikiPropertiesExtensionOldFlavors.split(','))
+extension.oldflavors=$oldFlavor.trim()
+#end
+#else
+# extension.oldflavors=
+#end
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

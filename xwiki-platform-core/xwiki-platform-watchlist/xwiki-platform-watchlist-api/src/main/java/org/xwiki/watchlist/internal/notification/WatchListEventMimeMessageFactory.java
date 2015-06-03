@@ -33,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;
 import org.xwiki.watchlist.internal.WatchListEventMatcher;
 
@@ -92,6 +93,9 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
     private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
 
     @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
     private Execution execution;
 
     @Inject
@@ -128,7 +132,7 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
 
         // The iterator that will be producing a MimeMessage for each WatchListMessageData produced by the userIterator.
         WatchListEventMimeMessageIterator messageIterator =
-            new WatchListEventMimeMessageIterator(userIterator, factory, parameters, avatarExtractor);
+            new WatchListEventMimeMessageIterator(userIterator, factory, parameters, avatarExtractor, serializer);
 
         return messageIterator;
     }

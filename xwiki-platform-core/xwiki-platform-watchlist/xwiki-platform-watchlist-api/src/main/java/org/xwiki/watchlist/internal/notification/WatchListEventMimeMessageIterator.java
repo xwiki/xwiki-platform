@@ -25,13 +25,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;
 import org.xwiki.watchlist.internal.api.WatchListEvent;
 
@@ -60,6 +63,11 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
      */
     public static final String TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER = "attachments";
 
+    /**
+     * Suffix used in the IDs of the conversations/threads started by WatchList e-mail.
+     */
+    public static final String CONVERSATION_SUFFIX = "@xwiki";
+
     private MimeMessageFactory<MimeMessage> factory;
 
     private Iterator<WatchListMessageData> subscriberIterator;
@@ -72,6 +80,8 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
 
     private List<Attachment> originalTemplateExtraParameters;
 
+    private EntityReferenceSerializer<String> serializer;
+
     /**
      * @param subscriberIterator the iterator used to go through each subscriber and extract the
      *            {@link WatchListMessageData}
@@ -79,15 +89,17 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
      * @param parameters the parameters from which to extract the factory source and factory parameters
      * @param avatarExtractor the {@link UserAvatarAttachmentExtractor} used once per message to extract an author's
      *            avatar attachment
+     * @param serializer the {@link EntityReferenceSerializer} used to determine the mail's Message-ID
      */
     public WatchListEventMimeMessageIterator(Iterator<WatchListMessageData> subscriberIterator,
         MimeMessageFactory<MimeMessage> factory, Map<String, Object> parameters,
-        UserAvatarAttachmentExtractor avatarExtractor)
+        UserAvatarAttachmentExtractor avatarExtractor, EntityReferenceSerializer<String> serializer)
     {
         this.subscriberIterator = subscriberIterator;
         this.factory = factory;
         this.parameters = parameters;
         this.avatarExtractor = avatarExtractor;
+        this.serializer = serializer;
 
         this.factoryParameters =
             (Map<String, Object>) this.parameters.get(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER);
@@ -125,6 +137,9 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
             // Use the factory to create the message.
             message = this.factory.createMessage(factorySource, factoryParameters);
             message.addRecipient(Message.RecipientType.TO, watchListMessageData.getAddress());
+
+            // Set conversation headers.
+            message = setConversationHeaders(message, watchListMessageData);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to create Mime Message, aborting mail sending for this batch", e);
         }
@@ -192,6 +207,33 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
             }
         }
         return templateExtraAttachments;
+    }
+
+    private MimeMessage setConversationHeaders(MimeMessage originalMessage, WatchListMessageData watchListMessageData)
+        throws MessagingException
+    {
+        // We need to copy the message in order to be able to set the Message-ID header without JavaMail overriding
+        // it with a random one by default.
+        MimeMessage result = new MimeMessage(originalMessage);
+
+        DocumentReference documentReference = watchListMessageData.getEvents().get(0).getDocumentReference();
+        String serializedReference = serializer.serialize(documentReference);
+
+        // Using MD5 instead of the document reference string to avoid escaping issues. Also, we can not use hashcode()
+        // on document reference because it is not consistent across JVM restarts. hashcode() over the reference string
+        // would also be subject to many collisions, so it's not a good option either.
+        String conversationIDPart = DigestUtils.md5Hex(serializedReference);
+        String conversationID = String.format("<%s%s>", conversationIDPart, CONVERSATION_SUFFIX);
+
+        String messageIDPart = UUID.randomUUID().toString();
+        String messageId = String.format("<%s/%s%s>", conversationIDPart, messageIDPart, CONVERSATION_SUFFIX);
+
+        // Set the headers.
+        result.setHeader("Message-ID", messageId);
+        result.setHeader("References", conversationID);
+        result.setHeader("In-Reply-To", conversationID);
+
+        return result;
     }
 
     @Override

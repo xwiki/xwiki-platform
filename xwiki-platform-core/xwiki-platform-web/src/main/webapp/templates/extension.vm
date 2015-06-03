@@ -988,26 +988,30 @@ $namespace##
       #end
     #end
   #elseif ($jobState == 'WAITING')
-    ## Continue an interactive extension job using the data submitted by the user.
-    #set ($questionType = $jobStatus.question.getClass().getName())
-    #if ($questionType.endsWith('.ConflictQuestion'))
-      ## A merge conflict occurred during installation.
-      #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
-      #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
-    #elseif ($questionType.endsWith('.CleanPagesQuestion'))
-      #foreach ($entry in $jobStatus.question.pages.entrySet())
-        ## Currently there's no string representation of a document reference with parameters (such as locale) that can
-        ## be resolved so what has been submitted is a set of (document reference without locale, locale) pairs.
-        #set ($stringReferenceWithoutLocale = $services.model.serialize($entry.key, 'default'))
-        #set ($localesToDelete = $request.getParameterValues($stringReferenceWithoutLocale))
-        #set ($delete = $localesToDelete && $localesToDelete.contains($entry.key.locale.toString()))
-        #set ($discard = $entry.setValue($delete))
-      #end
-    #end
-    #set ($discard = $jobStatus.answered())
+    #answerExtensionJobQuestion($jobStatus)
   #end
   ## Redirect to extension display.
   $response.sendRedirect("#getExtensionURL()")
+#end
+
+#macro (answerExtensionJobQuestion $jobStatus)
+  ## Continue an interactive extension job using the data submitted by the user.
+  #set ($questionType = $jobStatus.question.getClass().getName())
+  #if ($questionType.endsWith('.ConflictQuestion'))
+    ## A merge conflict occurred during installation.
+    #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
+    #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
+  #elseif ($questionType.endsWith('.CleanPagesQuestion'))
+    #foreach ($entry in $jobStatus.question.pages.entrySet())
+      ## Currently there's no string representation of a document reference with parameters (such as locale) that can
+      ## be resolved so what has been submitted is a set of (document reference without locale, locale) pairs.
+      #set ($stringReferenceWithoutLocale = $services.model.serialize($entry.key, 'default'))
+      #set ($localesToDelete = $request.getParameterValues($stringReferenceWithoutLocale))
+      #set ($delete = $localesToDelete && $localesToDelete.contains($entry.key.locale.toString()))
+      #set ($discard = $entry.setValue($delete))
+    #end
+  #end
+  #set ($discard = $jobStatus.answered())
 #end
 
 #macro (installExtension $extensionId $extensionVersion $namespaces)

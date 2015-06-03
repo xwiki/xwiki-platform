@@ -69,7 +69,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), observationManager, loggerManager, false);
+        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), observationManager, loggerManager, null);
 
         if (status instanceof DistributionJobStatus) {
             DistributionJobStatus<R> distributionJobStatus = (DistributionJobStatus<R>) status;
@@ -88,7 +88,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,
         List<DistributionStep> steps)
     {
-        super(request, observationManager, loggerManager, false);
+        super(request, observationManager, loggerManager, null);
 
         this.stepList = steps;
     }

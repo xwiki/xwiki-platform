@@ -19,11 +19,25 @@
  */
 package org.xwiki.extension.script;
 
-import javax.inject.Inject;
+import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Job;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobStatusStore;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Base class for all extension related script services.
@@ -38,6 +52,27 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      */
     public static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
 
+    protected static final String PROPERTY_USERREFERENCE = "user.reference";
+
+    protected static final String PROPERTY_CALLERREFERENCE = "caller.reference";
+
+    protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
+
+    /**
+     * Extension request property that specifies from which wiki the job was started.
+     */
+    protected static final String PROPERTY_CONTEXT_WIKI = "context.wiki";
+
+    /**
+     * Extension request property that specifies from which document action the job was started.
+     */
+    protected static final String PROPERTY_CONTEXT_ACTION = "context.action";
+
+    /**
+     * The prefix used for wiki namespace id.
+     */
+    protected static final String WIKI_NAMESPACE_PREFIX = "wiki:";
+
     @Inject
     @SuppressWarnings("rawtypes")
     protected ScriptSafeProvider scriptProvider;
@@ -49,6 +84,24 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected Execution execution;
 
     /**
+     * Needed for getting the current user reference.
+     */
+    @Inject
+    protected DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    protected JobExecutor jobExecutor;
+
+    @Inject
+    protected ContextualAuthorizationManager authorization;
+
+    @Inject
+    private JobStatusStore jobStore;
+
+    /**
      * @param <T> the type of the object
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
@@ -57,6 +110,45 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected <T> T safe(T unsafe)
     {
         return (T) this.scriptProvider.get(unsafe);
+    }
+
+    protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)
+    {
+        extensionRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        extensionRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        XWikiDocument callerDocument = getCallerDocument();
+        if (callerDocument != null) {
+            extensionRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+        }
+    }
+
+    protected XWikiDocument getCallerDocument()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument sdoc = (XWikiDocument) xcontext.get("sdoc");
+        if (sdoc == null) {
+            sdoc = xcontext.getDoc();
+        }
+
+        return sdoc;
+    }
+
+    protected JobStatus getJobStatus(List<String> jobId)
+    {
+        JobStatus jobStatus;
+
+        Job job = this.jobExecutor.getJob(jobId);
+        if (job == null) {
+            jobStatus = this.jobStore.getJobStatus(jobId);
+        } else {
+            jobStatus = job.getStatus();
+        }
+
+        if (jobStatus != null && !this.authorization.hasAccess(Right.PROGRAM)) {
+            jobStatus = safe(jobStatus);
+        }
+
+        return jobStatus;
     }
 
     // Error management

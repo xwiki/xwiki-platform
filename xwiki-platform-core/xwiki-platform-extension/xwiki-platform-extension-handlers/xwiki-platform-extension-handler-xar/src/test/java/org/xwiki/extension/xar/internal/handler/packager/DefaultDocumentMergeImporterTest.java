@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.internal.handler.packager;
+package org.xwiki.extension.xar.internal.handler.packager;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;

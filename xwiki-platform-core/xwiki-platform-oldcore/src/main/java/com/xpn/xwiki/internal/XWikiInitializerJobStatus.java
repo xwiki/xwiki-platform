@@ -39,7 +39,7 @@ public class XWikiInitializerJobStatus extends AbstractJobStatus<XWikiInitialize
     public XWikiInitializerJobStatus(XWikiInitializerRequest request, ObservationManager observationManager,
         LoggerManager loggerManager)
     {
-        super(request, observationManager, loggerManager, false);
+        super(request, observationManager, loggerManager, null);
 
         setIsolated(false);
     }

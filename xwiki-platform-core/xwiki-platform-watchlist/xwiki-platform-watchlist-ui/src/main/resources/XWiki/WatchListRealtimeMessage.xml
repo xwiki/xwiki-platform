@@ -96,14 +96,17 @@
     <property>
       <html>#set ($event = $events[0])
 #set ($eventDocument = $xwiki.getDocument($event.documentReference))
-#set ($document = $xwiki.getDocument($eventDocument, $event.version))
-#set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
-##
-## Document type, if applicable
-#set ($documentType = 'document')
-#if ($event.type == 'delete')
-  #set ($xobjects = $originalDocument.xWikiObjects)
+#if ($event.type != 'delete')
+  #set ($document = $xwiki.getDocument($eventDocument, $event.version))
 #else
+  ## Just use whatever getDocument() returns. It can be a shallow document (isNew() == true) or a real document (created between
+  ## the event and the mail prepare step), we are just careful not to use its content, just its name and URL.
+  #set ($document = $eventDocument)
+#end
+##
+## Document type, if applicable. Not available for deleted docs unless we start looking through the recycle bin.
+#set ($documentType = 'document')
+#if ($event.type != 'delete')
   #set ($xobjects = $document.xWikiObjects)
 #end
 #foreach ($classFullName in $xobjects.keySet())
@@ -175,10 +178,12 @@
   &lt;/tr&gt;
   ## Action
 #if ($event.type == 'create')
-  &lt;tr&gt;&lt;td&gt;created the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;created the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 #elseif ($event.type == 'delete')
-  &lt;tr&gt;&lt;td&gt;deleted the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;deleted the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 #elseif ($event.type == 'update')
+  #set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
+  ##
   #set ($contentDiff = $document.getContentDiff($originalDocument, $document))
   #set ($metadataDiff = $document.getMetaDataDiff($originalDocument, $document))
   #set ($attachmentDiff = $document.getAttachmentDiff($originalDocument, $document))
@@ -197,7 +202,7 @@
     #end
     #if ($metadataDiffsToDisplay.size() &gt; 0)
       &lt;tr&gt;&lt;td&gt;
-        &lt;p&gt;updated the metadata of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;updated the metadata of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/p&gt;
         &lt;ul&gt;
         #foreach ($metadataDiffToDisplay in $metadataDiffsToDisplay)
           &lt;li&gt;$metadataDiffToDisplay&lt;/li&gt;
@@ -210,13 +215,13 @@
   #end
   ## Content
   #if ($contentDiff.size() &gt; 0)
-    &lt;tr&gt;&lt;td&gt;updated the content of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated the content of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
     ## Mark displayed
     #set ($displayed = true)
   #end
   ## Class
   #if ($classDiff.size() &gt; 0)
-    &lt;tr&gt;&lt;td&gt;updated $classDiff.size() properties of the class &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated $classDiff.size() properties of the class &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
     &lt;tr&gt;&lt;td&gt;
       &lt;ul&gt;
       #foreach ($classDiffItems in $classDiff)
@@ -244,15 +249,15 @@
       #end
     #end
     #if ($newAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;added $newAttachments.size() attachment(s) to the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;added $newAttachments.size() attachment(s) to the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($newAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     #if ($updatedAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;updated $updatedAttachments.size() attachment(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;updated $updatedAttachments.size() attachment(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($updatedAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     #if ($deletedAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;deleted $deletedAttachments.size() attachment(s) from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;deleted $deletedAttachments.size() attachment(s) from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($deletedAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     ## Mark displayed
@@ -263,7 +268,7 @@
     ## How many objects?
     #if ($objectDiff.size() &gt; 1)
       ## Many, don`t bother displaying here.
-      &lt;tr&gt;&lt;td&gt;updated $objectDiff.size() object(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;updated $objectDiff.size() object(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;
         &lt;ul&gt;
           #foreach ($objectDiffItems in $objectDiff)
@@ -301,10 +306,10 @@
             #set ($replyToAuthorReference = $services.model.resolveDocument($replyToCommentObject.getValue('author'), $document.documentReference.wikiReference))
             #set ($replyToAuthorSerialized = $services.model.serialize($replyToAuthorReference))
             #set ($replyToAuthorURL = $xwiki.getDocument($replyToAuthorReference).getExternalURL())
-            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to &lt;a href="$replyToAuthorURL"&gt;$xwiki.getUserName($replyToAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to &lt;a href="$replyToAuthorURL"&gt;$xwiki.getUserName($replyToAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
             ## A regular new comment.
-            &lt;tr&gt;&lt;td&gt;added a $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;added a $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           &lt;tr&gt;&lt;td style='padding-left: 2em'&gt;
             #if ($commentType == 'annotation')
@@ -320,9 +325,9 @@
           ## Existing comment modified (property added or property modified)
           ## Their own comment?
           #if ($event.authorReference == $commentAuthorReference)
-            &lt;tr&gt;&lt;td&gt;updated their $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;updated their $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
-            &lt;tr&gt;&lt;td&gt;updated a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;updated a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           #if ($objectDiffItem.propName == 'comment')
             &lt;tr&gt;&lt;td&gt;from: &lt;blockquote&gt;$objectDiffItem.prevValue&lt;/blockquote&gt;&lt;/td&gt;&lt;/tr&gt;
@@ -330,9 +335,9 @@
           #end
         #elseif ($objectDiffItem.action == 'object-removed')
           #if ($event.authorReference == $commentAuthorReference)
-            &lt;tr&gt;&lt;td&gt;removed their $commentType from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;removed their $commentType from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
-            &lt;tr&gt;&lt;td&gt;removed a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;removed a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
         #end
         ## View all comments link
@@ -342,7 +347,7 @@
         ## Mark object displayed
         #set ($objectDisplayed = true)
       #elseif ($objectClass == 'XWiki.XWikiRights')
-        &lt;tr&gt;&lt;td&gt;updated the rights of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;updated the rights of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
         ## Mark object displayed
         #set ($objectDisplayed = true)
       #elseif ($objectClass == 'Blog.BlogPostClass')
@@ -351,7 +356,7 @@
           #set ($originalPublished = $originalObject.getValue('published'))
           #set ($newPublished = $object.getValue('published'))
           #if ($newPublished == '1' &amp;&amp; $originalPublished != '1')
-            &lt;tr&gt;&lt;td&gt;published the blog post &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;published the blog post &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
             ## Mark object displayed
             #set ($objectDisplayed = true)
           #end
@@ -359,7 +364,7 @@
       #end
       ## Generic object fallback for when no object displayer is available for the object's class or when the displayer did not output anything.
       #if (!$objectDisplayed)
-        &lt;tr&gt;&lt;td&gt;updated an object of type "$objectClass" on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;updated an object of type "$objectClass" on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
         ## Mark displayed
         #set ($displayed = true)
       #end
@@ -367,7 +372,7 @@
   #end
   ## Generic update event fallback for when no output was produced by the current displayers (content, metadata, objects, etc.).
   #if (!$displayed &amp;&amp; !$objectDisplayed)
-    &lt;tr&gt;&lt;td&gt;updated the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.displayTitle&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
   #end
 #end
 
@@ -375,8 +380,13 @@
 
 &lt;hr/&gt;
 
-#set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
-&lt;p&gt;Full change details are available in the &lt;a href="$changeURL"&gt;Changes View of the affected document&lt;/a&gt;.&lt;/p&gt;
+#if ($event.type == 'delete')
+  #set ($recycleBinURL = $document.getExternalURL('view', "viewer=recyclebinlist"))
+  &lt;p&gt;The list of deleted versions for the document are available in the &lt;a href="$recycleBinURL"&gt;Recycle Bin view of the affected document&lt;/a&gt;.&lt;/p&gt;
+#else
+  #set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
+  &lt;p&gt;Full change details are available in the &lt;a href="$changeURL"&gt;Changes View of the affected document&lt;/a&gt;.&lt;/p&gt;
+#end
 
 #*
 ## Unsubscribe / Remove from WatchList.
@@ -384,7 +394,7 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 #if ($services.watchlist.isWatched($services.model.serialize($document.documentReference), "DOCUMENT"))
   #set ($watchType = 'document')
   #set ($watchedEntityReference = $services.model.serialize($document.documentReference))
-  #set ($watchedEntity = "$document.displayTitle (${watchedEntityReference})")
+  #set ($watchedEntity = "$document.name (${watchedEntityReference})")
 #elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.lastSpaceReference), "SPACE"))
 #elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.wikiReference.name), "WIKI"))
 #elseif ($services.watchlist.isWatched($services.model.serialize($event.authorReference), "USER"))
@@ -402,7 +412,7 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
       <language>en</language>
     </property>
     <property>
-      <subject>Watchlist for document "$xwiki.getDocument($events[0].documentReference).displayTitle" ($events[0].documentReference)</subject>
+      <subject>Watchlist for document "$xwiki.getDocument($events[0].documentReference).name" ($events[0].documentReference)</subject>
     </property>
     <property>
       <text>## Note: ASCII formatting applies here since no whitespace cleaning is performed.
@@ -410,14 +420,17 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 ##
 #set ($event = $events[0])
 #set ($eventDocument = $xwiki.getDocument($event.documentReference))
-#set ($document = $xwiki.getDocument($eventDocument, $event.version))
-#set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
+#if ($event.type != 'delete')
+#**##set ($document = $xwiki.getDocument($eventDocument, $event.version))
+#else
+#**### Just use whatever getDocument() returns. It can be a shallow document (isNew() == true) or a real document (created between
+#**### the event and the mail prepare step), we are just careful not to use its content, just its name and URL.
+#**##set ($document = $eventDocument)
+#end
 ##
 ## Document type, if applicable
 #set ($documentType = 'document')
-#if ($event.type == 'delete')
-#**##set ($xobjects = $originalDocument.xWikiObjects)
-#else
+#if ($event.type != 'delete')
 #**##set ($xobjects = $document.xWikiObjects)
 #end
 #foreach ($classFullName in $xobjects.keySet())
@@ -446,19 +459,23 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 #set ($userWiki = $event.authorReference.wikiReference.name)
 #set ($output = "$xwiki.getUserName($event.author, false) (#if ($userWiki != $xcontext.getMainWikiName())${userWiki}:#end${event.authorReference.name})")
 #if ($event.type == 'create')
-#**##set ($output = "$output created the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output created the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #elseif ($event.type == 'delete')
-#**##set ($output = "$output deleted the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output deleted the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #elseif ($event.type == 'update')
-#**##set ($output = "$output updated the $documentType ""$document.displayTitle"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output updated the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #end
 
 $output
 
 ----------
-#set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
-Full change details are available in the Changes View of the affected document: $changeURL
-##
+#if ($event.type == 'delete')
+#**##set ($recycleBinURL = $document.getExternalURL('view', "viewer=recyclebinlist"))
+#**#The list of deleted versions for the document are available in the Recycle Bin view of the affected document: $recycleBinURL
+#else
+#**##set ($changeURL = $document.getExternalURL('view', "viewer=changes&amp;rev1=${event.previousVersion}&amp;rev2=${event.version}"))
+#**#Full change details are available in the Changes View of the affected document: $changeURL
+#end
 ## TODO: Some more details, or is this level of information enough for the plain text message?</text>
     </property>
   </object>

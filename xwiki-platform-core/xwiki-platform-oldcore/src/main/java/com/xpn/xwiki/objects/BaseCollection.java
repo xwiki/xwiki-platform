@@ -803,7 +803,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                 if (propertyResult == null) {
                     // Add if none has been added by user already
-                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                    safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                         : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
@@ -829,7 +829,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 if (propertyResult != null) {
                     if (propertyResult.equals(previousProperty)) {
                         // Let some automatic migration take care of that modification between DB and new
-                        addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                        safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                             : newProperty.clone());
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
@@ -841,7 +841,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                     // Lets assume it's a mistake to fix
                     mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
 
-                    addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
+                    safeput(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                         : newProperty.clone());
                     mergeResult.setModified(true);
                 }
@@ -884,12 +884,12 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
 
             if (field == null) {
                 // If the field does not exist add it
-                addField(entry.getKey(), newField);
+                safeput(entry.getKey(), newField);
                 modified = true;
             } else if (field.getClass() != newField.getClass()) {
                 // If the field is of different type, remove it first
                 removeField(entry.getKey());
-                addField(entry.getKey(), newField);
+                safeput(entry.getKey(), newField);
                 modified = true;
             } else {
                 // Otherwise try to merge the fields

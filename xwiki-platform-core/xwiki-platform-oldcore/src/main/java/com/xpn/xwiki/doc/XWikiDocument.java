@@ -8616,7 +8616,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         if (objectResult != null) {
                             if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
                                 if (propertyResult == null) {
-                                    objectResult.addField(diff.getPropName(), newProperty);
+                                    objectResult.safeput(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
                                 } else {
                                     // collision between DB and new: property to add but already exists in the DB
@@ -8642,7 +8642,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                                 if (propertyResult != null) {
                                     if (propertyResult.equals(previousProperty)) {
-                                        objectResult.addField(diff.getPropName(), newProperty);
+                                        objectResult.safeput(diff.getPropName(), newProperty);
                                         mergeResult.setModified(true);
                                     } else {
                                         // Try to apply a 3 ways merge on the property
@@ -8655,7 +8655,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     mergeResult.getLog()
                                         .warn("Object [{}] does not exists", newProperty.getReference());
 
-                                    objectResult.addField(diff.getPropName(), newProperty);
+                                    objectResult.safeput(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
                                 }
                             }

@@ -497,6 +497,10 @@
   #set ($replayJobState = $replayJobStatus.state)
   #set ($finished = $replayJobState == 'FINISHED')
   #set ($waiting = $replayJobState == 'WAITING')
+  ## TODO: Find a better way to detect if the replay job has failed. Checking if there are errors in the log is not
+  ## reliable because there can be error logs like "Collision found on object [...]" that don't prevent the replay job
+  ## from finishing successfully. The last log message cannot be used either because it is always an info log like this
+  ## "Finished job of type [...] with identifier [...]".
   #set ($success = $finished &amp;&amp; $replayJobStatus.log.getLogs('ERROR').isEmpty())
   #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
   &lt;div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"&gt;

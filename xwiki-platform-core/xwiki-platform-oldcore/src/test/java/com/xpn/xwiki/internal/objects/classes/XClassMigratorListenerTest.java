@@ -77,7 +77,7 @@ public class XClassMigratorListenerTest
         this.xobjectDocument.addXObject(xobject);
 
         Query query = mock(Query.class);
-        when(this.mockQueryManage.createQuery("from doc.object(Space.Class)", Query.XWQL)).thenReturn(query);
+        when(this.mockQueryManage.createQuery("from doc.object(Space.Class) as obj", Query.XWQL)).thenReturn(query);
         when(query.<String>execute()).thenReturn(Arrays.asList("Space.Page"));
 
         // We need document modification notifications

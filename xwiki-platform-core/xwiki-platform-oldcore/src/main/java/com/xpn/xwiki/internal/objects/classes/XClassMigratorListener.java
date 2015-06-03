@@ -109,7 +109,7 @@ public class XClassMigratorListener extends AbstractEventListener
                 try {
                     migrate(newPropertyClass);
                 } catch (QueryException e) {
-                    this.logger.error("Failed to migrate XClass property [{}]", newProperty.getReference(), e);
+                    this.logger.error("Failed to migrate XClass property [{}]", newPropertyClass.getReference(), e);
                 }
             }
         }
@@ -123,8 +123,8 @@ public class XClassMigratorListener extends AbstractEventListener
 
         // Get all document containing object of modified class
         Query query =
-            this.queryManager.createQuery("from doc.object(" + this.localSerializer.serialize(classReference) + ")",
-                Query.XWQL);
+            this.queryManager.createQuery("from doc.object(" + this.localSerializer.serialize(classReference)
+                + ") as obj", Query.XWQL);
         query.setWiki(wikiReference.getName());
 
         List<String> documents = query.execute();
@@ -178,7 +178,7 @@ public class XClassMigratorListener extends AbstractEventListener
                 // Set new field
                 // Don't set the new property if it's null (it means the property is not set).
                 if (convertedProperty != null) {
-                    xobject.addField(propertyReference.getName(), convertedProperty);
+                    xobject.safeput(propertyReference.getName(), convertedProperty);
                 }
 
                 modified = true;

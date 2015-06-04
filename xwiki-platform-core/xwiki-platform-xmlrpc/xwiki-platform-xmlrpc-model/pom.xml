@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-xmlrpc</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-xmlrpc-model</artifactId>
   <name>XWiki Platform - XMLRPC - Model</name>

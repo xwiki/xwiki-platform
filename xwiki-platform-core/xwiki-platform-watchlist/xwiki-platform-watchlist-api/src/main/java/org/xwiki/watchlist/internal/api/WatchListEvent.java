@@ -37,6 +37,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -259,6 +260,10 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getAuthor()
     {
+        if (authorReference == null) {
+            return XWikiRightService.GUEST_USER_FULLNAME;
+        }
+
         return getSerializer().serialize(authorReference);
     }
 

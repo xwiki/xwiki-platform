@@ -44,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.image.ImageProcessor;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Default implementation for {@link UserAvatarAttachmentExtractor}.
@@ -82,7 +83,20 @@ public class DefaultUserAvatarAttachmentExtractor implements UserAvatarAttachmen
     @Override
     public Attachment getUserAvatar(DocumentReference userReference)
     {
-        return getUserAvatar(userReference, 50, 50, String.format("%s.png", serializer.serialize(userReference)));
+        String fileName = getFileName(userReference);
+        return getUserAvatar(userReference, 50, 50, fileName);
+    }
+
+    private String getFileName(DocumentReference userReference)
+    {
+        String fileName;
+        if (userReference == null) {
+            fileName = XWikiRightService.GUEST_USER_FULLNAME;
+        } else {
+            fileName = serializer.serialize(userReference);
+        }
+        fileName = String.format("%s.png", fileName);
+        return fileName;
     }
 
     @Override
@@ -91,28 +105,46 @@ public class DefaultUserAvatarAttachmentExtractor implements UserAvatarAttachmen
         // FIXME: Unfortunately, the ImagePlugin is too much request-oriented and not generic enough to be reused
         // without rewriting. In the end, that might be the right way to go and rewriting it might be inevitable.
 
-        Attachment result;
+        Attachment result = null;
 
         InputStream sourceImageInputStream = null;
         try {
             XWikiContext context = xwikiContextProvider.get();
             XWiki wiki = context.getWiki();
 
-            XWikiDocument userProfileDocument = wiki.getDocument(userReference, context);
+            XWikiAttachment realAvatarAttachment;
+            XWikiAttachment fakeAvatarAttachment = null;
 
-            DocumentReference usersClassReference = wiki.getUserClass(context).getDocumentReference();
-            String avatarFileName = userProfileDocument.getStringValue(usersClassReference, "avatar");
+            // Use a second variable to be able to reassign it on the else branch below.
+            DocumentReference actualUserReference = userReference;
+            if (actualUserReference != null) {
+                // Registered user.
 
-            XWikiAttachment realAvatarAttachment = userProfileDocument.getAttachment(avatarFileName);
-            XWikiAttachment fakeAvatarAttachment;
-            if (realAvatarAttachment != null && realAvatarAttachment.isImage(context)) {
-                // Valid avatar, use the real attachment (and image), but make sure to use a clone as to not impact the
-                // real document.
-                fakeAvatarAttachment = (XWikiAttachment) realAvatarAttachment.clone();
-                sourceImageInputStream = realAvatarAttachment.getContentInputStream(context);
+                XWikiDocument userProfileDocument = wiki.getDocument(userReference, context);
 
-                result = new Attachment(new Document(userProfileDocument, context), fakeAvatarAttachment, context);
-            } else {
+                DocumentReference usersClassReference = wiki.getUserClass(context).getDocumentReference();
+                String avatarFileName = userProfileDocument.getStringValue(usersClassReference, "avatar");
+
+                realAvatarAttachment = userProfileDocument.getAttachment(avatarFileName);
+
+                if (realAvatarAttachment != null && realAvatarAttachment.isImage(context)) {
+                    // Valid avatar, use the real attachment (and image), but make sure to use a clone as to not impact
+                    // the
+                    // real document.
+                    fakeAvatarAttachment = (XWikiAttachment) realAvatarAttachment.clone();
+                    sourceImageInputStream = realAvatarAttachment.getContentInputStream(context);
+
+                    result = new Attachment(new Document(userProfileDocument, context), fakeAvatarAttachment, context);
+                } else {
+                    // No or invalid avatar, treat the user reference as it did not exist (guest user) so it can be
+                    // handled below for both cases.
+                    actualUserReference = null;
+                }
+            }
+
+            if (actualUserReference == null) {
+                // Guest user.
+
                 // No avatar. Return a fake attachment with the "noavatar.png" standard image.
                 fakeAvatarAttachment = new XWikiAttachment();
                 sourceImageInputStream = environment.getResourceAsStream("/resources/icons/xwiki/noavatar.png");

@@ -34,7 +34,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 
 /**
  * Converts from an {@link ActivityEvent}.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -57,9 +57,12 @@ public class ActivityEventWatchListEventConverter implements WatchListEventConve
 
         String type = from.getType();
 
-        DocumentReference userReference =
+        DocumentReference userReference = null;
+        // Watch out for unregistered user events since they have a null user.
+        if (from.getUser() != null) {
             new DocumentReference(resolver.resolve(from.getUser(), EntityType.DOCUMENT,
                 new WikiReference(from.getWiki())));
+        }
 
         WatchListEvent event =
             new WatchListEvent(documentReference, type, userReference, from.getVersion(), from.getDate());

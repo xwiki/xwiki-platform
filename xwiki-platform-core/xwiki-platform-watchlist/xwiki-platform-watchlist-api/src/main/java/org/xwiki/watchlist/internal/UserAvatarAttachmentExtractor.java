@@ -40,7 +40,7 @@ public interface UserAvatarAttachmentExtractor
      * @param userReference the document reference to the profile of the user from which to extract the avatar
      * @return a n {@link Attachment} instance containing the user's avatar or the default ("noavatar.png") image. The
      *         returned instance is a fake as to not affect live documents. Also, the file is resized and renamed to
-     *         default values (i.e. 50px, 50px, "userAvatar.png)
+     *         default values (i.e. 50px, 50px, "<prefixedFullUserName>.png")
      */
     Attachment getUserAvatar(DocumentReference userReference);
 

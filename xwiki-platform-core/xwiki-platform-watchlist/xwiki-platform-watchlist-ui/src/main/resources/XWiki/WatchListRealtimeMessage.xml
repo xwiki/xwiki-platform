@@ -145,31 +145,41 @@
 &lt;table&gt;
   &lt;tr style='vertical-align: top'&gt;
     ## User
-    #set ($userURL = $xwiki.getDocument($event.authorReference).externalURL)
+    #if ("$!event.authorReference" != '')
+      #set ($userURL = $xwiki.getDocument($event.authorReference).externalURL)
+    #end
     &lt;td colspan='2'&gt;
       &lt;table&gt;
         &lt;tr&gt;
           ## User Avatar
           &lt;td rowspan='2' &gt;
             ## The string returned by XWiki#getUserName() is XML encoded.
-            &lt;a href="$userURL"&gt;
+            #if ("$!event.authorReference" != '')&lt;a href="$userURL"&gt;#end
               ## Note: We are currently attaching the user's avatar to the current mail. This is now done in the java side, but we should be able to do it
               ## from the template in the future when http://jira.xwiki.org/browse/XWIKI-10638 gets implemented.
               ###getUserAvatarURL($event.authorReference $avatarURL 30)
               ##&lt;img src="${escapetool.xml($avatarURL.url)}" alt="${xwiki.getUserName($event.author, false)}" /&gt;
               &lt;img src="cid:${event.author}.png" alt="${xwiki.getUserName($event.author, false)}" /&gt;
-            &lt;/a&gt;
+            #if ("$!event.authorReference" != '')&lt;/a&gt;#end
           &lt;/td&gt;
           ## User Name
           ## Note: xwiki.getUserName(userName) does not generate an external URL, so we need to add the link manually.
-          &lt;td style='vertical-align: bottom;'&gt;&lt;a href="$userURL"&gt;${xwiki.getUserName($event.author, false)}&lt;/a&gt;&lt;/td&gt;
+          &lt;td style='vertical-align: bottom;'&gt;
+            #if ("$!event.authorReference" != '')&lt;a href="$userURL"&gt;#end
+            ${xwiki.getUserName($event.author, false)}
+            #if ("$!event.authorReference" != '')&lt;/a&gt;#end
+          &lt;/td&gt;
         &lt;/tr&gt;
         &lt;tr&gt;
           ## User ID (Wiki)
           &lt;td style='color: gray; vertical-align: top;'&gt;
-            ${escapetool.xml($event.authorReference.name)}
-            #if ($event.authorReference.wikiReference.name != $xcontext.getMainWikiName())
-              (${escapetool.xml($event.authorReference.wikiReference.name)})
+            #if ("$!event.authorReference" == '')
+              $services.model.resolveDocument($event.author).name
+            #else
+              ${escapetool.xml($event.authorReference.name)}
+              #if ($event.authorReference.wikiReference.name != $xcontext.getMainWikiName())
+                (${escapetool.xml($event.authorReference.wikiReference.name)})
+              #end
             #end
           &lt;/td&gt;
         &lt;/tr&gt;
@@ -303,13 +313,23 @@
           #set ($replyToCommentObject = $document.getObject($objectClass, $object.getValue('replyto')))
           #if ("$!replyToCommentObject" != '')
             ## A new reply comment.
-            #set ($replyToAuthorReference = $services.model.resolveDocument($replyToCommentObject.getValue('author'), $document.documentReference.wikiReference))
+            #set ($replyToAuthor = $replyToCommentObject.getValue('author'))
+            #set ($replyToAuthorReference = $services.model.resolveDocument($replyToAuthor, $document.documentReference.wikiReference))
             #set ($replyToAuthorSerialized = $services.model.serialize($replyToAuthorReference))
-            #set ($replyToAuthorURL = $xwiki.getDocument($replyToAuthorReference).getExternalURL())
-            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to &lt;a href="$replyToAuthorURL"&gt;$xwiki.getUserName($replyToAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            #set ($replyToAuthorDocument = $xwiki.getDocument($replyToAuthorReference))
+            #if (!$replyToAuthorDocument.isNew())
+              #set ($replyToAuthorURL = $replyToAuthorDocument.externalURL)
+              #set ($replyToOutput = "&lt;a href=""$replyToAuthorURL""&gt;$xwiki.getUserName($replyToAuthorSerialized, false)&lt;/a&gt;")
+            #else
+              #set ($replyToOutput = """${replyToAuthor}""")
+            #end
+            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to $replyToOutput on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
             ## A regular new comment.
-            &lt;tr&gt;&lt;td&gt;added a $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            #if ("$!event.authorReference" == '')
+              #set ($asGuestNamedOutput = "as ""$object.getValue('author')"" ")
+            #end
+            &lt;tr&gt;&lt;td&gt;added a $commentType ${asGuestNamedOutput}on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           &lt;tr&gt;&lt;td style='padding-left: 2em'&gt;
             #if ($commentType == 'annotation')
@@ -457,7 +477,13 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 ##
 ##
 #set ($userWiki = $event.authorReference.wikiReference.name)
-#set ($output = "$xwiki.getUserName($event.author, false) (#if ($userWiki != $xcontext.getMainWikiName())${userWiki}:#end${event.authorReference.name})")
+#set ($output = "$xwiki.getUserName($event.author, false)")
+#if ("$!event.authorReference" == '')
+#**##set ($output = "$output ($event.author)")
+#else
+#**##set ($output = "$output (#if ($userWiki != $xcontext.getMainWikiName())${userWiki}:#end${event.authorReference.name})")
+#end
+##
 #if ($event.type == 'create')
 #**##set ($output = "$output created the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #elseif ($event.type == 'delete')

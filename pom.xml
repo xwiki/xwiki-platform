@@ -33,7 +33,7 @@
   <version>0.2-SNAPSHOT</version>
   <packaging>xar</packaging>
   <name>Tour Application</name>
-  <description>This application provides for the users a possibility to create tour guides for every page they want.</description>
+  <description>Let users create tour guides for any page</description>
   <developers>
     <developer>
       <id>gabrielasmeria</id>

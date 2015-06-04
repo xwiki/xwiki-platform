@@ -32,8 +32,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1385047506000</creationDate>
-  <date>1385298756000</date>
-  <contentUpdateDate>1385298756000</contentUpdateDate>
+  <date>1433258948000</date>
+  <contentUpdateDate>1433258948000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <template/>
@@ -53,7 +53,7 @@ solr.admin.indexing.action.select_index=Ajouter à l'index
 solr.admin.indexing.action.select_reindex=Réindexer
 solr.admin.indexing.query.hint=Requête optionnelle limitant les documents affectés par l'indexation.
 solr.admin.indexing.query.label=Recherche avancée
-solr.admin.indexing.title=En cours d'indexation
+solr.admin.indexing.title=Gestion de l'index
 solr.admin.indexing.wiki.hint=Le wiki pour lequel tous les documents seront affectés par l'indexation.
 solr.admin.indexing.wiki.label=Wiki
 solr.admin.indexing.wiki.select_farm=Ferme entière

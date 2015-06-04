@@ -728,17 +728,7 @@ $value##
   ## Highlight enabled
   ## First check the request, then the configuration and enable it by default
   #if ($request.highlight)
-    #if ($request.highlight == 'false')
-      #set ($highlightEnabled = false)
-    #else
-      #set ($highlightEnabled = true)
-    #end
-  #elseif ($request.highlightHidden)
-    #if ($request.highlightHidden == 'true')
-      #set ($highlightEnabled = true)
-    #else
-      #set ($highlightEnabled = false)
-    #end
+    #set ($highlightEnabled = $request.highlight != 'false')
   #elseif ($solrConfig.containsKey('highlightEnabled'))
     #set ($highlightEnabled = $solrConfig.highlightEnabled)
   #else
@@ -748,17 +738,7 @@ $value##
   ## Facet enabled
   ## First check the request, then the configuration and enable it by default
   #if ($request.facet)
-    #if ($request.facet == 'false')
-      #set ($facetEnabled = false)
-    #else
-      #set ($facetEnabled = true)
-    #end
-  #elseif ($request.facetHidden)
-    #if ($request.facetHidden == 'true')
-      #set ($facetEnabled = true)
-    #else
-      #set ($facetEnabled = false)
-    #end
+    #set ($facetEnabled = $request.facet != 'false')
   #elseif ($solrConfig.containsKey('facetEnabled'))
     #set ($facetEnabled = $solrConfig.facetEnabled)
   #else

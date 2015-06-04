@@ -66,14 +66,12 @@ if "%2"=="profiler" (
   set JAVA_TOOL_OPTIONS=-agentlib:yjpagent
 )
 
-REM Get javaw.exe from the latest properly installed JRE
-if not "%JAVA_HOME%" == "" (
-  set JAVA_PATH=%JAVA_HOME\bin:java.exe
-) else (
-  for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
-  set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
-  if "%JAVA_PATH%"=="" set JAVA_PATH=java
-)
+REM Discover java.exe from the latest properly installed JRE
+for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
+set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
+if "%JAVA_PATH%"=="" set JAVA_PATH=java
+REM Handle the case when JAVA_HOME is set by the user
+if not "%JAVA_HOME%" == "" set JAVA_PATH=%JAVA_HOME%\bin\java.exe
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}

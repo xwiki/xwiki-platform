@@ -30,14 +30,12 @@ if not defined JETTY_STOP_PORT (
   )
 )
 
-REM Get javaw.exe from the latest properly installed JRE
-if not "%JAVA_HOME%" == "" (
-  set JAVA_PATH=%JAVA_HOME\bin:java.exe
-) else (
-  for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
-  set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
-  if "%JAVA_PATH%"=="" set JAVA_PATH=java
-)
+REM Discover java.exe from the latest properly installed JRE
+for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
+set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
+if "%JAVA_PATH%"=="" set JAVA_PATH=java
+REM Handle the case when JAVA_HOME is set by the user
+if not "%JAVA_HOME%" == "" set JAVA_PATH=%JAVA_HOME%\bin\java.exe
 
 REM Specify Jetty's home and base directories
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -Djetty.base=%JETTY_BASE%

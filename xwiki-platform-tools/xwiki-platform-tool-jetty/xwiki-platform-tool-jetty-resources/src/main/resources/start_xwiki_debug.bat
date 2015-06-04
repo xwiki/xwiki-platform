@@ -78,13 +78,13 @@ set XWIKI_DATA_DIR=${xwikiDataDir}
 set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir=%XWIKI_DATA_DIR%
 
 REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
-if not exist %XWIKI_DATA_DIR% mkdir %XWIKI_DATA_DIR%
+if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
 
 REM Ensure the logs directory exists as otherwise Jetty reports an error
-if not exist %XWIKI_DATA_DIR%\logs mkdir %XWIKI_DATA_DIR%\logs
+if not exist "%XWIKI_DATA_DIR%\logs" mkdir "%XWIKI_DATA_DIR%\logs"
 
 REM Specify Jetty's home and base directories
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -Djetty.base=%JETTY_BASE%
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BASE%"
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8

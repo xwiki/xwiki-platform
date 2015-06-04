@@ -43,7 +43,7 @@ set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home="%JETTY_HOME%" -Djetty.base="%JETTY_BAS
 REM Specify port and key to stop a running Jetty instance
 set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%
 
-"%JAVA_PATH%" %XWIKI_OPTS% -jar %JETTY_HOME%/start.jar --stop %JETTY_OPTS%
+"%JAVA_PATH%" %XWIKI_OPTS% -jar "%JETTY_HOME%/start.jar" --stop %JETTY_OPTS%
 
 REM Pause so that the command window used to run this script doesn't close automatically in case of problem
 REM (like when the JDK/JRE is not installed)

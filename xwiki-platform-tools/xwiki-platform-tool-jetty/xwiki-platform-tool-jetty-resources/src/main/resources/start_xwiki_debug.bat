@@ -75,7 +75,7 @@ if not "%JAVA_HOME%" == "" set JAVA_PATH=%JAVA_HOME%\bin\java.exe
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
-set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir=%XWIKI_DATA_DIR%
+set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir="%XWIKI_DATA_DIR%"
 
 REM Ensure the data directory exists so that XWiki can use it for storing permanent data.
 if not exist "%XWIKI_DATA_DIR%" mkdir "%XWIKI_DATA_DIR%"
@@ -98,7 +98,7 @@ set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 REM Specify port and key to stop a running Jetty instance
 set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%
 
-"%JAVA_PATH%" %XWIKI_OPTS% %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar --module=xwiki %JETTY_OPTS%
+"%JAVA_PATH%" %XWIKI_OPTS% %4 %5 %6 %7 %8 %9 -jar "%JETTY_HOME%/start.jar" --module=xwiki %JETTY_OPTS%
 
 if %2==profiler set PATH=%OLD_PATH%
 

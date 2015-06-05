@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,11 +26,11 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.WebHome</parent>
   <creationDate>1432050453000</creationDate>
+  <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1432926327000</date>
+  <date>1433506010000</date>
   <contentUpdateDate>1432050453000</contentUpdateDate>
   <version>1.1</version>
   <title/>
@@ -384,7 +383,14 @@
       #end
       ## Generic object fallback for when no object displayer is available for the object's class or when the displayer did not output anything.
       #if (!$objectDisplayed)
-        &lt;tr&gt;&lt;td&gt;updated an object of type "$objectClass" on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        #if ($objectDiffItem.action == 'object-added')
+          #set ($objectAction = 'added')
+        #elseif ($objectDiffItem.action == 'object-removed')
+          #set ($objectAction = 'removed')
+        #else
+          #set ($objectAction = 'updated')
+        #end
+        &lt;tr&gt;&lt;td&gt;$objectAction an object of type "$objectClass" #if($objectAction != 'removed')on#{else}from#end the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
         ## Mark displayed
         #set ($displayed = true)
       #end

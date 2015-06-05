@@ -329,7 +329,7 @@
             #if ("$!event.authorReference" == '')
               #set ($asGuestNamedOutput = "as ""$object.getValue('author')"" ")
             #end
-            &lt;tr&gt;&lt;td&gt;added a $commentType ${asGuestNamedOutput}on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;added a $commentType $!{asGuestNamedOutput}on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           &lt;tr&gt;&lt;td style='padding-left: 2em'&gt;
             #if ($commentType == 'annotation')

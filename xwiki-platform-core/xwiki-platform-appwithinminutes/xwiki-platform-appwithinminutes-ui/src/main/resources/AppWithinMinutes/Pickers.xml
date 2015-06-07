@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>Pickers</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1318184030000</creationDate>
+  <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1318495355000</date>
   <contentUpdateDate>1318495355000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorPickersCategoryName')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>AppWithinMinutes.Pickers</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldCategoryClass</className>
+    <guid>b7294eee-7373-418d-9532-d12bacf40948</guid>
     <class>
       <name>AppWithinMinutes.FormFieldCategoryClass</name>
       <customClass/>
@@ -67,13 +68,8 @@
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </priority>
     </class>
-    <name>AppWithinMinutes.Pickers</name>
-    <number>0</number>
-    <className>AppWithinMinutes.FormFieldCategoryClass</className>
-    <guid>b7294eee-7373-418d-9532-d12bacf40948</guid>
     <property>
       <priority>1</priority>
     </property>
   </object>
-  <content/>
 </xwikidoc>

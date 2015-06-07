@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>BlogScripts</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1226272589000</creationDate>
+  <parent>Blog.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1227681663000</date>
   <contentUpdateDate>1227681663000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Blog.BlogScripts</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>fee8479f-4003-4fb8-837a-97642e3ff753</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -55,6 +56,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
@@ -62,13 +64,14 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -78,6 +81,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <name>
+        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -86,6 +90,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parse>
+        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
@@ -96,6 +101,7 @@
       </parse>
       <use>
         <cache>0</cache>
+        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
@@ -103,17 +109,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>onDemand=On demand|always=Always</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Blog.BlogScripts</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>fee8479f-4003-4fb8-837a-97642e3ff753</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -355,5 +357,4 @@ document.observe("xwiki:dom:loaded", XWiki.Blog.initialize);</code>
       <use>onDemand</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

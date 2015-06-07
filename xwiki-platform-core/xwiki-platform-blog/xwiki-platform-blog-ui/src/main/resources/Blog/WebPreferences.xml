@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>WebPreferences</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiPreferences</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1236779890000</creationDate>
+  <parent>XWiki.XWikiPreferences</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1236779890000</date>
   <contentUpdateDate>1236779890000</contentUpdateDate>
   <version>1.1</version>
   <title>Preferences for the Blog space</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Blog.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiPreferences</className>
+    <guid>728b6ba0-48fa-450f-a337-76efd19a17a6</guid>
     <class>
       <name>XWiki.XWikiPreferences</name>
       <customClass/>
@@ -144,25 +145,7 @@
       <colorTheme>
         <cache>0</cache>
         <classname/>
-        <customDisplay>{{velocity}}
-{{html wiki="false" clean="false"}}
-#if ("$!value" == '')
-  #set ($value = '')
-#end
-&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
-  #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
-#foreach($theme in $xwiki.wrapDocs($services.query.hql(", BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate' order by doc.title").execute()))
-  #set($themeDoc = $xwiki.getDocument($theme))
-  #if($themeDoc.getObjectNumbers('FlamingoThemesCode.ThemeClass')&gt;0)
-    #set($name = "Flamingo Theme: $theme.plainTitle")
-  #else
-    #set($name = $theme.plainTitle)
-  #end
-  &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$name&lt;/option&gt;
-#end
-&lt;/select&gt;
-{{/html}}
-{{/velocity}}</customDisplay>
+        <customDisplay>{{include reference="XWiki.ColorThemePropertyDisplayer" /}}</customDisplay>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <idField/>
@@ -1238,10 +1221,6 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </xwiki.title.mandatory>
     </class>
-    <name>Blog.WebPreferences</name>
-    <number>0</number>
-    <className>XWiki.XWikiPreferences</className>
-    <guid>728b6ba0-48fa-450f-a337-76efd19a17a6</guid>
     <property>
       <admin_email/>
     </property>
@@ -1402,5 +1381,4 @@
       <webcopyright/>
     </property>
   </object>
-  <content/>
 </xwikidoc>

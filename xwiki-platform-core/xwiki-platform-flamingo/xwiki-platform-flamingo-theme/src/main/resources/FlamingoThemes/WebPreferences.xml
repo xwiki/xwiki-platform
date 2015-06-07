@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemes</web>
   <name>WebPreferences</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FlamingoThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1402406361000</creationDate>
+  <parent>FlamingoThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1402406374000</date>
   <contentUpdateDate>1402406361000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>FlamingoThemes.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiGlobalRights</className>
+    <guid>8577f039-cd9d-4c86-8d96-9557617069f1</guid>
     <class>
       <name>XWiki.XWikiGlobalRights</name>
       <customClass/>
@@ -108,10 +110,6 @@
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
-    <name>FlamingoThemes.WebPreferences</name>
-    <number>0</number>
-    <className>XWiki.XWikiGlobalRights</className>
-    <guid>8577f039-cd9d-4c86-8d96-9557617069f1</guid>
     <property>
       <allow>1</allow>
     </property>
@@ -123,6 +121,10 @@
     </property>
   </object>
   <object>
+    <name>FlamingoThemes.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiPreferences</className>
+    <guid>78283aa4-d37c-4997-ba4a-872dafa6d515</guid>
     <class>
       <name>XWiki.XWikiPreferences</name>
       <customClass/>
@@ -223,19 +225,7 @@
       <colorTheme>
         <cache>0</cache>
         <classname/>
-        <customDisplay>{{velocity}}
-{{html wiki="false" clean="false"}}
-#if ("$!value" == '')
-  #set ($value = '')
-#end
-&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
-  #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
-#foreach($theme in $xwiki.wrapDocs($services.query.hql(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title").execute()))
-  &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
-#end
-&lt;/select&gt;
-{{/html}}
-{{/velocity}}</customDisplay>
+        <customDisplay>{{include reference="XWiki.ColorThemePropertyDisplayer" /}}</customDisplay>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <idField/>
@@ -249,7 +239,7 @@
         <separators/>
         <size>1</size>
         <sort>none</sort>
-        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate'</sql>
+        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate'</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -495,6 +485,21 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </guest_comment_requires_captcha>
+      <iconTheme>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>iconTheme</name>
+        <number>73</number>
+        <prettyName>Icon theme</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <size>1</size>
+        <sql>select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, StringProperty propName where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' and doc.fullName&lt;&gt;'IconThemesCode.IconThemeTemplate' and theme.id = propName.id and propName.name = 'name'</sql>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+      </iconTheme>
       <invitation_email_content>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
@@ -783,7 +788,7 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>leftPanelsWidth</name>
-        <number>73</number>
+        <number>74</number>
         <prettyName>Width of the left panel column</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -944,7 +949,7 @@
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>rightPanelsWidth</name>
-        <number>74</number>
+        <number>75</number>
         <prettyName>Width of the right panel column</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -1296,10 +1301,6 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </xwiki.title.mandatory>
     </class>
-    <name>FlamingoThemes.WebPreferences</name>
-    <number>0</number>
-    <className>XWiki.XWikiPreferences</className>
-    <guid>78283aa4-d37c-4997-ba4a-872dafa6d515</guid>
     <property>
       <leftPanels/>
     </property>
@@ -1340,5 +1341,4 @@
       <title/>
     </property>
   </object>
-  <content/>
 </xwikidoc>

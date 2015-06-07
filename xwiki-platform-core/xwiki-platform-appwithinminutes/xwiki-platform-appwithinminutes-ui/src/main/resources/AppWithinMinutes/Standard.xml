@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>Standard</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1318183890000</creationDate>
+  <parent>AppWithinMinutes.FormFieldCategoryClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1318495355000</date>
   <contentUpdateDate>1318495355000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorStandardCategoryName')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>AppWithinMinutes.Standard</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldCategoryClass</className>
+    <guid>13b9e829-c5f5-45bc-89e1-19f7f6eaa8cc</guid>
     <class>
       <name>AppWithinMinutes.FormFieldCategoryClass</name>
       <customClass/>
@@ -67,13 +68,8 @@
         <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
       </priority>
     </class>
-    <name>AppWithinMinutes.Standard</name>
-    <number>0</number>
-    <className>AppWithinMinutes.FormFieldCategoryClass</className>
-    <guid>13b9e829-c5f5-45bc-89e1-19f7f6eaa8cc</guid>
     <property>
       <priority>0</priority>
     </property>
   </object>
-  <content/>
 </xwikidoc>

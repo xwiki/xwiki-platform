@@ -20,29 +20,528 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ColorThemes</web>
   <name>ColorThemeSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ColorThemes.ColorThemeClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1251108485000</creationDate>
+  <parent>ColorThemes.ColorThemeClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
   <title>#sheetTitle('xe.themes.colors.sheet.title' $doc.name.equals('ColorThemeSheet'))</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+##=======================================================
+##
+## INITIALIZATION
+##
+## Mode
+#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+  #set ($sheetMode = 'edit')
+#else
+  #set ($sheetMode = 'view')
+#end
+## The color theme class and object
+#set($classname = 'ColorThemes.ColorThemeClass')
+#set($class = $xwiki.getDocument($classname).getxWikiClass())
+#set($obj = $doc.getObject($classname))
+#set($propPrefix = "${classname}_${obj.number}_")
+##
+## Color theme initialization:
+## force the use of the default colors whenever this theme has undefined properties
+#set($defaultColorTheme = 'ColorThemes.DefaultColorTheme')
+#set($themeObj = $xwiki.getDocument($defaultColorTheme).getObject($classname))
+#template("colorThemeInit.vm")
+##
+## Default color palette
+#includeTopic('ColorThemes.WizardWebColors')
+##
+## Define a mapping between:
+## - elements and the color theme properties that affect them: $elementStylingPropertyMap
+## - elements and the color theme properties configured from them: $elementPropertyMap
+## to be used in both CSS-only version and JavaScript-enhanced version
+#includeTopic('ColorThemes.WizardPropertyMapping')
+##
+## Wizard stylesheet; defines the layout.
+$xwiki.ssx.use('ColorThemes.ColorThemeSheet')##
+##
+##
+##
+## Hashmap: property number -&gt; property name
+## In the request string, the ids are used because they are much shorter,
+## thus allowing more parameters to fit in the restricted size of the query string.
+#set($propNumberNameMap = {})
+#foreach($prop in $class.properties)
+  #set($discard = $propNumberNameMap.put(${prop.number}, ${prop.name}))
+#end
+##
+## The property values given as query parameters
+#set($requestDefinedValues = {})
+#foreach($propID in $request.getParameterNames())
+  #set($propname = "$!{propNumberNameMap.get($mathtool.toInteger($propID))}")
+  #if($propname.indexOf('Color') &gt;= 0)
+    #set($colorID  = $mathtool.toInteger("$!{request.get($propID)}"))
+    #if($colorID &gt;= 0 &amp;&amp; $colorID &lt; $webColors.size())
+      #set($color    = "$!{webColors.get($colorID)}")
+      #if("$!{propname}" != '' &amp;&amp; "$!{color}" != '')
+        #set($discard = $requestDefinedValues.put($propname, $color))
+      #end
+    #end
+  #else
+    ## TODO Other property types
+  #end
+#end
+##
+##
+## Javascript enhancements of the wizard
+## - Color pickers
+$xwiki.jsfx.use('uicomponents/widgets/colorpicker/procolor.js', true)##
+## - Live preview
+##   Parameters:
+##      colorTheme     - when this theme has undefined properties, force the use of the default
+##                       colors by ignoring the current configured color theme of the wiki;
+##                       colorThemeInit.vm will see this parameter in the URL and use it
+##      themeDoc       - the current document, needed for generating image URL templates
+##      propertyPrefix - "classname_objectnumber_" - needed to identify inputs
+$xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
+       'colorTheme'     : 'ColorThemes.DefaultColorTheme',
+       'themeDoc'       : $doc.fullName,
+       'propertyPrefix' : $propPrefix
+})##
+## ===============================================================
+##
+## MACROS
+##
+#**
+ * Prints a colors palette
+ *
+ * @param propname The property for which the palette is defined
+ *#
+#macro(printColorThemeWizardPalette $propname)
+  #set($rows = 5)
+  #set($columns = 7)
+  ## The Velocity foreach iterator includes the end of the range, so we define the last inclusive element
+  #set($lastRow = $rows - 1)
+  #set($lastColumn = $columns - 1)
+  #set($propID = "$!class.get(${propname}).number")
+  #set($propValue = "$!{requestDefinedValues.get($propname)}")
+  #if($propValue == '')
+    #if("$!{obj.getProperty($propname).value}" == '')
+      ##Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
+      #if ($propname.equals('menuContentLinkColor'))
+        #set($propValue = $!{obj.getProperty('menuLinkColor').value})
+      #elseif ($propname.equals('menuContentBackgroundColor') || $propname.equals('submenuContentBackgroundColor'))
+        #set($propValue = $!{obj.getProperty('menuBackgroundColor').value})
+      #elseif (!$propname.endsWith('GradientColor'))
+        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - leave this inputs empty
+        #set($propValue = $theme.get($propname))
+      #end
+    #end
+  #end
+  #if($propValue != '')
+    $obj.set($propname, $propValue)
+  #end
+  &lt;div class="colorthemewizard-picker-section colorthemewizard-palette"&gt;
+    #printPropertyLabel($propname)
+    ## Not using $doc.display($propname) because it generates an annoying
+    ## &lt;pre&gt; around the input (among other problems)
+    ## Also, set the class 'procolor', to be recognized by the color picker
+    &lt;input type="text" size="9" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="procolor"/&gt;
+    &lt;table class="colorthemewizard-picker-noscript" summary="35 Color Palette"&gt;
+      &lt;tbody&gt;
+        #foreach ($row in [0..$lastRow])
+          &lt;tr&gt;
+          #foreach ($cell in [0..$lastColumn])
+             #set($colorID = $mathtool.mul($row, $columns) + $cell)
+             #set($params = "$!{request.queryString}")
+             #set($params = $params.replaceAll("(^|&amp;)${propID}=[^&amp;]*", ""))
+             #set($params = $params.replaceAll("&amp;", "&amp;amp;"))
+             #set($params = "${params}&amp;amp;${propID}=${colorID}")
+             &lt;td&gt;&lt;a href="$doc.getURL('edit', $params)" class="color${colorID}#if("$!{obj.getProperty($propname).value}" == "$!{webColors.get($colorID)}") current#end"&gt;&lt;/a&gt;&lt;/td&gt;
+          #end
+         &lt;/tr&gt;
+        #end
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+#end
+##
+##
+##
+#**
+ * Prints a css dropdown displaying the names (and thumbnail previews?)
+ * of all the images attached to the current ColorTheme document
+ *
+ * @param propname The property for which the image picker is defined
+ *
+ * TODO write me!
+ *#
+#macro(printImageSelector $propname)
+   &lt;div class="colorthemewizard-picker-section"&gt;
+     #printPropertyLabel($propname)
+     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="colorthemewizard-backgroundImage"/&gt;
+##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
+   &lt;/div&gt;
+#end
+##
+##
+##
+
+#**
+ * Allows to choose possible positions and repeat patterns for the background images
+ *
+ * left    center   right
+ * +--+-----+--+-----+--+
+ * |  |     |  |     |  | top
+ * +--+     +--+     +--+
+ * |                    |
+ * +--+     +--+     +--+
+ * |  |     |  |     |  | center
+ * +--+     +--+     +--+
+ * |                    |
+ * +--+     +--+     +--+
+ * |  |     |  |     |  | bottom
+ * +--+-----+--+-----+--+
+ *
+ * @param propname The property for which the position selector is defined
+ *
+ * TODO write me!
+ *#
+#macro(printPositionSelector $propname)
+   &lt;div class="colorthemewizard-picker-section"&gt;
+     #printPropertyLabel($propname)
+     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}"/&gt;
+##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
+   &lt;/div&gt;
+#end
+##
+##
+##
+#**
+ * Chooses the right picker for each type of property.
+ * Right now, the choice is based on keywords present in the property name:
+ * color, image, position
+ *
+ * @param $propname The property name
+ *#
+#macro(printPropertyPicker $propname)
+  #if($propname.contains('Color'))
+    #printColorThemeWizardPalette($propname)
+  #elseif($propname.contains('Image'))
+    #printImageSelector($propname)
+  #elseif($propname.contains('Position'))
+    #printPositionSelector($propname)
+  #end
+#end
+##
+##
+##
+#**
+ * Obtains the prettyName of the property and processes it in order to display any text
+ * appearing in '()' in smaller print
+ *
+ * @param propname The name of the color theme property
+ *#
+#macro(printPropertyPrettyname $propname)$doc.displayPrettyName($propname).replaceAll("\((.*)\)", "&lt;span class='more-details'&gt;($1)&lt;/span&gt;")#end
+#**
+ * Generates the label for the input correspinding to a given property
+ *
+ * @param propname The name of the color theme property
+ *#
+#macro(printPropertyLabel $propname)
+   &lt;label for="${propPrefix}${propname}"&gt;#printPropertyPrettyname($propname)&lt;/label&gt;
+#end
+##
+##
+#**
+ * Prints the container of ColorTheme properties for an element.
+ * These properties are retrieved from the previously defined map $elementPropertyMap.
+ *
+ * @param element The target element
+ *#
+#macro(printColorThemeWizard $element)
+  ## Only generate the palettes in edit mode
+  #if ($sheetMode == 'edit')
+    #set($propnames = '')
+    #set($propnames = $!elementPropertyMap.get($element))
+    #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
+    &lt;div id="colorthemewizard-${element}-trigger" class="colorthemewizard-trigger"&gt;
+      &lt;div class="colorthemewizard-tip"&gt;
+        $services.localization.render('xe.themes.colors.wizard.choose'):
+        &lt;ul&gt;
+          #foreach($propname in $propnames)
+            &lt;li&gt;#printPropertyPrettyname($propname)&lt;/li&gt;
+          #end
+        &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div id="colorthemewizard-${element}-picker" class="colorthemewizard-picker"&gt;
+        &lt;fieldset&gt;
+          ##&lt;legend&gt;$!{element}&lt;/legend&gt;
+          #foreach($propname in $propnames)
+            #printPropertyPicker($propname)
+          #end
+        &lt;/fieldset&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    #end
+  #end
+#end
+##
+##
+##
+#**
+ * Generates inline style for a given element in the maquette.
+ * Search for values in the following order:
+ * - request parameters
+ * - color theme properties from the current document
+ * - default color theme
+ * The properties that affect it and their corresponding css rules are retrieved from
+ * the previously defined $elementStylingPropertyMap.
+ *
+ * @param $element The element for which we generate the inline style.
+ *###
+#macro(inlineStyle $element)
+  #set($style = '')
+  #foreach($cssProp in $elementStylingPropertyMap.get($element).keySet())
+    #set($cssValue = '')
+    #set($themeProps = $elementStylingPropertyMap.get($element).get($cssProp))
+    #foreach ($themeProp in $themeProps)
+      #set($themeValue = "$!{requestDefinedValues.get($themeProp)}")
+      #if($themeValue == '')
+        #set($themeValue = "$!{obj.getProperty($themeProp).value}")
+        #if($themeValue == '')
+          ## Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
+          #if ($themeProp.equals('menuContentLinkColor'))
+            #set($themeValue = "$!{obj.getProperty('menuLinkColor').value}")
+          #elseif ($themeProp.equals('menuContentBackgroundColor'))
+            #set($themeValue = "$!{obj.getProperty('menuBackgroundColor').value}")
+          #end
+        #end
+      #end
+      #if($themeValue == '' &amp;&amp; !$themeProp.endsWith('GradientColor'))
+        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - don t fallback on these values
+        #set($themeValue = "${theme.get($themeProp)}")
+      #end
+      #if($themeValue != '' &amp;&amp; $themeProp.indexOf('Image') &gt;= 0)
+        #set($themeValue = "url($doc.getAttachmentURL($themeValue))")
+      #end
+      #set($cssValue = "${cssValue} $!{themeValue}")
+    #end
+    #if($cssValue.trim() != '')
+      #if (!$cssProp.equals('background-image'))
+        #set($style = "$!{style} ${cssProp}:${cssValue};")
+      #else
+        ## 'background-image' css properties need to be specially constructed in order to add the gradient definition 
+        #set ($gradientValues = $cssValue.trim().split(' '))
+        #if ($gradientValues.size() &gt;= 2)
+          #if ($gradientValues[0] != '' &amp;&amp; $gradientValues[1] != '')
+            ## #css3_backgroundLinearGradient macro (defined in macros.vm) used for the majority of browsers (FF, Chrome, Opera, IE10) that support CSS3 properties
+            #set($style = "$!{style} #css3_backgroundLinearGradient({
+               'to': 'bottom',
+               'colors': [
+                {'color': $gradientValues[1], 'position': '0%'},
+                {'color': $gradientValues[0], 'position': '100%'}
+              ]
+            })")
+            ## #css_filterGradient macro (defined in macros.vm) used for the IE 6-9 browsers that don't support CSS3 properties
+            #set($style = "$!{style} #css_filterGradient(${gradientValues[1]}, ${gradientValues[0]})")
+          #end
+        #end
+      #end
+    #end
+  #end
+  #if ("$!{style}" != '')
+    #set($style = "style='${style}'")
+  #end
+  $style ##
+#end
+##
+##
+##
+#**
+ * Generates the classes corresponding to each theme property that 'affects' an element.
+ * These properties are retrieved from the previously defined map $elementStylingPropertyMap.
+ * The classname is constructed as "colorthemewizard-${propertyName}".
+ * Also sets the implicit class "colorthemewizard-${element}".
+ * In addition, if the element should display editable pickers for one or more theme properties,
+ * as defined in $elementPropertyMap, it will also have the class "colorthemewizard-editable-group".
+ *
+ * @param $element The element for which we generate the class names.
+ *#
+#macro(themePropertyClasses $element)
+  #set($classes = "colorthemewizard-${element}")
+  #set($attachedProps = '')
+  #set($attachedProps = $elementPropertyMap.get($element))
+  #if("$!{attachedProps}" != '' &amp;&amp; $attachedProps.size() &gt; 0)
+    #set($classes = "${classes} colorthemewizard-editable-group")
+  #end
+  #foreach($themeProps in $elementStylingPropertyMap.get($element))
+    #foreach ($property in $themeProps)
+      #set($classes = "$!{classes} colorthemewizard-${property}")
+    #end
+  #end
+  class="$!{classes}" ##
+#end
+##
+##
+##
+#**
+ * Generates the class and inline style for an element.
+ * @see #themePropertyClasses
+ * @see #inlineStyle
+ *
+ * @param $element The element for which we generate the metadata.
+ *#
+#macro(elementMetaData $element)
+  #themePropertyClasses($element) #inlineStyle($element)##
+#end
+##
+##
+##
+##
+{{/velocity}}
+
+{{velocity}}
+## ===============================================================
+##
+## PAGE MAQUETTE
+##
+{{html clean="false" wiki="false"}}
+##
+##
+#if($sheetMode == 'edit')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
+&lt;div #elementMetaData('page')&gt;
+  #printColorThemeWizard('page')
+  ## Main menu
+  &lt;div #elementMetaData('mainmenu')&gt;
+   &lt;div&gt;
+    $services.localization.render('xe.themes.colors.wizard.mainMenu')
+    &lt;span #elementMetaData('menuaddentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#$services.localization.render('core.menu.create')&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+   &lt;/div&gt;
+   #printColorThemeWizard('mainmenu')
+  &lt;/div&gt;
+  ## Page header
+  &lt;div #elementMetaData('headerbox')&gt;
+    &lt;div #elementMetaData('header')&gt;
+      ## Page Header
+      #set($themeLogoImage = $doc.getAttachment("$!{obj.getProperty('logoImage').value}"))
+      #if ("$!{themeLogoImage}" != '')
+        #set($themeLogoImage = $doc.getAttachmentURL($!{obj.getProperty('logoImage').value}))
+      #else
+        ## If the logo is not configured, use the one in the skin or the one set by default
+        ## For this $logoname is already set in global.vm
+        #set($themeLogoImage = "$xwiki.getSkinFile($logoname)")
+      #end
+      &lt;img id="colorthemewizard-logo" src="$themeLogoImage" alt="$services.localization.render('xe.themes.colors.wizard.logo')"/&gt;
+    &lt;/div&gt;
+    #printColorThemeWizard('headerbox')
+  &lt;/div&gt;
+  ## Panels
+  &lt;div #elementMetaData('panels')&gt;
+    ## Expanded panel
+    &lt;div #elementMetaData('panel')&gt;
+      ## Expanded panel header
+      &lt;div #elementMetaData('panelheader')&gt;
+        &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel')&lt;/div&gt;
+        #printColorThemeWizard('panelheader')
+      &lt;/div&gt;
+      ## Expanded panel contents
+      &lt;div #elementMetaData('panelcontents')&gt;
+        &lt;div&gt;&lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.panel.text')&lt;/span&gt; | &lt;span  #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.panel.link')&lt;/span&gt;&lt;/div&gt;
+        #printColorThemeWizard('panelcontents')
+      &lt;/div&gt;
+    &lt;/div&gt;
+    ## Collapsed panel
+    &lt;div #elementMetaData('collapsedpanel')&gt;
+      &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel.collapsed')&lt;/div&gt;
+      #printColorThemeWizard('collapsedpanel')
+    &lt;/div&gt;
+  &lt;/div&gt; ##panels
+  &lt;div #elementMetaData('maincolumn')&gt;
+    ## XWiki Content
+    &lt;div #elementMetaData('content')&gt;
+      &lt;div #elementMetaData('contentmenu')&gt;
+       $services.localization.render('xe.themes.colors.wizard.menu')
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
+       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
+       #printColorThemeWizard('contentmenu')
+      &lt;/div&gt;
+      &lt;div #elementMetaData('xwikicontent')&gt;
+        &lt;div #elementMetaData('titlebox')&gt;
+          &lt;h2 #elementMetaData('title')&gt;$services.localization.render('xe.themes.colors.wizard.title')&lt;/h2&gt;
+          #printColorThemeWizard('titlebox')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('info')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.informativeText')&lt;/div&gt;
+          #printColorThemeWizard('info')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('details')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.detailsText')&lt;/div&gt;
+          #printColorThemeWizard('details')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+        &lt;div #elementMetaData('textlink')&gt;
+          &lt;div&gt;
+            &lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.text')&lt;/span&gt; |
+            &lt;span #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.link')&lt;/span&gt;
+          &lt;/div&gt;
+          #printColorThemeWizard('textlink')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('highlight')&gt;
+          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.highlightedText')&lt;/div&gt;
+          #printColorThemeWizard('highlight')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('boxes')&gt;
+          &lt;div #elementMetaData('message')&gt;$services.localization.render('xe.themes.colors.wizard.messageBox')&lt;/div&gt;
+          &lt;table #elementMetaData('table')&gt;
+            &lt;thead&gt;&lt;tr&gt;&lt;th colspan="2" scope="col" #elementMetaData('th')&gt;$services.localization.render('xe.themes.colors.wizard.table')&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+            &lt;tbody&gt;&lt;tr&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#1&lt;/td&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+          &lt;/table&gt;
+          #printColorThemeWizard('boxes')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+        &lt;div #elementMetaData('buttonbox')&gt;
+          &lt;div&gt;&lt;input #elementMetaData('button') type="button" value="$services.localization.render('xe.themes.colors.wizard.button')" /&gt;&lt;/div&gt;
+          #printColorThemeWizard('buttonbox')
+        &lt;/div&gt;
+        &lt;div #elementMetaData('secondaryButtonbox')&gt;
+          &lt;div&gt;&lt;input #elementMetaData('secondaryButton') type="button" value="$services.localization.render('xe.themes.colors.wizard.secondaryButton')" /&gt;&lt;/div&gt;
+          #printColorThemeWizard('secondaryButtonbox')
+        &lt;/div&gt;
+        &lt;div class="clearfloats" &gt;&lt;/div&gt;
+      &lt;/div&gt; ## xwikicontent
+      #printColorThemeWizard('content')
+    &lt;/div&gt; ## content
+    ## Extra tabs - comments/attachments/history/information
+    &lt;div  #elementMetaData('extratabs')&gt;
+      &lt;div  #elementMetaData('tabshead')&gt;
+        &lt;span #elementMetaData('tabentryactive')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#1&lt;/span&gt;&lt;/span&gt;
+        &lt;span #elementMetaData('tabentry')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#2&lt;/span&gt;&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div #elementMetaData('tabscontent')&gt;$services.localization.render('xe.themes.colors.wizard.tab.text')&lt;/div&gt;
+      #printColorThemeWizard('extratabs')
+    &lt;/div&gt;
+  &lt;/div&gt; ## main column
+  &lt;div class="clearfloats" &gt;&lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
   <object>
+    <name>ColorThemes.ColorThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2fcb4790-0b18-41ad-8fdc-42f3062a8025</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -62,7 +561,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -107,17 +606,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>ColorThemes.ColorThemeSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>2fcb4790-0b18-41ad-8fdc-42f3062a8025</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -536,6 +1031,10 @@ document.observe('xwiki:dom:loaded', function(){
     </property>
   </object>
   <object>
+    <name>ColorThemes.ColorThemeSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>bb54e5ea-3751-424b-b8dc-b3d7dee268f6</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -555,7 +1054,7 @@ document.observe('xwiki:dom:loaded', function(){
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -571,6 +1070,22 @@ document.observe('xwiki:dom:loaded', function(){
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -600,17 +1115,13 @@ document.observe('xwiki:dom:loaded', function(){
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>ColorThemes.ColorThemeSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>bb54e5ea-3751-424b-b8dc-b3d7dee268f6</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1157,502 +1668,4 @@ input.procolor {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity output="false"}}
-##=======================================================
-##
-## INITIALIZATION
-##
-## Mode
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-  #set ($sheetMode = 'edit')
-#else
-  #set ($sheetMode = 'view')
-#end
-## The color theme class and object
-#set($classname = 'ColorThemes.ColorThemeClass')
-#set($class = $xwiki.getDocument($classname).getxWikiClass())
-#set($obj = $doc.getObject($classname))
-#set($propPrefix = "${classname}_${obj.number}_")
-##
-## Color theme initialization:
-## force the use of the default colors whenever this theme has undefined properties
-#set($defaultColorTheme = 'ColorThemes.DefaultColorTheme')
-#set($themeObj = $xwiki.getDocument($defaultColorTheme).getObject($classname))
-#template("colorThemeInit.vm")
-##
-## Default color palette
-#includeTopic('ColorThemes.WizardWebColors')
-##
-## Define a mapping between:
-## - elements and the color theme properties that affect them: $elementStylingPropertyMap
-## - elements and the color theme properties configured from them: $elementPropertyMap
-## to be used in both CSS-only version and JavaScript-enhanced version
-#includeTopic('ColorThemes.WizardPropertyMapping')
-##
-## Wizard stylesheet; defines the layout.
-$xwiki.ssx.use('ColorThemes.ColorThemeSheet')##
-##
-##
-##
-## Hashmap: property number -&gt; property name
-## In the request string, the ids are used because they are much shorter,
-## thus allowing more parameters to fit in the restricted size of the query string.
-#set($propNumberNameMap = {})
-#foreach($prop in $class.properties)
-  #set($discard = $propNumberNameMap.put(${prop.number}, ${prop.name}))
-#end
-##
-## The property values given as query parameters
-#set($requestDefinedValues = {})
-#foreach($propID in $request.getParameterNames())
-  #set($propname = "$!{propNumberNameMap.get($mathtool.toInteger($propID))}")
-  #if($propname.indexOf('Color') &gt;= 0)
-    #set($colorID  = $mathtool.toInteger("$!{request.get($propID)}"))
-    #if($colorID &gt;= 0 &amp;&amp; $colorID &lt; $webColors.size())
-      #set($color    = "$!{webColors.get($colorID)}")
-      #if("$!{propname}" != '' &amp;&amp; "$!{color}" != '')
-        #set($discard = $requestDefinedValues.put($propname, $color))
-      #end
-    #end
-  #else
-    ## TODO Other property types
-  #end
-#end
-##
-##
-## Javascript enhancements of the wizard
-## - Color pickers
-$xwiki.jsfx.use('uicomponents/widgets/colorpicker/procolor.js', true)##
-## - Live preview
-##   Parameters:
-##      colorTheme     - when this theme has undefined properties, force the use of the default
-##                       colors by ignoring the current configured color theme of the wiki;
-##                       colorThemeInit.vm will see this parameter in the URL and use it
-##      themeDoc       - the current document, needed for generating image URL templates
-##      propertyPrefix - "classname_objectnumber_" - needed to identify inputs
-$xwiki.jsx.use('ColorThemes.ColorThemeSheet', {
-       'colorTheme'     : 'ColorThemes.DefaultColorTheme',
-       'themeDoc'       : $doc.fullName,
-       'propertyPrefix' : $propPrefix
-})##
-## ===============================================================
-##
-## MACROS
-##
-#**
- * Prints a colors palette
- *
- * @param propname The property for which the palette is defined
- *#
-#macro(printColorThemeWizardPalette $propname)
-  #set($rows = 5)
-  #set($columns = 7)
-  ## The Velocity foreach iterator includes the end of the range, so we define the last inclusive element
-  #set($lastRow = $rows - 1)
-  #set($lastColumn = $columns - 1)
-  #set($propID = "$!class.get(${propname}).number")
-  #set($propValue = "$!{requestDefinedValues.get($propname)}")
-  #if($propValue == '')
-    #if("$!{obj.getProperty($propname).value}" == '')
-      ##Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
-      #if ($propname.equals('menuContentLinkColor'))
-        #set($propValue = $!{obj.getProperty('menuLinkColor').value})
-      #elseif ($propname.equals('menuContentBackgroundColor') || $propname.equals('submenuContentBackgroundColor'))
-        #set($propValue = $!{obj.getProperty('menuBackgroundColor').value})
-      #elseif (!$propname.endsWith('GradientColor'))
-        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - leave this inputs empty
-        #set($propValue = $theme.get($propname))
-      #end
-    #end
-  #end
-  #if($propValue != '')
-    $obj.set($propname, $propValue)
-  #end
-  &lt;div class="colorthemewizard-picker-section colorthemewizard-palette"&gt;
-    #printPropertyLabel($propname)
-    ## Not using $doc.display($propname) because it generates an annoying
-    ## &lt;pre&gt; around the input (among other problems)
-    ## Also, set the class 'procolor', to be recognized by the color picker
-    &lt;input type="text" size="9" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="procolor"/&gt;
-    &lt;table class="colorthemewizard-picker-noscript" summary="35 Color Palette"&gt;
-      &lt;tbody&gt;
-        #foreach ($row in [0..$lastRow])
-          &lt;tr&gt;
-          #foreach ($cell in [0..$lastColumn])
-             #set($colorID = $mathtool.mul($row, $columns) + $cell)
-             #set($params = "$!{request.queryString}")
-             #set($params = $params.replaceAll("(^|&amp;)${propID}=[^&amp;]*", ""))
-             #set($params = $params.replaceAll("&amp;", "&amp;amp;"))
-             #set($params = "${params}&amp;amp;${propID}=${colorID}")
-             &lt;td&gt;&lt;a href="$doc.getURL('edit', $params)" class="color${colorID}#if("$!{obj.getProperty($propname).value}" == "$!{webColors.get($colorID)}") current#end"&gt;&lt;/a&gt;&lt;/td&gt;
-          #end
-         &lt;/tr&gt;
-        #end
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-  &lt;/div&gt;
-#end
-##
-##
-##
-#**
- * Prints a css dropdown displaying the names (and thumbnail previews?)
- * of all the images attached to the current ColorTheme document
- *
- * @param propname The property for which the image picker is defined
- *
- * TODO write me!
- *#
-#macro(printImageSelector $propname)
-   &lt;div class="colorthemewizard-picker-section"&gt;
-     #printPropertyLabel($propname)
-     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}" class="colorthemewizard-backgroundImage"/&gt;
-##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
-   &lt;/div&gt;
-#end
-##
-##
-##
-
-#**
- * Allows to choose possible positions and repeat patterns for the background images
- *
- * left    center   right
- * +--+-----+--+-----+--+
- * |  |     |  |     |  | top
- * +--+     +--+     +--+
- * |                    |
- * +--+     +--+     +--+
- * |  |     |  |     |  | center
- * +--+     +--+     +--+
- * |                    |
- * +--+     +--+     +--+
- * |  |     |  |     |  | bottom
- * +--+-----+--+-----+--+
- *
- * @param propname The property for which the position selector is defined
- *
- * TODO write me!
- *#
-#macro(printPositionSelector $propname)
-   &lt;div class="colorthemewizard-picker-section"&gt;
-     #printPropertyLabel($propname)
-     &lt;input type="text" size="15" name="${propPrefix}${propname}" id="${propPrefix}${propname}" value="$!{obj.getProperty($propname).value}"/&gt;
-##     &lt;div style="color: red;"&gt;TODO: display friendly selector&lt;/div&gt;
-   &lt;/div&gt;
-#end
-##
-##
-##
-#**
- * Chooses the right picker for each type of property.
- * Right now, the choice is based on keywords present in the property name:
- * color, image, position
- *
- * @param $propname The property name
- *#
-#macro(printPropertyPicker $propname)
-  #if($propname.contains('Color'))
-    #printColorThemeWizardPalette($propname)
-  #elseif($propname.contains('Image'))
-    #printImageSelector($propname)
-  #elseif($propname.contains('Position'))
-    #printPositionSelector($propname)
-  #end
-#end
-##
-##
-##
-#**
- * Obtains the prettyName of the property and processes it in order to display any text
- * appearing in '()' in smaller print
- *
- * @param propname The name of the color theme property
- *#
-#macro(printPropertyPrettyname $propname)$doc.displayPrettyName($propname).replaceAll("\((.*)\)", "&lt;span class='more-details'&gt;($1)&lt;/span&gt;")#end
-#**
- * Generates the label for the input correspinding to a given property
- *
- * @param propname The name of the color theme property
- *#
-#macro(printPropertyLabel $propname)
-   &lt;label for="${propPrefix}${propname}"&gt;#printPropertyPrettyname($propname)&lt;/label&gt;
-#end
-##
-##
-#**
- * Prints the container of ColorTheme properties for an element.
- * These properties are retrieved from the previously defined map $elementPropertyMap.
- *
- * @param element The target element
- *#
-#macro(printColorThemeWizard $element)
-  ## Only generate the palettes in edit mode
-  #if ($sheetMode == 'edit')
-    #set($propnames = '')
-    #set($propnames = $!elementPropertyMap.get($element))
-    #if("$!{propnames}" != '' &amp;&amp; $propnames.size() &gt; 0)
-    &lt;div id="colorthemewizard-${element}-trigger" class="colorthemewizard-trigger"&gt;
-      &lt;div class="colorthemewizard-tip"&gt;
-        $services.localization.render('xe.themes.colors.wizard.choose'):
-        &lt;ul&gt;
-          #foreach($propname in $propnames)
-            &lt;li&gt;#printPropertyPrettyname($propname)&lt;/li&gt;
-          #end
-        &lt;/ul&gt;
-      &lt;/div&gt;
-      &lt;div id="colorthemewizard-${element}-picker" class="colorthemewizard-picker"&gt;
-        &lt;fieldset&gt;
-          ##&lt;legend&gt;$!{element}&lt;/legend&gt;
-          #foreach($propname in $propnames)
-            #printPropertyPicker($propname)
-          #end
-        &lt;/fieldset&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-    #end
-  #end
-#end
-##
-##
-##
-#**
- * Generates inline style for a given element in the maquette.
- * Search for values in the following order:
- * - request parameters
- * - color theme properties from the current document
- * - default color theme
- * The properties that affect it and their corresponding css rules are retrieved from
- * the previously defined $elementStylingPropertyMap.
- *
- * @param $element The element for which we generate the inline style.
- *###
-#macro(inlineStyle $element)
-  #set($style = '')
-  #foreach($cssProp in $elementStylingPropertyMap.get($element).keySet())
-    #set($cssValue = '')
-    #set($themeProps = $elementStylingPropertyMap.get($element).get($cssProp))
-    #foreach ($themeProp in $themeProps)
-      #set($themeValue = "$!{requestDefinedValues.get($themeProp)}")
-      #if($themeValue == '')
-        #set($themeValue = "$!{obj.getProperty($themeProp).value}")
-        #if($themeValue == '')
-          ## Old colorthemes (before 3.4) shared values for #mainmenu and #contentmenu
-          #if ($themeProp.equals('menuContentLinkColor'))
-            #set($themeValue = "$!{obj.getProperty('menuLinkColor').value}")
-          #elseif ($themeProp.equals('menuContentBackgroundColor'))
-            #set($themeValue = "$!{obj.getProperty('menuBackgroundColor').value}")
-          #end
-        #end
-      #end
-      #if($themeValue == '' &amp;&amp; !$themeProp.endsWith('GradientColor'))
-        ## Old colorthemes (before 3.4) don t have values set for GradientColor variables - don t fallback on these values
-        #set($themeValue = "${theme.get($themeProp)}")
-      #end
-      #if($themeValue != '' &amp;&amp; $themeProp.indexOf('Image') &gt;= 0)
-        #set($themeValue = "url($doc.getAttachmentURL($themeValue))")
-      #end
-      #set($cssValue = "${cssValue} $!{themeValue}")
-    #end
-    #if($cssValue.trim() != '')
-      #if (!$cssProp.equals('background-image'))
-        #set($style = "$!{style} ${cssProp}:${cssValue};")
-      #else
-        ## 'background-image' css properties need to be specially constructed in order to add the gradient definition 
-        #set ($gradientValues = $cssValue.trim().split(' '))
-        #if ($gradientValues.size() &gt;= 2)
-          #if ($gradientValues[0] != '' &amp;&amp; $gradientValues[1] != '')
-            ## #css3_backgroundLinearGradient macro (defined in macros.vm) used for the majority of browsers (FF, Chrome, Opera, IE10) that support CSS3 properties
-            #set($style = "$!{style} #css3_backgroundLinearGradient({
-               'to': 'bottom',
-               'colors': [
-                {'color': $gradientValues[1], 'position': '0%'},
-                {'color': $gradientValues[0], 'position': '100%'}
-              ]
-            })")
-            ## #css_filterGradient macro (defined in macros.vm) used for the IE 6-9 browsers that don't support CSS3 properties
-            #set($style = "$!{style} #css_filterGradient(${gradientValues[1]}, ${gradientValues[0]})")
-          #end
-        #end
-      #end
-    #end
-  #end
-  #if ("$!{style}" != '')
-    #set($style = "style='${style}'")
-  #end
-  $style ##
-#end
-##
-##
-##
-#**
- * Generates the classes corresponding to each theme property that 'affects' an element.
- * These properties are retrieved from the previously defined map $elementStylingPropertyMap.
- * The classname is constructed as "colorthemewizard-${propertyName}".
- * Also sets the implicit class "colorthemewizard-${element}".
- * In addition, if the element should display editable pickers for one or more theme properties,
- * as defined in $elementPropertyMap, it will also have the class "colorthemewizard-editable-group".
- *
- * @param $element The element for which we generate the class names.
- *#
-#macro(themePropertyClasses $element)
-  #set($classes = "colorthemewizard-${element}")
-  #set($attachedProps = '')
-  #set($attachedProps = $elementPropertyMap.get($element))
-  #if("$!{attachedProps}" != '' &amp;&amp; $attachedProps.size() &gt; 0)
-    #set($classes = "${classes} colorthemewizard-editable-group")
-  #end
-  #foreach($themeProps in $elementStylingPropertyMap.get($element))
-    #foreach ($property in $themeProps)
-      #set($classes = "$!{classes} colorthemewizard-${property}")
-    #end
-  #end
-  class="$!{classes}" ##
-#end
-##
-##
-##
-#**
- * Generates the class and inline style for an element.
- * @see #themePropertyClasses
- * @see #inlineStyle
- *
- * @param $element The element for which we generate the metadata.
- *#
-#macro(elementMetaData $element)
-  #themePropertyClasses($element) #inlineStyle($element)##
-#end
-##
-##
-##
-##
-{{/velocity}}
-
-{{velocity}}
-## ===============================================================
-##
-## PAGE MAQUETTE
-##
-{{html clean="false" wiki="false"}}
-##
-##
-#if($sheetMode == 'edit')&lt;div class="colorthemewizard-reset"&gt;&lt;input type="reset" value="$services.localization.render('xe.themes.colors.wizard.reset')"/&gt;&lt;/div&gt;#end
-&lt;div #elementMetaData('page')&gt;
-  #printColorThemeWizard('page')
-  ## Main menu
-  &lt;div #elementMetaData('mainmenu')&gt;
-   &lt;div&gt;
-    $services.localization.render('xe.themes.colors.wizard.mainMenu')
-    &lt;span #elementMetaData('menuaddentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#$services.localization.render('core.menu.create')&lt;/span&gt;
-    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
-    &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
-   &lt;/div&gt;
-   #printColorThemeWizard('mainmenu')
-  &lt;/div&gt;
-  ## Page header
-  &lt;div #elementMetaData('headerbox')&gt;
-    &lt;div #elementMetaData('header')&gt;
-      ## Page Header
-      #set($themeLogoImage = $doc.getAttachment("$!{obj.getProperty('logoImage').value}"))
-      #if ("$!{themeLogoImage}" != '')
-        #set($themeLogoImage = $doc.getAttachmentURL($!{obj.getProperty('logoImage').value}))
-      #else
-        ## If the logo is not configured, use the one in the skin or the one set by default
-        ## For this $logoname is already set in global.vm
-        #set($themeLogoImage = "$xwiki.getSkinFile($logoname)")
-      #end
-      &lt;img id="colorthemewizard-logo" src="$themeLogoImage" alt="$services.localization.render('xe.themes.colors.wizard.logo')"/&gt;
-    &lt;/div&gt;
-    #printColorThemeWizard('headerbox')
-  &lt;/div&gt;
-  ## Panels
-  &lt;div #elementMetaData('panels')&gt;
-    ## Expanded panel
-    &lt;div #elementMetaData('panel')&gt;
-      ## Expanded panel header
-      &lt;div #elementMetaData('panelheader')&gt;
-        &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel')&lt;/div&gt;
-        #printColorThemeWizard('panelheader')
-      &lt;/div&gt;
-      ## Expanded panel contents
-      &lt;div #elementMetaData('panelcontents')&gt;
-        &lt;div&gt;&lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.panel.text')&lt;/span&gt; | &lt;span  #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.panel.link')&lt;/span&gt;&lt;/div&gt;
-        #printColorThemeWizard('panelcontents')
-      &lt;/div&gt;
-    &lt;/div&gt;
-    ## Collapsed panel
-    &lt;div #elementMetaData('collapsedpanel')&gt;
-      &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.panel.collapsed')&lt;/div&gt;
-      #printColorThemeWizard('collapsedpanel')
-    &lt;/div&gt;
-  &lt;/div&gt; ##panels
-  &lt;div #elementMetaData('maincolumn')&gt;
-    ## XWiki Content
-    &lt;div #elementMetaData('content')&gt;
-      &lt;div #elementMetaData('contentmenu')&gt;
-       $services.localization.render('xe.themes.colors.wizard.menu')
-       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#1&lt;/span&gt;
-       &lt;span #elementMetaData('menuentry')&gt;$services.localization.render('xe.themes.colors.wizard.menuEntry')#2&lt;/span&gt;
-       #printColorThemeWizard('contentmenu')
-      &lt;/div&gt;
-      &lt;div #elementMetaData('xwikicontent')&gt;
-        &lt;div #elementMetaData('titlebox')&gt;
-          &lt;h2 #elementMetaData('title')&gt;$services.localization.render('xe.themes.colors.wizard.title')&lt;/h2&gt;
-          #printColorThemeWizard('titlebox')
-        &lt;/div&gt;
-        &lt;div #elementMetaData('info')&gt;
-          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.informativeText')&lt;/div&gt;
-          #printColorThemeWizard('info')
-        &lt;/div&gt;
-        &lt;div #elementMetaData('details')&gt;
-          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.detailsText')&lt;/div&gt;
-          #printColorThemeWizard('details')
-        &lt;/div&gt;
-        &lt;div class="clearfloats" &gt;&lt;/div&gt;
-        &lt;div #elementMetaData('textlink')&gt;
-          &lt;div&gt;
-            &lt;span #elementMetaData('text')&gt;$services.localization.render('xe.themes.colors.wizard.text')&lt;/span&gt; |
-            &lt;span #elementMetaData('link')&gt;$services.localization.render('xe.themes.colors.wizard.link')&lt;/span&gt;
-          &lt;/div&gt;
-          #printColorThemeWizard('textlink')
-        &lt;/div&gt;
-        &lt;div #elementMetaData('highlight')&gt;
-          &lt;div&gt;$services.localization.render('xe.themes.colors.wizard.highlightedText')&lt;/div&gt;
-          #printColorThemeWizard('highlight')
-        &lt;/div&gt;
-        &lt;div #elementMetaData('boxes')&gt;
-          &lt;div #elementMetaData('message')&gt;$services.localization.render('xe.themes.colors.wizard.messageBox')&lt;/div&gt;
-          &lt;table #elementMetaData('table')&gt;
-            &lt;thead&gt;&lt;tr&gt;&lt;th colspan="2" scope="col" #elementMetaData('th')&gt;$services.localization.render('xe.themes.colors.wizard.table')&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
-            &lt;tbody&gt;&lt;tr&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#1&lt;/td&gt;&lt;td #elementMetaData('td')&gt;$services.localization.render('xe.themes.colors.wizard.table.data')#2&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
-          &lt;/table&gt;
-          #printColorThemeWizard('boxes')
-        &lt;/div&gt;
-        &lt;div class="clearfloats" &gt;&lt;/div&gt;
-        &lt;div #elementMetaData('buttonbox')&gt;
-          &lt;div&gt;&lt;input #elementMetaData('button') type="button" value="$services.localization.render('xe.themes.colors.wizard.button')" /&gt;&lt;/div&gt;
-          #printColorThemeWizard('buttonbox')
-        &lt;/div&gt;
-        &lt;div #elementMetaData('secondaryButtonbox')&gt;
-          &lt;div&gt;&lt;input #elementMetaData('secondaryButton') type="button" value="$services.localization.render('xe.themes.colors.wizard.secondaryButton')" /&gt;&lt;/div&gt;
-          #printColorThemeWizard('secondaryButtonbox')
-        &lt;/div&gt;
-        &lt;div class="clearfloats" &gt;&lt;/div&gt;
-      &lt;/div&gt; ## xwikicontent
-      #printColorThemeWizard('content')
-    &lt;/div&gt; ## content
-    ## Extra tabs - comments/attachments/history/information
-    &lt;div  #elementMetaData('extratabs')&gt;
-      &lt;div  #elementMetaData('tabshead')&gt;
-        &lt;span #elementMetaData('tabentryactive')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#1&lt;/span&gt;&lt;/span&gt;
-        &lt;span #elementMetaData('tabentry')&gt;$services.localization.render('xe.themes.colors.wizard.tab') &lt;span #elementMetaData('tabdetails')&gt;#2&lt;/span&gt;&lt;/span&gt;
-      &lt;/div&gt;
-      &lt;div #elementMetaData('tabscontent')&gt;$services.localization.render('xe.themes.colors.wizard.tab.text')&lt;/div&gt;
-      #printColorThemeWizard('extratabs')
-    &lt;/div&gt;
-  &lt;/div&gt; ## main column
-  &lt;div class="clearfloats" &gt;&lt;/div&gt;
-&lt;/div&gt;
-{{/html}}
-{{/velocity}}</content>
 </xwikidoc>

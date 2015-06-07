@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>WysiwygEditorConfigTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WysiwygEditorConfigClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1364502206000</creationDate>
+  <parent>XWiki.WysiwygEditorConfigClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1364566519000</date>
   <contentUpdateDate>1364566519000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('wysiwyg.config.template.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>XWiki.WysiwygEditorConfigTemplate</name>
+    <number>0</number>
+    <className>XWiki.WysiwygEditorConfigClass</className>
+    <guid>9666430e-2e43-48f5-9a0f-cce3012f17a0</guid>
     <class>
       <name>XWiki.WysiwygEditorConfigClass</name>
       <customClass/>
@@ -241,10 +243,6 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </toolBar>
     </class>
-    <name>XWiki.WysiwygEditorConfigTemplate</name>
-    <number>0</number>
-    <className>XWiki.WysiwygEditorConfigClass</className>
-    <guid>9666430e-2e43-48f5-9a0f-cce3012f17a0</guid>
     <property>
       <attachmentSelectionLimited>0</attachmentSelectionLimited>
     </property>
@@ -311,5 +309,4 @@
       <toolBar>bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | paste</toolBar>
     </property>
   </object>
-  <content/>
 </xwikidoc>

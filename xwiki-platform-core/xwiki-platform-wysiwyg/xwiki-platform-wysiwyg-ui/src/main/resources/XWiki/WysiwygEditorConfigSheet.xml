@@ -20,29 +20,146 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>WysiwygEditorConfigSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WysiwygEditorConfigClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1364502206000</creationDate>
+  <parent>XWiki.WysiwygEditorConfigClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1364563225000</date>
   <contentUpdateDate>1364562921000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.name == 'WysiwygEditorConfigSheet')$services.localization.render('wysiwyg.config.sheet.title')#{else}$services.localization.render('wysiwyg.config.title')#end</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+{{html wiki="true"}}
+#set($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+#set($mode = 'view')
+#if($editing)
+#set($mode = 'edit')
+$xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
+$xwiki.jsfx.use('js/scriptaculous/controls.js')##
+$xwiki.jsfx.use('uicomponents/widgets/colorpicker/procolor.js', true)##
+$xwiki.jsx.use('XWiki.WysiwygEditorConfigSheet')##
+#end
+$xwiki.ssx.use('XWiki.WysiwygEditorConfigSheet')
+#set($ok = $doc.use('XWiki.WysiwygEditorConfigClass'))
+## We don't have access to the form element to set the CSS class for the vertical form layout standard.
+(% class="xform" %)
+(((
+##
+== {{translation key="wysiwyg.admin.general"/}} ==
+##
+
+## Vertical form styles are applied on the label element so we have to use it.
+; &lt;label&gt;$doc.displayPrettyName('sourceEditorEnabled', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.sourceEditorEnabled.hint"/}}
+: $doc.display('sourceEditorEnabled', $mode)
+##
+; &lt;label&gt;$doc.displayPrettyName('plugins', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.plugins.hint"/}}
+## TODO: Replace the DIV with a group when XRENDERING-29 is implemented.
+: &lt;div class="noScript"&gt;$doc.display('plugins', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('menuBar', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.menuBar.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('menuBar', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('toolBar', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.toolBar.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('toolBar', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('cleanPaste', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.cleanPaste.hint"/}}
+: $doc.display('cleanPaste', $mode)
+
+##
+== {{translation key="wysiwyg.admin.link"/}} ==
+##
+
+(% class="xHint" %)(((
+{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="link"/}}
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('attachmentSelectionLimited', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.attachmentSelectionLimited.hint"/}}
+: $doc.display('attachmentSelectionLimited', $mode)
+
+##
+== {{translation key="wysiwyg.admin.image"/}} ==
+##
+
+(% class="xHint" %)(((
+{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="image"/}}
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('externalImages', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.externalImages.hint"/}}
+: $doc.display('externalImages', $mode)
+##
+; &lt;label&gt;$doc.displayPrettyName('imageSelectionLimited', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.imageSelectionLimited.hint"/}}
+: $doc.display('imageSelectionLimited', $mode)
+
+##
+== {{translation key="wysiwyg.admin.color"/}} ==
+##
+
+(% class="xHint" %)(((
+{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="color"/}}
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('colorsPerRow', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.colorsPerRow.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('colorsPerRow', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('colorPalette', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.colorPalette.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('colorPalette', $mode)&lt;/div&gt;
+
+##
+== {{translation key="wysiwyg.admin.font"/}} ==
+##
+
+(% class="xHint" %)(((
+{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="font"/}}
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('fontNames', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.fontNames.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('fontNames', $mode)&lt;/div&gt;
+##
+; &lt;label&gt;$doc.displayPrettyName('fontSizes', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.fontSizes.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('fontSizes', $mode)&lt;/div&gt;
+
+##
+== {{translation key="wysiwyg.admin.style"/}} ==
+##
+
+(% class="xHint" %)(((
+{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="style"/}}
+)))
+
+; &lt;label&gt;$doc.displayPrettyName('styleNames', false, false)&lt;/label&gt;##
+(% class="xHint" %){{translation key="wysiwyg.admin.styleNames.hint"/}}
+: &lt;div class="noScript"&gt;$doc.display('styleNames', $mode)&lt;/div&gt;
+)))
+{{/html}}
+{{/velocity}}</content>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>8323d574-1519-4321-9d04-90bf5f1872a9</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -62,7 +179,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -107,17 +224,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>8323d574-1519-4321-9d04-90bf5f1872a9</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -260,6 +373,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>ca7dd193-cf03-4030-b93a-9a1ce8da1474</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -279,7 +396,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -324,17 +441,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>ca7dd193-cf03-4030-b93a-9a1ce8da1474</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -462,6 +575,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>185a9da6-6b0a-4095-97f7-aff994b9e857</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -481,7 +598,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -526,17 +643,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>2</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>185a9da6-6b0a-4095-97f7-aff994b9e857</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -788,6 +901,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>3</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>791d40c8-a0b3-4acb-8ca6-0abd08e11883</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -807,7 +924,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -852,17 +969,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>3</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>791d40c8-a0b3-4acb-8ca6-0abd08e11883</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -943,6 +1056,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>4</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>1f0cb4a9-e6cb-4d23-9ccc-fbca826b92b7</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -962,7 +1079,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1007,17 +1124,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>4</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>1f0cb4a9-e6cb-4d23-9ccc-fbca826b92b7</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1083,6 +1196,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>7523b0c9-7bcc-445f-a32f-6be301b6856e</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -1102,7 +1219,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1118,6 +1235,22 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -1147,17 +1280,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>7523b0c9-7bcc-445f-a32f-6be301b6856e</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1244,6 +1373,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8243190c-75cd-4b83-b10c-37c40b604b5c</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -1263,7 +1396,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1279,6 +1412,22 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -1308,17 +1457,13 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8243190c-75cd-4b83-b10c-37c40b604b5c</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1418,6 +1563,10 @@ ul.hSortable li .separator {
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigSheet</name>
+    <number>2</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>fc4b82e9-86bf-42de-931d-920b63dff5a5</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -1437,7 +1586,7 @@ ul.hSortable li .separator {
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -1453,6 +1602,22 @@ ul.hSortable li .separator {
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -1482,17 +1647,13 @@ ul.hSortable li .separator {
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.WysiwygEditorConfigSheet</name>
-    <number>2</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>fc4b82e9-86bf-42de-931d-920b63dff5a5</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1541,120 +1702,4 @@ ul.hSortable li .separator {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity}}
-{{html wiki="true"}}
-#set($editing = $xcontext.action == 'admin' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
-#set($mode = 'view')
-#if($editing)
-#set($mode = 'edit')
-$xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
-$xwiki.jsfx.use('js/scriptaculous/controls.js')##
-$xwiki.jsfx.use('uicomponents/widgets/colorpicker/procolor.js', true)##
-$xwiki.jsx.use('XWiki.WysiwygEditorConfigSheet')##
-#end
-$xwiki.ssx.use('XWiki.WysiwygEditorConfigSheet')
-#set($ok = $doc.use('XWiki.WysiwygEditorConfigClass'))
-## We don't have access to the form element to set the CSS class for the vertical form layout standard.
-(% class="xform" %)
-(((
-##
-== {{translation key="wysiwyg.admin.general"/}} ==
-##
-
-## Vertical form styles are applied on the label element so we have to use it.
-; &lt;label&gt;$doc.displayPrettyName('sourceEditorEnabled', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.sourceEditorEnabled.hint"/}}
-: $doc.display('sourceEditorEnabled', $mode)
-##
-; &lt;label&gt;$doc.displayPrettyName('plugins', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.plugins.hint"/}}
-## TODO: Replace the DIV with a group when XRENDERING-29 is implemented.
-: &lt;div class="noScript"&gt;$doc.display('plugins', $mode)&lt;/div&gt;
-##
-; &lt;label&gt;$doc.displayPrettyName('menuBar', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.menuBar.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('menuBar', $mode)&lt;/div&gt;
-##
-; &lt;label&gt;$doc.displayPrettyName('toolBar', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.toolBar.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('toolBar', $mode)&lt;/div&gt;
-##
-; &lt;label&gt;$doc.displayPrettyName('cleanPaste', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.cleanPaste.hint"/}}
-: $doc.display('cleanPaste', $mode)
-
-##
-== {{translation key="wysiwyg.admin.link"/}} ==
-##
-
-(% class="xHint" %)(((
-{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="link"/}}
-)))
-
-; &lt;label&gt;$doc.displayPrettyName('attachmentSelectionLimited', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.attachmentSelectionLimited.hint"/}}
-: $doc.display('attachmentSelectionLimited', $mode)
-
-##
-== {{translation key="wysiwyg.admin.image"/}} ==
-##
-
-(% class="xHint" %)(((
-{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="image"/}}
-)))
-
-; &lt;label&gt;$doc.displayPrettyName('externalImages', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.externalImages.hint"/}}
-: $doc.display('externalImages', $mode)
-##
-; &lt;label&gt;$doc.displayPrettyName('imageSelectionLimited', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.imageSelectionLimited.hint"/}}
-: $doc.display('imageSelectionLimited', $mode)
-
-##
-== {{translation key="wysiwyg.admin.color"/}} ==
-##
-
-(% class="xHint" %)(((
-{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="color"/}}
-)))
-
-; &lt;label&gt;$doc.displayPrettyName('colorsPerRow', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.colorsPerRow.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('colorsPerRow', $mode)&lt;/div&gt;
-##
-; &lt;label&gt;$doc.displayPrettyName('colorPalette', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.colorPalette.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('colorPalette', $mode)&lt;/div&gt;
-
-##
-== {{translation key="wysiwyg.admin.font"/}} ==
-##
-
-(% class="xHint" %)(((
-{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="font"/}}
-)))
-
-; &lt;label&gt;$doc.displayPrettyName('fontNames', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.fontNames.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('fontNames', $mode)&lt;/div&gt;
-##
-; &lt;label&gt;$doc.displayPrettyName('fontSizes', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.fontSizes.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('fontSizes', $mode)&lt;/div&gt;
-
-##
-== {{translation key="wysiwyg.admin.style"/}} ==
-##
-
-(% class="xHint" %)(((
-{{translation key="wysiwyg.admin.plugin.settings.hint" parameters="style"/}}
-)))
-
-; &lt;label&gt;$doc.displayPrettyName('styleNames', false, false)&lt;/label&gt;##
-(% class="xHint" %){{translation key="wysiwyg.admin.styleNames.hint"/}}
-: &lt;div class="noScript"&gt;$doc.display('styleNames', $mode)&lt;/div&gt;
-)))
-{{/html}}
-{{/velocity}}</content>
 </xwikidoc>

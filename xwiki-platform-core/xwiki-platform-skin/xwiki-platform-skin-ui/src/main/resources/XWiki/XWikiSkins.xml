@@ -20,29 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>XWikiSkins</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiClasses</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1303993396000</creationDate>
+  <parent>XWiki.XWikiClasses</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1306878410000</date>
   <contentUpdateDate>1306878410000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki Skin Class</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <class>
     <name>XWiki.XWikiSkins</name>
     <customClass/>
@@ -136,6 +133,22 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </name>
+    <outputSyntax>
+      <cache>0</cache>
+      <disabled>0</disabled>
+      <displayType>select</displayType>
+      <multiSelect>0</multiSelect>
+      <name>outputSyntax</name>
+      <number>10</number>
+      <prettyName>Output Syntax</prettyName>
+      <relationalStorage>0</relationalStorage>
+      <separator> </separator>
+      <separators>|, </separators>
+      <size>1</size>
+      <unmodifiable>0</unmodifiable>
+      <values>html/5.0=HTML 5|xhtml/1.0=XHTML 1.0</values>
+      <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+    </outputSyntax>
     <style.css>
       <customDisplay/>
       <disabled>0</disabled>
@@ -183,6 +196,10 @@
     </viewheader.vm>
   </class>
   <object>
+    <name>XWiki.XWikiSkins</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>789667d7-b354-4446-ac50-c2d0d6fff0b4</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -206,15 +223,15 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>XWiki.XWikiSkins</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>789667d7-b354-4446-ac50-c2d0d6fff0b4</guid>
     <property>
       <sheet>SkinsCode.XWikiSkinsSheet</sheet>
     </property>
   </object>
   <object>
+    <name>XWiki.XWikiSkins</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>17dcc34f-856a-47cc-9db6-c1c1656507c0</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -238,13 +255,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>XWiki.XWikiSkins</name>
-    <number>0</number>
-    <className>XWiki.DocumentSheetBinding</className>
-    <guid>17dcc34f-856a-47cc-9db6-c1c1656507c0</guid>
     <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>
-  <content/>
 </xwikidoc>

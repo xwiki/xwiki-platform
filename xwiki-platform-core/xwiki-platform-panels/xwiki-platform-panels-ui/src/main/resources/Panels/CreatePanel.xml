@@ -35,6 +35,7 @@
   <contentUpdateDate>1391691881000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.panels.create')</title>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>

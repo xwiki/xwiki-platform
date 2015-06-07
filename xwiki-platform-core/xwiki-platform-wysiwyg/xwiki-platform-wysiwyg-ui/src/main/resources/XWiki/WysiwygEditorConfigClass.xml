@@ -20,28 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>WysiwygEditorConfigClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1364502205000</creationDate>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1364567289000</date>
   <contentUpdateDate>1364567289000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('wysiwyg.config.class.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <class>
     <name>XWiki.WysiwygEditorConfigClass</name>
     <customClass/>
@@ -241,6 +239,10 @@
     </toolBar>
   </class>
   <object>
+    <name>XWiki.WysiwygEditorConfigClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>a3f1872b-69f3-4cda-98cd-2d4c51ea5e3d</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -264,15 +266,15 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>XWiki.WysiwygEditorConfigClass</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>a3f1872b-69f3-4cda-98cd-2d4c51ea5e3d</guid>
     <property>
       <sheet>WysiwygEditorConfigSheet</sheet>
     </property>
   </object>
   <object>
+    <name>XWiki.WysiwygEditorConfigClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>b376326a-ed18-407f-bf8e-46d3f9ddab46</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -296,13 +298,8 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
-    <name>XWiki.WysiwygEditorConfigClass</name>
-    <number>0</number>
-    <className>XWiki.DocumentSheetBinding</className>
-    <guid>b376326a-ed18-407f-bf8e-46d3f9ddab46</guid>
     <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>
-  <content/>
 </xwikidoc>

@@ -27,8 +27,8 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Main.UserDirectory</parent>
   <creationDate>1412951745000</creationDate>
+  <parent>Main.UserDirectory</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1413211263000</date>

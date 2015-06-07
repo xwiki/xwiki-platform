@@ -27,8 +27,8 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Main.UserDirectory</parent>
   <creationDate>1412940996000</creationDate>
+  <parent>Main.UserDirectory</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1413213238000</date>
@@ -54,7 +54,21 @@
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
       <codeToExecute>
+        <customDisplay/>
         <disabled>0</disabled>
         <editor>---</editor>
         <name>codeToExecute</name>
@@ -69,6 +83,7 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </codeToExecute>
       <configurationClass>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>configurationClass</name>
         <number>3</number>
@@ -81,6 +96,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </configurationClass>
       <configureGlobally>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
@@ -93,7 +109,34 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </configureGlobally>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
       <displayInSection>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>displayInSection</name>
         <number>1</number>
@@ -106,6 +149,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </displayInSection>
       <heading>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>heading</name>
         <number>2</number>
@@ -118,6 +162,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </heading>
       <iconAttachment>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>iconAttachment</name>
         <number>8</number>
@@ -130,6 +175,7 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </iconAttachment>
       <linkPrefix>
+        <customDisplay/>
         <disabled>0</disabled>
         <name>linkPrefix</name>
         <number>5</number>
@@ -143,6 +189,7 @@
       </linkPrefix>
       <propertiesToShow>
         <cache>0</cache>
+        <customDisplay/>
         <disabled>0</disabled>
         <displayType>input</displayType>
         <multiSelect>1</multiSelect>
@@ -161,6 +208,19 @@
         <values/>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
     </class>
     <property>
       <codeToExecute>{{include reference="XWiki.UserDirectoryConfigurationSheet"}}</codeToExecute>

@@ -26,9 +26,9 @@
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Mail.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1418130835000</creationDate>
+  <parent>Mail.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1418137751000</date>

@@ -20,29 +20,41 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>PanelsCode</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1413990648000</creationDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1413991189000</date>
   <contentUpdateDate>1413991189000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Here, you can select which applications are available in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. Don't forget to save your changes!
+platform.panels.applications.displayedapps=Applications in the bar
+platform.panels.applications.blacklistedapps=Applications not in the bar
+platform.panels.applications.save=Save
+platform.panels.applications.revert=Revert
+platform.panels.applications.ajax.success=The configuration has been saved.
+platform.panels.applications.ajax.csrf=CSRF validation failed. Try to reload the page.
+platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Failed to save your change.
+admin.panels.applications=Applications Panel
+</content>
   <object>
+    <name>PanelsCode.Translations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>93d6784d-6263-405b-bbe5-eca5deb8b5d5</guid>
     <class>
       <name>XWiki.TranslationDocumentClass</name>
       <customClass/>
@@ -62,30 +74,15 @@
         <prettyName>Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>PanelsCode.Translations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>93d6784d-6263-405b-bbe5-eca5deb8b5d5</guid>
     <property>
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>platform.panels.applications.helper=Here, you can select which applications are available in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. Don't forget to save your changes!
-platform.panels.applications.displayedapps=Applications in the bar
-platform.panels.applications.blacklistedapps=Applications not in the bar
-platform.panels.applications.save=Save
-platform.panels.applications.revert=Revert
-platform.panels.applications.ajax.success=The configuration has been saved.
-platform.panels.applications.ajax.csrf=CSRF validation failed. Try to reload the page.
-platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
-platform.panels.applications.ajax.error=Failed to save your change.
-admin.panels.applications=Applications Panel
-</content>
 </xwikidoc>

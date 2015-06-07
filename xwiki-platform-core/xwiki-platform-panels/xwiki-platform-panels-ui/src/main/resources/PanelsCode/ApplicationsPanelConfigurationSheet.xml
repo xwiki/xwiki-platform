@@ -20,29 +20,107 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>PanelsCode</web>
   <name>ApplicationsPanelConfigurationSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.ApplicationsPanel</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1413881393000</creationDate>
+  <parent>Panels.ApplicationsPanel</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1413991026000</date>
   <contentUpdateDate>1413990747000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.name == 'ApplicationsPanelConfigurationSheet')ApplicationsPanelConfiguration Sheet#{else}$services.display.title($doc, {'displayerHint': 'default'})#end</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+##########################
+## JAVASCRIPT/CSS
+##########################
+#set($discard = $xwiki.jsx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
+#set($discard = $xwiki.ssx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
+##########################
+## First, we split the applications in 2 categories (white listed/black listed)
+##########################
+#set($displayedApps = [])
+#set($blacklistedApps = [])
+#if($doc.fullName == 'XWiki.XWikiPreferences')
+  #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
+#else
+  #set($configDoc = $doc)
+#end
+#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
+  #if("$!configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id)" != '')
+    #set($discard = $blacklistedApps.add($uix))
+  #else
+    #set($discard = $displayedApps.add($uix))
+  #end
+#end
+##########################
+## Macro to display an application panel
+##########################
+#macro(showAppPanel $id $title $class $apps)
+
+  {{html}}
+    &lt;div class="col-xs-12 col-md-6"&gt;
+      &lt;div class="panel-width-Small panel $!class appsPanel" id="$id"&gt;
+        &lt;div class="panel-heading"&gt;
+          &lt;h2&gt;$title&lt;/h2&gt;
+        &lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          &lt;ul class="nav nav-pills applicationsPanel"&gt;
+            #foreach($uix in $apps)
+              #set($params = $uix.getParameters())
+              #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+                #if ($params.icon.startsWith('icon:'))
+                  #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+                #else
+                  #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
+                #end
+                &lt;li class="draggableApp" id="$uix.id"&gt;
+                  &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
+                &lt;/li&gt;
+              #end
+            #end
+          &lt;/ul&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  {{/html}}
+#end
+##########################
+## Display the information message
+##########################
+{{info}}
+{{translation key="platform.panels.applications.helper" /}}
+{{/info}}
+##########################
+## Display the 2 panels
+##########################
+(% class="row appLists" %)
+(((
+  #showAppPanel('displayedPanels', $services.localization.render('platform.panels.applications.displayedapps'), 'panel-primary', $displayedApps)
+  #showAppPanel('blacklistedPanels', $services.localization.render('platform.panels.applications.blacklistedapps'), 'panel-info', $blacklistedApps)
+)))
+##########################
+## Display the buttons
+##########################
+{{html}}
+&lt;button class="btn btn-success" id="bt-save"&gt;$services.localization.render('platform.panels.applications.save')&lt;/button&gt; &lt;button class="btn btn-default" id="bt-revert"&gt;$services.localization.render('platform.panels.applications.revert')&lt;/button&gt;
+{{/html}}
+{{/velocity}}
+</content>
   <object>
+    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>3bd008ad-ec26-4593-899c-729733fd5e37</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -62,7 +140,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -107,17 +185,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>3bd008ad-ec26-4593-899c-729733fd5e37</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -279,6 +353,10 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
     </property>
   </object>
   <object>
+    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e6d34b0f-3b57-4cdf-b263-ad878e949af3</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -298,7 +376,7 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -314,6 +392,22 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -343,17 +437,13 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>PanelsCode.ApplicationsPanelConfigurationSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>e6d34b0f-3b57-4cdf-b263-ad878e949af3</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -377,81 +467,4 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{velocity}}
-##########################
-## JAVASCRIPT/CSS
-##########################
-#set($discard = $xwiki.jsx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
-#set($discard = $xwiki.ssx.use('PanelsCode.ApplicationsPanelConfigurationSheet'))
-##########################
-## First, we split the applications in 2 categories (white listed/black listed)
-##########################
-#set($displayedApps = [])
-#set($blacklistedApps = [])
-#if($doc.fullName == 'XWiki.XWikiPreferences')
-  #set($configDoc = $xwiki.getDocument($services.model.createDocumentReference('', 'PanelsCode', 'ApplicationsPanelConfiguration')))
-#else
-  #set($configDoc = $doc)
-#end
-#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
-  #if("$!configDoc.getObject('PanelsCode.ApplicationsPanelBlackListClass', 'applicationId', $uix.id)" != '')
-    #set($discard = $blacklistedApps.add($uix))
-  #else
-    #set($discard = $displayedApps.add($uix))
-  #end
-#end
-##########################
-## Macro to display an application panel
-##########################
-#macro(showAppPanel $id $title $class $apps)
-
-  {{html}}
-    &lt;div class="col-xs-12 col-md-6"&gt;
-      &lt;div class="panel-width-Small panel $!class appsPanel" id="$id"&gt;
-        &lt;div class="panel-heading"&gt;
-          &lt;h2&gt;$title&lt;/h2&gt;
-        &lt;/div&gt;
-        &lt;div class="panel-body"&gt;
-          &lt;ul class="nav nav-pills applicationsPanel"&gt;
-            #foreach($uix in $apps)
-              #set($params = $uix.getParameters())
-              #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-                #if ($params.icon.startsWith('icon:'))
-                  #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
-                #else
-                  #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
-                #end
-                &lt;li class="draggableApp" id="$uix.id"&gt;
-                  &lt;a&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;
-                &lt;/li&gt;
-              #end
-            #end
-          &lt;/ul&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  {{/html}}
-#end
-##########################
-## Display the information message
-##########################
-{{info}}
-{{translation key="platform.panels.applications.helper" /}}
-{{/info}}
-##########################
-## Display the 2 panels
-##########################
-(% class="row appLists" %)
-(((
-  #showAppPanel('displayedPanels', $services.localization.render('platform.panels.applications.displayedapps'), 'panel-primary', $displayedApps)
-  #showAppPanel('blacklistedPanels', $services.localization.render('platform.panels.applications.blacklistedapps'), 'panel-info', $blacklistedApps)
-)))
-##########################
-## Display the buttons
-##########################
-{{html}}
-&lt;button class="btn btn-success" id="bt-save"&gt;$services.localization.render('platform.panels.applications.save')&lt;/button&gt; &lt;button class="btn btn-default" id="bt-revert"&gt;$services.localization.render('platform.panels.applications.revert')&lt;/button&gt;
-{{/html}}
-{{/velocity}}
-</content>
 </xwikidoc>

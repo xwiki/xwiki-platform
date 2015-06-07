@@ -20,371 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>SolrSearchAdmin</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.SearchAdmin</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1349094183000</creationDate>
+  <parent>XWiki.SearchAdmin</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1351958422000</date>
   <contentUpdateDate>1351958422000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("solr.admin.title")</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.SolrSearchAdmin</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>b5c1b9ee-7ea5-4196-af00-80c93bd72387</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>require(['jquery'], function($) {
-  var displayTimeDelta = function(millis) {
-    millis = Math.floor(millis);
-    if (millis &lt; 1000) {
-      return Math.floor(millis) + 'ms';
-    } else if (millis &lt; 60000) {
-      return Math.floor(millis / 1000) + 's ' + (millis % 1000) + 'ms';
-    } else if (millis &lt; 3600000) {
-      return Math.floor(millis / 60000) + 'm ' + Math.floor((millis % 60000) / 1000) + 's';
-    } else {
-      return Math.floor(millis / 3600000) + 'h ' + Math.floor((millis % 3600000) / 60000) + 'm';
-    }
-  };
-
-  var estimateRemainingTime = function(data) {
-    if (this._previousData) {
-      var sizeDelta = this._previousData.queueSize - data.queueSize;
-      if (data.queueSize &gt; 0 &amp;&amp; sizeDelta &gt; 0) {
-        var timeDelta = data.timestamp - this._previousData.timestamp;
-        var etr = (timeDelta / sizeDelta) * data.queueSize;
-        $(this).next().text('(Estimated time remaining: ' + displayTimeDelta(etr) + ')');
-      } else {
-        $(this).next().html('');
-      }
-    }
-    this._previousData = data;
-  };
-
-  var updateQueueSize = function(data) {
-    $(this).text(data.queueSize);
-    if (data.queueSize &gt; 0) {
-      $(this).addClass('loading');
-    } else {
-      $(this).removeClass('loading');
-    }
-    estimateRemainingTime.call(this, data);
-    scheduleQueueSizeUpdate.call(this);
-  };
-
-  var requestQueueSizeUpdate = function() {
-    var queueSizeContainer = this;
-    $.ajax({
-      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
-      data: {action: 'getQueueSize'}
-    }).done(function(data) {
-      updateQueueSize.call(queueSizeContainer, data);
-    });
-  };
-
-  var scheduleQueueSizeUpdate = function() {
-    var queueSize = parseInt($(this).text());
-    // Wait more if the queue size is 0 or not a number.
-    var delay = isNaN(queueSize) || queueSize &lt;= 0 ? 60 : 5;
-    var queueSizeContainer = this;
-    setTimeout(function() {
-      requestQueueSizeUpdate.call(queueSizeContainer);
-    }, delay * 1000);
-  };
-
-  $('.solrQueueSize').after('&lt;span class="estimatedTimeRemaining"/&gt;').each(scheduleQueueSizeUpdate);
-})</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.SolrSearchAdmin</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>e33ed638-628e-44ec-bb7e-87c9511da6ec</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#template('colorThemeInit.vm')
-
-.solrQueueSize.loading {
-  background-position: right center;
-  padding-right: 18px;
-}
-
-.estimatedTimeRemaining {
-  color: $theme.textSecondaryColor;
-  font-style: italic;
-  margin-left: 1em;
-}</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>1</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <disabled>0</disabled>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>5</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>XWiki.SolrSearchAdmin</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>5d55eff4-9ad5-4e40-924d-98e0264a9e5e</guid>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.search</extensionPointId>
-    </property>
-    <property>
-      <name>solr</name>
-    </property>
-    <property>
-      <parameters>label=$services.localization.render('search.extension.title.solr')
-admin=XWiki.SolrSearchAdmin
-search=Main.SolrSearch</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
-    </property>
-  </object>
   <content>{{velocity output='false'}}
 #macro (displaySolrIndexForm)
   {{html}}
@@ -575,4 +229,362 @@ search=Main.SolrSearch</parameters>
 #set ($isAjaxRequest = $request.getHeader('X-Requested-With') == 'XMLHttpRequest')
 #handleSolrRequest()
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b5c1b9ee-7ea5-4196-af00-80c93bd72387</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery'], function($) {
+  var displayTimeDelta = function(millis) {
+    millis = Math.floor(millis);
+    if (millis &lt; 1000) {
+      return Math.floor(millis) + 'ms';
+    } else if (millis &lt; 60000) {
+      return Math.floor(millis / 1000) + 's ' + (millis % 1000) + 'ms';
+    } else if (millis &lt; 3600000) {
+      return Math.floor(millis / 60000) + 'm ' + Math.floor((millis % 60000) / 1000) + 's';
+    } else {
+      return Math.floor(millis / 3600000) + 'h ' + Math.floor((millis % 3600000) / 60000) + 'm';
+    }
+  };
+
+  var estimateRemainingTime = function(data) {
+    if (this._previousData) {
+      var sizeDelta = this._previousData.queueSize - data.queueSize;
+      if (data.queueSize &gt; 0 &amp;&amp; sizeDelta &gt; 0) {
+        var timeDelta = data.timestamp - this._previousData.timestamp;
+        var etr = (timeDelta / sizeDelta) * data.queueSize;
+        $(this).next().text('(Estimated time remaining: ' + displayTimeDelta(etr) + ')');
+      } else {
+        $(this).next().html('');
+      }
+    }
+    this._previousData = data;
+  };
+
+  var updateQueueSize = function(data) {
+    $(this).text(data.queueSize);
+    if (data.queueSize &gt; 0) {
+      $(this).addClass('loading');
+    } else {
+      $(this).removeClass('loading');
+    }
+    estimateRemainingTime.call(this, data);
+    scheduleQueueSizeUpdate.call(this);
+  };
+
+  var requestQueueSizeUpdate = function() {
+    var queueSizeContainer = this;
+    $.ajax({
+      url: "$xwiki.getURL('XWiki.SolrSearchAdmin', 'get', 'outputSyntax=plain')",
+      data: {action: 'getQueueSize'}
+    }).done(function(data) {
+      updateQueueSize.call(queueSizeContainer, data);
+    });
+  };
+
+  var scheduleQueueSizeUpdate = function() {
+    var queueSize = parseInt($(this).text());
+    // Wait more if the queue size is 0 or not a number.
+    var delay = isNaN(queueSize) || queueSize &lt;= 0 ? 60 : 5;
+    var queueSizeContainer = this;
+    setTimeout(function() {
+      requestQueueSizeUpdate.call(queueSizeContainer);
+    }, delay * 1000);
+  };
+
+  $('.solrQueueSize').after('&lt;span class="estimatedTimeRemaining"/&gt;').each(scheduleQueueSizeUpdate);
+})</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>e33ed638-628e-44ec-bb7e-87c9511da6ec</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.solrQueueSize.loading {
+  background-position: right center;
+  padding-right: 18px;
+}
+
+.estimatedTimeRemaining {
+  color: $theme.textSecondaryColor;
+  font-style: italic;
+  margin-left: 1em;
+}</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.SolrSearchAdmin</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>5d55eff4-9ad5-4e40-924d-98e0264a9e5e</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.search</extensionPointId>
+    </property>
+    <property>
+      <name>solr</name>
+    </property>
+    <property>
+      <parameters>label=$services.localization.render('search.extension.title.solr')
+admin=XWiki.SolrSearchAdmin
+search=Main.SolrSearch</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
 </xwikidoc>

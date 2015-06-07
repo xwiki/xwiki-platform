@@ -20,29 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Invitation</web>
   <name>InvitationMailClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Invitation.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1271864541000</creationDate>
+  <parent>Invitation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1271865584000</date>
   <contentUpdateDate>1271865483000</contentUpdateDate>
   <version>1.1</version>
   <title>InvitationMailClass</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}{{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}{{/velocity}}</content>
   <class>
     <name>Invitation.InvitationMailClass</name>
     <customClass/>
@@ -53,6 +50,7 @@
     <nameField/>
     <validationScript/>
     <history>
+      <disabled>0</disabled>
       <name>history</name>
       <number>11</number>
       <prettyName>history</prettyName>
@@ -62,6 +60,7 @@
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </history>
     <messageBody>
+      <disabled>0</disabled>
       <editor>---</editor>
       <name>messageBody</name>
       <number>5</number>
@@ -72,71 +71,8 @@
       <unmodifiable>0</unmodifiable>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </messageBody>
-    <messageGroupID>
-      <name>messageGroupID</name>
-      <number>9</number>
-      <numberType>double</numberType>
-      <prettyName>messageGroupID</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-    </messageGroupID>
-    <messageID>
-      <name>messageID</name>
-      <number>1</number>
-      <picker>0</picker>
-      <prettyName>messageID</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </messageID>
-    <recipient>
-      <name>recipient</name>
-      <number>2</number>
-      <picker>0</picker>
-      <prettyName>recipient</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </recipient>
-    <sendingUser>
-      <name>sendingUser</name>
-      <number>3</number>
-      <picker>0</picker>
-      <prettyName>sendingUser</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </sendingUser>
-    <sentDate>
-      <dateFormat>dd/MM/yyyy</dateFormat>
-      <emptyIsToday>1</emptyIsToday>
-      <name>sentDate</name>
-      <number>8</number>
-      <picker>1</picker>
-      <prettyName>sentDate</prettyName>
-      <size>20</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
-    </sentDate>
-    <status>
-      <name>status</name>
-      <number>10</number>
-      <prettyName>status</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </status>
-    <subjectLine>
-      <name>subjectLine</name>
-      <number>4</number>
-      <picker>0</picker>
-      <prettyName>subjectLine</prettyName>
-      <size>30</size>
-      <unmodifiable>0</unmodifiable>
-      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </subjectLine>
     <messageBodyPlain>
+      <disabled>0</disabled>
       <editor>---</editor>
       <name>messageBodyPlain</name>
       <number>5</number>
@@ -147,6 +83,76 @@
       <unmodifiable>0</unmodifiable>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </messageBodyPlain>
+    <messageGroupID>
+      <disabled>0</disabled>
+      <name>messageGroupID</name>
+      <number>9</number>
+      <numberType>double</numberType>
+      <prettyName>messageGroupID</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </messageGroupID>
+    <messageID>
+      <disabled>0</disabled>
+      <name>messageID</name>
+      <number>1</number>
+      <picker>0</picker>
+      <prettyName>messageID</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </messageID>
+    <recipient>
+      <disabled>0</disabled>
+      <name>recipient</name>
+      <number>2</number>
+      <picker>0</picker>
+      <prettyName>recipient</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </recipient>
+    <sendingUser>
+      <disabled>0</disabled>
+      <name>sendingUser</name>
+      <number>3</number>
+      <picker>0</picker>
+      <prettyName>sendingUser</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </sendingUser>
+    <sentDate>
+      <dateFormat>dd/MM/yyyy</dateFormat>
+      <disabled>0</disabled>
+      <emptyIsToday>1</emptyIsToday>
+      <name>sentDate</name>
+      <number>8</number>
+      <picker>1</picker>
+      <prettyName>sentDate</prettyName>
+      <size>20</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+    </sentDate>
+    <status>
+      <disabled>0</disabled>
+      <name>status</name>
+      <number>10</number>
+      <prettyName>status</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </status>
+    <subjectLine>
+      <disabled>0</disabled>
+      <name>subjectLine</name>
+      <number>4</number>
+      <picker>0</picker>
+      <prettyName>subjectLine</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </subjectLine>
   </class>
-  <content>{{velocity}}{{info}}$services.localization.render('xe.invitation.internalDocument', ["${doc.getSpace()}.WebHome"]){{/info}}{{/velocity}}</content>
 </xwikidoc>

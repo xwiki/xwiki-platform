@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>RecentPostsPanel</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016401000</creationDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1373018473000</date>
   <contentUpdateDate>1373016401000</contentUpdateDate>
   <version>1.1</version>
   <title>Recent Blog Posts Panel</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Blog.RecentPostsPanel</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>2ecdb9b4-0266-4aca-9ce8-a6e7032aeec8</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -116,10 +118,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
-    <name>Blog.RecentPostsPanel</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>2ecdb9b4-0266-4aca-9ce8-a6e7032aeec8</guid>
     <property>
       <category>Navigation</category>
     </property>
@@ -150,5 +148,4 @@
       <type>view</type>
     </property>
   </object>
-  <content/>
 </xwikidoc>

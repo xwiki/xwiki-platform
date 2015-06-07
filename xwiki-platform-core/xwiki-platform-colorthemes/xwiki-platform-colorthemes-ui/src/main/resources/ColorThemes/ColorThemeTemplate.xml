@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ColorThemes</web>
   <name>ColorThemeTemplate</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ColorThemes.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1251108485000</creationDate>
+  <parent>ColorThemes.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1251108485000</date>
   <contentUpdateDate>1251108485000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.themes.colors.template.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>ColorThemes.ColorThemeTemplate</name>
+    <number>0</number>
+    <className>ColorThemes.ColorThemeClass</className>
+    <guid>e658ee3f-cf58-44ff-a87d-73e6ceea8181</guid>
     <class>
       <name>ColorThemes.ColorThemeClass</name>
       <customClass/>
@@ -651,10 +653,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </titleColor>
     </class>
-    <name>ColorThemes.ColorThemeTemplate</name>
-    <number>0</number>
-    <className>ColorThemes.ColorThemeClass</className>
-    <guid>e658ee3f-cf58-44ff-a87d-73e6ceea8181</guid>
     <property>
       <backgroundSecondaryColor>#F3F3F3</backgroundSecondaryColor>
     </property>
@@ -794,5 +792,4 @@
       <titleColor>#4D5860</titleColor>
     </property>
   </object>
-  <content/>
 </xwikidoc>

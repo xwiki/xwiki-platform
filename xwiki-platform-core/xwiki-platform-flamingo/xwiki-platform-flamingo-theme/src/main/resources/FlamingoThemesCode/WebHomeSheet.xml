@@ -20,316 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FlamingoThemesCode</web>
   <name>WebHomeSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1414513755000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1414515317000</date>
   <contentUpdateDate>1414515317000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.flamingo.themes.home.title')</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>FlamingoThemesCode.WebHomeSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>36837eed-1247-4e50-9e0d-0abc7f698eed</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#template('colorThemeInit.vm')
-.theme {
-  border: 1px dotted $theme.borderColor;
-  float: left;
-  margin: 0 1em 1em 0;
-  padding: 2px 4px;
-  width: 300px;
-}
-
-.current-theme {
-  background-color: $theme.highlightColor;
-}
-
-.theme-info {
-  margin-left: 60px;
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-}
-
-.theme-info h3{
-  margin-top: 0;
-  border-bottom: 1px solid $theme.borderColor;
-}
-
-/* Clear the floatting strategy after the display of all themes */
-.theme-viewer h2, .theme-creation-form {
-  clear: both;
-}
-
-.mockup-page {
-  border: 1px solid #aaa;
-  float: left;
-  height: 47px;
-  margin: 0 4px;
-  position: relative;
-  width: 50px;
-}
-
-.mockup-page * {
-  line-height: 1px;
-  overflow: hidden;
-  position: absolute;
-}
-
-/* Pretend to be the navbar */
-.mockup-navbar {
-  left: 0;
-  height: 3px;
-  top: 0;
-  width: 49px;
-}
-
-/* Pretend to be a logo */
-.mockup-logo {
-  background-color: orange;
-  top: 1px;
-  left: 1px;
-  height: 1px;
-  width: 6px;
-}
-
-/* Pretend to be menu inside the navbar */
-.mockup-navbar-menu {
-  width: 16px;
-  height: 1px;
-  border-style: dashed;
-  border-width: 1px;
-  left: 12px;
-}
-
-/* Pretend to be the add button */
-.mockup-add-button {
-  left: 30px;
-  height: 2px;
-  width: 5px;
-  top: 0px;
-}
-
-/* Pretend to be the page content */
-.mockup-page-content {
-  height: 40px;
-  left: 6px;
-  overflow: hidden;
-  top: 3px;
-  width: 32px;
-}
-
-.mockup-title, .mockup-text1, .mockup-text2, .mockup-text3, .mockup-text4, .mockup-text5{
-  left: 2px;
-  height: 1px;
-  width: 28px;
-  border-style: dotted;
-  border-width: 1px;
-}
-
-.mockup-title {
-  top: 4px;
-}
-
-.mockup-text1 {
-  top: 10px;
-}
-
-.mockup-text2 {
-  top: 13px;
-}
-
-.mockup-text3 {
-  top: 16px;
-}
-
-.mockup-text4 {
-  top: 19px;
-}
-
-.mockup-text5 {
-  top: 22px;
-}
-
-/* Pretend to be the app bar */
-.mockup-left-panel, .mockup-left-panel:before{
-  height: 40px;
-  top: 3px;
-  width: 4px;
-  left: 2px;
-}
-
-.mockup-left-panel:before{
-  content: "@ @ @ @ @";
-  font-size: 2px;
-}
-
-/* Pretend to be the right panel */
-.mockup-right-panel {
-  height: 24px;
-  top: 7px;
-  width: 7px;
-  right: 2px;
-}
-
-.mockup-right-panel-header-text, .mockup-right-panel-text1, .mockup-right-panel-text2, .mockup-right-panel-text3 {
-  height: 1px;
-  left: 2px;
-  top: 1px;
-  width: 8px;
-  border-style: dotted;
-  border-width: 1px;
-}
-
-.mockup-right-panel-header {
-  border-bottom: 1px dotted;
-  width: 12px;
-}
-
-.mockup-right-panel-contents{
-  top: 5px;
-  width: 8px;
-  height: 20px;
-}
-
-.mockup-right-panel-text1 {
-  top: 0px;
-}
-
-.mockup-right-panel-text2 {
-  top: 3px;
-}
-
-.mockup-right-panel-text3 {
-  top: 6px;
-}
-
-/* Pretend to be the footer */
-.mockup-footer {
-  top: 43px;
-  height: 3px;
-  width: 49px;
-  left: 0px;
-}
-
-.mockup-footer-content {
-  width: 25px;
-  height: 1px;
-  border-style: dashed;
-  border-width: 1px;
-  left: 12px;
-}
-
-.theme-creation-form form {
-  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
-  border: 1px dotted $theme.borderColor;
-  display: inline-block;
-  padding: .5em .5em .5em 22px;
-  margin-bottom: 1em;
-}
-
-</code>
-    </property>
-    <property>
-      <name>CSS</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
   <content>{{velocity}}
 ####################################
 ## GLOBALS &amp; STYLES
@@ -546,4 +255,308 @@
 #end
 {{/velocity}}
 </content>
+  <object>
+    <name>FlamingoThemesCode.WebHomeSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>36837eed-1247-4e50-9e0d-0abc7f698eed</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+.theme {
+  border: 1px dotted $theme.borderColor;
+  float: left;
+  margin: 0 1em 1em 0;
+  padding: 2px 4px;
+  width: 300px;
+}
+
+.current-theme {
+  background-color: $theme.highlightColor;
+}
+
+.theme-info {
+  margin-left: 60px;
+  color: $theme.textSecondaryColor;
+  font-size: .9em;
+}
+
+.theme-info h3{
+  margin-top: 0;
+  border-bottom: 1px solid $theme.borderColor;
+}
+
+/* Clear the floatting strategy after the display of all themes */
+.theme-viewer h2, .theme-creation-form {
+  clear: both;
+}
+
+.mockup-page {
+  border: 1px solid #aaa;
+  float: left;
+  height: 47px;
+  margin: 0 4px;
+  position: relative;
+  width: 50px;
+}
+
+.mockup-page * {
+  line-height: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* Pretend to be the navbar */
+.mockup-navbar {
+  left: 0;
+  height: 3px;
+  top: 0;
+  width: 49px;
+}
+
+/* Pretend to be a logo */
+.mockup-logo {
+  background-color: orange;
+  top: 1px;
+  left: 1px;
+  height: 1px;
+  width: 6px;
+}
+
+/* Pretend to be menu inside the navbar */
+.mockup-navbar-menu {
+  width: 16px;
+  height: 1px;
+  border-style: dashed;
+  border-width: 1px;
+  left: 12px;
+}
+
+/* Pretend to be the add button */
+.mockup-add-button {
+  left: 30px;
+  height: 2px;
+  width: 5px;
+  top: 0px;
+}
+
+/* Pretend to be the page content */
+.mockup-page-content {
+  height: 40px;
+  left: 6px;
+  overflow: hidden;
+  top: 3px;
+  width: 32px;
+}
+
+.mockup-title, .mockup-text1, .mockup-text2, .mockup-text3, .mockup-text4, .mockup-text5{
+  left: 2px;
+  height: 1px;
+  width: 28px;
+  border-style: dotted;
+  border-width: 1px;
+}
+
+.mockup-title {
+  top: 4px;
+}
+
+.mockup-text1 {
+  top: 10px;
+}
+
+.mockup-text2 {
+  top: 13px;
+}
+
+.mockup-text3 {
+  top: 16px;
+}
+
+.mockup-text4 {
+  top: 19px;
+}
+
+.mockup-text5 {
+  top: 22px;
+}
+
+/* Pretend to be the app bar */
+.mockup-left-panel, .mockup-left-panel:before{
+  height: 40px;
+  top: 3px;
+  width: 4px;
+  left: 2px;
+}
+
+.mockup-left-panel:before{
+  content: "@ @ @ @ @";
+  font-size: 2px;
+}
+
+/* Pretend to be the right panel */
+.mockup-right-panel {
+  height: 24px;
+  top: 7px;
+  width: 7px;
+  right: 2px;
+}
+
+.mockup-right-panel-header-text, .mockup-right-panel-text1, .mockup-right-panel-text2, .mockup-right-panel-text3 {
+  height: 1px;
+  left: 2px;
+  top: 1px;
+  width: 8px;
+  border-style: dotted;
+  border-width: 1px;
+}
+
+.mockup-right-panel-header {
+  border-bottom: 1px dotted;
+  width: 12px;
+}
+
+.mockup-right-panel-contents{
+  top: 5px;
+  width: 8px;
+  height: 20px;
+}
+
+.mockup-right-panel-text1 {
+  top: 0px;
+}
+
+.mockup-right-panel-text2 {
+  top: 3px;
+}
+
+.mockup-right-panel-text3 {
+  top: 6px;
+}
+
+/* Pretend to be the footer */
+.mockup-footer {
+  top: 43px;
+  height: 3px;
+  width: 49px;
+  left: 0px;
+}
+
+.mockup-footer-content {
+  width: 25px;
+  height: 1px;
+  border-style: dashed;
+  border-width: 1px;
+  left: 12px;
+}
+
+.theme-creation-form form {
+  background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
+  border: 1px dotted $theme.borderColor;
+  display: inline-block;
+  padding: .5em .5em .5em 22px;
+  margin-bottom: 1em;
+}
+
+</code>
+    </property>
+    <property>
+      <name>CSS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

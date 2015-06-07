@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>ApplicationsPanelEntry</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Blog.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1346774793000</creationDate>
+  <parent>Blog.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1346774793000</date>
   <contentUpdateDate>1346774793000</contentUpdateDate>
   <version>1.1</version>
   <title>Applications Panel Entry</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
   <object>
+    <name>Blog.ApplicationsPanelEntry</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>77db7815-bb64-4385-8f59-ab44ee51328f</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -57,22 +58,12 @@
         <disabled>0</disabled>
         <name>content</name>
         <number>3</number>
-        <prettyName>Extension content</prettyName>
+        <prettyName>Extension Content</prettyName>
         <rows>10</rows>
         <size>40</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
-      <parameters>
-        <disabled>0</disabled>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
       <extensionPointId>
         <disabled>0</disabled>
         <name>extensionPointId</name>
@@ -86,11 +77,21 @@
         <disabled>0</disabled>
         <name>name</name>
         <number>2</number>
-        <prettyName>Extension Name</prettyName>
+        <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
       <scope>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -101,24 +102,15 @@
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>wiki=Current Wiki|user=Current User|global=Global</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>Blog.ApplicationsPanelEntry</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>77db7815-bb64-4385-8f59-ab44ee51328f</guid>
     <property>
       <content/>
-    </property>
-    <property>
-      <parameters>label=$services.localization.render('xe.panels.quicklinks.blog')
-target=Blog.WebHome
-icon=icon:transmit</parameters>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
@@ -127,8 +119,12 @@ icon=icon:transmit</parameters>
       <name>platform.panels.blogApplication</name>
     </property>
     <property>
+      <parameters>label=$services.localization.render('xe.panels.quicklinks.blog')
+target=Blog.WebHome
+icon=icon:transmit</parameters>
+    </property>
+    <property>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
 </xwikidoc>

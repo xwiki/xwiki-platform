@@ -20,19 +20,22 @@
 package org.xwiki.watchlist.internal.notification;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.internal.SessionFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.watchlist.internal.UserAvatarAttachmentExtractor;
@@ -63,11 +66,6 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
      */
     public static final String TEMPLATE_FACTORY_ATTACHMENTS_PARAMETER = "attachments";
 
-    /**
-     * Suffix used in the IDs of the conversations/threads started by WatchList e-mail.
-     */
-    public static final String CONVERSATION_SUFFIX = "@xwiki";
-
     private MimeMessageFactory<MimeMessage> factory;
 
     private Iterator<WatchListMessageData> subscriberIterator;
@@ -82,6 +80,8 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
 
     private EntityReferenceSerializer<String> serializer;
 
+    private SessionFactory sessionFactory;
+
     /**
      * @param subscriberIterator the iterator used to go through each subscriber and extract the
      *            {@link WatchListMessageData}
@@ -90,16 +90,19 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
      * @param avatarExtractor the {@link UserAvatarAttachmentExtractor} used once per message to extract an author's
      *            avatar attachment
      * @param serializer the {@link EntityReferenceSerializer} used to determine the mail's Message-ID
+     * @param sessionFactory the session factory to be looked at when computing conversation IDs
      */
     public WatchListEventMimeMessageIterator(Iterator<WatchListMessageData> subscriberIterator,
         MimeMessageFactory<MimeMessage> factory, Map<String, Object> parameters,
-        UserAvatarAttachmentExtractor avatarExtractor, EntityReferenceSerializer<String> serializer)
+        UserAvatarAttachmentExtractor avatarExtractor, EntityReferenceSerializer<String> serializer,
+        SessionFactory sessionFactory)
     {
         this.subscriberIterator = subscriberIterator;
         this.factory = factory;
         this.parameters = parameters;
         this.avatarExtractor = avatarExtractor;
         this.serializer = serializer;
+        this.sessionFactory = sessionFactory;
 
         this.factoryParameters =
             (Map<String, Object>) this.parameters.get(WatchListEventMimeMessageFactory.PARAMETERS_PARAMETER);
@@ -223,17 +226,35 @@ public class WatchListEventMimeMessageIterator implements Iterator<MimeMessage>,
         // on document reference because it is not consistent across JVM restarts. hashcode() over the reference string
         // would also be subject to many collisions, so it's not a good option either.
         String conversationIDPart = DigestUtils.md5Hex(serializedReference);
-        String conversationID = String.format("<%s%s>", conversationIDPart, CONVERSATION_SUFFIX);
-
-        String messageIDPart = UUID.randomUUID().toString();
-        String messageId = String.format("<%s/%s%s>", conversationIDPart, messageIDPart, CONVERSATION_SUFFIX);
+        String suffix = getConversationSuffix();
+        String conversationID = String.format("<%s.XWiki.%s>", conversationIDPart, suffix);
 
         // Set the headers.
-        result.setHeader("Message-ID", messageId);
         result.setHeader("References", conversationID);
         result.setHeader("In-Reply-To", conversationID);
 
         return result;
+    }
+
+    /**
+     * Compute the suffix of a conversation ID. It is done similar to what JavaMail does by default, using the session
+     * to extract data (user, host, etc.) that can be set by the client, in case multiple instances of XWiki run on the
+     * same machine.
+     */
+    private String getConversationSuffix()
+    {
+        String suffix = null;
+
+        Session session = this.sessionFactory.create(Collections.<String, String>emptyMap());
+        InternetAddress addr = InternetAddress.getLocalAddress(session);
+        if (addr != null) {
+            suffix = addr.getAddress();
+        } else {
+            // Worst-case default
+            suffix = "xwiki@localhost";
+        }
+
+        return suffix;
     }
 
     @Override

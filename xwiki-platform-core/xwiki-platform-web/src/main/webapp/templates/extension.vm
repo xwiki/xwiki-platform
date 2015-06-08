@@ -832,6 +832,11 @@ $namespace##
       #if ($request.section)
         <input name="section" value="$escapetool.xml($request.section)" type="hidden" />
       #end
+      #if ($request.viewer)
+        ## Send the AJAX requests to the specified viewer (Velocity template). This is needed for instance when the
+        ## Extension Manager UI is not installed.
+        <input name="xpage" value="$escapetool.xml($request.viewer)" type="hidden" />
+      #end
     </div>
     <div class="extension-header">
       <h2 class="extension-title">
@@ -1259,15 +1264,15 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
 #set ($discard = $parameters.put('xback', $request.xback))
 #end
 ##
-#if ($request.section)
-#set ($discard = $parameters.put('section', $request.section))
+## Copy known parameters.
+#foreach ($paramName in ['section', 'xpage', 'viewer'])
+#set ($paramValue = $request.getParameter($paramName))
+#if ("$!paramValue" != '')
+#set ($discard = $parameters.put($paramName, $paramValue))
+#end
 #end
 ##
-#set ($queryString = '')
-#foreach ($entry in $parameters.entrySet())
-#set ($queryString = "$queryString&$escapetool.url($entry.key)=$escapetool.url($entry.value)")
-#end
-$doc.getURL($xcontext.action, $queryString.substring(1))##
+$doc.getURL($xcontext.action, $escapetool.url($parameters))##
 #end
 
 #macro (computeXBack)

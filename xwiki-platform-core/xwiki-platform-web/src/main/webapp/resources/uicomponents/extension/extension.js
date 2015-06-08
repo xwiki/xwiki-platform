@@ -11,11 +11,6 @@ XWiki.ExtensionBehaviour = Class.create({
     this.container = container;
     this.container._extensionBehaviour = this;
 
-    // The extension links (links to extension dependencies, links inside log messages) use the 'get' action when
-    // extension details are loaded asynchronously so we need to replace it with 'view' or 'admin' action, depending
-    // whether the extension is displayed alone or in the administration.
-    this._fixExtensionLinks();
-
     // Trigger the extension jobs asynchronously.
     this._enhanceActions();
 
@@ -454,18 +449,6 @@ XWiki.ExtensionBehaviour = Class.create({
   },
 
   /**
-   * Fix the extension links (links to extension dependencies, links inside log messages) when the extension details
-   * are loaded asynchronously because they use the 'get' action (specific to AJAX requests) instead of the 'view' or
-   * 'admin' action (depending whether the extension is displayed alone or in the administration section).
-   */
-  _fixExtensionLinks : function(container) {
-    (container || this.container).select("a.extension-link").each(function (link) {
-      var queryString = link.getAttribute('href').replace(/.*\?/, '');
-      link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction, queryString));
-    });
-  },
-
-  /**
    * Enhances the behaviour of the Progress section within the extension details.
    */
   _enhanceProgressBehaviour : function() {
@@ -525,7 +508,7 @@ XWiki.ExtensionBehaviour = Class.create({
         // Update the dependency if it's still attached to the document.
         if (dependency.up('html')) {
           dependency.insert({before: response.responseText});
-          this._fixExtensionLinks(dependency.previous());
+          fixExtensionLinks(dependency.previous());
           dependency.remove();
           this._resolveUnknownDependency(dependencies, index + 1);
         }
@@ -609,12 +592,44 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
   }
 });
 
+var toQueryParams = function(url) {
+  return url.indexOf('?') < 0 ? {} : url.toQueryParams();
+};
+
+/**
+ * Fix the extension links (links to extension dependencies, links inside log messages, etc.) when the extension
+ * details are loaded asynchronously because they use the 'get' action (specific to AJAX requests) instead of the 'view'
+ * or 'admin' action (depending whether the extension is displayed alone or in the administration section).
+ */
+var fixExtensionLinks = function(container) {
+  (container || $('body')).select("a.extension-link").each(function (link) {
+    var linkQueryParams = toQueryParams(link.getAttribute('href'));
+    var currentQueryParams = toQueryParams(window.location.href);
+    if (linkQueryParams.extensionId) {
+      currentQueryParams.extensionId = linkQueryParams.extensionId;
+      currentQueryParams.extensionVersion = linkQueryParams.extensionVersion;
+      if (linkQueryParams.extensionNamespace) {
+        currentQueryParams.extensionNamespace = linkQueryParams.extensionNamespace;
+      }
+    } else {
+      ['extensionId', 'extensionVersion', 'extensionVersionConstraint', 'extensionNamespace'].each(function(param) {
+        delete currentQueryParams[param];
+      });
+    }
+    link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction,
+      Object.toQueryString(currentQueryParams)));
+  });
+};
 
 var enhanceExtensions = function(event) {
   ((event && event.memo.elements) || [$('body')]).each(function(element) {
     element.select('.extension-item').each(function(extension) {
       !extension._extensionBehaviour && new XWiki.ExtensionBehaviour(extension);
     });
+    // The extension links (links to extension dependencies, links inside log messages, etc.) use the 'get' action when
+    // extension details are loaded asynchronously so we need to replace it with 'view' or 'admin' action, depending
+    // whether the extension is displayed alone or in the administration.
+    fixExtensionLinks(element);
   });
 };
 var init = function(event) {

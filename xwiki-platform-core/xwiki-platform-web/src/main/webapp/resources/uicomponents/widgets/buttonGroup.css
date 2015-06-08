@@ -99,7 +99,7 @@
 /* Force 100% width on the buttons. The anchors behave nicely. */
 .button-group > .dropdown-menu > input.button,
 .button-group > .dropdown-menu > button {
-  width: 100%;
+  min-width: 100%;
 }
 
 .button-group > .dropdown-menu > input.button:hover,

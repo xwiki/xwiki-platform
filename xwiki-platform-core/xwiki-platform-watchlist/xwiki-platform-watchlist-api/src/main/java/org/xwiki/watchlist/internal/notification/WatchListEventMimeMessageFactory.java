@@ -31,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.internal.SessionFactory;
 import org.xwiki.mail.internal.factory.AbstractIteratorMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -104,6 +105,9 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
     @Inject
     private UserAvatarAttachmentExtractor avatarExtractor;
 
+    @Inject
+    private SessionFactory sessionFactory;
+
     @Override
     public Iterator<MimeMessage> createMessage(Object sourceObject, Map<String, Object> parameters)
         throws MessagingException
@@ -132,7 +136,8 @@ public class WatchListEventMimeMessageFactory extends AbstractIteratorMimeMessag
 
         // The iterator that will be producing a MimeMessage for each WatchListMessageData produced by the userIterator.
         WatchListEventMimeMessageIterator messageIterator =
-            new WatchListEventMimeMessageIterator(userIterator, factory, parameters, avatarExtractor, serializer);
+            new WatchListEventMimeMessageIterator(userIterator, factory, parameters, avatarExtractor, serializer,
+                sessionFactory);
 
         return messageIterator;
     }

@@ -25,12 +25,9 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.exception.CloneFailedException;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.script.ScriptContextManager;
-import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -49,15 +46,6 @@ public class ExecutionContextCopier implements Copier<ExecutionContext>
 {
     @Inject
     private ExecutionContextManager executionContextManager;
-
-    @Inject
-    private ScriptContextManager scriptContextManager;
-
-    @Inject
-    private VelocityManager velocityManager;
-
-    @Inject
-    private Execution execution;
 
     @Inject
     private Copier<XWikiContext> xwikiContextCloner;

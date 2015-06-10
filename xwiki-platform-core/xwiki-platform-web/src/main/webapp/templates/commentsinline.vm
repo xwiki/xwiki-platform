@@ -154,7 +154,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <span class="commenttool comment-permalink"><a class="permalink" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.localization.render('core.viewers.comments.permalink')</a></span>
       #if($xwiki.hasAccessLevel('comment'))
         <span class="commenttool commentreply"><a class="commentreply" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.localization.render('core.viewers.comments.reply')</a></span>
-        #if($comment.author == $xcontext.user && $hasEdit)
+        #if($comment.author == $xcontext.user)
           <span class="commenttool commentedit"><a class="edit" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">$services.localization.render('core.viewers.comments.edit')</a></span>
         #end
       #end
@@ -243,7 +243,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 #macro(displayEditCommentForm $comment)
   #if (${comment.author} == ${xcontext.user})
-  <form action="$doc.getURL('save')" method="post" class="edit-xcomment reply">
+  <form action="$doc.getURL('commentsave')" method="post" class="edit-xcomment reply">
     <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#mediumUserAvatar($comment.author)#{else}#smallUserAvatar($comment.author)#end</div>
     <div class="commentheader">
@@ -263,7 +263,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <input type="hidden" name="xredirect" value="$xredirect">
     </div>
     <div>
-      <span class="buttonwrapper"><input type="submit" name="action_save" class="button" value="$services.localization.render('core.viewers.comments.edit.save')"/></span>
+      <span class="buttonwrapper"><input type="submit" name="action_commentsave" class="button" value="$services.localization.render('core.viewers.comments.edit.save')"/></span>
       <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL('view', 'viewer=comments')">$services.localization.render('core.viewers.comments.edit.cancel')</a></span>
     </div>
 

@@ -56,6 +56,8 @@
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="save"
                    type="com.xpn.xwiki.web.EditForm"/>
+        <form-bean name="commentsave"
+                   type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="saveandcontinue"
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="rollback"
@@ -279,6 +281,12 @@
                 name="commentadd"
                 scope="request">
             <forward name="commentadd" path="/templates/edit.vm"/>
+        </action>
+        <action path="/commentsave/"
+                type="com.xpn.xwiki.web.CommentSaveAction"
+                name="commentsave"
+                scope="request">
+            <forward name="commentsave" path="/templates/edit.vm"/>
         </action>
 
         <action path="/objectsync/"

@@ -23,8 +23,10 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,12 +62,17 @@ public class LogoutAction extends XWikiAction
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
         if (StringUtils.isEmpty(redirect)) {
-            ModelConfiguration modelDefaults = Utils.getComponent(ModelConfiguration.class);
-            DocumentReference doc = new DocumentReference(
-                context.getWikiId(),
-                modelDefaults.getDefaultReferenceValue(EntityType.SPACE),
-                modelDefaults.getDefaultReferenceValue(EntityType.DOCUMENT));
-            redirect = context.getWiki().getURL(doc, "view", context);
+            DocumentReferenceResolver<EntityReference> resolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
+
+            // Get default document
+            DocumentReference reference = resolver.resolve(null, EntityType.DOCUMENT);
+
+            // Set wiki reference to current wiki
+            reference = reference.setWikiReference(new WikiReference(context.getWikiId()));
+
+            // Create URL to the wiki home page
+            redirect = context.getWiki().getURL(reference, "view", context);
         }
         sendRedirect(response, redirect);
         return false;

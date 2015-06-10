@@ -19,20 +19,21 @@
  */
 package org.xwiki.security.authorization.internal.resolver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link CurrentUserAndGroupDocumentReferenceResolver}.
@@ -50,25 +51,24 @@ public class CurrentUserAndGroupDocumentReferenceResolverTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        EntityReferenceValueProvider provider =
-            this.mocker.registerMockComponent(EntityReferenceValueProvider.class, "current");
+        EntityReferenceProvider provider = this.mocker.registerMockComponent(EntityReferenceProvider.class, "current");
 
-        when(provider.getDefaultValue(EntityType.WIKI)).thenReturn("currentwiki");
+        when(provider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("currentwiki"));
     }
 
     @Test
     public void testResolver() throws ComponentLookupException
     {
-        assertEquals(new DocumentReference("currentwiki", "XWiki", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("Bosse"));
-        assertEquals(new DocumentReference("currentwiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse"));
-        assertEquals(new DocumentReference("bossesWiki", "XWiki", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("Bosse", new WikiReference("bossesWiki")));
-        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
-        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
-            this.mocker.getComponentUnderTest().resolve("bossesWiki:bossesSpace.Bosse"));
+        assertEquals(new DocumentReference("currentwiki", "XWiki", "Bosse"), this.mocker.getComponentUnderTest()
+            .resolve("Bosse"));
+        assertEquals(new DocumentReference("currentwiki", "bossesSpace", "Bosse"), this.mocker.getComponentUnderTest()
+            .resolve("bossesSpace.Bosse"));
+        assertEquals(new DocumentReference("bossesWiki", "XWiki", "Bosse"), this.mocker.getComponentUnderTest()
+            .resolve("Bosse", new WikiReference("bossesWiki")));
+        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"), this.mocker.getComponentUnderTest()
+            .resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
+        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"), this.mocker.getComponentUnderTest()
+            .resolve("bossesWiki:bossesSpace.Bosse"));
 
         // If null is passed we expect no reference (i.e. the guest user).
         assertNull(this.mocker.getComponentUnderTest().resolve(null));

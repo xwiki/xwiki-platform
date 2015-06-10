@@ -21,6 +21,7 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -43,19 +44,19 @@ public class ComponentCreatedListener extends AbstractEventListener
 {
     @Inject
     @Named(UserComponentManager.ID)
-    private ComponentManager userComponentManager;
+    private Provider<ComponentManager> userComponentManagerProvider;
 
     @Inject
     @Named(DocumentComponentManager.ID)
-    private ComponentManager documentComponentManager;
+    private Provider<ComponentManager> documentComponentManagerProvider;
 
     @Inject
     @Named(SpaceComponentManager.ID)
-    private ComponentManager spaceComponentManager;
+    private Provider<ComponentManager> spaceComponentManagerProvider;
 
     @Inject
     @Named(WikiComponentManager.ID)
-    private ComponentManager wikiComponentManager;
+    private Provider<ComponentManager> wikiComponentManagerProvider;
 
     /**
      * Default constructor.
@@ -68,17 +69,18 @@ public class ComponentCreatedListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        if (this.userComponentManager instanceof AbstractEntityComponentManager) {
-            ((AbstractEntityComponentManager) this.userComponentManager).onComponentAdded();
-        }
-        if (this.documentComponentManager instanceof AbstractEntityComponentManager) {
-            ((AbstractEntityComponentManager) this.documentComponentManager).onComponentAdded();
-        }
-        if (this.spaceComponentManager instanceof AbstractEntityComponentManager) {
-            ((AbstractEntityComponentManager) this.spaceComponentManager).onComponentAdded();
-        }
-        if (this.wikiComponentManager instanceof AbstractEntityComponentManager) {
-            ((AbstractEntityComponentManager) this.wikiComponentManager).onComponentAdded();
+        notifyComponentManager(this.userComponentManagerProvider);
+        notifyComponentManager(this.documentComponentManagerProvider);
+        notifyComponentManager(this.spaceComponentManagerProvider);
+        notifyComponentManager(this.wikiComponentManagerProvider);
+    }
+
+    private void notifyComponentManager(Provider<ComponentManager> provider)
+    {
+        ComponentManager componentManager = provider.get();
+
+        if (componentManager instanceof AbstractEntityComponentManager) {
+            ((AbstractEntityComponentManager) componentManager).onComponentAdded();
         }
     }
 }

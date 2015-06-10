@@ -19,6 +19,8 @@
  */
 package org.xwiki.component.internal;
 
+import javax.inject.Provider;
+
 import org.jmock.Expectations;
 import org.jmock.States;
 import org.junit.Assert;
@@ -29,11 +31,12 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Unit tests for {@link ContextComponentManager} which indirectly test
@@ -50,7 +53,11 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
      */
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    private EntityReferenceValueProvider mockCurrentValueProvider;
+    private WikiDescriptorManager mockWikiDescriptorManager;
+
+    private Provider<DocumentReference> mockCurrentDocumentReferenceProvider;
+
+    private Provider<SpaceReference> mockCurrentSpaceReferenceProvider;
 
     public static interface Role
     {
@@ -67,7 +74,9 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
 
         // Document Access Bridge Mock
         this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
-        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockCurrentDocumentReferenceProvider = registerMockComponent(DocumentReference.TYPE_PROVIDER, "current");
+        this.mockCurrentSpaceReferenceProvider = registerMockComponent(SpaceReference.TYPE_PROVIDER, "current");
     }
 
     @Override
@@ -94,12 +103,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otheruser"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user1")));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
             }
         });
 
@@ -131,12 +140,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             {
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user2")));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
             }
         });
 
@@ -156,15 +165,15 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 when(state.isNot("otherdocument"));
                 will(returnValue("wiki1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                allowing(mockCurrentSpaceReferenceProvider).get();
                 when(state.isNot("otherdocument"));
-                will(returnValue("space1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue(new SpaceReference("space1", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
                 when(state.isNot("otherdocument"));
-                will(returnValue("document1"));
+                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otherdocument"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
@@ -190,12 +199,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             {
                 exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document2"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
             }
         });
 
@@ -213,12 +222,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
             }
@@ -252,15 +261,15 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 when(state.isNot("otherspace"));
                 will(returnValue("wiki1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                allowing(mockCurrentSpaceReferenceProvider).get();
                 when(state.isNot("otherspace"));
-                will(returnValue("space1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue(new SpaceReference("space1", new WikiReference("wiki1"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
                 when(state.isNot("otherspace"));
-                will(returnValue("document1"));
+                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otherspace"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
@@ -286,12 +295,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             {
                 exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document2"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
             }
         });
 
@@ -311,15 +320,15 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 when(state.isNot("otherwiki"));
                 will(returnValue("wiki1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                allowing(mockCurrentSpaceReferenceProvider).get();
                 when(state.isNot("otherwiki"));
-                will(returnValue("space1"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue(new SpaceReference("space1", new WikiReference("wiki1"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
                 when(state.isNot("otherwiki"));
-                will(returnValue("document1"));
+                will(returnValue(new DocumentReference("wiki1", "space1", "document1")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otherwiki"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
@@ -345,12 +354,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
             {
                 exactly(1).of(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space2"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document2"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space2", new WikiReference("wiki2"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki2", "space2", "document2")));
             }
         });
 
@@ -368,12 +377,12 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document"));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));
             }
@@ -404,15 +413,15 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 when(state.isNot("otherwiki"));
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                allowing(mockCurrentSpaceReferenceProvider).get();
                 when(state.isNot("otherwiki"));
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentDocumentReferenceProvider).get();
                 when(state.isNot("otherwiki"));
-                will(returnValue("document"));
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
                 when(state.isNot("otherwiki"));
                 will(returnValue(new DocumentReference("wiki", "XWiki", "user")));

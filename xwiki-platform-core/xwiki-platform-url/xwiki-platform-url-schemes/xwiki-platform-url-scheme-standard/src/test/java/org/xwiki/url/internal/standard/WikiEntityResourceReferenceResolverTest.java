@@ -91,8 +91,8 @@ public class WikiEntityResourceReferenceResolverTest
         ExtendedURL extendedURL = new ExtendedURL(new URL(testURL), null);
         // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
         extendedURL.getSegments().remove(0);
-        EntityResourceReference entityResource = (EntityResourceReference) this.resolver.resolve(extendedURL,
-            new ResourceType("wiki"), Collections.<String, Object>emptyMap());
+        EntityResourceReference entityResource =
+            this.resolver.resolve(extendedURL, new ResourceType("wiki"), Collections.<String, Object>emptyMap());
 
         assertEquals(expectedActionName, entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());

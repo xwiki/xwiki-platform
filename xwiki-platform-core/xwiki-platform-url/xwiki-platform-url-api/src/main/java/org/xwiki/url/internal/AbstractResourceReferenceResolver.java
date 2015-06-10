@@ -19,6 +19,7 @@
  */
 package org.xwiki.url.internal;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -47,27 +48,34 @@ public abstract class AbstractResourceReferenceResolver implements ResourceRefer
     protected ComponentManager componentManager;
 
     /**
-     *  Find the right Resolver for the passed Resource type and call it.
+     * Find the right Resolver for the passed Resource type and call it.
      */
     protected ResourceReferenceResolver<ExtendedURL> findResourceResolver(String hintPrefix, ResourceType type)
         throws UnsupportedResourceReferenceException
     {
         ResourceReferenceResolver<ExtendedURL> resolver;
 
-        try {
-            // Step 1: Look for a Resolver specific to the scheme and specific to the Resource Type
-            resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
-                ResourceReferenceResolver.class, ExtendedURL.class), computeResolverHint(hintPrefix, type.getId()));
-        } catch (ComponentLookupException e) {
-            // Step 2: If not found, look for a Resolver specific to the Resource Type but registered for all URL
-            // schemes
+        Type roleType = new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class);
+        String roleHint = computeResolverHint(hintPrefix, type.getId());
+
+        // Step 1: Look for a Resolver specific to the scheme and specific to the Resource Type
+        if (this.componentManager.hasComponent(roleType, roleHint)) {
             try {
-                resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
-                    ResourceReferenceResolver.class, ExtendedURL.class), type.getId());
+                resolver = this.componentManager.getInstance(roleType, roleHint);
             } catch (ComponentLookupException cle) {
                 // There's no Resolver registered for the passed Resource Type
                 throw new UnsupportedResourceReferenceException(String.format(
-                    "Couldn't find any Resource Reference Resolver for type [%s]", type), cle);
+                    "Failed to lookup Resource Reference Resolver for hint [%s]", roleHint), cle);
+            }
+        } else {
+            // Step 2: If not found, look for a Resolver specific to the Resource Type but registered for all URL
+            // schemes
+            try {
+                resolver = this.componentManager.getInstance(roleType, type.getId());
+            } catch (ComponentLookupException cle) {
+                // There's no Resolver registered for the passed Resource Type
+                throw new UnsupportedResourceReferenceException(String.format(
+                    "Failed to lookup Resource Reference Resolver for type [%s]", type), cle);
             }
         }
 

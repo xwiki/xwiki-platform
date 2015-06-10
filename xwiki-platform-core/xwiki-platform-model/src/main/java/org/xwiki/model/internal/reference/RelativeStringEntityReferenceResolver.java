@@ -28,7 +28,7 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * Resolve {@link org.xwiki.model.reference.EntityReference} objects from its string representations. This
- * implementation doesn't generate absolute references; instead it stores the the representation into an
+ * implementation doesn't generate absolute references; instead it stores the representation into an
  * {@link EntityReference} object (ie if the representation is a Document reference and it has only a page name
  * specified, then a single EntityReference of type DOCUMENT will be returned, with no Space and Wiki references). This
  * is useful in cases when we need to store a reference relative to another reference (for example for storing Parent
@@ -48,16 +48,10 @@ public class RelativeStringEntityReferenceResolver extends AbstractStringEntityR
 {
 
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
         // Return null to signify to the generic algorithm that we don't want to generate references with default
         // values.
         return null;
-    }
-
-    @Override
-    public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
-    {
-        return super.resolve(entityReferenceRepresentation, type, parameters);
     }
 }

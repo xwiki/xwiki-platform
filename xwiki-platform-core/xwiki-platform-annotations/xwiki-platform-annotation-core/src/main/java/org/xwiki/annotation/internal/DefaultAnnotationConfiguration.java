@@ -30,10 +30,11 @@ import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -65,11 +66,9 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
     @Inject
     protected ModelContext modelContext;
 
-    /**
-     * @see #getCurrentWikiReference()
-     */
     @Inject
-    protected ModelConfiguration modelConfig;
+    @Named("current")
+    protected EntityReferenceProvider entityReferenceProvider;
 
     /**
      * @see #isInstalled()
@@ -128,10 +127,9 @@ public class DefaultAnnotationConfiguration implements AnnotationConfiguration
      */
     protected WikiReference getCurrentWikiReference()
     {
-        if (this.modelContext.getCurrentEntityReference() != null) {
-            return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-        }
+        EntityReference wikiReference = this.entityReferenceProvider.getDefaultReference(EntityType.WIKI);
 
-        return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
+        return wikiReference instanceof WikiReference ? (WikiReference) wikiReference
+            : new WikiReference(wikiReference);
     }
 }

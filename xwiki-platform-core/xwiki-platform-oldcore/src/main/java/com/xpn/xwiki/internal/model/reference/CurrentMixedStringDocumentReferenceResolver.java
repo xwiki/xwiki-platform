@@ -28,7 +28,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 
 /**
  * Resolve a String representing an Entity Reference into an {@link org.xwiki.model.reference.EntityReference} object.
@@ -46,7 +47,7 @@ public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringE
 {
     @Inject
     @Named("currentmixed")
-    private EntityReferenceValueProvider provider;
+    private EntityReferenceProvider provider;
 
     @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
@@ -55,8 +56,8 @@ public class CurrentMixedStringDocumentReferenceResolver extends AbstractStringE
     }
 
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
-        return this.provider.getDefaultValue(type);
+        return this.provider.getDefaultReference(type);
     }
 }

@@ -26,7 +26,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
@@ -46,9 +45,6 @@ import org.xwiki.url.ExtendedURL;
 @Singleton
 public class StandardExtendedURLResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
 {
-    @Inject
-    private ComponentManager rootComponentManager;
-
     @Inject
     @Named("generic")
     private ResourceReferenceResolver<ExtendedURL> genericResourceReferenceResolver;

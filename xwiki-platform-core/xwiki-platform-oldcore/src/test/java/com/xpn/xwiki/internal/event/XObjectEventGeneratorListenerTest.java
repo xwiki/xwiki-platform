@@ -19,223 +19,201 @@
  */
 package com.xpn.xwiki.internal.event;
 
-import java.util.Arrays;
-
-import org.jmock.Expectations;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.verify;
 
 /**
  * Validate {@link XObjectEventGeneratorListener}.
  * 
  * @version $Id$
  */
-public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentTestCase
+@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
+CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, DefaultStringEntityReferenceSerializer.class,
+DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
+DefaultEntityReferenceProvider.class, CurrentStringDocumentReferenceResolver.class,
+CurrentStringEntityReferenceResolver.class, LocalStringEntityReferenceSerializer.class })
+public class XObjectEventGeneratorListenerTest
 {
-    private ObservationManager observation;
+    public MockitoComponentMockingRule<XObjectEventGeneratorListener> mocker =
+        new MockitoComponentMockingRule<XObjectEventGeneratorListener>(XObjectEventGeneratorListener.class);
 
-    private XWiki xwiki;
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(mocker);
+
+    private ObservationManager mockObservation;
 
     private XWikiDocument document;
 
     private XWikiDocument documentOrigin;
-    
-    private EventListener listener;
-    
+
     private BaseObject xobject;
-    
-    private BaseClass xclass;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void before() throws Exception
     {
-        super.setUp();
-
-        this.observation = getComponentManager().getInstance(ObservationManager.class);
-
-        // Remove wiki macro listener which is useless and try to load documents from database
-        this.observation.removeListener("wikimacrolistener");
-
-        this.xwiki = getMockery().mock(XWiki.class);
-        getContext().setWiki(this.xwiki);
-        
-        this.listener = getMockery().mock(EventListener.class);
-
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.documentOrigin = new XWikiDocument(this.document.getDocumentReference());
         this.document.setOriginalDocument(this.documentOrigin);
-        
-        this.xclass = this.document.getXClass();
-        
+
         this.xobject = new BaseObject();
         this.xobject.setXClassReference(this.document.getDocumentReference());
-        
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getName(); will(returnValue("mylistener"));
-            allowing(xwiki).getXClass(xclass.getDocumentReference(), getContext()); will(returnValue(xclass));
-        }});
+
+        this.mockObservation = this.mocker.getInstance(ObservationManager.class);
     }
 
     @Test
-    public void testAddDocument()
+    public void testAddDocument() throws ComponentLookupException
     {
         this.document.addXObject(this.xobject);
 
         final Event event = new XObjectAddedEvent(this.xobject.getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentCreatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject added event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testDeleteDocument()
+    public void testDeleteDocument() throws ComponentLookupException
     {
         this.documentOrigin.addXObject(this.xobject);
 
         final Event event = new XObjectDeletedEvent(this.xobject.getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
- 
-        this.observation.notify(new DocumentDeletedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        this.mocker.getComponentUnderTest().onEvent(new DocumentDeletedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
+
+        // Make sure the listener generated a xobject deleted event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectAdded()
+    public void testModifiedDocumentXObjectAdded() throws ComponentLookupException
     {
         this.document.addXObject(this.xobject);
 
         final Event event = new XObjectAddedEvent(this.xobject.getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject added event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectDeleted()
+    public void testModifiedDocumentXObjectDeleted() throws ComponentLookupException
     {
         this.documentOrigin.addXObject(this.xobject);
 
         final Event event = new XObjectDeletedEvent(this.xobject.getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
- 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
+
+        // Make sure the listener generated a xobject deleted event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectModified()
+    public void testModifiedDocumentXObjectModified() throws ComponentLookupException
     {
         this.document.addXObject(this.xobject);
         this.documentOrigin.addXObject(this.xobject.clone());
-        
+
         this.xobject.setStringValue("newproperty", "newvalue");
 
         final Event event = new XObjectUpdatedEvent(this.xobject.getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject updated event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectPropertyAdded()
+    public void testModifiedDocumentXObjectPropertyAdded() throws ComponentLookupException
     {
         this.document.addXObject(this.xobject);
         this.documentOrigin.addXObject(this.xobject.clone());
-        
+
         this.xobject.setStringValue("newproperty", "newvalue");
 
         final Event event = new XObjectPropertyAddedEvent(this.xobject.getField("newproperty").getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject property added event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectPropertyDeleted()
+    public void testModifiedDocumentXObjectPropertyDeleted() throws ComponentLookupException
     {
         this.document.addXObject(this.xobject.clone());
         this.documentOrigin.addXObject(this.xobject);
-        
+
         this.xobject.setStringValue("deletedproperty", "deletedvalue");
 
         final Event event = new XObjectPropertyDeletedEvent(this.xobject.getField("deletedproperty").getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject deleted event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testModifiedDocumentXObjectPropertyModified()
+    public void testModifiedDocumentXObjectPropertyModified() throws ComponentLookupException
     {
         this.xobject.setStringValue("updatedproperty", "propertyvalue");
-     
+
         BaseObject xobjectModified = this.xobject.clone();
         xobjectModified.setStringValue("updatedproperty", "propertyvaluemodified");
-        
+
         this.document.addXObject(this.xobject);
         this.documentOrigin.addXObject(xobjectModified);
 
         final Event event = new XObjectPropertyUpdatedEvent(this.xobject.getField("updatedproperty").getReference());
 
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
+        this.mocker.getComponentUnderTest().onEvent(new DocumentUpdatedEvent(this.document.getDocumentReference()),
+            this.document, this.oldcore.getXWikiContext());
 
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
+        // Make sure the listener generated a xobject property updated event
+        verify(this.mockObservation).notify(eq(event), same(this.document), same(this.oldcore.getXWikiContext()));
     }
 }

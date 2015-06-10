@@ -20,45 +20,47 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer}.
+ * Unit tests for {@link CompactStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  */
-public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedComponentTestCase
+@ComponentList({ CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class })
+public class CompactStringEntityReferenceSerializerTest
 {
-    private EntityReferenceSerializer<EntityReference> serializer;
+    public MockitoComponentMockingRule<EntityReferenceSerializer<String>> mocker =
+        new MockitoComponentMockingRule<EntityReferenceSerializer<String>>(CompactStringEntityReferenceSerializer.class);
 
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        this.serializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
-    }
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.mocker);
 
     @Test
     public void testSerializeWhenNoContext() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
     }
 
     @Test
     public void testSerializeWhenNoContextDocument() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
     }
 
     @Test
@@ -66,37 +68,41 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        Assert.assertEquals("page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiReference(reference.getWikiReference());
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(reference));
+        Assert.assertEquals("page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
-        Assert.assertEquals("page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiReference(reference.getWikiReference());
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
+        Assert.assertEquals("page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "otherspace", "otherpage")));
-        Assert.assertEquals("space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiReference(reference.getWikiReference());
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference("wiki", "otherspace", "otherpage")));
+        Assert.assertEquals("space.page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("otherwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage")));
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage")));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "otherspace", "page")));
-        Assert.assertEquals("space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiReference(reference.getWikiReference());
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "otherspace", "page")));
+        Assert.assertEquals("space.page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("otherwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "page")));
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "page")));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("otherwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("otherwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "otherpage")));
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference("otherwiki", "space", "otherpage")));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
     }
 
     @Test
@@ -105,15 +111,16 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
         AttachmentReference reference =
             new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        Assert.assertEquals("page", this.serializer.serialize(reference.getParent()));
-        Assert.assertEquals("space", this.serializer.serialize(reference.getParent().getParent()));
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
+        Assert.assertEquals("page", this.mocker.getComponentUnderTest().serialize(reference.getParent()));
+        Assert.assertEquals("space", this.mocker.getComponentUnderTest().serialize(reference.getParent().getParent()));
 
-        getContext().setWikiId("xwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "xspace", "xpage")));
-        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference.getParent()));
-        Assert.assertEquals("wiki:space", this.serializer.serialize(reference.getParent().getParent()));
+        this.oldcore.getXWikiContext().setWikiId("xwiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "xspace", "xpage")));
+        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference.getParent()));
+        Assert.assertEquals("wiki:space",
+            this.mocker.getComponentUnderTest().serialize(reference.getParent().getParent()));
 
     }
 
@@ -123,27 +130,29 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
         AttachmentReference reference =
             new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        Assert.assertEquals("filename", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
+        Assert.assertEquals("filename", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
-        Assert.assertEquals("page@filename", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
+        Assert.assertEquals("page@filename", this.mocker.getComponentUnderTest().serialize(reference));
 
-        getContext().setWikiId("otherwiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
-        Assert.assertEquals("wiki:space.page@filename", this.serializer.serialize(reference));
+        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
+        Assert.assertEquals("wiki:space.page@filename", this.mocker.getComponentUnderTest().serialize(reference));
     }
 
     @Test
-    public void testSerializeEntityReferenceWithExplicit()
+    public void testSerializeEntityReferenceWithExplicit() throws ComponentLookupException
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        getContext().setWikiId("wiki");
-        getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
-        Assert.assertEquals("space.page",
-            this.serializer.serialize(reference, new EntityReference("otherspace", EntityType.SPACE)));
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
+        Assert.assertEquals(
+            "space.page",
+            this.mocker.getComponentUnderTest().serialize(reference,
+                new EntityReference("otherspace", EntityType.SPACE)));
     }
 }

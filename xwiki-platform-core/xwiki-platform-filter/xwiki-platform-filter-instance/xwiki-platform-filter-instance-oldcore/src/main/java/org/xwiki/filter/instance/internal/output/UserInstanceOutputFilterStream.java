@@ -45,8 +45,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -71,8 +71,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
     private EntityReferenceResolver<String> relativeResolver;
 
     @Inject
-    @Named("current")
-    private EntityReferenceValueProvider referenceProvider;
+    private WikiDescriptorManager wikis;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -136,7 +135,7 @@ public class UserInstanceOutputFilterStream extends AbstractBeanOutputFilterStre
         String wiki = this.currentWiki;
 
         if (wiki == null) {
-            wiki = this.referenceProvider.getDefaultValue(EntityType.WIKI);
+            wiki = this.wikis.getCurrentWikiId();
         }
 
         return wiki;

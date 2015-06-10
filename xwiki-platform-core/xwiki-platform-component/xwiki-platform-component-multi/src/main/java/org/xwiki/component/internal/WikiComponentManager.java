@@ -27,10 +27,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current wiki in the
@@ -52,12 +51,8 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
 
     private static final String KEY_PREFIX = ID + ':';
 
-    /**
-     * Used to access the current entities.
-     */
     @Inject
-    @Named("current")
-    private EntityReferenceValueProvider currentProvider;
+    private WikiDescriptorManager wikis;
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
@@ -67,7 +62,7 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
 
     private String getCurrentWiki()
     {
-        return this.currentProvider.getDefaultValue(EntityType.WIKI);
+        return this.wikis.getCurrentWikiId();
     }
 
     @Override

@@ -19,11 +19,15 @@
  */
 package org.xwiki.model.reference;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Provider;
+
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
@@ -34,6 +38,14 @@ import org.xwiki.model.EntityType;
  */
 public class DocumentReference extends EntityReference
 {
+    /**
+     * The {@link Type} for a Provider<DocumentReference>.
+     * 
+     * @since 7.2M1
+     */
+    public static final Type TYPE_PROVIDER =
+        new DefaultParameterizedType(null, Provider.class, DocumentReference.class);
+
     /**
      * Parameter key for the locale.
      */
@@ -103,8 +115,8 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * Create a new Document reference from wiki name, space name, page name and language.
-     * This is an helper function during transition from language to locale, it will be deprecated ASAP.
+     * Create a new Document reference from wiki name, space name, page name and language. This is an helper function
+     * during transition from language to locale, it will be deprecated ASAP.
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceName the name of the space containing the document, must not be null
@@ -113,8 +125,8 @@ public class DocumentReference extends EntityReference
      */
     public DocumentReference(String wikiName, String spaceName, String pageName, String language)
     {
-        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)),
-            (language == null) ? null : new Locale(language));
+        this(pageName, new SpaceReference(spaceName, new WikiReference(wikiName)), (language == null) ? null
+            : new Locale(language));
     }
 
     /**
@@ -122,7 +134,7 @@ public class DocumentReference extends EntityReference
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceNames an ordered list of the names of the spaces containing the document from root space to last one,
-     *                   must not be null
+     *            must not be null
      * @param pageName the name of the document
      */
     public DocumentReference(String wikiName, List<String> spaceNames, String pageName)
@@ -135,7 +147,7 @@ public class DocumentReference extends EntityReference
      *
      * @param wikiName the name of the wiki containing the document, must not be null
      * @param spaceNames an ordered list of the names of the spaces containing the document from root space to last one,
-     *                   must not be null
+     *            must not be null
      * @param pageName the name of the document reference
      * @param locale the locale of the document reference, may be null
      */
@@ -182,13 +194,11 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * Overridden in order to verify the validity of the passed parent.
+     * {@inheritDoc} Overridden in order to verify the validity of the passed parent.
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
      * @exception IllegalArgumentException if the passed parent is not a valid document reference parent (ie a space
-     *            reference)
+     *                reference)
      */
     @Override
     protected void setParent(EntityReference parent)
@@ -206,9 +216,7 @@ public class DocumentReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * Overridden in order to verify the validity of the passed type.
+     * {@inheritDoc} Overridden in order to verify the validity of the passed type.
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a document type
@@ -247,6 +255,24 @@ public class DocumentReference extends EntityReference
     public WikiReference getWikiReference()
     {
         return (WikiReference) extractReference(EntityType.WIKI);
+    }
+
+    /**
+     * Create a new DocumentReference with passed wiki reference.
+     * 
+     * @param wikiReference the wiki reference to use
+     * @return a new document reference or the same if the passed wiki is already the current wiki
+     * @since 7.2M1
+     */
+    public DocumentReference setWikiReference(WikiReference wikiReference)
+    {
+        WikiReference currentWikiReferene = getWikiReference();
+
+        if (currentWikiReferene.equals(wikiReference)) {
+            return this;
+        }
+
+        return new DocumentReference(this, currentWikiReferene, wikiReference);
     }
 
     /**

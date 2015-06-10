@@ -203,18 +203,19 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
         XWikiDocument doc = archive.loadDocument(version, context);
         if (doc == null) {
-            Object[] args = { basedoc.getFullName(), version.toString() };
+            Object[] args = { basedoc.getDocumentReferenceWithLocale(), version.toString() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
                 "Version {1} does not exist while reading document {0}", null, args);
         }
+
         // Make sure the document has the same name
         // as the new document (in case there was a name change
-        doc.setName(basedoc.getName());
-        doc.setSpace(basedoc.getSpace());
+        // FIXME: is this really needed ?
+        doc.setDocumentReference(basedoc.getDocumentReference());
 
-        doc.setDatabase(basedoc.getDatabase());
         doc.setStore(basedoc.getStore());
+
         return doc;
     }
 

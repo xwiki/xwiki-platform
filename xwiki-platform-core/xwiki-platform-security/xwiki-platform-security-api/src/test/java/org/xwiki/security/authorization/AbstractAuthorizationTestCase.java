@@ -20,21 +20,12 @@
 
 package org.xwiki.security.authorization;
 
-import static org.xwiki.security.authorization.Right.ADMIN;
-import static org.xwiki.security.authorization.Right.CREATE_WIKI;
-import static org.xwiki.security.authorization.Right.CREATOR;
-import static org.xwiki.security.authorization.Right.DELETE;
-import static org.xwiki.security.authorization.Right.ILLEGAL;
-import static org.xwiki.security.authorization.Right.LOGIN;
-import static org.xwiki.security.authorization.Right.PROGRAM;
-import static org.xwiki.security.authorization.Right.REGISTER;
-
 import java.io.File;
 
 import org.junit.Rule;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,6 +45,15 @@ import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATE_WIKI;
+import static org.xwiki.security.authorization.Right.CREATOR;
+import static org.xwiki.security.authorization.Right.DELETE;
+import static org.xwiki.security.authorization.Right.ILLEGAL;
+import static org.xwiki.security.authorization.Right.LOGIN;
+import static org.xwiki.security.authorization.Right.PROGRAM;
+import static org.xwiki.security.authorization.Right.REGISTER;
+
 
 /**
  * Abstract class that should be inherited when writing tests case based on XML based mocked wikis for testing
@@ -63,7 +63,7 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
  * @since 5.0M2
  */
 @ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
-    DefaultEntityReferenceValueProvider.class, DefaultModelConfiguration.class})
+    DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class})
 public abstract class AbstractAuthorizationTestCase
 {
     /** SuperAdmin user. */

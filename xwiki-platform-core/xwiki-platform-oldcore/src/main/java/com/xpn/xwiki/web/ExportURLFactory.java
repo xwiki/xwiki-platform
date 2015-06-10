@@ -136,12 +136,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         if (exportedPages != null) {
-            XWikiDocument doc = new XWikiDocument();
-
             for (String pageName : exportedPages) {
-                doc.setDatabase(null);
-                doc.setSpace(null);
-                doc.setName(null);
+                XWikiDocument doc = new XWikiDocument();
 
                 doc.setFullName(pageName);
 
@@ -190,33 +186,33 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
-    public URL createSkinURL(String filename, String web, String name, XWikiContext context)
+    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context)
     {
-        return createSkinURL(filename, web, name, null, context, false);
+        return createSkinURL(filename, spaces, name, null, context, false);
     }
 
-    public URL createSkinURL(String filename, String web, String name, XWikiContext context, boolean skipSkinDirectory)
+    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context, boolean skipSkinDirectory)
     {
-        return createSkinURL(filename, web, name, null, context, skipSkinDirectory);
+        return createSkinURL(filename, spaces, name, null, context, skipSkinDirectory);
     }
 
     @Override
-    public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context)
+    public URL createSkinURL(String fileName, String spaces, String name, String wikiId, XWikiContext context)
     {
-        return createSkinURL(fileName, web, name, wikiId, context, false);
+        return createSkinURL(fileName, spaces, name, wikiId, context, false);
     }
 
-    public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context,
+    public URL createSkinURL(String fileName, String spaces, String name, String wikiId, XWikiContext context,
         boolean skipSkinDirectory)
     {
         URL skinURL;
         if (wikiId == null) {
-            skinURL = super.createSkinURL(fileName, web, name, context);
+            skinURL = super.createSkinURL(fileName, spaces, name, context);
         } else {
-            skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+            skinURL = super.createSkinURL(fileName, spaces, name, wikiId, context);
         }
 
-        if (!"skins".equals(web)) {
+        if (!"skins".equals(spaces)) {
             return skinURL;
         }
 
@@ -243,11 +239,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     if (!folder.exists()) {
                         folder.mkdirs();
                     }
-                    renderSkinFile(skinURL.getPath(), web, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
+                    renderSkinFile(skinURL.getPath(), spaces, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
                         context);
                 }
 
-                followCssImports(file, web, name, wikiId, context);
+                followCssImports(file, spaces, name, wikiId, context);
             }
 
             StringBuffer newPath = new StringBuffer("file://");
@@ -268,7 +264,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * Results go in the passed {@code outputFile}.
      */
-    private void renderSkinFile(String path, String web, String name, String wikiId, File outputFile,
+    private void renderSkinFile(String path, String spaces, String name, String wikiId, File outputFile,
         int cssPathAdjustmentValue, XWikiContext context) throws IOException, XWikiException
     {
         FileOutputStream fos = new FileOutputStream(outputFile);
@@ -285,7 +281,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             // Adjust path for links inside CSS files.
             getExportURLFactoryContext().pushCSSPathAdjustment(cssPathAdjustmentValue);
             try {
-                renderWithSkinAction(web, name, wikiId, path, context);
+                renderWithSkinAction(spaces, name, wikiId, path, context);
             } finally {
                 getExportURLFactoryContext().popCSSPathAdjustement();
             }
@@ -322,7 +318,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * Resolve CSS <code>@import</code> targets.
      */
-    private void followCssImports(File file, String web, String name, String wikiId, XWikiContext context)
+    private void followCssImports(File file, String spaces, String name, String wikiId, XWikiContext context)
         throws IOException
     {
         // TODO: find better way to know it's css file (not sure it's possible, we could also try to find @import
@@ -345,9 +341,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     }
 
                     if (wikiId == null) {
-                        createSkinURL(fileName, web, name, context, true);
+                        createSkinURL(fileName, spaces, name, context, true);
                     } else {
-                        createSkinURL(fileName, web, name, wikiId, context, true);
+                        createSkinURL(fileName, spaces, name, wikiId, context, true);
                     }
                 }
             } finally {
@@ -401,14 +397,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
-    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+    public URL createURL(String spaces, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
         try {
             // Look for a special handler for the passed action
             try {
                 ExportURLFactoryActionHandler handler = Utils.getComponent(ExportURLFactoryActionHandler.class, action);
-                return handler.createURL(web, name, querystring, anchor, xwikidb, context,
+                return handler.createURL(spaces, name, querystring, anchor, xwikidb, context,
                     getExportURLFactoryContext());
             } catch (Exception e) {
                 // Failed to find such a component or it doesn't work, simply ignore it and continue with the default
@@ -417,7 +413,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String wikiname = xwikidb == null ? context.getWikiId().toLowerCase() : xwikidb.toLowerCase();
 
-            if (getExportURLFactoryContext().hasExportedPage(wikiname + XWikiDocument.DB_SPACE_SEP + web
+            if (getExportURLFactoryContext().hasExportedPage(wikiname + XWikiDocument.DB_SPACE_SEP + spaces
                 + XWikiDocument.SPACE_NAME_SEP + name)
                 && "view".equals(action) && context.getLinksAction() == null)
             {
@@ -427,7 +423,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
                 newpath.append(wikiname);
                 newpath.append(".");
-                newpath.append(web);
+                newpath.append(spaces);
                 newpath.append(".");
                 newpath.append(name);
 
@@ -444,7 +440,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             LOGGER.error("Failed to create page URL", e);
         }
 
-        return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
+        return super.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
     /**
@@ -488,28 +484,28 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     @Override
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
         try {
-            return createAttachmentURL(filename, web, name, xwikidb, context);
+            return createAttachmentURL(filename, spaces, name, xwikidb, context);
         } catch (Exception e) {
             LOGGER.error("Failed to create attachment URL", e);
 
-            return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
+            return super.createAttachmentURL(filename, spaces, name, action, null, xwikidb, context);
         }
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String xwikidb,
         XWikiContext context)
     {
         try {
-            return createAttachmentURL(filename, web, name, xwikidb, context);
+            return createAttachmentURL(filename, spaces, name, xwikidb, context);
         } catch (Exception e) {
             LOGGER.error("Failed to create attachment URL", e);
 
-            return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
+            return super.createAttachmentRevisionURL(filename, spaces, name, revision, xwikidb, context);
         }
     }
 

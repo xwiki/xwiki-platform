@@ -42,6 +42,7 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -53,6 +54,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -66,6 +68,7 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
  * @since 4.2
  * @version $Id$
  */
+// TODO: replace with MockitoOldcoreRule
 public class LegacyTestWiki extends AbstractTestWiki
 {
     private final boolean legacymock;
@@ -98,6 +101,8 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private final ObservationManager observationManager;
 
+    protected WikiDescriptorManager wikiDescriptorManager;
+
     private final Map<String, TestWiki> wikis = new HashMap<String, TestWiki>();
 
     /**
@@ -120,6 +125,13 @@ public class LegacyTestWiki extends AbstractTestWiki
         context = mockery.mock(XWikiContext.class);
 
         xwiki = mockery.mock(XWiki.class);
+
+        if (!componentManager.hasComponent(WikiDescriptorManager.class)) {
+            DefaultComponentDescriptor<WikiDescriptorManager> descriptor = new DefaultComponentDescriptor<>();
+            descriptor.setRoleType(WikiDescriptorManager.class);
+            this.wikiDescriptorManager = mockery.mock(WikiDescriptorManager.class);
+            componentManager.registerComponent(descriptor, this.wikiDescriptorManager);
+        }
 
         final XWikiGroupService groupService = mockery.mock(XWikiGroupService.class);
 
@@ -153,6 +165,15 @@ public class LegacyTestWiki extends AbstractTestWiki
                     public Object invoke(Invocation invocation)
                     {
                         return currentDatabase;
+                    }
+                });
+                allowing(context).getWikiReference();
+                will(new CustomAction("return the current database")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation)
+                    {
+                        return new WikiReference(currentDatabase);
                     }
                 });
                 allowing(context).get("wiki");
@@ -270,6 +291,17 @@ public class LegacyTestWiki extends AbstractTestWiki
                     public Object invoke(Invocation invocation)
                     {
                         return getAllGroupReferences((DocumentReference) invocation.getParameter(0));
+                    }
+                });
+
+                // Expectations for WikiDescriptorManager
+                allowing(wikiDescriptorManager).getCurrentWikiId();
+                will(new CustomAction("get the current wiki id")
+                {
+                    @Override
+                    public Object invoke(Invocation invocation)
+                    {
+                        return currentDatabase;
                     }
                 });
 

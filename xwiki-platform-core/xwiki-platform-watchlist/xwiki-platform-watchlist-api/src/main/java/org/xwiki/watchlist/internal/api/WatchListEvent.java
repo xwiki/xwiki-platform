@@ -26,7 +26,6 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -480,8 +479,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
     private XWikiContext getXWikiContext()
     {
-        Provider<XWikiContext> provider =
-            Utils.getComponent(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        Provider<XWikiContext> provider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
         return provider.get();
     }
 }

@@ -21,12 +21,12 @@ package org.xwiki.rest.internal.resources.wikis;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -60,7 +60,7 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
     private WikiUserManager wikiUserManager;
 
     @Inject
-    private EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+    private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
     @Override
     public Wikis getWikis() throws XWikiRestException
@@ -74,19 +74,18 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
                 // - or the wiki accepts global users and is not an invitation-based wiki
                 // - or the current user has a pending invitation to the wiki
                 // Note 1: To check if a user has view access to a wiki we check if the user can access the home page
-                //         of the "XWiki" space. We do this because this needs to be allowed in view for the wiki to
-                //         work properly.
+                // of the "XWiki" space. We do this because this needs to be allowed in view for the wiki to
+                // work properly.
                 // Note 2: it would be nicer to have an API for this.
                 // Note 3: this strategy is copied from WikisLiveTableResults.xml
-                EntityReference absoluteCommentReference = new EntityReference(
-                    this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT), EntityType.DOCUMENT,
+                EntityReference absoluteCommentReference =
+                    new EntityReference(this.defaultDocumentReferenceProvider.get().getName(), EntityType.DOCUMENT,
                         new EntityReference("XWiki", EntityType.SPACE, new EntityReference(wikiId, EntityType.WIKI)));
                 DocumentReference currentUserReference = getXWikiContext().getUserReference();
                 if (this.authorizationManager.hasAccess(Right.VIEW, absoluteCommentReference)
-                    || (this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY
-                        && this.wikiUserManager.getMembershipType(wikiId) != MembershipType.INVITE)
-                    || this.wikiUserManager.hasPendingInvitation(currentUserReference, wikiId))
-                {
+                    || (this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY && this.wikiUserManager
+                        .getMembershipType(wikiId) != MembershipType.INVITE)
+                    || this.wikiUserManager.hasPendingInvitation(currentUserReference, wikiId)) {
                     wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiId));
                 }
             }

@@ -111,7 +111,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer, Initializable
         stringBuffer.append(">");
     }
 
-    public static void internalLink(StringBuffer output, String start, String web, String topic, String link,
+    public static void internalLink(StringBuffer output, String start, String spaces, String topic, String link,
         String anchor, boolean doLink, XWikiContext context, Util util)
     {
         // kill spaces and Wikify page name (ManpreetSingh - 15 Sep 2000)
@@ -129,11 +129,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer, Initializable
         XWiki xwiki = context.getWiki();
         XWikiDocument doc;
         try {
-            doc = xwiki.getDocument(web, topic, context);
+            doc = xwiki.getDocument(spaces, topic, context);
         } catch (XWikiException e) {
             doc = new XWikiDocument();
             doc.setName(topic);
-            doc.setSpace(web);
+            doc.setSpace(spaces);
         }
 
         output.append(start);

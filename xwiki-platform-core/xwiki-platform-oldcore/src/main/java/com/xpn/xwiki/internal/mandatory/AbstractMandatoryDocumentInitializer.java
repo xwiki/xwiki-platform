@@ -24,8 +24,8 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
@@ -59,11 +59,8 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
     @Inject
     protected WikiDescriptorManager wikiDescriptorManager;
 
-    /**
-     * Used to get the default document name.
-     */
     @Inject
-    protected ModelConfiguration modelConfiguration;
+    protected DocumentReferenceResolver<EntityReference> resolver;
 
     /**
      * @see #getDocumentReference()
@@ -175,12 +172,11 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
 
         if (document.getParentReference() == null) {
             needsUpdate = true;
-            // Use the current document's space homepage.
+            // Use the current document's space homepage and default document name.
             EntityReference spaceReference = getDocumentReference().extractReference(EntityType.SPACE);
-            String spaceHomepageDocName = modelConfiguration.getDefaultReferenceValue(EntityType.DOCUMENT);
-            EntityReference parentReference =
-                new EntityReference(spaceHomepageDocName, EntityType.DOCUMENT, spaceReference);
-            document.setParentReference(parentReference);
+            DocumentReference fullReference = this.resolver.resolve(null, spaceReference);
+            EntityReference localReference = new LocalDocumentReference(fullReference);
+            document.setParentReference(localReference);
         }
 
         if (StringUtils.isBlank(document.getTitle())) {

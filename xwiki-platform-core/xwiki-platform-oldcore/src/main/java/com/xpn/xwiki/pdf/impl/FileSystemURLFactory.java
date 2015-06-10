@@ -58,26 +58,26 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
     private static final String SEPARATOR = "/";
 
     @Override
-    public URL createAttachmentURL(String filename, String space, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String wiki, XWikiContext context)
     {
         try {
-            return getURL(wiki, space, name, filename, null, context);
+            return getURL(wiki, spaces, name, filename, null, context);
         } catch (Exception ex) {
             LOGGER.warn("Failed to save image for PDF export", ex);
-            return super.createAttachmentURL(filename, space, name, action, null, wiki, context);
+            return super.createAttachmentURL(filename, spaces, name, action, null, wiki, context);
         }
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String space, String name, String revision, String wiki,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String wiki,
         XWikiContext context)
     {
         try {
-            return getURL(wiki, space, name, filename, revision, context);
+            return getURL(wiki, spaces, name, filename, revision, context);
         } catch (Exception ex) {
             LOGGER.warn("Failed to save image for PDF export: " + ex.getMessage());
-            return super.createAttachmentRevisionURL(filename, space, name, revision, wiki, context);
+            return super.createAttachmentRevisionURL(filename, spaces, name, revision, wiki, context);
         }
     }
 
@@ -142,19 +142,17 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @return a {@code file://} URL where the attachment has been stored
      * @throws Exception if the attachment can't be retrieved from the database and stored on the filesystem
      */
-    private URL getURL(String wiki, String space, String name, String filename, String revision, XWikiContext context)
+    private URL getURL(String wiki, String spaces, String name, String filename, String revision, XWikiContext context)
         throws Exception
     {
         Map<String, File> usedFiles = getFileMapping(context);
-        String key = getAttachmentKey(space, name, filename, revision);
+        String key = getAttachmentKey(spaces, name, filename, revision);
         if (!usedFiles.containsKey(key)) {
             File file = getTemporaryFile(key, context);
             LOGGER.debug("Temporary PDF export file [{}]", file.toString());
             XWikiDocument doc =
-                context.getWiki()
-                    .getDocument(
-                        new DocumentReference(StringUtils.defaultString(wiki, context.getWikiId()), space, name),
-                        context);
+                context.getWiki().getDocument(
+                    new DocumentReference(StringUtils.defaultString(wiki, context.getWikiId()), spaces, name), context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {
                 attachment = attachment.getAttachmentRevision(revision, context);
@@ -207,16 +205,16 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
      * @param revision an optional attachment version
      * @return an identifier for this attachment
      */
-    private String getAttachmentKey(String space, String name, String filename, String revision)
+    private String getAttachmentKey(String spaces, String name, String filename, String revision)
     {
         try {
-            return "attachment" + SEPARATOR + URLEncoder.encode(space, XWiki.DEFAULT_ENCODING) + SEPARATOR
+            return "attachment" + SEPARATOR + URLEncoder.encode(spaces, XWiki.DEFAULT_ENCODING) + SEPARATOR
                 + URLEncoder.encode(name, XWiki.DEFAULT_ENCODING) + SEPARATOR
                 + URLEncoder.encode(filename, XWiki.DEFAULT_ENCODING) + SEPARATOR
                 + URLEncoder.encode(StringUtils.defaultString(revision), XWiki.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException ex) {
             // This should never happen, UTF-8 is always available
-            return space + SEPARATOR + name + SEPARATOR + filename + SEPARATOR + StringUtils.defaultString(revision);
+            return spaces + SEPARATOR + name + SEPARATOR + filename + SEPARATOR + StringUtils.defaultString(revision);
         }
     }
 

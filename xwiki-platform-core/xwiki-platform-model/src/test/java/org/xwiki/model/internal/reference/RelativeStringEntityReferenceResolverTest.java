@@ -27,14 +27,14 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Unit tests for {@link org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver}.
+ * Unit tests for {@link RelativeStringEntityReferenceResolver}.
  *
  * @version $Id$
  * @since 2.2.3
  */
 public class RelativeStringEntityReferenceResolverTest
 {
-    private EntityReferenceResolver resolver;
+    private EntityReferenceResolver<String> resolver;
 
     @Before
     public void setUp()
@@ -45,15 +45,15 @@ public class RelativeStringEntityReferenceResolverTest
     @Test
     public void testResolveDocumentReference() throws Exception
     {
-        EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
+        EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertNull(reference);
 
-        reference = resolver.resolve("space.page", EntityType.DOCUMENT);
+        reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
         Assert.assertNull(reference.extractReference(EntityType.WIKI));
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
 
-        reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
+        reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
@@ -63,7 +63,8 @@ public class RelativeStringEntityReferenceResolverTest
     public void testResolveDocumentReferenceWithBaseReference() throws Exception
     {
         EntityReference reference =
-            resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
+            this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
+
         Assert.assertNull(reference.extractReference(EntityType.WIKI));
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertNull(reference.extractReference(EntityType.DOCUMENT));

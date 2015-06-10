@@ -70,6 +70,11 @@
   z-index: 200;
 }
 
+.button-group.align-right > .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
 /* IE discards the :target selector and thus we have to duplicate the rule.. */
 .button-group > .dropdown-menu:target {
   display: block;

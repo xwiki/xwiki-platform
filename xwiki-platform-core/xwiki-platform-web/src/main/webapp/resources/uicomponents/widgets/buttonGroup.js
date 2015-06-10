@@ -22,6 +22,7 @@ var widgets = XWiki.widgets = XWiki.widgets || {};
 widgets.ButtonGroup = Class.create({
   initialize : function(container) {
     this.container = container;
+    this.displayInsideParent = container.hasClassName('inside');
     this._dropDownMenu = container.down('.dropdown-menu');
     this._dropDownToggle = container.down('.dropdown-toggle');
     if (this._dropDownMenu && this._dropDownToggle) {
@@ -48,14 +49,14 @@ widgets.ButtonGroup = Class.create({
    */
   _onClick : function(event) {
     event.stop();
-    this._dropDownMenu.toggleClassName('open');
+    this._toggle();
   },
 
   /**
    * Close the drop down menu when pressing the Escape key.
    */
   _onKeyDown : function(event) {
-    event.keyCode == 27 && this._dropDownMenu.removeClassName('open');
+    event.keyCode == 27 && this._toggle(false);
   },
 
   /**
@@ -70,7 +71,7 @@ widgets.ButtonGroup = Class.create({
     // the menu items using the Tab key).
     this._closing = true;
     (function() {
-      (this._closing || forceClose) && this._dropDownMenu.removeClassName('open');
+      (this._closing || forceClose) && this._toggle(false);
       delete this._closing;
     }).bind(this).delay(0.15);
     // NOTE: A lower delay time doesn't work well in Chrome.
@@ -81,6 +82,19 @@ widgets.ButtonGroup = Class.create({
    */
   _cancelClose : function() {
     this._closing = false;
+  },
+
+  _toggle: function(open) {
+    this._dropDownMenu.toggleClassName('open', open);
+    if (this.displayInsideParent) {
+      if (this._dropDownMenu.hasClassName('open')) {
+        this.container.up().setStyle({
+          'height': (this.container.up().getHeight() + this._dropDownMenu.getHeight()) + 'px'
+        })
+      } else {
+        this.container.up().setStyle({'height': ''});
+      }
+    }
   }
 });
 
@@ -117,7 +131,7 @@ widgets.DynamicButtonGroup = Class.create({
     });
 
     // Initialize the container.
-    container.className = 'buttonwrapper button-group initialized';
+    container.removeClassName('dynamic-button-group').addClassName('buttonwrapper button-group initialized');
 
     // Insert the drop down menu toggle.
     buttons[0].insert({after: new Element('a', {

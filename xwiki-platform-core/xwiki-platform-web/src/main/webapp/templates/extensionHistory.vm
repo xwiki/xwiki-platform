@@ -89,10 +89,10 @@
   #if ($currentJobStatus)
     #set ($jobId = $stringtool.join($currentJobStatus.request.id, '/'))
     #if ($jobId.startsWith('extension/history'))
-      #set ($jobStatusURL = $doc.getURL('view', $escapetool.url({
+      #getExtensionHistoryURL($jobStatusURL 'view' {
         'data': 'replayStatus',
         'jobId': $stringtool.substringAfterLast($jobId, '/')
-      })))
+      })
       #set ($message = $services.localization.render('extension.history.currentJobInfo.replay',
         ["<a href='$jobStatusURL'>", '</a>']))
     #else
@@ -208,9 +208,6 @@
   #getExtensionHistoryRecords
   #if ($records && $records.size() > 0)
     #displayExtensionHistoryRecordsForm($records)
-    #if ($hasProgramming && !$isAjaxRequest)
-       #displayExtensionHistoryReplayOptions()
-    #end
   #else
     <div class="extension-history-records-form">
       <ul class="extension-history-records">
@@ -222,6 +219,9 @@
         </li>
       </ul>
     </div>
+  #end
+  #if ($hasProgramming && !$isAjaxRequest)
+    #displayExtensionHistoryReplayOptions()
   #end
 #end
 
@@ -341,7 +341,7 @@
   #set ($userReference = $record.request.getProperty('user.reference'))
   #set ($label = "extension.history.record.${record.jobType}User#if (!$hideDate)AndDate#end")
   <div class="extension-history-record-user">
-    $services.localization.render($label, [$xwiki.getUserName("$userReference"), $xwiki.formatDate($record.endDate)])
+    $services.localization.render($label, [$xwiki.getUserName("$!userReference"), $xwiki.formatDate($record.endDate)])
   </div>
 #end
 
@@ -461,7 +461,9 @@
   ## "Finished job of type [...] with identifier [...]".
   #set ($success = $finished && $replayJobStatus.log.getLogs('ERROR').isEmpty())
   #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
-  <div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState">
+  #getExtensionHistoryURL($extensionHistoryURL 'get' {})
+  <div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"
+      data-extensionHistoryURL="$extensionHistoryURL">
     <h2>$services.localization.render('extension.history.replayStatus.title')</h2>
     <div class="xHint">
       $services.localization.render('extension.history.replayStatus.hint',
@@ -504,8 +506,7 @@
       #printStatusLog($replayJobStatus)
     </div>
     #if ($waiting)
-      #getExtensionHistoryURL($continueURL 'get' {})
-      <form class="extension-question xform" action="$continueURL" method="post">
+      <form class="extension-question xform" action="$extensionHistoryURL" method="post">
         <div class="hidden">
           <input type="hidden" name="form_token" value="$services.csrf.token" />
           <input type="hidden" name="jobId" value="$escapetool.xml($replayJobId)" />
@@ -524,13 +525,14 @@
 #end
 
 #macro (getExtensionHistoryURL $return $action $params)
-  #set ($extensionHistoryDocRef = $services.model.createDocumentReference($NULL, 'XWiki', 'XExtensionHistory'))
+  #set ($extensionHistoryDocRef = $services.model.createDocumentReference($NULL, 'XWiki', 'ExtensionHistory'))
   #set ($parameters = {})
   #set ($discard = $parameters.putAll($params))
   #if (!$xwiki.exists($extensionHistoryDocRef))
     #if ($action == 'get')
       #set ($discard = $parameters.put('xpage', 'extensionHistory'))
     #else
+      #set ($discard = $parameters.put('xpage', 'view'))
       #set ($discard = $parameters.put('viewer', 'extensionHistory'))
     #end
   #end

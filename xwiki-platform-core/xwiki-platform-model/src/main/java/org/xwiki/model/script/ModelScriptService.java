@@ -36,6 +36,7 @@ import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceTree;
@@ -483,16 +484,45 @@ public class ModelScriptService implements ScriptService
      * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
      *         for the default space homepage
      * @since 4.3M1
+     * @deprecated since 7.2M1, use 
      */
+    @Deprecated
     public String getEntityReferenceValue(EntityType type, String hint)
     {
         if (type == null) {
             return null;
         }
+
         try {
             EntityReferenceValueProvider provider =
                 this.componentManager.getInstance(EntityReferenceValueProvider.class, hint);
             return provider.getDefaultValue(type);
+        } catch (ComponentLookupException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the reference configured for a specific entity type, like the space reference or wiki reference. This doesn't
+     * return a full entity reference, but just the part that should be used for that type of entity.
+     * 
+     * @param type the target entity type; from Velocity it's enough to use a string with the uppercase name of the
+     *            entity, like {@code 'SPACE'}
+     * @param hint the hint of the value provider to use (valid hints are for example "default", "current" and
+     *            "currentmixed")
+     * @return the configured value for the requested entity type, for example "Main" for the default space or "WebHome"
+     *         for the default space homepage
+     * @since 7.2M1
+     */
+    public EntityReference getEntityReference(EntityType type, String hint)
+    {
+        if (type == null) {
+            return null;
+        }
+
+        try {
+            EntityReferenceProvider provider = this.componentManager.getInstance(EntityReferenceProvider.class, hint);
+            return provider.getDefaultReference(type);
         } catch (ComponentLookupException ex) {
             return null;
         }

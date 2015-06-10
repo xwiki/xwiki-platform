@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Take care of setting the proper Thread classloader when new request starts.
@@ -50,15 +50,14 @@ public class ThreadClassloaderExecutionContextInitializer implements ExecutionCo
      * Used to get the current wiki.
      */
     @Inject
-    @Named("current")
-    private EntityReferenceValueProvider currentWikiProvider;
+    private WikiDescriptorManager wikis;
 
     @Override
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         if (!(Thread.currentThread().getContextClassLoader() instanceof ContextNamespaceURLClassLoader)) {
             Thread.currentThread().setContextClassLoader(
-                new ContextNamespaceURLClassLoader(currentWikiProvider, this.classLoaderManager));
+                new ContextNamespaceURLClassLoader(wikis, this.classLoaderManager));
         }
     }
 }

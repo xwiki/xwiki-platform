@@ -169,22 +169,22 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * and other times not. This is because the xwiki.home param is recommended to have a trailing / but this.serverURL
      * never does.
      *
-     * @param xwikidb the name of the database (subwiki) if null it is assumed to be the same as the wiki which we are
-     *            currently displaying.
+     * @param wikiId the identifier of the wiki, if null it is assumed to be the same as the wiki which we are currently
+     *            displaying.
      * @param context the XWikiContext used to determine the current wiki and the value if the xwiki.home parameter if
      *            needed as well as access the xwiki server document if in virtual mode.
      * @return a URL containing the protocol, host, and port (if applicable) of the server to use for the given
      *         database.
      */
-    public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
+    public URL getServerURL(String wikiId, XWikiContext context) throws MalformedURLException
     {
-        if (xwikidb == null || xwikidb.equals(context.getOriginalWikiId())) {
+        if (wikiId == null || wikiId.equals(context.getOriginalWikiId())) {
             // This is the case if we are getting a URL for a page which is in
             // the same wiki as the page which is now being displayed.
             return this.serverURL;
         }
 
-        if (context.isMainWiki(xwikidb)) {
+        if (context.isMainWiki(wikiId)) {
             // Not in the same wiki so we are in a subwiki and we want a URL which points to the main wiki.
             // if xwiki.home is set then lets return that.
             final URL homeParam = getXWikiHomeParameter(context);
@@ -193,18 +193,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        URL url = context.getWiki().getServerURL(xwikidb, context);
+        URL url = context.getWiki().getServerURL(wikiId, context);
         return url == null ? this.serverURL : url;
     }
 
     @Override
-    public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context)
+    public URL createURL(String spaces, String name, String action, boolean redirect, XWikiContext context)
     {
-        return createURL(web, name, action, context);
+        return createURL(spaces, name, action, context);
     }
 
     @Override
-    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+    public URL createURL(String spaces, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
         // Action and Query String transformers
@@ -222,7 +222,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
+        addSpace(newpath, spaces, action, context);
         addName(newpath, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
@@ -309,10 +309,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+    public URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context)
     {
-        return this.createURL(web, name, action, querystring, anchor, xwikidb, context);
+        return this.createURL(spaces, name, action, querystring, anchor, xwikidb, context);
     }
 
     @Override
@@ -331,12 +331,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
+    public URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, "skin", context);
-        addSpace(newpath, web, "skin", context);
+        addSpace(newpath, spaces, "skin", context);
         addName(newpath, name, "skin", context);
         addFileName(newpath, filename, false, context);
         try {
@@ -379,11 +379,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
-            && isContextDoc(xwikidb, web, name, context)) {
+            && isContextDoc(xwikidb, spaces, name, context)) {
             try {
                 String docRevision = context.get("rev").toString();
                 XWikiAttachment attachment =
@@ -392,7 +392,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     action = "viewattachrev";
                 } else {
                     long arbId = findDeletedAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
-                    return createAttachmentRevisionURL(filename, web, name, attachment.getVersion(), arbId,
+                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
@@ -405,7 +405,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
+        addSpace(newpath, spaces, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 
@@ -444,20 +444,20 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
-        return createAttachmentRevisionURL(filename, web, name, revision, -1, querystring, xwikidb, context);
+        return createAttachmentRevisionURL(filename, spaces, name, revision, -1, querystring, xwikidb, context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
-        String querystring, String xwikidb, XWikiContext context)
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
+        long recycleId, String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
+        addSpace(newpath, spaces, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 
@@ -603,14 +603,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
      * strip it since we don't want to have that in our URLs as it can cause issues with:
      * <ul>
-     *   <li>security</li>
-     *   <li>SEO</li>
-     *   <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
-     *       different as they'll get different URLs everytime they call the XWiki server</li>
+     * <li>security</li>
+     * <li>SEO</li>
+     * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     * different as they'll get different URLs everytime they call the XWiki server</li>
      * </ul>
-     * See why jsessionid are considered harmful
-     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
-     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     * See why jsessionid are considered harmful <a
+     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
+     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
      *
      * @param url the URL to encode and normalize
      * @param context the XWiki Context used to get access to the Response for encoding the URL
@@ -630,14 +630,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
      * strip it since we don't want to have that in our URLs as it can cause issues with:
      * <ul>
-     *   <li>security</li>
-     *   <li>SEO</li>
-     *   <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
-     *       different as they'll get different URLs everytime they call the XWiki server</li>
+     * <li>security</li>
+     * <li>SEO</li>
+     * <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     * different as they'll get different URLs everytime they call the XWiki server</li>
      * </ul>
-     * See why jsessionid are considered harmful
-     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
-     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     * See why jsessionid are considered harmful <a
+     * href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and <a
+     * href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
      *
      * @param url the URL to encode and normalize
      * @param context the XWiki Context used to get access to the Response for encoding the URL

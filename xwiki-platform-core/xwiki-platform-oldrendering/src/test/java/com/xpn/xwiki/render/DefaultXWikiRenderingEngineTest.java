@@ -28,6 +28,8 @@ import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
 import org.junit.Assert;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.LocalizationContext;
 
 import com.xpn.xwiki.XWiki;
@@ -107,6 +109,12 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             }
         };
         xwiki.setVersion("1.0");
+
+        // We don't care about multi CM
+        DefaultComponentDescriptor<ComponentManager> componentDescriptor = new DefaultComponentDescriptor<>();
+        componentDescriptor.setRoleType(ComponentManager.class);
+        componentDescriptor.setRoleHint("context");
+        getComponentManager().registerComponent(componentDescriptor, getComponentManager());
 
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're

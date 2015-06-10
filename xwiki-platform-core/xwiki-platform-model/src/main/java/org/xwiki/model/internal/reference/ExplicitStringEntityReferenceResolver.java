@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Resolver that resolves a Reference passed as a String into an absolute reference. For missing reference parts, the
@@ -39,7 +40,7 @@ import org.xwiki.model.EntityType;
 public class ExplicitStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
         throw new IllegalArgumentException("The resolver parameter doesn't contain an Entity Reference of type ["
             + type + "]");

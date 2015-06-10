@@ -44,7 +44,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Component
 @Singleton
 @Unstable
-//TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
+// TODO: replace this system by a default component dynamically taking into account the configuration behind the scene
 public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider<ReputationAlgorithm>
 {
     @Inject
@@ -97,9 +97,10 @@ public class ConfiguredReputationAlgorithmProvider implements ConfiguredProvider
 
         try {
             XWikiDocument ratingDocument = getXWiki().getDocument(documentRef, getXWikiContext());
-            XWikiDocument spaceConfigDoc =
-                getXWiki().getDocument(ratingDocument.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
-                    getXWikiContext());
+            DocumentReference spacePreferenceReference =
+                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, ratingDocument.getDocumentReference()
+                    .getLastSpaceReference());
+            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
             XWikiDocument globalConfigDoc =
                 getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
             XWikiDocument configDoc =

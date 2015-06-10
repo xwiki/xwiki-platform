@@ -46,7 +46,7 @@ import org.xwiki.model.reference.EntityReference;
 public class XClassRelativeStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Override
-    protected String getDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
         if (type == EntityType.DOCUMENT) {
             // This means that the user has not passed an optional page reference and we don't have a fallback, we
@@ -68,8 +68,8 @@ public class XClassRelativeStringEntityReferenceResolver extends AbstractStringE
             EntityReference extractedPageReference =
                 ((EntityReference) parameters[0]).extractReference(EntityType.DOCUMENT);
             if (extractedPageReference != null) {
-                explicitReference = new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT,
-                    explicitReference);
+                explicitReference =
+                    new EntityReference(extractedPageReference.getName(), EntityType.DOCUMENT, explicitReference);
             }
         }
 

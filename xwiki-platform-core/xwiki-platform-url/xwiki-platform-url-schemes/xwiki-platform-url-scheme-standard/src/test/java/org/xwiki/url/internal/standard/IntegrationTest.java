@@ -29,7 +29,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
@@ -54,8 +54,8 @@ import org.xwiki.url.internal.standard.resources.ResourcesResourceReferenceResol
 import org.xwiki.url.internal.standard.skins.SkinsResourceReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration Tests for resolving URLs using the Standard URL Scheme.
@@ -73,7 +73,7 @@ import static org.mockito.Mockito.*;
     GenericStringResourceTypeResolver.class,
     DomainWikiReferenceExtractor.class,
     PathWikiReferenceExtractor.class,
-    DefaultEntityReferenceValueProvider.class,
+    DefaultEntityReferenceProvider.class,
     DefaultReferenceEntityReferenceResolver.class,
     StandardStringResourceTypeResolver.class,
     ResourcesResourceReferenceResolver.class,
@@ -108,6 +108,7 @@ public class IntegrationTest
         // Isolate from xwiki's model
         WikiDescriptorManager wikiDescriptorManager =
             this.componentManager.registerMockComponent(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
         // For test simplicity consider that Context CM == CM
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);

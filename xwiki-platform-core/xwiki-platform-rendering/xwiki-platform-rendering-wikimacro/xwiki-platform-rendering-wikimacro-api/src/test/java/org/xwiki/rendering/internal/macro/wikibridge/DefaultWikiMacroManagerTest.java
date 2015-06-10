@@ -22,15 +22,18 @@ package org.xwiki.rendering.internal.macro.wikibridge;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import javax.inject.Provider;
+
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.EntityType;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
@@ -68,7 +71,11 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    private EntityReferenceValueProvider mockCurrentValueProvider;
+    private WikiDescriptorManager mockWikiDescriptorManager;
+
+    private Provider<DocumentReference> mockCurrentDocumentReferenceProvider;
+
+    private Provider<DocumentReference> mockCurrentSpaceReferenceProvider;
 
     private WikiMacroFactory mockWikiMacroFactory;
 
@@ -80,11 +87,12 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         super.registerComponents();
 
         // Document Access Bridge Mock
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockCurrentDocumentReferenceProvider = registerMockComponent(DocumentReference.TYPE_PROVIDER, "current");
+        this.mockCurrentSpaceReferenceProvider = registerMockComponent(SpaceReference.TYPE_PROVIDER, "current");
         this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
-        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
         registerMockComponent(LinkLabelGenerator.class);
-        registerMockComponent(WikiDescriptorManager.class);
         registerMockComponent(ContextualAuthorizationManager.class);
         registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
     }
@@ -104,12 +112,12 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
+                allowing(mockWikiDescriptorManager).getCurrentWikiId();
                 will(returnValue("wiki"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
-                will(returnValue("space"));
-                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
-                will(returnValue("document"));
+                allowing(mockCurrentDocumentReferenceProvider).get();
+                will(returnValue(new DocumentReference("wiki", "space", "document")));
+                allowing(mockCurrentSpaceReferenceProvider).get();
+                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
                 allowing(mockDocumentAccessBridge).setCurrentUser("dummy");
                 allowing(mockDocumentAccessBridge).setCurrentUser((String) with(anything()));
                 allowing(mockDocumentAccessBridge).getCurrentUserReference();
@@ -139,7 +147,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
         Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
-        Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
+        Macro<?> registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
 
         wikiMacroManager.unregisterWikiMacro(wikiMacro.getDocumentReference());
@@ -165,7 +173,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
         Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
-        Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
+        Macro<?> registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
     }
 
@@ -186,7 +194,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
         Assert.assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
 
-        Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
+        Macro<?> registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         Assert.assertEquals(0, registeredMacro.compareTo(wikiMacro));
     }
 

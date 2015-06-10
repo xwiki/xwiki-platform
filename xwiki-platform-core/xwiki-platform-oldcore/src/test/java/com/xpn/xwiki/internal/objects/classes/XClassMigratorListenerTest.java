@@ -24,15 +24,30 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
+import com.xpn.xwiki.internal.store.PropertyConverter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
@@ -46,7 +61,13 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@AllComponents
+@ComponentList({ XClassMigratorListener.class, DefaultObservationManager.class,
+LocalStringEntityReferenceSerializer.class, DefaultStringDocumentReferenceResolver.class, PropertyConverter.class,
+CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
+CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, DefaultStringEntityReferenceResolver.class,
+DefaultEntityReferenceProvider.class, XClassPropertyEventGeneratorListener.class,
+CurrentStringDocumentReferenceResolver.class, CurrentStringEntityReferenceResolver.class,
+LocalUidStringEntityReferenceSerializer.class, DefaultStringEntityReferenceSerializer.class })
 public class XClassMigratorListenerTest
 {
     @Rule
@@ -56,12 +77,12 @@ public class XClassMigratorListenerTest
 
     private XWikiDocument xclassDocument;
 
-    private QueryManager mockQueryManage;
+    private QueryManager mockQueryManager;
 
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.mockQueryManage = this.oldcore.getMocker().registerMockComponent(QueryManager.class);
+        this.mockQueryManager = this.oldcore.getMocker().registerMockComponent(QueryManager.class);
     }
 
     @Before
@@ -77,7 +98,7 @@ public class XClassMigratorListenerTest
         this.xobjectDocument.addXObject(xobject);
 
         Query query = mock(Query.class);
-        when(this.mockQueryManage.createQuery("from doc.object(Space.Class) as obj", Query.XWQL)).thenReturn(query);
+        when(this.mockQueryManager.createQuery("from doc.object(Space.Class) as obj", Query.XWQL)).thenReturn(query);
         when(query.<String>execute()).thenReturn(Arrays.asList("Space.Page"));
 
         // We need document modification notifications
@@ -102,10 +123,8 @@ public class XClassMigratorListenerTest
             this.oldcore.getMockXWiki().getDocument(this.xobjectDocument.getDocumentReference(),
                 this.oldcore.getXWikiContext());
 
-        assertEquals(
-            42,
-            ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference()).get("property"))
-                .getValue());
+        assertEquals(42, ((BaseProperty) this.xobjectDocument.getXObject(this.xclassDocument.getDocumentReference())
+            .get("property")).getValue());
     }
 
     private void saveXClassDocument() throws XWikiException

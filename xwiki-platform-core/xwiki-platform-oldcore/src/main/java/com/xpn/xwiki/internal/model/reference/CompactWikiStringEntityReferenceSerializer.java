@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * Generate an entity reference string that doesn't contain the wiki reference part if the passed reference matches the
@@ -38,10 +39,10 @@ import org.xwiki.model.EntityType;
 public class CompactWikiStringEntityReferenceSerializer extends CompactStringEntityReferenceSerializer
 {
     @Override
-    protected String resolveDefaultValue(EntityType type, Object... parameters)
+    protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
     {
         if (type == EntityType.WIKI) {
-            return super.resolveDefaultValue(type, parameters);
+            return super.resolveDefaultReference(type, parameters);
         }
 
         return null;

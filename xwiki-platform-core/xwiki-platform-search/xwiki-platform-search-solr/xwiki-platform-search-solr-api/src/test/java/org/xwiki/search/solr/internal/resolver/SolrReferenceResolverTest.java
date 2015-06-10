@@ -19,13 +19,6 @@
  */
 package org.xwiki.search.solr.internal.resolver;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +39,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
@@ -78,8 +71,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
@@ -91,6 +84,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.web.Utils;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests for the extraction of indexable references from a start reference.
  * 
@@ -98,9 +98,9 @@ import com.xpn.xwiki.web.Utils;
  */
 @ComponentList({DefaultModelContext.class, DefaultModelConfiguration.class, LocalStringEntityReferenceSerializer.class,
 RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
-CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
-DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class,
+CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceProvider.class,
+CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceProvider.class,
+DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer.class,
 DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
 DefaultStringEntityReferenceSerializer.class, DefaultExecution.class, AttachmentSolrReferenceResolver.class,
 DefaultSolrReferenceResolver.class, DocumentSolrReferenceResolver.class, ObjectPropertySolrReferenceResolver.class,

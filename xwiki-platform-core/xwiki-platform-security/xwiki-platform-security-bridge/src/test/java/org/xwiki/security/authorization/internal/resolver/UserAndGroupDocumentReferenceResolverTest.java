@@ -19,20 +19,21 @@
  */
 package org.xwiki.security.authorization.internal.resolver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.when;
 
 /**
  * Validate {@link UserAndGroupDocumentReferenceResolver}.
@@ -49,9 +50,9 @@ public class UserAndGroupDocumentReferenceResolverTest
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        EntityReferenceValueProvider provider = this.mocker.registerMockComponent(EntityReferenceValueProvider.class);
+        EntityReferenceProvider provider = this.mocker.registerMockComponent(EntityReferenceProvider.class);
 
-        when(provider.getDefaultValue(EntityType.WIKI)).thenReturn("defaultwiki");
+        when(provider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("defaultwiki"));
     }
 
     @Test

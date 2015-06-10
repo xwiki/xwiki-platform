@@ -133,7 +133,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private String orig_wikiId;
 
-    private String wikiId;
+    private WikiReference wikiReference;
 
     private DocumentReference userReference;
 
@@ -276,12 +276,21 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @return the id of the current wiki
+     * @return the id of the current wiki, or null if none is set
      * @since 6.1M1
      */
     public String getWikiId()
     {
-        return this.wikiId;
+        return this.wikiReference != null ? this.wikiReference.getName() : null;
+    }
+
+    /**
+     * @return the reference of the current wiki or null if none is set
+     * @since 7.2M1
+     */
+    public WikiReference getWikiReference()
+    {
+        return this.wikiReference;
     }
 
     /**
@@ -300,20 +309,25 @@ public class XWikiContext extends Hashtable<Object, Object>
      */
     public void setWikiId(String wikiId)
     {
-        this.wikiId = wikiId;
+        setWikiReference(wikiId != null ? new WikiReference(wikiId) : null);
+    }
 
-        if (wikiId == null) {
+    /**
+     * @param wikiReference the current wiki reference
+     * @since 7.2M1
+     */
+    public void setWikiReference(WikiReference wikiReference)
+    {
+        this.wikiReference = wikiReference;
+
+        if (this.wikiReference == null) {
             super.remove(WIKI_KEY);
         } else {
-            super.put(WIKI_KEY, wikiId);
-        }
+            super.put(WIKI_KEY, this.wikiReference.getName());
 
-        if (this.orig_wikiId == null) {
-            this.orig_wikiId = wikiId;
-            if (wikiId == null) {
-                super.remove(ORIGINAL_WIKI_KEY);
-            } else {
-                super.put(ORIGINAL_WIKI_KEY, wikiId);
+            if (this.orig_wikiId == null) {
+                this.orig_wikiId = this.wikiReference.getName();
+                super.put(ORIGINAL_WIKI_KEY, this.wikiReference.getName());
             }
         }
     }

@@ -19,6 +19,9 @@
  */
 package org.xwiki.security.internal;
 
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+
 /**
  * This class contains constants for accessing various xwiki elements.
  *
@@ -29,6 +32,13 @@ public interface XWikiConstants
 {
     /** Name of the space where user document and global preferences is stored. */
     String XWIKI_SPACE = "XWiki";
+
+    /**
+     * Relative reference of the space where user document and global preferences is stored.
+     * 
+     * @since 7.2M1
+     */
+    EntityReference XWIKI_SPACE_REFERENCE = new EntityReference(XWIKI_SPACE, EntityType.SPACE);
 
     /** Name of document where wiki rights are stored. */
     String WIKI_DOC = "XWikiPreferences";
@@ -55,10 +65,10 @@ public interface XWikiConstants
     String GROUPS_FIELD_NAME = "groups";
 
     /** Field name for users in xwiki rights object. */
-    String USERS_FIELD_NAME  = "users";
+    String USERS_FIELD_NAME = "users";
 
     /** Field name for rights in xwiki rights object. */
-    String ALLOW_FIELD_NAME  = "allow";
+    String ALLOW_FIELD_NAME = "allow";
 
     /** The Guest username. */
     String GUEST_USER = "XWikiGuest";

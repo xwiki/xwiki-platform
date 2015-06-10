@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -33,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -120,11 +121,6 @@ public class CreateAction extends XWikiAction
      * Local entity reference serializer hint.
      */
     private static final String LOCAL_SERIALIZER_HINT = "local";
-
-    /**
-     * Default entity reference resolver hint.
-     */
-    private static final String DEFAULT_RESOLVER_HINT = "default";
 
     /**
      * Current entity reference resolver hint.
@@ -252,9 +248,10 @@ public class CreateAction extends XWikiAction
      * @param request the current request for which this action is executed
      * @param doc the current document
      * @param isSpace {@code true} if the request is to create a space, {@code false} if a page should be created
+     * @param context the XWiki context
      * @return the serialized reference of the parent to create the document for
      */
-    private String getParent(XWikiRequest request, XWikiDocument doc, boolean isSpace)
+    private String getParent(XWikiRequest request, XWikiDocument doc, boolean isSpace, XWikiContext context)
     {
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
@@ -266,15 +263,11 @@ public class CreateAction extends XWikiAction
                 Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
 
             if (isSpace) {
-                EntityReferenceValueProvider currentReferenceValueProvider =
-                    Utils.getComponent(EntityReferenceValueProvider.class, CURRENT_RESOLVER_HINT);
-                EntityReferenceValueProvider defaultReferenceValueProvider =
-                    Utils.getComponent(EntityReferenceValueProvider.class, DEFAULT_RESOLVER_HINT);
+                Provider<DocumentReference> defaultDocumentReferenceProvider =
+                    Utils.getComponent(DocumentReference.TYPE_PROVIDER);
 
                 DocumentReference parentRef =
-                    new DocumentReference(currentReferenceValueProvider.getDefaultValue(EntityType.WIKI),
-                        defaultReferenceValueProvider.getDefaultValue(EntityType.SPACE),
-                        defaultReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT));
+                    defaultDocumentReferenceProvider.get().setWikiReference(context.getWikiReference());
 
                 parent = localSerializer.serialize(parentRef);
             } else if (!doc.isNew()) {
@@ -466,7 +459,7 @@ public class CreateAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
-        String parent = getParent(request, doc, isSpace);
+        String parent = getParent(request, doc, isSpace, context);
 
         // get the title of the page to create, as specified in the parameters
         String title = getTitle(request, newDocument, isSpace);

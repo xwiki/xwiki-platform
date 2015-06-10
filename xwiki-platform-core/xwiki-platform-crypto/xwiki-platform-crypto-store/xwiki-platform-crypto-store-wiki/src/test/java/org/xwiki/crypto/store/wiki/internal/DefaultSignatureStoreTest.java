@@ -29,7 +29,8 @@ import org.xwiki.crypto.store.SignatureStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.BlockReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -64,6 +65,10 @@ public class DefaultSignatureStoreTest
 
     private static final String ENCODED_SIGNATURE = "encoded_signature";
 
+    private static final WikiReference WIKI_REFERENCE = new WikiReference("wiki");
+    private static final EntityReference SPACE_REFERENCE = new EntityReference("space", EntityType.WIKI);
+    private static final EntityReference DOCUMENT_REFERENCE = new EntityReference("documents", EntityType.DOCUMENT);
+
     @Rule
     public MockitoComponentMockingRule<SignatureStore> mocker =
         new MockitoComponentMockingRule<SignatureStore>(DefaultSignatureStore.class);
@@ -77,12 +82,12 @@ public class DefaultSignatureStoreTest
     @Before
     public void setUp() throws Exception
     {
-        EntityReferenceValueProvider valueProvider = mock(EntityReferenceValueProvider.class);
-        when(valueProvider.getDefaultValue(EntityType.WIKI)).thenReturn("wiki");
-        when(valueProvider.getDefaultValue(EntityType.SPACE)).thenReturn("space");
-        when(valueProvider.getDefaultValue(EntityType.DOCUMENT)).thenReturn("document");
+        EntityReferenceProvider valueProvider = mock(EntityReferenceProvider.class);
+        when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
+        when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
+        when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
 
-        this.mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
+        this.mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
             this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);

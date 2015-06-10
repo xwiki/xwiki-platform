@@ -43,8 +43,9 @@ import org.xwiki.crypto.store.WikiStoreReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
@@ -94,6 +95,10 @@ public class X509KeyWikiStoreTest
     private static final String SPACE = "space";
     private static final String DOCUMENT = "document";
 
+    private static final WikiReference WIKI_REFERENCE = new WikiReference(WIKI);
+    private static final EntityReference SPACE_REFERENCE = new EntityReference(SPACE, EntityType.WIKI);
+    private static final EntityReference DOCUMENT_REFERENCE = new EntityReference(DOCUMENT, EntityType.DOCUMENT);
+
     private static final LocalDocumentReference DOC_STORE_ENTREF = new LocalDocumentReference("space", DOCUMENT);
     private static final EntityReference SPACE_STORE_ENTREF = new EntityReference(SPACE, EntityType.SPACE);
 
@@ -118,12 +123,12 @@ public class X509KeyWikiStoreTest
     @Before
     public void setUp() throws Exception
     {
-        EntityReferenceValueProvider valueProvider = mock(EntityReferenceValueProvider.class);
-        when(valueProvider.getDefaultValue(EntityType.WIKI)).thenReturn(WIKI);
-        when(valueProvider.getDefaultValue(EntityType.SPACE)).thenReturn(SPACE);
-        when(valueProvider.getDefaultValue(EntityType.DOCUMENT)).thenReturn(DOCUMENT);
+        EntityReferenceProvider valueProvider = mock(EntityReferenceProvider.class);
+        when(valueProvider.getDefaultReference(EntityType.WIKI)).thenReturn(WIKI_REFERENCE);
+        when(valueProvider.getDefaultReference(EntityType.SPACE)).thenReturn(SPACE_REFERENCE);
+        when(valueProvider.getDefaultReference(EntityType.DOCUMENT)).thenReturn(DOCUMENT_REFERENCE);
 
-        mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
+        mocker.registerComponent(EntityReferenceProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
             mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);

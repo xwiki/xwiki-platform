@@ -19,6 +19,11 @@
  */
 package org.xwiki.model.reference;
 
+import java.lang.reflect.Type;
+
+import javax.inject.Provider;
+
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
@@ -29,6 +34,13 @@ import org.xwiki.model.EntityType;
  */
 public class WikiReference extends EntityReference
 {
+    /**
+     * The {@link Type} for a Provider<WikiReference>.
+     * 
+     * @since 7.2M1
+     */
+    public static final Type TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class, WikiReference.class);
+
     /**
      * Special constructor that transforms a generic entity reference into a {@link WikiReference}. It checks the
      * validity of the passed reference (ie correct type).

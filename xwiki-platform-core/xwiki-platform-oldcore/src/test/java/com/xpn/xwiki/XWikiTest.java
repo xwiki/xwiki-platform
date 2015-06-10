@@ -77,6 +77,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWikiVersioningStore;
 
+    private Mock mockWikiDescriptorManager;
+
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     @Override
@@ -90,6 +92,17 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
+        this.mockWikiDescriptorManager.stubs().method("getCurrentWikiId").will(
+            new CustomStub("Implements WikiDescriptorManager.getCurrentWikiId")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return getContext().getWikiId();
+                }
+            });
 
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
@@ -160,7 +173,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             this.xwiki, getContext()});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
-
+        
         this.xwiki.setStore((XWikiStoreInterface) this.mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) this.mockXWikiVersioningStore.proxy());
         this.xwiki.saveDocument(this.document, getContext());

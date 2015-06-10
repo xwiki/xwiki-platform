@@ -582,7 +582,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @see #getLocalKey()
      */
     private String localKeyCache;
-    
+
     private RenderingContext renderingContext;
 
     /**
@@ -787,13 +787,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         this.store = store;
     }
-    
+
     private RenderingContext getRenderingContext()
     {
         if (this.renderingContext == null) {
             this.renderingContext = Utils.getComponent(RenderingContext.class);
         }
-        
+
         return this.renderingContext;
     }
 
@@ -894,29 +894,36 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Return the full local space reference. For example a document located in subwiki <code>space11</code> of space
+     * <code>space1</code> will return <code>space1.space11</code>.
+     * <p>
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
-     * @return the name of the space of the document
+     * @return the local reference the space of the document as String
      * @deprecated since 2.2M1 used {@link #getDocumentReference()} instead
      */
     @Deprecated
     public String getSpace()
     {
-        return getDocumentReference().getLastSpaceReference().getName();
+        return LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference());
     }
 
     /**
+     * Set the full local space reference.
+     * <p>
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      *
+     * @see #getSpace()
      * @deprecated since 2.2M1 used {@link #setDocumentReference(DocumentReference)} instead
      */
     @Deprecated
-    public void setSpace(String space)
+    public void setSpace(String spaces)
     {
-        if (space != null) {
+        if (spaces != null) {
             DocumentReference reference = getDocumentReference();
-            setDocumentReferenceInternal(new DocumentReference(new EntityReference(reference, new SpaceReference(space,
-                reference.getLastSpaceReference().getParent()))));
+            EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
+            spaceReference = spaceReference.appendParent(getDocumentReference().getWikiReference());
+            setDocumentReferenceInternal(new DocumentReference(reference.getName(), new SpaceReference(spaceReference)));
         }
     }
 
@@ -1121,7 +1128,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         return this.documentDisplayer;
     }
-    
+
     private Syntax getOutputSyntax()
     {
         return getRenderingContext().getTargetSyntax();
@@ -1140,18 +1147,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
-        getProgress().startStep(getDocumentReference(), "document.progress.render", "Render document [{}] in syntax [{}]",
-            getDocumentReference(), targetSyntax);
+        getProgress().startStep(getDocumentReference(), "document.progress.render",
+            "Render document [{}] in syntax [{}]", getDocumentReference(), targetSyntax);
 
         try {
             getProgress().pushLevelProgress(3, getDocumentReference());
 
-            getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent", "Get translated content");
+            getProgress().startStep(getDocumentReference(), "document.progress.render.translatedcontent",
+                "Get translated content");
 
             XWikiDocument tdoc = getTranslatedDocument(context);
             String translatedContent = tdoc.getContent();
 
-            getProgress().startStep(getDocumentReference(), "document.progress.render.cache", "Try to get content from the cache");
+            getProgress().startStep(getDocumentReference(), "document.progress.render.cache",
+                "Try to get content from the cache");
 
             String renderedContent =
                 getRenderingCache().getRenderedContent(getDocumentReference(), translatedContent, context);
@@ -1205,8 +1214,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(String text, String syntaxId, boolean restrictedTransformationContext,
         XWikiContext context)
     {
-        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(),
-                restrictedTransformationContext, context);
+        return getRenderedContent(text, syntaxId, getOutputSyntax().toIdString(), restrictedTransformationContext,
+            context);
     }
 
     /**
@@ -3102,8 +3111,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getXClass(context).get(fieldname);
             String prefix =
-                pref + LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference())
-                    + "_" + obj.getNumber() + "_";
+                pref + LOCAL_REFERENCE_SERIALIZER.serialize(obj.getXClass(context).getDocumentReference()) + "_"
+                    + obj.getNumber() + "_";
 
             if (pclass == null) {
                 return "";
@@ -3583,8 +3592,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context
      * @return a map containing ordered data
      */
-    private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request,
-        XWikiContext context)
+    private Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> parseRequestUpdateOrCreate(
+        XWikiRequest request, XWikiContext context)
     {
         Map<DocumentReference, SortedMap<Integer, Map<String, String[]>>> result = new HashMap<>();
         @SuppressWarnings("unchecked")
@@ -3595,7 +3604,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 continue;
             }
             Integer classNumber;
-            String className= matcher.group(1);
+            String className = matcher.group(1);
             String classNumberAsString = matcher.group(2);
             String classPropertyName = matcher.group(3);
             DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
@@ -6175,6 +6184,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
         }
 
+        if (ObjectUtils.notEqual(fromDoc.getDocumentReference(), toDoc.getDocumentReference())) {
+            list.add(new MetaDataDiff("reference", fromDoc.getDocumentReference(), toDoc.getDocumentReference()));
+        }
+
         if (!fromDoc.getSpace().equals(toDoc.getSpace())) {
             list.add(new MetaDataDiff("web", fromDoc.getSpace(), toDoc.getSpace()));
         }
@@ -7013,8 +7026,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 .resolve(form.getClassName(), EntityType.DOCUMENT, getDocumentReference());
         BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
-        baseclass.fromMap(
-            form.getObject(LOCAL_REFERENCE_SERIALIZER.serialize(resolveClassReference(classReference))),
+        baseclass.fromMap(form.getObject(LOCAL_REFERENCE_SERIALIZER.serialize(resolveClassReference(classReference))),
             object);
 
         return object;
@@ -8015,8 +8027,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
         } else {
             for (String className : classNames) {
-                List<BaseObject> objects =
-                    getXObjects(getCurrentMixedDocumentReferenceResolver().resolve(className));
+                List<BaseObject> objects = getXObjects(getCurrentMixedDocumentReferenceResolver().resolve(className));
                 if (objects != null) {
                     for (BaseObject obj : objects) {
                         if (obj != null) {
@@ -8310,8 +8321,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         // if the passed reference is null consider it points to the default reference
         if (reference == null) {
-            setDocumentReference(Utils.<DocumentReferenceResolver<String>>getComponent(
-                DocumentReferenceResolver.TYPE_STRING).resolve(""));
+            setDocumentReference(Utils.<Provider<DocumentReference>>getComponent(DocumentReference.TYPE_PROVIDER).get());
         } else {
             setDocumentReference(reference);
         }

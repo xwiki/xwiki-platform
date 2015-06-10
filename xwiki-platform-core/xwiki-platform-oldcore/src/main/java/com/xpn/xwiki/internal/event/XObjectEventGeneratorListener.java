@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -39,7 +40,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce {@link XObjectEvent} based on document events.
@@ -57,6 +57,9 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
+
+    @Inject
+    private ObservationManager observation;
 
     @Override
     public String getName()
@@ -93,14 +96,12 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
-        ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
         for (List<BaseObject> xobjects : doc.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
+                    this.observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
                     for (PropertyInterface property : (Collection<PropertyInterface>) xobject.getFieldList()) {
-                        observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
+                        this.observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
                     }
                 }
             }
@@ -114,14 +115,12 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     private void onDocumentDeletedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
-        ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
         for (List<BaseObject> xobjects : originalDoc.getXObjects().values()) {
             for (BaseObject xobject : xobjects) {
                 if (xobject != null) {
-                    observation.notify(new XObjectDeletedEvent(xobject.getReference()), doc, context);
+                    this.observation.notify(new XObjectDeletedEvent(xobject.getReference()), doc, context);
                     for (PropertyInterface property : (Collection<PropertyInterface>) xobject.getFieldList()) {
-                        observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
+                        this.observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
                     }
                 }
             }
@@ -135,25 +134,23 @@ public class XObjectEventGeneratorListener implements EventListener
      */
     private void onDocumentUpdatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
-        ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
         for (List<ObjectDiff> objectChanges : doc.getObjectDiff(originalDoc, doc, context)) {
             boolean modified = false;
             for (ObjectDiff diff : objectChanges) {
                 BaseObject xobject = doc.getXObject(diff.getXClassReference(), diff.getNumber());
                 BaseObject xobjectOriginal = originalDoc.getXObject(diff.getXClassReference(), diff.getNumber());
                 if (ObjectDiff.ACTION_OBJECTREMOVED.equals(diff.getAction())) {
-                    observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
+                    this.observation.notify(new XObjectDeletedEvent(xobjectOriginal.getReference()), doc, context);
                 } else {
                     if (ObjectDiff.ACTION_OBJECTADDED.equals(diff.getAction())) {
-                        observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
+                        this.observation.notify(new XObjectAddedEvent(xobject.getReference()), doc, context);
                     } else {
                         if (!modified && xobject != null && xobjectOriginal != null) {
-                            observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
+                            this.observation.notify(new XObjectUpdatedEvent(xobject.getReference()), doc, context);
                             modified = true;
                         }
 
-                        onObjectPropertyModified(observation, doc, diff, context);
+                        onObjectPropertyModified(doc, diff, context);
                     }
                 }
             }
@@ -163,25 +160,23 @@ public class XObjectEventGeneratorListener implements EventListener
     /**
      * Generate object property related events.
      *
-     * @param observation the object manager
      * @param doc the new version of the document
      * @param diff the diff entry
      * @param context the XWiki context
      */
-    private void onObjectPropertyModified(ObservationManager observation, XWikiDocument doc, ObjectDiff diff,
-        XWikiContext context)
+    private void onObjectPropertyModified(XWikiDocument doc, ObjectDiff diff, XWikiContext context)
     {
         if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
             BaseObject object = doc.getOriginalDocument().getXObject(diff.getXClassReference(), diff.getNumber());
             PropertyInterface property = object.getField(diff.getPropName());
-            observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
+            this.observation.notify(new XObjectPropertyDeletedEvent(property.getReference()), doc, context);
         } else {
             BaseObject object = doc.getXObject(diff.getXClassReference(), diff.getNumber());
             PropertyInterface property = object.getField(diff.getPropName());
             if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
+                this.observation.notify(new XObjectPropertyAddedEvent(property.getReference()), doc, context);
             } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()), doc, context);
+                this.observation.notify(new XObjectPropertyUpdatedEvent(property.getReference()), doc, context);
             }
         }
     }

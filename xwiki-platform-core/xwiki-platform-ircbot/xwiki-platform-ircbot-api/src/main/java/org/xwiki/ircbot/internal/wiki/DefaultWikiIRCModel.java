@@ -38,10 +38,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -82,11 +82,8 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiSerializer;
 
-    /**
-     * Used to compute reference to the default wiki (i.e. the main wiki).
-     */
     @Inject
-    private EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+    private WikiDescriptorManager wikis;
 
     /**
      * Used to perform search for IRC Bot listener classes in the current wiki.
@@ -120,9 +117,7 @@ public class DefaultWikiIRCModel implements WikiIRCModel, WikiIRCBotConstants
         // try in the main wiki.
         XWikiDocument document = getDocument(new DocumentReference(this.bot.getWikiId(), SPACE, CONFIGURATION_PAGE));
         if (document.isNew()) {
-            document = getDocument(
-                new DocumentReference(this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.WIKI),
-                    SPACE, CONFIGURATION_PAGE));
+            document = getDocument(new DocumentReference(this.wikis.getMainWikiId(), SPACE, CONFIGURATION_PAGE));
         }
 
         return  document;

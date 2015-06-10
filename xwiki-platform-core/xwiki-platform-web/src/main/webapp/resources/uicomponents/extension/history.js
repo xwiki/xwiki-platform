@@ -230,17 +230,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 
     var jobState = container.attr('data-jobState');
     if (jobState == 'WAITING') {
-      container.find('form.extension-question button[value="continue"]').click(function(event) {
-        event.preventDefault();
-        var data = $(this).closest('form').serialize();
-        updateReplayStatus(container, data + '&action=continue');
-      });
+      container.find('form.extension-question button[value="continue"]').click($.proxy(updateReplayStatus, null,
+        container, 'action=continue'));
       // Some questions have their own buttons (e.g. the "Show changes" button on the merge conflict question).
-      container.find('form.extension-question button[name="extensionAction"]').click(function(event) {
-        event.preventDefault();
-        var data = $(this).closest('form').serialize();
-        updateReplayStatus(container, data + '&data=replayStatus');
-      });
+      container.find('form.extension-question button[name="extensionAction"]').click($.proxy(updateReplayStatus, null,
+        container, 'data=replayStatus'));
     } else if (typeof jobState == 'string' && jobState != 'FINISHED') {
       setTimeout($.proxy(updateReplayStatus, this, container), 1000);
     }
@@ -252,11 +246,17 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     };
   };
 
-  var updateReplayStatus = function(container, data) {
-    $.post(new XWiki.Document('ExtensionHistory', 'XWiki').getURL('get'), data || {
-      'data': 'replayStatus',
-      'jobId': container.attr('data-jobId')
-    }).done(function(html) {
+  var updateReplayStatus = function(container, data, event) {
+    if (event) {
+      event.preventDefault();
+      data += '&' + $(this).closest('form').serialize();
+    } else {
+      data = data || {
+        'data': 'replayStatus',
+        'jobId': container.attr('data-jobId')
+      };
+    }
+    $.post(container.attr('data-extensionHistoryURL'), data).done(function(html) {
       var uiState = getReplayStatusUIState(container);
       var wrapper = $(document.createElement('div'));
       wrapper.append(html);

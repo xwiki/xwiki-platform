@@ -3,6 +3,7 @@
   ## Allow the current step to handle the action or to perform something before moving to the next step.
   #set ($discard = $services.distribution.renderCurrentStepToXHTML())
   ## Standard step actions are in upper case (custom step actions should be in camel case).
+  #set ($xredirect = $request.xredirect)
   #if ($action == $action.toUpperCase())
     #set ($distributionJobStatus = $services.distribution.jobStatus)
     #set ($distributionQuestion = $distributionJobStatus.question)
@@ -16,13 +17,17 @@
         #set ($discard = $distributionQuestion.step.setState($actionToState.get($action)))
       #else
         ## Action that targets the wizard (skip/cancel).
+        #if ($action == 'REPLAY')
+          #set ($action = 'SKIP')
+          #set ($xredirect = $xwiki.getURL('XWiki.ExtensionHistory', 'view', 'xpage=view&viewer=extensionHistory'))
+        #end
         #set ($discard = $distributionQuestion.setAction($action))
       #end
       #set ($discard = $distributionJobStatus.answered())
     #end
   #end
   $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution',
-    "xredirect=$!escapetool.url($request.xredirect)"))
+    "xredirect=$!escapetool.url($xredirect)"))
 #end
 
 #macro(displayStep)
@@ -120,12 +125,23 @@
         $services.localization.render('platform.extension.distributionWizard.continueLabel')
       </button>
     </span>
-    <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
-      <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))"
-          #if ($disableStepButtons) disabled="disabled"#end>
-        $services.localization.render('platform.extension.distributionWizard.skipLabel')
-      </button>
+    <span class="dynamic-button-group align-right inside">
+      <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
+        <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
+            title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))"
+            #if ($disableStepButtons) disabled="disabled"#end>
+          $services.localization.render('platform.extension.distributionWizard.skipLabel')
+        </button>
+      </span>
+      #if ($canCloseWizard)
+        <span class="buttonwrapper">
+          #set ($hint = $services.localization.render('platform.extension.distributionWizard.replayHint'))
+          <button class="secondary" type="submit" name="action" value="REPLAY" title="$escapetool.xml($hint)"
+              #if ($disableStepButtons) disabled="disabled"#end>
+            $services.localization.render('platform.extension.distributionWizard.replayLabel')
+          </button>
+        </span>
+      #end
     </span>
     <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
       <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"

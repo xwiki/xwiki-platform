@@ -139,7 +139,7 @@
     <property>
       <code>require.config({
   paths: {
-    ckeditor: "$!services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'ckeditor.js')"
+    ckeditor: "$!services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'ckeditor')"
   },
   shim: {
     ckeditor: {
@@ -385,15 +385,7 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>/* Fix for XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar). */
-a.cke_button &gt; span.cke_button_icon {
-  background-image: url("$services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono/icons.png')") !important;
-}
-.cke_hidpi a.cke_button &gt; span.cke_button_icon {
-  background-image: url("$services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono/icons_hidpi.png')") !important;
-}
-
-a.cke_button_disabled &gt; span.cke_button_icon.loading {
+      <code>a.cke_button_disabled &gt; span.cke_button_icon.loading {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')") !important;
   background-position: 0 0 !important;
 }

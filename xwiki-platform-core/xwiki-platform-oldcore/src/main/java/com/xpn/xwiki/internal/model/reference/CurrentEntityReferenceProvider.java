@@ -48,7 +48,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * </ul>
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 7.2M1
  */
 @Component
 @Named("current")

@@ -175,19 +175,7 @@ public class WebJarsScriptService implements ScriptService
         }
 
         // Construct a WebJarsResourceReference so that we can serialize it!
-        List<String> segments = new ArrayList<>();
-        segments.add(artifactId);
-        // Don't include the version if it's not specified and there's no installed/core extension that matches the
-        // given WebJar id.
-        if (version != null) {
-            segments.add((String) version);
-        }
-        segments.addAll(Arrays.asList(path.split(RESOURCE_SEPARATOR)));
-
-        WebJarsResourceReference resourceReference = new WebJarsResourceReference(segments);
-        for (Map.Entry<String, Object> parameterEntry : urlParams.entrySet()) {
-            resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
-        }
+        WebJarsResourceReference resourceReference = getResourceReference(artifactId, version, path, urlParams);
 
         ExtendedURL extendedURL;
         try {
@@ -199,6 +187,39 @@ public class WebJarsScriptService implements ScriptService
         }
 
         return extendedURL.serialize();
+    }
+
+    private WebJarsResourceReference getResourceReference(String artifactId, Object version, String path,
+        Map<String, Object> urlParams)
+    {
+        List<String> segments = new ArrayList<>();
+        segments.add(artifactId);
+        // Don't include the version if it's not specified and there's no installed/core extension that matches the
+        // given WebJar id.
+        if (version != null) {
+            segments.add((String) version);
+        }
+        segments.addAll(Arrays.asList(path.split(RESOURCE_SEPARATOR)));
+
+        // When a JavaScript resource is loaded using RequireJS the resource URL must not include the ".js" suffix (by
+        // default) if the URL is relative and doesn't have a query string. Before XWIKI-10881 (Introduce a proper
+        // "webjars" type instead of reusing the "bin" type) all WebJar URLs had a query string (the resource path) so
+        // we were forced to specify the ".js" suffix when using RequireJS. The resource path is currently no longer
+        // part of the query string and thus the ".js" suffix must now be omitted (otherwise RequireJS will ask for
+        // ".js.js"), unless the resource has parameters (e.g. the resource is evaluated). In order to preserve
+        // backwards compatibility with existing extensions and also in order to fix this mess (the developer doesn't
+        // know when to put the ".js" suffix and when not) we have decided to add a fake query string if the ".js"
+        // suffix is specified and there is no query string (thus preventing RequireJS from requesting ".js.js").
+        if (path.endsWith(".js") && urlParams.isEmpty()) {
+            urlParams.put("r", "1");
+        }
+
+        WebJarsResourceReference resourceReference = new WebJarsResourceReference(segments);
+        for (Map.Entry<String, Object> parameterEntry : urlParams.entrySet()) {
+            resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
+        }
+
+        return resourceReference;
     }
 
     private String getVersion(String extensionId)

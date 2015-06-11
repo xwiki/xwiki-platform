@@ -40,6 +40,7 @@ import org.xwiki.resource.CreateResourceTypeException;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractExtendedURLResourceTypeResolver;
 import org.xwiki.url.internal.standard.entity.BinEntityResourceReferenceResolver;
@@ -111,19 +112,34 @@ public class StandardExtendedURLResourceTypeResolver extends AbstractExtendedURL
         resolverDescriptor.setRoleHint(hint);
         resolverDescriptor.setRoleType(
             new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
+
         // Register dependencies
+
         DefaultComponentDependency<WikiReferenceExtractor> wikiReferenceExtractorDependency =
             new DefaultComponentDependency<>();
         wikiReferenceExtractorDependency.setRoleType(WikiReferenceExtractor.class);
         wikiReferenceExtractorDependency.setRoleHint(wikiExtractorHint);
         wikiReferenceExtractorDependency.setName("wikiExtractor");
         resolverDescriptor.addComponentDependency(wikiReferenceExtractorDependency);
+
         DefaultComponentDependency<EntityReferenceResolver<EntityReference>> entityReferenceResolverDependency =
             new DefaultComponentDependency<>();
         entityReferenceResolverDependency.setRoleType(new DefaultParameterizedType(null, EntityReferenceResolver.class,
             EntityReference.class));
         entityReferenceResolverDependency.setName("defaultReferenceEntityReferenceResolver");
         resolverDescriptor.addComponentDependency(entityReferenceResolverDependency);
+
+        DefaultComponentDependency<StandardURLConfiguration> standardURLConfigurationDependency =
+            new DefaultComponentDependency<>();
+        standardURLConfigurationDependency.setRoleType(StandardURLConfiguration.class);
+        standardURLConfigurationDependency.setName("configuration");
+        resolverDescriptor.addComponentDependency(standardURLConfigurationDependency);
+
+        DefaultComponentDependency<EntityResourceActionLister> entityResourceActionListerDependency =
+            new DefaultComponentDependency<>();
+        entityResourceActionListerDependency.setRoleType(EntityResourceActionLister.class);
+        entityResourceActionListerDependency.setName("entityResourceActionLister");
+        resolverDescriptor.addComponentDependency(entityResourceActionListerDependency);
 
         try {
             this.rootComponentManager.registerComponent(resolverDescriptor);

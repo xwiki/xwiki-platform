@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>6.2.5</version>
+    <version>7.1-milestone-1</version>
   </parent>
   <groupId>org.xwiki.contrib</groupId>
   <artifactId>application-ckeditor-pom</artifactId>

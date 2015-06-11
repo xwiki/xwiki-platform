@@ -58,13 +58,13 @@ public class WebJarsScriptServiceTest
             new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
                 ExtendedURL.class));
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(
-            Arrays.asList("ang:ular", "2.1.11", "angular.js"));
+            Arrays.asList("ang:ular", "2.1.11", "angular.css"));
         // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
         when(serializer.serialize(resourceReference)).thenReturn(
-            new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.js")));
+            new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.js",
-            this.mocker.getComponentUnderTest().url("ang:ular/2.1.11/angular.js"));
+        assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css",
+            this.mocker.getComponentUnderTest().url("ang:ular/2.1.11/angular.css"));
     }
 
     @Test
@@ -84,12 +84,12 @@ public class WebJarsScriptServiceTest
             new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
                 ExtendedURL.class));
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(
-            Arrays.asList("angular", "2.1.11", "angular.js"));
+            Arrays.asList("angular", "2.1.11", "angular.css"));
         when(serializer.serialize(resourceReference)).thenReturn(
-            new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.js")));
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
-        assertEquals("/xwiki/angular/2.1.11/angular.js",
-            this.mocker.getComponentUnderTest().url("angular", "angular.js"));
+        assertEquals("/xwiki/angular/2.1.11/angular.css",
+            this.mocker.getComponentUnderTest().url("angular", "angular.css"));
     }
 
     @Test
@@ -99,11 +99,11 @@ public class WebJarsScriptServiceTest
             this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
                 WebJarsResourceReference.class, ExtendedURL.class));
         WebJarsResourceReference resourceReference =
-            new WebJarsResourceReference(Arrays.asList("angular", "angular.js"));
+            new WebJarsResourceReference(Arrays.asList("angular", "angular.css"));
         when(serializer.serialize(resourceReference)).thenReturn(
-            new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js")));
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
 
-        assertEquals("/xwiki/angular/angular.js", this.mocker.getComponentUnderTest().url("angular", "angular.js"));
+        assertEquals("/xwiki/angular/angular.css", this.mocker.getComponentUnderTest().url("angular", "angular.css"));
     }
 
     @Test
@@ -126,5 +126,20 @@ public class WebJarsScriptServiceTest
         params.put("list", new String[] {"one", "two"});
         assertEquals("/xwiki/angular/2.1.11/angular.js?evaluate=true&list=one&list=two",
             this.mocker.getComponentUnderTest().url("angular", "angular.js", params));
+    }
+
+    @Test
+    public void computeJavaScriptURLWithSuffixAndNoParameters() throws Exception
+    {
+        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer =
+            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+                WebJarsResourceReference.class, ExtendedURL.class));
+        WebJarsResourceReference resourceReference =
+            new WebJarsResourceReference(Arrays.asList("angular", "angular.js"));
+        resourceReference.addParameter("r", "1");
+        when(serializer.serialize(resourceReference)).thenReturn(
+            new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
+
+        assertEquals("/xwiki/angular/angular.js?r=1", this.mocker.getComponentUnderTest().url("angular", "angular.js"));
     }
 }

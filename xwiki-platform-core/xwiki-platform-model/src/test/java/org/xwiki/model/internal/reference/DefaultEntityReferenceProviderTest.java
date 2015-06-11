@@ -34,7 +34,6 @@ import org.xwiki.model.reference.test.TestConstants;
  * Unit tests for the deprecated {@link DefaultEntityReferenceProvider}.
  *
  * @version $Id$
- * @since 2.3M1
  */
 public class DefaultEntityReferenceProviderTest implements TestConstants
 {

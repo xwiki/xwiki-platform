@@ -20,6 +20,7 @@
 package org.xwiki.url.internal.standard;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -38,6 +39,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.ResourceTypeResolver;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.resource.resources.ResourcesResourceReference;
 import org.xwiki.resource.skins.SkinsResourceReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -100,6 +102,7 @@ public class IntegrationTest
             StandardURLConfiguration.class);
         when(standardURLConfiguration.getEntityPathPrefix()).thenReturn("bin");
         when(standardURLConfiguration.getWikiPathPrefix()).thenReturn("wiki");
+        when(standardURLConfiguration.isViewActionHidden()).thenReturn(false);
 
         // Isolate from xwiki configuration file
         ModelConfiguration modelConfiguration = this.componentManager.registerMockComponent(ModelConfiguration.class);
@@ -109,6 +112,9 @@ public class IntegrationTest
         WikiDescriptorManager wikiDescriptorManager =
             this.componentManager.registerMockComponent(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+
+        // Isolate from Environment
+        this.componentManager.registerMockComponent(EntityResourceActionLister.class);
 
         // For test simplicity consider that Context CM == CM
         this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
@@ -138,27 +144,14 @@ public class IntegrationTest
 
         // GWT Resource References
         assertURL("http://localhost:8080/xwiki/resources/js/xwiki/wysiwyg/xwe/MacroService.gwtrpc",
-            EntityResourceReference.TYPE, new EntityResourceReference(new DocumentReference("xwiki", "js", "xwiki"),
+            EntityResourceReference.TYPE, new EntityResourceReference(new DocumentReference("xwiki",
+                Arrays.asList("js", "xwiki", "wysiwyg", "xwe"), "MacroService.gwtrpc"),
                 new EntityResourceAction("resources")));
 
         // Skins Resource References
         assertURL("http://localhost:8080/xwiki/skins/flamingo/logo.png", SkinsResourceReference.TYPE,
             new SkinsResourceReference());
 
-    }
-
-    private void assertEntityURL(String url, String expectedType, EntityResourceAction expectedAction,
-        DocumentReference expectedReference) throws Exception
-    {
-        ExtendedURL extendedURL = new ExtendedURL(new URL(url), "xwiki");
-        ResourceType resourceType =
-            this.resourceTypeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
-        assertEquals(expectedType, resourceType.getId());
-
-        EntityResourceReference reference = (EntityResourceReference) this.resourceReferenceResolver.resolve(
-            extendedURL, resourceType, Collections.<String, Object>emptyMap());
-        assertEquals(expectedAction, reference.getAction());
-        assertEquals(expectedReference, reference.getEntityReference());
     }
 
     private void assertURL(String url, ResourceType expectedType, ResourceReference expectedReference) throws Exception

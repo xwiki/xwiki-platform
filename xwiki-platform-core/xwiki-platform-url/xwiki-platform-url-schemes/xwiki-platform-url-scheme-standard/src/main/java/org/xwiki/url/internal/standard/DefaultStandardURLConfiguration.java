@@ -83,6 +83,12 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
         return getEntityPathPrefix("bin");
     }
 
+    @Override
+    public boolean isViewActionHidden()
+    {
+        return isViewActionHidden(false);
+    }
+
     /**
      * Makes it easy for this class to be extended.
      *
@@ -92,6 +98,17 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     protected String getWikiPathPrefix(String defaultValue)
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #isViewActionHidden()} ()}
+     */
+    protected boolean isViewActionHidden(boolean defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "hideViewAction", defaultValue);
     }
 
     /**

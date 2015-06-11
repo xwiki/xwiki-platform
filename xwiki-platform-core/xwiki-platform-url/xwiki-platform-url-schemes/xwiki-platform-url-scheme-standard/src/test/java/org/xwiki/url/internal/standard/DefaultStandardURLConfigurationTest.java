@@ -64,4 +64,13 @@ public class DefaultStandardURLConfigurationTest
 
         assertEquals("bin", this.mocker.getComponentUnderTest().getEntityPathPrefix());
     }
+
+    @Test
+    public void isViewActionHidden() throws Exception
+    {
+        ConfigurationSource source = this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        when(source.getProperty("url.standard.hideViewAction", false)).thenReturn(false);
+
+        assertFalse(this.mocker.getComponentUnderTest().isViewActionHidden());
+    }
 }

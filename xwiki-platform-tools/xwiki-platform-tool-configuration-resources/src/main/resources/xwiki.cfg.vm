@@ -231,8 +231,11 @@ xwiki.virtual.usepath=$xwikiCfgVirtualUsepath
 #-# xwiki.url.protocol=https
 # xwiki.url.protocol=
 #-# The name of the webapp to use in the generated URLs. If not specified, the value is extracted from the request URL
-#-# and thus it's generally not required to set it. However if you're deploying XWiki as root in your Servlet Container
-#-# and you're using XWiki >= 6.1 and < 7.0 you must set it to an empty value as otherwise the code cannot guess it.
+#-# and thus it's generally not required to set it. However if you're deploying XWiki as ROOT in your Servlet Container
+#-# and you're using XWiki 6.2.8+/6.4.3+/7.0+ you must set it to an empty value as otherwise the code cannot guess it.
+#-# Note that not setting this property seemed to work on previous versions when deploying as ROOT but it was actually
+#-# leading to errors from time to time, depending on what URL was used when doing the first request on the XWiki
+#-# instance.
 #-# For example:
 #-# xwiki.webapppath=xwiki
 # xwiki.webapppath=

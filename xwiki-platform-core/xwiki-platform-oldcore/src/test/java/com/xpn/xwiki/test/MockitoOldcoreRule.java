@@ -624,11 +624,17 @@ public class MockitoOldcoreRule implements MethodRule
         // If there's already a Query Manager registered, use it instead.
         // This allows, for example, using @ComponentList to use the real Query Manager, in integration tests.
         if (!this.componentManager.hasComponent(QueryManager.class)) {
-            this.queryManager = getMocker().registerMockComponent(QueryManager.class);
-        } else {
-            this.queryManager = this.componentManager.getInstance(QueryManager.class);
+            mockQueryManager();
         }
-        when(getMockStore().getQueryManager()).thenReturn(this.queryManager);
+        when(getMockStore().getQueryManager()).then(new Answer<QueryManager>()
+        {
+
+            @Override
+            public QueryManager answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getQueryManager();
+            }
+        });
 
         // WikiDescriptorManager
         // If there's already a WikiDescriptorManager registered, use it instead.
@@ -729,8 +735,24 @@ public class MockitoOldcoreRule implements MethodRule
     /**
      * @since 7.0RC1
      */
-    public QueryManager getQueryManager()
+    public QueryManager getQueryManager() throws ComponentLookupException
     {
+        if (this.queryManager == null) {
+            this.queryManager = this.componentManager.getInstance(QueryManager.class);
+        }
+
+        return this.queryManager;
+    }
+
+    /**
+     * Force mocking query manager.
+     * 
+     * @return 7.2M1
+     */
+    public QueryManager mockQueryManager() throws Exception
+    {
+        this.queryManager = getMocker().registerMockComponent(QueryManager.class);
+
         return this.queryManager;
     }
 

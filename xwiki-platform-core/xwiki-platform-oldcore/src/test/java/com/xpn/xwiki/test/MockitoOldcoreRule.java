@@ -58,7 +58,6 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWiki;
@@ -110,8 +109,6 @@ public class MockitoOldcoreRule implements MethodRule
     private ContextualAuthorizationManager mockContextualAuthorizationManager;
 
     private QueryManager queryManager;
-
-    private WikiDescriptorManager wikiDescriptorManager;
 
     protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
 
@@ -261,24 +258,12 @@ public class MockitoOldcoreRule implements MethodRule
         } else {
             econtext = execution.getContext();
         }
-        econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
+        econtext.setProperty("xwikicontext", this.context);
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {
             Provider<XWikiContext> xcontextProvider =
                 this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-            when(xcontextProvider.get()).thenReturn(this.context);
-        } else {
-            Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
-            if (mockUtil.isMock(xcontextProvider)) {
-                when(xcontextProvider.get()).thenReturn(this.context);
-            }
-        }
-
-        // Initialize readonly XWikiContext provider
-        if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER, "readonly")) {
-            Provider<XWikiContext> xcontextProvider =
-                this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
             when(xcontextProvider.get()).thenReturn(this.context);
         } else {
             Provider<XWikiContext> xcontextProvider = this.componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
@@ -629,29 +614,6 @@ public class MockitoOldcoreRule implements MethodRule
             this.queryManager = this.componentManager.getInstance(QueryManager.class);
         }
         when(getMockStore().getQueryManager()).thenReturn(this.queryManager);
-
-        // WikiDescriptorManager
-        // If there's already a WikiDescriptorManager registered, use it instead.
-        // This allows, for example, using @ComponentList to use the real WikiDescriptorManager, in integration tests.
-        if (!this.componentManager.hasComponent(WikiDescriptorManager.class)) {
-            this.wikiDescriptorManager = getMocker().registerMockComponent(WikiDescriptorManager.class);
-            when(this.wikiDescriptorManager.getMainWikiId()).then(new Answer<String>()
-            {
-                @Override
-                public String answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return getXWikiContext().getMainXWiki();
-                }
-            });
-            when(this.wikiDescriptorManager.getCurrentWikiId()).then(new Answer<String>()
-            {
-                @Override
-                public String answer(InvocationOnMock invocation) throws Throwable
-                {
-                    return getXWikiContext().getWikiId();
-                }
-            });
-        }
     }
 
     protected void after() throws Exception
@@ -732,21 +694,6 @@ public class MockitoOldcoreRule implements MethodRule
     public QueryManager getQueryManager()
     {
         return this.queryManager;
-    }
-
-    /**
-     * @since 7.2M1
-     */
-    public WikiDescriptorManager getWikiDescriptorManager() throws ComponentLookupException
-    {
-        if (this.wikiDescriptorManager == null) {
-            // Avoid initializing it if not needed
-            if (this.componentManager.hasComponent(WikiDescriptorManager.class)) {
-                this.wikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-            }
-        }
-
-        return this.wikiDescriptorManager;
     }
 
     /**

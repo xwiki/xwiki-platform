@@ -106,10 +106,9 @@ public abstract class AbstractRatingsManager implements RatingsManager
     {
         try {
             XWikiDocument sourceDoc = getXWiki().getDocument(documentRef, getXWikiContext());
-            DocumentReference spacePreferenceReference =
-                new DocumentReference(RatingsManager.RATINGS_CONFIG_SPACE_PAGE, sourceDoc.getDocumentReference()
-                    .getLastSpaceReference());
-            XWikiDocument spaceConfigDoc = getXWiki().getDocument(spacePreferenceReference, getXWikiContext());
+            XWikiDocument spaceConfigDoc =
+                getXWiki().getDocument(sourceDoc.getSpace(), RatingsManager.RATINGS_CONFIG_SPACE_PAGE,
+                    getXWikiContext());
             XWikiDocument globalConfigDoc =
                 getXWiki().getDocument(RatingsManager.RATINGS_CONFIG_GLOBAL_REFERENCE, getXWikiContext());
             XWikiDocument configDoc =

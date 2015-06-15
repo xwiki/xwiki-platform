@@ -24,6 +24,8 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
@@ -43,13 +45,14 @@ public class PathWikiReferenceExtractorTest
 {
     @Rule
     public MockitoComponentMockingRule<PathWikiReferenceExtractor> mocker =
-        new MockitoComponentMockingRule<>(PathWikiReferenceExtractor.class);
+        new MockitoComponentMockingRule(PathWikiReferenceExtractor.class);
 
     @Before
     public void setUp() throws Exception
     {
-        WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        EntityReferenceValueProvider entityReferenceValueProvider =
+            mocker.getInstance(EntityReferenceValueProvider.class);
+        when(entityReferenceValueProvider.getDefaultValue(EntityType.WIKI)).thenReturn("xwiki");
     }
 
     @Test

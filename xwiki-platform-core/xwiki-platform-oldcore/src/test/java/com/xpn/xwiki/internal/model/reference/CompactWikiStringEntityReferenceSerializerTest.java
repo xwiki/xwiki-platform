@@ -19,52 +19,59 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import org.jmock.Expectations;
 import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link CompactWikiStringEntityReferenceSerializer}.
+ * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentList({ CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class })
-public class CompactWikiStringEntityReferenceSerializerTest
+public class CompactWikiStringEntityReferenceSerializerTest extends AbstractComponentTestCase
 {
-    public MockitoComponentMockingRule<EntityReferenceSerializer<String>> mocker =
-        new MockitoComponentMockingRule<EntityReferenceSerializer<String>>(
-            CompactWikiStringEntityReferenceSerializer.class);
+    private EntityReferenceSerializer<EntityReference> serializer;
 
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.mocker);
+    private ModelContext mockModelContext;
 
-    @Test
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        this.mockModelContext = registerMockComponent(ModelContext.class);
+        this.serializer = getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+    }
+
+    @org.junit.Test
     public void testSerializeWhenInSameWiki() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        this.oldcore.getXWikiContext().setWikiReference(reference.getWikiReference());
+        getMockery().checking(new Expectations() {{
+            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("wiki")));
+        }});
 
-        Assert.assertEquals("space.page", this.mocker.getComponentUnderTest().serialize(reference));
-        Assert.assertEquals("space", this.mocker.getComponentUnderTest().serialize(reference.getParent()));
+        Assert.assertEquals("space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("space", this.serializer.serialize(reference.getParent()));
     }
 
-    @Test
+    @org.junit.Test
     public void testSerializeWhenNotInSameWiki() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        this.oldcore.getXWikiContext().setWikiId("otherwiki");
+        getMockery().checking(new Expectations() {{
+            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("otherwiki")));
+        }});
 
-        Assert.assertEquals("wiki:space.page", this.mocker.getComponentUnderTest().serialize(reference));
-        Assert.assertEquals("wiki:space", this.mocker.getComponentUnderTest().serialize(reference.getParent()));
+        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("wiki:space", this.serializer.serialize(reference.getParent()));
     }
 }

@@ -29,7 +29,8 @@ import java.util.Objects;
 
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.classloader.NamespaceURLClassLoader;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Dynamic classloader which select the current class loader based on context wiki each time it's called.
@@ -39,7 +40,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  */
 public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
 {
-    private WikiDescriptorManager wikis;
+    private final EntityReferenceValueProvider currentWikiProvider;
 
     private final ClassLoaderManager classLoaderManager;
 
@@ -48,11 +49,11 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
     private NamespaceURLClassLoader currentClassLoader;
 
     /**
-     * @param wikis the component used to access current wiki
+     * @param currentWikiProvider the component used to access current wiki
      * @param classLoaderManager the component used to get the ClassLoader associated to current wiki
-     * @since 7.2M1
      */
-    public ContextNamespaceURLClassLoader(WikiDescriptorManager wikis, ClassLoaderManager classLoaderManager)
+    public ContextNamespaceURLClassLoader(EntityReferenceValueProvider currentWikiProvider,
+        ClassLoaderManager classLoaderManager)
     {
         // Note: it's important to set the parent CL to be the Context CL since some third party frameworks can use
         // that information. For example the Apache Naming (JNDI) implementation will get the context CL to check if
@@ -61,14 +62,14 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
         // the DataSources defined in Tomcat will fail to be usable from our Hibernate code.
         super(new URI[] {}, Thread.currentThread().getContextClassLoader(), null);
 
-        this.wikis = wikis;
+        this.currentWikiProvider = currentWikiProvider;
         this.classLoaderManager = classLoaderManager;
     }
 
     // TODO: Add support for context user ?
     private NamespaceURLClassLoader getCurrentClassLoader()
     {
-        String currentWiki = this.wikis.getCurrentWikiId();
+        String currentWiki = this.currentWikiProvider.getDefaultValue(EntityType.WIKI);
 
         if (!Objects.equals(currentWiki, this.cachedCurrentWiki)) {
             this.currentClassLoader =

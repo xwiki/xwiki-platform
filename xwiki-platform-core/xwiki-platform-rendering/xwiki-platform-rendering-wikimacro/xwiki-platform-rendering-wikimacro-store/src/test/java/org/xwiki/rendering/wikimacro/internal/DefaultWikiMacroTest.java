@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,21 +97,6 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
-                will(new CustomAction("WikiDescriptorManager#getCurrentWikiId")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        return getContext().getWikiId();
-                    }
-                });
-            }
-        });
 
         final ContextualAuthorizationManager mockCam = getContextualAuthorizationManager();
 

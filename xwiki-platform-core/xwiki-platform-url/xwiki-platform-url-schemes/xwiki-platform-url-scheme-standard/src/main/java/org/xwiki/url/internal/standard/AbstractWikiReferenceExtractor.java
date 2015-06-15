@@ -21,6 +21,8 @@ package org.xwiki.url.internal.standard;
 
 import javax.inject.Inject;
 
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -35,6 +37,13 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
 {
     @Inject
     private StandardURLConfiguration configuration;
+
+    /**
+     * Used to get the main wiki name.
+     * @todo replace that with a proper API to get the main wiki reference
+     */
+    @Inject
+    private EntityReferenceValueProvider entityReferenceValueProvider;
 
     /**
      * Used to get wiki descriptors based on alias or wiki id.
@@ -81,6 +90,6 @@ public abstract class AbstractWikiReferenceExtractor implements WikiReferenceExt
 
     protected String getMainWikiId()
     {
-        return this.wikiDescriptorManager.getMainWikiId();
+        return this.entityReferenceValueProvider.getDefaultValue(EntityType.WIKI);
     }
 }

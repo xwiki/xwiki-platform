@@ -19,6 +19,10 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -26,8 +30,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.ircbot.IRCBot;
@@ -41,17 +43,12 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultWikiIRCModel}.
@@ -78,8 +75,6 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
     
     private QueryManager mockQueryManager;
 
-    private WikiDescriptorManager mockWikiDescriptorManager;
-
     @Before
     public void setUp() throws Exception
     {
@@ -91,7 +86,6 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
 
         this.xwikiContext = new XWikiContext();
         this.xwikiContext.setWiki(this.xwiki);
-        this.xwikiContext.setMainXWiki("xwiki");
 
         context.setProperty("xwikicontext", this.xwikiContext);
 
@@ -101,16 +95,6 @@ public class DefaultWikiIRCModelTest implements WikiIRCBotConstants
         when(this.mockExecution.getContext()).thenReturn(context);
         when(xwiki.getDocument(configDocReference, xwikiContext)).thenReturn(configDoc);
         when(configDoc.getDocumentReference()).thenReturn(configDocReference);
-
-        this.mockWikiDescriptorManager = this.componentManager.getInstance(WikiDescriptorManager.class);
-        when(mockWikiDescriptorManager.getMainWikiId()).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return xwikiContext.getMainXWiki();
-            }
-        });
     }
 
     @AfterComponent

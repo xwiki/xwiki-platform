@@ -45,7 +45,7 @@ public class StandardExtendedURLResourceReferenceSerializerTest
 {
     @Rule
     public MockitoComponentMockingRule<StandardExtendedURLResourceReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(StandardExtendedURLResourceReferenceSerializer.class);
+        new MockitoComponentMockingRule(StandardExtendedURLResourceReferenceSerializer.class);
 
     public class TestResourceReference extends AbstractResourceReference
     {

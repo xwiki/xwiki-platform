@@ -63,7 +63,8 @@ public class DefaultWatchListNotifierTest
     {
         this.xcontext = mock(XWikiContext.class);
 
-        Provider<XWikiContext> contextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> contextProvider =
+            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         when(contextProvider.get()).thenReturn(this.xcontext);
 
         this.xwiki = mock(com.xpn.xwiki.XWiki.class);

@@ -19,6 +19,11 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.net.URL;
 
 import org.junit.Before;
@@ -27,7 +32,7 @@ import org.junit.Test;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
@@ -39,17 +44,12 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.web.Utils;
-
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * TODO DOCUMENT ME!
@@ -58,9 +58,9 @@ import static org.mockito.Mockito.when;
  */
 @ComponentList({DefaultModelContext.class, DefaultModelConfiguration.class, LocalStringEntityReferenceSerializer.class,
 RelativeStringEntityReferenceResolver.class, CurrentReferenceDocumentReferenceResolver.class,
-CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceProvider.class,
-CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceProvider.class,
-DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
+CurrentReferenceEntityReferenceResolver.class, CurrentEntityReferenceValueProvider.class,
+CurrentMixedStringDocumentReferenceResolver.class, CurrentMixedEntityReferenceValueProvider.class,
+DefaultEntityReferenceValueProvider.class, CompactWikiStringEntityReferenceSerializer.class, DefaultExecution.class})
 public class DefaultSolrIndexerTest
 {
     @Rule

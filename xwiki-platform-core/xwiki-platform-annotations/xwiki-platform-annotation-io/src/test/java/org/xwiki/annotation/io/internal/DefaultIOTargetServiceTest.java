@@ -24,13 +24,12 @@ import org.junit.Test;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.web.Utils;
 
@@ -75,11 +74,8 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
         });
         this.classResolver = registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
 
-        // We don't care about multi CM
-        DefaultComponentDescriptor<ComponentManager> componentDescriptor = new DefaultComponentDescriptor<>();
-        componentDescriptor.setRoleType(ComponentManager.class);
-        componentDescriptor.setRoleHint("context");
-        getComponentManager().registerComponent(componentDescriptor, getComponentManager());
+        // We don't really need those but there supposed to be injected
+        registerMockComponent(WikiDescriptorManager.class);
     }
 
     @Override

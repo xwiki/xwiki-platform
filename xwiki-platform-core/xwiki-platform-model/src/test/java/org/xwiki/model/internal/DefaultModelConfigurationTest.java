@@ -19,18 +19,17 @@
  */
 package org.xwiki.model.internal;
 
+import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.configuration.internal.MemoryConfigurationSource;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.jmock.JMockRule;
 
 /**
  * Unit tests for {@link DefaultModelConfiguration}.
@@ -38,47 +37,75 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentList({RelativeStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class})
 public class DefaultModelConfigurationTest
 {
     @Rule
-    public final MockitoComponentMockingRule<ModelConfiguration> mocker =
-        new MockitoComponentMockingRule<ModelConfiguration>(DefaultModelConfiguration.class);
+    public final JMockRule mockery = new JMockRule();
 
-    private MemoryConfigurationSource configuration;
+    private ModelConfiguration configuration;
+
+    private ConfigurationSource mockSource;
 
     @Before
-    public void before() throws Exception
+    public void setUp() throws Exception
     {
-        this.configuration = this.mocker.registerMemoryConfigurationSource();
+        this.mockSource = this.mockery.mock(ConfigurationSource.class);
+        this.configuration = new DefaultModelConfiguration();
+
+        final ComponentManager mockCM = this.mockery.mock(ComponentManager.class);
+        ReflectionUtils.setFieldValue(this.configuration, "componentManager", mockCM);
+        this.mockery.checking(new Expectations() {{
+            allowing(mockCM).getInstance(ConfigurationSource.class, "xwikiproperties"); will(returnValue(mockSource));
+        }});
     }
 
     @Test
-    public void testGetDefaultReferenceNameWhenDefinedInConfiguration() throws ComponentLookupException
+    public void testGetDefaultReferenceNameWhenDefinedInConfiguration()
     {
-        this.configuration.setProperty("model.reference.default.wiki", "defaultWiki");
-        this.configuration.setProperty("model.reference.default.document", "defaultDocument");
-        this.configuration.setProperty("model.reference.default.space", "defaultSpace");
-        this.configuration.setProperty("model.reference.default.attachment", "defaultFilename");
-        this.configuration.setProperty("model.reference.default.object", "defaultObject");
-        this.configuration.setProperty("model.reference.default.object_property", "defaultProperty");
-
-        Assert.assertEquals("defaultWiki", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.WIKI));
-        Assert.assertEquals("defaultDocument", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.DOCUMENT));
-        Assert.assertEquals("defaultSpace", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.SPACE));
-        Assert.assertEquals("defaultFilename", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.ATTACHMENT));
-        Assert.assertEquals("defaultObject", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT));
-        Assert.assertEquals("defaultProperty", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
+        this.mockery.checking(new Expectations() {{
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.wiki")), with(any(String.class)));
+                will(returnValue("defaultWiki"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.document")), with(any(String.class)));
+                will(returnValue("defaultDocument"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.space")), with(any(String.class)));
+                will(returnValue("defaultSpace"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.attachment")), with(any(String.class)));
+                will(returnValue("defaultFilename"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.object")), with(any(String.class)));
+                will(returnValue("defaultObject"));
+            oneOf(mockSource).getProperty(with(equal("model.reference.default.object_property")), 
+                with(any(String.class)));
+                will(returnValue("defaultProperty"));
+        }});
+        
+        Assert.assertEquals("defaultWiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        Assert.assertEquals("defaultDocument", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        Assert.assertEquals("defaultSpace", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        Assert.assertEquals("defaultFilename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        Assert.assertEquals("defaultObject", this.configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        Assert.assertEquals("defaultProperty", this.configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 
     @Test
-    public void testGetDefaultReferenceNameWhenNotDefinedInConfiguration() throws ComponentLookupException
+    public void testGetDefaultReferenceNameWhenNotDefinedInConfiguration()
     {
-        Assert.assertEquals("xwiki", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.WIKI));
-        Assert.assertEquals("WebHome", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.DOCUMENT));
-        Assert.assertEquals("Main", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.SPACE));
-        Assert.assertEquals("filename", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.ATTACHMENT));
-        Assert.assertEquals("object", mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT));
-        Assert.assertEquals("property", mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
+        this.mockery.checking(new Expectations() {{
+            oneOf(mockSource).getProperty("model.reference.default.wiki", "xwiki"); will(returnValue("xwiki"));
+            oneOf(mockSource).getProperty("model.reference.default.document", "WebHome"); will(returnValue("WebHome"));
+            oneOf(mockSource).getProperty("model.reference.default.space", "Main"); will(returnValue("Main"));
+            oneOf(mockSource).getProperty("model.reference.default.attachment", "filename");
+                will(returnValue("filename"));
+            oneOf(mockSource).getProperty("model.reference.default.object", "object");
+                will(returnValue("Main.WebHome"));
+            oneOf(mockSource).getProperty("model.reference.default.object_property", "property");
+                will(returnValue("property"));
+        }});
+
+        Assert.assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        Assert.assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        Assert.assertEquals("Main", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        Assert.assertEquals("filename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        Assert.assertEquals("Main.WebHome", configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        Assert.assertEquals("property", configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 }

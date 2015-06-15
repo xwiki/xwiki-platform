@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.inject.Provider;
 import javax.script.ScriptContext;
 
 import org.apache.velocity.VelocityContext;
@@ -37,11 +36,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.macro.MacroId;
@@ -86,9 +84,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private WikiDescriptorManager mockWikiDescriptorManager;
 
-    private Provider<DocumentReference> mockCurrentDocumentReferenceProvider;
-
-    private Provider<DocumentReference> mockCurrentSpaceReferenceProvider;
+    private EntityReferenceValueProvider mockCurrentValueProvider;
 
     private Map<String, Object> xcontext;
 
@@ -117,12 +113,12 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockWikiDescriptorManager).getCurrentWikiId();
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.WIKI);
                 will(returnValue("wiki"));
-                allowing(mockCurrentDocumentReferenceProvider).get();
-                will(returnValue(new DocumentReference("wiki", "space", "document")));
-                allowing(mockCurrentSpaceReferenceProvider).get();
-                will(returnValue(new SpaceReference("space", new WikiReference("wiki"))));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue("space"));
+                allowing(mockCurrentValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue("document"));
                 allowing(mockDocBridge).getCurrentUser();
                 will(returnValue("dummy"));
                 allowing(mockDocBridge).setCurrentUser(with(any(String.class)));
@@ -146,8 +142,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
-        this.mockCurrentDocumentReferenceProvider = registerMockComponent(DocumentReference.TYPE_PROVIDER, "current");
-        this.mockCurrentSpaceReferenceProvider = registerMockComponent(SpaceReference.TYPE_PROVIDER, "current");
+        this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
 
         // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);

@@ -38,7 +38,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
@@ -55,8 +55,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider;
 import com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
@@ -70,10 +70,10 @@ import com.xpn.xwiki.web.Utils;
     RelativeStringEntityReferenceResolver.class,
     CurrentReferenceDocumentReferenceResolver.class,
     CurrentReferenceEntityReferenceResolver.class,
-    CurrentEntityReferenceProvider.class,
+    CurrentEntityReferenceValueProvider.class,
     CurrentMixedStringDocumentReferenceResolver.class,
-    CurrentMixedEntityReferenceProvider.class,
-    DefaultEntityReferenceProvider.class,
+    CurrentMixedEntityReferenceValueProvider.class,
+    DefaultEntityReferenceValueProvider.class,
     CompactWikiStringEntityReferenceSerializer.class
 })
 @MockingRequirement(value = DefaultWikiComponentBridge.class,

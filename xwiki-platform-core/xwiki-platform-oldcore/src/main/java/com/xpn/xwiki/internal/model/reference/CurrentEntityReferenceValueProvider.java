@@ -48,12 +48,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
  *
  * @version $Id$
  * @since 2.3M1
- * @deprecated since 7.2M1, use {@link CurrentEntityReferenceProvider} instead
  */
 @Component
 @Named("current")
 @Singleton
-@Deprecated
 public class CurrentEntityReferenceValueProvider extends DefaultEntityReferenceValueProvider
 {
     @Inject

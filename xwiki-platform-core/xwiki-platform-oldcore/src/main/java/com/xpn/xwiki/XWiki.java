@@ -119,6 +119,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -352,6 +353,10 @@ public class XWiki implements EventListener
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
+    @SuppressWarnings("deprecation")
+    private EntityReferenceValueProvider defaultEntityReferenceValueProvider = Utils
+        .getComponent((Type) EntityReferenceValueProvider.class);
+
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
@@ -411,8 +416,6 @@ public class XWiki implements EventListener
     private ParseGroovyFromString parseGroovyFromString;
 
     private JobProgressManager progress;
-
-    private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
     private ConfigurationSource getConfiguration()
     {
@@ -539,20 +542,6 @@ public class XWiki implements EventListener
         }
 
         return this.progress;
-    }
-
-    private Provider<DocumentReference> getDefaultDocumentReferenceProvider()
-    {
-        if (this.defaultDocumentReferenceProvider == null) {
-            this.defaultDocumentReferenceProvider = Utils.getComponent(DocumentReference.TYPE_PROVIDER);
-        }
-
-        return this.defaultDocumentReferenceProvider;
-    }
-
-    private DocumentReference getDefaultDocumentReference()
-    {
-        return getDefaultDocumentReferenceProvider().get();
     }
 
     private String localizePlainOrKey(String key, Object... parameters)
@@ -696,15 +685,13 @@ public class XWiki implements EventListener
         URL url = context.getURL();
         try {
             ExtendedURL extendedURL = new ExtendedURL(url, context.getRequest().getContextPath());
-            ResourceTypeResolver<ExtendedURL> typeResolver =
-                Utils.getComponent(new DefaultParameterizedType(null, ResourceTypeResolver.class, ExtendedURL.class));
+            ResourceTypeResolver<ExtendedURL> typeResolver = Utils.getComponent(new DefaultParameterizedType(
+                null, ResourceTypeResolver.class, ExtendedURL.class));
             ResourceType type = typeResolver.resolve(extendedURL, Collections.<String, Object>emptyMap());
-            ResourceReferenceResolver<ExtendedURL> resourceResolver =
-                Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
-                    ExtendedURL.class));
-            entityResourceReference =
-                (EntityResourceReference) resourceResolver.resolve(extendedURL, type,
-                    Collections.<String, Object>emptyMap());
+            ResourceReferenceResolver<ExtendedURL> resourceResolver = Utils.getComponent(new DefaultParameterizedType(
+                null, ResourceReferenceResolver.class, ExtendedURL.class));
+            entityResourceReference = (EntityResourceReference) resourceResolver.resolve(extendedURL, type,
+                Collections.<String, Object>emptyMap());
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
@@ -1180,8 +1167,8 @@ public class XWiki implements EventListener
     {
         String storeclass = getConfiguration().getProperty(param, defClass);
         try {
-            Class<?>[] classes = new Class<?>[] { XWikiContext.class };
-            Object[] args = new Object[] { context };
+            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
+            Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
         } catch (Exception e) {
@@ -1189,7 +1176,7 @@ public class XWiki implements EventListener
             if (e instanceof InvocationTargetException) {
                 ecause = ((InvocationTargetException) e).getTargetException();
             }
-            Object[] args = { param, storeclass };
+            Object[] args = {param, storeclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR, "Cannot load class {1} from param {0}", ecause,
                 args);
@@ -1579,7 +1566,7 @@ public class XWiki implements EventListener
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
     @Deprecated
-    public XWikiDocument getDocument(String spaces, String fullname, XWikiContext context) throws XWikiException
+    public XWikiDocument getDocument(String space, String fullname, XWikiContext context) throws XWikiException
     {
         int dotPosition = fullname.lastIndexOf('.');
         if (dotPosition != -1) {
@@ -1590,7 +1577,7 @@ public class XWiki implements EventListener
             }
             return getDocument(spaceFromFullname + "." + name, context);
         } else {
-            return getDocument(spaces + "." + fullname, context);
+            return getDocument(space + "." + fullname, context);
         }
     }
 
@@ -1768,7 +1755,7 @@ public class XWiki implements EventListener
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
-            Object[] args = { template };
+            Object[] args = {template};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
@@ -1796,7 +1783,7 @@ public class XWiki implements EventListener
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skinId, e);
 
-            Object[] args = { template, skinId };
+            Object[] args = {template, skinId};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
@@ -2986,13 +2973,13 @@ public class XWiki implements EventListener
             }
 
             if (withValidation) {
-                map.put("active", new String[] { "0" });
+                map.put("active", new String[] {"0"});
                 validkey = generateValidationKey(16);
-                map.put("validkey", new String[] { validkey });
+                map.put("validkey", new String[] {validkey});
 
             } else {
                 // Mark user active
-                map.put("active", new String[] { "1" });
+                map.put("active", new String[] {"1"});
             }
 
             int result =
@@ -3257,7 +3244,7 @@ public class XWiki implements EventListener
 
             return 1;
         } catch (Exception e) {
-            Object[] args = { "XWiki." + userName };
+            Object[] args = {"XWiki." + userName};
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_CREATE,
                 "Cannot create user {0}", e, args);
         }
@@ -3444,9 +3431,7 @@ public class XWiki implements EventListener
                 }
 
                 // Get document to include
-                DocumentReference targetDocumentReference =
-                    this.currentMixedDocumentReferenceResolver.resolve(localTopic);
-                doc = getDocument(targetDocumentReference, context);
+                doc = getDocument(((XWikiDocument) context.get("doc")).getSpace(), localTopic, context);
 
                 if (checkAccess("view", doc, context) == false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -4283,7 +4268,10 @@ public class XWiki implements EventListener
                 reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
             } else {
                 // Point to this wiki's home page
-                reference = getDefaultDocumentReference().setWikiReference(new WikiReference(context.getWikiId()));
+                reference =
+                    new DocumentReference(context.getWikiId(),
+                        this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE),
+                        this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT));
             }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
             reference =
@@ -4379,7 +4367,7 @@ public class XWiki implements EventListener
             // We need to check rights before we look for translations
             // Otherwise we don't have the user language
             if (checkAccess(context.getAction(), doc, context) == false) {
-                Object[] args = { doc.getFullName(), context.getUser() };
+                Object[] args = {doc.getFullName(), context.getUser()};
                 setPhonyDocument(reference, context, vcontext);
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                     "Access to document {0} has been denied to user {1}", null, args);
@@ -4410,7 +4398,7 @@ public class XWiki implements EventListener
                     }
                 }
                 if (!allow) {
-                    Object[] args = { context.getUser() };
+                    Object[] args = {context.getUser()};
                     setPhonyDocument(reference, context, vcontext);
                     throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                         XWikiException.ERROR_XWIKI_USER_INACTIVE, "User {0} account is inactive", null, args);
@@ -4662,7 +4650,7 @@ public class XWiki implements EventListener
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                    .getConstructor(new Class<?>[] { XWiki.class }).newInstance(new Object[] { this });
+                                    .getConstructor(new Class<?>[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -6320,10 +6308,13 @@ public class XWiki implements EventListener
             Pattern.compile(".*:XWiki.XWikiPreferences\\[\\d*\\]"), EntityType.OBJECT));
 
     private static final List<Event> LISTENER_EVENTS = Arrays.<Event>asList(
-        new XObjectAddedEvent(SERVERCLASS_REFERENCE), new XObjectDeletedEvent(SERVERCLASS_REFERENCE),
-        new XObjectUpdatedEvent(SERVERCLASS_REFERENCE), new XObjectPropertyAddedEvent(
-            XWIKIPREFERENCE_PROPERTY_REFERENCE), new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
-        new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE), new WikiDeletedEvent(),
+        new XObjectAddedEvent(SERVERCLASS_REFERENCE),
+        new XObjectDeletedEvent(SERVERCLASS_REFERENCE),
+        new XObjectUpdatedEvent(SERVERCLASS_REFERENCE),
+        new XObjectPropertyAddedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
+        new WikiDeletedEvent(),
         new ComponentDescriptorAddedEvent(MandatoryDocumentInitializer.class));
 
     @Override
@@ -6491,7 +6482,7 @@ public class XWiki implements EventListener
         try {
             initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
         } catch (FileNotFoundException e) {
-            Object[] args = { xwikicfgpath };
+            Object[] args = {xwikicfgpath};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
         }

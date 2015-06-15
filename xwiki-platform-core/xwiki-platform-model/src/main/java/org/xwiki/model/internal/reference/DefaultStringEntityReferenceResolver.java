@@ -24,8 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
@@ -43,11 +42,11 @@ public class DefaultStringEntityReferenceResolver extends AbstractStringEntityRe
      * Entity reference value provider used to provide default value.
      */
     @Inject
-    private EntityReferenceProvider provider;
+    private EntityReferenceValueProvider provider;
 
     @Override
-    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
+    protected String getDefaultValue(EntityType type, Object... parameters)
     {
-        return this.provider.getDefaultReference(type);
+        return this.provider.getDefaultValue(type);
     }
 }

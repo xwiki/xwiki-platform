@@ -33,11 +33,9 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  * @version $Id$
  * @since 2.3M1
  * @see org.xwiki.model.internal.DefaultModelConfiguration
- * @deprecated since 7.1M2, used {@link DefaultEntityReferenceProvider} instead
  */
 @Component
 @Singleton
-@Deprecated
 public class DefaultEntityReferenceValueProvider implements EntityReferenceValueProvider
 {
     /**
@@ -47,7 +45,6 @@ public class DefaultEntityReferenceValueProvider implements EntityReferenceValue
     private ModelConfiguration configuration;
 
     @Override
-    @Deprecated
     public String getDefaultValue(EntityType type)
     {
         return this.configuration.getDefaultReferenceValue(type);

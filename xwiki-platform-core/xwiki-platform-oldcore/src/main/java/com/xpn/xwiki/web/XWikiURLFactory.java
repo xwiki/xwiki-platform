@@ -28,21 +28,11 @@ public interface XWikiURLFactory
 {
     void init(XWikiContext context);
 
-    URL createURL(String spaces, String name, XWikiContext context);
+    URL createURL(String web, String name, XWikiContext context);
 
-    URL createURL(String spaces, String name, String action, XWikiContext context);
+    URL createURL(String web, String name, String action, XWikiContext context);
 
-    URL createURL(String spaces, String name, String action, boolean redirect, XWikiContext context);
-
-    /**
-     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
-     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
-     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
-     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
-     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
-     *        example
-     */
-    URL createURL(String spaces, String name, String action, String querystring, String anchor, XWikiContext context);
+    URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
 
     /**
      * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
@@ -52,7 +42,17 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
+    URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context);
+
+    /**
+     * @param querystring the URL-encoded Query String. It's important to realize that the implementation of this
+     *        method cannot encode it automatically since the Query String is passed as a String (and it's not possible
+     *        to differentiate between a '=' character that should be encoded and one that shouldn't. Imagine an input
+     *        of 'a=&amp;b=c' which can be understood either as 'a' = '&amp;b=c' or as 'a' = '' and 'b' = 'c'). Ideally
+     *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
+     *        example
+     */
+    URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         XWikiContext context);
 
     /**
@@ -63,7 +63,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createURL(String spaces, String name, String action, String querystring, String anchor, String xwikidb,
+    URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context);
 
     /**
@@ -74,14 +74,14 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
+    URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         String xwikidb, XWikiContext context);
 
     URL createSkinURL(String filename, String skin, XWikiContext context);
 
-    URL createSkinURL(String filename, String spaces, String name, XWikiContext context);
+    URL createSkinURL(String filename, String web, String name, XWikiContext context);
 
-    URL createSkinURL(String filename, String spaces, String name, String xwikidb, XWikiContext context);
+    URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
 
     URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context);
 
@@ -93,7 +93,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
+    URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         XWikiContext context);
 
     /**
@@ -104,7 +104,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring, String xwikidb,
+    URL createAttachmentURL(String filename, String web, String name, String action, String querystring, String xwikidb,
         XWikiContext context);
 
     /**
@@ -115,7 +115,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String querystring,
+    URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring,
         XWikiContext context);
 
     /**
@@ -126,7 +126,7 @@ public interface XWikiURLFactory
      *        we would need an API signature that accepts a {@code Map&lt;String, String&gt;} for the Query String, for
      *        example
      */
-    URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, String querystring,
+    URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring,
         String xwikidb, XWikiContext context);
 
     URL getRequestURL(XWikiContext context);

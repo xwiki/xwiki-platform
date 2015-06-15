@@ -36,7 +36,7 @@ public class DefaultStandardURLConfigurationTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultStandardURLConfiguration> mocker =
-        new MockitoComponentMockingRule<>(DefaultStandardURLConfiguration.class);
+        new MockitoComponentMockingRule(DefaultStandardURLConfiguration.class);
 
     @Test
     public void isPathBasedMultiWiki() throws Exception

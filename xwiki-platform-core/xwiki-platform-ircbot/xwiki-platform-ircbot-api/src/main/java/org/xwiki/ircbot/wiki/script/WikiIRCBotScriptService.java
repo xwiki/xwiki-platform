@@ -35,12 +35,13 @@ import org.xwiki.ircbot.IRCBotListener;
 import org.xwiki.ircbot.internal.BotListenerData;
 import org.xwiki.ircbot.wiki.WikiIRCBotManager;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -79,8 +80,11 @@ public class WikiIRCBotScriptService implements ScriptService
     @Named("wiki")
     private ComponentManager componentManager;
 
+    /**
+     * Used to find the name of the main wiki.
+     */
     @Inject
-    private WikiDescriptorManager wikis;
+    private EntityReferenceValueProvider valueProvider;
 
     /**
      * Used to get the XWiki Context.
@@ -207,7 +211,7 @@ public class WikiIRCBotScriptService implements ScriptService
             DocumentReference userReference = context.getUserReference();
 
             if (userReference != null) {
-                String mainWiki = this.wikis.getMainWikiId();
+                String mainWiki = this.valueProvider.getDefaultValue(EntityType.WIKI);
 
                 // Check if the current user is logged on the main wiki.
                 if (userReference.getWikiReference().getName().equals(mainWiki)) {

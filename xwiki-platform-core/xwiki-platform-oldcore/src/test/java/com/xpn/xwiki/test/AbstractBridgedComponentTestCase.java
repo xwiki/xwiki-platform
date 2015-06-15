@@ -88,7 +88,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 
         // Bridge with old XWiki Context, required for old code.
         Execution execution = getComponentManager().getInstance(Execution.class);
-        execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
+        execution.getContext().setProperty("xwikicontext", this.context);
         XWikiStubContextProvider stubContextProvider =
             getComponentManager().getInstance(XWikiStubContextProvider.class);
         stubContextProvider.initialize(this.context);
@@ -126,9 +126,8 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     @After
     public void tearDown() throws Exception
     {
-        super.tearDown();
-
         Utils.setComponentManager(null);
+        super.tearDown();
     }
 
     public XWikiContext getContext()

@@ -33,7 +33,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -91,7 +91,7 @@ import static org.xwiki.security.authorization.Right.values;
  * @since 5.0M2
  */
 @ComponentList({DefaultSecurityCache.class, DefaultStringEntityReferenceResolver.class,
-    DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceProvider.class,
+    DefaultStringEntityReferenceSerializer.class, DefaultEntityReferenceValueProvider.class,
     DefaultModelConfiguration.class, AuthorizationManagerConfiguration.class,
     DefaultSecurityReferenceFactory.class, DefaultSecurityCacheLoader.class,
     DefaultAuthorizationSettler.class, DefaultAuthorizationManager.class})

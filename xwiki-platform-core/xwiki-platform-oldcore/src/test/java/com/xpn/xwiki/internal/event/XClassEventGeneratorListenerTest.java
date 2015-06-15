@@ -33,7 +33,6 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
@@ -42,7 +41,7 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
  * 
  * @version $Id$
  */
-public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentTestCase
+public class XClassEventGeneratorListenerTest extends AbstractBridgedComponentTestCase
 {
     private ObservationManager observation;
 
@@ -54,9 +53,9 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     
     private EventListener listener;
     
-    private BaseObject xobject;
-    
     private BaseClass xclass;
+    
+    private BaseClass xclassOrigin;
 
     @Override
     public void setUp() throws Exception
@@ -78,22 +77,20 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
         this.document.setOriginalDocument(this.documentOrigin);
         
         this.xclass = this.document.getXClass();
-        
-        this.xobject = new BaseObject();
-        this.xobject.setXClassReference(this.document.getDocumentReference());
+        this.xclassOrigin = this.documentOrigin.getXClass();
         
         getMockery().checking(new Expectations() {{
             allowing(listener).getName(); will(returnValue("mylistener"));
-            allowing(xwiki).getXClass(xclass.getDocumentReference(), getContext()); will(returnValue(xclass));
+            //allowing(xwiki).getXClass(xclass.getDocumentReference(), getContext()); will(returnValue(xclass));
         }});
     }
 
     @Test
     public void testAddDocument()
     {
-        this.document.addXObject(this.xobject);
+        this.xclass.addTextField("property", "Property", 30);
 
-        final Event event = new XObjectAddedEvent(this.xobject.getReference());
+        final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
 
         getMockery().checking(new Expectations() {{
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
@@ -108,9 +105,9 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     @Test
     public void testDeleteDocument()
     {
-        this.documentOrigin.addXObject(this.xobject);
+        this.xclassOrigin.addTextField("property", "Property", 30);
 
-        final Event event = new XObjectDeletedEvent(this.xobject.getReference());
+        final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
 
         getMockery().checking(new Expectations() {{
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
@@ -123,11 +120,11 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     }
 
     @Test
-    public void testModifiedDocumentXObjectAdded()
+    public void testModifiedDocumentXClassPropertyAdded()
     {
-        this.document.addXObject(this.xobject);
+        this.xclass.addTextField("property", "Property", 30);
 
-        final Event event = new XObjectAddedEvent(this.xobject.getReference());
+        final Event event = new XClassPropertyAddedEvent(this.xclass.getField("property").getReference());
 
         getMockery().checking(new Expectations() {{
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
@@ -140,11 +137,11 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
     }
 
     @Test
-    public void testModifiedDocumentXObjectDeleted()
+    public void testModifiedDocumentXClassPropertyDeleted()
     {
-        this.documentOrigin.addXObject(this.xobject);
+        this.xclassOrigin.addTextField("property", "Property", 30);
 
-        final Event event = new XObjectDeletedEvent(this.xobject.getReference());
+        final Event event = new XClassPropertyDeletedEvent(this.xclassOrigin.getField("property").getReference());
 
         getMockery().checking(new Expectations() {{
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
@@ -155,86 +152,21 @@ public class XObjectEventGeneratorListenerTest extends AbstractBridgedComponentT
         this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
             getContext());
     }
-
+    
     @Test
-    public void testModifiedDocumentXObjectModified()
+    public void testModifiedDocumentXClassPropertyModified()
     {
-        this.document.addXObject(this.xobject);
-        this.documentOrigin.addXObject(this.xobject.clone());
-        
-        this.xobject.setStringValue("newproperty", "newvalue");
+        this.xclassOrigin.addTextField("property", "Property", 30);
+        this.xclass.addTextField("property", "New Property", 30);
 
-        final Event event = new XObjectUpdatedEvent(this.xobject.getReference());
+        final Event event = new XClassPropertyUpdatedEvent(this.xclassOrigin.getField("property").getReference());
 
         getMockery().checking(new Expectations() {{
             allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
             oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
         }});
         this.observation.addListener(this.listener);
-
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
-    }
-
-    @Test
-    public void testModifiedDocumentXObjectPropertyAdded()
-    {
-        this.document.addXObject(this.xobject);
-        this.documentOrigin.addXObject(this.xobject.clone());
-        
-        this.xobject.setStringValue("newproperty", "newvalue");
-
-        final Event event = new XObjectPropertyAddedEvent(this.xobject.getField("newproperty").getReference());
-
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
-
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
-    }
-
-    @Test
-    public void testModifiedDocumentXObjectPropertyDeleted()
-    {
-        this.document.addXObject(this.xobject.clone());
-        this.documentOrigin.addXObject(this.xobject);
-        
-        this.xobject.setStringValue("deletedproperty", "deletedvalue");
-
-        final Event event = new XObjectPropertyDeletedEvent(this.xobject.getField("deletedproperty").getReference());
-
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
-
-        this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
-            getContext());
-    }
-
-    @Test
-    public void testModifiedDocumentXObjectPropertyModified()
-    {
-        this.xobject.setStringValue("updatedproperty", "propertyvalue");
-     
-        BaseObject xobjectModified = this.xobject.clone();
-        xobjectModified.setStringValue("updatedproperty", "propertyvaluemodified");
-        
-        this.document.addXObject(this.xobject);
-        this.documentOrigin.addXObject(xobjectModified);
-
-        final Event event = new XObjectPropertyUpdatedEvent(this.xobject.getField("updatedproperty").getReference());
-
-        getMockery().checking(new Expectations() {{
-            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-            oneOf(listener).onEvent(with(equal(event)), with(same(document)), with(same(getContext())));
-        }});
-        this.observation.addListener(this.listener);
-
+ 
         this.observation.notify(new DocumentUpdatedEvent(this.document.getDocumentReference()), this.document,
             getContext());
     }

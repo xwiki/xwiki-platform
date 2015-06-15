@@ -30,7 +30,7 @@ import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Unit tests for the deprecated {@link org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider}.
+ * Unit tests for {@link org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider}.
  *
  * @version $Id$
  * @since 2.3M1

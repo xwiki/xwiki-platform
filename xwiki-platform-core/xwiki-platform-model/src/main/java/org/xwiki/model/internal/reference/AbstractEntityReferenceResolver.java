@@ -24,9 +24,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generic entity reference resolver deferring resolution and default values to extending classes but resolving default
- * value from the first optional parameter when provided and is an instance of a entity reference. This is use by most
- * resolver to provide relative resolution to a provided reference.
+ * Generic entity reference resolver deferring resolution and default values to extending classes but resolving
+ * default value from the first optional parameter when provided and is an instance of a entity reference. This
+ * is use by most resolver to provide relative resolution to a provided reference.
  *
  * @version $Id$
  * @since 3.3M2
@@ -37,44 +37,31 @@ public abstract class AbstractEntityReferenceResolver
      * @param type the entity type for which to return the default value to use (since the use has not specified it)
      * @param parameters optional parameters. Their meaning depends on the resolver implementation
      * @return the default value to use
-     * @since 7.2M1
      */
-    protected abstract EntityReference getDefaultReference(EntityType type, Object... parameters);
+    protected abstract String getDefaultValue(EntityType type, Object... parameters);
 
     /**
-     * Resolve default reference for a given reference type.
-     * 
+     * Resolve default name for a given reference type.
      * @param type the type for which a default name is requested
      * @param parameters optional parameters, if the first parameter is an entity reference which is of the given type
-     *            or contains the given types in its parent chain, use the name of the reference having the requested
-     *            type in place of the default value
-     * @return the reference for the given type
-     * @since 7.2M1
+     * or contains the given types in its parent chain, use the name of the reference having the requested type in
+     * place of the default value
+     * @return a name for the given type
      */
-    protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
+    protected String resolveDefaultValue(EntityType type, Object... parameters)
     {
-        EntityReference resolvedDefaultValue = null;
-
+        String resolvedDefaultValue = null;
         if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
             // Try to extract the type from the passed parameter.
             EntityReference referenceParameter = (EntityReference) parameters[0];
             EntityReference extractedReference = referenceParameter.extractReference(type);
             if (extractedReference != null) {
-                resolvedDefaultValue = extractedReference;
-
-                // Get rid of parent if any
-                EntityReference parent = extractedReference.getParent();
-                while (parent != null && parent.getType() == type) {
-                    parent = parent.getParent();
-                }
-                if (parent != null) {
-                    resolvedDefaultValue = resolvedDefaultValue.removeParent(parent);
-                }
+                resolvedDefaultValue = extractedReference.getName();
             }
         }
 
         if (resolvedDefaultValue == null) {
-            resolvedDefaultValue = getDefaultReference(type, parameters);
+            resolvedDefaultValue = getDefaultValue(type, parameters);
         }
 
         return resolvedDefaultValue;

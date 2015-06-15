@@ -28,21 +28,21 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.CESCAPE;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
+import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.SEPARATORS;
 
 /**
- * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows for
- * example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code from
- * this class.
+ * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows
+ * for example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code
+ * from this class.
  *
  * @see AbstractEntityReferenceResolver
  * @version $Id$
  * @since 2.2M1
  */
-public abstract class AbstractStringEntityReferenceResolver extends AbstractEntityReferenceResolver implements
-    EntityReferenceResolver<String>
+public abstract class AbstractStringEntityReferenceResolver  extends AbstractEntityReferenceResolver
+    implements EntityReferenceResolver<String>
 {
     /**
      * Map defining ordered entity types of a proper reference chain for a given entity type.
@@ -101,44 +101,38 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
         // Iterate over the representation string looking for iterators in the correct order (rightmost separator
         // looked for first).
         for (int i = 0; i < separatorsForType.length; i++) {
-            EntityReference newReference;
-
+            String name;
             if (representation.length() > 0) {
-                newReference =
-                    getSegmentReference(representation, separatorsForType[i], entityTypesForType[i], parameters);
+                name = getSegmentName(representation, separatorsForType[i], entityTypesForType[i], parameters);
             } else {
                 // There's no definition for the current segment use default values
-                newReference = resolveDefaultReference(entityTypesForType[i], parameters);
+                name = resolveDefaultValue(entityTypesForType[i], parameters);
             }
 
-            reference = appendNewReference(reference, newReference);
+            if (name != null) {
+                EntityReference newReference = new EntityReference(name, entityTypesForType[i]);
+                if (reference != null) {
+                    reference = reference.appendParent(newReference);
+                } else {
+                    reference = newReference;
+                }
+            }
         }
 
         // Handle last entity reference's name
-        EntityReference newReference;
+        String name;
         if (representation.length() > 0) {
-            String name = StringUtils.replaceEach(representation.toString(), ESCAPEMATCHING, ESCAPEMATCHINGREPLACE);
-            if (name != null) {
-                newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
-            } else {
-                newReference = null;
-            }
+            name = StringUtils.replaceEach(representation.toString(), ESCAPEMATCHING, ESCAPEMATCHINGREPLACE);
         } else {
-            newReference = resolveDefaultReference(entityTypesForType[separatorsForType.length], parameters);
+            name = resolveDefaultValue(entityTypesForType[separatorsForType.length], parameters);
         }
 
-        reference = appendNewReference(reference, newReference);
-
-        return reference;
-    }
-
-    private EntityReference appendNewReference(EntityReference reference, EntityReference newReference)
-    {
-        if (newReference != null) {
+        if (name != null) {
+            EntityReference newReference = new EntityReference(name, entityTypesForType[separatorsForType.length]);
             if (reference != null) {
-                return reference.appendParent(newReference);
+                reference = reference.appendParent(newReference);
             } else {
-                return newReference;
+                reference = newReference;
             }
         }
 
@@ -154,10 +148,10 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
      * @param parameters optional parameters, forwarded to get a default value
      * @return the segment name
      */
-    private EntityReference getSegmentReference(StringBuilder representation, char separator, EntityType entityType,
+    private String getSegmentName(StringBuilder representation, char separator, EntityType entityType,
         Object... parameters)
     {
-        EntityReference reference = null;
+        String name = null;
 
         // Search all characters for a non escaped separator. If found, then consider the part after the character as
         // the reference name and continue parsing the part before the separator.
@@ -177,10 +171,9 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
                 if (numberOfBackslashes % 2 == 0) {
                     // Found a valid separator (not escaped), separate content on its left from content on its right
                     if (i == representation.length() - 1) {
-                        reference = resolveDefaultReference(entityType, parameters);
+                        name = resolveDefaultValue(entityType, parameters);
                     } else {
-                        String name = representation.substring(i + 1, representation.length());
-                        reference = new EntityReference(name, entityType);
+                        name = representation.substring(i + 1, representation.length());
                     }
                     representation.delete(i, representation.length());
                     found = true;
@@ -199,11 +192,11 @@ public abstract class AbstractStringEntityReferenceResolver extends AbstractEnti
 
         // If not found then the full buffer is the current reference segment
         if (!found) {
-            reference = new EntityReference(representation.toString(), entityType);
+            name = representation.toString();
             representation.setLength(0);
         }
 
-        return reference;
+        return name;
     }
 
     /**

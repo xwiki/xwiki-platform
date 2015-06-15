@@ -29,11 +29,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.model.reference.test.TestConstants;
 
 /**
  * Unit tests for {@link DefaultStringEntityReferenceResolver}.
@@ -41,8 +40,22 @@ import org.xwiki.model.reference.test.TestConstants;
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultStringEntityReferenceResolverTest implements TestConstants
+public class DefaultStringEntityReferenceResolverTest
 {
+    private static final String DEFAULT_WIKI = "defwiki";
+    
+    private static final String DEFAULT_SPACE = "defspace";
+    
+    private static final String DEFAULT_PAGE = "defpage";
+        
+    private static final String DEFAULT_ATTACHMENT = "deffilename";
+
+    private static final String DEFAULT_OBJECT = "defobject";
+
+    private static final String DEFAULT_OBJECT_PROPERTY = "defobjproperty";
+    
+    private static final String DEFAULT_CLASS_PROPERTY = "defclassproperty";
+
     private EntityReferenceResolver<String> resolver;
 
     private Mockery mockery = new Mockery();
@@ -51,28 +64,25 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
     public void setUp()
     {
         this.resolver = new DefaultStringEntityReferenceResolver();
-        final EntityReferenceProvider mockReferenceProvider = this.mockery.mock(EntityReferenceProvider.class);
-        ReflectionUtils.setFieldValue(this.resolver, "provider", mockReferenceProvider);
-
-        this.mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.WIKI);
-                will(returnValue(DEFAULT_WIKI_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.SPACE);
-                will(returnValue(DEFAULT_SPACE_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.DOCUMENT);
-                will(returnValue(DEFAULT_PAGE_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.ATTACHMENT);
-                will(returnValue(DEFAULT_ATTACHMENT_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.OBJECT);
-                will(returnValue(DEFAULT_OBJECT_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.OBJECT_PROPERTY);
-                will(returnValue(DEFAULT_OBJECT_PROPERTY_REFERENCE));
-                allowing(mockReferenceProvider).getDefaultReference(EntityType.CLASS_PROPERTY);
-                will(returnValue(DEFAULT_CLASS_PROPERTY_REFERENCE));
-            }
-        });
+        final EntityReferenceValueProvider mockValueProvider = this.mockery.mock(EntityReferenceValueProvider.class);
+        ReflectionUtils.setFieldValue(this.resolver, "provider", mockValueProvider);
+        
+        this.mockery.checking(new Expectations() {{
+            allowing(mockValueProvider).getDefaultValue(EntityType.WIKI);
+                will(returnValue(DEFAULT_WIKI));
+            allowing(mockValueProvider).getDefaultValue(EntityType.SPACE);
+                will(returnValue(DEFAULT_SPACE));
+            allowing(mockValueProvider).getDefaultValue(EntityType.DOCUMENT);
+                will(returnValue(DEFAULT_PAGE));
+            allowing(mockValueProvider).getDefaultValue(EntityType.ATTACHMENT);
+                will(returnValue(DEFAULT_ATTACHMENT));
+            allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT);
+                will(returnValue(DEFAULT_OBJECT));
+            allowing(mockValueProvider).getDefaultValue(EntityType.OBJECT_PROPERTY);
+                will(returnValue(DEFAULT_OBJECT_PROPERTY));
+            allowing(mockValueProvider).getDefaultValue(EntityType.CLASS_PROPERTY);
+                will(returnValue(DEFAULT_CLASS_PROPERTY));
+        }});
     }
 
     @Test
@@ -246,8 +256,8 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("obje^ct", reference.getName());
-
-        // and that separators don't need to be escaped other than in the object name
+        
+        // and that separators don't need to be escaped other than in the object name        
         reference = resolver.resolve("wiki:spa^ce.page^Object", EntityType.OBJECT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("spa^ce", reference.extractReference(EntityType.SPACE).getName());
@@ -267,8 +277,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
     @Test
     public void testResolveObjectPropertyReference()
     {
-        EntityReference reference =
-            new ObjectPropertyReference(resolver.resolve("wiki:space.page^object.prop", EntityType.OBJECT_PROPERTY));
+        EntityReference reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^object.prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -321,8 +330,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals("page^Object", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // empty prop
-        reference =
-            new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.", EntityType.OBJECT_PROPERTY));
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -330,9 +338,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals(DEFAULT_OBJECT_PROPERTY, reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // test separator escape
-        reference =
-            new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.prop\\.erty",
-                EntityType.OBJECT_PROPERTY));
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^Object.prop\\.erty", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -340,9 +346,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals("prop.erty", reference.extractReference(EntityType.OBJECT_PROPERTY).getName());
 
         // and that separators don't need to be escaped other than in the property name
-        reference =
-            new ObjectPropertyReference(resolver.resolve("wiki:space.page^x.wiki.class[0].prop",
-                EntityType.OBJECT_PROPERTY));
+        reference = new ObjectPropertyReference(resolver.resolve("wiki:space.page^x.wiki.class[0].prop", EntityType.OBJECT_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -363,8 +367,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
     @Test
     public void testResolveClassPropertyReference()
     {
-        EntityReference reference =
-            new ClassPropertyReference(resolver.resolve("wiki:space.page^ClassProp", EntityType.CLASS_PROPERTY));
+        EntityReference reference = new ClassPropertyReference(resolver.resolve("wiki:space.page^ClassProp", EntityType.CLASS_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -401,8 +404,7 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert
-            .assertEquals("wiki:space.page.property", reference.extractReference(EntityType.CLASS_PROPERTY).getName());
+        Assert.assertEquals("wiki:space.page.property", reference.extractReference(EntityType.CLASS_PROPERTY).getName());
 
         // object with no name
         reference = new ClassPropertyReference(resolver.resolve("wiki:space.page^", EntityType.CLASS_PROPERTY));
@@ -412,16 +414,14 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals(DEFAULT_CLASS_PROPERTY, reference.extractReference(EntityType.CLASS_PROPERTY).getName());
 
         // test separator escape
-        reference =
-            new ClassPropertyReference(resolver.resolve("wiki:space.page^obje\\^ct", EntityType.CLASS_PROPERTY));
+        reference = new ClassPropertyReference(resolver.resolve("wiki:space.page^obje\\^ct", EntityType.CLASS_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("obje^ct", reference.extractReference(EntityType.CLASS_PROPERTY).getName());
-
-        // and that separators don't need to be escaped other than in the object name
-        reference =
-            new ClassPropertyReference(resolver.resolve("wiki:spa^ce.page^ClassProp", EntityType.CLASS_PROPERTY));
+        
+        // and that separators don't need to be escaped other than in the object name        
+        reference = new ClassPropertyReference(resolver.resolve("wiki:spa^ce.page^ClassProp", EntityType.CLASS_PROPERTY));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("spa^ce", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
@@ -433,13 +433,12 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals(":.^@", reference.extractReference(EntityType.CLASS_PROPERTY).getName());
     }
-
+    
     @Test
     public void testResolveDocumentReferenceWithExplicitReference()
     {
-        EntityReference reference =
-            resolver.resolve("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
-                new EntityReference("wiki", EntityType.WIKI)));
+        EntityReference reference = resolver.resolve("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());

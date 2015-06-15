@@ -21,15 +21,17 @@ package org.xwiki.component.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current space in the
@@ -49,9 +51,12 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
      */
     public static final String ID = "space";
 
+    /**
+     * Used to access the current entities.
+     */
     @Inject
     @Named("current")
-    private Provider<SpaceReference> referenceProvider;
+    private EntityReferenceValueProvider currentProvider;
 
     /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
@@ -63,7 +68,8 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
     @Override
     protected EntityReference getCurrentReference()
     {
-        return this.referenceProvider.get();
+        return new SpaceReference(this.currentProvider.getDefaultValue(EntityType.SPACE), new WikiReference(
+            this.currentProvider.getDefaultValue(EntityType.WIKI)));
     }
 
     @Override

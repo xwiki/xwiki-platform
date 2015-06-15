@@ -21,6 +21,7 @@ package org.xwiki.url.internal.standard.temporary;
 
 import java.util.Arrays;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
+import org.xwiki.url.URLNormalizer;
 import org.xwiki.url.ExtendedURL;
 
 /**
@@ -55,6 +57,9 @@ import org.xwiki.url.ExtendedURL;
 public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
 {
+    @Inject
+    private URLNormalizer<ExtendedURL> normalizer;
+
     @Override
     public ExtendedURL serialize(TemporaryResourceReference resource) throws UnsupportedResourceReferenceException
     {

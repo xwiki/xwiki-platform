@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Generate an entity reference string that doesn't contain reference parts that are the same as either the current
@@ -44,7 +44,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
 {
     @Inject
     @Named("current")
-    private EntityReferenceProvider provider;
+    private EntityReferenceValueProvider provider;
 
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
@@ -61,8 +61,8 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         if (isLastReference || representation.length() > 0) {
             shouldPrint = true;
         } else {
-            EntityReference defaultReference = resolveDefaultReference(currentReference.getType(), parameters);
-            if (defaultReference == null || !equal(defaultReference, currentReference)) {
+            String defaultName = resolveDefaultValue(currentReference.getType(), parameters);
+            if (defaultName == null || !defaultName.equals(currentReference.getName())) {
                 shouldPrint = true;
             }
         }
@@ -72,52 +72,22 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         }
     }
 
-    protected boolean equal(EntityReference reference1, EntityReference reference2)
+    protected String resolveDefaultValue(EntityType type, Object... parameters)
     {
-        EntityReference currentReference1 = reference1;
-        EntityReference currentReference2 = reference2;
-
-        while (currentReference1 != null && currentReference2 != null
-            && currentReference1.getType() == currentReference2.getType()) {
-            if (!currentReference1.getName().equals(currentReference2.getName())) {
-                return false;
-            }
-
-            currentReference1 = currentReference1.getParent();
-            currentReference2 = currentReference2.getParent();
-        }
-
-        return true;
-    }
-
-    /**
-     * @since 7.2M1
-     */
-    protected EntityReference resolveDefaultReference(EntityType type, Object... parameters)
-    {
-        EntityReference resolvedDefaultReference = null;
+        String resolvedDefaultValue = null;
         if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
             // Try to extract the type from the passed parameter.
             EntityReference referenceParameter = (EntityReference) parameters[0];
             EntityReference extractedReference = referenceParameter.extractReference(type);
             if (extractedReference != null) {
-                resolvedDefaultReference = extractedReference;
-
-                // Remove parent if any
-                EntityReference parent = resolvedDefaultReference.getParent();
-                while (parent != null && parent.getType() == resolvedDefaultReference.getType()) {
-                    parent = parent.getParent();
-                }
-                if (parent != null) {
-                    resolvedDefaultReference = resolvedDefaultReference.removeParent(parent);
-                }
+                resolvedDefaultValue = extractedReference.getName();
             }
         }
 
-        if (resolvedDefaultReference == null) {
-            resolvedDefaultReference = this.provider.getDefaultReference(type);
+        if (resolvedDefaultValue == null) {
+            resolvedDefaultValue = this.provider.getDefaultValue(type);
         }
 
-        return resolvedDefaultReference;
+        return resolvedDefaultValue;
     }
 }

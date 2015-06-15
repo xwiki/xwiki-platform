@@ -20,12 +20,10 @@
 package com.xpn.xwiki.internal;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,9 +52,6 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
      */
     @Inject
     private Logger logger;
-
-    @Inject
-    private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
     /**
      * The initial stub XWikiContext.
@@ -134,7 +129,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
             }
 
             // We make sure to not share the same document instance with several threads
-            stubContext.setDoc(new XWikiDocument(this.defaultDocumentReferenceProvider.get()));
+            stubContext.setDoc(new XWikiDocument());
         } else {
             stubContext = null;
         }

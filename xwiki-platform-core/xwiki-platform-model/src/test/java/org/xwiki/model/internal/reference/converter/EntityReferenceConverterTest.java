@@ -26,14 +26,14 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.Converter;
+import org.xwiki.properties.internal.converter.ColorConverter;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
- * Validate {@link EntityReferenceConverter} component.
+ * Validate {@link ColorConverter} component.
  * 
  * @version $Id$
  */
@@ -49,7 +49,7 @@ public class EntityReferenceConverterTest
     @Before
     public void setUp() throws Exception
     {
-        this.converterManager = this.mocker.getInstance(ConverterManager.class);
+        this.converterManager = mocker.getInstance(ConverterManager.class);
     }
 
     @Test

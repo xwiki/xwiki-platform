@@ -19,11 +19,6 @@
  */
 package org.xwiki.model.reference;
 
-import java.lang.reflect.Type;
-
-import javax.inject.Provider;
-
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 
 /**
@@ -34,13 +29,6 @@ import org.xwiki.model.EntityType;
  */
 public class SpaceReference extends EntityReference
 {
-    /**
-     * The {@link Type} for a Provider<SpaceReference>.
-     * 
-     * @since 7.2M1
-     */
-    public static final Type TYPE_PROVIDER = new DefaultParameterizedType(null, Provider.class, SpaceReference.class);
-
     /**
      * Special constructor that transforms a generic entity reference into a {@link SpaceReference}. It checks the
      * validity of the passed reference (ie correct type).
@@ -61,8 +49,7 @@ public class SpaceReference extends EntityReference
      * @param newReference the new parent that will replace oldReference in the chain
      * @since 3.3M2
      */
-    protected SpaceReference(EntityReference reference, EntityReference oldReference, EntityReference newReference)
-    {
+    protected SpaceReference(EntityReference reference, EntityReference oldReference, EntityReference newReference) {
         super(reference, oldReference, newReference);
     }
 
@@ -89,8 +76,8 @@ public class SpaceReference extends EntityReference
     }
 
     /**
-     * Create a space reference based on a space name and a parent entity reference. The entity reference may be either
-     * a wiki or a space reference.
+     * Create a space reference based on a space name and a parent entity reference.
+     * The entity reference may be either a wiki or a space reference.
      *
      * @param spaceName the name of the space
      * @param parent the entity reference
@@ -101,11 +88,13 @@ public class SpaceReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed parent.
+     * {@inheritDoc}
+     *
+     * Overridden in order to verify the validity of the passed parent.
      *
      * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
-     * @exception IllegalArgumentException if the passed parent is not a valid space reference parent (ie either a space
-     *                reference or a wiki reference)
+     * @exception IllegalArgumentException if the passed parent is not a valid space reference parent (ie either
+     *            a space reference or a wiki reference)
      */
     @Override
     protected void setParent(EntityReference parent)
@@ -127,7 +116,9 @@ public class SpaceReference extends EntityReference
     }
 
     /**
-     * {@inheritDoc} Overridden in order to verify the validity of the passed type.
+     * {@inheritDoc}
+     *
+     * Overridden in order to verify the validity of the passed type.
      *
      * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
      * @exception IllegalArgumentException if the passed type is not a space type
@@ -146,14 +137,5 @@ public class SpaceReference extends EntityReference
     public SpaceReference replaceParent(EntityReference oldParent, EntityReference newParent)
     {
         return new SpaceReference(this, oldParent, newParent);
-    }
-
-    /**
-     * @return the reference of the wiki containing this space
-     * @since 7.1M2
-     */
-    public WikiReference getWikiReference()
-    {
-        return (WikiReference) extractReference(EntityType.WIKI);
     }
 }

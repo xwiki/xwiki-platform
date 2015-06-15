@@ -28,7 +28,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
@@ -60,7 +60,7 @@ import static org.junit.Assert.assertThat;
  * @since 5.0M2
  */
 @ComponentList({DefaultStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class,
-    DefaultEntityReferenceProvider.class, DefaultModelConfiguration.class})
+    DefaultEntityReferenceValueProvider.class, DefaultModelConfiguration.class})
 public class TestDefinitionParserTest
 {
     @Rule

@@ -26,54 +26,54 @@ import com.xpn.xwiki.XWikiContext;
 public abstract class XWikiDefaultURLFactory implements XWikiURLFactory
 {
     @Override
-    public URL createURL(String spaces, String name, XWikiContext context)
+    public URL createURL(String web, String name, XWikiContext context)
     {
-        return createURL(spaces, name, "view", null, null, context);
+        return createURL(web, name, "view", null, null, context);
     }
 
     @Override
-    public URL createExternalURL(String spaces, String name, String action, String querystring, String anchor,
+    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
         XWikiContext context)
     {
-        return createExternalURL(spaces, name, action, querystring, anchor, context.getWikiId(), context);
+        return createExternalURL(web, name, action, querystring, anchor, context.getWikiId(), context);
     }
 
     @Override
-    public URL createURL(String spaces, String name, String action, XWikiContext context)
+    public URL createURL(String web, String name, String action, XWikiContext context)
     {
-        return createURL(spaces, name, action, null, null, context);
+        return createURL(web, name, action, null, null, context);
     }
 
     @Override
-    public URL createURL(String spaces, String name, String action, String querystring, String anchor, XWikiContext context)
+    public URL createURL(String web, String name, String action, String querystring, String anchor, XWikiContext context)
     {
-        return createURL(spaces, name, action, querystring, anchor, context.getWikiId(), context);
+        return createURL(web, name, action, querystring, anchor, context.getWikiId(), context);
     }
 
     @Override
-    public URL createSkinURL(String filename, String spaces, String name, XWikiContext context)
+    public URL createSkinURL(String filename, String web, String name, XWikiContext context)
     {
-        return createSkinURL(filename, spaces, name, context.getWikiId(), context);
+        return createSkinURL(filename, web, name, context.getWikiId(), context);
     }
 
     @Override
-    public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         XWikiContext context)
     {
-        return createAttachmentURL(filename, spaces, name, action, querystring, context.getWikiId(), context);
+        return createAttachmentURL(filename, web, name, action, querystring, context.getWikiId(), context);
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         String querystring, XWikiContext context)
     {
-        return createAttachmentRevisionURL(filename, spaces, name, revision, querystring, context.getWikiId(), context);
+        return createAttachmentRevisionURL(filename, web, name, revision, querystring, context.getWikiId(), context);
     }
 
-    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
         XWikiContext context)
     {
-        return createAttachmentRevisionURL(filename, spaces, name, revision, null, context.getWikiId(), context);
+        return createAttachmentRevisionURL(filename, web, name, revision, null, context.getWikiId(), context);
     }
 
     @Override

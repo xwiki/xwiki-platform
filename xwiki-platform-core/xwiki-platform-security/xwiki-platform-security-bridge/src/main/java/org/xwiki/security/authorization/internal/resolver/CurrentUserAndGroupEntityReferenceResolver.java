@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.security.internal.XWikiConstants;
 
 /**
@@ -39,16 +39,17 @@ import org.xwiki.security.internal.XWikiConstants;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {"user/current", "group/current"})
+@Component(hints = {"user/current", "group/current" })
 @Singleton
 public class CurrentUserAndGroupEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
     @Inject
     @Named("current")
-    private EntityReferenceProvider provider;
+    private EntityReferenceValueProvider provider;
 
     @Override
-    public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type,
+        Object... parameters)
     {
         // Special case: if null is passed then consider it's the guest user and return null.
         if (entityReferenceRepresentation == null) {
@@ -59,12 +60,12 @@ public class CurrentUserAndGroupEntityReferenceResolver extends AbstractStringEn
     }
 
     @Override
-    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
+    protected String getDefaultValue(EntityType type, Object... parameters)
     {
         if (type == EntityType.SPACE) {
-            return XWikiConstants.XWIKI_SPACE_REFERENCE;
+            return XWikiConstants.XWIKI_SPACE;
         } else {
-            return this.provider.getDefaultReference(type);
+            return this.provider.getDefaultValue(type);
         }
     }
 }

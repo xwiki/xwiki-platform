@@ -30,8 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Generate a string representation of an entity reference (eg "Wiki:Space.Page" for a
- * document reference in the "wiki" Wiki, the "space" Space and the "page" Page).
+ * Generate a path representation of an entity reference (eg "Wiki/Space/Page" on Unix or "Wiki\Space\Page" on
+ * Windows for a Document Reference in the "wiki" Wiki, the "space" Space and the "page" Page).
  *
  * @version $Id$
  * @since 3.0M2

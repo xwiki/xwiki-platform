@@ -26,7 +26,7 @@ import org.xwiki.model.reference.EntityReference;
  * Constants used in many unit tests.
  * 
  * @version $Id$
- * @since 7.2M1
+ * @since 7.1M2
  */
 public interface TestConstants
 {

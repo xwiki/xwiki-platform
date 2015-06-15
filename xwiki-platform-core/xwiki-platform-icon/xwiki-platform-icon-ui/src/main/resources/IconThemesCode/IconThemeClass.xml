@@ -28,7 +28,6 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1406818861000</creationDate>
-  <parent>IconThemes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1406821312000</date>
@@ -39,6 +38,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <parent>IconThemes.WebHome</parent>
   <content/>
   <class>
     <name>IconThemesCode.IconThemeClass</name>

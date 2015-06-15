@@ -28,7 +28,6 @@
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1406824491000</creationDate>
-  <parent>IconThemes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1406824705000</date>
@@ -39,6 +38,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <parent>IconThemes.WebHome</parent>
   <content>## General settings
 xwiki.iconset.type = image
 xwiki.iconset.render.wiki = image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")

@@ -20,26 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>FlamingoThemesCode</web>
   <name>ThemeClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1402406543000</creationDate>
   <parent>FlamingoThemesCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1402406543000</creationDate>
   <date>1407337974000</date>
   <contentUpdateDate>1407337974000</contentUpdateDate>
   <version>1.1</version>
   <title>Theme Class</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <class>
     <name>FlamingoThemesCode.ThemeClass</name>
     <customClass/>
@@ -783,10 +785,6 @@
     </xwiki-page-content-bg>
   </class>
   <object>
-    <name>FlamingoThemesCode.ThemeClass</name>
-    <number>0</number>
-    <className>XWiki.ClassSheetBinding</className>
-    <guid>05a31a29-f8a1-415d-9222-aa19743cd313</guid>
     <class>
       <name>XWiki.ClassSheetBinding</name>
       <customClass/>
@@ -810,15 +808,15 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
+    <name>FlamingoThemesCode.ThemeClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>05a31a29-f8a1-415d-9222-aa19743cd313</guid>
     <property>
       <sheet>ThemeSheet</sheet>
     </property>
   </object>
   <object>
-    <name>FlamingoThemesCode.ThemeClass</name>
-    <number>0</number>
-    <className>XWiki.DocumentSheetBinding</className>
-    <guid>3a9bb2f2-8476-495a-a5c5-002a59777fff</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -842,8 +840,13 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
+    <name>FlamingoThemesCode.ThemeClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>3a9bb2f2-8476-495a-a5c5-002a59777fff</guid>
     <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>
+  <content/>
 </xwikidoc>

@@ -20,26 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>AppWithinMinutes</web>
   <name>Groups</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1319403311000</creationDate>
   <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319403311000</creationDate>
   <date>1319488509000</date>
   <contentUpdateDate>1319488509000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorGroupsFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <class>
     <name>AppWithinMinutes.Groups</name>
     <customClass/>
@@ -72,10 +75,6 @@
     </group>
   </class>
   <object>
-    <name>AppWithinMinutes.Groups</name>
-    <number>0</number>
-    <className>AppWithinMinutes.FormFieldClass</className>
-    <guid>4f69d668-42bd-4b29-9bd2-6e88bd6a675c</guid>
     <class>
       <name>AppWithinMinutes.FormFieldClass</name>
       <customClass/>
@@ -149,6 +148,10 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </properties>
     </class>
+    <name>AppWithinMinutes.Groups</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>4f69d668-42bd-4b29-9bd2-6e88bd6a675c</guid>
     <property>
       <category>AppWithinMinutes.Pickers</category>
     </property>
@@ -162,4 +165,5 @@
       <properties>multiSelect</properties>
     </property>
   </object>
+  <content/>
 </xwikidoc>

@@ -20,31 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>Main</web>
   <name>Spaces</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1364502215000</creationDate>
   <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1364502215000</creationDate>
   <date>1364570212000</date>
   <contentUpdateDate>1364570127000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('index.spacesMacro.title')</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{spaces /}}</content>
   <object>
-    <name>Main.Spaces</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>eb832884-79a9-4e96-b1fa-55fdbb06b0a5</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -75,15 +73,15 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
+    <name>Main.Spaces</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>eb832884-79a9-4e96-b1fa-55fdbb06b0a5</guid>
     <property>
       <level>edit</level>
     </property>
   </object>
   <object>
-    <name>Main.Spaces</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>0556ca2b-73ab-4779-a84d-1d7e4107d9ae</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -103,7 +101,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -119,22 +117,6 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -164,13 +146,17 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>Main.Spaces</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>0556ca2b-73ab-4779-a84d-1d7e4107d9ae</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -224,10 +210,6 @@ ul.xlist li.xitem div.xshowonhover img {
     </property>
   </object>
   <object>
-    <name>Main.Spaces</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>e990e6f7-1eff-40d8-9699-9052e36b5802</guid>
     <class>
       <name>XWiki.WikiMacroClass</name>
       <customClass/>
@@ -337,6 +319,10 @@ ul.xlist li.xitem div.xshowonhover img {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <name>Main.Spaces</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>e990e6f7-1eff-40d8-9699-9052e36b5802</guid>
     <property>
       <code>{{velocity}}
 ##
@@ -432,4 +418,5 @@ $xwiki.ssx.use('Main.Spaces')##
       <visibility>Current Wiki</visibility>
     </property>
   </object>
+  <content>{{spaces /}}</content>
 </xwikidoc>

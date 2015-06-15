@@ -20,80 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>AppWithinMinutes</web>
   <name>WizardStep</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1322241394000</creationDate>
   <parent>AppWithinMinutes.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1322241394000</creationDate>
   <date>1322394959000</date>
   <contentUpdateDate>1322394959000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output="false"}}
-#macro(appWizardHeader $stepNumber)
-  {{html wiki="true"}}
-  (% class="wizard-header" %)
-  (((
-    #set($stepTitle = $services.localization.render("platform.appwithinminutes.wizardStep${stepNumber}Title"))
-    = $services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])  =
-
-    (% class="steps" %)
-    #foreach($index in [1,2,3])
-      #set($extraClassName = "#if($stepNumber == $index) active#elseif($stepNumber &gt; $index) done#end")
-      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Name")
-    #end
-
-    &lt;div class="clearfloats"&gt;&lt;/div&gt;
-  )))
-  {{/html}}
-#end
-
-#macro(appWizardFooter $stepNumber)
-  {{html wiki="true"}}
-  (% class="wizard-footer buttons" %)
-  (((
-    #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonLabel'))
-    #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonTip'))
-    #if($stepNumber == 3)##
-      #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
-      #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
-      #set($previousURL = $xwiki.getURL($className, 'edit', 'wizard=true'))
-    #elseif($stepNumber == 2 &amp;&amp; $doc.isNew())##
-      #set($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
-    #end
-    #if($previousURL)##
-      &lt;span class="buttonwrapper left"&gt;&lt;a href="$previousURL" title="$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonTip'))" class="button secondary"&gt;$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonLabel'))&lt;/a&gt;&lt;/span&gt;##
-    #end
-    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$escapetool.xml($nextLabel)" title="$escapetool.xml($nextTip)" class="button"/&gt;&lt;/span&gt;
-  )))
-  {{/html}}
-#end
-{{/velocity}}
-
-{{velocity}}
-#if($doc.fullName == 'AppWithinMinutes.WizardStep')
-  Code shared by all AppWithinMinutes wizard steps.
-#else
-  ## Use the style sheet and the JavaScript code required by the velocity macros previously defined.
-  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.WizardStep'))
-#end
-{{/velocity}}</content>
   <object>
-    <name>AppWithinMinutes.WizardStep</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>a05015f1-917d-4fdb-9060-285c27128b41</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -113,7 +63,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -158,13 +108,17 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>AppWithinMinutes.WizardStep</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a05015f1-917d-4fdb-9060-285c27128b41</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -224,4 +178,54 @@ return XWiki;
       <use>onDemand</use>
     </property>
   </object>
+  <content>{{velocity output="false"}}
+#macro(appWizardHeader $stepNumber)
+  {{html wiki="true"}}
+  (% class="wizard-header" %)
+  (((
+    #set($stepTitle = $services.localization.render("platform.appwithinminutes.wizardStep${stepNumber}Title"))
+    = $services.localization.render('platform.appwithinminutes.wizardStepHeading', [$stepNumber, $stepTitle])  =
+
+    (% class="steps" %)
+    #foreach($index in [1,2,3])
+      #set($extraClassName = "#if($stepNumber == $index) active#elseif($stepNumber &gt; $index) done#end")
+      * (% class="number$extraClassName" %)#if($stepNumber &gt; $index)&amp;${escapetool.h}10004;#else$index#end(%%) (% class="name$extraClassName" %)$services.localization.render("platform.appwithinminutes.wizardStep${index}Name")
+    #end
+
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  )))
+  {{/html}}
+#end
+
+#macro(appWizardFooter $stepNumber)
+  {{html wiki="true"}}
+  (% class="wizard-footer buttons" %)
+  (((
+    #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonLabel'))
+    #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepNextButtonTip'))
+    #if($stepNumber == 3)##
+      #set($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
+      #set($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
+      #set($previousURL = $xwiki.getURL($className, 'edit', 'wizard=true'))
+    #elseif($stepNumber == 2 &amp;&amp; $doc.isNew())##
+      #set($previousURL = $xwiki.getURL('AppWithinMinutes.CreateApplication'))
+    #end
+    #if($previousURL)##
+      &lt;span class="buttonwrapper left"&gt;&lt;a href="$previousURL" title="$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonTip'))" class="button secondary"&gt;$escapetool.xml($services.localization.render('platform.appwithinminutes.wizardStepPreviousButtonLabel'))&lt;/a&gt;&lt;/span&gt;##
+    #end
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="wizard-next" name="xaction_save" value="$escapetool.xml($nextLabel)" title="$escapetool.xml($nextTip)" class="button"/&gt;&lt;/span&gt;
+  )))
+  {{/html}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if($doc.fullName == 'AppWithinMinutes.WizardStep')
+  Code shared by all AppWithinMinutes wizard steps.
+#else
+  ## Use the style sheet and the JavaScript code required by the velocity macros previously defined.
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  #set($discard = $xwiki.jsx.use('AppWithinMinutes.WizardStep'))
+#end
+{{/velocity}}</content>
 </xwikidoc>

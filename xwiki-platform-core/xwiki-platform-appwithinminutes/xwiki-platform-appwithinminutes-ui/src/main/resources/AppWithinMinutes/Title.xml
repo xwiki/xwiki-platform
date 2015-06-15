@@ -20,51 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>AppWithinMinutes</web>
   <name>Title</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1352135286000</creationDate>
   <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1352135286000</creationDate>
   <date>1352137695000</date>
   <contentUpdateDate>1352137695000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorTitleFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if ($type == 'edit')
-  #set ($className = $object.getxWikiClass().name)
-  #if ($doc.fullName == $className)
-    ## We are editing the class so the title must be read from / written to the template document.
-    #set ($name = 'templateTitle')
-    #set ($value = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template").title)
-  #else
-    ## We are editing an application entry so the title must be read from / written to the current document.
-    #set ($name = 'title')
-    #set ($value = $tdoc.title)
-    #if ("$!value" == '')
-      #set ($value = $tdoc.name)
-    #end
-  #end
-  {{html clean="false"}}
-  &lt;input type="text" name="$name" value="$!escapetool.xml($value)"
-    #if ($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/&gt;
-  {{/html}}
-#elseif ("$!type" != '')
-  ## Render the title of the current document.
-  {{html}}$tdoc.getRenderedTitle('xhtml/1.0'){{/html}}
-#else
-  The display mode is not specified!
-#end
-{{/velocity}}</content>
   <class>
     <name>AppWithinMinutes.Title</name>
     <customClass/>
@@ -88,10 +66,6 @@
     </title>
   </class>
   <object>
-    <name>AppWithinMinutes.Title</name>
-    <number>0</number>
-    <className>AppWithinMinutes.FormFieldClass</className>
-    <guid>6a3b76c3-1537-42b6-bf0a-017ba10070c3</guid>
     <class>
       <name>AppWithinMinutes.FormFieldClass</name>
       <customClass/>
@@ -165,6 +139,10 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </properties>
     </class>
+    <name>AppWithinMinutes.Title</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>6a3b76c3-1537-42b6-bf0a-017ba10070c3</guid>
     <property>
       <category>AppWithinMinutes.Document</category>
     </property>
@@ -178,4 +156,30 @@
       <properties/>
     </property>
   </object>
+  <content>{{velocity}}
+#if ($type == 'edit')
+  #set ($className = $object.getxWikiClass().name)
+  #if ($doc.fullName == $className)
+    ## We are editing the class so the title must be read from / written to the template document.
+    #set ($name = 'templateTitle')
+    #set ($value = $xwiki.getDocument("$stringtool.removeEnd($className, 'Class')Template").title)
+  #else
+    ## We are editing an application entry so the title must be read from / written to the current document.
+    #set ($name = 'title')
+    #set ($value = $tdoc.title)
+    #if ("$!value" == '')
+      #set ($value = $tdoc.name)
+    #end
+  #end
+  {{html clean="false"}}
+  &lt;input type="text" name="$name" value="$!escapetool.xml($value)"
+    #if ($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)class="required"#end/&gt;
+  {{/html}}
+#elseif ("$!type" != '')
+  ## Render the title of the current document.
+  {{html}}$tdoc.getRenderedTitle('xhtml/1.0'){{/html}}
+#else
+  The display mode is not specified!
+#end
+{{/velocity}}</content>
 </xwikidoc>

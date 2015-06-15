@@ -647,7 +647,7 @@ $doc.dropPermissions()##
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -692,7 +692,7 @@ $doc.dropPermissions()##
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>

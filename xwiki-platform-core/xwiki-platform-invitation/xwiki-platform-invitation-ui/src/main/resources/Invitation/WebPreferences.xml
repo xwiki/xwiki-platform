@@ -20,31 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>Invitation</web>
   <name>WebPreferences</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1275531576000</creationDate>
   <parent>Invitation.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1275531576000</creationDate>
   <date>1275547709000</date>
   <contentUpdateDate>1275547709000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <object>
-    <name>Invitation.WebPreferences</name>
-    <number>0</number>
-    <className>XWiki.XWikiGlobalRights</className>
-    <guid>fda0173d-1cb1-4d21-bb81-bd7acdca08f3</guid>
     <class>
       <name>XWiki.XWikiGlobalRights</name>
       <customClass/>
@@ -110,6 +109,10 @@
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
+    <name>Invitation.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiGlobalRights</className>
+    <guid>fda0173d-1cb1-4d21-bb81-bd7acdca08f3</guid>
     <property>
       <allow>0</allow>
     </property>
@@ -124,10 +127,6 @@
     </property>
   </object>
   <object>
-    <name>Invitation.WebPreferences</name>
-    <number>0</number>
-    <className>XWiki.XWikiPreferences</className>
-    <guid>949017f2-6fa7-4a36-aeb5-7b013d1ea4b1</guid>
     <class>
       <name>XWiki.XWikiPreferences</name>
       <customClass/>
@@ -228,7 +227,19 @@
       <colorTheme>
         <cache>0</cache>
         <classname/>
-        <customDisplay>{{include reference="XWiki.ColorThemePropertyDisplayer" /}}</customDisplay>
+        <customDisplay>{{velocity}}
+{{html wiki="false" clean="false"}}
+#if ("$!value" == '')
+  #set ($value = '')
+#end
+&lt;select name="${object.getxWikiClass().name}_${object.number}_${name}" id="${object.getxWikiClass().name}_${object.number}_${name}"&gt;
+  #if ($editor != 'globaladmin')&lt;option value=""#if ($value == '') selected="selected"#end&gt;---&lt;/option&gt;#end
+#foreach($theme in $xwiki.wrapDocs($services.query.hql(", BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' order by doc.title").execute()))
+  &lt;option value="$theme.fullName"#if ($theme.fullName.equals($value)) selected="selected"#end&gt;$theme.plainTitle&lt;/option&gt;
+#end
+&lt;/select&gt;
+{{/html}}
+{{/velocity}}</customDisplay>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <idField/>
@@ -242,7 +253,7 @@
         <separators/>
         <size>1</size>
         <sort>none</sort>
-        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' or theme.className='FlamingoThemesCode.ThemeClass') and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate' and doc.fullName&lt;&gt;'FlamingoThemesCode.ThemeTemplate'</sql>
+        <sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate'</sql>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
@@ -488,21 +499,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </guest_comment_requires_captcha>
-      <iconTheme>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>iconTheme</name>
-        <number>73</number>
-        <prettyName>Icon theme</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <size>1</size>
-        <sql>select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, StringProperty propName where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' and doc.fullName&lt;&gt;'IconThemesCode.IconThemeTemplate' and theme.id = propName.id and propName.name = 'name'</sql>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-      </iconTheme>
       <invitation_email_content>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
@@ -785,22 +781,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </leftPanels>
-      <leftPanelsWidth>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>leftPanelsWidth</name>
-        <number>74</number>
-        <prettyName>Width of the left panel column</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </leftPanelsWidth>
       <meta>
         <contenttype>FullyRenderedText</contenttype>
         <customDisplay/>
@@ -847,20 +827,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </multilingual>
-      <obfuscateEmailAddresses>
-        <customDisplay/>
-        <defaultValue>0</defaultValue>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType/>
-        <name>obfuscateEmailAddresses</name>
-        <number>72</number>
-        <prettyName>Obfuscate Email Addresses</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </obfuscateEmailAddresses>
       <parent>
         <customDisplay/>
         <disabled>0</disabled>
@@ -946,22 +912,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </rightPanels>
-      <rightPanelsWidth>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>rightPanelsWidth</name>
-        <number>75</number>
-        <prettyName>Width of the right panel column</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>---|Small|Medium|Large</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </rightPanelsWidth>
       <showLeftPanels>
         <customDisplay/>
         <defaultValue/>
@@ -1304,6 +1254,10 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </xwiki.title.mandatory>
     </class>
+    <name>Invitation.WebPreferences</name>
+    <number>0</number>
+    <className>XWiki.XWikiPreferences</className>
+    <guid>949017f2-6fa7-4a36-aeb5-7b013d1ea4b1</guid>
     <property>
       <admin_email/>
     </property>
@@ -1461,4 +1415,5 @@
       <webcopyright/>
     </property>
   </object>
+  <content/>
 </xwikidoc>

@@ -20,26 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>AppWithinMinutes</web>
   <name>StaticList</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1319402104000</creationDate>
   <parent>AppWithinMinutes.FormFieldClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1319402104000</creationDate>
   <date>1319488327000</date>
   <contentUpdateDate>1319488327000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.classEditorStaticListFieldName')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <class>
     <name>AppWithinMinutes.StaticList</name>
     <customClass/>
@@ -72,10 +75,6 @@
     </staticList>
   </class>
   <object>
-    <name>AppWithinMinutes.StaticList</name>
-    <number>0</number>
-    <className>AppWithinMinutes.FormFieldClass</className>
-    <guid>1c20ee7e-5c0e-4b35-ae88-aa40235c90ee</guid>
     <class>
       <name>AppWithinMinutes.FormFieldClass</name>
       <customClass/>
@@ -149,6 +148,10 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </properties>
     </class>
+    <name>AppWithinMinutes.StaticList</name>
+    <number>0</number>
+    <className>AppWithinMinutes.FormFieldClass</className>
+    <guid>1c20ee7e-5c0e-4b35-ae88-aa40235c90ee</guid>
     <property>
       <category>AppWithinMinutes.Standard</category>
     </property>
@@ -163,10 +166,6 @@
     </property>
   </object>
   <object>
-    <name>AppWithinMinutes.StaticList</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>3d4a5074-49f3-4462-a006-15f6902c9bd1</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -186,7 +185,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -231,13 +230,17 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>AppWithinMinutes.StaticList</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>3d4a5074-49f3-4462-a006-15f6902c9bd1</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -444,10 +447,6 @@ return XWiki;
     </property>
   </object>
   <object>
-    <name>AppWithinMinutes.StaticList</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>f19f7ef1-3f86-40c8-9950-c044ae7d1264</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -467,7 +466,7 @@ return XWiki;
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -483,22 +482,6 @@ return XWiki;
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -528,13 +511,17 @@ return XWiki;
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>AppWithinMinutes.StaticList</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>f19f7ef1-3f86-40c8-9950-c044ae7d1264</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -616,4 +603,5 @@ return XWiki;
       <use>onDemand</use>
     </property>
   </object>
+  <content/>
 </xwikidoc>

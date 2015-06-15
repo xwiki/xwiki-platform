@@ -53,11 +53,4 @@ public interface StandardURLConfiguration
      * @return the action to take when a subwiki is not found (ie there's no wiki descriptor for it)
      */
     WikiNotFoundBehavior getWikiNotFoundBehavior();
-
-    /**
-     * @return true if the "view" action is hidden in the URL (other actions are never hidden).
-     *         This is useful when you wish to have short URLs
-     * @since 7.2M1
-     */
-    boolean isViewActionHidden();
 }

@@ -67,12 +67,6 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
     }
 
     @Override
-    public boolean isViewActionHidden()
-    {
-        return super.isViewActionHidden("0".equals(this.xwikicfg.getProperty("xwiki.showviewaction", "1")));
-    }
-
-    @Override
     public WikiNotFoundBehavior getWikiNotFoundBehavior()
     {
         WikiNotFoundBehavior legacyBehavior = WikiNotFoundBehavior.DISPLAY_ERROR;

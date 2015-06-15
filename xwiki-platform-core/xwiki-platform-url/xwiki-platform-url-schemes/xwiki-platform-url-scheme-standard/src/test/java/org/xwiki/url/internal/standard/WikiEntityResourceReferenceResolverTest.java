@@ -20,7 +20,6 @@
 package org.xwiki.url.internal.standard;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.junit.Before;
@@ -34,7 +33,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
-import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.standard.entity.WikiEntityResourceReferenceResolver;
 
@@ -57,10 +55,6 @@ public class WikiEntityResourceReferenceResolverTest
 
     private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
-    private EntityResourceActionLister entityResourceActionLister;
-
-    private StandardURLConfiguration configuration;
-
     @Before
     public void setUp() throws Exception
     {
@@ -72,14 +66,6 @@ public class WikiEntityResourceReferenceResolverTest
         this.entityReferenceResolver = mock(EntityReferenceResolver.class);
         ReflectionUtils.setFieldValue(this.resolver, "defaultReferenceEntityReferenceResolver",
             this.entityReferenceResolver);
-
-        this.configuration = mock(StandardURLConfiguration.class);
-        when(this.configuration.isViewActionHidden()).thenReturn(false);
-        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.configuration);
-
-        this.entityResourceActionLister = mock(EntityResourceActionLister.class);
-        when(this.entityResourceActionLister.listActions()).thenReturn(Arrays.asList("view", "download"));
-        ReflectionUtils.setFieldValue(this.resolver, "entityResourceActionLister", this.entityResourceActionLister);
     }
 
     @Test

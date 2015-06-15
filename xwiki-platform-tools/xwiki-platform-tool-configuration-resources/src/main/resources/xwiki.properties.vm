@@ -603,7 +603,7 @@ extension.oldflavors=$oldFlavor.trim()
 #-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
 #-# For example this is the "bin" part in the following URL:
 #-#   http://server/xwiki/bin/view/space/page
-#-# Note that this replaces the old xwiki.defaultservletpath property in the xwiki.cfg file.
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
 #-#
 #-# The default is:
 # url.standard.getEntityPathPrefix=bin
@@ -615,13 +615,6 @@ extension.oldflavors=$oldFlavor.trim()
 #-#
 #-# The default is:
 # url.standard.multiwiki.notFoundBehavior=redirect_to_main_wiki
-
-#-# [Since 7.2M1]
-#-# Whether the "view" action is omitted in URLs ()in order to have shorter URLs).
-#-# Note that this replaces the old xwiki.showviewaction property in the xwiki.cfg file.
-#-#
-#-# The default is:
-# url.standard.hideViewAction=false
 
 #-------------------------------------------------------------------------------------
 # Attachment

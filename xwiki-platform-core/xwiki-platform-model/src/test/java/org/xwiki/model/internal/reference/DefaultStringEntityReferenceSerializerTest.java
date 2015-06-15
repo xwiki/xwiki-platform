@@ -101,10 +101,10 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
         Assert.assertEquals("defwiki:defspace.defpage", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("wiki1.wiki2:wiki3:some\\.space.page", serializer.serialize(reference));
+        Assert.assertEquals("wiki1.wiki2:wiki3:some.space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("some.space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("defwiki:some\\.space.page", serializer.serialize(reference));
+        Assert.assertEquals("defwiki:some.space.page", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
         Assert.assertEquals("defwiki:defspace.wiki:page", serializer.serialize(reference));
@@ -129,7 +129,7 @@ public class DefaultStringEntityReferenceSerializerTest implements TestConstants
     public void testSerializeSpaceReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
-        Assert.assertEquals("wiki:space1\\.space2", serializer.serialize(reference));
+        Assert.assertEquals("wiki:space1.space2", serializer.serialize(reference));
     }
 
     @Test

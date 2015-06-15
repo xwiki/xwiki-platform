@@ -54,7 +54,7 @@ public class UidStringEntityReferenceSerializerTest
         Assert.assertEquals("4:wiki5:space4:page", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("17:wiki1.wiki2:wiki310:some.space4:page", serializer.serialize(reference));
+        Assert.assertEquals("17:wiki1.wiki2:wiki34:some5:space4:page", serializer.serialize(reference));
 
         // Verify that passing null doesn't throw a NPE
         Assert.assertNull(serializer.serialize(null));
@@ -64,7 +64,7 @@ public class UidStringEntityReferenceSerializerTest
     public void testSerializeSpaceReference() throws Exception
     {
         EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
-        Assert.assertEquals("4:wiki13:space1.space2", serializer.serialize(reference));
+        Assert.assertEquals("4:wiki6:space16:space2", serializer.serialize(reference));
     }
 
     @Test

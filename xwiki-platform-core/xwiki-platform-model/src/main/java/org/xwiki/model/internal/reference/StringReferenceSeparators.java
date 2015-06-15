@@ -20,7 +20,9 @@
 
 package org.xwiki.model.internal.reference;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xwiki.model.EntityType;
@@ -39,8 +41,8 @@ interface StringReferenceSeparators
     char CESCAPE = '\\';
 
     /**
-      * A colon string. Colon is used to separate wiki name.
-      */
+     * A colon string. Colon is used to separate wiki name.
+     */
     char CWIKISEP = ':';
 
     /**
@@ -79,8 +81,8 @@ interface StringReferenceSeparators
     String DBLESCAPE = ESCAPE + ESCAPE;
 
     /**
-      * A colon string. Colon is used to separate wiki name.
-      */
+     * A colon string. Colon is used to separate wiki name.
+     */
     String WIKISEP = Character.toString(CWIKISEP);
 
     /**
@@ -114,12 +116,12 @@ interface StringReferenceSeparators
     Map<EntityType, String[]> ESCAPES = new HashMap<EntityType, String[]>()
     {
         {
-            put(EntityType.ATTACHMENT, new String[] {ATTACHMENTSEP, ESCAPE});
-            put(EntityType.DOCUMENT, new String[] {SPACESEP, ESCAPE});
-            put(EntityType.SPACE, new String[] {SPACESEP, WIKISEP, ESCAPE});
-            put(EntityType.OBJECT, new String[] {OBJECTSEP, ESCAPE});
-            put(EntityType.OBJECT_PROPERTY, new String[] {PROPERTYSEP, ESCAPE});
-            put(EntityType.CLASS_PROPERTY, new String[] {CLASSPROPSEP, SPACESEP, ESCAPE});
+            put(EntityType.ATTACHMENT, new String[] { ATTACHMENTSEP, ESCAPE });
+            put(EntityType.DOCUMENT, new String[] { SPACESEP, ESCAPE });
+            put(EntityType.SPACE, new String[] { SPACESEP, WIKISEP, ESCAPE });
+            put(EntityType.OBJECT, new String[] { OBJECTSEP, ESCAPE });
+            put(EntityType.OBJECT_PROPERTY, new String[] { PROPERTYSEP, ESCAPE });
+            put(EntityType.CLASS_PROPERTY, new String[] { CLASSPROPSEP, SPACESEP, ESCAPE });
         }
     };
 
@@ -129,28 +131,46 @@ interface StringReferenceSeparators
     Map<EntityType, String[]> REPLACEMENTS = new HashMap<EntityType, String[]>()
     {
         {
-            put(EntityType.ATTACHMENT, new String[] {ESCAPE + ATTACHMENTSEP, DBLESCAPE});
-            put(EntityType.DOCUMENT, new String[] {ESCAPE + SPACESEP, DBLESCAPE});
-            put(EntityType.SPACE, new String[] {ESCAPE + SPACESEP, ESCAPE + WIKISEP, DBLESCAPE});
-            put(EntityType.OBJECT, new String[] {ESCAPE + OBJECTSEP, DBLESCAPE});
-            put(EntityType.OBJECT_PROPERTY, new String[] {ESCAPE + PROPERTYSEP, DBLESCAPE});
-            put(EntityType.CLASS_PROPERTY, new String[] {ESCAPE + CLASSPROPSEP, ESCAPE + SPACESEP, DBLESCAPE});
+            put(EntityType.ATTACHMENT, new String[] { ESCAPE + ATTACHMENTSEP, DBLESCAPE });
+            put(EntityType.DOCUMENT, new String[] { ESCAPE + SPACESEP, DBLESCAPE });
+            put(EntityType.SPACE, new String[] { ESCAPE + SPACESEP, ESCAPE + WIKISEP, DBLESCAPE });
+            put(EntityType.OBJECT, new String[] { ESCAPE + OBJECTSEP, DBLESCAPE });
+            put(EntityType.OBJECT_PROPERTY, new String[] { ESCAPE + PROPERTYSEP, DBLESCAPE });
+            put(EntityType.CLASS_PROPERTY, new String[] { ESCAPE + CLASSPROPSEP, ESCAPE + SPACESEP, DBLESCAPE });
         }
     };
 
     /**
-     * Map defining syntax separators for each type of reference.
+     * Map<current entity, Map<parent separator, parent type>>.
+     * 
+     * @since 7.2M1
      */
-    Map<EntityType, char[]> SEPARATORS = new HashMap<EntityType, char[]>()
+    Map<EntityType, Map<Character, EntityType>> REFERENCE_SETUP = new HashMap<EntityType, Map<Character, EntityType>>()
     {
         {
-            put(EntityType.DOCUMENT, new char[] {CSPACESEP, CWIKISEP});
-            put(EntityType.ATTACHMENT, new char[] {CATTACHMENTSEP, CSPACESEP, CWIKISEP});
-            put(EntityType.SPACE, new char[] {CWIKISEP});
-            put(EntityType.OBJECT, new char[] {COBJECTSEP, CSPACESEP, CWIKISEP});
-            put(EntityType.OBJECT_PROPERTY, new char[] {CPROPERTYSEP, COBJECTSEP, CSPACESEP, CWIKISEP});
-            put(EntityType.CLASS_PROPERTY, new char[] {CCLASSPROPSEP, CSPACESEP, CWIKISEP});
-            put(EntityType.WIKI, new char[] {});
+            put(EntityType.DOCUMENT, Collections.singletonMap(CSPACESEP, EntityType.SPACE));
+            put(EntityType.ATTACHMENT, Collections.singletonMap(CATTACHMENTSEP, EntityType.DOCUMENT));
+            Map<Character, EntityType> spaceSetup = new LinkedHashMap<>();
+            // Default parent (used for relative reference) is wiki so it's first in the map
+            spaceSetup.put(CWIKISEP, EntityType.WIKI);
+            spaceSetup.put(CSPACESEP, EntityType.SPACE);
+            put(EntityType.SPACE, spaceSetup);
+            put(EntityType.OBJECT, Collections.singletonMap(COBJECTSEP, EntityType.DOCUMENT));
+            put(EntityType.OBJECT_PROPERTY, Collections.singletonMap(CPROPERTYSEP, EntityType.OBJECT));
+            put(EntityType.CLASS_PROPERTY, Collections.singletonMap(CCLASSPROPSEP, EntityType.DOCUMENT));
+        }
+    };
+
+    Map<EntityType, EntityType[]> TYPE_PARENTS = new HashMap<EntityType, EntityType[]>()
+    {
+        {
+            put(EntityType.DOCUMENT, new EntityType[] {});
+            put(EntityType.ATTACHMENT, new EntityType[] {});
+            put(EntityType.SPACE, new EntityType[] {});
+            put(EntityType.OBJECT, new EntityType[] {});
+            put(EntityType.OBJECT_PROPERTY, new EntityType[] {});
+            put(EntityType.CLASS_PROPERTY, new EntityType[] {});
+            put(EntityType.WIKI, new EntityType[] {});
         }
     };
 }

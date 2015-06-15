@@ -32,6 +32,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.ObjectPropertyReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.reference.test.TestConstants;
 
@@ -115,12 +116,14 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
 
         reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki1.wiki2:wiki3", reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("some", reference.extractReference(EntityType.SPACE).getParent().getName());
         Assert.assertEquals("page", reference.getName());
 
         reference = resolver.resolve("some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("some", reference.extractReference(EntityType.SPACE).getParent().getName());
         Assert.assertEquals("page", reference.getName());
 
         reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
@@ -443,6 +446,21 @@ public class DefaultStringEntityReferenceResolverTest implements TestConstants
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
+    }
+
+    /**
+     * Tests resolving space references.
+     */
+    @Test
+    public void testResolveSpaceReference()
+    {
+        SpaceReference reference = new SpaceReference(this.resolver.resolve("space", EntityType.SPACE));
+        Assert.assertEquals("space", reference.getName());
+
+        // several spaces
+        reference = new SpaceReference(this.resolver.resolve("space1.space2", EntityType.SPACE));
+        Assert.assertEquals("space2", reference.getName());
+        Assert.assertEquals("space1", reference.getParent().getName());
     }
 
     /**

@@ -451,103 +451,11 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/skin/Skin</className>
-              <method>org.xwiki.rendering.syntax.Syntax getOutputSyntax()</method>
-              <justification>Add a new method to this young API</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>com.xpn.xwiki.render.XWikiRenderingEngine getRenderingEngine()</method>
-              <justification>Not really been removed but now return Object. Breaks code building that use this method but should be ok for runtime.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>void setRenderingEngine(com.xpn.xwiki.render.XWikiRenderingEngine)</method>
-              <justification>Not used since a long time now (XWikiRenderingEngine is a component) and impossible to implement it without a trigerring most of the old rendering engine.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/url/ExtendedURL</className>
-              <method>ExtendedURL(java.net.URL)</method>
-              <justification>Young API. Added handling of URL parameters</justification>
-            </difference>
-            <difference>
-              <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/plugin/scheduler/StatusListener</className>
-              <justification>Never supposed to be an API</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/MimeMessageFactory</className>
-              <method>java.lang.Object createMessage(javax.mail.Session, java.lang.Object, java.util.Map)</method>
-              <justification>Young API. Remove useless Session argument since the MimeMessage will be given a valid Session when it's deserialized from the mail content store for sending.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/MailStatusStore</className>
-              <method>java.util.List load(java.util.Map, int, int)</method>
-              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
-            </difference>
-            <difference>
-              <differenceType>7006</differenceType>
-              <className>org/xwiki/mail/MailStatusStore</className>
-              <method>java.util.List load(java.util.Map, int, int)</method>
-              <to>org.xwiki.mail.MailStatus</to>
-              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
-            </difference>
-            <difference>
-              <differenceType>7012</differenceType>
-              <className>org/xwiki/mail/MailStatusStore</className>
-              <method>java.util.List load(java.util.Map, int, int, java.lang.String, boolean)</method>
-              <justification>Young API. Allow load a single message status and added sorting capabilities for multiple statuses.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/MailContentStore</className>
-              <method>void save(javax.mail.internet.MimeMessage)</method>
-              <justification>Young API. Added explicit batchId argument to stop storing batchId in mime headers.</justification>
-            </difference>
-            <difference>
-              <differenceType>7004</differenceType>
-              <className>org/xwiki/mail/MailStatus</className>
-              <method>MailStatus(javax.mail.internet.MimeMessage, org.xwiki.mail.MailState)</method>
-              <justification>Young API. Added explicit batchId argument to stop storing batchId in mime headers.</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Move xwiki/1.0 and old rendering engine to its own module -->
-            <exclude>com/xpn/xwiki/content/**</exclude>
-            <exclude>com/xpn/xwiki/render/**</exclude>
-            <exclude>com/xpn/xwiki/plugin/graphviz/GraphVizMacro</exclude>
-            <exclude>com/xpn/xwiki/plugin/svg/SVGMacro</exclude>
-            <exclude>com/xpn/xwiki/util/MenuSubstitution</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/ChartingMacro</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/CustomXWikiRenderingEngine</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/RadeoxHelper</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSource</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/source/TableDataSourceFactory</exclude>
-            <exclude>com/xpn/xwiki/plugin/charts/wizard/DatasourceDefaultsHelper</exclude>
-            <!-- Young API. Large refactoring for adding the ability to register new URL Resource Types -->
-            <exclude>**/org/xwiki/resource/**</exclude>
-            <!-- Young API. Rename MimeMessageWrapper into ScriptMimeMessage (not a wrapper anymore). Velocity scripts
-                 are not affected by the change. -->
-            <exclude>**/org/xwiki/mail/script/**</exclude>
-            <!-- Young API. Change of API to fix bug in waitForProcessin(). Scripting API has not been broken, only the
-                 Java API has -->
-            <exclude>**/org/xwiki/mail/MailResult*</exclude>
-            <exclude>**/org/xwiki/mail/MailStatusResult*</exclude>
-            <!-- Young API. Class moved to the "script" package. Script service usage is unchanged. -->
-            <exclude>**/org/xwiki/mail/MailStorageScriptService*</exclude>
-            <!-- Young API. Improve states and listener to provide more detailled and better reporting. -->
-            <exclude>**/org/xwiki/mail/MailListener</exclude>
-            <exclude>**/org/xwiki/mail/MailState</exclude>
           </excludes>
         </configuration>
       </plugin>

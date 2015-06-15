@@ -68,9 +68,7 @@ public class WikiComponentManager extends AbstractEntityComponentManager impleme
     @Override
     protected EntityReference getCurrentReference()
     {
-        String currentWikiId = getCurrentWiki();
-
-        return currentWikiId != null ? new WikiReference(currentWikiId) : null;
+        return new WikiReference(getCurrentWiki());
     }
 
     /**

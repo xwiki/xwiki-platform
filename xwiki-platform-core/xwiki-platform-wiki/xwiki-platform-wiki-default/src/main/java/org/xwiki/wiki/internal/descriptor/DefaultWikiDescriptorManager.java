@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -54,7 +53,6 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 {
     @Inject
-    @Named("readonly")
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
@@ -210,17 +208,13 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public String getMainWikiId()
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        return xcontext != null ? xcontext.getMainXWiki() : "xwiki";
+        return xcontextProvider.get().getMainXWiki();
     }
 
     @Override
     public String getCurrentWikiId()
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        return xcontext != null ? xcontext.getWikiId() : null;
+        return xcontextProvider.get().getWikiId();
     }
 
     @Override

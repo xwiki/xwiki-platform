@@ -23,6 +23,7 @@ import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Rule;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailSender;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;

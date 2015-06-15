@@ -35,7 +35,7 @@ import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLConfiguration;
 
 /**
- * Generic Resolver which first tries to find a Resource Reference Resolver specific to both the URL Scheme and to the
+ * Generic resolved which first tries to find a Resource Reference Resolver specific to both the URL Scheme and to the
  * Resource Type (i.e. with a hint of the type {@code <URL scheme id>/<resource type id>}, e.g. {@code standard/entity})
  * and if it cannot find it then tries to find a Resource Reference Resolver specific only to the Resource Type
  * (i.e. with a hint of the type {@code <resource type id>}, e.g. {@code entity}, which means a Resolver registered

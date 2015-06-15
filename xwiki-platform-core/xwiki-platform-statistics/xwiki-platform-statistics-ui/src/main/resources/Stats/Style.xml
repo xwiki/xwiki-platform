@@ -20,32 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>Stats</web>
   <name>Style</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1208996758000</creationDate>
   <parent>Stats.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1208996758000</creationDate>
   <date>1208996826000</date>
   <contentUpdateDate>1208996826000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-</content>
   <object>
-    <name>Stats.Style</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>87a0a691-faa2-48b7-9aa1-e41a4ce1c6ce</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -57,7 +55,6 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
-        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>cache</name>
@@ -65,14 +62,13 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
-        <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -81,24 +77,7 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
       <name>
-        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -107,7 +86,6 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
       <parse>
-        <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
@@ -118,7 +96,6 @@
       </parse>
       <use>
         <cache>0</cache>
-        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>use</name>
@@ -126,13 +103,16 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators>|, </separators>
+        <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
+        <values>onDemand=On demand|always=Always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>Stats.Style</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
     <property>
       <cache>long</cache>
     </property>
@@ -178,4 +158,6 @@ table.stats .moz-ellipsis-container {
       <use>onDemand</use>
     </property>
   </object>
+  <content>
+</content>
 </xwikidoc>

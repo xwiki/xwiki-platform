@@ -20,26 +20,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>PanelsCode</web>
   <name>ApplicationsPanelBlackListClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1413880148000</creationDate>
   <parent>Panels.Applications</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1413880148000</creationDate>
   <date>1413987071000</date>
   <contentUpdateDate>1413906654000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <class>
     <name>PanelsCode.ApplicationsPanelBlackListClass</name>
     <customClass/>
@@ -60,10 +62,6 @@
     </applicationId>
   </class>
   <object>
-    <name>PanelsCode.ApplicationsPanelBlackListClass</name>
-    <number>0</number>
-    <className>XWiki.DocumentSheetBinding</className>
-    <guid>d42506ea-9cac-45e0-96bb-3c7ef2d9ec5a</guid>
     <class>
       <name>XWiki.DocumentSheetBinding</name>
       <customClass/>
@@ -87,8 +85,13 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </sheet>
     </class>
+    <name>PanelsCode.ApplicationsPanelBlackListClass</name>
+    <number>0</number>
+    <className>XWiki.DocumentSheetBinding</className>
+    <guid>d42506ea-9cac-45e0-96bb-3c7ef2d9ec5a</guid>
     <property>
       <sheet>XWiki.ClassSheet</sheet>
     </property>
   </object>
+  <content/>
 </xwikidoc>

@@ -239,6 +239,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>puretext</contenttype>
         <disabled>0</disabled>
         <name>code</name>
         <number>2</number>
@@ -488,6 +489,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>puretext</contenttype>
         <disabled>0</disabled>
         <name>code</name>
         <number>2</number>

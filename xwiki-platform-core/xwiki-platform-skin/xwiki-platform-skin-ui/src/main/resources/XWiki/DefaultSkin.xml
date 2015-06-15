@@ -20,31 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>XWiki</web>
   <name>DefaultSkin</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1167576476000</creationDate>
   <parent>XWiki.XWikiPreferences</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1167576476000</creationDate>
   <date>1167576476000</date>
   <contentUpdateDate>1167576476000</contentUpdateDate>
   <version>1.1</version>
   <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <object>
-    <name>XWiki.DefaultSkin</name>
-    <number>0</number>
-    <className>XWiki.XWikiSkins</className>
-    <guid>c52655e2-0fae-4b2c-8508-378d1c1fb4ac</guid>
     <class>
       <name>XWiki.XWikiSkins</name>
       <customClass/>
@@ -138,22 +137,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
-      <outputSyntax>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>outputSyntax</name>
-        <number>10</number>
-        <prettyName>Output Syntax</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>html/5.0=HTML 5|xhtml/1.0=XHTML 1.0</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </outputSyntax>
       <style.css>
         <customDisplay/>
         <disabled>0</disabled>
@@ -200,6 +183,10 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </viewheader.vm>
     </class>
+    <name>XWiki.DefaultSkin</name>
+    <number>0</number>
+    <className>XWiki.XWikiSkins</className>
+    <guid>c52655e2-0fae-4b2c-8508-378d1c1fb4ac</guid>
     <property>
       <baseskin>flamingo</baseskin>
     </property>
@@ -228,4 +215,5 @@
       <viewheader.vm/>
     </property>
   </object>
+  <content/>
 </xwikidoc>

@@ -20,31 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>Stats</web>
   <name>AllTimeActivity</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1195803878000</creationDate>
   <parent>Stats.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1195803878000</creationDate>
   <date>1208532894000</date>
   <contentUpdateDate>1208532894000</contentUpdateDate>
   <version>1.1</version>
   <title>All Time Activity Panel</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <object>
-    <name>Stats.AllTimeActivity</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>40045a8c-8d84-40db-90d0-96850a7d93ef</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -56,7 +55,6 @@
       <validationScript/>
       <category>
         <cache>0</cache>
-        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>category</name>
@@ -71,18 +69,16 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </category>
       <content>
-        <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
         <number>4</number>
         <prettyName>Content</prettyName>
         <rows>25</rows>
-        <size>120</size>
+        <size>60</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
       <description>
-        <disabled>0</disabled>
         <editor>Text</editor>
         <name>description</name>
         <number>3</number>
@@ -93,7 +89,6 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </description>
       <name>
-        <disabled>0</disabled>
         <name>name</name>
         <number>1</number>
         <prettyName>Name</prettyName>
@@ -103,7 +98,6 @@
       </name>
       <type>
         <cache>0</cache>
-        <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>type</name>
@@ -118,6 +112,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
+    <name>Stats.AllTimeActivity</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
     <property>
       <category>Information</category>
     </property>
@@ -169,4 +166,5 @@
       <type>view</type>
     </property>
   </object>
+  <content/>
 </xwikidoc>

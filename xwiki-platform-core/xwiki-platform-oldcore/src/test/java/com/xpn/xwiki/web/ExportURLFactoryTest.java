@@ -40,7 +40,7 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
     private File tmpDir;
 
     /** The tested instance. */
-    private ExportURLFactory urlFactory = new ExportURLFactory();
+    private ExportURLFactory urlFactory;
 
     @Override
     protected void setUp() throws Exception
@@ -68,6 +68,7 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
         this.tmpDir.mkdirs();
         new File(this.tmpDir, "attachment").mkdir();
 
+        this.urlFactory = new ExportURLFactory();
         this.urlFactory.init(null, this.tmpDir, getContext());
     }
 

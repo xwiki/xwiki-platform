@@ -41,9 +41,9 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
 
-    private XWikiServletURLFactory urlFactory = new XWikiServletURLFactory();
+    private XWikiServletURLFactory urlFactory;
 
-    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
+    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<>();
 
     /**
      * Flag indicating if the request is secure. A request is secure if either its URL uses the HTTPS scheme or the
@@ -55,11 +55,16 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     private boolean secure;
 
     /**
+     * Tests requiring to control the "usedefaultweb" config property should set this class variable.
+     */
+    private boolean skipDefaultSpaceInURLs;
+
+    /**
      * The map of HTTP headers.
      * <p>
      * Tests can add values to this map to control the value returned by {@link XWikiRequest#getHeader(String)}.
      */
-    private final Map<String, String> httpHeaders = new HashMap<String, String>();
+    private final Map<String, String> httpHeaders = new HashMap<>();
 
     private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
     {
@@ -121,9 +126,28 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
             }
 
             @Override
+            public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context)
+                throws XWikiException
+            {
+                return XWikiServletURLFactoryTest.this.getDocument(doc.getDocumentReference());
+            }
+
+            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
+            }
+
+            @Override
+            public boolean skipDefaultSpaceInURLs(XWikiContext context)
+            {
+                return XWikiServletURLFactoryTest.this.skipDefaultSpaceInURLs;
+            }
+
+            @Override
+            public String getDefaultSpace(XWikiContext context)
+            {
+                return "DefaultSpace";
             }
         };
         xwiki.setDatabase(getContext().getWikiId());
@@ -159,6 +183,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
         getContext().setURL(new URL("http://127.0.0.1/xwiki/view/InitialSpace/InitialPage"));
 
+        this.urlFactory = new XWikiServletURLFactory();
         this.urlFactory.init(getContext());
     }
 
@@ -472,5 +497,50 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en"),
             urlFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
                 + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", getContext()));
+    }
+
+    public void testCreateURLWithNestedSpaces() throws Exception
+    {
+        URL url = this.urlFactory.createURL("Space1.Space2", "Page", getContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page"), url);
+    }
+
+    public void testCreateURLWhenDefaultSpaceIsSkipped() throws Exception
+    {
+        this.skipDefaultSpaceInURLs = true;
+        URL url = this.urlFactory.createURL("DefaultSpace", "Page", getContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/Page"), url);
+    }
+
+    public void testCreateURLWhenDefaultSpaceIsSkippedButDefaultSpaveDoesntMatch() throws Exception
+    {
+        this.skipDefaultSpaceInURLs = true;
+        URL url = this.urlFactory.createURL("NonDefaultSpace", "Page", getContext());
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/view/NonDefaultSpace/Page"), url);
+    }
+
+    public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsNotContextDoc() throws Exception
+    {
+        XWikiContext xwikiContext = getContext();
+        xwikiContext.put("rev", "1.0");
+        xwikiContext.setAction("viewrev");
+        xwikiContext.setDoc(new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage")));
+        URL url = this.urlFactory.createAttachmentURL("file", "space", "page", "viewrev", null, xwikiContext);
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/viewrev/space/page/file"), url);
+    }
+
+    public void testCreateAttachmentURLWhenViewRevAndRevSpecifiedAndIsContextDocAndAttachmentDoesntExist()
+        throws Exception
+    {
+        XWikiContext xwikiContext = getContext();
+        xwikiContext.put("rev", "1.0");
+        xwikiContext.setAction("viewrev");
+        XWikiDocument document = new XWikiDocument(new DocumentReference("currentwiki", "currentspace", "currentpage"));
+        saveDocument(document);
+        xwikiContext.setDoc(document);
+        xwikiContext.setWikiId("currentwiki");
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "viewrev", null,
+            xwikiContext);
+        assertEquals(new URL("http://127.0.0.1/xwiki/bin/viewattachrev/currentspace/currentpage/file"), url);
     }
 }

@@ -27,6 +27,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,6 +44,9 @@ import com.xpn.xwiki.util.Util;
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
+
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver =
+        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
     /**
      * This is the URL which was requested by the user possibly with the host modified if x-forwarded-host header is set
@@ -222,7 +230,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, spaces, action, context);
+        addSpaces(newpath, spaces, action, context);
         addName(newpath, name, action, context);
 
         if (!StringUtils.isEmpty(querystring)) {
@@ -266,17 +274,37 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    private void addSpace(StringBuffer newpath, String space, String action, XWikiContext context)
+    /**
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
+     */
+    private void addSpaces(StringBuffer newpath, String spaces, String action, XWikiContext context)
     {
-        boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
-        if (skipDefaultSpace) {
-            String defaultSpace = context.getWiki().getDefaultSpace(context);
-            skipDefaultSpace = (space.equals(defaultSpace)) && ("view".equals(action));
+        // Parse the spaces list into Space References
+        EntityReference spaceReference = this.relativeEntityReferenceResolver.resolve(spaces, EntityType.SPACE);
+
+        // Skip outputting the default space is the proper config parameter has been set AND there's only a single
+        // space (the concept doesn't work with multiple spaces)
+        if (spaceReference.getParent() == null) {
+            boolean skipDefaultSpace = context.getWiki().skipDefaultSpaceInURLs(context);
+            if (skipDefaultSpace) {
+                String defaultSpace = context.getWiki().getDefaultSpace(context);
+                skipDefaultSpace = (spaceReference.getName().equals(defaultSpace)) && ("view".equals(action));
+            }
+            if (!skipDefaultSpace) {
+                appendSpacePathSegment(newpath, spaceReference, context);
+            }
+        } else {
+            for (EntityReference reference : spaceReference.getReversedReferenceChain()) {
+                appendSpacePathSegment(newpath, reference, context);
+            }
         }
-        if (!skipDefaultSpace) {
-            newpath.append(encode(space, context));
-            newpath.append("/");
-        }
+    }
+
+    private void appendSpacePathSegment(StringBuffer newpath, EntityReference spaceReference, XWikiContext context)
+    {
+        newpath.append(encode(spaceReference.getName(), context));
+        newpath.append('/');
     }
 
     private void addName(StringBuffer newpath, String name, String action, XWikiContext context)
@@ -336,7 +364,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, "skin", context);
-        addSpace(newpath, spaces, "skin", context);
+        addSpaces(newpath, spaces, "skin", context);
         addName(newpath, name, "skin", context);
         addFileName(newpath, filename, false, context);
         try {
@@ -405,7 +433,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, spaces, action, context);
+        addSpaces(newpath, spaces, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 
@@ -426,21 +454,26 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * since only attachments of the context document should also be versioned.
      *
      * @param wiki the wiki name of the document to check
-     * @param space the space name of the document to check
+     * @param spaces the space names of the document to check
      * @param name the document name of the document to check
      * @param context the current request context
      * @return {@code true} if the provided document is the same as the current context document, {@code false}
      *         otherwise
      */
-    protected boolean isContextDoc(String wiki, String space, String name, XWikiContext context)
+    protected boolean isContextDoc(String wiki, String spaces, String name, XWikiContext context)
     {
         if (context == null || context.getDoc() == null) {
             return false;
         }
-        XWikiDocument doc = context.getDoc();
-        return doc.getDocumentReference().getLastSpaceReference().getName().equals(space)
-            && doc.getDocumentReference().getName().equals(name)
-            && (wiki == null || doc.getDocumentReference().getWikiReference().getName().equals(wiki));
+
+        // Use the local serializer so that we don't serialize the wiki part since all we want to do is compare the
+        // passed spaces represented as a String with the current doc's spaces.
+        EntityReferenceSerializer<String> serializer =
+            Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        DocumentReference currentDocumentReference = context.getDoc().getDocumentReference();
+        return serializer.serialize(currentDocumentReference.getLastSpaceReference()).equals(spaces)
+            && currentDocumentReference.getName().equals(name)
+            && (wiki == null || currentDocumentReference.getWikiReference().getName().equals(wiki));
     }
 
     @Override
@@ -457,7 +490,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
-        addSpace(newpath, spaces, action, context);
+        addSpaces(newpath, spaces, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 

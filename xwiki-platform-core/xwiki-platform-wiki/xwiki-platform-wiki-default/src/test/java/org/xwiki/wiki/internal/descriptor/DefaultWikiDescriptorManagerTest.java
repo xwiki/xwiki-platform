@@ -85,8 +85,7 @@ public class DefaultWikiDescriptorManagerTest
     public void setUp() throws Exception
     {
         // Injection
-        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
-
+        xcontextProvider = mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);

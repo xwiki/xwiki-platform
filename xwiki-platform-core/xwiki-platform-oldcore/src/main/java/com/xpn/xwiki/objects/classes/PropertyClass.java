@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 

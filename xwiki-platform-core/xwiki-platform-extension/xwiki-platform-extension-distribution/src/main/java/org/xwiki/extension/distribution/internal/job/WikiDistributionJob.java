@@ -29,9 +29,11 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
+import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -47,13 +49,24 @@ public class WikiDistributionJob extends AbstractDistributionJob<DistributionReq
     {
         List<DistributionStep> steps = new ArrayList<DistributionStep>(3);
 
-        // Step 1: Install/upgrade main wiki UI
-
-        try {
-            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
-                FlavorDistributionStep.ID));
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get default UI step instance");
+        // Step 1: Install/upgrade the wiki UI
+        ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
+        if (wikiUI != null && StringUtils.isNotBlank(wikiUI.getId())) {
+            // ... but only if the wiki extension ID is defined
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        DefaultUIDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get default UI step instance");
+            }
+        } else {
+            // Display the wikis flavor step
+            try {
+                steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                        FlavorDistributionStep.ID));
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to get the flavor step instance");
+            }
         }
 
         // Step 2: Upgrade outdated extensions

@@ -29,6 +29,7 @@ import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.platform.flavor.FlavorManager;
+import org.xwiki.platform.flavor.FlavorManagerException;
 import org.xwiki.platform.flavor.FlavorQuery;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -78,11 +79,16 @@ public class FlavorManagerScriptService implements ScriptService
     /**
      * Get all flavors matching a query.
      * @param query query to execute
-     * @return flavors matching the query
+     * @return flavors matching the query or null if problem occurs
      */
     public IterableResult<Extension> getFlavors(FlavorQuery query)
     {
-        return flavorManager.getFlavors(query);
+        try {
+            return flavorManager.getFlavors(query);
+        } catch (FlavorManagerException e) {
+            setLastError(e);
+            return null;
+        }
     }
 
     /**

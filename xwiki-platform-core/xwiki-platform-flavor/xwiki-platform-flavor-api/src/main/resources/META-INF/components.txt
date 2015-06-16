@@ -1,2 +1,3 @@
 org.xwiki.platform.flavor.internal.DefaultFlavorManager
+org.xwiki.platform.flavor.internal.WhiteListFlavorFilter
 org.xwiki.platform.flavor.script.FlavorManagerScriptService

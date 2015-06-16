@@ -20,32 +20,28 @@
 package org.xwiki.platform.flavor;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.repository.result.IterableResult;
 
 /**
- * Find the flavors into the repositories, applying filters according to the configuration.
+ * Component that filter the flavors the user can install.
  *  
+ * @since 7.2M1  
  * @version $Id$
- * @since 7.1M2 
  */
 @Role
-public interface FlavorManager
+public interface FlavorFilter
 {
     /**
-     * Get all flavors matching a query.
-     * @param query query to execute
-     * @return flavors matching the query
-     * @throws FlavorManagerException if a problem occurs
+     * @param flavor the flavor to test.
+     * @return wether or not the user is authorized to install the flavor
+     * @throws FlavorManagerException if problem occur 
      */
-    IterableResult<Extension> getFlavors(FlavorQuery query) throws FlavorManagerException;
+    boolean isFlavorAuthorized(ExtensionId flavor) throws FlavorManagerException;
 
     /**
-     * Get the flavor installed on a given wiki.
-     * @param wikiId id of the wiki
-     * @return the id of the flavor installed on the given wiki or null if there is no flavor installed
+     * Add a filter to the query to only find the authorized flavors.
+     * @param flavorQuery the query where the filters will be added
+     * @throws FlavorManagerException if problem occur
      */
-    ExtensionId getFlavorOfWiki(String wikiId);
-
+    void addFilterToQuery(FlavorQuery flavorQuery) throws FlavorManagerException;
 }

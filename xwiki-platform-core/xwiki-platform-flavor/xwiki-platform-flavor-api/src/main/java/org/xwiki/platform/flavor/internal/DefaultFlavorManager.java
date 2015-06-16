@@ -21,11 +21,14 @@ package org.xwiki.platform.flavor.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
@@ -34,7 +37,9 @@ import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.platform.flavor.FlavorFilter;
 import org.xwiki.platform.flavor.FlavorManager;
+import org.xwiki.platform.flavor.FlavorManagerException;
 import org.xwiki.platform.flavor.FlavorQuery;
 
 /**
@@ -55,11 +60,23 @@ public class DefaultFlavorManager implements FlavorManager
     
     @Inject
     private ConfigurationSource configurationSource;
+    
+    @Inject
+    private ComponentManager componentManager;
 
     @Override
-    public IterableResult<Extension> getFlavors(FlavorQuery query)
+    public IterableResult<Extension> getFlavors(FlavorQuery query) throws FlavorManagerException
     {
-        return extensionRepositoryManager.search(query);
+        // Apply the flavor filters to the query
+        try {
+            List<FlavorFilter> filters = componentManager.getInstanceList(FlavorFilter.class);
+            for (FlavorFilter filter : filters) {
+                filter.addFilterToQuery(query);
+            }
+            return extensionRepositoryManager.search(query);
+        } catch (ComponentLookupException e) {
+            throw new FlavorManagerException("Failed to get the flavor filters.", e);
+        }
     }
 
     @Override

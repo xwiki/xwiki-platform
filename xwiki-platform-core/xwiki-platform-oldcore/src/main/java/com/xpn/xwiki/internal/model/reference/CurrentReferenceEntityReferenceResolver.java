@@ -32,7 +32,7 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 /**
  * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
  * parents filled in). The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider}.
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider}.
  *
  * @version $Id$
  * @since 2.2M1

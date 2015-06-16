@@ -68,4 +68,10 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
         Assert.assertEquals(CURRENT_WIKI, reference.getParent().getParent().getParent().getName());
         Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getParent().getType());
     }
+
+    @Test
+    public void testResolveDocumentFromObjectReference()
+    {
+        
+    }
 }

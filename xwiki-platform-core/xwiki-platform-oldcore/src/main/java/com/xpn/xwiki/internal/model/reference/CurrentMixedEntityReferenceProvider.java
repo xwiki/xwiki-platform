@@ -29,7 +29,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 
 /**
- * The behavior is the same as for {@link CurrentEntityReferenceValueProvider} but with the following differences:
+ * The behavior is the same as for {@link CurrentEntityReferenceProvider} but with the following differences:
  * <ul>
  * <li>if the passed reference doesn't have a page name specified (or if it's empty) the value used is the default page
  * name (instead of the page name of the current document's reference).</li>

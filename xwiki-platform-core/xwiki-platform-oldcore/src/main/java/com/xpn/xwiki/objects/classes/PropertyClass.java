@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.template.Template;
+import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -730,15 +732,12 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             }
 
             // Look in templates
-            String template = "displayer_" + propertyClassName + ".vm";
-            String result = "";
-            try {
-                result = context.getWiki().evaluateTemplate(template, context);
-                if (StringUtils.isNotEmpty(result)) {
-                    LOGGER.debug("Found default custom displayer for property class name as template: [{}]", template);
-                    return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + template;
-                }
-            } catch (IOException e) {
+            String templateName = "displayer_" + propertyClassName + ".vm";
+            TemplateManager templateManager = Utils.getComponent(TemplateManager.class);
+            Template existingTemplate = templateManager.getTemplate(templateName);
+            if (existingTemplate != null) {
+                LOGGER.debug("Found default custom displayer for property class name as template: [{}]", templateName);
+                return TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX + templateName;
             }
         } catch (Throwable e) {
             // If we fail we consider there is no custom displayer

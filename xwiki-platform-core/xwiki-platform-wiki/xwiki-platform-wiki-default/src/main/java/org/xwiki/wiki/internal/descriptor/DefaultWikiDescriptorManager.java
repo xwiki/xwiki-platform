@@ -61,7 +61,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     private WikiDescriptorCache cache;
 
     @Inject
-    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
+    private Provider<WikiDescriptorDocumentHelper> descriptorDocumentHelperProvider;
 
     @Inject
     private WikiDescriptorBuilder wikiDescriptorBuilder;
@@ -100,7 +100,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         if (wikiIds == null) {
             List<String> documentNames;
             try {
-                documentNames = this.descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
+                documentNames = this.descriptorDocumentHelperProvider.get().getAllXWikiServerClassDocumentNames();
             } catch (Exception e) {
                 throw new WikiManagerException("Failed to get wiki ids", e);
             }
@@ -112,7 +112,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             XWikiContext xcontext = this.xcontextProvider.get();
 
             for (String documentName : documentNames) {
-                String wikId = this.descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
+                String wikId = this.descriptorDocumentHelperProvider.get().getWikiIdFromDocumentFullname(documentName);
 
                 wikiIds.add(wikId);
 
@@ -143,7 +143,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // Note that In order for performance to be maximum it also means we need to have a cache size at least as
         // large as the max # of wikis being used at once.
         if (descriptor == null) {
-            XWikiDocument document = descriptorDocumentHelper.findXWikiServerClassDocument(wikiAlias);
+            XWikiDocument document = descriptorDocumentHelperProvider.get().findXWikiServerClassDocument(wikiAlias);
             if (document != null) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
@@ -165,7 +165,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
-            XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+            XWikiDocument document = descriptorDocumentHelperProvider.get().getDocumentFromWikiId(wikiId);
 
             if (!document.isNew()) {
                 // Build the descriptor

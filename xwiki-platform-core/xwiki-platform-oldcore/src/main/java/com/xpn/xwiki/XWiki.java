@@ -414,6 +414,10 @@ public class XWiki implements EventListener
 
     private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
+    private EntityReferenceResolver<EntityReference> currentReferenceEntityReferenceResolver;
+
+    private DocumentReferenceResolver<EntityReference> defaultReferenceDocumentReferenceResolver;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -548,6 +552,26 @@ public class XWiki implements EventListener
         }
 
         return this.defaultDocumentReferenceProvider;
+    }
+
+    private EntityReferenceResolver<EntityReference> getCurrentReferenceEntityReferenceResolver()
+    {
+        if (this.currentReferenceEntityReferenceResolver == null) {
+            this.currentReferenceEntityReferenceResolver = Utils.getComponent(
+                EntityReferenceResolver.TYPE_REFERENCE, "current");
+        }
+
+        return this.currentReferenceEntityReferenceResolver;
+    }
+
+    private DocumentReferenceResolver<EntityReference> getDefaultReferenceDocumentReferenceResolver()
+    {
+        if (this.defaultReferenceDocumentReferenceResolver == null) {
+            this.defaultReferenceDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE);
+        }
+
+        return this.defaultReferenceDocumentReferenceResolver;
     }
 
     private DocumentReference getDefaultDocumentReference()
@@ -1500,12 +1524,44 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Loads a XWikiDocument from the store.
+     * <p>
+     * Before 7.2M1 the reference is assumed to be a complete or incomplete document reference.
+     * <p>
+     * Since 7.2M1, the passed reference can be anything. If if a document child, the document reference will be
+     * extracted from it. If it's a document parent it will be completed with the necessary default references (for
+     * example if it's a space reference it will load the space home page).
+     * 
      * @since 5.0M1
      */
     @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
-        return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);
+        DocumentReference documentReference;
+
+        if (reference instanceof DocumentReference) {
+            documentReference = (DocumentReference) reference;
+        } else if (reference.getType() == EntityType.DOCUMENT) {
+            documentReference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
+        } else {
+            // Get complete current reference
+            EntityReference completeReference =
+                getCurrentReferenceEntityReferenceResolver().resolve(reference, reference.getType());
+
+            // Try to extract document reference
+
+            EntityReference extractedReference = reference.extractReference(EntityType.DOCUMENT);
+            if (extractedReference != null) {
+                return getDocument(extractedReference, context);
+            }
+
+            // If it does not contain a document reference then it's probably a document parent
+
+            // Append necessary default references to it
+            documentReference = getDefaultReferenceDocumentReferenceResolver().resolve(completeReference);
+        }
+
+        return getDocument(documentReference, context);
     }
 
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException

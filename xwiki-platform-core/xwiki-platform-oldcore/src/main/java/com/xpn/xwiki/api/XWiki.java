@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -185,7 +186,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Loads an Document from the database. Rights are checked before sending back the document.
+     * Loads a Document from the database. Rights are checked before sending back the document.
      *
      * @param reference the reference of the XWiki document to be loaded
      * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
@@ -207,6 +208,38 @@ public class XWiki extends Api
         } catch (Exception ex) {
             LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
             return new Document(new XWikiDocument(reference), getXWikiContext());
+        }
+    }
+
+    /**
+     * Loads a Document from the store. Rights are checked before sending back the document.
+     * <p>
+     * Before 7.2M1 the reference is assumed to be a complete or incomplete document reference.
+     * <p>
+     * Since 7.2M1, the passed reference can be anything. If if a document child, the document reference will be
+     * extracted from it. If it's a document parent it will be completed with the necessary default references (for
+     * example if it's a space reference it will load the space home page).
+     *
+     * @param reference the reference close to the XWiki document to be loaded
+     * @return a Document object (if the document couldn't be found a new one is created in memory - but not saved, you
+     *         can check whether it's a new document or not by using {@link com.xpn.xwiki.api.Document#isNew()}
+     * @throws XWikiException
+     * @since 7.1M2
+     */
+    public Document getDocument(EntityReference reference) throws XWikiException
+    {
+        try {
+            XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
+                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+                return null;
+            }
+
+            Document newdoc = doc.newDocument(getXWikiContext());
+            return newdoc;
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to access document " + reference + ": " + ex.getMessage());
+            return new Document(new XWikiDocument((DocumentReference) reference), getXWikiContext());
         }
     }
 

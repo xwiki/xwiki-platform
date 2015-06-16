@@ -37,6 +37,7 @@ com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerialize
 com.xpn.xwiki.internal.model.reference.CurrentDocumentReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider
+com.xpn.xwiki.internal.model.reference.CurrentGetDocumentReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceValueProvider
 com.xpn.xwiki.internal.model.reference.CurrentMixedReferenceEntityReferenceResolver

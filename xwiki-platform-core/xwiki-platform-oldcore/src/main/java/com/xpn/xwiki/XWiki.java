@@ -414,6 +414,8 @@ public class XWiki implements EventListener
 
     private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
+    private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -479,12 +481,8 @@ public class XWiki implements EventListener
 
     private MutableRenderingContext getMutableRenderingContext()
     {
-        if (this.renderingContext == null) {
-            this.renderingContext = Utils.getComponent(RenderingContext.class);
-        }
-
-        return this.renderingContext instanceof MutableRenderingContext
-            ? (MutableRenderingContext) this.renderingContext : null;
+        return getRenderingContext() instanceof MutableRenderingContext
+            ? (MutableRenderingContext) getRenderingContext() : null;
     }
 
     private ObservationManager getObservationManager()
@@ -548,6 +546,16 @@ public class XWiki implements EventListener
         }
 
         return this.defaultDocumentReferenceProvider;
+    }
+
+    private DocumentReferenceResolver<EntityReference> getCurrentGetDocumentResolver()
+    {
+        if (this.currentgetdocumentResolver == null) {
+            this.currentgetdocumentResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
+        }
+
+        return this.currentgetdocumentResolver;
     }
 
     private DocumentReference getDefaultDocumentReference()
@@ -1500,12 +1508,20 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Loads a XWikiDocument from the store.
+     * <p>
+     * Before 7.2M1 the reference is assumed to be a complete or incomplete document reference.
+     * <p>
+     * Since 7.2M1, the passed reference can be anything. If if a document child, the document reference will be
+     * extracted from it. If it's a document parent it will be completed with the necessary default references (for
+     * example if it's a space reference it will load the space home page).
+     * 
      * @since 5.0M1
      */
     @Unstable
     public XWikiDocument getDocument(EntityReference reference, XWikiContext context) throws XWikiException
     {
-        return getDocument(this.currentReferenceDocumentReferenceResolver.resolve(reference), context);
+        return getDocument(getCurrentGetDocumentResolver().resolve(reference), context);
     }
 
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException

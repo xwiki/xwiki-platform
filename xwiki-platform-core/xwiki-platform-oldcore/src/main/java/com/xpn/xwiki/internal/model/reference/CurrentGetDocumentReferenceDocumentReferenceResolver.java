@@ -33,29 +33,42 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
  * component to resolve {@link org.xwiki.model.reference.DocumentReference} objects from Entity Reference (when they
- * miss some parent references or have NULL values). The behavior is the one defined in
- * {@link com.xpn.xwiki.internal.model.reference.CurrentMixedEntityReferenceProvider}.
+ * miss some parent references or have NULL values).
+ * <p>
+ * The goal is to have the document that correspond the best to the passed reference (if a space then get the space home
+ * page, if a wiki then get the wiki home page, if an attachment then get the document where it's located, etc).
  *
  * @version $Id$
- * @since 2.3M1
+ * @since 7.2M1
  */
 @Component
-@Named("currentmixed")
+@Named("currentgetdocument")
 @Singleton
-public class CurrentMixedReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
+public class CurrentGetDocumentReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
     @Inject
-    @Named("currentmixed")
-    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
+    @Named("current")
+    private DocumentReferenceResolver<EntityReference> currentDocumentResolver;
+
+    @Inject
+    @Named("current")
+    private EntityReferenceResolver<EntityReference> currentResolver;
+
+    @Inject
+    private DocumentReferenceResolver<EntityReference> defaultResolver;
 
     @Override
-    public DocumentReference resolve(EntityReference documentReferenceRepresentation, Object... parameters)
+    public DocumentReference resolve(EntityReference initialReference, Object... parameters)
     {
-        if (documentReferenceRepresentation instanceof DocumentReference) {
-            return (DocumentReference) documentReferenceRepresentation;
-        }
+        if (initialReference.getType().ordinal() < EntityType.DOCUMENT.ordinal()) {
+            // Get the complete initial reference
+            EntityReference currentParentReference =
+                this.currentResolver.resolve(initialReference, initialReference.getType(), parameters);
 
-        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT, parameters));
+            // Resolve missing lower part as default (to get space home page and wiki home page)
+            return this.defaultResolver.resolve(currentParentReference, parameters);
+        } else {
+            return this.currentDocumentResolver.resolve(initialReference, parameters);
+        }
     }
 }

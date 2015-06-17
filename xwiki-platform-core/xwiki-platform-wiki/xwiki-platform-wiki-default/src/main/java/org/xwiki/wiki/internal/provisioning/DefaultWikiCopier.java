@@ -87,9 +87,8 @@ public class DefaultWikiCopier implements WikiCopier
 
                 DocumentReference origDocReference = documentReferenceResolver.resolve(documentFullName,
                         fromWikiReference);
-                DocumentReference newDocReference = new DocumentReference(toWikiId,
-                        origDocReference.getLastSpaceReference().getName(), origDocReference.getName());
-                
+                DocumentReference newDocReference = origDocReference.setWikiReference(new WikiReference(toWikiId));
+
                 logger.info("Copying document [{}] to [{}].", origDocReference, newDocReference);
                 xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
                 logger.info("Done copying document [{}] to [{}].", origDocReference, newDocReference);

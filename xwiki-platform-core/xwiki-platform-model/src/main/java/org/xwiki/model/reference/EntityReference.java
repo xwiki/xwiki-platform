@@ -34,7 +34,7 @@ import org.xwiki.model.internal.reference.LocalizedStringEntityReferenceSerializ
 
 /**
  * Represents a reference to an Entity (Document, Attachment, Space, Wiki, etc).
- *  
+ * 
  * @version $Id$
  * @since 2.2M1
  */
@@ -127,8 +127,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Create a new root EntityReference.
-     * Note: Entity reference are immutable since 3.3M2.
+     * Create a new root EntityReference. Note: Entity reference are immutable since 3.3M2.
      *
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
@@ -139,8 +138,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Create a new EntityReference.
-     * Note: Entity reference are immutable since 3.3M2.
+     * Create a new EntityReference. Note: Entity reference are immutable since 3.3M2.
      *
      * @param name name for the newly created entity reference, could not be null.
      * @param type type for the newly created entity reference, could not be null.
@@ -154,8 +152,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Create a new EntityReference.
-     * Note: Entity reference are immutable since 3.3M2.
+     * Create a new EntityReference. Note: Entity reference are immutable since 3.3M2.
      *
      * @param name name for the newly created entity, could not be null.
      * @param type type for the newly created entity, could not be null.
@@ -174,6 +171,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
     /**
      * Entity reference are immutable since 3.3M2, so this method is now protected.
+     * 
      * @param name the name for this entity
      * @exception IllegalArgumentException if the passed name is null or empty
      */
@@ -186,9 +184,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Returns the name of this entity.
-     * This method is final to ensure that name is never null and we use the private field in all other methods of
-     * this implementation (faster).
+     * Returns the name of this entity. This method is final to ensure that name is never null and we use the private
+     * field in all other methods of this implementation (faster).
      *
      * @return the name of this entity.
      */
@@ -199,6 +196,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
     /**
      * Entity reference are immutable since 3.3M2, so this method is now protected.
+     * 
      * @param parent the parent for this entity, may be null for a root entity.
      */
     protected void setParent(EntityReference parent)
@@ -216,6 +214,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
     /**
      * Entity reference are immutable since 3.3M2, so this method is now protected.
+     * 
      * @param type the type for this entity
      * @exception IllegalArgumentException if the passed type is null
      */
@@ -228,9 +227,9 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Returns the type of this entity.
-     * This method is final to ensure that type is never null and we use the private field in all other methods of
-     * this implementation (faster).
+     * Returns the type of this entity. This method is final to ensure that type is never null and we use the private
+     * field in all other methods of this implementation (faster).
+     * 
      * @return the type of this entity
      */
     public final EntityType getType()
@@ -276,9 +275,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Get the value of a parameter. Return null if the parameter is not set.
-     * This method is final so there is no way to override the map, and the private field in all other methods of
-     * this implementation (faster).
+     * Get the value of a parameter. Return null if the parameter is not set. This method is final so there is no way to
+     * override the map, and the private field in all other methods of this implementation (faster).
      *
      * @param <T> the type of the value of the requested parameter
      * @param name the name of the parameter to get
@@ -300,7 +298,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      */
     final Map<String, Serializable> getParameters()
     {
-        return this.parameters == null ? Collections.<String, Serializable> emptyMap() : this.parameters;
+        return this.parameters == null ? Collections.<String, Serializable>emptyMap() : this.parameters;
     }
 
     /**
@@ -332,6 +330,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
 
     /**
      * Extract the entity of the given type from this one. This entity may be returned if it has the type requested.
+     * 
      * @param type the type of the entity to be extracted
      * @return the entity of the given type
      */
@@ -350,8 +349,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Return a clone of this reference, but with one of its parent replaced by another one.
      *
      * @param oldParent the old parent that will be replaced
-     * @param newParent the new parent that will replace oldParent in the chain. If the same as oldParent,
-     *                  this is returned.
+     * @param newParent the new parent that will replace oldParent in the chain. If the same as oldParent, this is
+     *            returned.
      * @return a new reference with a amended parent chain
      * @since 3.3M2
      */
@@ -366,8 +365,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     /**
      * Return a clone of this reference with a parent appended at the root of its parents chain.
      *
-     * @param newParent the parent that became the root parent of this reference (and its parent).
-     *                  If null, this is returned.
+     * @param newParent the parent that became the root parent of this reference (and its parent). If null, this is
+     *            returned.
      * @return a new reference with newParent added to its parent chain
      */
     public EntityReference appendParent(EntityReference newParent)
@@ -379,8 +378,8 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     }
 
     /**
-     * Return a clone of this reference truncated to a null parent when it reach the given parent.
-     * It is very similar to replaceParent(parent, null), except that it is not overridden.
+     * Return a clone of this reference truncated to a null parent when it reach the given parent. It is very similar to
+     * replaceParent(parent, null), except that it is not overridden.
      *
      * @param oldParent the parent that will be replaced by a null. If null, this is returned.
      * @return a new reference with oldParent and its descendant removed from its parent chain
@@ -421,15 +420,102 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
             && (parameters == null ? ref.parameters == null : parameters.equals(ref.parameters));
     }
 
+    /**
+     * Compared the two reference between the first reference and the last (including) <code>to</code> type of entity.
+     * <p>
+     * For example if you want to make sure some local document matches some complete document reference you can so it
+     * with localDocumentReference.equals(documentReference, EntityType.SPACE).
+     * 
+     * @param otherReference the reference to compare
+     * @param to the type of the the last (including) entity reference to compare
+     * @return true if the two references are equals between the passes entity types references
+     * @since 7.2M1
+     */
+    public boolean equals(EntityReference otherReference, EntityType to)
+    {
+        if (to == null) {
+            return equals(otherReference);
+        }
+
+        if (otherReference == this) {
+            return true;
+        }
+
+        if (otherReference == null) {
+            return false;
+        }
+
+        EntityReference currentReference1 = this;
+        EntityReference currentReference2 = otherReference;
+
+        while (currentReference1 != null && currentReference1.getType().ordinal() >= to.ordinal()) {
+            if (!currentReference1.equalsNonRecursive(currentReference2)) {
+                return false;
+            }
+
+            currentReference1 = currentReference1.getParent();
+            currentReference2 = currentReference2.getParent();
+        }
+
+        if (currentReference2 == null || currentReference2.getType().ordinal() < to.ordinal()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Compared the two reference between the first (including) <code>from</code> type of entity and the last
+     * (including) <code>to</code> type of entity.
+     * 
+     * @param otherReference the reference to compare
+     * @param from the type of the first (including) entity reference to compare
+     * @param to the type of the the last (including) entity reference to compare
+     * @return true if the two references are equals between the passes entity types references
+     * @since 7.2M1
+     */
+    public boolean equals(EntityReference otherReference, EntityType from, EntityType to)
+    {
+        if (otherReference == this) {
+            return true;
+        }
+
+        if (otherReference == null) {
+            return false;
+        }
+
+        EntityReference currentReference1 = from != null ? this.extractReference(from) : this;
+        EntityReference currentReference2 = from != null ? otherReference.extractReference(from) : otherReference;
+
+        return currentReference1.equals(currentReference2, to);
+    }
+
+    /**
+     * Same as {@link #equals(Object)} but only the first level of the references (ignore parents).
+     * 
+     * @param otherReference the reference to compare
+     * @return true if the two references are equals
+     * @since 7.2M1
+     */
+    public boolean equalsNonRecursive(EntityReference otherReference)
+    {
+        if (otherReference == this) {
+            return true;
+        }
+
+        if (otherReference == null) {
+            return false;
+        }
+
+        return name.equals(otherReference.name) && type.equals(otherReference.type)
+            && (parameters == null ? otherReference.parameters == null : parameters.equals(otherReference.parameters));
+    }
+
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(3, 17)
-            .append(getName())
-            .append(getType())
-            .append(getParent())
-            .append(this.parameters)
-            .toHashCode();
+        return new HashCodeBuilder(3, 17).append(getName()).append(getType()).append(getParent())
+            .append(this.parameters).toHashCode();
     }
 
     @Override

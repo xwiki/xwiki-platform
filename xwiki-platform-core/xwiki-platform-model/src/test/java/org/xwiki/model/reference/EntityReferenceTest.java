@@ -31,10 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertFalse;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link EntityReference}.
@@ -173,6 +176,49 @@ public class EntityReferenceTest
         Assert.assertFalse(reference7.equals(reference9));
         Assert.assertFalse(reference1.equals(reference10));
         Assert.assertFalse(reference7.equals(reference10));
+    }
+
+    @Test
+    public void testEqualsTo()
+    {
+        EntityReference documentReference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+
+        EntityReference localdocumentReference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE));
+
+        assertTrue(localdocumentReference.equals(documentReference, EntityType.SPACE));
+        assertTrue(documentReference.equals(localdocumentReference, EntityType.SPACE));
+    }
+
+    @Test
+    public void testEqualsFromTo()
+    {
+        EntityReference documentReference =
+            new EntityReference("page1", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+
+        EntityReference spaceReference =
+            new EntityReference("space", EntityType.SPACE, new EntityReference("wiki2", EntityType.WIKI));
+
+        assertTrue(spaceReference.equals(documentReference, EntityType.SPACE, EntityType.SPACE));
+        assertTrue(documentReference.equals(spaceReference, EntityType.SPACE, EntityType.SPACE));
+    }
+
+    @Test
+    public void testEqualsNonRecursive()
+    {
+        EntityReference documentReference1 =
+            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        EntityReference documentReference2 =
+            new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space2", EntityType.SPACE,
+                new EntityReference("wiki2", EntityType.WIKI)));
+
+        assertTrue(documentReference1.equalsNonRecursive(documentReference2));
+
+        assertFalse(documentReference1.getParent().equalsNonRecursive(documentReference2.getParent()));
     }
 
     @Test

@@ -34,6 +34,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -206,8 +207,7 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
      */
     private void deliverUpdateEvent(DocumentReference ref)
     {
-        if (ref.getName().equals(XWikiConstants.WIKI_DOC)
-            && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)) {
+        if (XWikiConstants.WIKI_DOC_REFERENCE.equals(ref, EntityType.SPACE)) {
             // For XWiki.XWikiPreferences, remove the whole wiki.
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getWikiReference()));
         } else if (ref.getName().equals(XWikiConstants.SPACE_DOC)) {
@@ -216,8 +216,10 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
         } else {
             // For any other documents, remove that document cache.
             securityCache.remove(securityReferenceFactory.newEntityReference(ref));
+
+            // If it's a wiki descriptor remove the wiki reference from the cache
             if (ref.getName().startsWith(XWikiConstants.WIKI_DESCRIPTOR_PREFIX)
-                && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)
+                && XWikiConstants.XWIKI_SPACE_REFERENCE.equals(ref.getLastSpaceReference(), EntityType.SPACE)
                 && ref.getWikiReference().getName().equals(this.xcontextProvider.get().getMainXWiki())) {
                 // For xwiki:XWiki.XWikiServer... documents, also remove the whole corresponding wiki.
                 securityCache.remove(securityReferenceFactory.newEntityReference(new WikiReference(ref.getName()

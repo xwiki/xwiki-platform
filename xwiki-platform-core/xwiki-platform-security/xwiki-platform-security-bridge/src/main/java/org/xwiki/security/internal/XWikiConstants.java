@@ -21,6 +21,7 @@ package org.xwiki.security.internal;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * This class contains constants for accessing various xwiki elements.
@@ -33,6 +34,9 @@ public interface XWikiConstants
     /** Name of the space where user document and global preferences is stored. */
     String XWIKI_SPACE = "XWiki";
 
+    /** Name of document where wiki rights are stored. */
+    String WIKI_DOC = "XWikiPreferences";
+
     /**
      * Relative reference of the space where user document and global preferences is stored.
      * 
@@ -40,8 +44,12 @@ public interface XWikiConstants
      */
     EntityReference XWIKI_SPACE_REFERENCE = new EntityReference(XWIKI_SPACE, EntityType.SPACE);
 
-    /** Name of document where wiki rights are stored. */
-    String WIKI_DOC = "XWikiPreferences";
+    /**
+     * XWiki.XWikiPreferences reference.
+     * 
+     * @since 7.2M1
+     */
+    LocalDocumentReference WIKI_DOC_REFERENCE = new LocalDocumentReference(XWIKI_SPACE, WIKI_DOC);
 
     /** Name of document where space rights are stored. */
     String SPACE_DOC = "WebPreferences";

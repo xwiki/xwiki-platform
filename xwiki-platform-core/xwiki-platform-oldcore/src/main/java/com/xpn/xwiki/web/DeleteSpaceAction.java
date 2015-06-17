@@ -25,12 +25,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.QueryException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
@@ -52,19 +53,16 @@ public class DeleteSpaceAction extends XWikiAction
     /** Confirm parameter name. */
     private static final String CONFIRM_PARAM = "confirm";
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
-        String wiki = context.getDoc().getDocumentReference().getWikiReference().getName();
-        String space = context.getDoc().getDocumentReference().getLastSpaceReference().getName();
-        EntityReferenceResolver<String> nameResolver =
-            Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
+
+        XWikiDocument document = context.getDoc();
+        SpaceReference spaceReference = document.getDocumentReference().getLastSpaceReference();
+
         boolean redirected = false;
         // If confirm=1 then delete the space. If not, the render action will go to the "deletespace" template asking
         // for user confirmation. The "deletespace" template will then call the /deletespace/ action again with
@@ -77,7 +75,7 @@ public class DeleteSpaceAction extends XWikiAction
             return false;
         }
 
-        List<String> documentsInSpace = getDocumentsInSpace(space, xwiki.getStore());
+        List<String> documentsInSpace = getDocumentsInSpace(document.getSpace(), xwiki.getStore());
         if (documentsInSpace.isEmpty()) {
             // Redirect the user to the view template so that he gets the "document doesn't exist" box.
             sendRedirect(response, Utils.getRedirect("view", context));
@@ -85,7 +83,7 @@ public class DeleteSpaceAction extends XWikiAction
         } else {
             // Delete to recycle bin
             for (String docName : documentsInSpace) {
-                DocumentReference docReference = new DocumentReference(wiki, space, docName);
+                DocumentReference docReference = new DocumentReference(docName, spaceReference);
                 xwiki.deleteAllDocuments(xwiki.getDocument(docReference, context), context);
             }
         }
@@ -101,9 +99,6 @@ public class DeleteSpaceAction extends XWikiAction
         return !redirected;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -116,23 +111,24 @@ public class DeleteSpaceAction extends XWikiAction
     }
 
     /**
-     * @param space the space to get documents from
+     * @param spaceField the value to match in the database <code>space</code> field
      * @param store the store implementation to use
      * @return the list of documents (even hidden ones) located in the passed space
      */
-    private List<String> getDocumentsInSpace(String space, XWikiStoreInterface store)
+    private List<String> getDocumentsInSpace(String spaceField, XWikiStoreInterface store)
     {
         List<String> results;
         try {
             // Note: We're not using the "hidden" filter since we want to be able to remove all pages even if there are
             // only hidden documents.
             results = store.getQueryManager().getNamedQuery("getSpaceDocsName")
-                .bindValue(SPACE_BIND_NAME, space)
+                .bindValue(SPACE_BIND_NAME, spaceField)
                 .execute();
         } catch (QueryException e) {
-            LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]: [{}]", space,
+            LOGGER.warn("Failed to get the list of documents while trying to delete space [{}]: [{}]", spaceField,
                 e.getMessage());
-            results = Collections.EMPTY_LIST;
+
+            results = Collections.emptyList();
         }
 
         return results;

@@ -112,7 +112,7 @@ public class AttachMacro extends BaseLocaleMacro
                     doc = (XWikiDocument) xcontext.get("sdoc");
                 }
             } else {
-                doc = xcontext.getWiki().getDocument(xcontext.getDoc().getSpace(), document, xcontext);
+                doc = xcontext.getWiki().getDocument(document, xcontext);
             }
         } catch (Exception ex) {
             // NullPointer or ClassCast

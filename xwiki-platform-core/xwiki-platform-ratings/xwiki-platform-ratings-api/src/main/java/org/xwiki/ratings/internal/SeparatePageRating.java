@@ -23,6 +23,7 @@ import java.util.Date;
 
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
@@ -246,16 +247,25 @@ public class SeparatePageRating implements Rating
         XWikiDocument doc = context.getWiki().getDocument(documentRef, context);
         String ratingsSpace = ratingsManager.getRatingsSpaceName(documentRef);
         String pageSufix = "R";
+
         boolean hasRatingsSpaceForeachSpace = ratingsManager.hasRatingsSpaceForeachSpace(documentRef);
+
+        SpaceReference spaceReference = doc.getDocumentReference().getLastSpaceReference();
+        spaceReference.replaceParent(spaceReference.getWikiReference(), this.context.getWikiReference());
+
         if (hasRatingsSpaceForeachSpace) {
-            return new DocumentReference(context.getWikiId(), doc.getSpace() + ratingsSpace, getUniquePageName(
-                ratingsSpace, doc.getName(), pageSufix, true));
+            spaceReference = new SpaceReference(spaceReference.getName() + ratingsSpace, spaceReference.getParent());
+            String uniqueName = getUniquePageName(ratingsSpace, doc.getName(), pageSufix, true);
+
+            return new DocumentReference(uniqueName, spaceReference);
         } else if (ratingsSpace == null) {
-            return new DocumentReference(context.getWikiId(), doc.getSpace(), getUniquePageName(doc.getSpace(),
-                doc.getName() + pageSufix, "", true));
+            String uniqueName = getUniquePageName(doc.getSpace(), doc.getName() + pageSufix, "", true);
+
+            return new DocumentReference(uniqueName, spaceReference);
         } else {
-            return new DocumentReference(context.getWikiId(), ratingsSpace, getUniquePageName(ratingsSpace,
-                doc.getSpace() + "_" + doc.getName(), pageSufix, true));
+            String uniqueName = getUniquePageName(ratingsSpace, doc.getSpace() + "_" + doc.getName(), pageSufix, true);
+
+            return new DocumentReference(context.getWikiId(), ratingsSpace, uniqueName);
         }
     }
 

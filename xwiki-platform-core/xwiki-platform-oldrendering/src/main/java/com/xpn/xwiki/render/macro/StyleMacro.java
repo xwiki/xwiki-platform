@@ -84,9 +84,10 @@ public class StyleMacro extends BaseLocaleMacro
             }
             try {
                 if (space.equals("")) {
-                    space = xcontext.getDoc().getSpace();
+                    doc = xcontext.getWiki().getDocument(document, xcontext);
+                } else {
+                    doc = xcontext.getWiki().getDocument(space, document, xcontext);
                 }
-                doc = xcontext.getWiki().getDocument(space, document, xcontext);
             } catch (XWikiException e) {
                 // NullPointer or ClassCast
             }

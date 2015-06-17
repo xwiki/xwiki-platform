@@ -931,6 +931,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
      *
      * @return the name of the space of the document
+     * @see #getSpace()
      * @deprecated use {@link #getDocumentReference()} instead
      */
     @Deprecated

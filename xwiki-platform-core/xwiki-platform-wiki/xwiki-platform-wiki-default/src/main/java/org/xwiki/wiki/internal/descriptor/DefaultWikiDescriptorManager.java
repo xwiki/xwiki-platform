@@ -64,7 +64,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     private Provider<WikiDescriptorDocumentHelper> descriptorDocumentHelperProvider;
 
     @Inject
-    private WikiDescriptorBuilder wikiDescriptorBuilder;
+    private Provider<WikiDescriptorBuilder> wikiDescriptorBuilderProvider;
 
     @Override
     public Collection<WikiDescriptor> getAll() throws WikiManagerException
@@ -194,7 +194,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     public void saveDescriptor(WikiDescriptor descriptor) throws WikiManagerException
     {
         try {
-            wikiDescriptorBuilder.save(descriptor);
+            this.wikiDescriptorBuilderProvider.get().save(descriptor);
         } catch (WikiDescriptorBuilderException e) {
             throw new WikiManagerException(
                 String.format("Unable to save wiki descriptor for [%s].", descriptor.getId()), e);
@@ -234,7 +234,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         DefaultWikiDescriptor descriptor = null;
         List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
-            descriptor = wikiDescriptorBuilder.buildDescriptorObject(serverClassObjects, document);
+            descriptor = this.wikiDescriptorBuilderProvider.get().buildDescriptorObject(serverClassObjects, document);
             // Add to the cache
             if (descriptor != null) {
                 cache.add(descriptor);

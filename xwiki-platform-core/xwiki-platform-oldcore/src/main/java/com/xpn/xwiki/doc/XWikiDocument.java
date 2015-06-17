@@ -894,7 +894,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Return the full local space reference. For example a document located in subwiki <code>space11</code> of space
+     * Return the full local space reference. For example a document located in sub-space <code>space11</code> of space
      * <code>space1</code> will return <code>space1.space11</code>.
      * <p>
      * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.

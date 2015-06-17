@@ -47,6 +47,7 @@
   'showWikis': false,
   'showWikiPrettyName': true,
   'showSpaces': false,
+  'showSpaceAsDocument': false,
   'showDocumentTitle': true,
   'showAddDocument': false,
   'showTranslations': true,
@@ -240,7 +241,12 @@
 
 #macro (maybeAddSpaceNode $spaceReference $siblings $placeholder)
   #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $spaceReference))
-    #addSpaceNode($spaceReference $siblings)
+    #if ($docTreeConfig.showSpaceAsDocument &amp;&amp; !$docTreeConfig.showChildDocuments)
+      #set ($spaceHomePageRef = $services.model.resolveDocument('', 'default', $spaceReference))
+      #addDocumentNode($spaceHomePageRef $siblings)
+    #else
+      #addSpaceNode($spaceReference $siblings)
+    #end
   #elseif ($placeholder)
     #set ($discard = $siblings.add($placeholder))
   #end
@@ -249,8 +255,7 @@
 #macro (addSpaceNode $spaceReference $siblings)
   #set ($spaceId = $services.model.serialize($spaceReference, 'default'))
   #set ($spaceHomePageRef = $services.model.resolveDocument('', 'default', $spaceReference))
-  #set ($spacePrefsDocRef = $services.model.resolveDocument('WebPreferences', 'explicit', $spaceReference))
-  #set ($hasSpaceAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, $spacePrefsDocRef))
+  #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $spaceReference))
   #set ($discard = $siblings.add({
     'id': "space:$spaceId",
     'text': $spaceReference.name,
@@ -265,7 +270,7 @@
       'canRename': $hasSpaceAdmin,
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceHomePageRef, 'create', $NULL),
-      'deleteURL': $xwiki.getURL($spaceHomePageRef, 'deletespace', 'confirm=1')
+      'deleteURL': $xwiki.getURL($spaceHomePageRef, 'deletespace')
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceHomePageRef)
@@ -277,6 +282,11 @@
   #set ($spaceReference = $services.model.resolveSpace($spaceId))
   #maybeAddAddDocumentNode($spaceReference $children)
   ## Get the documents from the specified space.
+  #getSpaceChildDocumentsQuery($spaceReference $query)
+  #addDocumentNodesFromQuery($query $offset $limit $spaceReference $children)
+#end
+
+#macro (getSpaceChildDocumentsQuery $spaceReference $return)
   #set ($constraints = [
     'doc.space = :space',
     'doc.translation = 0'
@@ -289,9 +299,13 @@
     #set ($absoluteRef = $services.model.resolveDocument('%', 'explicit', $spaceReference))
     #set ($parameters.absoluteRef = "$absoluteRef")
     #set ($parameters.localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))
+  #elseif ($docTreeConfig.showSpaceAsDocument)
+    #set ($spaceHomePageName = $services.model.getEntityReferenceValue('DOCUMENT', 'default'))
+    #set ($discard = $constraints.add("doc.name &lt;&gt; '$spaceHomePageName'"))
   #end
   #getDocumentsQuery($constraints $parameters $query)
-  #addDocumentNodesFromQuery($query $offset $limit $spaceReference $children)
+  #set ($return = $NULL)
+  #setVariable("$return" $query)
 #end
 
 #macro (maybeAddAddDocumentNode $reference $siblings)
@@ -325,7 +339,7 @@
     #set ($documentReference = $services.model.resolveDocument($docFullName, 'explicit', $parentReference))
     #maybeAddDocumentNode($documentReference $children)
   #end
-  #if ($results.size() &gt;= $limit)
+  #if ($results &amp;&amp; $results.size() &gt;= $limit)
     ## There may be more documents in this space.
     #set ($totalCount = $_query.count())
     #set ($newOffset = $mathtool.add($offset, $results.size()))
@@ -347,31 +361,38 @@
 #end
 
 #macro (addDocumentNode $documentReference $siblings)
-  #set ($docNode = $xwiki.getDocument($documentReference))
-  #set ($canViewDoc = "$!docNode" != '')
-  #set ($canEditDoc = $docNode.hasAccessLevel('edit'))
-  #set ($canDeleteDoc = $docNode.hasAccessLevel('delete'))
+  #set ($isSpaceNode = $documentReference.name == $services.model.getEntityReferenceValue('DOCUMENT', 'default')
+    &amp;&amp; $docTreeConfig.showSpaces &amp;&amp; $docTreeConfig.showSpaceAsDocument &amp;&amp; !$docTreeConfig.showChildDocuments)
+  #if ($isSpaceNode)
+    ## Use the space name as default value for the node label (in case the document is not viewable).
+    #set ($label = $documentReference.parent.name)
+  #else
+    #set ($label = $documentReference.name)
+  #end
   #set ($hasChildren = false)
+  #set ($canViewDoc = $services.security.authorization.hasAccess('view', $documentReference))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $documentReference))
+  #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
   #if ($canViewDoc)
-    #set ($hasChildren = $hasChildren || ($docTreeConfig.showTranslations &amp;&amp; $docNode.translationList.size() &gt; 0))
-    #set ($hasChildren = $hasChildren || ($docTreeConfig.showAttachments
-      &amp;&amp; (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $docNode.attachmentList.size() &gt; 0)))
-    #set ($xclass = $docNode.getxWikiClass())
-    #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
-    #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $docNode.getxWikiObjects().size() &gt; 0))
-  #end
-  #if (!$hasChildren &amp;&amp; $docTreeConfig.showChildDocuments)
-    #getChildDocumentsCount($documentReference $count)
-    #set ($hasChildren = $count &gt; 0)
-  #end
-  #set ($label = $documentReference.name)
-  #if ($docTreeConfig.showDocumentTitle)
-    #set ($plainTitle = $docNode.plainTitle)
-    #if (!$stringtool.isBlank($plainTitle))
-      #set ($label = $plainTitle)
+    #set ($document = $xwiki.getDocument($documentReference))
+    #if ($docTreeConfig.showDocumentTitle)
+      #set ($plainTitle = $document.plainTitle)
+      #if (!$stringtool.isBlank($plainTitle))
+        #set ($label = $plainTitle)
+      #end
     #end
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showTranslations &amp;&amp; $document.translationList.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showAttachments
+      &amp;&amp; (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $document.attachmentList.size() &gt; 0)))
+    #set ($xclass = $document.getxWikiClass())
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $document.getxWikiObjects().size() &gt; 0))
   #end
-  #set ($discard = $siblings.add({
+  #if (!$hasChildren &amp;&amp; ($docTreeConfig.showChildDocuments || $isSpaceNode))
+    #getChildDocumentsCount($documentReference $count)
+    #set ($hasChildren = $count &amp;&amp; $count &gt; 0)
+  #end
+  #set ($docNode = {
     'id': "document:$documentReference",
     'text': $label,
     'icon': 'fa fa-file-o',
@@ -391,10 +412,32 @@
     'a_attr': {
       'href': $xwiki.getURL($documentReference)
     }
-  }))
+  })
+  #if ($isSpaceNode)
+    ## Limit the actions considering that this document node represents a space. See #addSpaceNode().
+    #set ($discard = $docNode.data.keySet().removeAll(['draggable', 'canMove', 'canCopy']))
+    #set ($hasSpaceAdmin = $services.security.authorization.hasAccess('admin', $documentReference.parent))
+    #set ($discard = $docNode.data.putAll({
+      'canRename': $hasSpaceAdmin,
+      'canDelete': $hasSpaceAdmin,
+      'deleteURL': $xwiki.getURL($documentReference, 'deletespace')
+    }))
+  #end
+  #set ($discard = $siblings.add($docNode))
 #end
 
 #macro (getChildDocumentsQuery $parentReference $return)
+  #if ($docTreeConfig.showChildDocuments)
+    #getParentChildDocumentsQuery($parentReference $query)
+  #else
+    #set ($spaceReference = $parentReference.extractReference('SPACE'))
+    #getSpaceChildDocumentsQuery($spaceReference $query)
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $query)
+#end
+
+#macro (getParentChildDocumentsQuery $parentReference $return)
   #set ($constraints = [
     'doc.translation = 0',
     '(doc.parent in (:absoluteRef, :localRef) or (doc.space = :space and doc.parent = :relativeRef))'
@@ -438,10 +481,10 @@
 
 #macro (addDocumentChildren $docId $offset $limit $children)
   #set ($documentReference = $services.model.resolveDocument($docId))
-  #set ($docNode = $xwiki.getDocument($documentReference))
-  #set ($canEditDoc = $docNode.hasAccessLevel('edit'))
-  #set ($canDeleteDoc = $docNode.hasAccessLevel('delete'))
-  #if ($offset == 0 &amp;&amp; $docTreeConfig.showTranslations &amp;&amp; $docNode.translationList.size() &gt; 0)
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $documentReference))
+  #set ($canDeleteDoc = $services.security.authorization.hasAccess('delete', $documentReference))
+  #set ($document = $xwiki.getDocument($documentReference))
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showTranslations &amp;&amp; $document.translationList.size() &gt; 0)
     #set ($discard = $children.add({
       'id': "translations:${documentReference}",
       'text': 'Translations',
@@ -455,10 +498,10 @@
     }))
   #end
   #if ($offset == 0 &amp;&amp; $docTreeConfig.showAttachments &amp;&amp;
-      (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $docNode.attachmentList.size() &gt; 0))
+      (($docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc) || $document.attachmentList.size() &gt; 0))
     #addAttachmentsNode($documentReference $children)
   #end
-  #set ($xclass = $docNode.getxWikiClass())
+  #set ($xclass = $document.getxWikiClass())
   #if ($offset == 0 &amp;&amp; $docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0)
     #set ($discard = $children.add({
       'id': "classProperties:${documentReference}",
@@ -472,7 +515,7 @@
       }
     }))
   #end
-  #if ($offset == 0 &amp;&amp; $docTreeConfig.showObjects &amp;&amp; $docNode.getxWikiObjects().size() &gt; 0)
+  #if ($offset == 0 &amp;&amp; $docTreeConfig.showObjects &amp;&amp; $document.getxWikiObjects().size() &gt; 0)
     #set ($discard = $children.add({
       'id': "objects:${documentReference}",
       'text': 'Objects',
@@ -485,15 +528,15 @@
       }
     }))
   #end
-  #if ($docTreeConfig.showChildDocuments)
+  #set ($isSpaceNode = $documentReference.name == $services.model.getEntityReferenceValue('DOCUMENT', 'default')
+    &amp;&amp; $docTreeConfig.showSpaces &amp;&amp; $docTreeConfig.showSpaceAsDocument)
+  #if ($docTreeConfig.showChildDocuments || $isSpaceNode)
     #getChildDocumentsQuery($documentReference $query)
     #addDocumentNodesFromQuery($query $offset $limit $documentReference $children)
   #end
 #end
 
 #macro (addAttachmentsNode $documentReference $siblings)
-  #set ($docNode = $xwiki.getDocument($documentReference))
-  #set ($canEditDoc = $docNode.hasAccessLevel('edit'))
   #set ($discard = $siblings.add({
     'id': "attachments:${documentReference}",
     'text': 'Attachments',
@@ -503,27 +546,25 @@
       'type': 'attachments',
       'validChildren': ['addAttachment', 'attachment', 'pagination'],
       'hasContextMenu': true,
-      'canDelete': $canEditDoc
+      'canDelete': $services.security.authorization.hasAccess('edit', $documentReference)
     },
     'a_attr': {
-      'href': $docNode.getURL('view', 'viewer=attachments')
+      'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
     }
   }))
 #end
 
 #macro (addTranslationsChildren $docId $offset $limit $children)
   #set ($docRef = $services.model.resolveDocument($docId))
-  #set ($docNode = $xwiki.getDocument($docRef))
-  #foreach ($language in $docNode.translationList)
+  #foreach ($language in $xwiki.getDocument($docRef).translationList)
     #set ($locale = $services.localization.toLocale($language))
-    #set ($translationReference = $services.model.createDocumentReference($docNode.documentReference, $locale))
+    #set ($translationReference = $services.model.createDocumentReference($docRef, $locale))
     #addTranslationNode($translationReference $children)
   #end
 #end
 
 #macro (addTranslationNode $translationReference $siblings)
   #set ($currentLocale = $services.localization.currentLocale)
-  #set ($translationNode = $xwiki.getDocument($translationReference))
   #set ($discard = $siblings.add({
     'id': "translation:$services.model.serialize($translationReference, 'default')_$translationReference.locale",
     'text': $translationReference.locale.getDisplayName($currentLocale),
@@ -532,7 +573,7 @@
     'data': {
       'type': 'translation',
       'validChildren': [],
-      'canDelete': $translationNode.hasAccessLevel('delete')
+      'canDelete': $services.security.authorization.hasAccess('delete', $translationReference)
     },
     'a_attr': {
       'href': $xwiki.getURL($translationReference, 'view', $escapetool.url({
@@ -544,12 +585,11 @@
 
 #macro (addAttachmentsChildren $docId $offset $limit $children)
   #set ($docRef = $services.model.resolveDocument($docId))
-  #set ($docNode = $xwiki.getDocument($docRef))
-  #set ($canEditDoc = $docNode.hasAccessLevel('edit'))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $docRef))
   #if ($offset == 0 &amp;&amp; $docTreeConfig.showAddAttachment &amp;&amp; $canEditDoc)
     #addAddAttachmentNode($docRef $children)
   #end
-  #set ($attachments = $docNode.attachmentList)
+  #set ($attachments = $xwiki.getDocument($docRef).attachmentList)
   #set ($totalCount = $attachments.size())
   ## Limit the number of attachments.
   #set ($attachments = $attachments.subList($offset, $mathtool.min($mathtool.add($offset, $limit), $totalCount)))
@@ -564,9 +604,9 @@
   #end
 #end
 
-#macro (addAddAttachmentNode $docNode $siblings)
+#macro (addAddAttachmentNode $documentReference $siblings)
   #set ($discard = $siblings.add({
-    'id': "addAttachment:$docRef",
+    'id': "addAttachment:$documentReference",
     'text': 'Upload file...',
     'icon': 'fa fa-plus-circle',
     'children': false,
@@ -575,7 +615,7 @@
       'validChildren': []
     },
     'a_attr': {
-      'href': $xwiki.getURL($docRef, 'view', 'viewer=attachments')
+      'href': $xwiki.getURL($documentReference, 'view', 'viewer=attachments')
     }
   }))
 #end
@@ -600,10 +640,10 @@
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,
       'canCopy': true,
-      'deleteURL': $docNode.getAttachmentURL($attachment.filename, 'delattachment')
+      'deleteURL': $attachment.document.getAttachmentURL($attachment.filename, 'delattachment')
     },
     'a_attr': {
-      'href': $docNode.getAttachmentURL($attachment.filename)
+      'href': $attachment.document.getAttachmentURL($attachment.filename)
     }
   }))
 #end
@@ -690,8 +730,7 @@
 
 #macro (addObjectsChildren $docId $offset $limit $children)
   #set ($docRef = $services.model.resolveDocument($docId))
-  #set ($docNode = $xwiki.getDocument($docRef))
-  #foreach ($classId in $docNode.getxWikiObjects().keySet())
+  #foreach ($classId in $xwiki.getDocument($docRef).getxWikiObjects().keySet())
     #set ($discard = $children.add({
       'id': "objectsOfType:$docRef/$classId",
       'text': $classId,
@@ -700,7 +739,7 @@
       'data': {
         'type': 'objectsOfType',
         'validChildren': ['object', 'pagination'],
-        'canDelete': $docNode.hasAccessLevel('edit')
+        'canDelete': $services.security.authorization.hasAccess('edit', $docRef)
       }
     }))
   #end
@@ -711,9 +750,8 @@
   #set ($docId = $nodeId.substring(0, $separatorIndex))
   #set ($classId = $nodeId.substring($mathtool.add($separatorIndex, 1)))
   #set ($docRef = $services.model.resolveDocument($docId))
-  #set ($docNode = $xwiki.getDocument($docRef))
-  #set ($canEditDoc = $docNode.hasAccessLevel('edit'))
-  #set ($objects = $docNode.getObjects($classId))
+  #set ($canEditDoc = $services.security.authorization.hasAccess('edit', $docRef))
+  #set ($objects = $xwiki.getDocument($docRef).getObjects($classId))
   #set ($totalCount = $objects.size())
   ## Limit the number of objects.
   #set ($objects = $objects.subList($offset, $mathtool.min($mathtool.add($offset, $limit), $totalCount)))
@@ -747,14 +785,14 @@
 
 #macro (addObjectChildren $objId $offset $limit $children)
   #set ($objRef = $services.model.resolveObject($objId))
-  #set ($docNode = $xwiki.getDocument($objRef.extractReference('DOCUMENT')))
   ## Object name is: Space.Class[index]
   #set ($separatorIndex = $objRef.name.lastIndexOf('['))
   #set ($classId = $objRef.name.substring(0, $separatorIndex))
   #set ($objectNumber = $mathtool.toInteger($objRef.name.substring($mathtool.add($separatorIndex, 1),
     $mathtool.sub($objRef.name.length(), 1))))
-  #set ($objNode = $docNode.getObject($classId, $objectNumber))
-  #foreach ($property in $objNode.properties)
+  #set ($document = $xwiki.getDocument($objRef.extractReference('DOCUMENT')))
+  #set ($object = $document.getObject($classId, $objectNumber))
+  #foreach ($property in $object.properties)
     #addObjectPropertyNode($property $objRef $children)
   #end
 #end
@@ -850,9 +888,14 @@
     ## Collect the references of all the ancestor documents.
     #getDocumentPathRecursively($docPath)
   #end
-  #set ($rootDocRef = $docPath.get(0))
+  #set ($rootDocRef = $docPath.first)
   #if ($docTreeConfig.showSpaces)
     #getSpacePath($rootDocRef $path)
+    #if ($rootDocRef.name == $services.model.getEntityReferenceValue('DOCUMENT', 'default')
+        &amp;&amp; $docTreeConfig.showSpaceAsDocument &amp;&amp; !$docTreeConfig.showChildDocuments)
+      ## The space home page node is merged with the space node.
+      #set ($discard = $docPath.remove())
+    #end
   #elseif ($docTreeConfig.showWikis &amp;&amp; $xcontext.isMainWiki())
     #getWikiPath($rootDocRef $path)
   #end
@@ -863,12 +906,12 @@
 
 #macro (getDocumentPathRecursively $path)
   #set ($docRef = $path.get(0))
-  #set ($docNode = $xwiki.getDocument($docRef))
-  #if ($docNode &amp;&amp; $docNode.parent != '')
-    #set ($parentRef = $services.model.resolveDocument($docNode.parent, 'explicit', $docRef))
+  #set ($document = $xwiki.getDocument($docRef))
+  #if ($document &amp;&amp; $document.parent != '')
+    #set ($parentRef = $services.model.resolveDocument($document.parent, 'explicit', $docRef))
     ## If the wiki/space nodes are displayed then the documents are grouped by wiki/space and thus the parent document
     ## must remain in the same wiki/space.
-    #if ((!$docTreeConfig.showSpaces || $docRef.lastSpaceReference.equals($parentRef.lastSpaceReference))
+    #if ((!$docTreeConfig.showSpaces || $docRef.parent.equals($parentRef.parent))
         &amp;&amp; (!$docTreeConfig.showWikis || $docRef.wikiReference.equals($parentRef.wikiReference)))
       #set ($discard = $path.add(0, $parentRef))
       #getDocumentPathRecursively($path)
@@ -1055,7 +1098,7 @@
   #if ($docTreeConfig.showAttachments)
     #addAttachmentSuggestions($text $limit $lists)
   #end
-  #if ($docTreeConfig.showSpaces)
+  #if ($docTreeConfig.showSpaces &amp;&amp; !$docTreeConfig.showSpaceAsDocument)
     #addSpaceSuggestions($text $limit $lists)
   #end
   #limitTotalCount($lists $limit)

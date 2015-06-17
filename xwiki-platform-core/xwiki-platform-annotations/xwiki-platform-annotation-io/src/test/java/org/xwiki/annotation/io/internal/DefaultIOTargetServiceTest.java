@@ -312,7 +312,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
             }
         });
 
-        String reference = "wiki:Space.Page^XWiki.Class.property";
+        String reference = "wiki:Space\\.Page^XWiki\\.Class.property";
         assertEquals("defcontent", ioTargetService.getSource(reference));
         assertEquals("xwiki/2.0", ioTargetService.getSourceSyntax(reference));
     }

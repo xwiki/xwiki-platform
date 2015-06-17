@@ -59,7 +59,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                         DefaultUIDistributionStep.ID));
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get default UI step instance");
+                this.logger.error("Failed to get default UI step instance", e);
             }
         } else {
             // Display the flavor step
@@ -67,7 +67,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                         FlavorDistributionStep.ID));
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get flavor step instance");   
+                this.logger.error("Failed to get flavor step instance", e);
             }
         }
 
@@ -79,7 +79,7 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                         WikisDefaultUIDistributionStep.ID));
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get all in one default UI step instance");
+                this.logger.error("Failed to get all in one default UI step instance", e);
             }
         } else {
             // Display the wikis flavor step
@@ -87,17 +87,16 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
                 steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                         WikisFlavorDistributionStep.ID));
             } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get all in one flavor step instance");
+                this.logger.error("Failed to get all in one flavor step instance", e);
             }
         }
 
         // Step 3: Upgrade outdated extensions
-
         try {
             steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
                 OutdatedExtensionsDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get outdated extensions step instance");
+            this.logger.error("Failed to get outdated extensions step instance", e);
         }
 
         return steps;

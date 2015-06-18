@@ -20,6 +20,7 @@
 package org.xwiki.url.internal.standard.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -52,6 +53,16 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     private static final String VIEW_ACTION = "view";
 
     private static final String DOWNLOAD_ACTION = "download";
+
+    private static final String DELATTACHMENT_ACTION = "delattachment";
+
+    private static final String VIEWATTACHREV_ACTION = "viewattachrev";
+
+    /**
+     * List of Actions which use URLs of the format {@code /(actionname)/space1/space2/page/filename}.
+     */
+    private static final List<String> FILE_ACTION_LIST =
+        Arrays.asList(DOWNLOAD_ACTION, DELATTACHMENT_ACTION, VIEWATTACHREV_ACTION);
 
     private StandardURLConfiguration configuration;
 
@@ -106,7 +117,10 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         //   - "/view/download/space/page" ("view" hidden, 1st segment is "view"): download.space.page, "view" action
         //     Note: URL serialization must generate a 1st segment named "view" since "download" is a reserved name for
         //     a space (it's an action name)
-
+        //   - "/delattachment/space/page/attachment (1st segment is "delattachment"): space.page@attachment,
+        //     "delattachment" action. Note: if there are segments after "delattachment" then they are ignored
+        //   - "/viewattachrev/space/page/attachment (1st segment is "viewattachrev"): space.page@attachment,
+        //     "viewattachrev" action. Note: if there are segments after "viewattachrev" then they are ignored
 
         List<String> pathSegments = extendedURL.getSegments();
         List<String> spaceNames = null;
@@ -123,7 +137,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         } else if (pathSegments.size() != 0) {
             String firstSegment = pathSegments.get(0);
             action = firstSegment;
-            if (DOWNLOAD_ACTION.equals(firstSegment) && pathSegments.size() >= 4) {
+            if (FILE_ACTION_LIST.contains(firstSegment) && pathSegments.size() >= 4) {
                 // Last segment is the attachment
                 attachmentName = pathSegments.get(pathSegments.size() - 1);
                 // Last but one segment is the page name

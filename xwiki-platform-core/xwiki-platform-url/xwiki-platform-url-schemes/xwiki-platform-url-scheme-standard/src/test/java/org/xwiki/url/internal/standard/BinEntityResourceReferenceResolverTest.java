@@ -171,7 +171,7 @@ public class BinEntityResourceReferenceResolverTest
     }
 
     @Test
-    public void createResourceWhenDownloadAction() throws Exception
+    public void createResourceWhenFileActionAction() throws Exception
     {
         EntityReference singleSpaceReference =
             buildEntityReference("wiki", Arrays.asList("space"), "page", "attachment.ext");
@@ -181,6 +181,16 @@ public class BinEntityResourceReferenceResolverTest
         testCreateResource("http://localhost/bin/download/space/page/attachment.ext", "download", singleSpaceReference,
             singleSpaceReference, EntityType.ATTACHMENT);
         testCreateResource("http://localhost/bin/download/space1/space2/page/attachment.ext", "download",
+            twoSpaceReference, twoSpaceReference, EntityType.ATTACHMENT);
+
+        testCreateResource("http://localhost/bin/delattachment/space/page/attachment.ext", "delattachment",
+            singleSpaceReference, singleSpaceReference, EntityType.ATTACHMENT);
+        testCreateResource("http://localhost/bin/delattachment/space1/space2/page/attachment.ext", "delattachment",
+            twoSpaceReference, twoSpaceReference, EntityType.ATTACHMENT);
+
+        testCreateResource("http://localhost/bin/viewattachrev/space/page/attachment.ext", "viewattachrev",
+            singleSpaceReference, singleSpaceReference, EntityType.ATTACHMENT);
+        testCreateResource("http://localhost/bin/viewattachrev/space1/space2/page/attachment.ext", "viewattachrev",
             twoSpaceReference, twoSpaceReference, EntityType.ATTACHMENT);
     }
 

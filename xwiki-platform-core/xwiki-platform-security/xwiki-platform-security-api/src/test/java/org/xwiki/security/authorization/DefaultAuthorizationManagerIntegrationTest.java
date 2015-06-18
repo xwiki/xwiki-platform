@@ -83,6 +83,7 @@ import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.SCRIPT;
 import static org.xwiki.security.authorization.Right.VIEW;
 import static org.xwiki.security.authorization.Right.values;
 
@@ -349,6 +350,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
                             return reference;
                         }
 
+                        @Override
                         public String toString()
                         {
                             return String.format("Rule entry for %s containing %d rules", reference.toString(), mockedRules.size());
@@ -382,15 +384,15 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         initialiseWikiMock("emptyWikis");
 
         // Public access on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
             null, getXDoc("an empty main wiki", "anySpace"));
 
         // SuperAdmin access on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, CREATE_WIKI, ILLEGAL),
-            SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM,
+            CREATE_WIKI, ILLEGAL), SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
 
         // Any Global user without access rules on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
             getXUser("a global user without any access rule"), getXDoc("main wiki", "anySpace"));
 
         // Any Local user on main wiki
@@ -398,15 +400,16 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             getUser("a local user", "any SubWiki"), getXDoc("main wiki", "anySpace"));
 
         // Public access on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
             null, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // SuperAdmin access on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM, CREATE_WIKI, ILLEGAL),
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, REGISTER, LOGIN, ADMIN, PROGRAM,
+            CREATE_WIKI, ILLEGAL),
             SUPERADMIN, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // Any Global user without access rules on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
             getXUser("a global user without any access rule"), getDoc("a subwiki", "anySpace", "any SubWiki"));
 
         // Any Local user on another subwiki
@@ -556,10 +559,14 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     {
         initialiseWikiMock("documentCreator");
 
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userA"), getXDoc("userAdoc","space"));
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userA"), getXDoc("userBdoc","space"));
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userB"), getXDoc("userAdoc","space"));
-        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"), getXDoc("userBdoc","space"));
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userA"),
+            getXDoc("userAdoc", "space"));
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, LOGIN, REGISTER), getXUser("userA"),
+            getXDoc("userBdoc", "space"));
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, LOGIN, REGISTER), getXUser("userB"),
+            getXDoc("userAdoc", "space"));
+        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"),
+            getXDoc("userBdoc", "space"));
     }
 
     @Test
@@ -644,7 +651,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         // remove group A from the cache => this should also remove all members of groupA
         securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
 
-        // check that userA was seen as a member of groupA by the cache => implies document userA was considered as a 
+        // check that userA was seen as a member of groupA by the cache => implies document userA was considered as a
         // user (and not simply a document) after the second check.
         assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
     }

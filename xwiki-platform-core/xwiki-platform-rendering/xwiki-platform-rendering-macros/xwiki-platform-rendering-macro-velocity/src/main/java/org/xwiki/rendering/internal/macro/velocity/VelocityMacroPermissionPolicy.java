@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.macro.velocity;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,11 +27,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Decide if velocity script execution is allowed. Allow execution if one of the following conditions is met:
  * <ul>
- *   <li>if the macro transformation context is <strong>not</strong> restricted</li>
+ * <li>if the macro transformation context is <strong>not</strong> restricted</li>
+ * <li>if the current document has script rights</li>
  * </ul>
  *
  * @version $Id$
@@ -41,9 +45,15 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Singleton
 public class VelocityMacroPermissionPolicy extends AbstractScriptMacroPermissionPolicy
 {
+    /**
+     * Used to verify if the current doc has script rights.
+     */
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
-        return !context.getTransformationContext().isRestricted();
+        return !context.getTransformationContext().isRestricted() && authorizationManager.hasAccess(Right.SCRIPT);
     }
 }

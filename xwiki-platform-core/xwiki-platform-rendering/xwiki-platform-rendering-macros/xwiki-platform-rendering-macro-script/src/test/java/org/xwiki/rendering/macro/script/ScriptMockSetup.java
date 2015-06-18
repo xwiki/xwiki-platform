@@ -32,7 +32,7 @@ import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
  * Dynamic mock setup for script macros.
- * 
+ *
  * @version $Id$
  * @since 2.0RC1
  */
@@ -43,7 +43,7 @@ public class ScriptMockSetup
     public ContextualAuthorizationManager authorizationManager;
 
     public AttachmentReferenceResolver<String> attachmentReferenceResolver;
-    
+
     public DocumentReferenceResolver<String> documentReferenceResolver;
 
     public WikiModel wikiModel;
@@ -64,6 +64,7 @@ public class ScriptMockSetup
         // Contextual Authorization Manager Mock setup
         this.authorizationManager = cm.registerMockComponent(mockery, ContextualAuthorizationManager.class);
         mockery.checking(new Expectations() {{
+            allowing(authorizationManager).hasAccess(Right.SCRIPT); will(returnValue(true));
             allowing(authorizationManager).hasAccess(Right.PROGRAM); will(returnValue(true));
         }});
 

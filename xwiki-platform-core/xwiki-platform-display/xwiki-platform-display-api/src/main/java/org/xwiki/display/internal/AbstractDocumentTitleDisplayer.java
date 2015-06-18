@@ -40,13 +40,15 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -102,6 +104,9 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Named("xwikicfg")
     private ConfigurationSource xwikicfg;
 
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
     /**
      * Used to emulate an in-line parsing.
      */
@@ -136,9 +141,15 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     private XDOM displayTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         // 1. Try to use the title provided by the user.
-        if (!StringUtils.isEmpty(document.getTitle())) {
+        String rawTitle = document.getTitle();
+        if (!StringUtils.isEmpty(rawTitle)) {
             try {
-                return parseTitle(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
+                String title = rawTitle;
+                // Evaluate the title only if the document has script rights, otherwise use the raw title.
+                if (authorizationManager.hasAccess(Right.SCRIPT)) {
+                    title = evaluateTitle(rawTitle, document.getDocumentReference(), parameters);
+                }
+                return parseTitle(title);
             } catch (Exception e) {
                 logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
             }
@@ -163,7 +174,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * Parses the given title as plain text and returns the generated XDOM.
-     * 
+     *
      * @param title the title to be parsed
      * @return the XDOM generated from parsing the title as plain text
      */
@@ -180,7 +191,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * Evaluates the Velocity script from the specified title.
-     * 
+     *
      * @param title the title to evaluate
      * @param documentReference a reference to the document whose title is evaluated
      * @param parameters display parameters
@@ -242,7 +253,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
 
     /**
      * Extracts the title from the document content.
-     * 
+     *
      * @param document the document to extract the title from
      * @param parameters display parameters
      * @return the title XDOM

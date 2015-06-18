@@ -65,6 +65,9 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     /** The program access right. */
     public static final Right PROGRAM;
 
+    /** The script access right. */
+    public static final Right SCRIPT;
+
     /** The register access right. */
     public static final Right REGISTER;
 
@@ -120,11 +123,13 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     private static final Map<EntityType, Set<Right>> UNMODIFIABLE_ENABLED_RIGHTS
         = new HashMap<EntityType, Set<Right>>();
 
+    // @formatter:off
     static {
         LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, WIKI_ONLY                       , true);
         VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT             , true);
+        SCRIPT   = new Right("script",      ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT             , true);
         EDIT     = new Right("edit",        ALLOW,  DENY,  true,
-                                                    new RightSet(VIEW), WIKI_SPACE_DOCUMENT             , false);
+            new RightSet(VIEW, SCRIPT), WIKI_SPACE_DOCUMENT                                             , false);
         DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT             , false);
         CREATOR  = new Right("creator",     DENY,   ALLOW, false,
             new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
@@ -132,15 +137,16 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT             , false);
 
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE                      , true);
+            new RightSet(LOGIN, VIEW, SCRIPT, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE              , true);
 
         CREATE_WIKI = new Right("createwiki", DENY, DENY,  true,  null, FARM_ONLY                       , false);
 
         PROGRAM  = new Right("programming", DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN, CREATE_WIKI), FARM_ONLY   , true);
+            new RightSet(LOGIN, VIEW, SCRIPT, EDIT, DELETE, REGISTER, COMMENT, ADMIN, CREATE_WIKI), FARM_ONLY, true);
 
         ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null                          , false);
     }
+    // @formatter:on
 
     /** The numeric value of this access right. */
     private final int value;

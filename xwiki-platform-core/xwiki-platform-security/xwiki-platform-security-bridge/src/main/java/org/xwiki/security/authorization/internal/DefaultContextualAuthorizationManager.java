@@ -19,6 +19,10 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -47,6 +51,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DefaultContextualAuthorizationManager implements ContextualAuthorizationManager
 {
+    /**
+     * Rights to be checked for the content author instead of the current user.
+     */
+    private static final Set<Right> CONTENT_AUTHOR_RIGHTS = new HashSet<Right>(Arrays.asList(Right.SCRIPT,
+        Right.PROGRAM));
+
     @Inject
     private AuthorizationManager authorizationManager;
 
@@ -59,11 +69,18 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
     {
-        if (right == Right.PROGRAM) {
-            checkAccess(right, getCurrentUser(right, null), null);
+        if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
+            EntityReference entity;
+            if (right == Right.PROGRAM) {
+                // Defaults to the main wiki reference.
+                entity = null;
+            } else {
+                entity = getCurrentEntity();
+            }
+            checkAccess(right, getCurrentUser(right, null), entity);
+        } else {
+            checkAccess(right, getCurrentEntity());
         }
-
-        checkAccess(right, right == Right.PROGRAM ? null : getCurrentEntity());
     }
 
     @Override
@@ -86,8 +103,15 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public boolean hasAccess(Right right)
     {
-        if (right == Right.PROGRAM) {
-            return hasAccess(right, getCurrentUser(right, null), null);
+        if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
+            EntityReference entity;
+            if (right == Right.PROGRAM) {
+                // Defaults to the main wiki reference.
+                entity = null;
+            } else {
+                entity = getCurrentEntity();
+            }
+            return hasAccess(right, getCurrentUser(right, null), entity);
         }
 
         return hasAccess(right, getCurrentEntity());
@@ -114,8 +138,10 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
      */
     private boolean checkPreAccess(Right right)
     {
-        if (right == Right.PROGRAM) {
-            if (this.renderingContext.isRestricted() || this.xcontextProvider.get().hasDroppedPermissions()) {
+        if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
+            if (this.renderingContext.isRestricted()) {
+                return false;
+            } else if (right == Right.PROGRAM && this.xcontextProvider.get().hasDroppedPermissions()) {
                 return false;
             }
         }
@@ -126,7 +152,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     private DocumentReference getCurrentUser(Right right, EntityReference entity)
     {
         // Backward compatibility for the old way of assigning programming right.
-        if (right == Right.PROGRAM) {
+        if (CONTENT_AUTHOR_RIGHTS.contains(right)) {
             XWikiDocument doc = entity == null ? getProgrammingDocument() : getDocument(entity);
             if (doc != null) {
                 return getContentAuthor(doc);
@@ -195,7 +221,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Get the document used to test programming right.
      *
-     * @return the current sdoc or doc document reference, null if no doc available.
+     * @return the current sdoc or doc document, null if no doc available.
      */
     private XWikiDocument getProgrammingDocument()
     {

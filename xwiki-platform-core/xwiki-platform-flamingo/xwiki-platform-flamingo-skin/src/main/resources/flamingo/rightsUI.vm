@@ -11,13 +11,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #if("$!request.section"=='wikis.rights')
   #set ($rightsLevels = {'createwiki': 0})
 #else
-  #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})  
+  #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'script': 3, 'delete': 4, 'admin': 5, 'register': 6, 'programming': 7})
 #end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
-#set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, delete
+#set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, script, delete
 #if("$!request.section"=='wikis.rights')
   #set ($maxlevel = $rightsLevels.get('createwiki'))
   #set ($clsname = 'XWiki.XWikiGlobalRights')

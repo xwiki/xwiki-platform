@@ -70,7 +70,7 @@ public class ContextNamespaceURLClassLoader extends NamespaceURLClassLoader
     {
         String currentWiki = this.wikis.getCurrentWikiId();
 
-        if (!Objects.equals(currentWiki, this.cachedCurrentWiki)) {
+        if (this.currentClassLoader == null || !Objects.equals(currentWiki, this.cachedCurrentWiki)) {
             this.currentClassLoader =
                 this.classLoaderManager.getURLClassLoader(currentWiki != null ? "wiki:" + currentWiki : null, false);
 

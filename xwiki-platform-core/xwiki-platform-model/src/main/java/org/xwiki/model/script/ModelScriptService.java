@@ -80,6 +80,9 @@ public class ModelScriptService implements ScriptService
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> defaultSerializer;
+
     /**
      * Create a Document Reference from a passed wiki, space and page names, which can be empty strings or {@code null}
      * in which case they are resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver.
@@ -550,5 +553,18 @@ public class ModelScriptService implements ScriptService
     public EntityReferenceTree toTree(EntityReference... references)
     {
         return new EntityReferenceTree(references);
+    }
+
+    /**
+     * Escape the passed entity name according to reference syntax.
+     * 
+     * @param name the name of the entity
+     * @param type the type of the entity
+     * @return the escaped version of the passed name
+     * @since 7.2M1
+     */
+    public String escape(String name, EntityType type)
+    {
+        return this.defaultSerializer.serialize(new EntityReference(name, type));
     }
 }

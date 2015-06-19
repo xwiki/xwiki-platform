@@ -21,12 +21,14 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.pdf.api.PdfExport.ExportType;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-import com.xpn.xwiki.util.Util;
 
 /**
  * Exports a document as PDF.
@@ -52,10 +54,18 @@ public class PDFAction extends XWikiAction
 
         try {
             context.getResponse().setContentType(ExportType.PDF.getMimeType());
-            context.getResponse().addHeader(
-                "Content-disposition", "inline; filename="
-                + Util.encodeURI(doc.getDocumentReference().getLastSpaceReference().getName(), context) + "_"
-                + Util.encodeURI(doc.getDocumentReference().getName(), context) + "." + ExportType.PDF.getExtension());
+
+            // Compute the name of the export. Since it's gong to be saved on the user's file system it needs to be a
+            // valid File name. Thus we use the "path" serializer but replace the "/" separator by "_" since we're not
+            // computing a directory hierarchy but a file name
+            EntityReferenceSerializer<String> serializer =
+                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+            String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+            // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
+            filename = StringUtils.abbreviateMiddle(filename, "__", 255);
+
+            context.getResponse().addHeader("Content-disposition",
+                String.format("inline; filename=%s.%s", filename, ExportType.PDF.getExtension()));
 
             pdfexport.export(doc, context.getResponse().getOutputStream(), ExportType.PDF, context);
         } catch (IOException e) {

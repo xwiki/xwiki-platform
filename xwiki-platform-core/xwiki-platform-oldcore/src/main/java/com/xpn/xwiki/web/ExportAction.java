@@ -40,6 +40,7 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.WikiReference;
 
@@ -223,11 +224,18 @@ public class ExportAction extends XWikiAction
 
         XWikiDocument doc = context.getDoc();
         context.getResponse().setContentType(exportType.getMimeType());
+
+        // Compute the name of the export. Since it's gong to be saved on the user's file system it needs to be a valid
+        // File name. Thus we use the "path" serializer but replace the "/" separator by "_" since we're not computing
+        // a directory hierarchy but a file name
+        EntityReferenceSerializer<String> serializer =
+            Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+        String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
+        // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
+        filename = StringUtils.abbreviateMiddle(filename, "__", 255);
         context.getResponse().addHeader(
             "Content-disposition",
-            String.format("inline; filename=%s_%s.%s",
-                Util.encodeURI(doc.getDocumentReference().getLastSpaceReference().getName(), context),
-                Util.encodeURI(doc.getDocumentReference().getName(), context), exportType.getExtension()));
+            String.format("inline; filename=%s.%s", filename, exportType.getExtension()));
         exporter.export(doc, context.getResponse().getOutputStream(), exportType, context);
 
         return null;

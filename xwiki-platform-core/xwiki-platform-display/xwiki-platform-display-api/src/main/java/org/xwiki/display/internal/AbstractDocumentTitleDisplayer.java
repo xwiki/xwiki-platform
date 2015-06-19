@@ -34,7 +34,9 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
@@ -101,6 +103,14 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource xwikicfg;
+
+    /**
+     * Used to get the default document reference, which normally is used to represent the home page of a space.
+     * 
+     * @see #getStaticTitle(DocumentModelBridge)
+     */
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
 
     /**
      * Used to emulate an in-line parsing.
@@ -258,7 +268,12 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     private XDOM getStaticTitle(DocumentModelBridge document)
     {
-        return parseTitle(document.getDocumentReference().getName());
+        String documentName = document.getDocumentReference().getName();
+        if (defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName().equals(documentName)) {
+            // This document represents a space (it is the home page of a space). Use the space name instead.
+            documentName = document.getDocumentReference().getParent().getName();
+        }
+        return parseTitle(documentName);
     }
 
     /**

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -58,7 +59,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiUserManager implements WikiUserManager
 {
-    private static final String GROUP_CLASS_NAME = "XWikiGroups";
+    private static final LocalDocumentReference GROUPCLASS_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
+        "XWikiGroups");
 
     private static final String GROUP_CLASS_MEMBER_FIELD = "member";
 
@@ -166,8 +168,7 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         // Get the other members from the wiki AllGroup
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
-        DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
         if (memberObjects != null) {
             for (BaseObject object : memberObjects) {
                 if (object == null) {
@@ -189,13 +190,13 @@ public class DefaultWikiUserManager implements WikiUserManager
         return getMembers(wikiId).contains(userId);
     }
 
-    private void addMemberObject(XWikiDocument groupDoc, String userId, DocumentReference classReference)
+    private void addMemberObject(XWikiDocument groupDoc, String userId)
         throws WikiUserManagerException
     {
         try {
             XWikiContext xcontext = xcontextProvider.get();
-            int objectNumber = groupDoc.createXObject(classReference, xcontext);
-            BaseObject object = groupDoc.getXObject(classReference, objectNumber);
+            int objectNumber = groupDoc.createXObject(GROUPCLASS_REFERENCE, xcontext);
+            BaseObject object = groupDoc.getXObject(GROUPCLASS_REFERENCE, objectNumber);
             object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
         } catch (XWikiException e) {
             throw new WikiUserManagerException("Fail to add a member to the group", e);
@@ -215,16 +216,14 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Add a member object
-        DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
-        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
         if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "", classReference);
+            addMemberObject(groupDoc, "");
         }
 
         // Add the user
-        addMemberObject(groupDoc, userId, classReference);
+        addMemberObject(groupDoc, userId);
 
         // Save the document
         saveGroupDocument(groupDoc, String.format("Add [%s] to the group.", userId));
@@ -235,23 +234,20 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         Collection<String> members = getMembers(wikiId);
 
-        DocumentReference classReference =
-                new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
-        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        List<BaseObject> memberObjects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
         if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "", classReference);
+            addMemberObject(groupDoc, "");
         }
 
         // Add members
         for (String userId : userIds) {
             if (!members.contains(userId)) {
                 // Add a member object
-                addMemberObject(groupDoc, userId, classReference);
+                addMemberObject(groupDoc, userId);
             }
         }
 
@@ -266,8 +262,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Get the member objects
-        DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        List<BaseObject> objects = groupDoc.getXObjects(classReference);
+        List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
         if (objects != null) {
 
             // Get the member objects to remove
@@ -299,8 +294,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Get the member objects
-        DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        List<BaseObject> objects = groupDoc.getXObjects(classReference);
+        List<BaseObject> objects = groupDoc.getXObjects(GROUPCLASS_REFERENCE);
         if (objects != null) {
 
             // Get the member objects to remove
@@ -478,14 +472,6 @@ public class DefaultWikiUserManager implements WikiUserManager
     @Override
     public void join(String userId, String wikiId) throws WikiUserManagerException
     {
-        // Get the descriptor of the wiki
-        WikiDescriptor wikiDescriptor = null;
-        try {
-            wikiDescriptor = wikiDescriptorManager.getById(wikiId);
-        } catch (WikiManagerException e) {
-            throw new WikiUserManagerException(String.format("Failed to get the descriptor of the wiki [%s].", wikiId));
-        }
-
         // Check if the user has the right to join the wiki
         if (!wikiUserConfigurationHelper.getConfiguration(wikiId).getMembershipType().equals(MembershipType.OPEN)) {
             throw new WikiUserManagerException(String.format("The user [%s] is not authorized to join the wiki [%s].",
@@ -645,9 +631,6 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Add the user to the members
         addMember(invitation.getUserId(), invitation.getWikiId());
 
-        // Then, update the candidacy object
-        XWikiContext xcontext = xcontextProvider.get();
-
         // Set the values
         invitation.setUserComment(message);
         invitation.setStatus(MemberCandidacy.Status.ACCEPTED);
@@ -657,10 +640,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(invitation.getWikiId(),
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, invitation.getId());
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
 
         // Set the new values
         object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT, invitation.getUserComment());
@@ -675,9 +655,6 @@ public class DefaultWikiUserManager implements WikiUserManager
     @Override
     public void refuseInvitation(MemberCandidacy invitation, String message) throws WikiUserManagerException
     {
-        // Update the candidacy object
-        XWikiContext xcontext = xcontextProvider.get();
-
         // Set the values
         invitation.setUserComment(message);
         invitation.setStatus(MemberCandidacy.Status.REJECTED);

@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
@@ -48,6 +49,11 @@ public class WikiCandidateMemberClassInitializer extends AbstractMandatoryDocume
      * The space of the mandatory document.
      */
     public static final String DOCUMENT_SPACE = "WikiManager";
+
+    /**
+     * The local reference of the class.
+     */
+    public static final LocalDocumentReference REFERENCE = new LocalDocumentReference(DOCUMENT_SPACE, DOCUMENT_NAME);
 
     /**
      * Name of field <code>userName</code> for the XWiki class WikiManager.WikiCandidateMemberClass.
@@ -155,7 +161,7 @@ public class WikiCandidateMemberClassInitializer extends AbstractMandatoryDocume
      */
     public WikiCandidateMemberClassInitializer()
     {
-        super(DOCUMENT_SPACE, DOCUMENT_NAME);
+        super(REFERENCE);
     }
 
     @Override

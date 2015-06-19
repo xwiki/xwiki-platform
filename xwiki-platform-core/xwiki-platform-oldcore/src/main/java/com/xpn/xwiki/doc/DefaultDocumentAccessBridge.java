@@ -42,6 +42,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -622,12 +623,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
                 isFullURL);
         }
         if (isFullURL) {
-            return this
-                .getContext()
-                .getURLFactory()
-                .createExternalURL(documentReference.getLastSpaceReference().getName(), documentReference.getName(),
-                    action, queryString, anchor, documentReference.getWikiReference().getName(), this.getContext())
-                .toString();
+            return this.getContext().getURLFactory().createExternalURL(extractSpacesFromDocumentReference(
+                documentReference), documentReference.getName(), action, queryString, anchor,
+                documentReference.getWikiReference().getName(), this.getContext()).toString();
         } else {
             return this.getContext().getWiki()
                 .getURL(documentReference, action, queryString, anchor, this.getContext());
@@ -680,13 +678,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         String url;
         if (isFullURL) {
             XWikiContext xcontext = getContext();
-            url =
-                xcontext
-                    .getURLFactory()
-                    .createAttachmentURL(attachmentReference.getName(),
-                        attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", queryString,
-                        attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
+            url = xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
+                extractSpacesFromDocumentReference(attachmentReference.getDocumentReference()),
+                attachmentReference.getDocumentReference().getName(), "download", queryString,
+                attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
         } else {
             XWikiContext xcontext = getContext();
             String documentReference =
@@ -878,4 +873,11 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     }
 
+    private String extractSpacesFromDocumentReference(DocumentReference reference)
+    {
+        // Extract and escape the spaces portion of the passed reference to pass to the old createURL() API which
+        // unfortunately doesn't accept a DocumentReference...
+        EntityReference spaceReference = reference.getLastSpaceReference().removeParent(reference.getWikiReference());
+        return this.defaultEntityReferenceSerializer.serialize(spaceReference);
+    }
 }

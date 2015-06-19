@@ -4158,10 +4158,8 @@ public class XWiki implements EventListener
             documentReference.getLastSpaceReference().removeParent(documentReference.getWikiReference());
         String spaces = this.defaultEntityReferenceSerializer.serialize(spaceReference);
 
-        URL url =
-            context.getURLFactory().createURL(spaces,
-                documentReference.getName(), action, queryString, anchor,
-                documentReference.getWikiReference().getName(), context);
+        URL url = context.getURLFactory().createURL(spaces, documentReference.getName(), action, queryString, anchor,
+            documentReference.getWikiReference().getName(), context);
 
         return context.getURLFactory().getURL(url, context);
     }

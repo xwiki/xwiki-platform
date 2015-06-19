@@ -476,7 +476,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         @Override
         public void onUpdate()
         {
-            setContentDirty(true);
+            setMetaDataDirty(true);
         }
     };
 
@@ -1505,6 +1505,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setTitle(String title)
     {
         if (title != null && !title.equals(this.title)) {
+            // Document titles usually contain velocity script, so it is not enough to set the metadata dirty, since we
+            // want to content author to be updated for programming or script rights to be updated.
             setContentDirty(true);
         }
         this.title = title;
@@ -2226,12 +2228,26 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setXObjects(Map<DocumentReference, List<BaseObject>> objects)
     {
+        if (objects == null) {
+            // Make sure we don`t set a null objects map since we assume everywhere that it is not null when using it.
+            objects = new HashMap<>();
+        }
+
+        boolean isDirty = false;
+
         for (List<BaseObject> objList : objects.values()) {
             for (BaseObject obj : objList) {
                 obj.setOwnerDocument(this);
+                isDirty = true;
             }
         }
-        setContentDirty(true);
+
+        // This operation resulted in marking the current document dirty.
+        if (isDirty) {
+            setMetaDataDirty(true);
+        }
+
+        // Replace the current objects with the provided ones.
         this.xObjects = objects;
     }
 
@@ -2304,7 +2320,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         objects.add(object);
         int nb = objects.size() - 1;
         object.setNumber(nb);
-        setContentDirty(true);
+        setMetaDataDirty(true);
         return nb;
     }
 
@@ -2402,7 +2418,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
         }
 
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     /**
@@ -2672,11 +2688,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             objects.add(null);
         }
         objects.set(nb, object);
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     /**
-     * Replaces the object at the specified position and for the specified object xclass.
+     * Replaces the object at the specified position and for the specified object's xclass.
      *
      * @param nb index of the element to replace
      * @param object the xobject to insert
@@ -2698,7 +2714,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             objects.add(null);
         }
         objects.set(nb, object);
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     /**
@@ -2737,7 +2753,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 getXClass().merge(tbclass.clone());
             }
         }
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     /**
@@ -2769,7 +2785,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
             }
         }
-        setContentDirty(true);
     }
 
     /**
@@ -3930,7 +3945,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void copyAttachments(XWikiDocument sourceDocument)
     {
+        // Note: when clearing the attachment list, we automatically mark the document's metadata as dirty.
         getAttachmentList().clear();
+
         Iterator<XWikiAttachment> attit = sourceDocument.getAttachmentList().iterator();
         while (attit.hasNext()) {
             XWikiAttachment attachment = attit.next();
@@ -3938,16 +3955,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             newattachment.setDoc(this);
 
             // We need to set the content of the attachment to be dirty because the dirty bit
-            // is used to signal that there is a reason to save the attachment and while the
-            // old attachment has already been saved so there is not, the copy has not been
-            // saved so it should be.
+            // is used to signal that there is a reason to save the copied attachment, otherwise
+            // the copied attachment will be empty since the original attachment content is not
+            // modified in this operation.
             if (newattachment.getAttachment_content() != null) {
                 newattachment.getAttachment_content().setContentDirty(true);
             }
 
             getAttachmentList().add(newattachment);
         }
-        setContentDirty(true);
     }
 
     /**
@@ -5237,6 +5253,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             return;
         }
 
+        boolean isDirty = false;
         for (BaseObject bobject : objects) {
             if (bobject == null) {
                 continue;
@@ -5250,11 +5267,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     bobject.removeField(origname);
                     prop.setName(newname);
                     bobject.addField(newname, prop);
+
+                    isDirty = true;
                 }
             }
         }
 
-        setContentDirty(true);
+        // If at least one property was renamed, mark the document dirty.
+        if (isDirty) {
+            setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -5273,7 +5295,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         getXObjectsToRemove().add(object);
         object.setOwnerDocument(null);
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     /**
@@ -5294,8 +5316,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     BaseObject newObj = getXObject(originalObj.getXClassReference(), originalObj.getNumber());
                     if (newObj == null) {
                         // The object was deleted.
-                        getXObjectsToRemove().add(originalObj);
-                        setContentDirty(true);
+                        this.addXObjectToRemove(originalObj);
                     }
                 }
             }
@@ -5334,7 +5355,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setXObjectsToRemove(List<BaseObject> objectsToRemove)
     {
         this.xObjectsToRemove = objectsToRemove;
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
 
     public List<String> getIncludedPages(XWikiContext context)
@@ -8530,7 +8551,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             addXObject(bobject);
         }
         bobject.setDocumentReference(getDocumentReference());
-        setContentDirty(true);
+        setMetaDataDirty(true);
         return bobject;
     }
 

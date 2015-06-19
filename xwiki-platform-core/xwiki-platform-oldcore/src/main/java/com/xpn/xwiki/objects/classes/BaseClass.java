@@ -1333,7 +1333,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         if (ownerDocument != null && this.isDirty) {
-            ownerDocument.setContentDirty(true);
+            ownerDocument.setMetaDataDirty(true);
         }
     }
 
@@ -1345,7 +1345,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         this.isDirty = isDirty;
         if (isDirty && this.ownerDocument != null) {
-            this.ownerDocument.setContentDirty(true);
+            this.ownerDocument.setMetaDataDirty(true);
         }
     }
 }

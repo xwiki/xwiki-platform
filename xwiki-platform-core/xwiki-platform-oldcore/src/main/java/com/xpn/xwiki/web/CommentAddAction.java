@@ -67,6 +67,7 @@ public class CommentAddAction extends XWikiAction
         } else {
             // className = XWiki.XWikiComments
             String className = baseclass.getName();
+            // Create a new comment object and mark the document as dirty.
             BaseObject object = doc.newObject(className, context);
             // TODO The map should be pre-filled with empty strings for all class properties, just like in
             // ObjectAddAction, so that properties missing from the request are still added to the database.
@@ -88,10 +89,8 @@ public class CommentAddAction extends XWikiAction
                 object.set(AUTHOR_PROPERTY_NAME, context.getUser(), context);
             }
             doc.setAuthorReference(context.getUserReference());
-            // Consider comments not being content.
-            doc.setContentDirty(false);
-            // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
-            doc.setMetaDataDirty(true);
+
+            // Save the new comment.
             xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.

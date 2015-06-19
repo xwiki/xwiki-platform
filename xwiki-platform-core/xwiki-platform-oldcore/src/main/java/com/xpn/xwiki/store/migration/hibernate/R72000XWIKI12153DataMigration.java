@@ -122,7 +122,7 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
         String spaceReference = serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
 
         statement.setString(1, spaceReference);
-        statement.setString(1, spaceName);
+        statement.setString(2, spaceName);
 
         // Add a conversion to the list
         statement.addBatch();

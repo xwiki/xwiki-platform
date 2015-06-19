@@ -8498,6 +8498,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if (reference instanceof DocumentReference) {
             return (DocumentReference) reference;
+        } else if (reference instanceof LocalDocumentReference) {
+            return new DocumentReference((LocalDocumentReference) reference, getDocumentReference().getWikiReference());
         } else {
             DocumentReference defaultReference =
                 new DocumentReference(getDocumentReference().getWikiReference().getName(), XWiki.SYSTEM_SPACE,

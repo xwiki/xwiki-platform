@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
@@ -361,9 +362,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             try {
                 doc = xwiki.getDocument(getClassFullName(), context);
             } catch (Exception e) {
-                doc = new XWikiDocument();
-                doc.setSpace(getClassSpace());
-                doc.setName(getClassName());
+                doc = new XWikiDocument(new DocumentReference(context.getWikiId(), getClassSpace(), getClassName()));
                 doc.setCreator(XWikiRightService.SUPERADMIN_USER);
                 doc.setAuthor(doc.getCreator());
                 needsUpdate = true;
@@ -448,9 +447,9 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             try {
                 doc = xwiki.getDocument(getClassSheetFullName(), context);
             } catch (Exception e) {
-                doc = new XWikiDocument();
-                doc.setSpace(getClassSheetSpace());
-                doc.setName(getClassSheetName());
+                doc =
+                    new XWikiDocument(new DocumentReference(context.getWikiId(), getClassSheetSpace(),
+                        getClassSheetName()));
                 needsUpdate = true;
             }
 
@@ -500,9 +499,9 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             try {
                 doc = xwiki.getDocument(getClassTemplateFullName(), context);
             } catch (Exception e) {
-                doc = new XWikiDocument();
-                doc.setSpace(getClassTemplateSpace());
-                doc.setName(getClassTemplateName());
+                doc =
+                    new XWikiDocument(new DocumentReference(context.getWikiId(), getClassTemplateSpace(),
+                        getClassTemplateName()));
                 needsUpdate = true;
             }
 

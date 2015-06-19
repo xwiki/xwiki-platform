@@ -52,6 +52,7 @@ com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentWikiReferenceProvider
 com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver
+com.xpn.xwiki.internal.model.DefaultLegacySpaceResolver
 com.xpn.xwiki.internal.objects.classes.XClassMigratorListener
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter

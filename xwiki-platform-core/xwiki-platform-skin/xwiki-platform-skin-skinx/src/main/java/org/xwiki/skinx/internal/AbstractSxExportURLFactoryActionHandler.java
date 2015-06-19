@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +40,7 @@ import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.LegacySpaceResolver;
 import com.xpn.xwiki.web.ExportURLFactoryActionHandler;
 import com.xpn.xwiki.web.ExportURLFactoryContext;
 import com.xpn.xwiki.web.sx.Extension;
@@ -61,6 +63,9 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
     private static final char URL_PATH_SEPARATOR = '/';
 
     @Inject
+    private LegacySpaceResolver legacySpaceResolve;
+
+    @Inject
     private ContextualAuthorizationManager authorizationManager;
 
     protected abstract String getSxPrefix();
@@ -75,14 +80,16 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
     public abstract Extension getExtensionType();
 
     @Override
-    public URL createURL(String web, String name, String queryString, String anchor, String wikiId,
+    public URL createURL(String spaces, String name, String queryString, String anchor, String wikiId,
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
     {
         // Check if the current user has the right to view the SX file. We do this since this is what would happen
         // in XE when a SX action is called (check done in XWikiAction).
         // Note that we cannot just open an HTTP connection to the SX action here since we wouldn't be authenticated...
         // Thus we have to simulate the same behavior as the SX action...
-        DocumentReference sxDocumentReference = new DocumentReference(wikiId, web, name);
+
+        List<String> spaceNames = this.legacySpaceResolve.resolve(spaces);
+        DocumentReference sxDocumentReference = new DocumentReference(wikiId, spaceNames, name);
         this.authorizationManager.checkAccess(Right.VIEW, sxDocumentReference);
 
         // Set the SX document as the current document in the XWiki Context since unfortunately the SxSource code
@@ -93,13 +100,13 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         XWikiDocument.backupContext(backup, context);
         try {
             sxDocument.setAsContextDoc(context);
-            return processSx(web, name, queryString, context, factoryContext);
+            return processSx(spaceNames, name, queryString, context, factoryContext);
         } finally {
             XWikiDocument.restoreContext(backup, context);
         }
     }
 
-    private URL processSx(String web, String name, String queryString, XWikiContext context,
+    private URL processSx(List<String> spaceNames, String name, String queryString, XWikiContext context,
         ExportURLFactoryContext factoryContext) throws Exception
     {
         SxSource sxSource = null;
@@ -121,7 +128,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
         // Write the content to file
         // We need a unique name for that SSX content
-        String targetPath = String.format("%s/%s/%s", getSxPrefix(), web, name);
+        String targetPath = String.format("%s/%s/%s", getSxPrefix(), StringUtils.join(spaceNames, '/'), name);
         File targetDirectory = new File(factoryContext.getExportDir(), targetPath);
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
@@ -133,8 +140,10 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         StringBuilder path = new StringBuilder("file://");
         path.append(getSxPrefix());
         path.append(URL_PATH_SEPARATOR);
-        path.append(encodeURLPart(web));
-        path.append(URL_PATH_SEPARATOR);
+        for (String spaceName : spaceNames) {
+            path.append(encodeURLPart(spaceName));
+            path.append(URL_PATH_SEPARATOR);
+        }
         path.append(encodeURLPart(name));
         path.append(URL_PATH_SEPARATOR);
         path.append(encodeURLPart(targetLocation.getName()));

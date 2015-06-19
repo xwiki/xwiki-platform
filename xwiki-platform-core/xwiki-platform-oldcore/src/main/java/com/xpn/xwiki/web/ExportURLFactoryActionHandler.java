@@ -38,7 +38,8 @@ import com.xpn.xwiki.XWikiContext;
 public interface ExportURLFactoryActionHandler
 {
     /**
-     * @param web the space name pointed to
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param name the page name pointed to
      * @param queryString the optional query string
      * @param anchor the optional anchor
@@ -48,6 +49,6 @@ public interface ExportURLFactoryActionHandler
      * @return the URL to generate at export
      * @throws Exception in case of an error
      */
-    URL createURL(String web, String name, String queryString, String anchor, String wikiId,
+    URL createURL(String spaces, String name, String queryString, String anchor, String wikiId,
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception;
 }

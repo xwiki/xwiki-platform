@@ -27,6 +27,8 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.model.LegacySpaceResolver;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
@@ -38,6 +40,8 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
  */
 public class PdfURLFactory extends FileSystemURLFactory
 {
+    private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
+
     /**
      * We delegate to the XWiki Servlet URL Factory for the creation of attachment URLs since we want links to
      * attachments to be absolute. Image URLs are converted by the {@link PDFURIResolver}.
@@ -78,31 +82,32 @@ public class PdfURLFactory extends FileSystemURLFactory
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision,
         String querystring, String xwikidb, XWikiContext context)
     {
         URL url =
-            this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, querystring, xwikidb,
+            this.servletURLFactory.createAttachmentRevisionURL(filename, spaces, name, revision, querystring, xwikidb,
                 context);
-        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        saveAttachmentReference(url, xwikidb, spaces, name, filename, context);
         return url;
     }
 
     @Override
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, long recycleId,
+    public URL createAttachmentRevisionURL(String filename, String spaces, String name, String revision, long recycleId,
         String querystring, String xwikidb, XWikiContext context)
     {
         URL url =
-            this.servletURLFactory.createAttachmentRevisionURL(filename, web, name, revision, recycleId, querystring,
+            this.servletURLFactory.createAttachmentRevisionURL(filename, spaces, name, revision, recycleId, querystring,
                 xwikidb, context);
-        saveAttachmentReference(url, xwikidb, web, name, filename, context);
+        saveAttachmentReference(url, xwikidb, spaces, name, filename, context);
         return url;
     }
 
     /**
      * @param url the URL to save in the attachment map
      * @param wiki the wiki where the attachment is located
-     * @param space the space where the attachment is located
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param page the page where the attachment is located
      * @param fileName the name of the attachment file
      * @param context the XWiki Context where to find the attachment map that we add to
@@ -116,10 +121,11 @@ public class PdfURLFactory extends FileSystemURLFactory
         Map<String, AttachmentReference> attachmentMap =
             (Map<String, AttachmentReference>) context.get(PDF_EXPORT_CONTEXT_KEY);
         if (attachmentMap == null) {
-            attachmentMap = new HashMap<String, AttachmentReference>();
+            attachmentMap = new HashMap<>();
             context.put(PDF_EXPORT_CONTEXT_KEY, attachmentMap);
         }
 
-        attachmentMap.put(url.toString(), new AttachmentReference(fileName, new DocumentReference(wiki, spaces, page)));
+        attachmentMap.put(url.toString(), new AttachmentReference(fileName,
+            new DocumentReference(wiki, this.legacySpaceResolver.resolve(spaces), page)));
     }
 }

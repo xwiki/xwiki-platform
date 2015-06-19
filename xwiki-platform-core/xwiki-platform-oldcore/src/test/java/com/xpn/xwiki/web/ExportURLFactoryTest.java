@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.jmock.Mock;
@@ -80,21 +81,23 @@ public class ExportURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
     public void testCreateAttachmentURL() throws Exception
     {
         // Prepare the exported document and attachment.
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", " Space ", "New  Page"));
+        XWikiDocument doc = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList(" Space1 ", "Space2"), "New  Page"));
         XWikiAttachment attachment = new XWikiAttachment(doc, "img .jpg");
         attachment.setContent(new ByteArrayInputStream("test".getBytes()));
         doc.getAttachmentList().add(attachment);
         this.mockXWiki.stubs().method("getDocument").will(returnValue(doc));
 
-        URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space ", "Pa ge", "view", "", "x", getContext());
-        assertEquals(new URL("file://attachment/x.%20Space%20.Pa%20ge.img%20.jpg"), url);
+        URL url = this.urlFactory.createAttachmentURL("img .jpg", " Space1 .Space2", "Pa ge", "view", "", "x",
+            getContext());
+        assertEquals(new URL("file://attachment/x/+Space1+/Space2/Pa+ge/img+%252Ejpg"), url);
     }
 
     /** When the test is over, delete the folder where the exported attachments were placed. */
     @Override
     protected void tearDown() throws Exception
     {
-        super.tearDown();
         FileUtils.deleteDirectory(this.tmpDir);
+        super.tearDown();
     }
 }

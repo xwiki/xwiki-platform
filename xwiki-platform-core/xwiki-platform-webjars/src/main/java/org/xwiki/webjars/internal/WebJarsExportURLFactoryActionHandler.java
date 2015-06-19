@@ -62,7 +62,7 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
     private static final String WEBJAR_PATH = "webjars/";
 
     @Override
-    public URL createURL(String web, String name, String querystring, String anchor, String wikiId,
+    public URL createURL(String spaces, String name, String querystring, String anchor, String wikiId,
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
     {
         // Example of URL:

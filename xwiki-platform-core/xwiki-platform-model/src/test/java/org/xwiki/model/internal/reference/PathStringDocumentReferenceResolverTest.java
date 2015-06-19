@@ -39,13 +39,14 @@ public class PathStringDocumentReferenceResolverTest
     @Test
     public void serializeAndResolve()
     {
-        test("wiki", "Space", "Page");
-        test("w/i?ki", "Sp.a#ce", "P a@g&e");
+        test("wiki", "Space", "Page", "wiki/Space/Page");
+        test("w/i?ki", "Sp.a#ce", "P a@g&e", "w%2Fi%3Fki/Sp%2Ea%23ce/P+a%40g%26e");
     }
 
-    private void test(String wiki, String space, String page)
+    private void test(String wiki, String space, String page, String expectedSerializedString)
     {
         DocumentReference documentReference = new DocumentReference(wiki, space, page);
-        assertEquals(documentReference, resolver.resolve(serializer.serialize(documentReference)));
+        assertEquals(expectedSerializedString, this.serializer.serialize(documentReference));
+        assertEquals(documentReference, this.resolver.resolve(this.serializer.serialize(documentReference)));
     }
 }

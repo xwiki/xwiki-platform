@@ -185,7 +185,8 @@ public class HtmlPackager
     private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
         throws XWikiException, IOException
     {
-        DocumentReferenceResolver<String> resolver = Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        DocumentReferenceResolver<String> resolver =
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
         DocumentReference docReference = resolver.resolve(pageName);
         XWikiDocument doc = context.getWiki().getDocument(docReference, context);
 

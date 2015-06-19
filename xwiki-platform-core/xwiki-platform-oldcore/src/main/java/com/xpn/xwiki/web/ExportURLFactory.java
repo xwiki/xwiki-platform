@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,16 +40,20 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.model.LegacySpaceResolver;
 
 /**
- * Handle URL generation in rendered wiki pages. This implementation makes sure URL will be local URL for exported
- * content (like skin, attachment and pages).
+ * Handle URL generation in rendered wiki pages. This implementation makes sure that generated URLs will be file URLs
+ * pointing to the local filesystem, for exported content (like skin, attachment and pages). This is needed for example
+ * for the HTML export.
  *
  * @version $Id$
  */
@@ -67,13 +72,18 @@ public class ExportURLFactory extends XWikiServletURLFactory
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
 
+    private LegacySpaceResolver legacySpaceResolver = Utils.getComponent(LegacySpaceResolver.class);
+
+    private EntityReferenceSerializer<String> pathEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "path");
+
     /**
      * Pages for which to convert URL to local.
      *
      * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
      */
     @Deprecated
-    protected Set<String> exportedPages = new HashSet<String>();
+    protected Set<String> exportedPages = new HashSet<>();
 
     /**
      * Directory where to export attachment.
@@ -293,7 +303,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    private void renderWithSkinAction(String space, String name, String wikiId, String path, XWikiContext context)
+    private void renderWithSkinAction(String spaces, String name, String wikiId, String path, XWikiContext context)
         throws IOException, XWikiException
     {
         // We're simulating a Skin Action below. However we need to ensure that we set the right doc
@@ -302,7 +312,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         // get for example "Main.WebHome" as the current doc instead of "Main.flamingo".
         // See http://jira.xwiki.org/browse/XWIKI-10922 for details.
 
-        DocumentReference dummyDocumentReference = new DocumentReference(wikiId, space, name);
+        DocumentReference dummyDocumentReference =
+            new DocumentReference(wikiId, this.legacySpaceResolver.resolve(spaces), name);
         XWikiDocument dummyDocument = context.getWiki().getDocument(dummyDocumentReference, context);
 
         Map<String, Object> backup = new HashMap<>();
@@ -413,20 +424,15 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String wikiname = xwikidb == null ? context.getWikiId().toLowerCase() : xwikidb.toLowerCase();
 
-            if (getExportURLFactoryContext().hasExportedPage(wikiname + XWikiDocument.DB_SPACE_SEP + spaces
-                + XWikiDocument.SPACE_NAME_SEP + name)
-                && "view".equals(action) && context.getLinksAction() == null)
+            String serializedReference = this.pathEntityReferenceSerializer.serialize(
+                new DocumentReference(wikiname, this.legacySpaceResolver.resolve(spaces), name));
+            if (getExportURLFactoryContext().hasExportedPage(serializedReference) && "view".equals(action)
+                && context.getLinksAction() == null)
             {
                 StringBuffer newpath = new StringBuffer();
 
                 newpath.append("file://");
-
-                newpath.append(wikiname);
-                newpath.append(".");
-                newpath.append(spaces);
-                newpath.append(".");
-                newpath.append(name);
-
+                newpath.append(serializedReference);
                 newpath.append(".html");
 
                 if (!StringUtils.isEmpty(anchor)) {
@@ -447,7 +453,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * Generate an url targeting attachment in provided wiki page.
      *
      * @param filename the name of the attachment.
-     * @param space the space of the page containing the attachment.
+     * @param spaces a serialized space reference which can contain one or several spaces (e.g. "space1.space2"). If
+     *        a space name contains a dot (".") it must be passed escaped as in "space1\.with\.dot.space2"
      * @param name the name of the page containing the attachment.
      * @param xwikidb the wiki of the page containing the attachment.
      * @param context the XWiki context.
@@ -456,18 +463,21 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @throws IOException error when retrieving document attachment.
      * @throws URISyntaxException when retrieving document attachment.
      */
-    private URL createAttachmentURL(String filename, String space, String name, String xwikidb, XWikiContext context)
+    private URL createAttachmentURL(String filename, String spaces, String name, String xwikidb, XWikiContext context)
         throws XWikiException, IOException, URISyntaxException
     {
         String db = (xwikidb == null ? context.getWikiId() : xwikidb);
-        String path = "attachment/" + db + "." + space + "." + name + "." + filename;
+        DocumentReference documentReference =
+            new DocumentReference(db, this.legacySpaceResolver.resolve(spaces), name);
+        String serializedReference = this.pathEntityReferenceSerializer.serialize(
+            new AttachmentReference(filename, documentReference));
+        String path = "attachment/" + serializedReference;
 
         File file = new File(getExportURLFactoryContext().getExportDir(), path);
         if (!file.exists()) {
-            XWikiDocument doc =
-                context.getWiki().getDocument(
-                    db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
+            XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
+            file.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(file);
             IOUtils.copy(attachment.getContentInputStream(context), fos);
             fos.close();
@@ -478,9 +488,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
         getExportURLFactoryContext().adjustCSSPath(newPath);
 
-        newPath.append(path.replace(" ", "%20"));
+        newPath.append(path);
 
-        return new URI(newPath.toString()).toURL();
+        // Since the returned URL is used in HTML links, we need to escape "%" characters so that browsers don't decode
+        // for example %2E as "." by default which would lead to the browser not finding the file on the filesystem.
+        return new URL(newPath.toString().replaceAll("%", "%25"));
     }
 
     @Override

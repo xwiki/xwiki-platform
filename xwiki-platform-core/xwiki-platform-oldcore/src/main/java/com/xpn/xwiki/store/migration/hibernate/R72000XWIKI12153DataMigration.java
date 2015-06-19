@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -89,30 +90,41 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
         @Override
         public void execute(Connection connection) throws SQLException
         {
-            try (PreparedStatement statement =
-                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
-                // Search for all document spaces that should be escaped
+            // Search for all document spaces that should be escaped
+            try (Statement selectStatement = connection.createStatement()) {
                 try (ResultSet result =
-                    statement.executeQuery("select DISTINCT XWD_WEB from xwikidoc"
+                    selectStatement.executeQuery("select DISTINCT XWD_WEB from xwikidoc"
                         + " where XWD_WEB like '%.%' OR XWD_WEB like '%\\\\%' OR XWD_WEB like '%:%'")) {
-                    while (result.next()) {
-                        // Get space name
-                        String spaceName = result.getString(1);
-
-                        // Convert the space name into a space reference
-                        String spaceReference = serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
-
-                        statement.setString(1, spaceReference);
-                        statement.setString(1, spaceName);
-
-                        // Add a conversion to the list
-                        statement.addBatch();
-                    }
-
-                    // Do all the changes
-                    statement.executeBatch();
+                    convert(connection, result);
                 }
             }
         }
+    }
+
+    private void convert(Connection connection, ResultSet result) throws SQLException
+    {
+        if (result.next()) {
+            try (PreparedStatement statement =
+                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
+                do {
+                    addBatch(statement, result.getString(1));
+                } while (result.next());
+
+                // Do all the changes
+                statement.executeBatch();
+            }
+        }
+    }
+
+    private void addBatch(PreparedStatement statement, String spaceName) throws SQLException
+    {
+        // Convert the space name into a space reference
+        String spaceReference = serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
+
+        statement.setString(1, spaceReference);
+        statement.setString(1, spaceName);
+
+        // Add a conversion to the list
+        statement.addBatch();
     }
 }

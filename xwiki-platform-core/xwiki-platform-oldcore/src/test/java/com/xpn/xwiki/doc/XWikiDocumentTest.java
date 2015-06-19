@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1388,6 +1389,109 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(false, this.document.isMetaDataDirty());
     }
 
+    public void testSetContentSetsContentDirtyFlag()
+    {
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        this.document.setContent("something");
+
+        assertTrue(this.document.isContentDirty());
+        assertFalse(this.document.isMetaDataDirty());
+    }
+
+    public void testSetSameContentDoesNotSetContentDirtyFlag()
+    {
+        this.document.setContent("something");
+        // Make sure we set the flag to false to verify it's changed
+        this.document.setContentDirty(false);
+
+        // Set the same content again.
+        this.document.setContent("something");
+
+        assertFalse(this.document.isContentDirty());
+    }
+
+    public void testModifyObjectsSetsOnlyMetadataDirtyFlag() throws Exception
+    {
+        DocumentReference classReference = this.document.getDocumentReference();
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // New objects.
+        BaseObject object = this.document.newXObject(classReference, getContext());
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Set/add objects.
+        this.document.setXObject(0, object);
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Remove objects
+        this.document.removeXObject(object);
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+    }
+
+    public void testModifyAttachmentsSetsOnlyMetadataDirtyFlag() throws Exception
+    {
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Add attachments.
+        XWikiAttachment attachment =
+            document.addAttachment("file", new ByteArrayInputStream(new byte[] {}), getContext());
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Add attachments (2).
+        document.addAttachment(attachment);
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Modify attachment.
+        attachment.setContent(new ByteArrayInputStream(new byte[] {1, 2, 3}));
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+
+        // Make sure we set the flags to false to verify it's changed
+        this.document.setContentDirty(false);
+        this.document.setMetaDataDirty(false);
+
+        // Remove objects
+        this.document.removeAttachment(attachment);
+
+        assertTrue(this.document.isMetaDataDirty());
+        assertFalse(this.document.isContentDirty());
+    }
+
     /**
      * @see XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException
      */
@@ -1484,13 +1588,31 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Assert.assertFalse(document.equalsData(otherDocument));
     }
 
-    public void testContentDirtyWhenAttachmenListChanges()
+    public void testSetMetadataDirtyWhenAttachmenListChanges() throws XWikiException
     {
         XWikiDocument document = new XWikiDocument();
 
-        document.setContentDirty(false);
+        XWikiAttachment attachment = document.addAttachment("file", new byte[] {1, 2}, getContext());
+
+        // Force the metadata not dirty.
+        document.setMetaDataDirty(false);
 
         List<XWikiAttachment> attachments = document.getAttachmentList();
+        // Modify (clear) the attachments list)
+        attachments.clear();
+
+        // Check that the the metadata is now dirty as a result.
+        Assert.assertTrue(document.isMetaDataDirty());
+
+        // Check adding to list
+        document.setMetaDataDirty(false);
+        attachments.add(new XWikiAttachment());
+        Assert.assertTrue(document.isMetaDataDirty());
+
+        // Check removing from the list
+        document.setMetaDataDirty(false);
+        attachments.remove(0);
+        Assert.assertTrue(document.isMetaDataDirty());
     }
 
     /**

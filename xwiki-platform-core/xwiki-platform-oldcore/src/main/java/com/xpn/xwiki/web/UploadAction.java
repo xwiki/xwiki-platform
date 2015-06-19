@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -171,31 +172,23 @@ public class UploadAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         String username = context.getUser();
 
-        // Read XWikiAttachment
-        XWikiAttachment attachment = doc.getAttachment(filename);
-
-        if (attachment == null) {
-            attachment = new XWikiAttachment();
-            doc.getAttachmentList().add(attachment);
-        }
-
+        XWikiAttachment attachment;
         try {
-            attachment.setContent(fileupload.getFileItemInputStream(fieldName, context));
+            InputStream contentInputStream = fileupload.getFileItemInputStream(fieldName, context);
+            attachment = doc.addAttachment(filename, contentInputStream, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
         }
 
-        attachment.setFilename(filename);
-        attachment.setAuthor(username);
-
-        // Add the attachment to the document
-        attachment.setDoc(doc);
-
+        // Set the document author
         doc.setAuthor(username);
         if (doc.isNew()) {
             doc.setCreator(username);
         }
+
+        // Calculate and store mime type
+        attachment.resetMimeType(context);
 
         // Adding a comment with a link to the download URL
         String comment;
@@ -208,9 +201,6 @@ public class UploadAction extends XWikiAction
         } else {
             comment = localizePlainOrKey("core.comment.uploadAttachmentComment", params);
         }
-
-        // Calculate and store mime type
-        attachment.resetMimeType(context);
 
         // Save the document.
         try {

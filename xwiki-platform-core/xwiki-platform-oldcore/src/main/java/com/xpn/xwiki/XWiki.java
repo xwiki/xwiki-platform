@@ -4152,8 +4152,14 @@ public class XWiki implements EventListener
     public String getURL(DocumentReference documentReference, String action, String queryString, String anchor,
         XWikiContext context)
     {
+        // Extract and escape the spaces portion of the passed reference to pass to the old createURL() API which
+        // unfortunately doesn't accept a DocumentReference...
+        EntityReference spaceReference =
+            documentReference.getLastSpaceReference().removeParent(documentReference.getWikiReference());
+        String spaces = this.defaultEntityReferenceSerializer.serialize(spaceReference);
+
         URL url =
-            context.getURLFactory().createURL(documentReference.getLastSpaceReference().getName(),
+            context.getURLFactory().createURL(spaces,
                 documentReference.getName(), action, queryString, anchor,
                 documentReference.getWikiReference().getName(), context);
 

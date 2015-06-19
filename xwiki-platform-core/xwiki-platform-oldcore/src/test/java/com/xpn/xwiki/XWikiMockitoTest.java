@@ -34,8 +34,10 @@ import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -54,6 +56,7 @@ import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -293,5 +296,22 @@ public class XWikiMockitoTest
         when(userObject.getStringValue("first_name")).thenReturn("");
         when(userObject.getStringValue("last_name")).thenReturn("last'name");
         assertEquals("last'name", xwiki.getPlainUserName(userReference, context));
+    }
+
+    @Test
+    public void getURLWithDotsAndBackslashInSpaceName() throws Exception
+    {
+        XWikiURLFactory urlFactory = mock(XWikiURLFactory.class);
+        when(context.getURLFactory()).thenReturn(urlFactory);
+
+        EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(serializer.serialize(new EntityReference("space.withdot.and\\and:", EntityType.SPACE))).thenReturn(
+            "somescapedspace");
+
+        DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space.withdot.and\\and:"), "page");
+
+        this.xwiki.getURL(reference, "view", null, null, context);
+
+        verify(urlFactory).createURL("somescapedspace", "page", "view", null, null, "wiki", context);
     }
 }

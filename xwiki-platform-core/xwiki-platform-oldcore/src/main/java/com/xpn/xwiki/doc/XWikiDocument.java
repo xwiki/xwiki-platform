@@ -2762,6 +2762,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 entry.getKey().replaceParent(entry.getKey().getWikiReference(),
                     getDocumentReference().getWikiReference());
             // Copy the objects from the template document only if this document doesn't have them already.
+            //
+            // Note: this might be a bit misleading since it will not add objects from the template if objects of that
+            // class already exist in the current document.
             if (getXObjectSize(classReference) == 0) {
                 for (BaseObject object : entry.getValue()) {
                     if (object != null) {

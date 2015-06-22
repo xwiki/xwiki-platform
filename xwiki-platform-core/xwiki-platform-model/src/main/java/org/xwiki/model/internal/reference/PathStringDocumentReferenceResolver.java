@@ -35,8 +35,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
- * Creates a {@link DocumentReference} from a string representation that has the "wiki/space/page" format, where each
- * path component is URL encoded. The current implementation only supports absolute references
+ * Creates a {@link DocumentReference} from a string representation that has the "wiki/space1/.../spaceN/page" format,
+ * where each path component is URL encoded. The current implementation only supports absolute references
  * (i.e up to the wiki part). We made this to work with {@link PathStringEntityReferenceSerializer}.
  * 
  * @version $Id$

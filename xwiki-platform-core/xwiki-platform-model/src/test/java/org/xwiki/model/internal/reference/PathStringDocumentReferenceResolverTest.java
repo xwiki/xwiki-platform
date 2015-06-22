@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.internal.reference;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -39,13 +42,13 @@ public class PathStringDocumentReferenceResolverTest
     @Test
     public void serializeAndResolve()
     {
-        test("wiki", "Space", "Page", "wiki/Space/Page");
-        test("w/i?ki", "Sp.a#ce", "P a@g&e", "w%2Fi%3Fki/Sp%2Ea%23ce/P+a%40g%26e");
+        test("wiki", Arrays.asList("space1", "space2"), "page", "wiki/space1/space2/page");
+        test("w/i?ki", Arrays.asList("Sp.a#ce"), "P a@g&e", "w%2Fi%3Fki/Sp%2Ea%23ce/P+a%40g%26e");
     }
 
-    private void test(String wiki, String space, String page, String expectedSerializedString)
+    private void test(String wiki, List<String> spaces, String page, String expectedSerializedString)
     {
-        DocumentReference documentReference = new DocumentReference(wiki, space, page);
+        DocumentReference documentReference = new DocumentReference(wiki, spaces, page);
         assertEquals(expectedSerializedString, this.serializer.serialize(documentReference));
         assertEquals(documentReference, this.resolver.resolve(this.serializer.serialize(documentReference)));
     }

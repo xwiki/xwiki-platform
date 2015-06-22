@@ -22,6 +22,9 @@ package org.xwiki.model.internal.reference;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -33,9 +36,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Creates a {@link DocumentReference} from a string representation that has the "wiki/space/page" format, where each
- * path component is URL encoded. The current (quick) implementation doesn't support nested spaces and expects the path
- * to contain all 3 components: the wiki name, the space name and the page name (so relative references are not
- * supported either). We made this to work with {@link PathStringEntityReferenceSerializer}.
+ * path component is URL encoded. The current implementation only supports absolute references
+ * (i.e up to the wiki part). We made this to work with {@link PathStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  * @since 5.3M1
@@ -50,13 +52,25 @@ public class PathStringDocumentReferenceResolver implements DocumentReferenceRes
     {
         try {
             File file = new File(path);
+            // The last segment is the page name
             String page = URLDecoder.decode(file.getName(), CharEncoding.UTF_8);
-            String space = URLDecoder.decode(file.getParentFile().getName(), CharEncoding.UTF_8);
-            String wiki = URLDecoder.decode(file.getParentFile().getParentFile().getName(), CharEncoding.UTF_8);
-            return new DocumentReference(wiki, space, page);
+            // All parent segments are space segment till the top level segment which is the wiki name
+            File current = file;
+            String segmentName = null;
+            List<String> spaceNames = new ArrayList<>();
+            while (current.getParentFile() != null) {
+                current = current.getParentFile();
+                segmentName = URLDecoder.decode(current.getName(), CharEncoding.UTF_8);
+                if (current.getParentFile() != null) {
+                    spaceNames.add(segmentName);
+                }
+            }
+            Collections.reverse(spaceNames);
+            String wiki = segmentName;
+            return new DocumentReference(wiki, spaceNames, page);
         } catch (UnsupportedEncodingException e) {
             // This will never happen, UTF-8 is always available
-            return null;
+            throw new RuntimeException("UTF-8 encoding is not present on the system!", e);
         }
     }
 }

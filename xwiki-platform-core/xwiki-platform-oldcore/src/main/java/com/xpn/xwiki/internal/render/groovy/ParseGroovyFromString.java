@@ -31,14 +31,13 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 import groovy.lang.GroovyClassLoader;
 
 /**
- * Helper used to implement {@link XWiki#parseGroovyFromString(String, XWikiContext)}
+ * Helper used to implement {@link com.xpn.xwiki.XWiki#parseGroovyFromString(String, XWikiContext)}.
  * 
  * @version $Id$
  * @since 7.1M1

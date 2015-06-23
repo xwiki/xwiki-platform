@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.CreateResourceReferenceException;
+import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.entity.EntityResourceAction;
@@ -64,7 +65,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     private static final List<String> FILE_ACTION_LIST =
         Arrays.asList(DOWNLOAD_ACTION, DELATTACHMENT_ACTION, VIEWATTACHREV_ACTION);
 
-    private StandardURLConfiguration configuration;
+    private StandardURLConfiguration standardURLConfiguration;
 
     private EntityResourceActionLister entityResourceActionLister;
 
@@ -79,7 +80,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     public EntityResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
-        EntityResourceReference entityURL;
+        EntityResourceReference reference = null;
 
         // Extract the wiki reference from the URL
         WikiReference wikiReference = extractWikiReference(extendedURL);
@@ -137,36 +138,53 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         } else if (pathSegments.size() != 0) {
             String firstSegment = pathSegments.get(0);
             action = firstSegment;
-            if (FILE_ACTION_LIST.contains(firstSegment) && pathSegments.size() >= 4) {
-                // Last segment is the attachment
-                attachmentName = pathSegments.get(pathSegments.size() - 1);
-                // Last but one segment is the page name
-                pageName = pathSegments.get(pathSegments.size() - 2);
-                // All segments in between are the space names
-                spaceNames = extractSpaceNames(pathSegments, 1, pathSegments.size() - 3);
+            // Is there a specific Resolver registered for this action? If so call it. Otherwise use the generic
+            // algorithm to resolve the Entity URL.
+            ResourceReferenceResolver<ExtendedURL> actionResolver = findResourceResolver(type, action);
+            if (actionResolver != null) {
+                // Remove the first element (the action)
+                List<String> segments = new ArrayList<>(extendedURL.getSegments());
+                segments.remove(0);
+                ExtendedURL newExtendedURL = new ExtendedURL(segments);
+                reference = (EntityResourceReference) actionResolver.resolve(newExtendedURL, type, parameters);
+                // Update the Entity Reference to add the Wiki Reference
+                EntityReference newEntityReference = new EntityReference(reference.getEntityReference(), wikiReference);
+                reference.setEntityReference(newEntityReference);
             } else {
-                // Handle the following UCs:
-                // - /view/space/page ==> view.space.page, action = "view"
-                // - /view/download/space2/page => download.space.page, action = "view"
-                // - /view/view/download/space3/page => view.download.space3.page, action = "view"
-                Pair<String, Integer> actionAndStartPosition =
-                    computeActionAndStartPosition(firstSegment, pathSegments, action);
-                action = actionAndStartPosition.getLeft();
-                int startPosition = actionAndStartPosition.getRight();
-                // Last segment is the page name
-                pageName = pathSegments.get(pathSegments.size() - 1);
-                // All segments in between are the space names
-                spaceNames = extractSpaceNames(pathSegments, startPosition, pathSegments.size() - 2);
+                // Generic parsing
+                if (FILE_ACTION_LIST.contains(firstSegment) && pathSegments.size() >= 4) {
+                    // Last segment is the attachment
+                    attachmentName = pathSegments.get(pathSegments.size() - 1);
+                    // Last but one segment is the page name
+                    pageName = pathSegments.get(pathSegments.size() - 2);
+                    // All segments in between are the space names
+                    spaceNames = extractSpaceNames(pathSegments, 1, pathSegments.size() - 3);
+                } else {
+                    // Handle the following UCs:
+                    // - /view/space/page ==> view.space.page, action = "view"
+                    // - /view/download/space2/page => download.space.page, action = "view"
+                    // - /view/view/download/space3/page => view.download.space3.page, action = "view"
+                    Pair<String, Integer> actionAndStartPosition =
+                        computeActionAndStartPosition(firstSegment, pathSegments, action);
+                    action = actionAndStartPosition.getLeft();
+                    int startPosition = actionAndStartPosition.getRight();
+                    // Last segment is the page name
+                    pageName = pathSegments.get(pathSegments.size() - 1);
+                    // All segments in between are the space names
+                    spaceNames = extractSpaceNames(pathSegments, startPosition, pathSegments.size() - 2);
+                }
             }
         }
 
-        entityURL = new EntityResourceReference(
-            buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
-            EntityResourceAction.fromString(action));
+        if (reference == null) {
+            reference = new EntityResourceReference(
+                buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
+                EntityResourceAction.fromString(action));
+        }
 
-        copyParameters(extendedURL, entityURL);
+        copyParameters(extendedURL, reference);
 
-        return entityURL;
+        return reference;
     }
 
     private Pair<String, Integer> computeActionAndStartPosition(String firstSegment, List<String> pathSegments,
@@ -175,7 +193,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         String action = currentAction;
         int startPosition = 1;
 
-        if (this.configuration.isViewActionHidden()) {
+        if (this.standardURLConfiguration.isViewActionHidden()) {
             if (VIEW_ACTION.equals(firstSegment)) {
                 // Does the next segment have an action name?
                 String secondSegment = pathSegments.get(1);

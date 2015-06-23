@@ -258,7 +258,7 @@
   #else
     #if(!$classTemplateDoc.getObject(${doc.fullName}))
       #set($xredirect = $xwiki.relativeRequestURL)
-      #set($createUrl = $classTemplateDoc.getURL('objectadd', "classname=${doc.fullName}&amp;amp;xredirect=${escapetool.url($xredirect)}&amp;amp;form_token=$!{services.csrf.getToken()}"))
+      #set($createUrl = $classTemplateDoc.getURL('objectadd', "classname=${escapetool.url($doc.fullName)}&amp;amp;xredirect=${escapetool.url($xredirect)}&amp;amp;form_token=$!{services.csrf.getToken()}"))
       {{warning}}
         The template does not contain an object of type //$doc.fullName//. {{html}}&lt;a href="$createUrl"&gt;Add a ${className} object to the template »&lt;/a&gt;.{{/html}}
       {{/warning}}

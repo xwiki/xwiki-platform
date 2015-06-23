@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -225,14 +226,15 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
     {
         XWikiContext xcontext = getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
-
+        
+        WikiReference mainWikiReference = new WikiReference(wikiDescriptorManager.getMainWikiId());
+                
         Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
         while (itDocumentsToRestore.hasNext()) {
             DocumentReference docRef = itDocumentsToRestore.next();
 
             // Get the corresponding doc in the main wiki
-            DocumentReference mainDocRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                    docRef.getLastSpaceReference().getName(), docRef.getName());
+            DocumentReference mainDocRef = docRef.setWikiReference(mainWikiReference);
 
             // If the document exists in the main wiki, copy it
             if (xwiki.exists(mainDocRef, xcontext)) {

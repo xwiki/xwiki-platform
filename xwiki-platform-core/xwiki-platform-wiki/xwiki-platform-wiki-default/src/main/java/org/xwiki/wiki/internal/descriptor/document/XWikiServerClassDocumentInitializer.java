@@ -24,9 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.sheet.SheetBinder;
 
 import com.xpn.xwiki.XWiki;
@@ -53,8 +52,8 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * Reference to the server class.
      */
-    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+    public static final LocalDocumentReference SERVER_CLASS = 
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
 
     /**
      * Default list separators of XWiki.XWikiServerClass fields.

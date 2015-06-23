@@ -155,7 +155,7 @@ public class DefaultWikiUserManager implements WikiUserManager
     @Override
     public Collection<String> getMembers(String wikiId) throws WikiUserManagerException
     {
-        List<String> members = new ArrayList<String>();
+        List<String> members = new ArrayList<>();
 
         try {
             // Get the descriptor
@@ -266,7 +266,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         if (objects != null) {
 
             // Get the member objects to remove
-            List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
+            List<BaseObject> objectsToRemove = new ArrayList<>();
             for (BaseObject object : objects) {
                 if (object == null) {
                     continue;
@@ -298,7 +298,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         if (objects != null) {
 
             // Get the member objects to remove
-            List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
+            List<BaseObject> objectsToRemove = new ArrayList<>();
             for (String userId: userIds) {
                 for (BaseObject object : objects) {
                     if (object == null) {
@@ -353,12 +353,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Collect all the candidacy of the good type
-        Collection<MemberCandidacy> candidacies = new ArrayList<MemberCandidacy>();
+        Collection<MemberCandidacy> candidacies = new ArrayList<>();
         String typeString = type.name().toLowerCase();
-        DocumentReference candidateClassReference = new DocumentReference(wikiId,
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        List<BaseObject> candidacyObjects = groupDoc.getXObjects(candidateClassReference);
+        List<BaseObject> candidacyObjects = groupDoc.getXObjects(WikiCandidateMemberClassInitializer.REFERENCE);
         if (candidacyObjects != null) {
             for (BaseObject object : candidacyObjects) {
                 if (object != null
@@ -424,10 +421,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Get the candidacy
-        DocumentReference candidateClassReference = new DocumentReference(wikiId,
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, candidacyId);
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacyId);
         return readCandidacyFromObject(object, wikiId);
     }
 
@@ -443,13 +437,10 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         // Add a candidacy object
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference candidateClassReference = new DocumentReference(wikiId,
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
         try {
-            int objectNumber = groupDoc.createXObject(candidateClassReference, xcontext);
+            int objectNumber = groupDoc.createXObject(WikiCandidateMemberClassInitializer.REFERENCE, xcontext);
             candidacy.setId(objectNumber);
-            BaseObject object = groupDoc.getXObject(candidateClassReference, objectNumber);
+            BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, objectNumber);
             object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_USER, candidacy.getUserId());
             object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT,
                     candidacy.getUserComment());
@@ -509,10 +500,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(request.getWikiId(),
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, request.getId());
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
 
         // Set the new values
         object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, request.getAdminId());
@@ -546,10 +534,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(request.getWikiId(),
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, request.getId());
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, request.getId());
 
         // Set the new values
         object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, request.getAdminId());
@@ -572,10 +557,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(candidacy.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(candidacy.getWikiId(),
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, candidacy.getId());
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, candidacy.getId());
 
         // Remove the candidacy, if any
         if (object != null) {
@@ -599,13 +581,10 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Add a candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(wikiId,
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
         try {
-            int objectNumber = groupDoc.createXObject(candidateClassReference, xcontext);
+            int objectNumber = groupDoc.createXObject(WikiCandidateMemberClassInitializer.REFERENCE, xcontext);
             candidacy.setId(objectNumber);
-            BaseObject object = groupDoc.getXObject(candidateClassReference, objectNumber);
+            BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, objectNumber);
             object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_USER, candidacy.getUserId());
             object.setStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN, candidacy.getAdminId());
             object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_ADMIN_COMMENT, message);
@@ -664,10 +643,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(invitation.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(invitation.getWikiId(),
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, invitation.getId());
+        BaseObject object = groupDoc.getXObject(WikiCandidateMemberClassInitializer.REFERENCE, invitation.getId());
 
         // Set the new values
         object.setLargeStringValue(WikiCandidateMemberClassInitializer.FIELD_USER_COMMENT, invitation.getUserComment());

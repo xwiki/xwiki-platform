@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MembershipType;
@@ -129,12 +130,11 @@ public class WikiUserFromXEMMigrationTest
         when(xwiki.getDocument(eq(memberGroupRef), any(XWikiContext.class))).thenReturn(memberGroupDoc);
         DocumentReference candidacyOldClass = new DocumentReference("workspace", "XWiki",
                 "WorkspaceCandidateMemberClass");
-        List<BaseObject> oldCandidacies = new ArrayList<BaseObject>();
+        List<BaseObject> oldCandidacies = new ArrayList<>();
         BaseObject oldCandidacy = mock(BaseObject.class);
         oldCandidacies.add(oldCandidacy);
         when(memberGroupDoc.getXObjects(eq(candidacyOldClass))).thenReturn(oldCandidacies);
-        DocumentReference newCandidacyClassRef = new DocumentReference("workspace",
-                WikiCandidateMemberClassInitializer.DOCUMENT_SPACE, WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
+        LocalDocumentReference newCandidacyClassRef = WikiCandidateMemberClassInitializer.REFERENCE;
         BaseObject newCandidacyObject = mock(BaseObject.class);
         when(memberGroupDoc.newXObject(eq(newCandidacyClassRef), any(XWikiContext.class)))
                 .thenReturn(newCandidacyObject);

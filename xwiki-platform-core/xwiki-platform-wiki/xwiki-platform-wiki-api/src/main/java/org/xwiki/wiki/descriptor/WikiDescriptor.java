@@ -191,7 +191,7 @@ public class WikiDescriptor implements Cloneable
      */
     public DocumentReference getMainPageReference()
     {
-        return new DocumentReference(getId(), mainPageReference.getParent().getName(), mainPageReference.getName());
+        return new DocumentReference(mainPageReference, new WikiReference(getId()));
     }
 
     /**
@@ -199,7 +199,7 @@ public class WikiDescriptor implements Cloneable
      */
     public void setMainPageReference(DocumentReference reference)
     {
-        this.mainPageReference = new LocalDocumentReference(reference.getParent().getName(), reference.getName());
+        this.mainPageReference = new LocalDocumentReference(reference);
     }
 
     /**

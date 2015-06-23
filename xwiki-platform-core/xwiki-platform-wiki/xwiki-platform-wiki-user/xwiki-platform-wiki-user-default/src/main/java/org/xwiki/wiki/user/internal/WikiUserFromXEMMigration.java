@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
@@ -256,9 +257,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
                 "WorkspaceCandidateMemberClass");
         List<BaseObject> candidacyObjects = candidaciesDocument.getXObjects(oldCandidateClassReference);
         if (candidacyObjects != null) {
-            DocumentReference newCandidateClassReference = new DocumentReference(wikiId,
-                    WikiCandidateMemberClassInitializer.DOCUMENT_SPACE,
-                    WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
+            LocalDocumentReference newCandidateClassReference = WikiCandidateMemberClassInitializer.REFERENCE;
 
             for (BaseObject oldObject : candidacyObjects) {
                 if (oldObject == null) {

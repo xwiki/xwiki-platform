@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -159,7 +158,6 @@ public class DefaultWikiDescriptorManagerTest
         when(cache.getFromId("wikiid")).thenReturn(null);
 
         // But exists
-        DocumentReference reference = new DocumentReference("xwiki", "space", "page");
         XWikiDocument document = mock(XWikiDocument.class);
         when(descriptorDocumentHelper.findXWikiServerClassDocument("wikialias")).thenReturn(document);
         when(document.isNew()).thenReturn(false);

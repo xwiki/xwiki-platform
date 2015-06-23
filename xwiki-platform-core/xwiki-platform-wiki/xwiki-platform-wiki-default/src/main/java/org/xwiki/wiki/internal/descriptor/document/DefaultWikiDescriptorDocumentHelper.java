@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -150,15 +151,12 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
         WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
 
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
-
+        
         List<String> documentNames = getAllXWikiServerClassDocumentNames();
         if (documentNames != null) {
+            WikiReference mainWikiReference = new WikiReference(wikiDescriptorManager.getMainWikiId());
             for (String documentName : documentNames) {
-                // Resolve the document names into references
-                DocumentReference docRef = documentReferenceResolver.resolve(documentName);
-                docRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                        docRef.getLastSpaceReference().getName(), docRef.getName());
-                result.add(getDocument(docRef));
+                result.add(getDocument(documentReferenceResolver.resolve(documentName, mainWikiReference)));
             }
         }
 

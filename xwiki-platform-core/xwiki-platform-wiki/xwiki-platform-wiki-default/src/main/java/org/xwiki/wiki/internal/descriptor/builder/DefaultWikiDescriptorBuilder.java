@@ -196,7 +196,6 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     @Override
     public XWikiDocument save(WikiDescriptor descriptor) throws WikiDescriptorBuilderException
     {
-        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
         XWikiDocument descriptorDoc = null;
@@ -217,14 +216,10 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();
-            DocumentReference serverClass =
-                new DocumentReference(wikiDescriptorManager.getMainWikiId(), DefaultWikiDescriptor.SERVER_CLASS
-                    .getParent().getName(), DefaultWikiDescriptor.SERVER_CLASS.getName());
             for (int i = 1; i < aliases.size(); ++i) {
                 String alias = aliases.get(i);
-                BaseObject objAlias =
-                    descriptorDoc
-                        .getXObject(serverClass, XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
+                BaseObject objAlias = descriptorDoc.getXObject(DefaultWikiDescriptor.SERVER_CLASS,
+                    XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, true);
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 

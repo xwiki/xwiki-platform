@@ -19,7 +19,7 @@
  */
 package org.xwiki.wiki.internal.descriptor;
 
-import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
 
@@ -33,7 +33,7 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     /**
      * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
      */
-    public static final EntityReference SERVER_CLASS = XWikiServerClassDocumentInitializer.SERVER_CLASS;
+    public static final LocalDocumentReference SERVER_CLASS = XWikiServerClassDocumentInitializer.SERVER_CLASS;
 
     /**
      * Used to associate to a cache key the fact that no descriptor exist.

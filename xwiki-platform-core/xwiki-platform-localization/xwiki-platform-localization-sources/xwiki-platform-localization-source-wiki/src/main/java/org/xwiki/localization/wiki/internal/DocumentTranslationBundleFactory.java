@@ -57,6 +57,7 @@ import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -213,20 +214,19 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     private void loadTranslations(String wiki)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        WikiReference wikiReference = new WikiReference(wiki);
 
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
-                    "select distinct doc.space, doc.name from Document doc, doc.object(%s) as translation",
+                    "select distinct doc.fullName from Document doc, doc.object(%s) as translation",
                     TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE_STRING), Query.XWQL);
 
             query.setWiki(wiki);
-
-            List<Object[]> documents = query.execute();
-            for (Object[] documentName : documents) {
-                DocumentReference reference =
-                    new DocumentReference(wiki, (String) documentName[0], (String) documentName[1]);
-
+            
+            List<String> documents = query.execute();
+            for (String documentName : documents) {
+                DocumentReference reference = currentResolver.resolve(documentName, wikiReference);
                 XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
                 try {

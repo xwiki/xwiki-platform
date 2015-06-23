@@ -57,6 +57,7 @@ public class HTMLMimeBodyPartFactoryTest
             Collections.<String, Object>emptyMap());
 
         assertEquals("<p>some html</p>", bodyPart.getContent());
+        assertEquals("text/html; charset=UTF-8", bodyPart.getContentType());
     }
 
     @Test

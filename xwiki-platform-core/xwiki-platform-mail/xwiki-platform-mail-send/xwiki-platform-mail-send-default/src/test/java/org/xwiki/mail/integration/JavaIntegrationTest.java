@@ -285,7 +285,7 @@ public class JavaIntegrationTest
         assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
 
         BodyPart htmlBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
-        assertEquals("text/html; charset=UTF-8", htmlBodyPart.getHeader("Content-Type")[0]);
+        assertEquals("text/html", htmlBodyPart.getHeader("Content-Type")[0]);
         assertEquals("<font size=\"\\\"2\\\"\">simple meeting invitation</font>", htmlBodyPart.getContent());
 
         BodyPart calendarBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(1);

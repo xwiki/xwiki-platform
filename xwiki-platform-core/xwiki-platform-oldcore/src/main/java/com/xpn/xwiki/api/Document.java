@@ -254,7 +254,7 @@ public class Document extends Api
      */
     public String getSpace()
     {
-        return this.doc.getDocumentReference().getLastSpaceReference().getName();
+        return this.doc.getSpace();
     }
 
     /**

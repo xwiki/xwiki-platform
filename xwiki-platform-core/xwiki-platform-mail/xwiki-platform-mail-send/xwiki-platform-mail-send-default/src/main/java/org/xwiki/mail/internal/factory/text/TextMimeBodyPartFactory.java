@@ -42,6 +42,8 @@ import org.xwiki.mail.internal.factory.AbstractMimeBodyPartFactory;
 @Singleton
 public class TextMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 {
+    private static final String TEXT_PLAIN_CONTENT_TYPE = "text/plain; charset=" + StandardCharsets.UTF_8.name();
+
     /**
      * Provides access to the logger.
      */
@@ -54,7 +56,7 @@ public class TextMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         // Create the body part of the email
         MimeBodyPart bodyPart = new MimeBodyPart();
 
-        bodyPart.setContent(content, "text/plain; charset=" + StandardCharsets.UTF_8.name());
+        bodyPart.setContent(content, TEXT_PLAIN_CONTENT_TYPE);
 
         bodyPart.setHeader("Content-Type", getMimetype(parameters));
 
@@ -74,7 +76,7 @@ public class TextMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     {
         String mimeType = (String) parameters.get("mimetype");
         if (StringUtils.isEmpty(mimeType)) {
-            mimeType = "text/plain";
+            mimeType = TEXT_PLAIN_CONTENT_TYPE;
         }
         return mimeType;
     }

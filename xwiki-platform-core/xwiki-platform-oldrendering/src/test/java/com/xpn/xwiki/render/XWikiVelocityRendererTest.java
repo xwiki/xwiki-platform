@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.jmock.Mock;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -31,7 +33,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiVelocityRenderer}.
- * 
+ *
  * @version $Id$
  */
 public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTestCase
@@ -53,7 +55,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
     {
         super.setUp();
 
-        this.renderer = new XWikiVelocityRenderer();
+        this.renderer = getComponentManager().getInstance(XWikiRenderer.class, "velocity");
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
@@ -71,7 +73,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
 
         Mock mockApiDocument =
             mock(Document.class, new Class[] {XWikiDocument.class, XWikiContext.class}, new Object[] {this.document,
-            getContext()});
+                getContext()});
         this.mockDocument.stubs().method("newDocument").will(returnValue(mockApiDocument.proxy()));
     }
 
@@ -93,6 +95,11 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getIncludedMacros").will(returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getPrefixedFullName").will(returnValue("xwiki:Space2.Document"));
+
+        DocumentReference authorReference = new DocumentReference("wiki", Arrays.asList("space"), "user");
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("space"), "page");
+        this.mockDocument.stubs().method("getContentAuthorReference").will(returnValue(authorReference));
+        this.mockDocument.stubs().method("getDocumentReference").will(returnValue(documentReference));
 
         String result =
             this.renderer.render("#set ($test = \"hello\")\n$test world\n## comment", this.contentDocument,

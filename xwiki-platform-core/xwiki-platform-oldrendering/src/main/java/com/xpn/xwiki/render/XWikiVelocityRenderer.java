@@ -34,6 +34,8 @@ import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -55,6 +57,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 
     @Inject
     private VelocityManager velocityManager;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
 
     @Override
     public String getId()
@@ -83,6 +88,12 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         // If there are no # or $ characters than the content doesn't contain any velocity code
         // see: http://velocity.apache.org/engine/releases/velocity-1.5/vtl-reference-guide.html
         if (StringUtils.containsNone(content, VELOCITY_CHARACTERS)) {
+            return content;
+        }
+
+        // Check for script rights.
+        if (!this.authorizationManager.hasAccess(Right.SCRIPT, contextdoc.getContentAuthorReference(),
+            contextdoc.getDocumentReference())) {
             return content;
         }
 

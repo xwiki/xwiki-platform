@@ -111,7 +111,7 @@ public class TestDefinitionParserTest
 
         Collection<TestAccessRule> rules = mainwiki.getAccessRules();
 
-        assertThat("There must be 24 access rules on main wiki", rules.size(), equalTo(24));
+        assertThat("There must be 26 access rules on main wiki", rules.size(), equalTo(26));
 
         List<DocumentReference> userRefs = new ArrayList<DocumentReference>();
         List<Right> rights = new ArrayList<Right>();
@@ -145,7 +145,7 @@ public class TestDefinitionParserTest
 
         rules = space.getAccessRules();
 
-        assertThat("There must be 7 access rules on space 1", rules.size(), equalTo(7));
+        assertThat("There must be 8 access rules on space 1", rules.size(), equalTo(8));
 
         userRefs = new ArrayList<DocumentReference>();
         rights = new ArrayList<Right>();
@@ -178,7 +178,7 @@ public class TestDefinitionParserTest
 
         rules = document.getAccessRules();
 
-        assertThat("There must be 6 access rules on document 1", rules.size(), equalTo(6));
+        assertThat("There must be 7 access rules on document 1", rules.size(), equalTo(7));
 
         userRefs = new ArrayList<DocumentReference>();
         rights = new ArrayList<Right>();

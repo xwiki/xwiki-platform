@@ -411,6 +411,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
     'view'        : "$escapetool.javascript($services.localization.render('rightsmanager.view'))",
     'comment'     : "$escapetool.javascript($services.localization.render('rightsmanager.comment'))",
     'edit'        : "$escapetool.javascript($services.localization.render('rightsmanager.edit'))",
+    'script'      : "$escapetool.javascript($services.localization.render('rightsmanager.script'))",
     'delete'      : "$escapetool.javascript($services.localization.render('rightsmanager.delete'))",
     'admin'       : "$escapetool.javascript($services.localization.render('rightsmanager.admin'))",
     'register'    : "$escapetool.javascript($services.localization.render('rightsmanager.register'))",

@@ -308,6 +308,25 @@ public class ReferenceUserIteratorTest
     }
 
     @Test
+    public void getMembersWhenGroupWithNullMember() throws Exception
+    {
+        setUpBaseMocks();
+        DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.isNew()).thenReturn(false);
+        when(document.getDocumentReference()).thenReturn(groupReference);
+        when(xwiki.getDocument(groupReference, this.xwikiContext)).thenReturn(document);
+        List<BaseObject> memberObjects = new ArrayList<>();
+        memberObjects.add(null);
+        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
+            memberObjects);
+
+        Iterator<DocumentReference> iterator = new ReferenceUserIterator(groupReference, this.resolver, this.execution);
+
+        assertFalse(iterator.hasNext());
+    }
+
+    @Test
     public void getMembersWhenGroupHasReferenceToItself() throws Exception
     {
         setUpBaseMocks();

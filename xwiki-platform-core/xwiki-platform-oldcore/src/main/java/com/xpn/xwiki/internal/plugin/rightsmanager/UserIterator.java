@@ -352,14 +352,22 @@ public class UserIterator<T> implements Iterator<T>
         // Handle duplicates by using a Set (last one wins).
         Collection<DocumentReference> members = new LinkedHashSet<>();
         for (BaseObject memberObject : memberObjects) {
+            // If the member object is null, discard this entry!
+            if (memberObject == null) {
+                continue;
+            }
+
             String member = memberObject.getStringValue("member");
-            // If the member is empty, discard it!
-            if (!StringUtils.isBlank(member)) {
-                DocumentReference resolvedReference =
-                    this.explicitDocumentReferenceResolver.resolve(member, currentReference);
-                if (!resolvedReference.equals(currentReference)) {
-                    members.add(resolvedReference);
-                }
+
+            // If the member reference is empty, discard this entry!
+            if (StringUtils.isBlank(member)) {
+                continue;
+            }
+
+            DocumentReference resolvedReference =
+                this.explicitDocumentReferenceResolver.resolve(member, currentReference);
+            if (!resolvedReference.equals(currentReference)) {
+                members.add(resolvedReference);
             }
         }
         return members;

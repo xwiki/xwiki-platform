@@ -88,7 +88,7 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setListValue(fieldName, value);
-        setContentDirty(true);
+        setMetaDataDirty(true);
     }
     
     /**

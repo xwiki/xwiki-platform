@@ -227,7 +227,7 @@ public class XWikiAttachmentContent implements Cloneable
     {
         this.isContentDirty = contentDirty;
         if (contentDirty && this.ownerDocument != null) {
-            this.ownerDocument.setContentDirty(contentDirty);
+            this.ownerDocument.setMetaDataDirty(contentDirty);
         }
     }
 
@@ -332,7 +332,7 @@ public class XWikiAttachmentContent implements Cloneable
     {
         this.ownerDocument = ownerDocument;
         if (this.isContentDirty && ownerDocument != null) {
-            ownerDocument.setContentDirty(true);
+            ownerDocument.setMetaDataDirty(true);
         }
     }
 }

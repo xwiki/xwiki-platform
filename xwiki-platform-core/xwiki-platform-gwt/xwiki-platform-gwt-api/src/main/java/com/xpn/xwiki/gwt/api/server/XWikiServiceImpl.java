@@ -441,7 +441,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 bobject.setName(doc.getFullName());
                 bobject.setClassName(className);
                 bobject.set(propertyname, value, context);
-                doc.setContentDirty(true);
+                doc.setMetaDataDirty(true);
                 doc.setAuthor(context.getUser());
                 context.getWiki().saveDocument(doc, localizePlainOrKey("core.comment.updateProperty"),
                     context);

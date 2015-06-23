@@ -51,7 +51,7 @@ public class TextMimeBodyPartFactoryTest
             Collections.<String, Object>emptyMap());
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
-        assertEquals("text/plain", bodyPart.getContentType());
+        assertEquals("text/plain; charset=UTF-8", bodyPart.getContentType());
     }
 
     @Test

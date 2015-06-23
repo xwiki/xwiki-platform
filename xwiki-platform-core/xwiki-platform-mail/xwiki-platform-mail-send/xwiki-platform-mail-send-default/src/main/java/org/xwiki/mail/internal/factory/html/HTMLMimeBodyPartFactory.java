@@ -59,6 +59,8 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     private static final Pattern CID_PATTERN =
         Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
+    private static final String TEXT_HTML_CONTENT_TYPE = "text/html; charset=" + StandardCharsets.UTF_8.name();
+
     @Inject
     @Named("xwiki/attachment")
     private MimeBodyPartFactory<Attachment> attachmentPartFactory;
@@ -151,8 +153,8 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     private MimeBodyPart createHTMLBodyPart(String content, boolean hasAttachments) throws MessagingException
     {
         MimeBodyPart htmlPart = new MimeBodyPart();
-        htmlPart.setContent(content, "text/html; charset=" + StandardCharsets.UTF_8.name());
-        htmlPart.setHeader("Content-Type", "text/html");
+        htmlPart.setContent(content, TEXT_HTML_CONTENT_TYPE);
+        htmlPart.setHeader("Content-Type", TEXT_HTML_CONTENT_TYPE);
         if (hasAttachments) {
             htmlPart.setHeader("Content-Disposition", "inline");
             htmlPart.setHeader("Content-Transfer-Encoding", "quoted-printable");

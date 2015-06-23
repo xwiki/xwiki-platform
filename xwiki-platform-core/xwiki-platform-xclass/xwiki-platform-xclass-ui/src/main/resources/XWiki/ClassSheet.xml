@@ -89,16 +89,16 @@
   #if ($classSheetReferences.isEmpty())
     ## There is no class sheet explicitly bound to this class. Fall-back on naming convention.
     ## Before XWiki 2.0, the default class sheet was suffixed with "ClassSheet". Since 2.0, the suffix is just "Sheet".
-    #set($defaultClassSheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}ClassSheet"))
+    #set($defaultClassSheetReference = $services.model.resolveDocument("${className}ClassSheet"))
     #if(!$xwiki.exists($defaultClassSheetReference))
-      #set($defaultClassSheetReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Sheet"))
+      #set($defaultClassSheetReference = $services.model.resolveDocument("${className}Sheet"))
     #end
   #end
   ## Determine the template using naming convention.
   ## Before XWiki 2.0, the default class template was suffixed with "ClassTemplate". Since 2.0, the suffix is just "Template".
-  #set($classTemplateReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}ClassTemplate"))
+  #set($classTemplateReference = $services.model.resolveDocument("${className}ClassTemplate"))
   #if(!$xwiki.exists($classTemplateReference))
-    #set($classTemplateReference = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+    #set($classTemplateReference = $services.model.resolveDocument("${className}Template"))
   #end
   #set($classTemplateDoc = $xwiki.getDocument($classTemplateReference))
   #set($hasClassSheets = !$classSheetReferences.isEmpty() || $xwiki.exists($defaultClassSheetReference))

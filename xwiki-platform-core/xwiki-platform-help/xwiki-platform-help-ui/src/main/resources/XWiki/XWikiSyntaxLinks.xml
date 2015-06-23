@@ -223,8 +223,9 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 |Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link to an attachment on the current page|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link to an attachment in a different page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
-|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page#anchor]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
-|Link to a Heading in a page|{{{[[label&gt;&gt;Space.Page#HMyheading]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page#anchor]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
+|Link to a Heading in a page|{{{[[label&gt;&gt;Space.Page#HMyheading]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
+|Link to an Anchor in the current page|{{{[[label&gt;&gt;#anchor]]}}}|[[label&gt;&gt;||anchor="anchor"]]
 
 {{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
 
@@ -276,8 +277,9 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 |Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link to an attachment on the current page|{{{[[text&gt;&gt;attach:img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link to an attachment in a different page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
-|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page||anchor=anchor]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
-|Link to a Heading in a page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+|Link to an Anchor in a page|{{{[[label&gt;&gt;Space.Page||anchor="anchor"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="anchor"]]
+|Link to a Heading in a page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMyheading"]]
+|Link to an Anchor in the current page|{{{[[label&gt;&gt;||anchor="anchor"]]}}}|[[label&gt;&gt;||anchor="anchor"]]
 
 {{info}}When you add a Heading, an anchor named "H" followed by the heading title with only alpha characters is created. For example, for a Heading named "My heading", the generated anchor will be "HMyheading".{{/info}}
 

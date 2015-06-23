@@ -42,7 +42,8 @@
  XWiki is a free wiki software platform written in Java with a design emphasis
  on extensibility.
  .
- This package contains preconfigured SOLR server synchronized with XWiki version.
+ This package contains preconfigured SOLR server synchronized with XWiki version
+  to be used to setup a standalone Solr server.
     </debian.solr.description>
     <debian.description>
  ${debian.solr.description}

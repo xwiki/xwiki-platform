@@ -29,8 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,13 +41,20 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.lang3.LocaleUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.XarUtils;
 import org.xwiki.xar.internal.model.XarModel;
+
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 /**
  * Manipulate package.xml XAR package file.
@@ -61,6 +66,23 @@ public class XarPackage
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
         new LocalStringEntityReferenceSerializer();
+
+    private static final RelativeStringEntityReferenceResolver RESOLVER = new RelativeStringEntityReferenceResolver();
+
+    /**
+     * Get all entries found in a XAR file.
+     * 
+     * @param file the XAR file
+     * @return the entries of the passed XAR file
+     * @throws XarException when failing to parse the XAR package
+     * @throws IOException when failing to read the file
+     */
+    public static Collection<XarEntry> getEntries(File file) throws XarException, IOException
+    {
+        XarPackage xarPackage = new XarPackage(file);
+
+        return xarPackage.getEntries();
+    }
 
     /**
      * @see #getPackageExtensionId()
@@ -101,6 +123,9 @@ public class XarPackage
      * @see #isPackageBackupPack()
      */
     private boolean packageBackupPack;
+
+    private final Map<LocalDocumentReference, XarEntry> packageFiles =
+        new LinkedHashMap<LocalDocumentReference, XarEntry>();
 
     private final Map<LocalDocumentReference, XarEntry> entries = new LinkedHashMap<LocalDocumentReference, XarEntry>();
 
@@ -211,9 +236,19 @@ public class XarPackage
         if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
             readDescriptor(stream);
         } else {
-            XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
+            LocalDocumentReference reference = XarUtils.getReference(stream);
+
+            // Get current action associated to the document
+            int defaultAction = getDefaultAction(reference);
+
+            // Create entry
+            XarEntry xarEntry = new XarEntry(reference, entry.getName(), defaultAction);
+
+            // Register entry
             this.entries.put(xarEntry, xarEntry);
 
+            // Update existing package file entry name
+            updatePackageFileEntryName(xarEntry);
         }
     }
 
@@ -243,10 +278,20 @@ public class XarPackage
 
     /**
      * @param preserveVersion true if the history should be preserved by default
+     * @deprecated since 7.2M1, use {@link #setPackagePreserveVersion(boolean)} instead
      */
+    @Deprecated
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.packagePreserveVersion = preserveVersion;
+    }
+
+    /**
+     * @param preserveVersion true if the history should be preserved by default
+     */
+    public void setPackagePreserveVersion(boolean packagePreserveVersion)
+    {
+        this.packagePreserveVersion = packagePreserveVersion;
     }
 
     /**
@@ -346,13 +391,59 @@ public class XarPackage
     }
 
     /**
+     * @return the entries listed in the package descriptor
+     * @since 7.2M1
+     */
+    public Collection<XarEntry> getPackageFiles()
+    {
+        return this.packageFiles.values();
+    }
+
+    /**
+     * Add a new entry to the package.
+     * 
+     * @param reference the entry reference since 7.2M1
+     */
+    public void addPackageFile(LocalDocumentReference reference, int action)
+    {
+        this.packageFiles.put(reference, new XarEntry(reference, null, action));
+    }
+
+    /**
      * Add a new entry to the package.
      * 
      * @param reference the entry reference
+     * @deprecated since 7.2M1, use {@link #addPackageFile(LocalDocumentReference, int)} instead
      */
+    @Deprecated
     public void addEntry(LocalDocumentReference reference)
     {
-        this.entries.put(reference, new XarEntry(reference));
+        addEntry(reference, null);
+    }
+
+    /**
+     * Add a new entry to the package.
+     * 
+     * @param reference the entry reference
+     * @since 7.2M1
+     */
+    public void addEntry(LocalDocumentReference reference, String entryName)
+    {
+        addEntry(reference, entryName, XarModel.ACTION_OVERWRITE);
+    }
+
+    /**
+     * Add a new entry to the package.
+     * 
+     * @param reference the entry reference
+     * @since 7.2M1
+     */
+    public void addEntry(LocalDocumentReference reference, String entryName, int action)
+    {
+        XarEntry entry = new XarEntry(reference, entryName, action);
+
+        this.entries.put(reference, entry);
+        this.packageFiles.put(reference, entry);
     }
 
     /**
@@ -361,21 +452,6 @@ public class XarPackage
     public Collection<XarEntry> getEntries()
     {
         return this.entries.values();
-    }
-
-    /**
-     * Get all entries found in a XAR file.
-     * 
-     * @param file the XAR file
-     * @return the entries of the passed XAR file
-     * @throws XarException when failing to parse the XAR package
-     * @throws IOException when failing to read the file
-     */
-    public static Collection<XarEntry> getEntries(File file) throws XarException, IOException
-    {
-        XarPackage xarPackage = new XarPackage(file);
-
-        return xarPackage.getEntries();
     }
 
     /**
@@ -413,21 +489,130 @@ public class XarPackage
             throw new XarException("Failed to parse XML document", e);
         }
 
+        // Normalize the document
         doc.getDocumentElement().normalize();
 
-        this.packageExtensionId = getElementText(doc, "extensionId");
-        this.packageVersion = getElementText(doc, "version");
-        this.packageName = getElementText(doc, "name");
-        this.packageDescription = getElementText(doc, "description");
-        this.packageLicense = getElementText(doc, "licence");
-        this.packageAuthor = getElementText(doc, "author");
-        this.packageBackupPack = Boolean.valueOf(getElementText(doc, "backupPack")).booleanValue();
-        this.packagePreserveVersion = Boolean.valueOf(getElementText(doc, "preserveVersion")).booleanValue();
+        // Read the document
+        NodeList children = doc.getChildNodes();
+        for (int i = 0; i < children.getLength(); ++i) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                if (element.getTagName().equals(XarModel.ELEMENT_PACKAGE)) {
+                    readDescriptorPackage(element);
+                    break;
+                }
+            }
+        }
     }
 
-    private String getElementText(Document doc, String tagName)
+    private void readDescriptorPackage(Element packageElement)
     {
-        NodeList nList = doc.getElementsByTagName(tagName);
+        NodeList children = packageElement.getChildNodes();
+        for (int i = 0; i < children.getLength(); ++i) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                if (element.getTagName().equals(XarModel.ELEMENT_INFOS)) {
+                    readDescriptorInfos(element);
+                } else if (element.getTagName().equals(XarModel.ELEMENT_FILES)) {
+                    readDescriptorFiles(element);
+                }
+            }
+        }
+    }
+
+    private void readDescriptorInfos(Element infos)
+    {
+        this.packageExtensionId = getElementText(infos, XarModel.ELEMENT_INFOS_EXTENSIONID);
+        this.packageVersion = getElementText(infos, XarModel.ELEMENT_INFOS_VERSION);
+        this.packageName = getElementText(infos, XarModel.ELEMENT_INFOS_NAME);
+        this.packageDescription = getElementText(infos, XarModel.ELEMENT_INFOS_DESCRIPTION);
+        this.packageLicense = getElementText(infos, XarModel.ELEMENT_INFOS_LICENSE);
+        this.packageAuthor = getElementText(infos, XarModel.ELEMENT_INFOS_AUTHOR);
+        this.packageBackupPack =
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISBACKUPPACK)).booleanValue();
+        this.packagePreserveVersion =
+            Boolean.valueOf(getElementText(infos, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION)).booleanValue();
+    }
+
+    private void readDescriptorFiles(Element files)
+    {
+        NodeList children = files.getChildNodes();
+        for (int i = 0; i < children.getLength(); ++i) {
+            Node node = children.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                if (element.getTagName().equals(XarModel.ELEMENT_FILES_FILE)) {
+                    String localeString = element.getAttribute(XarModel.ATTRIBUTE_LOCALE);
+                    String defaultActionString = element.getAttribute(XarModel.ATTRIBUTE_DEFAULTACTION);
+                    String referenceString = element.getTextContent();
+
+                    // Parse reference
+                    LocalDocumentReference reference =
+                        new LocalDocumentReference(RESOLVER.resolve(referenceString, EntityType.DOCUMENT),
+                            LocaleUtils.toLocale(localeString));
+
+                    // Parse default action
+                    int defaultAction = Integer.valueOf(defaultActionString);
+
+                    // Get entry name associated to the document
+                    String entryName = getEntryName(reference);
+
+                    // Create entry
+                    XarEntry packageFile = new XarEntry(reference, entryName, defaultAction);
+
+                    // Register package file entry
+                    this.packageFiles.put(packageFile, packageFile);
+
+                    // Update existing entry default action
+                    updateEntryDefaultAction(packageFile);
+                }
+            }
+        }
+    }
+
+    private String getEntryName(LocalDocumentReference reference)
+    {
+        String entryName = null;
+
+        XarEntry entry = this.entries.get(reference);
+        if (entry != null) {
+            entryName = entry.getEntryName();
+        }
+
+        return entryName;
+    }
+
+    private int getDefaultAction(LocalDocumentReference reference)
+    {
+        int defaultAction = XarModel.ACTION_SKIP;
+
+        XarEntry packageFile = this.packageFiles.get(reference);
+        if (packageFile != null) {
+            defaultAction = packageFile.getDefaultAction();
+        }
+
+        return defaultAction;
+    }
+
+    private void updateEntryDefaultAction(XarEntry packageFile)
+    {
+        if (this.entries.containsKey(packageFile)) {
+            this.entries.put(packageFile, packageFile);
+        }
+    }
+
+    private void updatePackageFileEntryName(XarEntry xarEntry)
+    {
+        if (this.packageFiles.containsKey(xarEntry)) {
+            this.packageFiles.put(xarEntry, xarEntry);
+        }
+    }
+
+    private String getElementText(Element element, String tagName)
+    {
+        NodeList nList = element.getElementsByTagName(tagName);
 
         return nList.getLength() > 0 ? nList.item(0).getTextContent() : null;
     }
@@ -472,7 +657,7 @@ public class XarPackage
         writer = new IndentingXMLStreamWriter(writer);
 
         try {
-            writer(writer, encoding);
+            write(writer, encoding);
 
             writer.flush();
         } catch (Exception e) {
@@ -486,7 +671,7 @@ public class XarPackage
         }
     }
 
-    private void writer(XMLStreamWriter writer, String encoding) throws XMLStreamException
+    private void write(XMLStreamWriter writer, String encoding) throws XMLStreamException
     {
         writer.writeStartDocument(encoding, "1.0");
         writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
@@ -504,7 +689,7 @@ public class XarPackage
 
         writer.writeStartElement(XarModel.ELEMENT_FILES);
         for (XarEntry entry : this.entries.values()) {
-            writer.writeStartElement(XarModel.ELEMENT_FILES_FILES);
+            writer.writeStartElement(XarModel.ELEMENT_FILES_FILE);
             writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
             writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, Objects.toString(entry.getLocale(), ""));
             writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry));
@@ -528,5 +713,4 @@ public class XarPackage
             streamWriter.writeEmptyElement(localName);
         }
     }
-
 }

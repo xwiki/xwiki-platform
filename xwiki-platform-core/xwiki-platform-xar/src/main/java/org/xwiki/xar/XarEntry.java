@@ -25,6 +25,9 @@ import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * An entry (wiki page) in a XAR package.
+ * <p>
+ * Reuse LocalDocumentReference equals and hashCode implementation so that the entry can be used as a
+ * {@link LocalDocumentReference} in a map.
  * 
  * @version $Id$
  * @since 5.4RC1
@@ -56,6 +59,16 @@ public class XarEntry extends LocalDocumentReference
     public XarEntry(LocalDocumentReference reference, String name)
     {
         this(reference, name, XarModel.ACTION_OVERWRITE);
+    }
+
+    /**
+     * @param reference the reference of the document
+     * @param defaultAction the default action associated to a XAR entry
+     * @since 7.2M1
+     */
+    public XarEntry(LocalDocumentReference reference, int defaultAction)
+    {
+        this(reference, null, defaultAction);
     }
 
     /**

@@ -49,7 +49,10 @@ public class XarModel
 
     public static final String ELEMENT_FILES = "files";
 
-    public static final String ELEMENT_FILES_FILES = "file";
+    public static final String ELEMENT_FILES_FILE = "file";
+
+    @Deprecated
+    public static final String ELEMENT_FILES_FILES = ELEMENT_FILES_FILE;
 
     public static final String ATTRIBUTE_DEFAULTACTION = "defaultAction";
 

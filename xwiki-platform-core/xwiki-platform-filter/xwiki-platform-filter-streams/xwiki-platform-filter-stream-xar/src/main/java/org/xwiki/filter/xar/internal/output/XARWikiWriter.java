@@ -28,12 +28,12 @@ import java.util.Locale;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;
-import org.xwiki.filter.xar.output.XAROutputProperties;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.output.FileOutputTarget;
 import org.xwiki.filter.output.OutputStreamOutputTarget;
 import org.xwiki.filter.output.OutputTarget;
+import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarPackage;
 
 /**
@@ -116,14 +116,16 @@ public class XARWikiWriter implements Closeable
         // Add extension
         path.append(".xml");
 
-        ZipArchiveEntry zipentry = new ZipArchiveEntry(path.toString());
+        String entryName = path.toString();
+
+        ZipArchiveEntry zipentry = new ZipArchiveEntry(entryName);
         try {
             this.zipStream.putArchiveEntry(zipentry);
         } catch (IOException e) {
             throw new FilterException("Failed to add a new zip entry for [" + path + "]", e);
         }
 
-        this.xarPackage.addEntry(reference);
+        this.xarPackage.addEntry(reference, entryName);
 
         return this.zipStream;
     }

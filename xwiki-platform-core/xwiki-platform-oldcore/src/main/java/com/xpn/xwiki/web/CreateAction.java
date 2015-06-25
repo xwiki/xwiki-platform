@@ -34,11 +34,12 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
@@ -128,6 +129,11 @@ public class CreateAction extends XWikiAction
     private static final String CURRENT_RESOLVER_HINT = "current";
 
     /**
+     * Current entity reference resolver hint.
+     */
+    private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
+
+    /**
      * Default constructor.
      */
     public CreateAction()
@@ -142,7 +148,7 @@ public class CreateAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         // resolver to use to resolve references received in request parameters
         DocumentReferenceResolver<String> resolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, CURRENT_MIXED_RESOLVER_HINT);
 
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
@@ -156,43 +162,47 @@ public class CreateAction extends XWikiAction
         BaseObject templateProvider = getTemplateProvider(context, resolver, templateProviderClassReference);
 
         // Set the space, page, title variables from the current doc if its new, from the passed parameters if any
-        String space = "";
-        String page = "";
+        SpaceReference spaceReference = null;
+        String pageName = "";
+
         if (doc.isNew()) {
-            space = doc.getDocumentReference().getSpaceReferences().get(0).getName();
-            page = doc.getDocumentReference().getName();
+            // Current space and page name.
+            spaceReference = doc.getDocumentReference().getLastSpaceReference();
+            pageName = doc.getDocumentReference().getName();
         } else {
-            space = request.getParameter(SPACE);
-            page = request.getParameter(PAGE);
+            // Given space and page name.
+            String spaceParameter = request.getParameter(SPACE);
+            if (StringUtils.isNotEmpty(spaceParameter)) {
+                // Make sure we don`t use defaults for empty space by mistake.
+                EntityReferenceResolver<String> genericResolver =
+                    Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
+
+                spaceReference = new SpaceReference(genericResolver.resolve(spaceParameter, EntityType.SPACE));
+            }
+            pageName = request.getParameter(PAGE);
         }
 
         // get the available templates, in the current space, to check if all conditions to create a new document are
         // met
         List<Document> availableTemplates =
-            getAvailableTemplates(doc.getDocumentReference().getSpaceReferences().get(0).getName(), isSpace, resolver,
+            getAvailableTemplates(doc.getDocumentReference().getLastSpaceReference(), isSpace, resolver,
                 templateProviderClassReference, context);
         // put the available templates on the context, for the .vm to not compute them again
         ((VelocityContext) context.get(VELOCITY_CONTEXT_KEY)).put("createAvailableTemplates", availableTemplates);
 
         // get the reference to the new document
         DocumentReference newDocRef =
-            getNewDocumentReference(context, space, page, isSpace, templateProvider, availableTemplates);
+            getNewDocumentReference(context, spaceReference, pageName, isSpace, templateProvider, availableTemplates);
 
         if (newDocRef != null) {
             // Checking rights
-            SpaceReference spaceReference = newDocRef.getLastSpaceReference();
-            AuthorizationManager authManager = Utils.getComponent(AuthorizationManager.class);
-            if (!authManager.hasAccess(Right.EDIT, context.getUserReference(), spaceReference)) {
-                Object[] args = { spaceReference.toString(), context.getUser() };
-                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    "The creation of a document into the space {0} has been denied to user {1}", null, args);
-            }
+            checkRights(spaceReference, context);
 
             XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {
-                Object[] args = { space, page };
+                Object[] args = {spaceReference, pageName};
                 XWikiException documentAlreadyExists =
                     new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
@@ -205,6 +215,21 @@ public class CreateAction extends XWikiAction
         }
 
         return "create";
+    }
+
+    /**
+     * @param context the XWiki context
+     * @param spaceReference the reference of the space where the new document will be created
+     * @throws XWikiException in case the permission to create a new document in the specified space is denied
+     */
+    private void checkRights(SpaceReference spaceReference, XWikiContext context) throws XWikiException
+    {
+        ContextualAuthorizationManager authManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        if (!authManager.hasAccess(Right.EDIT, spaceReference)) {
+            Object[] args = { spaceReference.toString(), context.getUser() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "The creation of a document into the space {0} has been denied to user {1}", null, args);
+        }
     }
 
     /**
@@ -222,6 +247,10 @@ public class CreateAction extends XWikiAction
         if (document.isNew()) {
             return true;
         }
+
+        // FIXME: the code below is not really what users might expect. Overriding an existing document (even if no
+        // content or objects) is not really nice to do. Should be removed.
+
         // otherwise, check content and objects (only empty newline content allowed and no objects)
         String content = document.getContent();
         if (!content.equals("\n") && !content.equals("") && !content.equals("\\\\")) {
@@ -252,14 +281,19 @@ public class CreateAction extends XWikiAction
     {
         // This template can be passed a parent document reference in parameter (using the "parent" parameter).
         // If a parent parameter is passed, use it to set the parent when creating the new Page or Space.
-        // If no parent parameter was passed, use the current document if we're creating a new page, use the Main
-        // space's WebHome if we're creating a new space. Also don't set current document as parent if it's a new doc
+        // If no parent parameter was passed:
+        // * use the current document
+        // ** if we're creating a new page and if the current document exists or
+        // * use the Main space's WebHome
+        // ** if we're creating a new space or
+        // ** if we're creating a new page and the current document does not exist.
         String parent = request.getParameter("parent");
         if (StringUtils.isEmpty(parent)) {
             EntityReferenceSerializer<String> localSerializer =
                 Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
 
-            if (isSpace) {
+            if (isSpace || doc.isNew()) {
+                // Use the Main space's WebHome.
                 Provider<DocumentReference> defaultDocumentReferenceProvider =
                     Utils.getComponent(DocumentReference.TYPE_PROVIDER);
 
@@ -267,7 +301,8 @@ public class CreateAction extends XWikiAction
                     defaultDocumentReferenceProvider.get().setWikiReference(context.getWikiReference());
 
                 parent = localSerializer.serialize(parentRef);
-            } else if (!doc.isNew()) {
+            } else {
+                // Use the current document.
                 DocumentReference parentRef = doc.getDocumentReference();
 
                 parent = localSerializer.serialize(parentRef);
@@ -304,14 +339,15 @@ public class CreateAction extends XWikiAction
      * @param request the current request for which this action is executed
      * @param newDocument the document to be created
      * @param isSpace {@code true} if the request is to create a space, {@code false} if a page should be created
-     * @return the title of the page to be created
+     * @return the title of the page to be created. If no request parameter is set, the page name is returned for a new
+     *         page and the space name is returned for a new space
      */
     private String getTitle(XWikiRequest request, XWikiDocument newDocument, boolean isSpace)
     {
         String title = request.getParameter("title");
         if (StringUtils.isEmpty(title)) {
             title =
-                isSpace ? newDocument.getDocumentReference().getSpaceReferences().get(0).getName() : newDocument
+                isSpace ? newDocument.getDocumentReference().getLastSpaceReference().getName() : newDocument
                     .getDocumentReference().getName();
         }
 
@@ -320,41 +356,52 @@ public class CreateAction extends XWikiAction
 
     /**
      * @param context the context to execute this action
-     * @param space the space of the new document
-     * @param page the page of the new document
+     * @param spaceReference the space reference of the new document
+     * @param pageName the page name of the new document
      * @param isSpace whether the new document to be created is a space homepage (create space) or a regular page
      * @param templateProvider the template provider for creating this page
      * @param availableTemplates the templates available
      * @return the document reference of the new document to be created, {@code null} if a no document can be created
      *         (because the conditions are not met)
      */
-    private DocumentReference getNewDocumentReference(XWikiContext context, String space, String page, boolean isSpace,
-        BaseObject templateProvider, List<Document> availableTemplates)
+    private DocumentReference getNewDocumentReference(XWikiContext context, SpaceReference spaceReference,
+        String pageName, boolean isSpace, BaseObject templateProvider, List<Document> availableTemplates)
     {
-        DocumentReference newDocRef = null;
-
-        if (isSpace && !StringUtils.isEmpty(space)) {
-            // If a space is ready to be created, redirect to the space home in edit mode
-            newDocRef = new DocumentReference(context.getWikiId(), space, "WebHome");
+        if (spaceReference == null) {
+            // No space specified, nothing to do.
+            return null;
         }
 
-        // check whether there is a template parameter set, be it an empty one. If a page should be created and there is
+        DocumentReference newDocRef = null;
+
+        if (isSpace) {
+            // If a space is ready to be created, redirect to the space home in edit mode
+            newDocRef = new DocumentReference("WebHome", spaceReference);
+
+            // Nothing else to do but return the new reference.
+            return newDocRef;
+        }
+
+        // Proceed with creating a document...
+
+        // Check whether there is a template parameter set, be it an empty one. If a page should be created and there is
         // no template parameter, it means the create action is not supposed to be executed, but only display the
         // available templates and let the user choose
         boolean hasTemplate =
             context.getRequest().getParameterMap().containsKey(TEMPLATE_PROVIDER)
                 || context.getRequest().getParameterMap().containsKey(TEMPLATE);
-        // if there's no passed template check if there are any available templates. If none available, then the fact
-        // that there is no template is ok
+        // If there's no passed template, check if there are any available templates. If none available, then the fact
+        // that there is no template is ok.
         if (!hasTemplate) {
             boolean canHasTemplate = availableTemplates.size() > 0;
             hasTemplate = !canHasTemplate;
         }
-        if (!isSpace && !StringUtils.isEmpty(page) && !StringUtils.isEmpty(space) && hasTemplate) {
+
+        if (!StringUtils.isEmpty(pageName) && hasTemplate) {
             // check if the creation in this space is allowed, and only set the new document reference if the creation
             // is allowed
-            if (checkAllowedSpace(space, page, templateProvider, context)) {
-                newDocRef = new DocumentReference(context.getWikiId(), space, page);
+            if (checkAllowedSpace(spaceReference, pageName, templateProvider, context)) {
+                newDocRef = new DocumentReference(pageName, spaceReference);
             }
         }
 
@@ -365,13 +412,14 @@ public class CreateAction extends XWikiAction
      * Verifies if the creation inside space {@code space} is allowed by the template provider described by
      * {@code templateProvider}. If the creation is not allowed, an exception will be set on the context.
      *
-     * @param space the space to create page in
+     * @param spaceReference the reference of the space to create a page in
      * @param page the page to create
      * @param templateProvider the template provider to use for the creation
      * @param context the context of the request
      * @return {@code true} if the creation is allowed, {@code false} otherwise
      */
-    private boolean checkAllowedSpace(String space, String page, BaseObject templateProvider, XWikiContext context)
+    private boolean checkAllowedSpace(SpaceReference spaceReference, String page, BaseObject templateProvider,
+        XWikiContext context)
     {
         // Check that the chosen space is allowed with the given template, if not:
         // - Cancel the redirect
@@ -380,17 +428,22 @@ public class CreateAction extends XWikiAction
             @SuppressWarnings("unchecked")
             List<String> allowedSpaces = templateProvider.getListValue(SPACES_PROPERTY);
             // if there is no allowed spaces set, all spaces are allowed
-            if (allowedSpaces.size() > 0 && !allowedSpaces.contains(space)) {
-                // put an exception on the context, for create.vm to know to display an error
-                Object[] args = { templateProvider.getStringValue(TEMPLATE), space, page };
-                XWikiException exception =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
-                VelocityContext vcontext = (VelocityContext) context.get(VELOCITY_CONTEXT_KEY);
-                vcontext.put(EXCEPTION, exception);
-                vcontext.put("createAllowedSpaces", allowedSpaces);
-                return false;
+            if (allowedSpaces.size() > 0) {
+                EntityReferenceSerializer<String> localSerializer =
+                    Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+                String localSerializedSpace = localSerializer.serialize(spaceReference);
+                if (!allowedSpaces.contains(localSerializedSpace)) {
+                    // put an exception on the context, for create.vm to know to display an error
+                    Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, page};
+                    XWikiException exception =
+                        new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                            XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                            "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                    VelocityContext vcontext = (VelocityContext) context.get(VELOCITY_CONTEXT_KEY);
+                    vcontext.put(EXCEPTION, exception);
+                    vcontext.put("createAllowedSpaces", allowedSpaces);
+                    return false;
+                }
             }
         }
         // if no template is specified, creation is allowed
@@ -509,8 +562,7 @@ public class CreateAction extends XWikiAction
         redirectURL = context.getResponse().encodeRedirectURL(redirectURL);
         if (context.getRequest().getParameterMap().containsKey("ajax")) {
             // If this template is displayed from a modal popup, send a header in the response notifying that a
-            // redirect
-            // must be performed in the calling page.
+            // redirect must be performed in the calling page.
             context.getResponse().setHeader("redirect", redirectURL);
         } else {
             // Perform the redirect
@@ -519,23 +571,31 @@ public class CreateAction extends XWikiAction
     }
 
     /**
-     * @param space the space to check if there are available templates for
+     * @param spaceReference the space to check if there are available templates for
      * @param isSpace {@code true} if a space should be created instead of a page
      * @param resolver the resolver to solve template document references
      * @param context the context of the current request
      * @param templateClassReference the reference to the template provider class
      * @return the available templates for the passed space, as {@link Document}s
      */
-    private List<Document> getAvailableTemplates(String space, boolean isSpace,
+    private List<Document> getAvailableTemplates(SpaceReference spaceReference, boolean isSpace,
         DocumentReferenceResolver<String> resolver, DocumentReference templateClassReference, XWikiContext context)
     {
         XWiki wiki = context.getWiki();
         List<Document> templates = new ArrayList<Document>();
         try {
+            EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+            String spaceStringReference = serializer.serialize(spaceReference);
+
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
             Query query =
                 queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
                     + "where doc.fullName not like 'XWiki.TemplateProviderTemplate'", Query.XWQL);
+
+            // TODO: Extend the above query to include a filter on the type and allowed spaces properties so we can
+            // remove the java code below, thus improving performance by not loading all the documents, but only the
+            // documents we need.
+
             List<String> templateProviderDocNames = query.execute();
             for (String templateProviderName : templateProviderDocNames) {
                 // get the document
@@ -548,14 +608,14 @@ public class CreateAction extends XWikiAction
                     @SuppressWarnings("unchecked")
                     List<String> allowedSpaces = templateObject.getListValue(SPACES_PROPERTY);
                     // if no space is checked or the current space is in the list of allowed spaces
-                    if (allowedSpaces.size() == 0 || allowedSpaces.contains(space)) {
+                    if (allowedSpaces.size() == 0 || allowedSpaces.contains(spaceStringReference)) {
                         // create a Document and put it in the list
                         templates.add(new Document(templateDoc, context));
                     }
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("There was an error gettting the available templates for space " + space, e);
+            LOGGER.warn("There was an error gettting the available templates for space {0}", spaceReference, e);
         }
 
         return templates;

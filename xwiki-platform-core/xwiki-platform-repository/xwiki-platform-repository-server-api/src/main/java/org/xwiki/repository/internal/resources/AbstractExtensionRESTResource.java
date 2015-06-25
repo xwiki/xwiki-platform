@@ -570,8 +570,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
     {
         XWikiContext xcontext = getXWikiContext();
 
-        String documentName = (String) document.getFieldValue("space");
-        String documentSpace = (String) document.getFieldValue("name");
+        String documentSpace = (String) document.getFieldValue("space");
+        String documentName = (String) document.getFieldValue("name");
 
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 

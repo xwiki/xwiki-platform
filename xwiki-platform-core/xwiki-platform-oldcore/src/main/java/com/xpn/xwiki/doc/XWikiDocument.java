@@ -2779,8 +2779,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     getDocumentReference().getWikiReference());
             // Copy the objects from the template document only if this document doesn't have them already.
             //
-            // Note: this might be a bit misleading since it will not add objects from the template if objects of that
-            // class already exist in the current document.
+            // Note: this might be a bit misleading since it will not add objects from the template if some objects of
+            // that class already exist in the current document.
             if (getXObjectSize(classReference) == 0) {
                 for (BaseObject object : entry.getValue()) {
                     if (object != null) {
@@ -3759,7 +3759,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     }
 
                     if (isNew()) {
-                        // We might have received the object from the cache and the template objects might have been
+                        // We might have received the objects from the cache and the template objects might have been
                         // copied already we need to remove them
                         setXObjects(new TreeMap<DocumentReference, List<BaseObject>>());
                     }
@@ -8535,7 +8535,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Return the reference of the parent document as it stored and passed to
      * {@link #setParentReference(EntityReference)}.
      * <p>
-     * You should use {@link #getParentReference()} reference if you want to complete parent reference.
+     * You should use {@link #getParentReference()} reference if you want the complete parent reference.
      *
      * @return the relative parent reference
      * @since 2.2.3

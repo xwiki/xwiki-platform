@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -324,6 +326,60 @@ public class ReferenceUserIteratorTest
         Iterator<DocumentReference> iterator = new ReferenceUserIterator(groupReference, this.resolver, this.execution);
 
         assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void getMembersWhenGroupIsLooping() throws Exception
+    {
+        setUpBaseMocks();
+
+        DocumentReference groupReference = new DocumentReference("groupwiki", "XWiki", "grouppage");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.isNew()).thenReturn(false);
+        when(document.getDocumentReference()).thenReturn(groupReference);
+        when(xwiki.getDocument(groupReference, this.xwikiContext)).thenReturn(document);
+
+        List<BaseObject> memberObjects = new ArrayList<>();
+        BaseObject bo = mock(BaseObject.class);
+        when(bo.getStringValue("member")).thenReturn("XWiki.othergroup");
+        memberObjects.add(bo);
+        bo = mock(BaseObject.class);
+        when(bo.getStringValue("member")).thenReturn("XWiki.userpage");
+        memberObjects.add(bo);
+        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
+            memberObjects);
+
+        DocumentReference userpageReference = new DocumentReference("groupwiki", "XWiki", "userpage");
+        setUpUserPageMocks(userpageReference);
+        when(this.resolver.resolve("XWiki.userpage", groupReference)).thenReturn(userpageReference);
+
+        DocumentReference otherGroupReference = new DocumentReference("groupwiki", "XWiki", "othergroup");
+        document = mock(XWikiDocument.class);
+        when(document.isNew()).thenReturn(false);
+        when(document.getDocumentReference()).thenReturn(otherGroupReference);
+        when(xwiki.getDocument(otherGroupReference, this.xwikiContext)).thenReturn(document);
+
+        memberObjects = new ArrayList<>();
+        bo = mock(BaseObject.class);
+        when(bo.getStringValue("member")).thenReturn("XWiki.grouppage");
+        memberObjects.add(bo);
+        bo = mock(BaseObject.class);
+        when(bo.getStringValue("member")).thenReturn("XWiki.anotheruser");
+        memberObjects.add(bo);
+        when(document.getXObjects(new DocumentReference("groupwiki", "XWiki", "XWikiGroups"))).thenReturn(
+            memberObjects);
+
+        DocumentReference anotheruserReference = new DocumentReference("groupwiki", "XWiki", "anotheruser");
+        setUpUserPageMocks(anotheruserReference);
+        when(this.resolver.resolve("XWiki.anotheruser", otherGroupReference)).thenReturn(anotheruserReference);
+
+        when(this.resolver.resolve("XWiki.grouppage", otherGroupReference)).thenReturn(groupReference);
+        when(this.resolver.resolve("XWiki.othergroup", groupReference)).thenReturn(otherGroupReference);
+
+        Iterator<DocumentReference> iterator = new ReferenceUserIterator(groupReference, this.resolver, this.execution);
+
+        assertThat((List<DocumentReference>) IteratorUtils.toList(iterator),
+            containsInAnyOrder(userpageReference, anotheruserReference));
     }
 
     @Test

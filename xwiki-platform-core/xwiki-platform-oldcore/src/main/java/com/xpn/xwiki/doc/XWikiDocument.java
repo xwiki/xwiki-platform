@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -1049,8 +1050,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setParentReference(EntityReference parentReference)
     {
-        if ((parentReference == null && getRelativeParentReference() != null)
-            || (parentReference != null && !parentReference.equals(getRelativeParentReference()))) {
+        if (!Objects.equals(getRelativeParentReference(), parentReference)) {
             this.parentReference = parentReference;
 
             // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
@@ -2878,8 +2878,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setTemplateDocumentReference(DocumentReference templateDocumentReference)
     {
-        if ((templateDocumentReference == null && getTemplateDocumentReference() != null)
-            || (templateDocumentReference != null && !templateDocumentReference.equals(getTemplateDocumentReference()))) {
+        if (!Objects.equals(getTemplateDocumentReference(), templateDocumentReference)) {
             this.templateDocumentReference = templateDocumentReference;
             setMetaDataDirty(true);
         }
@@ -3730,7 +3729,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         if (templateDocumentReference != null) {
             String content = getContent();
-            if ((!content.equals("\n")) && (!content.equals("")) && !isNew()) {
+            if (!content.equals("\n") && !content.equals("") && !isNew()) {
                 Object[] args = { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()) };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,

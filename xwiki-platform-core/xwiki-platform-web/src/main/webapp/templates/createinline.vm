@@ -17,8 +17,7 @@
 ## if there is no passed parent, a page is to be created and the current document is existing, put the current document as a parent
 #if ($parent == '')
   #if ($tocreate == 'page' && !$doc.isNew())
-    #set ($parentReference = $services.model.createDocumentReference($doc.documentReference.wikiReference.name,
-      $doc.documentReference.lastSpaceReference.name, $doc.documentReference.name))
+    #set ($parentReference = $doc.documentReference)
     #set ($parent = $services.model.serialize($parentReference, 'local'))
   #elseif ($tocreate == 'space')
     ## currentWiki:Main.WebHome
@@ -68,7 +67,7 @@
 #if("$!exception" != '' && $exception.code == 11002)
   <div class="box errormessage">
     #if($tocreate == 'space')
-        $services.localization.render('core.create.space.error.docalreadyexists', [$space])
+      $services.localization.render('core.create.space.error.docalreadyexists', [$space])
     #else
       #set ($existingDocumentReference = $services.model.createDocumentReference('', $space, $page))
       $services.localization.render('core.create.page.error.docalreadyexists',  ["${space}.${page}", $xwiki.getURL($existingDocumentReference, 'view', ''), $xwiki.getURL($existingDocumentReference, 'edit','')])

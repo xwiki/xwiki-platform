@@ -147,10 +147,7 @@ public class CreateAction extends XWikiAction
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
         String toCreate = request.getParameter("tocreate");
-        boolean isSpace = false;
-        if (!StringUtils.isEmpty(toCreate) && TOCREATE_SPACE.equals(toCreate)) {
-            isSpace = true;
-        }
+        boolean isSpace = TOCREATE_SPACE.equals(toCreate);
 
         // get the template provider for creating this document, if any template provider is specified
         DocumentReferenceResolver<EntityReference> referenceResolver =

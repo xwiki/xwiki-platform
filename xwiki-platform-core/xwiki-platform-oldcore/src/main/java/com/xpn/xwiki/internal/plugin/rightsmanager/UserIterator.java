@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.internal.plugin.rightsmanager;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -61,7 +63,9 @@ public class UserIterator<T> implements Iterator<T>
 
     private List<DocumentReference> excludedUserAndGroupReferences;
 
-    private Stack<Iterator<DocumentReference>> userAndGroupIteratorStack = new Stack<>();
+    private List<DocumentReference> processedGroups = new ArrayList<>();
+
+    private Deque<Iterator<DocumentReference>> userAndGroupIteratorStack = new ArrayDeque<>();
 
     private T lookaheadValue;
 
@@ -294,18 +298,26 @@ public class UserIterator<T> implements Iterator<T>
         // If we have only a user reference then we'll just return it
         // If we have neither a group reference nor a user reference, skip it and get the next reference
         if (isGroupReference) {
-            // Extract the references and push them on the stack as an iterator
-            Collection<DocumentReference> groupMemberReferences =
-                convertToDocumentReferences(members, currentReference);
-            if (!groupMemberReferences.isEmpty()) {
-                this.userAndGroupIteratorStack.push(groupMemberReferences.iterator());
-            } else {
+            // Ensure groups are visited only once to prevent potential infinite loops
+            if (processedGroups.contains(currentReference)) {
                 cleanStackIfNeeded(currentIterator);
-            }
-            if (!isUserReference) {
                 value = getNext();
             } else {
-                value = getValue(currentIterator, currentReference, document, userObject);
+                processedGroups.add(currentReference);
+
+                // Extract the references and push them on the stack as an iterator
+                Collection<DocumentReference> groupMemberReferences =
+                    convertToDocumentReferences(members, currentReference);
+                if (!groupMemberReferences.isEmpty()) {
+                    this.userAndGroupIteratorStack.push(groupMemberReferences.iterator());
+                } else {
+                    cleanStackIfNeeded(currentIterator);
+                }
+                if (!isUserReference) {
+                    value = getNext();
+                } else {
+                    value = getValue(currentIterator, currentReference, document, userObject);
+                }
             }
         } else if (!isUserReference) {
             cleanStackIfNeeded(currentIterator);

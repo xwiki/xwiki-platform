@@ -28,7 +28,6 @@ import org.xwiki.groovy.GroovyConfiguration;
 import org.xwiki.rendering.macro.script.AbstractScriptMacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -53,12 +52,6 @@ public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPo
     @Inject
     private GroovyConfiguration configuration;
 
-    /**
-     * Used to verify if the current doc has script rights.
-     */
-    @Inject
-    private ContextualAuthorizationManager authorizationManager;
-
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
@@ -67,7 +60,7 @@ public class GroovyMacroPermissionPolicy extends AbstractScriptMacroPermissionPo
             // If we are not running in a restricted context and we have the script right, the macro may run, but
             // security will be delegated to the Groovy Secure Customizer.
             hasPermission =
-                !context.getTransformationContext().isRestricted() && authorizationManager.hasAccess(Right.SCRIPT);
+                !context.getTransformationContext().isRestricted() && getAuthorizationManager().hasAccess(Right.SCRIPT);
         } else {
             hasPermission = super.hasPermission(parameters, context);
         }

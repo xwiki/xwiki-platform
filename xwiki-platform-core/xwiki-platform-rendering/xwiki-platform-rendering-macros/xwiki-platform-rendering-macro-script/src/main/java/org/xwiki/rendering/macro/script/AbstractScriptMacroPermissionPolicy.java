@@ -45,4 +45,9 @@ public abstract class AbstractScriptMacroPermissionPolicy implements MacroPermis
     {
         return authorizationManager.hasAccess(Right.PROGRAM);
     }
+
+    protected ContextualAuthorizationManager getAuthorizationManager()
+    {
+        return authorizationManager;
+    }
 }

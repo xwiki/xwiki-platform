@@ -19,8 +19,9 @@
  */
 package org.xwiki.rendering.macro.groovy;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -65,105 +66,110 @@ public class SecurityTest extends AbstractComponentTestCase
         this.configurationSource = registerMockComponent(ConfigurationSource.class);
     }
 
+    // Using a customizer
+
     @Test
-    public void testExecutionWhenSecureCustomizerAndNoProgrammingRights() throws Exception
+    public void testExecutionWhenSecureCustomizerWithScriptRightsAndNoProgrammingRights() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {{
-            // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
-            will(returnValue(false));
+        // Conclusion: Can run with a customizer and SR to avoid PR.
+        testExecution(true, false, true, false);
+    }
 
-            // Have the secure AST Customizer active!
-            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-        }});
-
-        // Note: We execute something that works with the Groovy Security customizer...
-        executeGroovyMacro("new Integer(0)");
+    @Test(expected = MacroExecutionException.class)
+    public void testExecutionWhenSecureCustomizerWithNoScriptRightsAndNoProgrammingRights() throws Exception
+    {
+        // Conclusion: When running with a customizer and no PR, SR is needed.
+        testExecution(true, false, false, false);
     }
 
     @Test
-    public void testExecutionWhenNoSecureCustomizerAndNoProgrammingRights() throws Exception
+    public void testExecutionWhenSecureCustomizerWithNoScriptRightsAndProgrammingRights() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {{
-            // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
-            will(returnValue(false));
+        // Conclusion: When running with a customizer and PR, SR are implied by the PR.
+        testExecution(true, false, false, true);
+    }
 
-            // The secure AST Customizer is not active
-            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Collections.emptyList()));
-        }});
+    @Test(expected = MacroExecutionException.class)
+    public void testExecutionWhenSecureCustomizerAndRestricted() throws Exception
+    {
+        // Conclusion: When running with a customizer and SR to avoid PR, transformations have to not be restricted.
+        testExecution(true, true, true, false);
+    }
 
-        Macro macro = getComponentManager().getInstance(Macro.class, "groovy");
-        JSR223ScriptMacroParameters parameters = new JSR223ScriptMacroParameters();
+    @Test(expected = MacroExecutionException.class)
+    public void testExecutionWhenSecureCustomizerAndRestrictedWithScriptRightsAndProgrammingRights() throws Exception
+    {
+        // Conclusion: When running with a customizer, event with PR (and inherited SR), transformations have to not be
+        // restricted.
+        testExecution(true, true, false, true);
+    }
 
-        MacroTransformationContext context = new MacroTransformationContext();
-        // The script macro checks the current block (which is a macro block) to see what engine to use
-        context.setCurrentMacroBlock(new MacroBlock("groovy", Collections.<String, String>emptyMap(), false));
+    // Not using a customizer
 
+    @Test
+    public void testExecutionWhenNoSecureCustomizerAndNoRights() throws Exception
+    {
+        // Conclusion: When running with no customizer and no PR, execution fails.
         try {
-            macro.execute(parameters, "new Integer(0)", context);
+            testExecution(false, false, false, false);
             Assert.fail("Should have thrown an exception here!");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("You don't have the right to execute the script macro [groovy]", expected.getMessage());
         }
     }
 
+    @Test(expected = MacroExecutionException.class)
+    public void testExecutionWhenNoSecureCustomizerAndScriptRights() throws Exception
+    {
+        // Conclusion: When running with no customizer, SR is not enough. You need PR.
+        testExecution(false, false, true, false);
+    }
+
     @Test
     public void testExecutionWhenNoSecureCustomizerAndProgrammingRights() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {{
-            // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
-            will(returnValue(true));
-
-            // The secure AST Customizer is not active
-            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Collections.emptyList()));
-        }});
-
-        // Note: We execute something that works with the Groovy Security customizer...
-        executeGroovyMacro("new Integer(0)");
+        // Conclusion: When running with no customizer, PR is needed.
+        testExecution(false, false, false, true);
     }
 
     @Test
-    public void testExecutionWhenSecureCustomizerAndProgrammingRights() throws Exception
+    public void testExecutionWhenNoSecureCustomizerAndExecutionRestrictedAndProgrammingRights() throws Exception
     {
-        getMockery().checking(new Expectations()
-        {{
-            // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
-            will(returnValue(true));
-
-            // The secure AST Customizer is active
-            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-        }});
-
-        // Note: We execute something that is normally caught by the Groovy Secure Customizer
-        executeGroovyMacro("synchronized(this) {}");
+        // Conclusion: When running with no customizer, transformation restrictions do not matter, only PR does.
+        testExecution(false, true, false, true);
     }
 
-    @Test(expected=MacroExecutionException.class)
-    public void testExecutionWhenSecureCustomizerAndRestricted() throws Exception
+    /*
+     * Utility methods.
+     */
+
+    private void testExecution(final boolean hasCustomizer, final boolean isRestricted, final boolean hasSR,
+        final boolean hasPR) throws Exception
     {
         getMockery().checking(new Expectations()
-        {{
-            // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
-            will(returnValue(false));
+        {
+            {
+                // Programming Rights
+                allowing(cam).hasAccess(Right.PROGRAM);
+                will(returnValue(hasPR));
 
-            // The secure AST Customizer is active
-            allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
-                will(returnValue(Arrays.asList("secure")));
-        }});
+                // Script Rights
+                allowing(cam).hasAccess(Right.SCRIPT);
+                will(returnValue(hasSR || hasPR));
+
+                // Secure AST Customizer
+                List<String> customizers = new ArrayList<>();
+                if (hasCustomizer) {
+                    customizers.add("secure");
+                }
+                allowing(configurationSource).getProperty("groovy.compilationCustomizers", Collections.emptyList());
+                will(returnValue(customizers));
+
+            }
+        });
 
         // Note: We execute something that works with the Groovy Security customizer...
-        executeGroovyMacro("new Integer(0)", true);
+        executeGroovyMacro("new Integer(0)", isRestricted);
     }
 
     private void executeGroovyMacro(String script) throws Exception

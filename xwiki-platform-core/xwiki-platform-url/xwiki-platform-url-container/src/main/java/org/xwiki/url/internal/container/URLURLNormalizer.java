@@ -21,6 +21,7 @@ package org.xwiki.url.internal.container;
 
 import java.net.URL;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -35,6 +36,7 @@ import org.xwiki.url.ExtendedURL;
  * @since 6.1M2
  */
 @Component
+@Named("url")
 @Singleton
 public class URLURLNormalizer implements URLNormalizer<URL>
 {

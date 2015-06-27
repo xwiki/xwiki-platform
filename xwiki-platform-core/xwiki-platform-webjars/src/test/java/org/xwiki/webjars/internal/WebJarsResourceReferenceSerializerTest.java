@@ -50,7 +50,7 @@ public class WebJarsResourceReferenceSerializerTest
     public void serialize() throws Exception
     {
         URLNormalizer<ExtendedURL> normalizer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class));
+            new DefaultParameterizedType(null, URLNormalizer.class, ExtendedURL.class), "contextpath");
         Map<String, List<String>> parameters = new HashMap<>();
         parameters.put("key1", Arrays.asList("value1"));
         parameters.put("key2", Arrays.asList("value2", "value3"));

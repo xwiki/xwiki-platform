@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -43,6 +44,7 @@ public class WebjarsResourceReferenceSerializer
     implements ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL>
 {
     @Inject
+    @Named("contextpath")
     private URLNormalizer<ExtendedURL> extendedURLNormalizer;
 
     @Override

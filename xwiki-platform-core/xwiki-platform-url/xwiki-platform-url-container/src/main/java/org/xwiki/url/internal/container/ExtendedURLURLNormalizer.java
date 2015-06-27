@@ -45,6 +45,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @since 6.1M2
  */
 @Component
+@Named("contextpath")
 @Singleton
 public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
 {

@@ -363,9 +363,7 @@ public class DocumentLocaleReader extends AbstractReader
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
 
         // Reference
-        String referenceString =
-            xmlReader.getAttributeValue(XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
-                XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
+        String referenceString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
         if (StringUtils.isNotEmpty(referenceString)) {
             this.currentDocumentReference = this.relativeResolver.resolve(referenceString, EntityType.DOCUMENT);
 
@@ -378,9 +376,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
 
         // Locale
-        String localeString =
-            xmlReader.getAttributeValue(XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE,
-                XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
+        String localeString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
         if (localeString != null) {
             this.currentDocumentLocale = toLocale(localeString);
             this.localeFromLegacy = false;

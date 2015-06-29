@@ -32,7 +32,7 @@ import org.xwiki.test.annotation.AllComponents;
  */
 @RunWith(FilterTestSuite.class)
 @AllComponents
-@Scope(value = "document", pattern= "new1.test")
+@Scope("document")
 public class DocumentIntegrationTests
 {
 }

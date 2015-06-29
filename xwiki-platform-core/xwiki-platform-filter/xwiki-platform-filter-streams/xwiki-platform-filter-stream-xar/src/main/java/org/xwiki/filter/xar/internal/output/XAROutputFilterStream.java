@@ -53,6 +53,7 @@ import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.internal.output.FilterStreamXMLStreamWriter;
 import org.xwiki.filter.xml.output.ResultOutputTarget;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -80,7 +81,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
 
     private XARWikiWriter wikiWriter;
 
-    private String currentSpace;
+    private EntityReference currentSpaceReference;
 
     private String currentDocument;
 
@@ -172,13 +173,15 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     @Override
     public void beginWikiSpace(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.currentSpace = name;
+        this.currentSpaceReference =
+            currentSpaceReference == null ? new EntityReference(name, EntityType.SPACE) : new EntityReference(name,
+                EntityType.SPACE, this.currentSpaceReference);
     }
 
     @Override
     public void endWikiSpace(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.currentSpace = null;
+        this.currentSpaceReference = this.currentSpaceReference.getParent();
     }
 
     @Override
@@ -187,7 +190,7 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         this.currentDocument = name;
         this.currentDocumentParameters = parameters;
 
-        this.currentDocumentReference = new LocalDocumentReference(this.currentSpace, this.currentDocument);
+        this.currentDocumentReference = new LocalDocumentReference(this.currentDocument, this.currentSpaceReference);
     }
 
     @Override

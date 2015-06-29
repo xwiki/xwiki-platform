@@ -171,10 +171,9 @@ public class DocumentLocaleReader extends AbstractReader
             int diff = size - previousSize;
 
             if (diff > 0) {
-                // TODO: opens what needs to be opened
-                for (EntityReference spaceReference = this.currentSpaceReference; diff > 0 && spaceReference != null; spaceReference =
-                    spaceReference.getParent(), --diff) {
-                    proxyFilter.beginWikiSpace(spaceReference.getName(), FilterEventParameters.EMPTY);
+                List<EntityReference> spaces = this.currentSpaceReference.getReversedReferenceChain();
+                for (int i = spaces.size() - diff; i < spaces.size(); ++i) {
+                    proxyFilter.beginWikiSpace(spaces.get(i).getName(), FilterEventParameters.EMPTY);
                     this.sentBeginWikiSpace = true;
                     this.previousSpaceReference = this.currentSpaceReference;
                 }

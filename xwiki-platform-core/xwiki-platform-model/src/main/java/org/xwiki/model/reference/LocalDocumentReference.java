@@ -88,6 +88,18 @@ public class LocalDocumentReference extends EntityReference
     }
 
     /**
+     * Create a new Document reference in the current wiki.
+     * 
+     * @param pageName the name of the document, must not be null
+     * @param spaceReference the reference of the space, must not be null
+     * @since 7.2M1
+     */
+    public LocalDocumentReference(String pageName, EntityReference spaceReference)
+    {
+        super(pageName, EntityType.DOCUMENT, spaceReference);
+    }
+
+    /**
      * @return the locale of this document reference
      * @since 5.3RC1
      */

@@ -356,7 +356,9 @@ $xwiki.ssx.use('Main.Spaces')##
     #if($xwiki.hasAccessLevel('view', $services.model.serialize($spaceHomeDocumentReference)) &amp;&amp; !$blacklistedSpaces.contains($space))
       &lt;li class="xitem xunderline xhighlight space"&gt;
         &lt;div class="xitemcontainer"&gt;
-          &lt;div class="spSpaceName"&gt;&lt;a href="$xwiki.getURL($spaceHomeDocumentReference)"&gt;${escapetool.xml($space)}&lt;/a&gt;&lt;/div&gt;
+          ## FIXME: Use a cleaner way ($services.model) if we decide to keep the spaces macro.
+          #set ($spaceHomeStringReference = "${space}.WebHome")
+          &lt;div class="spSpaceName"&gt;&lt;a href="$xwiki.getURL($spaceHomeStringReference)"&gt;${escapetool.xml($space)}&lt;/a&gt;&lt;/div&gt;
           &lt;div class="xshowonhover spSpaceActions"&gt;
             ## Link to the space index.
             &lt;a href="$xwiki.getURL('Main.SpaceIndex', 'view', "space=$escapetool.url($space)")" title="$services.localization.render('index.spacesMacro.spaceIndex.title')"&gt;

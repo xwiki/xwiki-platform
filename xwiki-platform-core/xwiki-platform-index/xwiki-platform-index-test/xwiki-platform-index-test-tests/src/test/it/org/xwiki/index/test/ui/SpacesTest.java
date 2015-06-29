@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.test.ui;
 
-import java.lang.String;
 import org.junit.Test;
 import org.xwiki.index.test.po.SpaceIndexPage;
 import org.xwiki.index.test.po.SpacesMacroPage;
@@ -30,11 +29,12 @@ import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the Spaces Macro.
- * 
+ *
  * @version $Id$
  * @since 7.0RC1
  */
@@ -51,6 +51,7 @@ public class SpacesTest extends AbstractTest
         // See XE-1228: Broken links displayed in the Spaces widget if a space name contains a colon
         // See XE-1298: Spaces macro doesn't list spaces that contain a colon in their name
         String spaceName = getTestClassName() + ":" + getTestMethodName() + "&";
+        String referenceEscapedSpaceName = getTestClassName() + "\\:" + getTestMethodName() + "&";
         // Make sure the new space's WebHome page doesn't exist.
         getUtil().deletePage(spaceName, "WebHome");
 
@@ -62,26 +63,27 @@ public class SpacesTest extends AbstractTest
         assertEquals(spaceName, editPage.getDocumentTitle());
 
         // Verify that the space created is correct by looking at the generate metadata in the HTML header
-        // (they contain the space name amongst other data).
-        assertEquals(spaceName, editPage.getMetaDataValue("space"));
+        // (they contain the space reference amongst other data).
+        // Note: the value will be escaped since it is the space reference, not the space name.
+        assertEquals(referenceEscapedSpaceName, editPage.getMetaDataValue("space"));
 
         // Go back to the Spaces Macro page and verify that the link to space index works
         // First, save the space's home page
         editPage.clickSaveAndContinue();
 
         macroPage = SpacesMacroPage.gotoPage();
-        macroPage.getSpacesMacroPane().clickSpaceIndex(spaceName);
+        macroPage.getSpacesMacroPane().clickSpaceIndex(referenceEscapedSpaceName);
 
         // Assert the content of the space index live table.
         LiveTableElement spaceIndexLiveTable = new SpaceIndexPage().getLiveTable();
         spaceIndexLiveTable.waitUntilReady();
         assertEquals(1, spaceIndexLiveTable.getRowCount());
         assertTrue(spaceIndexLiveTable.hasRow("Page", "WebHome"));
-        assertTrue(spaceIndexLiveTable.hasRow("Space", spaceName));
+        assertTrue(spaceIndexLiveTable.hasRow("Space", referenceEscapedSpaceName));
 
         // Go back to the Spaces Macro page and this time verify that the link to the space home page works
         macroPage = SpacesMacroPage.gotoPage();
-        ViewPage spaceHomePage = macroPage.getSpacesMacroPane().clickSpaceHome(spaceName);
+        ViewPage spaceHomePage = macroPage.getSpacesMacroPane().clickSpaceHome(referenceEscapedSpaceName);
         assertEquals(spaceName, spaceHomePage.getDocumentTitle());
     }
 }

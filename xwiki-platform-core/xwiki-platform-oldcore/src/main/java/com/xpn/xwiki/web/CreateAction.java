@@ -70,14 +70,22 @@ public class CreateAction extends XWikiAction
         EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /**
-     * The name of the space parameter. <br />
+     * The name of the deprecated space parameter. <br />
      * Note: if you change the value of this variable, change the value of {{@link #TOCREATE_SPACE} to the previous
      * value.
+     *
+     * @deprecated Use {@value #SPACE_REFERENCE} as parameter name instead.
      */
+    @Deprecated
     private static final String SPACE = "space";
 
     /**
-     * The name of the page parameter. <br />
+     * The name of the space reference parameter.
+     */
+    private static final String SPACE_REFERENCE = "spaceReference";
+
+    /**
+     * The name of the page parameter.
      */
     private static final String PAGE = "page";
 
@@ -171,15 +179,8 @@ public class CreateAction extends XWikiAction
             pageName = doc.getDocumentReference().getName();
         } else {
             // Given space and page name.
-            String spaceParameter = request.getParameter(SPACE);
-            if (StringUtils.isNotEmpty(spaceParameter)) {
-                // Make sure we don`t use defaults for empty space by mistake.
-                EntityReferenceResolver<String> genericResolver =
-                    Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
-
-                spaceReference = new SpaceReference(genericResolver.resolve(spaceParameter, EntityType.SPACE));
-            }
             pageName = request.getParameter(PAGE);
+            spaceReference = getSpaceReference(request, doc);
         }
 
         // get the available templates, in the current space, to check if all conditions to create a new document are
@@ -215,6 +216,38 @@ public class CreateAction extends XWikiAction
         }
 
         return "create";
+    }
+
+    /**
+     * @param request the request
+     * @param doc the current document
+     * @return the space reference from the current request if either the "spaceReference" or the deprecated "space"
+     *         parameters are used, otherwise {@code null}
+     */
+    private SpaceReference getSpaceReference(XWikiRequest request, XWikiDocument doc)
+    {
+        SpaceReference spaceReference = null;
+
+        String spaceReferenceParameter = request.getParameter(SPACE_REFERENCE);
+
+        // If a space reference parameter is passed, convert it to a SpaceReference.
+        if (StringUtils.isNotEmpty(spaceReferenceParameter)) {
+            EntityReferenceResolver<String> genericResolver =
+                Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
+
+            EntityReference resolvedEntityReference =
+                genericResolver.resolve(spaceReferenceParameter, EntityType.SPACE);
+            spaceReference = new SpaceReference(resolvedEntityReference);
+        } else {
+            // Backwards compatibility: Also supporting unescaped space names through the "space" parameter.
+            String spaceParameter = request.getParameter(SPACE);
+
+            if (StringUtils.isNotEmpty(spaceParameter)) {
+                spaceReference = new SpaceReference(spaceParameter, doc.getDocumentReference().getWikiReference());
+            }
+        }
+
+        return spaceReference;
     }
 
     /**

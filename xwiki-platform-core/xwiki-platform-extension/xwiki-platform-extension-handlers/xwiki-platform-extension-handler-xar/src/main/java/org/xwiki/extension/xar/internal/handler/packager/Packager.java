@@ -119,7 +119,7 @@ public class Packager
     private MandatoryDocumentInitializerManager initializerManager;
 
     @Inject
-    @Named(XARFilterUtils.ROLEHINT)
+    @Named(XARFilterUtils.ROLEHINT_CURRENT)
     private InputFilterStreamFactory xarFilterStreamFactory;
 
     public void importXAR(String comment, File xarFile, PackageConfiguration configuration) throws IOException,

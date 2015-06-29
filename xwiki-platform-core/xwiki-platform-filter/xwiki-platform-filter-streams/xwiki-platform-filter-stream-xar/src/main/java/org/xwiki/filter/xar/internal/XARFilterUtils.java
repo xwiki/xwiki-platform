@@ -33,9 +33,9 @@ public final class XARFilterUtils
     {
         public String name;
 
-        public Class< ? > type;
+        public Class<?> type;
 
-        public EventParameter(String name, Class< ? > type)
+        public EventParameter(String name, Class<?> type)
         {
             this.name = name;
             this.type = type;
@@ -48,7 +48,24 @@ public final class XARFilterUtils
     }
 
     /**
-     * @since 6.2M1
+     * @since 7.2M1
      */
-    public static final String ROLEHINT = "xwiki+xar/1.1";
+    public static final String ROLEHINT_11 = "xwiki+xar/1.1";
+
+    /**
+     * @since 7.2M1
+     */
+    public static final String ROLEHINT_12 = "xwiki+xar/1.2";
+
+    /**
+     * @since 7.2M1
+     */
+    public static final String ROLEHINT_CURRENT = ROLEHINT_12;
+
+    /**
+     * @since 6.2M1
+     * @deprecated 7.2M1
+     */
+    @Deprecated
+    public static final String ROLEHINT = ROLEHINT_11;
 }

@@ -38,6 +38,7 @@ import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.logging.marker.TranslationMarker;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.xar.XarPackage;
 import org.xwiki.xar.internal.model.XarModel;
 
@@ -95,9 +96,11 @@ public class WikiReader
         read(stream, filter, proxyFilter);
 
         // Close last space
-        if (this.documentReader.isSentBeginWikiSpace() && this.documentReader.getCurrentSpace() != null) {
-            proxyFilter.endWikiSpace(this.documentReader.getCurrentSpace(),
-                this.documentReader.getCurrentSpaceParameters());
+        if (this.documentReader.isSentBeginWikiSpace() && this.documentReader.getCurrentSpaceReference() != null) {
+            for (EntityReference space = this.documentReader.getCurrentSpaceReference(); space != null; space =
+                space.getParent()) {
+                proxyFilter.endWikiSpace(space.getName(), FilterEventParameters.EMPTY);
+            }
         }
 
         // Send extension event

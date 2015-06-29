@@ -4373,30 +4373,40 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // IMPORTANT: we don't use SAX apis here because the specified XMLWriter could be a DOMXMLWriter for retro
         // compatibility reasons
 
-        Element docel = new DOMElement("xwikidoc");
+        Element docel = new DOMElement(XarDocumentModel.ELEMENT_DOCUMENT);
+        docel.addAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
+            LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference()));
+        docel.addAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE, getLocale().toString());
         wr.writeOpen(docel);
 
-        Element el = new DOMElement("web");
-        el.addText(getDocumentReference().getLastSpaceReference().getName());
+        Element el = new DOMElement(XarDocumentModel.ELEMENT_SPACE);
+        if (getDocumentReference().getLastSpaceReference().getParent().getType() == EntityType.SPACE) {
+            // If nested space put the space reference in the field
+            el.addText(LOCAL_REFERENCE_SERIALIZER.serialize(getDocumentReference().getLastSpaceReference()));
+        } else {
+            // If single space behave as it used to and put the space name instead of the reference to keep
+            // compatibility when importing in older version
+            el.addText(getDocumentReference().getLastSpaceReference().getName());
+        }
         wr.write(el);
 
-        el = new DOMElement("name");
+        el = new DOMElement(XarDocumentModel.ELEMENT_NAME);
         el.addText(getDocumentReference().getName());
         wr.write(el);
 
-        el = new DOMElement("language");
+        el = new DOMElement(XarDocumentModel.ELEMENT_LOCALE);
         el.addText(getLanguage());
         wr.write(el);
 
-        el = new DOMElement("defaultLanguage");
+        el = new DOMElement(XarDocumentModel.ELEMENT_DEFAULTLOCALE);
         el.addText(getDefaultLanguage());
         wr.write(el);
 
-        el = new DOMElement("translation");
+        el = new DOMElement(XarDocumentModel.ELEMENT_ISTRANSLATION);
         el.addText("" + getTranslation());
         wr.write(el);
 
-        el = new DOMElement("parent");
+        el = new DOMElement(XarDocumentModel.ELEMENT_PARENT);
         if (getRelativeParentReference() == null) {
             // No parent have been specified
             el.addText("");
@@ -4405,66 +4415,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
         wr.write(el);
 
-        el = new DOMElement("creator");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CREATION_AUTHOR);
         el.addText(getCreator());
         wr.write(el);
 
-        el = new DOMElement("author");
+        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_AUTHOR);
         el.addText(getAuthor());
         wr.write(el);
 
-        el = new DOMElement("customClass");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CUSTOMCLASS);
         el.addText(getCustomClass());
         wr.write(el);
 
-        el = new DOMElement("contentAuthor");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_AUTHOR);
         el.addText(getContentAuthor());
         wr.write(el);
 
         long d = getCreationDate().getTime();
-        el = new DOMElement("creationDate");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CREATION_DATE);
         el.addText("" + d);
         wr.write(el);
 
         d = getDate().getTime();
-        el = new DOMElement("date");
+        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_DATE);
         el.addText("" + d);
         wr.write(el);
 
         d = getContentUpdateDate().getTime();
-        el = new DOMElement("contentUpdateDate");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_DATE);
         el.addText("" + d);
         wr.write(el);
 
-        el = new DOMElement("version");
+        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION);
         el.addText(getVersion());
         wr.write(el);
 
-        el = new DOMElement("title");
+        el = new DOMElement(XarDocumentModel.ELEMENT_TITLE);
         el.addText(getTitle());
         wr.write(el);
 
-        el = new DOMElement("defaultTemplate");
+        el = new DOMElement(XarDocumentModel.ELEMENT_DEFAULTTEMPLATE);
         el.addText(getDefaultTemplate());
         wr.write(el);
 
-        el = new DOMElement("validationScript");
+        el = new DOMElement(XarDocumentModel.ELEMENT_VALIDATIONSCRIPT);
         el.addText(getValidationScript());
         wr.write(el);
 
-        el = new DOMElement("comment");
+        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_COMMENT);
         el.addText(getComment());
         wr.write(el);
 
-        el = new DOMElement("minorEdit");
+        el = new DOMElement(XarDocumentModel.ELEMENT_REVISION_MINOR);
         el.addText(String.valueOf(isMinorEdit()));
         wr.write(el);
 
-        el = new DOMElement("syntaxId");
+        el = new DOMElement(XarDocumentModel.ELEMENT_SYNTAX);
         el.addText(getSyntaxId());
         wr.write(el);
 
-        el = new DOMElement("hidden");
+        el = new DOMElement(XarDocumentModel.ELEMENT_HIDDEN);
         el.addText(String.valueOf(isHidden()));
         wr.write(el);
 
@@ -4515,7 +4525,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         // Add Content
-        el = new DOMElement("content");
+        el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT);
 
         // Filter filter = new CharacterFilter();
         // String newcontent = filter.process(getContent());
@@ -4525,7 +4535,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         wr.write(el);
 
         if (bWithRendering) {
-            el = new DOMElement("renderedcontent");
+            el = new DOMElement(XarDocumentModel.ELEMENT_CONTENT_HTML);
             try {
                 el.addText(getRenderedContent(context));
             } catch (XWikiException e) {
@@ -4535,7 +4545,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         if (bWithVersions) {
-            el = new DOMElement("versions");
+            el = new DOMElement(XarDocumentModel.ELEMENT_REVISIONS);
             try {
                 el.addText(getDocumentArchive(context).getArchive(context));
                 wr.write(el);
@@ -4673,23 +4683,37 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         Element docel = domdoc.getRootElement();
 
-        // If, for some reason, the document name or space are not set in the XML input, we still ensure that the
-        // constructed XWikiDocument object has a valid name or space (by using current document values if they are
-        // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
-        // instance.
-        String name = getElement(docel, XarDocumentModel.ELEMENT_NAME);
-        String space = getElement(docel, XarDocumentModel.ELEMENT_SPACE);
+        // Reference
+        String referenceString = docel.attributeValue(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
+        EntityReference reference;
+        if (StringUtils.isEmpty(referenceString)) {
+            // If, for some reason, the document name or space are not set in the XML input, we still ensure that the
+            // constructed XWikiDocument object has a valid name or space (by using current document values if they are
+            // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
+            // instance.
+            String name = getElement(docel, XarDocumentModel.ELEMENT_NAME);
+            String space = getElement(docel, XarDocumentModel.ELEMENT_SPACE);
 
-        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Invalid XML: \"name\" and \"web\" cannot be empty");
+            if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Invalid XML: \"name\" and \"web\" cannot be empty");
+            }
+
+            reference = new LocalDocumentReference(space, name);
+        } else {
+            reference = getRelativeEntityReferenceResolver().resolve(referenceString, EntityType.DOCUMENT);
         }
-
-        EntityReference reference =
-            new EntityReference(name, EntityType.DOCUMENT, new EntityReference(space, EntityType.SPACE));
         reference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
         setDocumentReference(new DocumentReference(reference));
 
+        // Locale
+        String localeString = docel.attributeValue(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
+        if (localeString == null) {
+            localeString = getElement(docel, XarDocumentModel.ELEMENT_LOCALE);
+        }
+        setLocale(LocaleUtils.toLocale(localeString));
+
+        // Parent
         String parent = getElement(docel, XarDocumentModel.ELEMENT_PARENT);
         if (StringUtils.isNotEmpty(parent)) {
             setParentReference(getRelativeEntityReferenceResolver().resolve(parent, EntityType.DOCUMENT));
@@ -4703,7 +4727,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setVersion(getElement(docel, XarDocumentModel.ELEMENT_REVISION));
         }
         setContent(getElement(docel, XarDocumentModel.ELEMENT_CONTENT));
-        setLanguage(getElement(docel, XarDocumentModel.ELEMENT_LOCALE));
         setDefaultLanguage(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTLOCALE));
         setTitle(getElement(docel, XarDocumentModel.ELEMENT_TITLE));
         setDefaultTemplate(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTTEMPLATE));

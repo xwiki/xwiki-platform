@@ -25,9 +25,49 @@ package org.xwiki.xar.internal.model;
  */
 public class XarDocumentModel
 {
+    /**
+     * Never really used. It's supposedly what an old format would have used.
+     */
+    public static final String VERSION_10 = "1.0";
+
+    /**
+     * Not real change, it only change the order of things.
+     */
+    public static final String VERSION_11 = "1.1";
+
+    /**
+     * Add support for nested spaces (see {@link #ATTRIBUTE_DOCUMENT_REFERENCE}).
+     */
+    public static final String VERSION_12 = "1.2";
+
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 
-    public static final String ATTRIBUTE_STREAMVERSION = "version";
+    /**
+     * Contains the version of the specification.
+     * 
+     * @since 7.2M1
+     */
+    public static final String ATTRIBUTE_DOCUMENT_SPECVERSION = "version";
+
+    /**
+     * Contains the complete reference of the document.
+     * 
+     * @since 7.2M1
+     */
+    public static final String ATTRIBUTE_DOCUMENT_REFERENCE = "reference";
+
+    /**
+     * Contains the locale of the document.
+     * 
+     * @since 7.2M1
+     */
+    public static final String ATTRIBUTE_DOCUMENT_LOCALE = "locale";
+
+    /**
+     * @since 7.2M1, use {@link #ATTRIBUTE_DOCUMENT_SPECVERSION} instead
+     */
+    @Deprecated
+    public static final String ATTRIBUTE_STREAMVERSION = ATTRIBUTE_DOCUMENT_SPECVERSION;
 
     public static final String ELEMENT_SPACE = "web";
 

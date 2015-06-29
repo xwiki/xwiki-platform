@@ -21,7 +21,6 @@ package org.xwiki.model.reference;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +70,10 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      * Parameters of this entity.
      */
     private Map<String, Serializable> parameters;
+
+    private Integer size;
+
+    private List<EntityReference> referenceList;
 
     /**
      * Clone an EntityReference.
@@ -316,16 +319,41 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     /**
      * @return a list of references in the parents chain of this reference, ordered from root to this reference.
      */
-    @SuppressWarnings("unchecked")
     public List<EntityReference> getReversedReferenceChain()
     {
-        Deque<EntityReference> referenceList = new LinkedList<EntityReference>();
-        EntityReference reference = this;
-        do {
-            referenceList.push(reference);
-            reference = reference.getParent();
-        } while (reference != null);
-        return (List<EntityReference>) referenceList;
+        if (this.referenceList == null) {
+            LinkedList<EntityReference> referenceDeque = new LinkedList<EntityReference>();
+
+            EntityReference reference = this;
+            do {
+                referenceDeque.push(reference);
+                reference = reference.getParent();
+            } while (reference != null);
+
+            this.referenceList = Collections.<EntityReference>unmodifiableList(referenceDeque);
+        }
+
+        return this.referenceList;
+    }
+
+    /**
+     * @return the number of elements in the {@link EntityReference}
+     * @since 7.2M1
+     */
+    public int size()
+    {
+        if (this.size == null) {
+            int i = 0;
+
+            for (EntityReference currentReference = this; currentReference != null; currentReference =
+                currentReference.getParent()) {
+                ++i;
+            }
+
+            this.size = i;
+        }
+
+        return this.size;
     }
 
     /**

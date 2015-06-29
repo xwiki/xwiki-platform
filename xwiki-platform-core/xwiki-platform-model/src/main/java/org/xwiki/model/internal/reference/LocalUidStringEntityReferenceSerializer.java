@@ -63,14 +63,16 @@ public class LocalUidStringEntityReferenceSerializer implements EntityReferenceS
         StringBuilder representation = new StringBuilder();
         List<EntityReference> references = reference.getReversedReferenceChain();
         EntityReference wikiReference = references.get(0);
+
+        int index;
         if (wikiReference.getType() == EntityType.WIKI) {
-            references.remove(0);
+            index = 1;
         } else {
-            wikiReference = null;
+            index = 0;
         }
 
-        for (EntityReference currentReference : references) {
-            serializeEntityReference(currentReference, representation, wikiReference, parameters);
+        for (; index < reference.size(); ++index) {
+            serializeEntityReference(references.get(index), representation, wikiReference, parameters);
         }
 
         return representation.toString();

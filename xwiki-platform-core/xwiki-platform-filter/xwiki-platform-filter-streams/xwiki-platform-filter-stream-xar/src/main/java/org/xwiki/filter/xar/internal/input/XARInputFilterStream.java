@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.input.AbstractBeanInputFilterStream;
 import org.xwiki.filter.input.InputSource;
@@ -38,13 +38,13 @@ import org.xwiki.filter.input.ReaderInputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xml.input.SourceInputSource;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * @version $Id$
  * @since 6.2M1
  */
-@Component
-@Named(XARFilterUtils.ROLEHINT)
+@Component(hints = {XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInputProperties, XARInputFilter>
 {
@@ -123,8 +123,11 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
             throw new FilterException("Failed to read XAR XML document", e);
         }
 
-        if (documentReader.isSentBeginWikiSpace() && documentReader.getCurrentSpace() != null) {
-            proxyFilter.endWikiSpace(documentReader.getCurrentSpace(), documentReader.getCurrentSpaceParameters());
+        if (documentReader.isSentBeginWikiSpace() && documentReader.getCurrentSpaceReference() != null) {
+            for (EntityReference space = documentReader.getCurrentSpaceReference(); space != null; space =
+                space.getParent()) {
+                proxyFilter.endWikiSpace(space.getName(), FilterEventParameters.EMPTY);
+            }
         }
     }
 

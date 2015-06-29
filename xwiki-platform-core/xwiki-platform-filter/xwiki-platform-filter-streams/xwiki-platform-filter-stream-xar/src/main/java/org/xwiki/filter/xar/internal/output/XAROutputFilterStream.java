@@ -47,9 +47,9 @@ import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARClassModel;
 import org.xwiki.filter.xar.internal.XARClassPropertyModel;
 import org.xwiki.filter.xar.internal.XARFilter;
+import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xar.internal.XARObjectModel;
 import org.xwiki.filter.xar.internal.XARObjectPropertyModel;
-import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.filter.xml.internal.output.FilterStreamXMLStreamWriter;
 import org.xwiki.filter.xml.output.ResultOutputTarget;
@@ -64,8 +64,7 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @version $Id$
  * @since 6.2M1
  */
-@Component
-@Named(XARFilterUtils.ROLEHINT)
+@Component(hints = {XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter
 {
@@ -228,12 +227,27 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         this.writer.writeStartDocument(this.properties.getEncoding(), "1.0");
 
         this.writer.writeStartElement(XarDocumentModel.ELEMENT_DOCUMENT);
-        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_STREAMVERSION, "1.1");
+        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_SPECVERSION, XarDocumentModel.VERSION_12);
+        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
+            localSerializer.serialize(this.currentDocumentReference));
+        this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE, toString(locale));
 
-        this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE, this.currentSpace);
-        this.writer.writeElement(XarDocumentModel.ELEMENT_NAME, this.currentDocument);
+        // Legacy space and name
+        if (this.currentDocumentReference.getParent().getParent() == null) {
+            // If single space behave as it used to and put the space name instead of the reference to keep
+            // compatibility when importing in older version
+            this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE, this.currentDocumentReference.getParent()
+                .getName());
+        } else {
+            // If nested space put the space reference in the field
+            this.writer.writeElement(XarDocumentModel.ELEMENT_SPACE,
+                defaultSerializer.serialize(this.currentDocumentReference.getParent()));
+        }
+        this.writer.writeElement(XarDocumentModel.ELEMENT_NAME, this.currentDocumentReference.getName());
 
+        // Legacy locale
         this.writer.writeElement(XarDocumentModel.ELEMENT_LOCALE, toString(locale));
+
         this.writer.writeElement(XarDocumentModel.ELEMENT_DEFAULTLOCALE,
             toString(this.currentDocumentParameters.get(XWikiWikiDocumentFilter.PARAMETER_LOCALE)));
         this.writer.writeElement(XarDocumentModel.ELEMENT_ISTRANSLATION, locale != null && !Locale.ROOT.equals(locale)

@@ -329,7 +329,8 @@ public class ExportAction extends XWikiAction
             xarProperties.setPreserveVersion(backup || history);
 
             BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory =
-                Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+                Utils.getComponent((Type) OutputFilterStreamFactory.class,
+                    FilterStreamType.XWIKI_XAR_CURRENT.serialize());
 
             OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
 

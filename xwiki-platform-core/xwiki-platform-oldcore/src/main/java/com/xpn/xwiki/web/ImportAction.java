@@ -296,7 +296,7 @@ public class ImportAction extends XWikiAction
         }
 
         BeanInputFilterStreamFactory<XARInputProperties> xarFilterStreamFactory =
-            Utils.getComponent((Type) InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+            Utils.getComponent((Type) InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
         BeanInputFilterStream<XARInputProperties> xarFilterStream =
             xarFilterStreamFactory.createInputFilterStream(xarProperties);
 

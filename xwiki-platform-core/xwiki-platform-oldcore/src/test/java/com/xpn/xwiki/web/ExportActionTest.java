@@ -95,7 +95,7 @@ public class ExportActionTest
         when(inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
         BeanOutputFilterStreamFactory beanOutputFilterStreamFactory = mock(BeanOutputFilterStreamFactory.class);
         oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
-            FilterStreamType.XWIKI_XAR_11.serialize(), beanOutputFilterStreamFactory);
+            FilterStreamType.XWIKI_XAR_CURRENT.serialize(), beanOutputFilterStreamFactory);
         when(beanOutputFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class))).thenReturn(
             mock(BeanOutputFilterStream.class));
 

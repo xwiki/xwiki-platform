@@ -22,6 +22,7 @@ package org.xwiki.filter.xar.internal.input;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 
@@ -31,6 +32,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -77,13 +79,19 @@ public class DocumentLocaleReader extends AbstractReader
 
     private XARInputProperties properties;
 
-    private String currentSpace;
+    private String currentLegacySpace;
 
-    private FilterEventParameters currentSpaceParameters = FilterEventParameters.EMPTY;
+    private String currentLegacyDocument;
 
-    private String currentDocument;
+    private EntityReference previousSpaceReference;
+
+    private EntityReference currentSpaceReference;
+
+    private EntityReference currentDocumentReference;
 
     private Locale currentDocumentLocale;
+
+    private boolean localeFromLegacy = true;
 
     private String currentDocumentRevision;
 
@@ -112,9 +120,14 @@ public class DocumentLocaleReader extends AbstractReader
         this.properties = properties;
     }
 
-    public String getCurrentSpace()
+    public EntityReference getCurrentSpaceReference()
     {
-        return this.currentSpace;
+        return this.currentSpaceReference;
+    }
+
+    public EntityReference getCurrentDocumentReference()
+    {
+        return this.currentDocumentReference;
     }
 
     public boolean isSentBeginWikiSpace()
@@ -122,14 +135,16 @@ public class DocumentLocaleReader extends AbstractReader
         return this.sentBeginWikiSpace;
     }
 
-    public FilterEventParameters getCurrentSpaceParameters()
+    private void resetDocument()
     {
-        return this.currentSpaceParameters;
-    }
+        if (!this.sentBeginWikiSpace) {
+            // Space was not sent after all so let's forget it
+            this.currentSpaceReference = null;
+            this.currentLegacySpace = null;
+        }
 
-    private void reset()
-    {
-        this.currentDocument = null;
+        this.currentDocumentReference = null;
+        this.currentLegacyDocument = null;
         this.currentDocumentLocale = null;
         this.currentDocumentRevision = null;
 
@@ -150,22 +165,58 @@ public class DocumentLocaleReader extends AbstractReader
     private void sendBeginWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
         if (canSendBeginWikiSpace(force)) {
-            proxyFilter.beginWikiSpace(this.currentSpace, this.currentSpaceParameters);
-            this.sentBeginWikiSpace = true;
+            int previousSize = this.previousSpaceReference != null ? this.previousSpaceReference.size() : 0;
+            int size = this.currentSpaceReference != null ? this.currentSpaceReference.size() : 0;
+
+            int diff = size - previousSize;
+
+            if (diff > 0) {
+                // TODO: opens what needs to be opened
+                for (EntityReference spaceReference = this.currentSpaceReference; diff > 0 && spaceReference != null; spaceReference =
+                    spaceReference.getParent(), --diff) {
+                    proxyFilter.beginWikiSpace(spaceReference.getName(), FilterEventParameters.EMPTY);
+                    this.sentBeginWikiSpace = true;
+                    this.previousSpaceReference = this.currentSpaceReference;
+                }
+            }
         }
     }
 
     private void sendEndWikiSpace(XARInputFilter proxyFilter) throws FilterException
     {
-        proxyFilter.endWikiSpace(this.currentSpace, this.currentSpaceParameters);
-        this.sentBeginWikiSpace = false;
+        List<EntityReference> newSpaces = this.currentSpaceReference.getReversedReferenceChain();
+        List<EntityReference> previousSpaces = this.previousSpaceReference.getReversedReferenceChain();
+
+        // Find the first different level
+        int i = 0;
+        while (i < previousSpaces.size() && i < newSpaces.size()) {
+            if (!newSpaces.get(i).equals(previousSpaces.get(i))) {
+                break;
+            }
+
+            ++i;
+        }
+
+        if (i < previousSpaces.size()) {
+            // Delete what is different
+            for (int diff = previousSpaces.size() - i; diff > 0; --diff, this.previousSpaceReference =
+                this.previousSpaceReference.getParent()) {
+                proxyFilter.endWikiSpace(this.previousSpaceReference.getName(), FilterEventParameters.EMPTY);
+            }
+
+            // If we got back to root forget about current space
+            if (this.previousSpaceReference == null) {
+                this.currentSpaceReference = null;
+                this.sentBeginWikiSpace = false;
+            }
+        }
     }
 
     private boolean canSendBeginWikiDocument(boolean force)
     {
         return this.sentBeginWikiSpace
             && !this.sentBeginWikiDocument
-            && (force || (this.currentDocument != null
+            && (force || (this.currentDocumentReference != null
                 && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS.size() && this.properties
                 .getEntities() == null));
     }
@@ -177,7 +228,7 @@ public class DocumentLocaleReader extends AbstractReader
         if (canSendBeginWikiDocument(force)) {
             sendBeginWikiSpace(proxyFilter, true);
 
-            proxyFilter.beginWikiDocument(this.currentDocument, this.currentDocumentParameters);
+            proxyFilter.beginWikiDocument(this.currentDocumentReference.getName(), this.currentDocumentParameters);
             this.sentBeginWikiDocument = true;
         }
     }
@@ -187,7 +238,7 @@ public class DocumentLocaleReader extends AbstractReader
         sendBeginWikiDocument(proxyFilter, true);
         sendEndWikiDocumentLocale(proxyFilter);
 
-        proxyFilter.endWikiDocument(this.currentDocument, this.currentDocumentParameters);
+        proxyFilter.endWikiDocument(this.currentDocumentReference.getName(), this.currentDocumentParameters);
         this.sentBeginWikiDocument = false;
     }
 
@@ -201,9 +252,9 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendBeginWikiDocumentLocale(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
-        if (force || (this.currentSpace != null && this.currentDocument != null && this.currentDocumentLocale != null)) {
+        if (force || (this.currentDocumentReference != null && this.currentDocumentLocale != null)) {
             LocalDocumentReference reference =
-                new LocalDocumentReference(this.currentSpace, this.currentDocument, this.currentDocumentLocale);
+                new LocalDocumentReference(this.currentDocumentReference, this.currentDocumentLocale);
 
             if (this.properties.getEntities() != null && !this.properties.getEntities().matches(reference)) {
                 throw new SkipEntityException(reference);
@@ -281,7 +332,7 @@ public class DocumentLocaleReader extends AbstractReader
     public void read(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
         FilterException
     {
-        reset();
+        resetDocument();
 
         // <xwikidoc>
 
@@ -292,12 +343,48 @@ public class DocumentLocaleReader extends AbstractReader
         readDocument(xmlReader, filter, proxyFilter);
     }
 
+    private void checkSpaces(XARInputFilter proxyFilter) throws FilterException
+    {
+        if (!this.currentSpaceReference.equals(this.previousSpaceReference)) {
+            // Close spaces that needs to be closed
+            if (this.sentBeginWikiSpace) {
+                sendEndWikiSpace(proxyFilter);
+            }
+            // Open spaces that needs to be opened
+            sendBeginWikiSpace(proxyFilter, false);
+        }
+    }
+
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
         // Initialize with a few defaults (thing that don't exist in old XAR format)
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
         this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
+
+        // Reference
+        String referenceString =
+            xmlReader.getAttributeValue(XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE,
+                XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
+        if (StringUtils.isNotEmpty(referenceString)) {
+            this.currentDocumentReference = this.relativeResolver.resolve(referenceString, EntityType.DOCUMENT);
+
+            // Remember previous space reference
+            this.previousSpaceReference = this.currentSpaceReference;
+            // Get new space reference
+            this.currentSpaceReference = this.currentDocumentReference.getParent();
+
+            checkSpaces(proxyFilter);
+        }
+
+        // Locale
+        String localeString =
+            xmlReader.getAttributeValue(XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE,
+                XARDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
+        if (localeString != null) {
+            this.currentDocumentLocale = toLocale(localeString);
+            this.localeFromLegacy = false;
+        }
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
@@ -312,17 +399,36 @@ public class DocumentLocaleReader extends AbstractReader
                 String value = xmlReader.getElementText();
 
                 if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
-                    if (!value.equals(this.currentSpace)) {
-                        if (this.currentSpace != null && this.sentBeginWikiSpace) {
-                            sendEndWikiSpace(proxyFilter);
+                    this.currentLegacySpace = value;
+
+                    if (this.currentDocumentReference == null) {
+                        // Its an old thing
+                        this.previousSpaceReference = this.currentSpaceReference;
+                        if (this.currentLegacyDocument == null) {
+                            this.currentSpaceReference = new EntityReference(value, EntityType.SPACE);
+                        } else {
+                            this.currentDocumentReference =
+                                new LocalDocumentReference(this.currentLegacySpace, this.currentLegacyDocument);
+                            this.currentSpaceReference = this.currentDocumentReference.getParent();
                         }
-                        this.currentSpace = value;
-                        sendBeginWikiSpace(proxyFilter, false);
+
+                        checkSpaces(proxyFilter);
                     }
                 } else if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
-                    this.currentDocument = value;
+                    this.currentLegacyDocument = value;
+
+                    if (this.currentDocumentReference == null) {
+                        // Its an old thing
+                        if (this.currentLegacySpace != null) {
+                            this.currentDocumentReference =
+                                new LocalDocumentReference(this.currentLegacySpace, this.currentLegacyDocument);
+                            this.currentSpaceReference = this.currentDocumentReference.getParent();
+                        }
+                    }
                 } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
-                    this.currentDocumentLocale = (Locale) convert(Locale.class, value);
+                    if (this.localeFromLegacy) {
+                        this.currentDocumentLocale = toLocale(value);
+                    }
                 } else if (XarDocumentModel.ELEMENT_REVISION.equals(elementName)) {
                     this.currentDocumentRevision = value;
                 } else {

@@ -86,7 +86,7 @@ public class XARInputFilterStreamTest
         expected = StringUtils.removeStart(expected, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
 
         BeanInputFilterStreamFactory<XARInputProperties> inputFilterStreamFactory =
-            this.mocker.getInstance(InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+            this.mocker.getInstance(InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_CURRENT.serialize());
         InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(xarProperties);
 
         StringWriterOutputTarget writer = new StringWriterOutputTarget();

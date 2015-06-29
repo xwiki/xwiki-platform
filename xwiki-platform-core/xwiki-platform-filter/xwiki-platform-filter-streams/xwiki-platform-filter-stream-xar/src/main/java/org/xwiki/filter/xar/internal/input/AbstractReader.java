@@ -41,7 +41,7 @@ public abstract class AbstractReader
     @Inject
     protected SyntaxFactory syntaxFactory;
 
-    protected Object convert(Class< ? > type, String source) throws FilterException
+    protected <T> T convert(Class< ? > type, String source) throws FilterException
     {
         Object value = source;
 
@@ -65,7 +65,7 @@ public abstract class AbstractReader
             value = StringUtils.isNotEmpty(source) ? Integer.parseInt(source) : null;
         }
 
-        return value;
+        return (T) value;
     }
 
     protected Locale toLocale(String value)

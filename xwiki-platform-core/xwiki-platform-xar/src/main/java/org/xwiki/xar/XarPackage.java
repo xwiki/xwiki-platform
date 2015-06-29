@@ -657,7 +657,9 @@ public class XarPackage
         writer = new IndentingXMLStreamWriter(writer);
 
         try {
-            write(writer, encoding);
+            writer.writeStartDocument(encoding, "1.0");
+            write(writer);
+            writer.writeEndDocument();
 
             writer.flush();
         } catch (Exception e) {
@@ -671,9 +673,15 @@ public class XarPackage
         }
     }
 
-    private void write(XMLStreamWriter writer, String encoding) throws XMLStreamException
+   /**
+    * Write the package descriptor to the passed XML stream.
+    * 
+    * @param stream the XML stream where to write
+    * @throws XarException when failing to parse the descriptor
+    * @throws IOException when failing to read the file
+    */
+    public void write(XMLStreamWriter writer) throws XMLStreamException
     {
-        writer.writeStartDocument(encoding, "1.0");
         writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
 
         writer.writeStartElement(XarModel.ELEMENT_INFOS);
@@ -696,7 +704,6 @@ public class XarPackage
             writer.writeEndElement();
         }
         writer.writeEndElement();
-        writer.writeEndDocument();
     }
 
     private void writeElement(XMLStreamWriter streamWriter, String localName, String value) throws XMLStreamException

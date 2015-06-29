@@ -19,7 +19,6 @@
  */
 package org.xwiki.filter.xar.internal.input;
 
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -34,15 +33,14 @@ import org.xwiki.filter.xar.internal.XARFilterUtils;
  * @version $Id$
  * @since 6.2M1
  */
-@Component
-@Named(XARFilterUtils.ROLEHINT)
+@Component(hints = {XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
 @Singleton
 public class XARInputFilterStreamFactory extends
     AbstractBeanInputFilterStreamFactory<XARInputProperties, XARInputFilter>
 {
     public XARInputFilterStreamFactory()
     {
-        super(FilterStreamType.XWIKI_XAR_11);
+        super(FilterStreamType.XWIKI_XAR_CURRENT);
 
         setName("XAR input stream");
         setDescription("Generates wiki events from XAR package.");

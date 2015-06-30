@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
@@ -209,7 +210,7 @@ public class XWikiRepositoryModel
         // Rating
         SOLR_FIELDS.put(PROP_RATING_TOTALVOTES, new RatingSolrField(PROP_RATING_TOTALVOTES, "int", null));
         SOLR_FIELDS.put("votes", SOLR_FIELDS.get(PROP_RATING_TOTALVOTES));
-        SOLR_FIELDS.put(PROP_RATING_AVERAGEVOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
+        SOLR_FIELDS.put(RatingExtension.FIELD_AVERAGE_VOTE, new RatingSolrField(PROP_RATING_AVERAGEVOTE, "float", null));
         SOLR_FIELDS.put("vote", SOLR_FIELDS.get(PROP_RATING_AVERAGEVOTE));
 
         // Fields not stored

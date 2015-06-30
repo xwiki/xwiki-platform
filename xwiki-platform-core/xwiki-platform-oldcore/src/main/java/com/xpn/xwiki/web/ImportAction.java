@@ -115,24 +115,15 @@ public class ImportAction extends XWikiAction
     }
 
     private void getPackageInfos(XWikiAttachment packFile, XWikiResponse response, XWikiContext xcontext)
-        throws IOException, XWikiException, FilterException, XarException
+        throws IOException, XWikiException, XarException
     {
         String encoding = xcontext.getWiki().getEncoding();
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
-        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usefilter", 1) == 0) {
-            PackageAPI importer = ((PackageAPI) xcontext.getWiki().getPluginApi("package", xcontext));
-            importer.Import(packFile.getContentInputStream(xcontext));
-            String xml = importer.toXml();
-            byte[] result = xml.getBytes(encoding);
-            response.setContentLength(result.length);
-            response.getOutputStream().write(result);
-        } else {
-            XarPackage xarPackage = new XarPackage(packFile.getContentInputStream(xcontext));
+        XarPackage xarPackage = new XarPackage(packFile.getContentInputStream(xcontext));
 
-            xarPackage.write(response.getOutputStream(), encoding);
-        }
+        xarPackage.write(response.getOutputStream(), encoding);
     }
 
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)

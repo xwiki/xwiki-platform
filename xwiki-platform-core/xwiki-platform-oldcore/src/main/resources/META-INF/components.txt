@@ -34,6 +34,7 @@ com.xpn.xwiki.internal.mandatory.XWikiSkinsDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer
 com.xpn.xwiki.internal.model.reference.CompactStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer
+com.xpn.xwiki.internal.model.reference.CurrentAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentDocumentReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceValueProvider

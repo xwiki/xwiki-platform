@@ -451,6 +451,24 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
+              <method>org.xwiki.model.reference.EntityReferenceSerializer ajc$interFieldGetDispatch$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki)</method>
+              <justification>com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer now exists in oldcore, we do not need it in the aspect anymore.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
+              <method>void ajc$interFieldInit$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki)</method>
+              <justification>com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer now exists in oldcore, we do not need it in the aspect anymore.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
+              <method>void ajc$interFieldSetDispatch$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
+              <justification>com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer now exists in oldcore, we do not need it in the aspect anymore.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -1660,6 +1660,41 @@ public class XWiki extends Api
     }
 
     /**
+     * API to retrieve the URL of an an entity in view mode The URL is generated differently depending on the
+     * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
+     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It
+     * is important to always use the URL functions to generate URL and never hardcode URLs
+     *
+     * @param reference the reference to the entity for which to return the URL for
+     * @return a URL as a string pointing to the entity in view mode
+     * @throws XWikiException if the URL could not be generated properly
+     * @since 7.2M1
+     */
+    public String getURL(EntityReference reference) throws XWikiException
+    {
+        return this.xwiki.getURL(reference, "view", getXWikiContext());
+    }
+
+    /**
+     * API to retrieve the URL of an entity in any mode, optionally adding a query string The URL is generated
+     * differently depending on the environment (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
+     * implementing a new XWikiURLFactory object. The query string will be modified to be added in the way the
+     * environment needs it. It is important to not add the query string parameter manually after a URL. Some
+     * environments will not accept this (like the Portlet environement).
+     *
+     * @param reference the reference to the entity for which to return the URL for
+     * @param action the mode in which to access the entity (view/edit/save/..). Any valid XWiki action is possible
+     * @param querystring the Query String to provide in the usual mode (name1=value1&name2=value=2) including encoding
+     * @return a URL as a string pointing to the entity
+     * @throws XWikiException if the URL could not be generated properly
+     * @since 7.2M1
+     */
+    public String getURL(EntityReference reference, String action, String querystring) throws XWikiException
+    {
+        return this.xwiki.getURL(reference, action, querystring, null, getXWikiContext());
+    }
+
+    /**
      * API to retrieve the URL of an a Wiki Document in view mode The URL is generated differently depending on the
      * environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by implementing a new
      * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment) It

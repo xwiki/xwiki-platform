@@ -114,6 +114,8 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MailStatusResultSerializer;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -372,6 +374,9 @@ public class XWiki implements EventListener
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
+    private EntityReferenceSerializer<String> localStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
     @SuppressWarnings("deprecation")
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
@@ -415,6 +420,8 @@ public class XWiki implements EventListener
     private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
+    
+    private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
 
     private ConfigurationSource getConfiguration()
     {
@@ -556,6 +563,16 @@ public class XWiki implements EventListener
         }
 
         return this.currentgetdocumentResolver;
+    }
+    
+    private AttachmentReferenceResolver<EntityReference> getCurrentAttachmentResolver()
+    {
+        if (this.currentAttachmentReferenceResolver == null) {
+            this.currentAttachmentReferenceResolver =
+                Utils.getComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
+        }
+        
+        return this.currentAttachmentReferenceResolver;
     }
 
     private DocumentReference getDefaultDocumentReference()
@@ -4147,6 +4164,34 @@ public class XWiki implements EventListener
     }
 
     /**
+     * @since 7.2M1
+     */
+    public String getURL(EntityReference entityReference, String action, String queryString, String anchor,
+        XWikiContext context)
+    {
+        // TODO: replace this API with a clean implementation of EntityResourceReferenceSerializer
+        
+        // Handle attachment URL
+        if (EntityType.ATTACHMENT.equals(entityReference.getType())) {
+            // Get the full attachment reference
+            AttachmentReference attachmentReference = getCurrentAttachmentResolver().resolve(entityReference);
+            return getAttachmentURL(attachmentReference, action, queryString, context);
+        }
+
+        // For all other types, we return the URL of the default corresponding document.
+        DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(entityReference);
+        return getURL(documentReference, action, queryString, anchor, context);
+    }
+
+    /**
+     * @since 7.2M1
+     */
+    public String getURL(EntityReference reference, String action, XWikiContext context)
+    {
+        return getURL(reference, action, null, null, context);
+    }
+
+    /**
      * @since 2.2.1
      */
     public String getURL(DocumentReference documentReference, String action, String queryString, String anchor,
@@ -4217,6 +4262,56 @@ public class XWiki implements EventListener
         return url.toString();
     }
 
+    /**
+     * @since 7.2M1
+     */
+    public String getAttachmentURL(AttachmentReference attachmentReference, String action, String queryString, 
+        XWikiContext context)
+    {
+        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+        WikiReference wikiReference = spaceReference.getWikiReference();
+        
+        // We need to serialize the space reference because the old URLFactory has no method to create an Attachment URL
+        // from an AttachmentReference...
+        String serializedSpace = 
+            localStringEntityReferenceSerializer.serialize(spaceReference.removeParent(wikiReference));
+        
+        URL url = context.getURLFactory().createAttachmentURL(attachmentReference.getName(), serializedSpace,
+                    documentReference.getName(), action, queryString, wikiReference.getName(), context);
+        
+        return context.getURLFactory().getURL(url, context);
+    }
+
+    /**
+     * @since 7.2M1
+     */
+    public String getAttachmentURL(AttachmentReference attachmentReference, String queryString, XWikiContext context)
+    {
+        return getAttachmentURL(attachmentReference, "download", queryString, context);
+    }
+
+    /**
+     * @since 7.2M1
+     */
+    public String getAttachmentRevisionURL(AttachmentReference attachmentReference, String revision, String queryString,
+        XWikiContext context)
+    {
+        DocumentReference documentReference = attachmentReference.getDocumentReference();
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+        WikiReference wikiReference = spaceReference.getWikiReference();
+
+        // We need to serialize the space reference because the old URLFactory has no method to create an Attachment URL
+        // from an AttachmentReference...
+        String serializedSpace =
+                localStringEntityReferenceSerializer.serialize(spaceReference.removeParent(wikiReference));
+
+        URL url = context.getURLFactory().createAttachmentRevisionURL(attachmentReference.getName(), serializedSpace,
+                documentReference.getName(), revision, queryString, wikiReference.getName(), context);
+
+        return context.getURLFactory().getURL(url, context);
+    }
+
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException
     {
         return getAttachmentURL(fullname, filename, null, context);
@@ -4228,8 +4323,10 @@ public class XWiki implements EventListener
     public String getAttachmentURL(String fullname, String filename, String queryString, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument(this.currentMixedDocumentReferenceResolver.resolve(fullname));
-        return doc.getAttachmentURL(filename, "download", queryString, context);
+        AttachmentReference attachmentReference = new AttachmentReference(filename,
+            this.currentMixedDocumentReferenceResolver.resolve(fullname));
+        
+        return getAttachmentURL(attachmentReference, queryString, context);
     }
 
     // Usefull date functions

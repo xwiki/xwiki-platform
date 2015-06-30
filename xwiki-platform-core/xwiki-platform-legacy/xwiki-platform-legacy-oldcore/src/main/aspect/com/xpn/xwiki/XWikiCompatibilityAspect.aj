@@ -86,10 +86,6 @@ public privileged aspect XWikiCompatibilityAspect
 
     private EntityReferenceResolver<EntityReference> XWiki.defaultReferenceEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_REFERENCE);
-
-    private EntityReferenceSerializer<String> XWiki.localStringEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "local");
-
     
     /**
      * Used to get the temporary and permanent directory.

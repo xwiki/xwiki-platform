@@ -90,6 +90,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -1843,10 +1844,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentURL(String filename, String action, XWikiContext context)
     {
-        URL url =
-            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(),
-                context);
-        return context.getURLFactory().getURL(url, context);
+        return getAttachmentURL(filename, action, null, context);
     }
 
     public String getExternalAttachmentURL(String filename, String action, XWikiContext context)
@@ -1859,26 +1857,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context)
     {
-        URL url =
-            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, querystring,
-                getDatabase(), context);
-        return context.getURLFactory().getURL(url, context);
+        return context.getWiki().getAttachmentURL(new AttachmentReference(filename, this.getDocumentReference()),
+            action, querystring, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context)
     {
-        URL url =
-            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, null,
-                getDatabase(), context);
-        return context.getURLFactory().getURL(url, context);
+        return getAttachmentRevisionURL(filename, revision, null, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
-        URL url =
-            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, querystring,
-                getDatabase(), context);
-        return context.getURLFactory().getURL(url, context);
+        return context.getWiki().getAttachmentRevisionURL(new AttachmentReference(filename, getDocumentReference()),
+            revision, querystring, context);
     }
 
     /**

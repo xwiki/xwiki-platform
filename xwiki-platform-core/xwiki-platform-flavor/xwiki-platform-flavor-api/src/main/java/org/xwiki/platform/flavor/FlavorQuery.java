@@ -19,8 +19,9 @@
  */
 package org.xwiki.platform.flavor;
 
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.search.ExtensionQuery;
-import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -61,7 +62,7 @@ public class FlavorQuery extends ExtensionQuery
 
     private void init()
     {
-        addFilter(XWikiRepositoryModel.PROP_EXTENSION_CATEGORY, "flavor", ExtensionQuery.COMPARISON.EQUAL);
+        addFilter(Extension.FIELD_CATEGORY, "flavor", ExtensionQuery.COMPARISON.EQUAL);
     }
 
     /**
@@ -71,7 +72,7 @@ public class FlavorQuery extends ExtensionQuery
      */
     public FlavorQuery filterByName(String name)
     {
-        addFilter(XWikiRepositoryModel.PROP_EXTENSION_NAME, name, COMPARISON.MATCH);
+        addFilter(Extension.FIELD_NAME, name, COMPARISON.MATCH);
         return this;
     }
 
@@ -82,7 +83,7 @@ public class FlavorQuery extends ExtensionQuery
      */
     public FlavorQuery filterBySummary(String summary)
     {
-        addFilter(XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, summary, COMPARISON.MATCH);
+        addFilter(Extension.FIELD_SUMMARY, summary, COMPARISON.MATCH);
         return this;
     }
 
@@ -93,7 +94,7 @@ public class FlavorQuery extends ExtensionQuery
      */
     public FlavorQuery orderByName(ORDER order)
     {
-        addSort(XWikiRepositoryModel.PROP_EXTENSION_NAME, order);
+        addSort(Extension.FIELD_NAME, order);
         return this;
     }
 
@@ -104,7 +105,7 @@ public class FlavorQuery extends ExtensionQuery
      */
     public FlavorQuery orderByRating(ORDER order)
     {
-        addSort(XWikiRepositoryModel.PROP_RATING_AVERAGEVOTE, order);
+        addSort(RatingExtension.FIELD_AVERAGE_VOTE, order);
         return this;
     }
     

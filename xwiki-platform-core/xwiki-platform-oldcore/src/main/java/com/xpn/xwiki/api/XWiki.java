@@ -1607,14 +1607,14 @@ public class XWiki extends Api
     /**
      * API to list all non-hidden documents in a space.
      *
-     * @param spaceName the space for which to return all non-hidden documents
+     * @param spaceReference the local reference of the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
      * @throws XWikiException if the loading went wrong
      */
-    public List<String> getSpaceDocsName(String spaceName) throws XWikiException
+    public List<String> getSpaceDocsName(String spaceReference) throws XWikiException
     {
-        return this.xwiki.getSpaceDocsName(spaceName, getXWikiContext());
+        return this.xwiki.getSpaceDocsName(spaceReference, getXWikiContext());
     }
 
     /**

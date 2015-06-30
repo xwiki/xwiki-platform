@@ -6514,6 +6514,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
         }
 
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
         for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
             XWikiDocument backlinkRootDocument = xwiki.getDocument(backlinkDocumentReference, context);
 

@@ -4274,8 +4274,7 @@ public class XWiki implements EventListener
         
         // We need to serialize the space reference because the old URLFactory has no method to create an Attachment URL
         // from an AttachmentReference...
-        String serializedSpace = 
-            localStringEntityReferenceSerializer.serialize(spaceReference.removeParent(wikiReference));
+        String serializedSpace = localStringEntityReferenceSerializer.serialize(spaceReference);
         
         URL url = context.getURLFactory().createAttachmentURL(attachmentReference.getName(), serializedSpace,
                     documentReference.getName(), action, queryString, wikiReference.getName(), context);

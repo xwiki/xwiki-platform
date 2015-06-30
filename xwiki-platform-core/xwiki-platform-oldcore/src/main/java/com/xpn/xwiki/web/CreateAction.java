@@ -248,8 +248,8 @@ public class CreateAction extends XWikiAction
             getNewDocumentReference(context, spaceReference, name, isSpace, templateProvider, availableTemplates);
 
         if (newDocRef != null) {
-            // Checking rights
-            checkRights(spaceReference, context);
+            // Checking rights to create the new document.
+            checkRights(newDocRef.getLastSpaceReference(), context);
 
             XWikiDocument newDoc = context.getWiki().getDocument(newDocRef, context);
             // if the document exists don't create it, put the exception on the context so that the template gets it and

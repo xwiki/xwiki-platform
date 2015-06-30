@@ -159,7 +159,7 @@ public class ImportAction extends XWikiAction
         return null;
     }
 
-    private String getLanguage(String pageName, XWikiRequest request)
+    private String getLocale(String pageName, XWikiRequest request)
     {
         return Util.normalizeLanguage(request.get("language_" + pageName));
     }
@@ -185,9 +185,9 @@ public class ImportAction extends XWikiAction
         return iAction;
     }
 
-    private String getDocName(String pageName)
+    private String getDocumentReference(String pageEntry)
     {
-        return pageName.replaceAll(":[^:]*$", "");
+        return pageEntry.replaceAll(":[^:]*$", "");
     }
 
     private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
@@ -206,11 +206,11 @@ public class ImportAction extends XWikiAction
             }
 
             // Indicate with documents to import
-            for (String pageName : pages) {
-                String language = getLanguage(pageName, request);
-                int iAction = getAction(pageName, language, request);
+            for (String pageEntry : pages) {
+                String language = getLocale(pageEntry, request);
+                int iAction = getAction(pageEntry, language, request);
 
-                String docName = getDocName(pageName);
+                String docName = getDocumentReference(pageEntry);
                 if (language == null) {
                     importer.setDocumentAction(docName, iAction);
                 } else {
@@ -257,15 +257,15 @@ public class ImportAction extends XWikiAction
             EntityReferenceResolver<String> resolver =
                 Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
-            for (String pageName : pages) {
-                if (StringUtils.isNotEmpty(pageName)) {
-                    String language = getLanguage(pageName, request);
-                    int iAction = getAction(pageName, language, request);
+            for (String pageEntry : pages) {
+                if (StringUtils.isNotEmpty(pageEntry)) {
+                    String locale = getLocale(pageEntry, request);
+                    int iAction = getAction(pageEntry, locale, request);
 
-                    String docName = getDocName(pageName);
+                    String documentReference = getDocumentReference(pageEntry);
                     if (iAction == DocumentInfo.ACTION_OVERWRITE) {
-                        entities.includes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
-                            LocaleUtils.toLocale(language)));
+                        entities.includes(new LocalDocumentReference(resolver.resolve(documentReference, EntityType.DOCUMENT),
+                            LocaleUtils.toLocale(locale)));
                     }
                 }
             }

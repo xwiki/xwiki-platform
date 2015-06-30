@@ -992,7 +992,12 @@ public class RepositoryManager implements Initializable, Disposable
     {
         List<String> list = new ArrayList<>(map.size());
         for (Map.Entry<String, ?> entry : map.entrySet()) {
-            list.add(entry.getKey() + '=' + entry.getValue());
+            String entryString = entry.getKey() + '=' + entry.getValue();
+            if (entryString.length() > 255) {
+                // Protect against properties too big
+                entryString = entryString.substring(0, 255);
+            }
+            list.add(entryString);
         }
 
         if (ObjectUtils.notEqual(list, getValue(object, XWikiRepositoryModel.PROP_EXTENSION_PROPERTIES))) {

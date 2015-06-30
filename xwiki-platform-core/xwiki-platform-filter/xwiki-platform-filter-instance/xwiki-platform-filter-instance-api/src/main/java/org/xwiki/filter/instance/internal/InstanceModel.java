@@ -23,18 +23,30 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.filter.FilterException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceTreeNode;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
- * 
  * @version $Id$
  * @since 6.2M1
  */
 @Role
 public interface InstanceModel
 {
-    List<String> getWikis() throws FilterException;
+    /**
+     * @since 7.2M1
+     */
+    List<WikiReference> getWikiReferences() throws FilterException;
 
-    List<String> getSpaces(String wiki) throws FilterException;
+    /**
+     * @since 7.2M1
+     */
+    EntityReferenceTreeNode getSpaceReferences(WikiReference wiki) throws FilterException;
 
-    List<String> getDocuments(String wiki, String space) throws FilterException;
+    /**
+     * @since 7.2M1
+     */
+    List<DocumentReference> getDocumentReferences(SpaceReference spaceReference) throws FilterException;
 }

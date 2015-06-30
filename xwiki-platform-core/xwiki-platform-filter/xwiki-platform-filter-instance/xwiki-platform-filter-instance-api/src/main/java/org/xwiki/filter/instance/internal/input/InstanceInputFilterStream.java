@@ -43,6 +43,7 @@ import org.xwiki.filter.instance.internal.InstanceModel;
 import org.xwiki.filter.instance.internal.InstanceUtils;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceTreeNode;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 
@@ -87,21 +88,19 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
         }
     }
 
-    private boolean isWikiEnabled(String wiki)
+    private boolean isWikiEnabled(WikiReference wikiReference)
     {
-        return this.properties.getEntities() == null || this.properties.getEntities().matches(new WikiReference(wiki));
+        return this.properties.getEntities() == null || this.properties.getEntities().matches(wikiReference);
     }
 
-    private boolean isSpaceEnabled(String wiki, String space)
+    private boolean isSpaceEnabled(SpaceReference spaceReference)
     {
-        return this.properties.getEntities() == null
-            || this.properties.getEntities().matches(new SpaceReference(space, new WikiReference(wiki)));
+        return this.properties.getEntities() == null || this.properties.getEntities().matches(spaceReference);
     }
 
-    private boolean isDocumentEnabled(String wiki, String space, String document)
+    private boolean isDocumentEnabled(DocumentReference documentReference)
     {
-        return this.properties.getEntities() == null
-            || this.properties.getEntities().matches(new DocumentReference(wiki, space, document));
+        return this.properties.getEntities() == null || this.properties.getEntities().matches(documentReference);
     }
 
     @Override
@@ -126,9 +125,9 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
             generator.beginWikiFarm(parameters);
         }
 
-        for (String wikiName : this.instanceModel.getWikis()) {
-            if (isWikiEnabled(wikiName)) {
-                writeWiki(wikiName, filter, proxyFilter);
+        for (WikiReference wikiReference : this.instanceModel.getWikiReferences()) {
+            if (isWikiEnabled(wikiReference)) {
+                writeWiki(wikiReference, filter, proxyFilter);
             }
         }
 
@@ -139,84 +138,101 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
         proxyFilter.endWikiFarm(parameters);
     }
 
-    private void writeWiki(String wiki, Object filter, InstanceFilter proxyFilter) throws FilterException
-    {
-        FilterEventParameters parameters = new FilterEventParameters();
-
-        for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.setWikiParameters(wiki, parameters);
-        }
-
-        proxyFilter.beginWiki(wiki, parameters);
-
-        for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.beginWiki(wiki, parameters);
-        }
-
-        for (String spaceName : this.instanceModel.getSpaces(wiki)) {
-            if (isSpaceEnabled(wiki, spaceName)) {
-                writeSpace(wiki, spaceName, filter, proxyFilter);
-            }
-        }
-
-        for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endWiki(wiki, parameters);
-        }
-
-        proxyFilter.endWiki(wiki, parameters);
-    }
-
-    private void writeSpace(String wiki, String space, Object filter, InstanceFilter proxyFilter)
+    private void writeWiki(WikiReference wikiReference, Object filter, InstanceFilter proxyFilter)
         throws FilterException
     {
         FilterEventParameters parameters = new FilterEventParameters();
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.setWikiSpaceParameters(space, parameters);
+            generator.setWikiParameters(wikiReference.getName(), parameters);
         }
 
-        proxyFilter.beginWikiSpace(space, parameters);
+        proxyFilter.beginWiki(wikiReference.getName(), parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.beginWikiSpace(space, parameters);
+            generator.beginWiki(wikiReference.getName(), parameters);
         }
 
-        for (String documentName : this.instanceModel.getDocuments(wiki, space)) {
-            if (isDocumentEnabled(wiki, space, documentName)) {
-                writeDocument(documentName, filter, proxyFilter);
-            } else {
-                if (this.properties.isVerbose()) {
-                    this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", new DocumentReference(wiki, space,
-                        documentName));
-                }
+        // TODO: improve with a new space related API to get space level by space level instead of all of them at the
+        // same time
+        EntityReferenceTreeNode spaces = this.instanceModel.getSpaceReferences(wikiReference);
+        for (EntityReferenceTreeNode node : spaces.getChildren()) {
+            if (isSpaceEnabled((SpaceReference) node.getReference())) {
+                writeSpace(node, filter, proxyFilter);
             }
         }
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endWikiSpace(space, parameters);
+            generator.endWiki(wikiReference.getName(), parameters);
         }
 
-        proxyFilter.endWikiSpace(space, parameters);
+        proxyFilter.endWiki(wikiReference.getName(), parameters);
     }
 
-    private void writeDocument(String document, Object filter, InstanceFilter proxyFilter) throws FilterException
+    private void writeSpace(EntityReferenceTreeNode node, Object filter, InstanceFilter proxyFilter)
+        throws FilterException
+    {
+        SpaceReference spaceReference = (SpaceReference) node.getReference();
+
+        FilterEventParameters parameters = new FilterEventParameters();
+
+        // Get begin/end space parameters
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setWikiSpaceParameters(spaceReference.getName(), parameters);
+        }
+
+        // Begin space
+        proxyFilter.beginWikiSpace(spaceReference.getName(), parameters);
+
+        // Extend begin space
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.beginWikiSpace(spaceReference.getName(), parameters);
+        }
+
+        // Write documents
+        for (DocumentReference documentReference : this.instanceModel.getDocumentReferences(spaceReference)) {
+            if (isDocumentEnabled(documentReference)) {
+                writeDocument(documentReference, filter, proxyFilter);
+            } else {
+                if (this.properties.isVerbose()) {
+                    this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", documentReference);
+                }
+            }
+        }
+
+        // Write nested spaces
+        for (EntityReferenceTreeNode child : node.getChildren()) {
+            writeSpace(child, filter, proxyFilter);
+        }
+
+        // Extend end space
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.endWikiSpace(spaceReference.getName(), parameters);
+        }
+
+        // End space
+        proxyFilter.endWikiSpace(spaceReference.getName(), parameters);
+    }
+
+    private void writeDocument(DocumentReference documentReference, Object filter, InstanceFilter proxyFilter)
+        throws FilterException
     {
         FilterEventParameters parameters = new FilterEventParameters();
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.setWikiDocumentParameters(document, parameters);
+            generator.setWikiDocumentParameters(documentReference.getName(), parameters);
         }
 
-        proxyFilter.beginWikiDocument(document, parameters);
+        proxyFilter.beginWikiDocument(documentReference.getName(), parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.beginWikiDocument(document, parameters);
+            generator.beginWikiDocument(documentReference.getName(), parameters);
         }
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endWikiDocument(document, parameters);
+            generator.endWikiDocument(documentReference.getName(), parameters);
         }
 
-        proxyFilter.endWikiDocument(document, parameters);
+        proxyFilter.endWikiDocument(documentReference.getName(), parameters);
     }
 }

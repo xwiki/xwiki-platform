@@ -4,6 +4,7 @@ org.xwiki.model.internal.reference.DefaultDocumentReferenceProvider
 org.xwiki.model.internal.reference.DefaultEntityReferenceProvider
 org.xwiki.model.internal.reference.DefaultEntityReferenceValueProvider
 org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver
+org.xwiki.model.internal.reference.DefaultReferenceSpaceReferenceResolver
 org.xwiki.model.internal.reference.DefaultReferenceDocumentReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringAttachmentReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver
@@ -11,6 +12,7 @@ org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.DefaultStringObjectPropertyReferenceResolver
 org.xwiki.model.internal.reference.DefaultStringObjectReferenceResolver
+org.xwiki.model.internal.reference.DefaultStringSpaceReferenceResolver
 org.xwiki.model.internal.reference.DefaultSpaceReferenceProvider
 org.xwiki.model.internal.reference.DefaultWikiReferenceProvider
 org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver

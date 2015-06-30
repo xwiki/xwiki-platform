@@ -119,6 +119,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
         // To ovewrite
     }
 
+    @Override
     public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;

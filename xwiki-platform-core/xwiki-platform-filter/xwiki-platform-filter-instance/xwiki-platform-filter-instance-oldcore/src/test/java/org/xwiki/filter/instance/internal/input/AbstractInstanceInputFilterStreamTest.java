@@ -19,9 +19,6 @@
  */
 package org.xwiki.filter.instance.internal.input;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,8 +48,15 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.output.StringWriterOutputTarget;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceTree;
+import org.xwiki.model.reference.EntityReferenceTreeNode;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class to validate an instance sub {@link InputInstanceFilterStream}.
@@ -69,6 +73,7 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
     protected InstanceModel instanceModelMock;
 
     @Before
+    @Override
     public void before() throws Exception
     {
         super.before();
@@ -83,68 +88,67 @@ public class AbstractInstanceInputFilterStreamTest extends AbstractInstanceFilte
         // Query manager
 
         // Wikis
-        when(this.instanceModelMock.getWikis()).thenAnswer(new Answer<List<String>>()
+        when(this.instanceModelMock.getWikiReferences()).thenAnswer(new Answer<List<WikiReference>>()
         {
             @Override
-            public List<String> answer(InvocationOnMock invocation) throws Throwable
+            public List<WikiReference> answer(InvocationOnMock invocation) throws Throwable
             {
-                Set<String> wikis = new HashSet<String>();
+                Set<WikiReference> wikis = new HashSet<WikiReference>();
 
                 for (DocumentReference reference : oldcore.getDocuments().keySet()) {
-                    wikis.add(reference.getWikiReference().getName());
+                    wikis.add(reference.getWikiReference());
                 }
 
-                List<String> list = new ArrayList<String>(wikis);
+                List<WikiReference> list = new ArrayList<WikiReference>(wikis);
                 Collections.sort(list);
+
                 return list;
             }
         });
 
         // Spaces
-        when(this.instanceModelMock.getSpaces(anyString())).thenAnswer(new Answer<List<String>>()
-        {
-            @Override
-            public List<String> answer(InvocationOnMock invocation) throws Throwable
+        when(this.instanceModelMock.getSpaceReferences(any(WikiReference.class))).thenAnswer(
+            new Answer<EntityReferenceTreeNode>()
             {
-                String wiki = (String) invocation.getArguments()[0];
+                @Override
+                public EntityReferenceTreeNode answer(InvocationOnMock invocation) throws Throwable
+                {
+                    WikiReference wiki = (WikiReference) invocation.getArguments()[0];
 
-                Set<String> spaces = new HashSet<String>();
+                    Set<SpaceReference> spaces = new HashSet<SpaceReference>();
 
-                for (DocumentReference reference : oldcore.getDocuments().keySet()) {
-                    if (reference.getWikiReference().getName().equals(wiki)) {
-                        spaces.add(reference.getLastSpaceReference().getName());
+                    for (DocumentReference reference : oldcore.getDocuments().keySet()) {
+                        if (reference.getWikiReference().equals(wiki)) {
+                            spaces.add(reference.getLastSpaceReference());
+                        }
                     }
-                }
 
-                List<String> list = new ArrayList<String>(spaces);
-                Collections.sort(list);
-                return list;
-            }
-        });
+                    return new EntityReferenceTree(spaces).getChildren().iterator().next();
+                }
+            });
 
         // Documents
-        when(this.instanceModelMock.getDocuments(anyString(), anyString())).thenAnswer(new Answer<List<String>>()
-        {
-            @Override
-            public List<String> answer(InvocationOnMock invocation) throws Throwable
+        when(this.instanceModelMock.getDocumentReferences(any(SpaceReference.class))).thenAnswer(
+            new Answer<List<DocumentReference>>()
             {
-                String wiki = (String) invocation.getArguments()[0];
-                String space = (String) invocation.getArguments()[1];
+                @Override
+                public List<DocumentReference> answer(InvocationOnMock invocation) throws Throwable
+                {
+                    SpaceReference space = (SpaceReference) invocation.getArguments()[0];
 
-                Set<String> docs = new HashSet<String>();
+                    Set<DocumentReference> docs = new HashSet<DocumentReference>();
 
-                for (DocumentReference reference : oldcore.getDocuments().keySet()) {
-                    if (reference.getWikiReference().getName().equals(wiki)
-                        && reference.getLastSpaceReference().getName().equals(space)) {
-                        docs.add(reference.getName());
+                    for (DocumentReference reference : oldcore.getDocuments().keySet()) {
+                        if (reference.getLastSpaceReference().equals(space)) {
+                            docs.add(reference);
+                        }
                     }
-                }
 
-                List<String> list = new ArrayList<String>(docs);
-                Collections.sort(list);
-                return list;
-            }
-        });
+                    List<DocumentReference> list = new ArrayList<DocumentReference>(docs);
+                    Collections.sort(list);
+                    return list;
+                }
+            });
     }
 
     @AfterComponent

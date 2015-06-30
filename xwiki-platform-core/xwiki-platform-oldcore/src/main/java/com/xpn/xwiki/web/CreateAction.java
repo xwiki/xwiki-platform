@@ -59,6 +59,11 @@ import com.xpn.xwiki.util.Util;
 public class CreateAction extends XWikiAction
 {
     /**
+     * 
+     */
+    private static final String WEBHOME = "WebHome";
+
+    /**
      * Log used to report exceptions.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateAction.class);
@@ -90,10 +95,20 @@ public class CreateAction extends XWikiAction
     private static final String PAGE = "page";
 
     /**
-     * The value of the toCreate parameter when a space is to be created. <br />
+     * The name parameter.
+     */
+    private static final String NAME = "name";
+
+    /**
+     * The value of the tocreate parameter when a space is to be created. <br />
      * TODO: find a way to give this constant the same value as the constant above without violating checkstyle.
      */
     private static final String TOCREATE_SPACE = SPACE;
+
+    /**
+     * The value of the tocreate parameter when a terminal/regular document is to be created.
+     */
+    private static final String TOCREATE_TERMINAL = "terminal";
 
     /**
      * The name of the template provider parameter.
@@ -161,7 +176,7 @@ public class CreateAction extends XWikiAction
         // Since this template can be used for creating a Page or a Space, check the passed "tocreate" parameter
         // which can be either "page" or "space". If no parameter is passed then we default to creating a Page.
         String toCreate = request.getParameter("tocreate");
-        boolean isSpace = TOCREATE_SPACE.equals(toCreate);
+        boolean isSpace;
 
         // get the template provider for creating this document, if any template provider is specified
         DocumentReferenceResolver<EntityReference> referenceResolver =
@@ -171,16 +186,53 @@ public class CreateAction extends XWikiAction
 
         // Set the space, page, title variables from the current doc if its new, from the passed parameters if any
         SpaceReference spaceReference = null;
-        String pageName = "";
+        String name = "";
 
         if (doc.isNew()) {
             // Current space and page name.
             spaceReference = doc.getDocumentReference().getLastSpaceReference();
-            pageName = doc.getDocumentReference().getName();
+            name = doc.getDocumentReference().getName();
+
+            // Always creating terminal documents when using the create action from the URL on inexistent documents.
+            isSpace = false;
         } else {
-            // Given space and page name.
-            pageName = request.getParameter(PAGE);
-            spaceReference = getSpaceReference(request, doc);
+            String spaceReferenceParameter = request.getParameter(SPACE_REFERENCE);
+
+            if (spaceReferenceParameter != null) {
+                // We can have an empty spaceReference parameter symbolizing that we are creating a top level space/ND.
+                if (StringUtils.isNotEmpty(spaceReferenceParameter)) {
+                    EntityReferenceResolver<String> genericResolver =
+                        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
+
+                    EntityReference resolvedEntityReference =
+                        genericResolver.resolve(spaceReferenceParameter, EntityType.SPACE);
+                    spaceReference = new SpaceReference(resolvedEntityReference);
+                }
+
+                name = request.getParameter(NAME);
+
+                isSpace = !TOCREATE_TERMINAL.equals(toCreate);
+            } else {
+                // If no spaceReference parameter is set, then we are in Backwards Compatibility mode and we are using
+                // the deprecated parameter names.
+                // Note: The deprecated "space" parameter stores unescaped space names, not references!
+                String spaceParameter = request.getParameter(SPACE);
+
+                isSpace = TOCREATE_SPACE.equals(toCreate);
+                if (isSpace) {
+                    // Always creating top level spaces in this mode. Adapt to the new implementation.
+                    spaceReference = null;
+                    name = spaceParameter;
+                } else {
+                    if (StringUtils.isNotEmpty(spaceParameter)) {
+                        // Always creating documents in top level spaces in this mode.
+                        spaceReference =
+                            new SpaceReference(spaceParameter, doc.getDocumentReference().getWikiReference());
+                    }
+
+                    name = request.getParameter(PAGE);
+                }
+            }
         }
 
         // get the available templates, in the current space, to check if all conditions to create a new document are
@@ -193,7 +245,7 @@ public class CreateAction extends XWikiAction
 
         // get the reference to the new document
         DocumentReference newDocRef =
-            getNewDocumentReference(context, spaceReference, pageName, isSpace, templateProvider, availableTemplates);
+            getNewDocumentReference(context, spaceReference, name, isSpace, templateProvider, availableTemplates);
 
         if (newDocRef != null) {
             // Checking rights
@@ -203,11 +255,11 @@ public class CreateAction extends XWikiAction
             // if the document exists don't create it, put the exception on the context so that the template gets it and
             // re-requests the page and space, else create the document and redirect to edit
             if (!isEmptyDocument(newDoc)) {
-                Object[] args = {spaceReference, pageName};
+                Object[] args = {newDocRef};
                 XWikiException documentAlreadyExists =
                     new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
-                        "Cannot create document {0}.{1} because it already has content", null, args);
+                        "Cannot create document {0} because it already has content", null, args);
                 ((VelocityContext) context.get(VELOCITY_CONTEXT_KEY)).put(EXCEPTION, documentAlreadyExists);
             } else {
                 // create is finally valid, can be executed
@@ -216,38 +268,6 @@ public class CreateAction extends XWikiAction
         }
 
         return "create";
-    }
-
-    /**
-     * @param request the request
-     * @param doc the current document
-     * @return the space reference from the current request if either the "spaceReference" or the deprecated "space"
-     *         parameters are used, otherwise {@code null}
-     */
-    private SpaceReference getSpaceReference(XWikiRequest request, XWikiDocument doc)
-    {
-        SpaceReference spaceReference = null;
-
-        String spaceReferenceParameter = request.getParameter(SPACE_REFERENCE);
-
-        // If a space reference parameter is passed, convert it to a SpaceReference.
-        if (StringUtils.isNotEmpty(spaceReferenceParameter)) {
-            EntityReferenceResolver<String> genericResolver =
-                Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
-
-            EntityReference resolvedEntityReference =
-                genericResolver.resolve(spaceReferenceParameter, EntityType.SPACE);
-            spaceReference = new SpaceReference(resolvedEntityReference);
-        } else {
-            // Backwards compatibility: Also supporting unescaped space names through the "space" parameter.
-            String spaceParameter = request.getParameter(SPACE);
-
-            if (StringUtils.isNotEmpty(spaceParameter)) {
-                spaceReference = new SpaceReference(spaceParameter, doc.getDocumentReference().getWikiReference());
-            }
-        }
-
-        return spaceReference;
     }
 
     /**
@@ -379,9 +399,15 @@ public class CreateAction extends XWikiAction
     {
         String title = request.getParameter("title");
         if (StringUtils.isEmpty(title)) {
-            title =
-                isSpace ? newDocument.getDocumentReference().getLastSpaceReference().getName() : newDocument
-                    .getDocumentReference().getName();
+            if (isSpace) {
+                title = newDocument.getDocumentReference().getLastSpaceReference().getName();
+            } else {
+                title = newDocument.getDocumentReference().getName();
+                // Avoid WebHome titles for pages that are rally space homepages.
+                if (WEBHOME.equals(title)) {
+                    title = newDocument.getDocumentReference().getLastSpaceReference().getName();
+                }
+            }
         }
 
         return title;
@@ -389,30 +415,45 @@ public class CreateAction extends XWikiAction
 
     /**
      * @param context the context to execute this action
-     * @param spaceReference the space reference of the new document
-     * @param pageName the page name of the new document
-     * @param isSpace whether the new document to be created is a space homepage (create space) or a regular page
+     * @param spaceReference the space reference of the new document or the parent space of the new space
+     * @param name the page name of the new terminal document or the space name of the space
+     * @param isSpace whether the new document to be created is a space homepage (create space / create Nested Document)
+     *            or a regular (terminal) page
      * @param templateProvider the template provider for creating this page
      * @param availableTemplates the templates available
      * @return the document reference of the new document to be created, {@code null} if a no document can be created
      *         (because the conditions are not met)
      */
-    private DocumentReference getNewDocumentReference(XWikiContext context, SpaceReference spaceReference,
-        String pageName, boolean isSpace, BaseObject templateProvider, List<Document> availableTemplates)
+    private DocumentReference getNewDocumentReference(XWikiContext context, SpaceReference spaceReference, String name,
+        boolean isSpace, BaseObject templateProvider, List<Document> availableTemplates)
     {
-        if (spaceReference == null) {
-            // No space specified, nothing to do.
-            return null;
-        }
-
         DocumentReference newDocRef = null;
 
         if (isSpace) {
-            // If a space is ready to be created, redirect to the space home in edit mode
-            newDocRef = new DocumentReference("WebHome", spaceReference);
+            if (StringUtils.isEmpty(name)) {
+                // The new space's name is missing.
+                return null;
+            }
+
+            EntityReference parentReference = spaceReference;
+            if (parentReference == null) {
+                EntityReference currentWikiReference = context.getDoc().getDocumentReference().getWikiReference();
+                parentReference = currentWikiReference;
+            }
+
+            // The new space's reference.
+            SpaceReference newSpaceReference = new SpaceReference(name, parentReference);
+
+            // The new space's homepage, i.e. Nested Document's reference.
+            newDocRef = new DocumentReference(WEBHOME, newSpaceReference);
 
             // Nothing else to do but return the new reference.
             return newDocRef;
+        }
+
+        if (spaceReference == null) {
+            // No space specified, nothing to do.
+            return null;
         }
 
         // Proceed with creating a document...
@@ -430,11 +471,11 @@ public class CreateAction extends XWikiAction
             hasTemplate = !canHasTemplate;
         }
 
-        if (!StringUtils.isEmpty(pageName) && hasTemplate) {
+        if (!StringUtils.isEmpty(name) && hasTemplate) {
             // check if the creation in this space is allowed, and only set the new document reference if the creation
             // is allowed
-            if (checkAllowedSpace(spaceReference, pageName, templateProvider, context)) {
-                newDocRef = new DocumentReference(pageName, spaceReference);
+            if (checkAllowedSpace(spaceReference, name, templateProvider, context)) {
+                newDocRef = new DocumentReference(name, spaceReference);
             }
         }
 

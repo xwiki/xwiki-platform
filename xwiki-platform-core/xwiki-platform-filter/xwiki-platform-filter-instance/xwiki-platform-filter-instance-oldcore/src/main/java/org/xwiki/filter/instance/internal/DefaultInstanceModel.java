@@ -100,7 +100,7 @@ public class DefaultInstanceModel implements InstanceModel
         // Get references
         List<SpaceReference> spaceReferences = new ArrayList<>(spaceReferenceStrings.size());
         for (String spaceReferenceString : spaceReferenceStrings) {
-            spaceReferences.add(spaceResolver.resolve(spaceReferenceString, wikiReference));
+            spaceReferences.add(this.spaceResolver.resolve(spaceReferenceString, wikiReference));
         }
 
         // Create the tree

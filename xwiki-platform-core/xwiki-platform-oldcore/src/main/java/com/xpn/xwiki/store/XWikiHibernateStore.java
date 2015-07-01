@@ -67,7 +67,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -133,6 +132,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Inject
     @Named("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    @Inject
+    private DocumentReferenceResolver<String> defaultDocumentReferenceResolver;
 
     /**
      * Used to convert a proper Document Reference to string (standard form).
@@ -2000,7 +2002,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
+        String sql = createSQLQuery("select distinct doc.fullName", parametrizedSqlClause);
         return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
     }
 
@@ -2008,7 +2010,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
+        String sql = createSQLQuery("select distinct doc.fullName", parametrizedSqlClause);
         return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
     }
 
@@ -2043,7 +2045,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
+        String sql = createSQLQuery("select distinct doc.fullName", wheresql);
         return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
@@ -2051,7 +2053,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
+        String sql = createSQLQuery("select distinct doc.fullName", wheresql);
         return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
@@ -2259,20 +2261,23 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
-        for (Object[] result : searchGenericInternal(sql, nb, start, parameterValues, context)) {
-            // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
-            // name is not stored in the database for document references.
-            DocumentReference reference = new DocumentReference((String) result[1],
-                new SpaceReference((String) result[0], new WikiReference(context.getWikiId())));
+
+        // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
+        // name is not stored in the database for document references.
+        WikiReference wikiReference = new WikiReference(context.getWikiId());
+        for (String referenceString : this.<String>searchGenericInternal(sql, nb, start, parameterValues, context)) {
+            DocumentReference reference = this.defaultDocumentReferenceResolver.resolve(referenceString, wikiReference);
+
             documentReferences.add(reference);
         }
+
         return documentReferences;
     }
 
     /**
      * @since 2.2M1
      */
-    private List<Object[]> searchGenericInternal(String sql, int nb, int start, List<?> parameterValues,
+    private <T> List<T> searchGenericInternal(String sql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         boolean bTransaction = false;
@@ -2297,9 +2302,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 query.setMaxResults(nb);
             }
             Iterator it = query.list().iterator();
-            List<Object[]> list = new ArrayList<Object[]>();
+            List list = new ArrayList<>();
             while (it.hasNext()) {
-                list.add((Object[]) it.next());
+                list.add(it.next());
             }
             return list;
         } catch (Exception e) {

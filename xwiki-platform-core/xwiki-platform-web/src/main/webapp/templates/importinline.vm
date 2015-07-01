@@ -120,40 +120,53 @@
                       <input type='hidden' name='pages' value=''/>
                     </li>
                     ## List each page in the package
-                    #foreach($spaceNode in $services.model.toTree($package.entries).children)
-                    #set($space = $spaceNode.reference.name)
-                    <li class="xitem xunderline">
-                      <div class="xitemcontainer">
-                      <div class="spacename">$space</div>
-                      <div class="clearfloats"></div>
-                      <div class="pages">
-                      <ul class="xlist pages">
-                      ## List each document in the current space
-                      #foreach($pageNode in $spaceNode.children)
-                        #set($document = $pageNode.reference.name)
-                        ## List each locale of the current document
-                        #foreach($locale in $pageNode.locales)
-                        <li class="xitem xhighlight">
-                          <div class="xitemcontainer xpagecontainer">
-                            <span class="checkbox">
-                              <input type="checkbox" name="pages"
-                                    value="${escapetool.xml($services.model.serialize($locale, 'local'))}#if("$!locale.locale" != ''):${locale.locale}#end" checked />
-                            </span>
-                            <span class="documentName">
-                              <input type="hidden" name="$!{escapetool.xml($services.model.serialize($locale, 'local'))}:$!{escapetool.xml($locale.locale)}" value="$!{escapetool.xml($locale.locale)}" />
-                              $document #if("$!locale.locale" != '') - $locale.locale #end
-                            </span>
-                            <div class="clearfloats"></div>
-                          </div>
-                        </li>
-                        #end
+                    #macro(displayPageNode $pageNode)
+                      #set($document = $pageNode.reference.name)
+                      ## List each locale of the current document
+                      #foreach($locale in $pageNode.locales)
+                      <li class="xitem xhighlight pages">
+                        <div class="xitemcontainer xpagecontainer">
+                          <span class="checkbox">
+                            <input type="checkbox" name="pages"
+                                  value="${escapetool.xml($services.model.serialize($locale, 'local'))}#if("$!locale.locale" != ''):${locale.locale}#end" checked />
+                          </span>
+                          <span class="documentName">
+                            <input type="hidden" name="$!{escapetool.xml($services.model.serialize($locale, 'local'))}:$!{escapetool.xml($locale.locale)}" value="$!{escapetool.xml($locale.locale)}" />
+                            $document #if("$!locale.locale" != '') - $locale.locale #end
+                          </span>
+                          <div class="clearfloats"></div>
+                        </div>
+                      </li>
                       #end
-                      </ul>
-                      </div>
-                      </div>
-                    </li>
                     #end
-                </ul>
+                    #macro(displaySpaceNode $spaceNode)
+                      #set($spaceReference = $spaceNode.reference)
+                      #set($space = $spaceNode.reference.name)
+                      <li class="xitem xunderline">
+                        <div class="xitemcontainer">
+                        <div class="spacename">$space</div>
+                        <div class="clearfloats"></div>
+                        <div class="pages">
+                        <ul class="xlist pages">
+                        #foreach($node in $spaceNode.children)
+                          #displayNode($node)
+                        #end
+                        </ul>
+                        </div>
+                        </div>
+                      </li>
+                    #end
+                    #macro(displayNode $node)
+                      #if ($node.children.isEmpty())
+                        #displayPageNode($node)
+                      #else
+                        #displaySpaceNode($node)
+                      #end                      
+                    #end
+                    #foreach($node in $services.model.toTree($package.entries).children)
+                      #displayNode($node)
+                    #end
+                  </ul>
                 <div class="importOption">
                   <em>$services.localization.render('core.importer.whenDocumentAlreadyExists')</em>
                   <div class="historyStrategyOption">

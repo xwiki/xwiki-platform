@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -61,6 +62,7 @@ public class DefaultInstanceModel implements InstanceModel
     private SpaceReferenceResolver<String> spaceResolver;
 
     @Inject
+    @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
 
     @Override

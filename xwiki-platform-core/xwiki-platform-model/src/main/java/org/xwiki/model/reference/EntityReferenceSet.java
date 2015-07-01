@@ -159,6 +159,28 @@ public class EntityReferenceSet
 
             return true;
         }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (this.type != null) {
+                builder.append(this.type);
+                builder.append(':');
+                builder.append(this.name);
+            }
+
+            if (this.childrenType != null) {
+                builder.append('(');
+                builder.append(this.childrenType);
+                builder.append(" : ");
+                builder.append(this.children);
+                builder.append(')');
+            }
+
+            return builder.toString();
+        }
     }
 
     private EntityReferenceEntry includes;
@@ -228,8 +250,8 @@ public class EntityReferenceSet
                 return true;
             }
 
-            // Children have same type
             if (currentEntry.childrenType == element.getType()) {
+                // Children have same type
                 EntityReferenceEntry nameEntry = currentEntry.children.get(element.getName());
 
                 if (nameEntry == null) {
@@ -245,6 +267,8 @@ public class EntityReferenceSet
                 if (!currentEntry.matches(element)) {
                     return false;
                 }
+            } else if (currentEntry.childrenType.ordinal() < element.getType().ordinal()) {
+                return false;
             }
         }
 

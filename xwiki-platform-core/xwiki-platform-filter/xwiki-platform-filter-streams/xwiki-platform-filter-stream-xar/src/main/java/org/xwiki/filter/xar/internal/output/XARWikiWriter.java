@@ -33,6 +33,8 @@ import org.xwiki.filter.output.FileOutputTarget;
 import org.xwiki.filter.output.OutputStreamOutputTarget;
 import org.xwiki.filter.output.OutputTarget;
 import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarPackage;
 
@@ -97,12 +99,22 @@ public class XARWikiWriter implements Closeable
         return this.name;
     }
 
+    private void addSpacePath(StringBuilder path, EntityReference spaceReference)
+    {
+        EntityReference parent = spaceReference.getParent();
+        if (parent != null && parent.getType() == EntityType.SPACE) {
+            addSpacePath(path, parent);
+        }
+
+        path.append(spaceReference.getName()).append('/');
+    }
+
     public OutputStream newEntry(LocalDocumentReference reference) throws FilterException
     {
         StringBuilder path = new StringBuilder();
 
-        // Add space name
-        path.append(reference.getParent().getName()).append('/');
+        // Add space path
+        addSpacePath(path, reference.getParent());
 
         // Add document name
         path.append(reference.getName());

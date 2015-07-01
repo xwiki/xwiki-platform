@@ -108,7 +108,7 @@ public class ExportAction extends XWikiAction
             name = context.getDoc().getFullName();
         }
 
-        Collection<String> pageList = getPagesToExport(request.getParameterValues("pages"), context);
+        Collection<String> pageList = resolvePagesToExport(request.getParameterValues("pages"), context);
         if (pageList.isEmpty()) {
             return null;
         }
@@ -130,7 +130,7 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private Collection<String> getPagesToExport(String[] pages, XWikiContext context) throws XWikiException
+    private Collection<String> resolvePagesToExport(String[] pages, XWikiContext context) throws XWikiException
     {
         List<String> pageList = new ArrayList<>();
         if (pages == null || pages.length == 0) {
@@ -288,7 +288,7 @@ public class ExportAction extends XWikiAction
                 entities.includes(new WikiReference(context.getWikiId()));
             } else {
                 // Find all page references and add them for processing
-                Collection<String> pageList = getPagesToExport(pages, context);
+                Collection<String> pageList = resolvePagesToExport(pages, context);
                 DocumentReferenceResolver<String> resolver =
                     Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
                 for (String pageName : pageList) {

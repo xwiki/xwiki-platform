@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.XarException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
@@ -38,6 +41,8 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XarUtils
 {
+    public static final RelativeStringEntityReferenceResolver RESOLVER = new RelativeStringEntityReferenceResolver();
+
     private XarUtils()
     {
         // Utility class
@@ -60,9 +65,11 @@ public final class XarUtils
             throw new XarException("Failed to create a XML read", e);
         }
 
-        String space = null;
-        String page = null;
+        EntityReference reference = null;
         Locale locale = null;
+
+        String legacySpace = null;
+        String legacyPage = null;
 
         try {
             // <xwikidoc>
@@ -71,34 +78,63 @@ public final class XarUtils
 
             xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
 
-            for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
-                String elementName = xmlReader.getLocalName();
+            // Reference
+            String referenceString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
+            if (referenceString != null) {
+                reference = RESOLVER.resolve(referenceString, EntityType.DOCUMENT);
+            }
 
-                if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
-                    page = xmlReader.getElementText();
-
-                    if (space != null && locale != null) {
-                        break;
-                    }
-                } else if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
-                    space = xmlReader.getElementText();
-
-                    if (page != null && locale != null) {
-                        break;
-                    }
-                } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
-                    String value = xmlReader.getElementText();
-                    if (value.length() == 0) {
-                        locale = Locale.ROOT;
-                    } else {
-                        locale = LocaleUtils.toLocale(value);
-                    }
-
-                    if (space != null && page != null) {
-                        break;
-                    }
+            // Locale
+            String localeString = xmlReader.getAttributeValue(null, XarDocumentModel.ATTRIBUTE_DOCUMENT_LOCALE);
+            if (localeString != null) {
+                if (localeString.isEmpty()) {
+                    locale = Locale.ROOT;
                 } else {
-                    StAXUtils.skipElement(xmlReader);
+                    locale = LocaleUtils.toLocale(localeString);
+                }
+            }
+
+            // Legacy fallback
+            if (reference == null || locale == null) {
+                for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+                    String elementName = xmlReader.getLocalName();
+
+                    if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
+                        if (reference == null) {
+                            legacyPage = xmlReader.getElementText();
+
+                            if (legacySpace != null && locale != null) {
+                                break;
+                            }
+                        } else if (locale != null) {
+                            break;
+                        }
+                    } else if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
+                        if (reference == null) {
+                            legacySpace = xmlReader.getElementText();
+
+                            if (legacyPage != null && locale != null) {
+                                break;
+                            }
+                        } else if (locale != null) {
+                            break;
+                        }
+                    } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
+                        if (locale == null) {
+                            String value = xmlReader.getElementText();
+                            if (value.length() == 0) {
+                                locale = Locale.ROOT;
+                            } else {
+                                locale = LocaleUtils.toLocale(value);
+                            }
+                        }
+
+                        if (reference != null || (legacySpace != null && legacyPage != null)) {
+                            break;
+                        }
+                    } else {
+                        StAXUtils.skipElement(xmlReader);
+                    }
                 }
             }
         } catch (XMLStreamException e) {
@@ -111,16 +147,21 @@ public final class XarUtils
             }
         }
 
-        if (space == null) {
-            throw new XarException("Missing space element");
+        if (reference == null) {
+            if (legacySpace == null) {
+                throw new XarException("Missing space element");
+            }
+            if (legacyPage == null) {
+                throw new XarException("Missing page element");
+            }
+
+            reference = new LocalDocumentReference(legacySpace, legacyPage);
         }
-        if (page == null) {
-            throw new XarException("Missing page element");
-        }
+
         if (locale == null) {
             throw new XarException("Missing locale element");
         }
 
-        return new LocalDocumentReference(space, page, locale);
+        return new LocalDocumentReference(reference, locale);
     }
 }

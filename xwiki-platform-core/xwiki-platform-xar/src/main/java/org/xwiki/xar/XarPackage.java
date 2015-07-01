@@ -49,7 +49,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.xar.internal.XarUtils;
 import org.xwiki.xar.internal.model.XarModel;
@@ -66,8 +65,6 @@ public class XarPackage
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
         new LocalStringEntityReferenceSerializer();
-
-    private static final RelativeStringEntityReferenceResolver RESOLVER = new RelativeStringEntityReferenceResolver();
 
     /**
      * Get all entries found in a XAR file.
@@ -550,7 +547,7 @@ public class XarPackage
 
                     // Parse reference
                     LocalDocumentReference reference =
-                        new LocalDocumentReference(RESOLVER.resolve(referenceString, EntityType.DOCUMENT),
+                        new LocalDocumentReference(XarUtils.RESOLVER.resolve(referenceString, EntityType.DOCUMENT),
                             LocaleUtils.toLocale(localeString));
 
                     // Parse default action
@@ -673,13 +670,13 @@ public class XarPackage
         }
     }
 
-   /**
-    * Write the package descriptor to the passed XML stream.
-    * 
-    * @param stream the XML stream where to write
-    * @throws XarException when failing to parse the descriptor
-    * @throws IOException when failing to read the file
-    */
+    /**
+     * Write the package descriptor to the passed XML stream.
+     * 
+     * @param stream the XML stream where to write
+     * @throws XarException when failing to parse the descriptor
+     * @throws IOException when failing to read the file
+     */
     public void write(XMLStreamWriter writer) throws XMLStreamException
     {
         writer.writeStartElement(XarModel.ELEMENT_PACKAGE);

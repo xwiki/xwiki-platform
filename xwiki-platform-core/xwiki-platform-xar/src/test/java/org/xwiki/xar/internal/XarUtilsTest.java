@@ -29,6 +29,11 @@ import org.xwiki.xar.XarException;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Validate {@link XarUtils}.
+ * 
+ * @version $Id$
+ */
 public class XarUtilsTest
 {
     @Test

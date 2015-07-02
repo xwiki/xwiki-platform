@@ -221,26 +221,23 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   
-  <!-- We set the CORS policy globally for webjars because the <url-pattern> option does not filter on query strings 
-       TODO: Remove this when http://jira.xwiki.org/browse/XWIKI-10881 is fixed -->
+  <!-- We set the CORS policy globally for webjars.
+
+       TODO: We currently use a <servlet-name> mapping since we've noticed that <url-pattern> ones have no effect.
+       The problem is described at http://stackoverflow.com/questions/31142302/getnameddispatcher-forward-and-filters-using-url-pattern
+       Right now it means that all URLs handled by a ResourceReferenecHandler<ResourceType> will have this filter
+       applied when it should only be applied to "webjars" URLs. We need to find a solution to fix this. It happens
+       that at this point in time, only "webjars" URLs are handled using a ResourceReferenecHandler<ResourceType>.
+  -->
   <filter-mapping>
     <filter-name>Set CORS policy for fonts</filter-name>
-    <url-pattern>/bin/webjars/*</url-pattern>
-  </filter-mapping>
-  
-  <filter-mapping>
-    <filter-name>Set CORS policy for fonts</filter-name>
+    <servlet-name>resourceReferenceHandler</servlet-name>
+    <url-pattern>/webjars/*</url-pattern>
     <url-pattern>*.woff</url-pattern>
-  </filter-mapping>
-  
-  <filter-mapping>
-    <filter-name>Set CORS policy for fonts</filter-name>
     <url-pattern>*.eot</url-pattern>
-  </filter-mapping>
-  
-  <filter-mapping>
-    <filter-name>Set CORS policy for fonts</filter-name>
     <url-pattern>*.ttf</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
 
   <!-- Initializes XWiki -->

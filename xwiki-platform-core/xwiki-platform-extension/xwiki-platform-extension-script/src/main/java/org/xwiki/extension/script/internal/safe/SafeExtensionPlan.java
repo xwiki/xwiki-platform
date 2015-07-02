@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.extension.job.plan.ExtensionPlanAction;
 import org.xwiki.extension.job.plan.ExtensionPlanTree;
+import org.xwiki.job.internal.script.safe.SafeJobStatus;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to an extension plan.

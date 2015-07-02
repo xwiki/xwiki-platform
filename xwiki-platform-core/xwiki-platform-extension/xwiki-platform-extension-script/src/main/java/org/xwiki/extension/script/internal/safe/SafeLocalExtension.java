@@ -21,9 +21,9 @@ package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.LocalExtensionFile;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingLocalExtension;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a local extension.

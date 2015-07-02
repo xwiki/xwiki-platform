@@ -23,8 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide safe Extension.

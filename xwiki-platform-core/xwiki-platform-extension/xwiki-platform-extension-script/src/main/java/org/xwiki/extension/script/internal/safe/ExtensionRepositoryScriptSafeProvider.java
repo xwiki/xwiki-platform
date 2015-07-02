@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
@@ -33,6 +32,7 @@ import org.xwiki.extension.repository.rating.Ratable;
 import org.xwiki.extension.repository.rating.RatableExtensionRepository;
 import org.xwiki.extension.repository.search.AdvancedSearchable;
 import org.xwiki.extension.repository.search.Searchable;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide safe Extension.

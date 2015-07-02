@@ -21,9 +21,9 @@ package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.CoreExtensionFile;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingCoreExtension;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a core extension.

@@ -469,6 +469,14 @@
               <method>void ajc$interFieldSetDispatch$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
               <justification>com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer now exists in oldcore, we do not need it in the aspect anymore.</justification>
             </difference>
+            <difference>
+              <differenceType>6004</differenceType>
+              <className>org/xwiki/extension/script/AbstractExtensionScriptService</className>
+              <field>scriptProvider</field>
+              <from>org.xwiki.extension.internal.safe.ScriptSafeProvider</from>
+              <to>org.xwiki.script.internal.safe.ScriptSafeProvider</to>
+              <justification>ScriptSafeProvider has been moved to xwiki-commons-script</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -27,9 +27,9 @@ import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide safe Extension.

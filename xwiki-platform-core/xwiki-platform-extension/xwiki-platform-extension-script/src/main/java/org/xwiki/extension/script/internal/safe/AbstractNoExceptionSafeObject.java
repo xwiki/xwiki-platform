@@ -22,9 +22,9 @@ package org.xwiki.extension.script.internal.safe;
 import javax.inject.Inject;
 
 import org.xwiki.context.Execution;
-import org.xwiki.extension.internal.safe.AbstractSafeObject;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.script.ExtensionManagerScriptService;
+import org.xwiki.script.internal.safe.AbstractSafeObject;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Encapsulate {@link AbstractSafeObject} with tools to make easier to use the wrapped API with script language not

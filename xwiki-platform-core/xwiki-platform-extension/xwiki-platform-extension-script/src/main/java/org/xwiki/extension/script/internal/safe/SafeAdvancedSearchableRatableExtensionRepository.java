@@ -21,12 +21,12 @@ package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.context.Execution;
 import org.xwiki.extension.Extension;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.AdvancedSearchable;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a {@link AdvancedSearchable} ratable extension repository.

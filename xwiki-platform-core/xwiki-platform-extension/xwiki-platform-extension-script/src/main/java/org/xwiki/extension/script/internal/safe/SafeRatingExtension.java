@@ -20,10 +20,10 @@
 package org.xwiki.extension.script.internal.safe;
 
 import org.xwiki.extension.ExtensionFile;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.rating.RatingExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingRatingExtension;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a public script access to a rating extension.

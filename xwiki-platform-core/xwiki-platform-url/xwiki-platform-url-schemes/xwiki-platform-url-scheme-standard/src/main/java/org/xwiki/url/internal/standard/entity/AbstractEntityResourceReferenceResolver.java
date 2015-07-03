@@ -79,7 +79,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     public EntityResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
-        EntityResourceReference entityURL;
+        EntityResourceReference reference = null;
 
         // Extract the wiki reference from the URL
         WikiReference wikiReference = extractWikiReference(extendedURL);
@@ -88,10 +88,12 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         //   - "": (default space).(default page), "view" action
         // - 1 segment:
         //   - "/": (default space).(default page), "view" action
-        //   - "/page": (default space).page, "view" action
+        //   - "/space": space.(default page), "view" action
+        //   - "/edit": (default space).(default page), "edit" action
         // - 2 segments:
         //   - "/space/": space.(default page), "view" action
-        //   - "/space/page": space.page, "view" action
+        //   - "/space/page" ("view" hidden, "space" != action name): space.page, "view" action
+        //   - "/view/space" ("view" shown): space.(default page), "view" action
         // - 3 segments:
         //   - "/space1/space2/" ("view" hidden, "space1" != action name): space1.space2.(default page), "view" action
         //   - "/space1/space2/page" ("view" hidden, "space1" != action name): space1.space2.page, "view" action.
@@ -128,15 +130,11 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         String attachmentName = null;
         String action = VIEW_ACTION;
 
-        if (pathSegments.size() == 1) {
-            pageName = pathSegments.get(0);
-        } else if (pathSegments.size() == 2) {
-            spaceNames = new ArrayList();
-            spaceNames.add(pathSegments.get(0));
-            pageName = pathSegments.get(1);
-        } else if (pathSegments.size() != 0) {
+        if (pathSegments.size() != 0) {
             String firstSegment = pathSegments.get(0);
             action = firstSegment;
+            // Generic parsing
+            // Handle actions specifying an attachment.
             if (FILE_ACTION_LIST.contains(firstSegment) && pathSegments.size() >= 4) {
                 // Last segment is the attachment
                 attachmentName = pathSegments.get(pathSegments.size() - 1);
@@ -145,28 +143,37 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
                 // All segments in between are the space names
                 spaceNames = extractSpaceNames(pathSegments, 1, pathSegments.size() - 3);
             } else {
-                // Handle the following UCs:
-                // - /view/space/page ==> view.space.page, action = "view"
-                // - /view/download/space2/page => download.space.page, action = "view"
-                // - /view/view/download/space3/page => view.download.space3.page, action = "view"
+                // Handle actions not specifying any attachment.
                 Pair<String, Integer> actionAndStartPosition =
                     computeActionAndStartPosition(firstSegment, pathSegments, action);
                 action = actionAndStartPosition.getLeft();
                 int startPosition = actionAndStartPosition.getRight();
-                // Last segment is the page name
-                pageName = pathSegments.get(pathSegments.size() - 1);
-                // All segments in between are the space names
-                spaceNames = extractSpaceNames(pathSegments, startPosition, pathSegments.size() - 2);
+                // Normally the last segment is always the page name but we want to handle a special case when we
+                // have "/view/something" and we wish in this case to consider that "something" is the space. This
+                // is to handle Nested Documents, so that the user can have a top level Nested Document
+                // (something.WebHome) and access it from /view/something. If we didn't handle this special case
+                // the user would get Main.something and thus wouldn't be able to access something.WebHome. He'd
+                // need to use /view/something/ which is not natural in the Nested Document mode.
+                if (pathSegments.size() - startPosition == 1) {
+                    spaceNames = Arrays.asList(pathSegments.get(startPosition));
+                } else {
+                    // Last segment is the page name
+                    pageName = pathSegments.get(pathSegments.size() - 1);
+                    // All segments in between are the space names
+                    spaceNames = extractSpaceNames(pathSegments, startPosition, pathSegments.size() - 2);
+                }
             }
         }
 
-        entityURL = new EntityResourceReference(
-            buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
-            EntityResourceAction.fromString(action));
+        if (reference == null) {
+            reference = new EntityResourceReference(
+                buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
+                EntityResourceAction.fromString(action));
+        }
 
-        copyParameters(extendedURL, entityURL);
+        copyParameters(extendedURL, reference);
 
-        return entityURL;
+        return reference;
     }
 
     private Pair<String, Integer> computeActionAndStartPosition(String firstSegment, List<String> pathSegments,
@@ -197,7 +204,11 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
 
     private List<String> extractSpaceNames(List<String> pathSegments, int startPosition, int stopPosition)
     {
-        List<String> spaceNames = new ArrayList();
+        if (stopPosition < 0) {
+            return null;
+        }
+
+        List<String> spaceNames = new ArrayList<>();
         ListIterator<String> iterator = pathSegments.listIterator(startPosition);
         int total = stopPosition - startPosition + 1;
         int count = 0;
@@ -224,9 +235,11 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         EntityType entityType = EntityType.DOCUMENT;
         if (spaceNames != null && !spaceNames.isEmpty()) {
             EntityReference parent = reference;
-            for (String space : spaceNames) {
-                reference = new EntityReference(space, EntityType.SPACE, parent);
-                parent = reference;
+            for (String spaceName : spaceNames) {
+                if (!StringUtils.isEmpty(spaceName)) {
+                    reference = new EntityReference(spaceName, EntityType.SPACE, parent);
+                    parent = reference;
+                }
             }
         }
         if (!StringUtils.isEmpty(pageName)) {

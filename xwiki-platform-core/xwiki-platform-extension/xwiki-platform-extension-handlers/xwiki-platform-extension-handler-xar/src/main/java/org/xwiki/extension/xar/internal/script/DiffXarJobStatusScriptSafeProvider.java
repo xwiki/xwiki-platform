@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Provide a safe {@link DiffXarJobStatus}.

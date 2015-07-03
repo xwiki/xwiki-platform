@@ -20,10 +20,10 @@
 package org.xwiki.extension.xar.internal.script;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.xwiki.extension.internal.safe.AbstractSafeObject;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.xar.question.ConflictQuestion;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
+import org.xwiki.script.internal.safe.AbstractSafeObject;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;

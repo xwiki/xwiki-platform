@@ -17,12 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.script;
+package com.xpn.xwiki.internal.script;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -31,7 +33,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 4.0M2
  */
-// TODO: Move this to oldcore when ScriptSafeProvider is to a public package
+@Component
+@Singleton
 public class DocumentScriptSafeProvider implements ScriptSafeProvider<XWikiDocument>
 {
     @Inject

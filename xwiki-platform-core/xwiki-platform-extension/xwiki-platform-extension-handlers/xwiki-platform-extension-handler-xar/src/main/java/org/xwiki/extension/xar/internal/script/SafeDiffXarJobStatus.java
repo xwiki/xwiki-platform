@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.script.internal.safe.SafeJobStatus;
 import org.xwiki.extension.xar.job.diff.DiffXarJobStatus;
 import org.xwiki.extension.xar.job.diff.DocumentUnifiedDiff;
+import org.xwiki.job.internal.script.safe.SafeJobStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * Safe version of {@link DiffXarJobStatus}.

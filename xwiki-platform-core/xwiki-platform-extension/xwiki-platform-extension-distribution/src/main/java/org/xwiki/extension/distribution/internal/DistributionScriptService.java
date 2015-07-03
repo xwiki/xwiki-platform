@@ -34,7 +34,6 @@ import org.xwiki.extension.distribution.internal.DistributionManager.Distributio
 import org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener.DocumentStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.DocumentReference;
@@ -44,6 +43,7 @@ import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.text.StringUtils;
 

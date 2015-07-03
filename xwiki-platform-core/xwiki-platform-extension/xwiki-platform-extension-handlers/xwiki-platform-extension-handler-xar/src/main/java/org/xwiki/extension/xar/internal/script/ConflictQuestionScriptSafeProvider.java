@@ -20,14 +20,18 @@
 package org.xwiki.extension.xar.internal.script;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
  * @version $Id$
  * @since 4.0M2
  */
+@Component
+@Singleton
 public class ConflictQuestionScriptSafeProvider implements ScriptSafeProvider<ConflictQuestion>
 {
     /**

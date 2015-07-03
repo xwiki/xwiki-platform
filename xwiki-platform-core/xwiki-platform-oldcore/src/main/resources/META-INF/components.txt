@@ -63,6 +63,7 @@ com.xpn.xwiki.internal.skin.InternalSkinConfiguration
 com.xpn.xwiki.internal.skin.InternalSkinManager
 com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.script.DebugScriptService
+com.xpn.xwiki.internal.script.DocumentScriptSafeProvider
 com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager

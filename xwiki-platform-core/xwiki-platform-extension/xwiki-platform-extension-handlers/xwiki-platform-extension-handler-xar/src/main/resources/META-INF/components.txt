@@ -12,6 +12,5 @@ org.xwiki.extension.xar.internal.question.ConflictQuestionRecorder
 org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
 org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
 org.xwiki.extension.xar.internal.script.DiffXarJobStatusScriptSafeProvider
-org.xwiki.extension.xar.internal.script.DocumentScriptSafeProvider
 org.xwiki.extension.xar.script.DeprecatedXarExtensionScriptService
 org.xwiki.extension.xar.script.XarExtensionScriptService

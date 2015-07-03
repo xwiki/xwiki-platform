@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.FieldUtils;
@@ -50,13 +49,6 @@ public class AttachmentSolrMetadataExtractor extends AbstractSolrMetadataExtract
 {
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Used to resolve the attachment author reference because {@link XWikiAttachment} doesn't have a method to return
-     * the author reference.
-     */
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
     public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)

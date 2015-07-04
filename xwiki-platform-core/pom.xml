@@ -477,6 +477,14 @@
               <to>org.xwiki.script.internal.safe.ScriptSafeProvider</to>
               <justification>ScriptSafeProvider has been moved to xwiki-commons-script</justification>
             </difference>
+            <difference>
+              <differenceType>6004</differenceType>
+              <className>org/xwiki/filter/script/AbstractFilterScriptService</className>
+              <field>scriptProvider</field>
+              <from>org.xwiki.extension.internal.safe.ScriptSafeProvider</from>
+              <to>org.xwiki.script.internal.safe.ScriptSafeProvider</to>
+              <justification>ScriptSafeProvider has been moved to xwiki-commons-script</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

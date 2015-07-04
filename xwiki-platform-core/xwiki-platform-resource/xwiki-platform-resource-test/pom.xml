@@ -24,25 +24,20 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-resource</artifactId>
     <version>7.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-resource</artifactId>
-  <name>XWiki Platform - Resource - Parent POM</name>
+  <artifactId>xwiki-platform-resource-test</artifactId>
+  <name>XWiki Platform - Resource - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
+  <description>Tests for the Resource feature</description>
+  <properties>
+    <!-- Don't run CLIRR in test modules since we don't care about backward compatibility for tests -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-resource-api</module>
-    <module>xwiki-platform-resource-default</module>
-    <module>xwiki-platform-resource-servlet</module>
+    <module>xwiki-platform-resource-test-tests</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-resource-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

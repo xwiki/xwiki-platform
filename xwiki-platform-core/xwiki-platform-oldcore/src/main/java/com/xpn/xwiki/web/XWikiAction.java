@@ -816,7 +816,7 @@ public abstract class XWikiAction extends Action
                     EntityType.DOCUMENT).getName();
                 // Avoid an infinite loop by using a Thread Local variable (we can do this since forward() is guaranteed
                 // to be caled in the same thread by the Servlet Specifications).
-                if (!this.redirectSpaceURLAlreadyHandled.get()) {
+                if (this.redirectSpaceURLAlreadyHandled.get() == null || !this.redirectSpaceURLAlreadyHandled.get()) {
                     this.redirectSpaceURLAlreadyHandled.set(true);
                     // Consider the reference as a Space Reference and Construct a new reference to the home of that
                     // Space. Then generate the URL for it and forward to it

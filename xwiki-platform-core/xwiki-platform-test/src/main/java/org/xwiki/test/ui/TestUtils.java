@@ -561,17 +561,17 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(new String[] {space, page}, action, queryString);
+        return getURL(new String[]{ space, page }, action, queryString);
     }
 
-    private String getURL(String[] path, String action, String queryString)
+    public String getURL(String[] path, String action, String queryString)
     {
         StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
-        builder.append(action);
-        for (String element : path) {
-            builder.append('/').append(escapeURL(element));
+        if (!StringUtils.isEmpty(action)) {
+            builder.append(action).append('/');
         }
+        builder.append(StringUtils.join(path, '/'));
 
         boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {

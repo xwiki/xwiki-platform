@@ -29,7 +29,7 @@ import org.xwiki.rest.model.jaxb.Space;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}")
 public interface SpaceResource
 {
     @GET Space getSpace(

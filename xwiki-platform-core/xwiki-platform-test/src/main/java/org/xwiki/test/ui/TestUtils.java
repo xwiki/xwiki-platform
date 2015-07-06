@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -571,7 +572,11 @@ public class TestUtils
         if (!StringUtils.isEmpty(action)) {
             builder.append(action).append('/');
         }
-        builder.append(StringUtils.join(path, '/'));
+        List<String> escapedPath = new ArrayList<>();
+        for (String element : path) {
+            escapedPath.add(escapeURL(element));
+        }
+        builder.append(StringUtils.join(escapedPath, '/'));
 
         boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
         if (needToAddSecretToken || !StringUtils.isEmpty(queryString)) {

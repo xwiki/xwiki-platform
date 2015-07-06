@@ -20,6 +20,8 @@
 package org.xwiki.rest.internal;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -59,13 +61,35 @@ public class Utils
      * @param pageName
      * @return The page id.
      */
-    public static String getPageId(String wikiName, String spaceName, String pageName)
+    public static String getPageId(String wikiName, String spaceName, String pageName) throws XWikiException
     {
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+        // Handle nested spaces
+        List<String> spaces = getSpacesFromURLSegment(spaceName);
+        
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
         return document.getPrefixedFullName();
+    }
+    
+    public static List<String> getSpacesFromURLSegment(String spaceSegment) throws XWikiException
+    {
+        // The URL format is: /spaces/A/spaces/B/spaces/C to actually point to the space A.B.C.
+        List<String> spaces = new ArrayList<>();
+        int i = 0;
+        for (String space : spaceSegment.split("/")) {
+            if (i % 2 == 0) {
+                // Every 2 segments, we should have "spaces", or the URL is malformed 
+                if (!"spaces".equals(space)) {
+                    throw new XWikiException("Malformed URL", new Exception());
+                }
+            } else {
+                spaces.add(space);
+            }
+            i++;
+        }
+        return spaces;
     }
 
     /**

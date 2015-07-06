@@ -242,12 +242,11 @@ public class WikiManagerScriptService implements ScriptService
      */
     public boolean canDeleteWiki(String userId, String wikiId)
     {
-        String errorMessage = String.format("Error while getting the descriptor of wiki [%s]", wikiId);
         try {
-            // Get the wiki owner
+            // Get target wiki descriptor
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
-                error(new Exception(errorMessage));
+                error(new Exception(String.format("Could not find wiki [%s]]", wikiId)));
                 return false;
             }
             // Get the full reference of the given user
@@ -266,7 +265,7 @@ public class WikiManagerScriptService implements ScriptService
                 return true;
             }
         } catch (WikiManagerException e) {
-            error(errorMessage, e);
+            error(String.format("Error while getting the descriptor of wiki [%s]", wikiId), e);
         }
 
         return false;

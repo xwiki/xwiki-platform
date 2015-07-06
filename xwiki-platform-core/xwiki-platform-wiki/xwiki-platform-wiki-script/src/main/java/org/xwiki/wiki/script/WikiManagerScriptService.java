@@ -246,7 +246,7 @@ public class WikiManagerScriptService implements ScriptService
             // Get target wiki descriptor
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
-                error(new Exception(String.format("Could not find wiki [%s]]", wikiId)));
+                error(new Exception(String.format("Could not find descriptor for wiki [%s]]", wikiId)));
                 return false;
             }
             // Get the full reference of the given user

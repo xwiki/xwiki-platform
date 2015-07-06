@@ -71,9 +71,9 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
      */
     private Map<String, Serializable> parameters;
 
-    private Integer size;
+    private transient Integer size;
 
-    private List<EntityReference> referenceList;
+    private transient List<EntityReference> referenceList;
 
     /**
      * Clone an EntityReference.

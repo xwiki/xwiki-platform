@@ -122,7 +122,7 @@ public class EntityReferenceSetTest
     }
 
     @Test
-    public void testIncludePartial()
+    public void testIncludePartialOnlySpace()
     {
         EntityReferenceSet set = new EntityReferenceSet();
 
@@ -135,6 +135,22 @@ public class EntityReferenceSetTest
         Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
             EntityType.WIKI))));
         Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE)));
+    }
+
+    @Test
+    public void testIncludePartialWikiDocument()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.includes(new EntityReference("document", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
+
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+        Assert.assertTrue(set.matches(new EntityReference("document", EntityType.DOCUMENT, new EntityReference(
+            "space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
+
+        Assert.assertFalse(set.matches(new EntityReference("nodocument", EntityType.DOCUMENT, new EntityReference(
+            "space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)))));
     }
 
     @Test

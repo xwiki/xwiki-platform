@@ -22,19 +22,18 @@ package org.xwiki.extension.script;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.job.AbstractRequest;
-import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
-import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.script.JobScriptService;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -99,7 +98,8 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected ContextualAuthorizationManager authorization;
 
     @Inject
-    private JobStatusStore jobStore;
+    @Named("job")
+    private ScriptService jobScriptService;
 
     /**
      * @param <T> the type of the object
@@ -135,20 +135,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
 
     protected JobStatus getJobStatus(List<String> jobId)
     {
-        JobStatus jobStatus;
-
-        Job job = this.jobExecutor.getJob(jobId);
-        if (job == null) {
-            jobStatus = this.jobStore.getJobStatus(jobId);
-        } else {
-            jobStatus = job.getStatus();
-        }
-
-        if (jobStatus != null && !this.authorization.hasAccess(Right.PROGRAM)) {
-            jobStatus = safe(jobStatus);
-        }
-
-        return jobStatus;
+        return ((JobScriptService) jobScriptService).getJobStatus(jobId);
     }
 
     // Error management

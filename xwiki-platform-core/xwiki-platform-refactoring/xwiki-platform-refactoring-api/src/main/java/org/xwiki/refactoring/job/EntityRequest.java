@@ -22,6 +22,7 @@ package org.xwiki.refactoring.job;
 import java.util.Collection;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
@@ -35,19 +36,95 @@ import org.xwiki.stability.Unstable;
 public class EntityRequest extends AbstractRequest
 {
     /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getJobType()
+     */
+    private static final String PROPERTY_JOB_TYPE = "job.type";
+
+    /**
+     * @see #getUserReference()
+     */
+    private static final String PROPERTY_USER_REFERENCE = "user.reference";
+
+    /**
+     * @see #isCheckRights()
+     */
+    private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
+
+    /**
      * @see #getEntityReferences()
      */
-    public static final String PROPERTY_ENTITY_REFERENCES = "entityReferences";
+    private static final String PROPERTY_ENTITY_REFERENCES = "entityReferences";
 
     /**
      * @see #isDeep()
      */
-    public static final String PROPERTY_DEEP = "deep";
+    private static final String PROPERTY_DEEP = "deep";
 
     /**
-     * Serialization identifier.
+     * @return the type of job that should perform this request; this is useful when different jobs use the same type of
+     *         request
      */
-    private static final long serialVersionUID = 1L;
+    public String getJobType()
+    {
+        return getProperty(PROPERTY_JOB_TYPE);
+    }
+
+    /**
+     * Sets the type of job that should perform this request. This is useful when different jobs use the same type of
+     * request.
+     * 
+     * @param jobType the type of job that should perform this request
+     */
+    public void setJobType(String jobType)
+    {
+        setProperty(PROPERTY_JOB_TYPE, jobType);
+    }
+
+    /**
+     * @return {@code true} in case the job should check if the user specified by {@link #getUserReference()} is
+     *         authorized to perform the actions implied by this request, {@code false} otherwise
+     */
+    public boolean isCheckRights()
+    {
+        return getProperty(PROPERTY_CHECK_RIGHTS, true);
+    }
+
+    /**
+     * Sets whether the job should check or not if the user specified by {@link #getUserReference()} is authorized to
+     * perform the actions implied by this request.
+     * 
+     * @param checkRights {@code true} to check if {@link #getUserReference()} is authorized to perform this request,
+     *            {@code false} to perform this request without checking rights
+     */
+    public void setCheckRights(boolean checkRights)
+    {
+        setProperty(PROPERTY_CHECK_RIGHTS, checkRights);
+    }
+
+    /**
+     * @return the user that should be used to perform this request; this user must be authorized to perform the actions
+     *         implied by this request if {@link #isCheckRights()} is {@code true}.
+     */
+    public DocumentReference getUserReference()
+    {
+        return getProperty(PROPERTY_USER_REFERENCE);
+    }
+
+    /**
+     * Sets the user that should be used to perform this request. This user must be authorized to perform the actions
+     * implied by this request if {@link #isCheckRights()} is {@code true}.
+     * 
+     * @param userReference the user reference
+     */
+    public void setUserReference(DocumentReference userReference)
+    {
+        setProperty(PROPERTY_USER_REFERENCE, userReference);
+    }
 
     /**
      * @return the collection of entity references that are targeted by this request

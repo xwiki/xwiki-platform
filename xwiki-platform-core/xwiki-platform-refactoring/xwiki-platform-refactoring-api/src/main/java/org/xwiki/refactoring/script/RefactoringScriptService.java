@@ -33,7 +33,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
@@ -73,24 +72,6 @@ public class RefactoringScriptService implements ScriptService
      * The key under which the last encountered error is stored in the current execution context.
      */
     private static final String REFACTORING_ERROR_KEY = String.format("scriptservice.%s.error", ROLE_HINT);
-
-    /**
-     * The property used to store the job type on the job request. This is mostly used to distinguish between move and
-     * rename on a {@link MoveRequest}.
-     */
-    private static final String PROPERTY_JOB_TYPE = "job.type";
-
-    /**
-     * The property that holds the current user reference on the job request. This user must be authorized to perform
-     * the actions implied by the request if {@link #PROPERTY_CHECK_RIGHTS} is set to {@code true}.
-     */
-    private static final String PROPERTY_USER_REFERENCE = "user.reference";
-
-    /**
-     * Whether to check or not if the user specified by {@link #PROPERTY_USER_REFERENCE} is authorized to perform the
-     * actions implied by the job request.
-     */
-    private static final String PROPERTY_CHECK_RIGHTS = "checkrights";
 
     /**
      * Provides access to the current context.
@@ -179,7 +160,7 @@ public class RefactoringScriptService implements ScriptService
         MoveRequest request = new MoveRequest();
         request.setId(generateJobId(type));
         request.setInteractive(true);
-        request.setProperty(PROPERTY_JOB_TYPE, type);
+        request.setJobType(type);
         request.setEntityReferences(sources);
         request.setDestination(destination);
         request.setDeep(true);
@@ -331,10 +312,10 @@ public class RefactoringScriptService implements ScriptService
         }
     }
 
-    private <T extends AbstractRequest> void setRightsProperties(T request)
+    private <T extends EntityRequest> void setRightsProperties(T request)
     {
-        request.setProperty(PROPERTY_CHECK_RIGHTS, true);
-        request.setProperty(PROPERTY_USER_REFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        request.setCheckRights(true);
+        request.setUserReference(this.documentAccessBridge.getCurrentUserReference());
     }
 
     /**

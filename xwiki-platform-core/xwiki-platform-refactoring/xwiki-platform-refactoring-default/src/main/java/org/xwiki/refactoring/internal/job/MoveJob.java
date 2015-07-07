@@ -308,24 +308,32 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
     private boolean copy(DocumentReference source, DocumentReference destination)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference userReference = xcontext.getUserReference();
         try {
+            xcontext.setUserReference(this.request.getUserReference());
             return xcontext.getWiki().copyDocument(source, destination, false, xcontext);
         } catch (Exception e) {
             this.logger.warn("Failed to copy [{}] to [{}].", source, destination, e);
             return false;
+        } finally {
+            xcontext.setUserReference(userReference);
         }
     }
 
     private boolean delete(DocumentReference reference)
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference userReference = xcontext.getUserReference();
         try {
+            xcontext.setUserReference(this.request.getUserReference());
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
             xcontext.getWiki().deleteAllDocuments(document, xcontext);
             return true;
         } catch (Exception e) {
             this.logger.warn("Failed to delete document [{}].", reference, e);
             return false;
+        } finally {
+            xcontext.setUserReference(userReference);
         }
     }
 
@@ -337,9 +345,8 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private boolean hasAccess(Right right, EntityReference reference)
     {
-        boolean checkRights = this.request.getProperty("checkrights", true);
-        DocumentReference userReference = this.request.getProperty("user.reference");
-        return !checkRights || userReference == null || this.authorization.hasAccess(right, userReference, reference);
+        return !this.request.isCheckRights()
+            || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
     }
 
     /**

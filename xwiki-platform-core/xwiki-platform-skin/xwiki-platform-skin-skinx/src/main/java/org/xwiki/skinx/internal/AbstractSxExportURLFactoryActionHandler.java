@@ -37,12 +37,12 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.model.LegacySpaceResolver;
 import com.xpn.xwiki.web.ExportURLFactoryActionHandler;
-import com.xpn.xwiki.web.ExportURLFactoryContext;
 import com.xpn.xwiki.web.sx.Extension;
 import com.xpn.xwiki.web.sx.SxDocumentSource;
 import com.xpn.xwiki.web.sx.SxResourceSource;
@@ -81,7 +81,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
 
     @Override
     public URL createURL(String spaces, String name, String queryString, String anchor, String wikiId,
-        XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
+        XWikiContext context, FilesystemExportContext exportContext) throws Exception
     {
         // Check if the current user has the right to view the SX file. We do this since this is what would happen
         // in XE when a SX action is called (check done in XWikiAction).
@@ -100,14 +100,14 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         XWikiDocument.backupContext(backup, context);
         try {
             sxDocument.setAsContextDoc(context);
-            return processSx(spaceNames, name, queryString, context, factoryContext);
+            return processSx(spaceNames, name, queryString, context, exportContext);
         } finally {
             XWikiDocument.restoreContext(backup, context);
         }
     }
 
     private URL processSx(List<String> spaceNames, String name, String queryString, XWikiContext context,
-        ExportURLFactoryContext factoryContext) throws Exception
+        FilesystemExportContext exportContext) throws Exception
     {
         SxSource sxSource = null;
 
@@ -124,12 +124,12 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
             sxSource = new SxDocumentSource(context, getExtensionType());
         }
 
-        String content = getContent(sxSource, factoryContext);
+        String content = getContent(sxSource, exportContext);
 
         // Write the content to file
         // We need a unique name for that SSX content
         String targetPath = String.format("%s/%s/%s", getSxPrefix(), StringUtils.join(spaceNames, '/'), name);
-        File targetDirectory = new File(factoryContext.getExportDir(), targetPath);
+        File targetDirectory = new File(exportContext.getExportDir(), targetPath);
         if (!targetDirectory.exists()) {
             targetDirectory.mkdirs();
         }
@@ -151,7 +151,7 @@ public abstract class AbstractSxExportURLFactoryActionHandler implements ExportU
         return new URL(path.toString());
     }
 
-    protected String getContent(SxSource sxSource, ExportURLFactoryContext factoryContext)
+    protected String getContent(SxSource sxSource, FilesystemExportContext exportContext)
     {
         return sxSource.getContent();
     }

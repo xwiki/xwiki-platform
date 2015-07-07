@@ -17,33 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard;
+package org.xwiki.url.internal;
 
-import javax.inject.Named;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.AbstractExtendedURLResourceReferenceSerializer;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.url.URLContextManager;
 
 /**
- * Transforms a XWiki Resource instance into a {@link ExtendedURL} object following the Standard URL format.
+ * Gets the current URL scheme to use from the Execution Context.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 7.2M1
  */
 @Component
-@Named("standard")
 @Singleton
-public class StandardExtendedURLResourceReferenceSerializer extends AbstractExtendedURLResourceReferenceSerializer
+public class DefaultURLContextManager implements URLContextManager
 {
+    static final String CONTEXT_KEY = "urlscheme";
+
+    @Inject
+    private Execution execution;
+
     @Override
-    public ExtendedURL serialize(ResourceReference reference)
-        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
+    public String getURLFormatId()
     {
-        return serialize(reference, "standard");
+        // Note: There should always be a context ready
+        ExecutionContext ec = this.execution.getContext();
+        return (String) ec.getProperty(CONTEXT_KEY);
+    }
+
+    @Override
+    public void setURLFormatId(String urlFormatId)
+    {
+        ExecutionContext ec = this.execution.getContext();
+        ec.setProperty(CONTEXT_KEY, urlFormatId);
     }
 }

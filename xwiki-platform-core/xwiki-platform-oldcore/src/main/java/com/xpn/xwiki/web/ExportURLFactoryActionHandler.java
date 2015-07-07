@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -45,10 +46,11 @@ public interface ExportURLFactoryActionHandler
      * @param anchor the optional anchor
      * @param wikiId the wiki id pointed to
      * @param context the XWiki Context
-     * @param factoryContext the Export URL Factory Context containing states of the export
+     * @param exportContext the Context containing states of the export
      * @return the URL to generate at export
      * @throws Exception in case of an error
+     * @since 7.2M1
      */
     URL createURL(String spaces, String name, String queryString, String anchor, String wikiId,
-        XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception;
+        XWikiContext context, FilesystemExportContext exportContext) throws Exception;
 }

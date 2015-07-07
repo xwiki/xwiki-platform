@@ -23,8 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
-import com.xpn.xwiki.web.ExportURLFactoryContext;
 import com.xpn.xwiki.web.SsxAction;
 import com.xpn.xwiki.web.sx.Extension;
 import com.xpn.xwiki.web.sx.SxSource;
@@ -59,19 +59,19 @@ public class SsxExportURLFactoryActionHandler extends AbstractSxExportURLFactory
     }
 
     @Override
-    protected String getContent(SxSource sxSource, ExportURLFactoryContext factoryContext)
+    protected String getContent(SxSource sxSource, FilesystemExportContext exportContext)
     {
         // There can be some calls to URLs inside the SSX content. For example:
         //   background-image: url("$xwiki.getSkinFile('icons/silk/folder_add.png')");
         // In order for these URLs to be resolved correctly they need to be relative to where the CSS file is located
         // on disk. Thus we adjust the CSS path by 3 levels since we're locating the SSX files in "ssx/<space>/<page>".
-        factoryContext.pushCSSPathAdjustment(3);
+        exportContext.pushCSSParentLevels(3);
 
         try {
-            return super.getContent(sxSource, factoryContext);
+            return super.getContent(sxSource, exportContext);
         } finally {
-            // Put back the CSS path
-            factoryContext.popCSSPathAdjustement();
+            // Put back the CSS level
+            exportContext.popCSSParentLevels();
         }
     }
 }

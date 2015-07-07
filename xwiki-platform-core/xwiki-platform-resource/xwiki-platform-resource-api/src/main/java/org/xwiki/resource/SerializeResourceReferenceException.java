@@ -19,29 +19,32 @@
  */
 package org.xwiki.resource;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Transforms a Resource Reference into some other representation (eg URL).
- * 
+ * Means that an error occurred while trying to serialize a {@link ResourceReference} object.
+ *
  * @version $Id$
- * @since 6.1M2
- * @param <T> the type of the resource reference to serialize
- * @param <U> the return type (e.g. a URL, a String, etc)
+ * @since 7.2M1
  */
-@Role
 @Unstable
-public interface ResourceReferenceSerializer<T extends ResourceReference, U>
+public class SerializeResourceReferenceException extends Exception
 {
     /**
-     * Transforms a Resource Reference into some other representation.
-     * 
-     * @param resource the Resource Reference to transform
-     * @return the new representation
-     * @throws SerializeResourceReferenceException if there was an error while serializing the XWiki Resource object
-     * @throws UnsupportedResourceReferenceException if the passed representation points to an unsupported Resource
-     *         Reference type that we don't know how to serialize
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    U serialize(T resource) throws SerializeResourceReferenceException, UnsupportedResourceReferenceException;
+    public SerializeResourceReferenceException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
+     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value
+     *        is permitted, and indicates that the cause is nonexistent or unknown)
+     */
+    public SerializeResourceReferenceException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

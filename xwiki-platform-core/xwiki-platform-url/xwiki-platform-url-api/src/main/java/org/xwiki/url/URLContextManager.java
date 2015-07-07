@@ -17,31 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.resource;
+package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Transforms a Resource Reference into some other representation (eg URL).
- * 
+ * Access various URL-related items from the Execution Context; for example access the current URL scheme.
+ *
  * @version $Id$
- * @since 6.1M2
- * @param <T> the type of the resource reference to serialize
- * @param <U> the return type (e.g. a URL, a String, etc)
+ * @since 7.2M1
  */
 @Role
 @Unstable
-public interface ResourceReferenceSerializer<T extends ResourceReference, U>
+public interface URLContextManager
 {
     /**
-     * Transforms a Resource Reference into some other representation.
-     * 
-     * @param resource the Resource Reference to transform
-     * @return the new representation
-     * @throws SerializeResourceReferenceException if there was an error while serializing the XWiki Resource object
-     * @throws UnsupportedResourceReferenceException if the passed representation points to an unsupported Resource
-     *         Reference type that we don't know how to serialize
+     * @return the URL scheme being used; it's retrieved from the Execution Context (e.g. "standard", "reference", etc)
      */
-    U serialize(T resource) throws SerializeResourceReferenceException, UnsupportedResourceReferenceException;
+    String getURLFormatId();
+
+    /**
+     * @param urlFormatId see {@link @getURLFormatId}
+     */
+    void setURLFormatId(String urlFormatId);
 }

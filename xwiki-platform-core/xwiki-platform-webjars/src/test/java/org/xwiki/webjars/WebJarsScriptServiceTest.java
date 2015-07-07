@@ -23,12 +23,14 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
@@ -51,16 +53,22 @@ public class WebJarsScriptServiceTest
     public MockitoComponentMockingRule<WebJarsScriptService> mocker =
         new MockitoComponentMockingRule<>(WebJarsScriptService.class);
 
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
+
+    @Before
+    public void setUp() throws Exception
+    {
+       this.serializer = this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
+           ResourceReference.class, ExtendedURL.class));
+    }
+
     @Test
     public void computeURLWithVersion() throws Exception
     {
-        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
-                ExtendedURL.class));
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(
             Arrays.asList("ang:ular", "2.1.11", "angular.css"));
         // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
-        when(serializer.serialize(resourceReference)).thenReturn(
+        when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "ang:ular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/ang%3Aular/2.1.11/angular.css",
@@ -80,12 +88,9 @@ public class WebJarsScriptServiceTest
             extension);
         when(extension.getId()).thenReturn(new ExtensionId("bar", "2.1.11"));
 
-        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
-                ExtendedURL.class));
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(
             Arrays.asList("angular", "2.1.11", "angular.css"));
-        when(serializer.serialize(resourceReference)).thenReturn(
+        when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.css")));
 
         assertEquals("/xwiki/angular/2.1.11/angular.css",
@@ -95,12 +100,9 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeURLWithoutVersionAndNoExtensionMatchingWebJarId() throws Exception
     {
-        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer =
-            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-                WebJarsResourceReference.class, ExtendedURL.class));
         WebJarsResourceReference resourceReference =
             new WebJarsResourceReference(Arrays.asList("angular", "angular.css"));
-        when(serializer.serialize(resourceReference)).thenReturn(
+        when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.css")));
 
         assertEquals("/xwiki/angular/angular.css", this.mocker.getComponentUnderTest().url("angular", "angular.css"));
@@ -109,16 +111,13 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeURLWithParameters() throws Exception
     {
-        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer = this.mocker.getInstance(
-            new DefaultParameterizedType(null, ResourceReferenceSerializer.class, WebJarsResourceReference.class,
-                ExtendedURL.class));
         WebJarsResourceReference resourceReference = new WebJarsResourceReference(
             Arrays.asList("angular", "2.1.11", "angular.js"));
         resourceReference.addParameter("evaluate", "true");
         resourceReference.addParameter("list", Arrays.asList("one", "two"));
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("xwiki", "angular", "2.1.11", "angular.js"),
             resourceReference.getParameters());
-        when(serializer.serialize(resourceReference)).thenReturn(extendedURL);
+        when(this.serializer.serialize(resourceReference)).thenReturn(extendedURL);
 
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("version", "2.1.11");
@@ -131,13 +130,10 @@ public class WebJarsScriptServiceTest
     @Test
     public void computeJavaScriptURLWithSuffixAndNoParameters() throws Exception
     {
-        ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> serializer =
-            this.mocker.getInstance(new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
-                WebJarsResourceReference.class, ExtendedURL.class));
         WebJarsResourceReference resourceReference =
             new WebJarsResourceReference(Arrays.asList("angular", "angular.js"));
         resourceReference.addParameter("r", "1");
-        when(serializer.serialize(resourceReference)).thenReturn(
+        when(this.serializer.serialize(resourceReference)).thenReturn(
             new ExtendedURL(Arrays.asList("xwiki", "angular", "angular.js"), resourceReference.getParameters()));
 
         assertEquals("/xwiki/angular/angular.js?r=1", this.mocker.getComponentUnderTest().url("angular", "angular.js"));

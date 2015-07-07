@@ -24,74 +24,78 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.ExportURLFactoryActionHandler;
-import com.xpn.xwiki.web.ExportURLFactoryContext;
+import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.SerializeResourceReferenceException;
+import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.filesystem.FilesystemExportContext;
+import org.xwiki.url.internal.RelativeExtendedURL;
 
 /**
- * Handles exporting content having WebJARS URLs, by extracting resources from JARs pointed to by the WebJARs URLs.
+ * Converts a {@link WebJarsResourceReference} into a {@link ExtendedURL} (with the Context Path added) that points
+ * to a absolute URL pointing to a file on the local filesystem. This can be used when exporting to HTML for example.
  *
  * @version $Id$
- * @since 6.2RC1
+ * @since 7.2M1
  */
 @Component
-@Named("webjars")
+@Named("filesystem")
 @Singleton
-public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryActionHandler
+public class FilesystemResourceReferenceSerializer
+    implements ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL>
 {
     /**
      * Prefix for locating resource files (JavaScript, CSS) in the classloader.
      */
-    private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
+    private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars";
 
-    private static final String WEBJAR_PATH = "webjars/";
+    private static final String WEBJAR_PATH = "webjars";
+
+    @Inject
+    private Provider<FilesystemExportContext> exportContextProvider;
 
     @Override
-    public URL createURL(String spaces, String name, String querystring, String anchor, String wikiId,
-        XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception
+    public ExtendedURL serialize(WebJarsResourceReference reference)
+        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        // Example of URL:
-        // /xwiki/bin/webjars/resources/path?value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
-        // where:
-        // - web = resources
-        // - name = path
-        // - action = webjars
-        // - querystring = value=bootstrap%2F3.2.0%2Ffonts/glyphicons-halflings-regular.eot
+        // Copy the resource from the webajar to the filesystem
+        FilesystemExportContext exportContext = this.exportContextProvider.get();
+        try {
+            copyResourceFromJAR(WEBJARS_RESOURCE_PREFIX, reference.getResourceName(), WEBJAR_PATH, exportContext);
+        } catch (IOException e) {
+            throw new SerializeResourceReferenceException(
+                String.format("Failed to extract and copy WebJAR resource [%s]", reference.getResourceName()), e);
+        }
 
-        // Copy the resources found in JARs on the filesystem
-
-        // We need to decode the passed Query String because the query string passed to ExportURLFactory are always
-        // encoded. See XWikiURLFactory#createURL()'s javadoc for more details on why the query string is passed
-        // encoded.
-        String resourceName = URLDecoder.decode(StringUtils.substringAfter(querystring, "value="), "UTF-8");
-
-        String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
-
-        copyResourceFromJAR(resourcePath, WEBJAR_PATH, factoryContext);
-
-        StringBuffer path = new StringBuffer("file://");
+        List<String> pathSegments = new ArrayList<>();
 
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-        factoryContext.adjustCSSPath(path);
+        for (int i = 0; i < exportContext.getCSSParentLevel(); i++) {
+            pathSegments.add("..");
+        }
 
-        path.append(WEBJAR_PATH);
-        path.append(resourcePath.replace(" ", "%20"));
-        return new URI(path.toString()).toURL();
+        pathSegments.add(WEBJAR_PATH);
+        for (String resourceSegment : StringUtils.split(reference.getResourceName(), '/')) {
+            pathSegments.add(resourceSegment);
+        }
+
+        return new RelativeExtendedURL(pathSegments);
     }
 
     private File getJARFile(String resourceName) throws IOException
@@ -111,20 +115,21 @@ public class WebJarsExportURLFactoryActionHandler implements ExportURLFactoryAct
         return file;
     }
 
-    private void copyResourceFromJAR(String resourcePath, String prefix, ExportURLFactoryContext factoryContext)
-        throws IOException
+    private void copyResourceFromJAR(String resourcePrefix, String resourceName, String targetPrefix,
+        FilesystemExportContext exportContext) throws IOException
     {
         // Note that we cannot use ClassLoader.getResource() to access the resource since the resourcePath may point
         // to a directory inside the JAR, and in this case we need to copy all resources inside that directory in the
         // JAR!
 
+        String resourcePath = String.format("%s/%s", resourcePrefix, resourceName);
         JarFile jar = new JarFile(getJARFile(resourcePath));
         for (Enumeration<JarEntry> enumeration = jar.entries(); enumeration.hasMoreElements();) {
             JarEntry entry = enumeration.nextElement();
             if (entry.getName().startsWith(resourcePath) && !entry.isDirectory()) {
                 // Copy the resource!
-                String targetPath = prefix + entry.getName();
-                File targetLocation = new File(factoryContext.getExportDir(), targetPath);
+                String targetPath = targetPrefix + entry.getName().substring(resourcePrefix.length());
+                File targetLocation = new File(exportContext.getExportDir(), targetPath);
                 if (!targetLocation.exists()) {
                     targetLocation.getParentFile().mkdirs();
                     FileOutputStream fos = new FileOutputStream(targetLocation);

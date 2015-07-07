@@ -31,9 +31,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.URLConfiguration;
+import org.xwiki.url.URLContextManager;
 
 /**
  * Delegates the work to the Resource Reference Serializer specified in the XWiki Configuration
@@ -46,11 +47,8 @@ import org.xwiki.url.URLConfiguration;
 @Singleton
 public class DefaultResourceReferenceSerializer implements ResourceReferenceSerializer<ResourceReference, ExtendedURL>
 {
-    /**
-     * Used to get the hint of the {@link org.xwiki.resource.ResourceReferenceSerializer} to use.
-     */
     @Inject
-    private URLConfiguration configuration;
+    private URLContextManager urlContextManager;
 
     /**
      * Used to lookup the correct {@link org.xwiki.resource.ResourceReferenceSerializer} component.
@@ -60,17 +58,18 @@ public class DefaultResourceReferenceSerializer implements ResourceReferenceSeri
     private ComponentManager componentManager;
 
     @Override
-    public ExtendedURL serialize(ResourceReference resource) throws UnsupportedResourceReferenceException
+    public ExtendedURL serialize(ResourceReference resource)
+        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         ResourceReferenceSerializer<ResourceReference, ExtendedURL> serializer;
         ParameterizedType type = new DefaultParameterizedType(null, ResourceReferenceSerializer.class,
             ResourceReference.class, ExtendedURL.class);
         try {
-            serializer = this.componentManager.getInstance(type, this.configuration.getURLFormatId());
+            serializer = this.componentManager.getInstance(type, this.urlContextManager.getURLFormatId());
         } catch (ComponentLookupException e) {
             throw new UnsupportedResourceReferenceException(
-                String.format("Invalid configuration hint [%s]. Cannot serialize Resource Reference [%s].",
-                    this.configuration.getURLFormatId(), resource), e);
+                String.format("Invalid URL format id [%s]. Cannot serialize Resource Reference [%s].",
+                    this.urlContextManager.getURLFormatId(), resource), e);
         }
 
         return serializer.serialize(resource);

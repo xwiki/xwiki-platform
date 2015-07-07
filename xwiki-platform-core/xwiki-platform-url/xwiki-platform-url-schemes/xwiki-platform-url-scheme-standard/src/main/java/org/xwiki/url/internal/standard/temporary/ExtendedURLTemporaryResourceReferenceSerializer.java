@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.url.ExtendedURL;
@@ -56,7 +57,8 @@ public class ExtendedURLTemporaryResourceReferenceSerializer
     implements ResourceReferenceSerializer<TemporaryResourceReference, ExtendedURL>
 {
     @Override
-    public ExtendedURL serialize(TemporaryResourceReference resource) throws UnsupportedResourceReferenceException
+    public ExtendedURL serialize(TemporaryResourceReference resource)
+        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         DocumentReference owningReference = (DocumentReference) resource.getOwningEntityReference();
         return new ExtendedURL(Arrays.asList(owningReference.getLastSpaceReference().getName(),

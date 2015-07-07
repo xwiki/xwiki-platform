@@ -24,17 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-url</artifactId>
+    <artifactId>xwiki-platform-url-schemes</artifactId>
     <version>7.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-url-schemes</artifactId>
-  <name>XWiki Platform - URL - Schemes - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - URL - Schemes - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-url-scheme-filesystem</module>
-    <module>xwiki-platform-url-scheme-reference</module>
-    <module>xwiki-platform-url-scheme-standard</module>
-  </modules>
+  <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
+  <name>XWiki Platform - URL - Scheme - Filesystem Implementation</name>
+  <packaging>jar</packaging>
+  <description>URLs to XWiki Resources exported on the filesystem format</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

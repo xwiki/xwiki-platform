@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package org.xwiki.url.filesystem;
 
 import java.io.File;
 import java.util.Collection;
@@ -25,25 +25,24 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.stability.Unstable;
 
 /**
- * Stores states when computing URLs when performing an export.
+ * Stores states when generating Filesystem URLs. As we generate URLs for passed Resources we also export them to the
+ * filesystem at the same time.
  *
  * @version $Id$
- * @since 6.2RC1
- * @see com.xpn.xwiki.web.ExportURLFactory
+ * @since 7.2M1
  */
 @Unstable
-public class ExportURLFactoryContext
+public class FilesystemExportContext
 {
     /**
      * When there are relative links to resources inside CSS files they are resolved based on the location of the CSS
      * file itself. When we export we put all resources and attachments in the root of the exported directory and thus
      * in order to have valid relative links we need to make them match. We use this variable to do this.
      */
-    private Stack cssPathAdjustementStack = new Stack();
+    private Stack<Integer> cssParentDepth = new Stack<>();
 
     /**
      * @see #getExportedPages()
@@ -66,34 +65,29 @@ public class ExportURLFactoryContext
     private Set<String> exportedSkinFiles = new HashSet<>();
 
     /**
-     * Adds "../" prefixes to the passed path for adjusting the path so that it's relative to where the CSS file it's
-     * contained in.
-     *
-     * @param builder the path to adjust
+     * @return the number of relative parent levels in the path to find the CSS file
      */
-    public void adjustCSSPath(StringBuffer builder)
+    public int getCSSParentLevel()
     {
-        if (!this.cssPathAdjustementStack.empty()) {
-            builder.append(this.cssPathAdjustementStack.peek());
-        }
+        return this.cssParentDepth.isEmpty() ? 0 : this.cssParentDepth.peek();
     }
 
     /**
-     * Pushes "../" prefixes.
+     * Pushes a new CSS parent's levels.
      *
-     * @param count the numer of "../" prefixes to add
+     * @param depth the number of relative parent levels in the path to find the CSS file
      */
-    public void pushCSSPathAdjustment(int count)
+    public void pushCSSParentLevels(int depth)
     {
-        this.cssPathAdjustementStack.push(StringUtils.repeat("../", count));
+        this.cssParentDepth.push(depth);
     }
 
     /**
-     * Pops "../" prefixes.
+     * Pops the last CSS parent's levels.
      */
-    public void popCSSPathAdjustement()
+    public void popCSSParentLevels()
     {
-        this.cssPathAdjustementStack.pop();
+        this.cssParentDepth.pop();
     }
 
     /**

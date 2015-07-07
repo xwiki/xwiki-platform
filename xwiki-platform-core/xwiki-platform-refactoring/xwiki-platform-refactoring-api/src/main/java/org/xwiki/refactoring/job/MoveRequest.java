@@ -33,14 +33,19 @@ import org.xwiki.stability.Unstable;
 public class MoveRequest extends EntityRequest
 {
     /**
-     * @see #getDestination()
-     */
-    public static final String PROPERTY_DESTINATION = "destination";
-
-    /**
      * Serialization identifier.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getDestination()
+     */
+    private static final String PROPERTY_DESTINATION = "destination";
+
+    /**
+     * @see #isUpdateLinks()
+     */
+    private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
 
     /**
      * @return the destination entity, where to move the entities specified by {@link #getEntityReferences()}
@@ -58,5 +63,25 @@ public class MoveRequest extends EntityRequest
     public void setDestination(EntityReference destination)
     {
         setProperty(PROPERTY_DESTINATION, destination);
+    }
+
+    /**
+     * @return {@code true} if the links that target the old entity reference (before the move) should be updated to
+     *         target the new reference (after the move), {@code false} to preserve the old link target
+     */
+    public boolean isUpdateLinks()
+    {
+        return getProperty(PROPERTY_UPDATE_LINKS, true);
+    }
+
+    /**
+     * Sets whether the links that target the old entity reference (before the move) should be updated to target the new
+     * reference (after the move) or not.
+     * 
+     * @param updateLinks {@code true} to update the links, {@code false} to preserve the old link target
+     */
+    public void setUpdateLinks(boolean updateLinks)
+    {
+        setProperty(PROPERTY_UPDATE_LINKS, updateLinks);
     }
 }

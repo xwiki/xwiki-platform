@@ -21,14 +21,19 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import org.xwiki.job.GroupedJob;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Abstract job that targets multiple entities.
@@ -50,6 +55,22 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
      * part of the group of refactoring jobs that run at farm level.
      */
     private JobGroupPath groupPath;
+
+    /**
+     * Used to check access permissions.
+     * 
+     * @see #hasAccess(Right, EntityReference)
+     */
+    @Inject
+    private AuthorizationManager authorization;
+
+    /**
+     * Used to distinguish between terminal and non-terminal (WebHome) documents.
+     * 
+     * @see #isTerminal(EntityReference)
+     */
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Override
     public JobGroupPath getGroupPath()
@@ -135,5 +156,17 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
         }
 
         return targetWiki;
+    }
+
+    protected boolean hasAccess(Right right, EntityReference reference)
+    {
+        return !this.request.isCheckRights()
+            || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
+    }
+
+    protected boolean isTerminal(EntityReference entityReference)
+    {
+        return entityReference.getName().equals(
+            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()));
     }
 }

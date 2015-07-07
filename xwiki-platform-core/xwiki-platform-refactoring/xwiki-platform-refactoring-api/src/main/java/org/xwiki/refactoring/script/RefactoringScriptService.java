@@ -163,6 +163,7 @@ public class RefactoringScriptService implements ScriptService
         request.setJobType(type);
         request.setEntityReferences(sources);
         request.setDestination(destination);
+        request.setUpdateLinks(true);
         request.setDeep(true);
         setRightsProperties(request);
         return request;

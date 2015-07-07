@@ -19,33 +19,19 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
-import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * A job that can move entities to a new parent within the hierarchy.
@@ -55,66 +41,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 @Component
 @Named(MoveJob.JOB_TYPE)
-public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
+public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
 {
     /**
      * The id of the job.
      */
     public static final String JOB_TYPE = "moveEntities";
-
-    /**
-     * Regular expression used to match the special characters supported by the like HQL operator (plus the escaping
-     * character).
-     * 
-     * @see #getChildren(DocumentReference)
-     */
-    private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_/])");
-
-    /**
-     * Used to distinguish between terminal and non-terminal (WebHome) documents.
-     * 
-     * @see #isTerminal(EntityReference)
-     */
-    @Inject
-    private EntityReferenceProvider defaultEntityReferenceProvider;
-
-    /**
-     * Used to check access permissions.
-     * 
-     * @see #hasAccess(Right, EntityReference)
-     */
-    @Inject
-    private AuthorizationManager authorization;
-
-    /**
-     * Used to perform the low level operations on entities.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
-     * Used to serialize a space reference in order to query the child document.
-     * 
-     * @see #getChildren(DocumentReference)
-     */
-    @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
-
-    /**
-     * Used to resolve the references of child documents.
-     * 
-     * @see #getChildren(DocumentReference)
-     */
-    @Inject
-    @Named("explicit")
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver;
-
-    /**
-     * Used to query the child documents.
-     */
-    @Inject
-    private QueryManager queryManager;
 
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
@@ -174,7 +106,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         return parent != null;
     }
 
-    private void move(DocumentReference source, EntityReference destination)
+    protected void move(DocumentReference source, EntityReference destination)
     {
         // Compute the reference of the destination document.
 
@@ -200,13 +132,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         maybeMove(source, new DocumentReference(newReference));
     }
 
-    private boolean isTerminal(EntityReference entityReference)
-    {
-        return entityReference.getName().equals(
-            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()));
-    }
-
-    private void maybeMove(DocumentReference oldReference, DocumentReference newReference)
+    protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)
     {
         // Perform checks that are specific to the document source/destination type.
 
@@ -217,7 +143,7 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
         // The move operation is currently implemented as Copy + Delete.
         if (!hasAccess(Right.DELETE, oldReference)) {
-            this.logger.warn("You are not allowed to move [{}].", oldReference);
+            this.logger.warn("You are not allowed to delete [{}].", oldReference);
             return;
         }
 
@@ -232,29 +158,50 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
 
     private void move(DocumentReference oldReference, DocumentReference newReference, boolean deep)
     {
-        if (exists(newReference)) {
-            if (this.request.isInteractive() && !confirmOverwrite(oldReference, newReference)) {
-                this.logger.warn(
-                    "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
-                    oldReference, newReference);
-                return;
-            } else if (!delete(newReference)) {
+        this.progressManager.pushLevelProgress(5, this);
+
+        try {
+            // Step 1: Delete the destination document if needed.
+            this.progressManager.startStep(this);
+            if (exists(newReference)) {
+                if (this.request.isInteractive() && !confirmOverwrite(oldReference, newReference)) {
+                    this.logger.warn(
+                        "Skipping [{}] because [{}] already exists and the user doesn't want to overwrite it.",
+                        oldReference, newReference);
+                    return;
+                } else if (!delete(newReference)) {
+                    return;
+                }
+            }
+            this.progressManager.endStep(this);
+
+            // Step 2: Copy the source document to the destination.
+            this.progressManager.startStep(this);
+            if (!copy(oldReference, newReference)) {
                 return;
             }
-        }
+            this.progressManager.endStep(this);
 
-        if (!copy(oldReference, newReference)) {
-            return;
-        }
+            // Step 3: Update the links.
+            this.progressManager.startStep(this);
+            if (this.request.isUpdateLinks()) {
+                updateLinks(oldReference, newReference);
+            }
+            this.progressManager.endStep(this);
 
-        // TODO: Update back links
-        // TODO: Refactor links from doc content
-        delete(oldReference);
+            // Step 4: Delete the source document.
+            this.progressManager.startStep(this);
+            delete(oldReference);
+            this.progressManager.endStep(this);
 
-        this.logger.info("Document [{}] has been moved to [{}].", oldReference, newReference);
-
-        if (deep && !isTerminal(oldReference)) {
-            moveChildren(oldReference, newReference);
+            // Step 5: Move the child documents.
+            this.progressManager.startStep(this);
+            if (deep && !isTerminal(oldReference)) {
+                moveChildren(oldReference, newReference);
+            }
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
         }
     }
 
@@ -305,79 +252,10 @@ public class MoveJob extends AbstractEntityJob<MoveRequest, EntityJobStatus<Move
         }
     }
 
-    private boolean copy(DocumentReference source, DocumentReference destination)
+    private void updateLinks(DocumentReference oldReference, DocumentReference newReference)
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference userReference = xcontext.getUserReference();
-        try {
-            xcontext.setUserReference(this.request.getUserReference());
-            return xcontext.getWiki().copyDocument(source, destination, false, xcontext);
-        } catch (Exception e) {
-            this.logger.warn("Failed to copy [{}] to [{}].", source, destination, e);
-            return false;
-        } finally {
-            xcontext.setUserReference(userReference);
-        }
-    }
-
-    private boolean delete(DocumentReference reference)
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        DocumentReference userReference = xcontext.getUserReference();
-        try {
-            xcontext.setUserReference(this.request.getUserReference());
-            XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
-            xcontext.getWiki().deleteAllDocuments(document, xcontext);
-            return true;
-        } catch (Exception e) {
-            this.logger.warn("Failed to delete document [{}].", reference, e);
-            return false;
-        } finally {
-            xcontext.setUserReference(userReference);
-        }
-    }
-
-    private boolean exists(DocumentReference reference)
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        return xcontext.getWiki().exists(reference, xcontext);
-    }
-
-    private boolean hasAccess(Right right, EntityReference reference)
-    {
-        return !this.request.isCheckRights()
-            || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
-    }
-
-    /**
-     * @param documentReference the reference to a non-terminal (WebHome) document
-     * @return the list of references to the child documents of the specified parent document
-     */
-    private List<DocumentReference> getChildren(DocumentReference documentReference)
-    {
-        try {
-            // We don't have a way to retrieve only the direct children so we select all the descendants. This means we
-            // select all the documents from the same space (excluding the given document) and from all the nested
-            // spaces.
-            String statement =
-                "select distinct(doc.fullName) from XWikiDocument as doc "
-                    + "where (doc.space = :space and doc.name <> :name) or doc.space like :spacePrefix escape '/'";
-            Query query = this.queryManager.createQuery(statement, "hql");
-            query.setWiki(documentReference.getWikiReference().getName());
-            String localSpaceReference = this.localEntityReferenceSerializer.serialize(documentReference.getParent());
-            query.bindValue("space", localSpaceReference).bindValue("name", documentReference.getName());
-            String spacePrefix = LIKE_SPECIAL_CHARS.matcher(localSpaceReference).replaceAll("/$1");
-            query.bindValue("spacePrefix", spacePrefix + ".%");
-
-            List<DocumentReference> children = new ArrayList<>();
-            for (Object fullName : query.execute()) {
-                children.add(this.explicitDocumentReferenceResolver.resolve((String) fullName, documentReference));
-            }
-            return children;
-        } catch (Exception e) {
-            this.logger.warn("Failed to retrieve the child documents of [{}].", documentReference, e);
-            return Collections.emptyList();
-        }
+        // TODO: Update back links
+        // TODO: Refactor links from doc content
     }
 
     @Override

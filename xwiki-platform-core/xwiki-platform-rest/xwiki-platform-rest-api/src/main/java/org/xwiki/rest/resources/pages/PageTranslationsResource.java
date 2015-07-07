@@ -29,7 +29,7 @@ import org.xwiki.rest.model.jaxb.Translations;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/translations")
 public interface PageTranslationsResource
 {
     @GET Translations getTranslations(

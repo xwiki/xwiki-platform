@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Page;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{language}/history/{version}")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/translations/{language}/history/{version}")
 public interface PageTranslationVersionResource
 {
     @GET Page getPageTranslationVersion(

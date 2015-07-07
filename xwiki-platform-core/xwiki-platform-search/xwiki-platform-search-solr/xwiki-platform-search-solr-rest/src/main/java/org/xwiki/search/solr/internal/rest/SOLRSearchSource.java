@@ -173,8 +173,9 @@ public class SOLRSearchSource extends AbstractSearchSource
                 } else {
                     searchResult.setLanguage(locale.toString());
                     pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, searchResult.getSpace(),
-                            searchResult.getPageName(), locale).toString();
+                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, 
+                            Utils.getSpacesFromSpaceId(searchResult.getSpace()),
+                                searchResult.getPageName(), locale).toString();
                 }
 
                 Link pageLink = new Link();

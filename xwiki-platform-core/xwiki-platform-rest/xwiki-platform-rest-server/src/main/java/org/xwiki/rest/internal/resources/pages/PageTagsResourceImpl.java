@@ -55,7 +55,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
     public Tags getPageTags(String wikiName, String spaceName, String pageName) throws XWikiRestException
     {
         try {
-            String pageId = Utils.getPageId(wikiName, spaceName, pageName);
+            String pageId = Utils.getPageId(wikiName, parseSpaceSegments(spaceName), pageName);
             List<String> tagNames = getTagsFromDocument(pageId);
 
             Tags tags = objectFactory.createTags();

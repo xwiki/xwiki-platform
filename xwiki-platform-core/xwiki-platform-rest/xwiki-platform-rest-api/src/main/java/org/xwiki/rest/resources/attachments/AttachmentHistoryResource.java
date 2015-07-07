@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Attachments;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/history")
 public interface AttachmentHistoryResource
 {
     @GET Attachments getAttachmentHistory(

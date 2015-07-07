@@ -469,6 +469,12 @@
               <method>void ajc$interFieldSetDispatch$com_xpn_xwiki_XWikiCompatibilityAspect$com_xpn_xwiki_XWiki$localStringEntityReferenceSerializer(com.xpn.xwiki.XWiki, org.xwiki.model.reference.EntityReferenceSerializer)</method>
               <justification>com.xpn.xwiki.XWiki#localStringEntityReferenceSerializer now exists in oldcore, we do not need it in the aspect anymore.</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/rest/resources/spaces/SpaceResource</className>
+              <method>org.xwiki.rest.model.jaxb.Space getSpace(java.lang.String, java.lang.String)</method>
+              <justification>This API has been changed to support nested spaces.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

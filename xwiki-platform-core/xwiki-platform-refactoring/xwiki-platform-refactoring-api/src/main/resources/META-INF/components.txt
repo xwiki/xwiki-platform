@@ -1,0 +1,2 @@
+org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter
+org.xwiki.refactoring.script.RefactoringScriptService

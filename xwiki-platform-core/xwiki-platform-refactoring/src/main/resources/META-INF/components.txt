@@ -1,1 +1,0 @@
-org.xwiki.refactoring.internal.splitter.DefaultDocumentSplitter

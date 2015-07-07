@@ -17,39 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
-
-import java.net.URL;
+package org.xwiki.url;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.url.filesystem.FilesystemExportContext;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
- * Allows code to override how to handle creating URLs for specific Entity resource actions. Used by the
- * {@link com.xpn.xwiki.web.ExportURLFactory} class.
+ * Access various URL-related items from the Execution Context; for example access the current URL scheme.
  *
  * @version $Id$
- * @since 6.2RC1
+ * @since 7.2M1
  */
 @Role
 @Unstable
-public interface ExportURLFactoryActionHandler
+public interface URLContextManager
 {
     /**
-     * @param web the space name pointed to
-     * @param name the page name pointed to
-     * @param queryString the optional query string
-     * @param anchor the optional anchor
-     * @param wikiId the wiki id pointed to
-     * @param context the XWiki Context
-     * @param exportContext the Context containing states of the export
-     * @return the URL to generate at export
-     * @throws Exception in case of an error
-     * @since 7.2M1
+     * @return the URL scheme being used; it's retrieved from the Execution Context (e.g. "standard", "reference", etc)
      */
-    URL createURL(String web, String name, String queryString, String anchor, String wikiId,
-        XWikiContext context, FilesystemExportContext exportContext) throws Exception;
+    String getURLFormatId();
+
+    /**
+     * @param urlFormatId see {@link @getURLFormatId}
+     */
+    void setURLFormatId(String urlFormatId);
 }

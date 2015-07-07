@@ -24,25 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-resource</artifactId>
-    <version>7.1.2-SNAPSHOT</version>
+    <artifactId>xwiki-platform-url-schemes</artifactId>
+    <version>7.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-resource-api</artifactId>
-  <name>XWiki Platform - Resource - API</name>
+  <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
+  <name>XWiki Platform - URL - Scheme - Filesystem Implementation</name>
   <packaging>jar</packaging>
-  <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
+  <description>URLs to XWiki Resources exported on the filesystem format</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.39</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Resource API</xwiki.extension.name>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-resource</xwiki.extension.features>
+    <xwiki.extension.name>Filesystem URL Scheme</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

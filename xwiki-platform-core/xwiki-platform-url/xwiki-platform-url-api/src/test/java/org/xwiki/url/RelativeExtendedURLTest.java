@@ -17,33 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard;
+package org.xwiki.url;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Arrays;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.AbstractExtendedURLResourceReferenceSerializer;
+import org.junit.Test;
+import org.xwiki.url.internal.RelativeExtendedURL;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Transforms a XWiki Resource instance into a {@link ExtendedURL} object following the Standard URL format.
+ * Unit tests for {@link RelativeExtendedURL}.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 7.2M1
  */
-@Component
-@Named("standard")
-@Singleton
-public class StandardExtendedURLResourceReferenceSerializer extends AbstractExtendedURLResourceReferenceSerializer
+public class RelativeExtendedURLTest
 {
-    @Override
-    public ExtendedURL serialize(ResourceReference reference)
-        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
+    @Test
+    public void serialize()
     {
-        return serialize(reference, "standard");
+        RelativeExtendedURL url = new RelativeExtendedURL(Arrays.asList("a", "b"));
+        assertEquals("a/b", url.serialize());
     }
 }

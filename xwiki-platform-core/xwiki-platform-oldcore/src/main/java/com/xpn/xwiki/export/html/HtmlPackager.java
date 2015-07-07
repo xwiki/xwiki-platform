@@ -46,6 +46,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.url.URLContextManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -278,14 +279,15 @@ public class HtmlPackager
             execution.pushContext(executionContext);
 
             try {
-
                 VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
                 // At this stage we have a clean Velocity Context
                 VelocityContext vcontext = velocityManager.getVelocityContext();
 
+                // Set the URL Factories/Serializer to use
                 urlf.init(this.pages, tempdir, renderContext);
                 renderContext.setURLFactory(urlf);
+                Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
 
                 for (String pageName : this.pages) {
                     renderDocument(pageName, zos, renderContext, vcontext);

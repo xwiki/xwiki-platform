@@ -5,3 +5,5 @@ org.xwiki.url.internal.DefaultResourceTypeResolver
 org.xwiki.url.internal.GenericResourceReferenceResolver
 org.xwiki.url.internal.GenericStringResourceTypeResolver
 org.xwiki.url.internal.DefaultStringResourceTypeResolver
+org.xwiki.url.internal.URLExecutionContextInitializer
+org.xwiki.url.internal.DefaultURLContextManager

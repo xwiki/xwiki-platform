@@ -77,6 +77,11 @@
       <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Required at runtime! -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

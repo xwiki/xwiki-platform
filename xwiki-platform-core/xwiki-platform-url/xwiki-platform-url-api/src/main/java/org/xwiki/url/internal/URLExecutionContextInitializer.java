@@ -17,33 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard;
+package org.xwiki.url.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.ResourceReference;
-import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
-import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.AbstractExtendedURLResourceReferenceSerializer;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.url.URLConfiguration;
 
 /**
- * Transforms a XWiki Resource instance into a {@link ExtendedURL} object following the Standard URL format.
+ * Sets the URL Scheme to use in the Execution Context by getting it from XWiki's configuration.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 7.2M1
  */
 @Component
-@Named("standard")
+@Named("urlscheme")
 @Singleton
-public class StandardExtendedURLResourceReferenceSerializer extends AbstractExtendedURLResourceReferenceSerializer
+public class URLExecutionContextInitializer implements ExecutionContextInitializer
 {
+    /**
+     * Used to get the URL Scheme to use from the configuration.
+     */
+    @Inject
+    private URLConfiguration configuration;
+
     @Override
-    public ExtendedURL serialize(ResourceReference reference)
-        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
+    public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        return serialize(reference, "standard");
+        if (!context.hasProperty(DefaultURLContextManager.CONTEXT_KEY)) {
+            context.newProperty(DefaultURLContextManager.CONTEXT_KEY)
+                .inherited()
+                .initial(this.configuration.getURLFormatId())
+                .declare();
+        }
     }
 }

@@ -35,11 +35,15 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,7 +87,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     @Deprecated
     protected File exportDir;
 
-    private ExportURLFactoryContext factoryContext = new ExportURLFactoryContext();
+    private FilesystemExportContext exportContext;
 
     /**
      * ExportURLFactory constructor.
@@ -92,9 +96,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
     {
     }
 
-    public ExportURLFactoryContext getExportURLFactoryContext()
+    public FilesystemExportContext getExportURLFactoryContext()
     {
-        return this.factoryContext;
+        return this.exportContext;
     }
 
     /**
@@ -127,6 +131,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
     {
         super.init(context);
+
+        Provider<FilesystemExportContext> exportContextProvider = Utils.getComponent(
+            new DefaultParameterizedType(null, Provider.class, FilesystemExportContext.class));
+        this.exportContext = exportContextProvider.get();
 
         if (exportDir != null) {
             getExportURLFactoryContext().setExportDir(exportDir);
@@ -174,7 +182,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             StringBuffer newPath = new StringBuffer("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-            getExportURLFactoryContext().adjustCSSPath(newPath);
+            adjustCSSPath(newPath);
 
             newPath.append("skins/");
             newPath.append(skin);
@@ -253,7 +261,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             StringBuffer newPath = new StringBuffer("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-            getExportURLFactoryContext().adjustCSSPath(newPath);
+            adjustCSSPath(newPath);
 
             newPath.append(filePath);
 
@@ -283,11 +291,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
             }
 
             // Adjust path for links inside CSS files.
-            getExportURLFactoryContext().pushCSSPathAdjustment(cssPathAdjustmentValue);
+            getExportURLFactoryContext().pushCSSParentLevels(cssPathAdjustmentValue);
             try {
                 renderWithSkinAction(web, name, wikiId, path, context);
             } finally {
-                getExportURLFactoryContext().popCSSPathAdjustement();
+                getExportURLFactoryContext().popCSSParentLevels();
             }
         } finally {
             fos.close();
@@ -386,7 +394,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             StringBuffer newPath = new StringBuffer("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-            getExportURLFactoryContext().adjustCSSPath(newPath);
+            adjustCSSPath(newPath);
 
             newPath.append("resources");
 
@@ -480,7 +488,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         StringBuffer newPath = new StringBuffer("file://");
 
         // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
-        getExportURLFactoryContext().adjustCSSPath(newPath);
+        adjustCSSPath(newPath);
 
         newPath.append(path.replace(" ", "%20"));
 
@@ -527,5 +535,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         return path;
+    }
+
+    private void adjustCSSPath(StringBuffer path)
+    {
+        path.append(StringUtils.repeat("../", getExportURLFactoryContext().getCSSParentLevel()));
     }
 }

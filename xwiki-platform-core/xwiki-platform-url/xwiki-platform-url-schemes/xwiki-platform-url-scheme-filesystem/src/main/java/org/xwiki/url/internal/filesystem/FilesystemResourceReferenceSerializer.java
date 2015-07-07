@@ -17,53 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.webjars.internal;
+package org.xwiki.url.internal.filesystem;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.URLNormalizer;
+import org.xwiki.url.internal.AbstractExtendedURLResourceReferenceSerializer;
 
 /**
- * Converts a {@link WebJarsResourceReference} into a relative {@link ExtendedURL} (with the Context Path added).
+ * Converts a {@link org.xwiki.resource.ResourceReference} into a {@link ExtendedURL} (with the Context Path added)
+ * that points to a absolute URL pointing to a file on the local filesystem. This can be used when exporting to HTML
+ * for example.
  *
  * @version $Id$
- * @since 7.1M1
+ * @since 7.2M1
  */
 @Component
+@Named("filesystem")
 @Singleton
-public class WebjarsResourceReferenceSerializer
-    implements ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL>
+public class FilesystemResourceReferenceSerializer extends AbstractExtendedURLResourceReferenceSerializer
 {
-    @Inject
-    @Named("contextpath")
-    private URLNormalizer<ExtendedURL> extendedURLNormalizer;
-
     @Override
-    public ExtendedURL serialize(WebJarsResourceReference resourceReference)
+    public ExtendedURL serialize(ResourceReference reference)
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
-        List<String> segments = new ArrayList<>();
-
-        // Add the resource type segment.
-        segments.add("webjars");
-
-        // Add the resource name
-        segments.addAll(resourceReference.getResourceSegments());
-
-        // Add all optional parameters
-        ExtendedURL extendedURL = new ExtendedURL(segments, resourceReference.getParameters());
-
-        // Normalize the URL to add the Context Path since we want a full relative URL to be returned.
-        return this.extendedURLNormalizer.normalize(extendedURL);
+        return serialize(reference, "filesystem");
     }
 }

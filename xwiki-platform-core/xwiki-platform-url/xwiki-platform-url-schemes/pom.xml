@@ -33,6 +33,7 @@
   <description>XWiki Platform - URL - Schemes - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-url-scheme-filesystem</module>
     <module>xwiki-platform-url-scheme-reference</module>
     <module>xwiki-platform-url-scheme-standard</module>
   </modules>

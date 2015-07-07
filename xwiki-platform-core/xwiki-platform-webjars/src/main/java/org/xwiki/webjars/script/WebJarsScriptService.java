@@ -37,7 +37,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceSerializer;
+import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.url.ExtendedURL;
@@ -89,7 +91,7 @@ public class WebJarsScriptService implements ScriptService
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private ResourceReferenceSerializer<WebJarsResourceReference, ExtendedURL> webJarsResourceReferenceSerializer;
+    private ResourceReferenceSerializer<ResourceReference, ExtendedURL> defaultResourceReferenceSerializer;
 
     /**
      * Compute an XWiki WebJar URL of the form {@code http://server/webjars?resource=(resource name)}.
@@ -179,8 +181,8 @@ public class WebJarsScriptService implements ScriptService
 
         ExtendedURL extendedURL;
         try {
-            extendedURL = this.webJarsResourceReferenceSerializer.serialize(resourceReference);
-        } catch (UnsupportedResourceReferenceException e) {
+            extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
+        } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
             this.logger.warn("Error while serializing WebJar URL for id [{}], path = [{}]. Root cause = [{}]",
                 webjarId, path, ExceptionUtils.getRootCauseMessage(e));
             return null;

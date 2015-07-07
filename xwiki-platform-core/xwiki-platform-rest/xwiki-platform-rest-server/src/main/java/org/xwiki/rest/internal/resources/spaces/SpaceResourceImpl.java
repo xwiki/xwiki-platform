@@ -19,12 +19,10 @@
  */
 package org.xwiki.rest.internal.resources.spaces;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -44,16 +42,13 @@ import com.xpn.xwiki.api.Document;
 public class SpaceResourceImpl extends XWikiResource implements SpaceResource
 {
     @Override
-    public Space getSpace(String wikiName, String spaceName, String lastSpaceName) throws XWikiRestException
+    public Space getSpace(String wikiName, String spaceName) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
-        // Because the path "/wikis/{wikiName}/{spaceName: .*}" was not working, we use
-        // "/wikis/{wikiName}/{spaceName: .*}spaces/{lastSpaceName}", which means we have the last space in a parameter,
-        // and the parent spaces in an other parameter. 
-        // The parent spaces might exist (e.g. Main.SubSpace) or not (e.g. Main), so we handle the 2 cases.
-        List<String> spaces = 
-                StringUtils.isNotEmpty(spaceName) ? parseSpaceSegments(spaceName) : new ArrayList<String>();
-        spaces.add(lastSpaceName);
+        // TODO: explain why do this weird thing
+        List<String> spaces = parseSpaceSegments("spaces/" + spaceName);
+        
+        //spaces.add(lastSpaceName);
 
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);

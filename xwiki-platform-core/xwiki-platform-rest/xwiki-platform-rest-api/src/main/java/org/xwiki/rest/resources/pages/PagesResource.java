@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Pages;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages")
 public interface PagesResource
 {
     @GET Pages getPages(

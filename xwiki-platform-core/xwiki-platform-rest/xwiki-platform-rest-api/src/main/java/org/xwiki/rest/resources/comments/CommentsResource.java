@@ -34,7 +34,7 @@ import org.xwiki.rest.model.jaxb.Comments;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/comments")
 public interface CommentsResource
 {
     @GET Comments getComments(

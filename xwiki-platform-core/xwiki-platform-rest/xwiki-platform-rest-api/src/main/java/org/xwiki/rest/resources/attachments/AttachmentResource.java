@@ -31,7 +31,7 @@ import org.xwiki.rest.XWikiRestException;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}")
 public interface AttachmentResource
 {
     @GET Response getAttachment(

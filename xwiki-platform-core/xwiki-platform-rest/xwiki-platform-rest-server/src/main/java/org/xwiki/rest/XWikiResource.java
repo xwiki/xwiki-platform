@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +43,9 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -142,6 +147,44 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     }
 
     /**
+     * @param spaceSegments the space segments of the URL
+     * @return the list of parent spaces
+     * @throws XWikiRestException if the URL is malformed
+     */
+    public List<String> parseSpaceSegments(String spaceSegments) throws XWikiRestException
+    {
+        // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
+        List<String> spaces = new ArrayList<>();
+        int i = 0;
+        for (String space : spaceSegments.split("/")) {
+            if (i % 2 == 0) {
+                // Every 2 segments, we should have "spaces". If not, the URL is malformed
+                if (!"spaces".equals(space)) {
+                    throw new XWikiRestException("Malformed URL: the spaces section is invalid.");
+                }
+            } else {
+                spaces.add(space);
+            }
+            i++;
+        }
+        if (i == 0) {
+            throw new XWikiRestException("Malformed URL: the spaces section is empty.");
+        }
+        return spaces;
+    }
+
+    /**
+     * @param spaceSegments the space segments of the URL
+     * @param wikiName the name of the wiki
+     * @return the space reference
+     * @throws XWikiRestException if the URL is malformed
+     */
+    public SpaceReference getSpaceReference(String spaceSegments, String wikiName) throws XWikiRestException
+    {
+        return Utils.getSpaceReference(parseSpaceSegments(spaceSegments), wikiName);
+    }
+    
+    /**
      * Retrieve a document. This method never returns null. If something goes wrong with respect to some
      * precondition an exception is thrown.
      *
@@ -155,18 +198,42 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * @return A DocumentInfo structure containing the actual document and additional information about it.
      * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
      * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
+     * @throws XWikiRestException if the URL is malformed 
      * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
      */
     public DocumentInfo getDocumentInfo(String wikiName, String spaceName, String pageName, String language,
+            String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException, XWikiRestException
+    {
+        return getDocumentInfo(wikiName, parseSpaceSegments(spaceName), pageName, language, version, failIfDoesntExist,
+            failIfLocked);
+    }
+
+    /**
+     * Retrieve a document. This method never returns null. If something goes wrong with respect to some
+     * precondition an exception is thrown.
+     *
+     * @param wikiName The wiki name. Cannot be null.
+     * @param spaces The space hierarchy. Cannot be null.
+     * @param pageName The page name. Cannot be null.
+     * @param language The language. Null for the default language.
+     * @param version The version. Null for the latest version.
+     * @param failIfDoesntExist True if an exception should be raised whenever the page doesn't exist.
+     * @param failIfLocked True if an exception should be raised whenever the page is locked.
+     * @return A DocumentInfo structure containing the actual document and additional information about it.
+     * @throws IllegalArgumentException If a parameter has an incorrect value (e.g. null)
+     * @throws WebApplicationException NOT_FOUND if failIfDoesntExist is true and the page doesn't exist.
+     * PRECONDITION_FAILED if failIfLocked is true and the document is locked.
+     */
+    public DocumentInfo getDocumentInfo(String wikiName, List<String> spaces, String pageName, String language,
             String version, boolean failIfDoesntExist, boolean failIfLocked) throws XWikiException
     {
-        if ((wikiName == null) || (spaceName == null) || (pageName == null)) {
+        if ((wikiName == null) || (spaces == null || spaces.isEmpty()) || (pageName == null)) {
             throw new IllegalArgumentException(String.format(
                     "wikiName, spaceName and pageName must all be not null. Current values: (%s:%s.%s)", wikiName,
-                    spaceName, pageName));
+                    spaces, pageName));
         }
 
-        String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
+        String pageFullName =  Utils.getPageId(wikiName, spaces, pageName);
 
         boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
 
@@ -202,7 +269,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
-                        new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName), locale);
+                        new XWikiDocument(new DocumentReference(wikiName, spaces, pageName), locale);
                     doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;

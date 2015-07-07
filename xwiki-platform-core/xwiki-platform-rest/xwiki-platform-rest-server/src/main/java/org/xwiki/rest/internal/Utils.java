@@ -21,6 +21,7 @@ package org.xwiki.rest.internal;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
@@ -31,8 +32,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -61,61 +65,88 @@ public class Utils
      * @param pageName
      * @return The page id.
      */
-    public static String getPageId(String wikiName, String spaceName, String pageName) throws XWikiException
-    {
-        // Handle nested spaces
-        List<String> spaces = getSpacesFromURLSegment(spaceName);
-        
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
+    public static String getPageId(String wikiName, List<String> spaceName, String pageName)
+    {        
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
         return document.getPrefixedFullName();
     }
     
-    public static List<String> getSpacesFromURLSegment(String spaceSegment) throws XWikiException
+    /**
+     * @param spaces the space hierarchy
+     * @param wikiName the name of the wiki
+     * @return the space reference
+     */
+    public static SpaceReference getSpaceReference(List<String> spaces, String wikiName)
     {
-        // The URL format is: /spaces/A/spaces/B/spaces/C to actually point to the space A.B.C.
-        List<String> spaces = new ArrayList<>();
-        int i = 0;
-        for (String space : spaceSegment.split("/")) {
-            if (i % 2 == 0) {
-                // Every 2 segments, we should have "spaces", or the URL is malformed 
-                if (!"spaces".equals(space)) {
-                    throw new XWikiException("Malformed URL", new Exception());
-                }
-            } else {
-                spaces.add(space);
-            }
-            i++;
+        EntityReference parentReference = new WikiReference(wikiName);
+        SpaceReference spaceReference = null;
+
+        for (String space : spaces) {
+            spaceReference = new SpaceReference(space, parentReference);
+            parentReference = spaceReference;
         }
-        return spaces;
+
+        return spaceReference;
+    }
+
+    public static String getLocalSpaceId(List<String> spaces)
+    {
+        EntityReferenceSerializer<String> serializer =
+                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        // The wiki name cannot be not empty in a space reference, but its value has no importance since the local
+        // serializer does not use it
+        return serializer.serialize(getSpaceReference(spaces, "whatever"));
     }
 
     /**
      * @param wikiName the name of the wiki that contains the space
-     * @param spaceName the space name
+     * @param spaces the spaces hierarchy
      * @return the space id
+     * @throws org.xwiki.rest.XWikiRestException
      */
-    public static String getSpaceId(String wikiName, String spaceName)
+    public static String getSpaceId(String wikiName, List<String> spaces)
     {
         EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
             com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-        SpaceReference spaceReference = new SpaceReference(spaceName, new WikiReference(wikiName));
+        SpaceReference spaceReference = getSpaceReference(spaces, wikiName);
         return defaultEntityReferenceSerializer.serialize(spaceReference);
+    }
+    
+    public static SpaceReference resolveLocalSpaceId(String spaceId, String wikiName)
+    {
+        EntityReferenceResolver<String> resolver =
+                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
+        return new SpaceReference(resolver.resolve(spaceId, EntityType.SPACE, new WikiReference(wikiName)));
+    }
+
+    public static List<String> getSpacesFromSpaceId(String spaceId)
+    {
+        List<String> spaces = new ArrayList<>();
+        EntityReference spaceReference =  resolveLocalSpaceId(spaceId, "whatever");
+        
+        while(spaceReference != null && EntityType.SPACE == spaceReference.getType()) {
+            spaces.add(spaceReference.getName());
+            spaceReference = spaceReference.getParent();
+        }
+
+        Collections.reverse(spaces);
+        return spaces;
     }
 
     /**
      * Get the page full name given its components.
      * 
      * @param wikiName
-     * @param spaceName
+     * @param spaces
      * @param pageName
      * @return The page full name.
      */
-    public static String getPageFullName(String wikiName, String spaceName, String pageName)
+    public static String getPageFullName(String wikiName, List<String> spaces, String pageName)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -132,10 +163,10 @@ public class Utils
      * @param objectNumber
      * @return The object id.
      */
-    public static String getObjectId(String wikiName, String spaceName, String pageName, String className,
+    public static String getObjectId(String wikiName, List<String> spaces, String pageName, String className,
         int objectNumber)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
 
         Document document = new Document(xwikiDocument, null);
 

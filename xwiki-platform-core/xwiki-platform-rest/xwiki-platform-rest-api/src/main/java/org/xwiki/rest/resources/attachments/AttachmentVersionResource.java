@@ -29,7 +29,7 @@ import org.xwiki.rest.XWikiRestException;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}")
 public interface AttachmentVersionResource
 {
     @GET Response getAttachment(

@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Comment;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments/{id}")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/comments/{id}")
 public interface CommentResource
 {
     @GET Comment getComment(

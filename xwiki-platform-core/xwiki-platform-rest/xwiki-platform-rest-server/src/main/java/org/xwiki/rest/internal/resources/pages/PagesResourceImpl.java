@@ -49,6 +49,8 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
             throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
+        List<String> spaces = parseSpaceSegments(spaceName);
+        String spaceId = Utils.getLocalSpaceId(spaces);
 
         Pages pages = objectFactory.createPages();
 
@@ -62,7 +64,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
             /* Use an explicit query to improve performance */
             List<String> pageNames =
                     query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden"))
-                            .bindValue("space", spaceName).setOffset(start).setLimit(number).execute();
+                        .bindValue("space", spaceId).setOffset(start).setLimit(number).execute();
 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {
@@ -74,13 +76,13 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
             }
 
             for (String pageName : pageNames) {
-                String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
+                String pageFullName = Utils.getPageId(wikiName, spaces, pageName);
 
                 if (!Utils.getXWikiApi(componentManager).exists(pageFullName)) {
                     logger.warning(String
                             .format("[Page '%s' appears to be in space '%s' but no information is available.]",
                                     pageName,
-                                    spaceName));
+                                    spaceId));
                 } else {
                     Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
 

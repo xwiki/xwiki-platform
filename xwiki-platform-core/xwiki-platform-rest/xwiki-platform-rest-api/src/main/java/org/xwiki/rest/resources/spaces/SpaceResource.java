@@ -29,11 +29,13 @@ import org.xwiki.rest.model.jaxb.Space;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}")
+// We use this complicated path because "/wikis/{wikiName}/{spaceName: .*}" only is not working
+@Path("/wikis/{wikiName}/{spaceName: .*}spaces/{lastSpaceName}")
 public interface SpaceResource
 {
     @GET Space getSpace(
             @PathParam("wikiName") String wikiName,
-            @PathParam("spaceName") String spaceName
+            @PathParam("spaceName") String spaceName,
+            @PathParam("lastSpaceName") String lastSpaceName
     ) throws XWikiRestException;
 }

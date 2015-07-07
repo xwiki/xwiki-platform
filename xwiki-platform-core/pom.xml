@@ -503,6 +503,12 @@
               <to>java.net.URL createURL*</to>
               <justification>ExportURLFactoryActionHandler was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
             </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/rest/resources/spaces/SpaceResource</className>
+              <method>org.xwiki.rest.model.jaxb.Space getSpace(java.lang.String, java.lang.String)</method>
+              <justification>This API has been changed to support nested spaces.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

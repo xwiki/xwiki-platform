@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Property;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}/properties/{propertyName}")
+@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}/properties/{propertyName}")
 public interface ObjectPropertyAtPageVersionResource
 {
     @GET Property getObjectProperty(

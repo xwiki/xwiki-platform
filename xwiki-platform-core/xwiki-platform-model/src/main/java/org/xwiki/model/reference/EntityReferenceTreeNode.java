@@ -140,7 +140,7 @@ public class EntityReferenceTreeNode
     }
 
     /**
-     * @return the child reference nodes
+     * @return the child references containing a {@link Locale}
      */
     public Collection<EntityReference> getLocales()
     {

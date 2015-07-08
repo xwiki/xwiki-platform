@@ -320,11 +320,26 @@ public class Utils
      */
     public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
     {
+        UriBuilder uriBuilder = UriBuilder.fromUri(baseURI).path(resourceClass);
+
+        // uriBuilder.toString() returns the path (see AbstractUriBuilder#toString())
+        // but it means UriBuilder must use AbstractUriBuilder from restlet.
+        // TODO: find a more generic way to not depend heavily on restlet.
+        List<String> pathVariableNames = getVariableNamesFromPathTemplate(uriBuilder.toString());
+          
         Object[] encodedPathElements = new String[pathElements.length];
         for (int i = 0; i < pathElements.length; i++) {
             if (pathElements[i] != null) {
                 try {
-                    encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                    // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
+                    if ("spaceName".equals(pathVariableNames.get(i))) {
+                        if (!(pathElements[i] instanceof List)) {
+                            throw new RuntimeException("The 'spaceName' parameter must be a list!");
+                        }
+                        encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
+                    } else {
+                        encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                    }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
                 }
@@ -332,7 +347,64 @@ public class Utils
                 encodedPathElements[i] = null;
             }
         }
-        return UriBuilder.fromUri(baseURI).path(resourceClass).buildFromEncoded(encodedPathElements);
+        return uriBuilder.buildFromEncoded(encodedPathElements);
+    }
+
+    /**
+     * Parse a path template to find variables:
+     * e.g. with "/wikis/{wikiName}/spaces/{spaceName}/" it returns ['wikiName', 'spaceName'].
+     * @param pathTemplate the path template (from the resource)
+     * @return the list of variable names
+     */
+    private static List<String> getVariableNamesFromPathTemplate(String pathTemplate)
+    {
+        List<String> variables = new ArrayList<>();
+
+        boolean inVariable = false;
+        StringBuilder varName = new StringBuilder();
+
+        // Parse the whole string
+        for (int i = 0; i < pathTemplate.length(); ++i) {
+            char c = pathTemplate.charAt(i);
+            if (inVariable) {
+                if (c == '}') {
+                    variables.add(varName.toString());
+                    // we clear the varName buffer
+                    varName.delete(0, varName.length());
+                    inVariable = false;
+                } else {
+                    varName.append(c);
+                }
+            } else if (c == '{') {
+                inVariable = true;
+            }
+        }
+
+        return variables;
+    }
+
+    /**
+     * Generate an encoded segment for the 'spaceName' parameter of a resource URL.
+     *
+     * Using UriBuilder is an elegant way to generate a REST URL for a jax-rs resource. It takes the path from the
+     * resource (described with the @Path annotation) and fill the variable parts. However, we have introduced a special
+     * syntax for nested spaces (with /spaces/A/spaces/B, etc...) that is not supported by jax-rs. So we manually handle
+     * the spaceName part of the URL.
+     *
+     * @param spaces the list of spaces of the resource
+     * @return the encoded spaces segment of the URL
+     * @throws URIException if problems occur
+     */
+    private static String generateEncodedSpacesURISegment(List<Object> spaces) throws URIException
+    {
+        StringBuilder spaceSegment = new StringBuilder();
+        for (Object space : spaces) {
+            if (spaceSegment.length() > 0) {
+                spaceSegment.append("/spaces/");
+            }
+            spaceSegment.append(URIUtil.encodePath(space.toString()));
+        }
+        return spaceSegment.toString();
     }
 
     /**

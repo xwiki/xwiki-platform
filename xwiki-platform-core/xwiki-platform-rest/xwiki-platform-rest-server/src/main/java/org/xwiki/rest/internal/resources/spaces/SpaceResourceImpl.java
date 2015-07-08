@@ -45,10 +45,7 @@ public class SpaceResourceImpl extends XWikiResource implements SpaceResource
     public Space getSpace(String wikiName, String spaceName) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
-        // TODO: explain why do this weird thing
-        List<String> spaces = parseSpaceSegments("spaces/" + spaceName);
-        
-        //spaces.add(lastSpaceName);
+        List<String> spaces = parseSpaceSegments(spaceName);
 
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);

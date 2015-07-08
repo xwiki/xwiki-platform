@@ -155,7 +155,8 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     {
         // The URL format is: "spaces/A/spaces/B/spaces/C" to actually point to the space "A.B.C".
         List<String> spaces = new ArrayList<>();
-        int i = 0;
+        // We actually don't get the first "spaces/" segment so we start from the first space
+        int i = 1;
         for (String space : spaceSegments.split("/")) {
             if (i % 2 == 0) {
                 // Every 2 segments, we should have "spaces". If not, the URL is malformed
@@ -167,7 +168,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
             }
             i++;
         }
-        if (i == 0) {
+        if (spaces.isEmpty()) {
             throw new XWikiRestException("Malformed URL: the spaces section is empty.");
         }
         return spaces;

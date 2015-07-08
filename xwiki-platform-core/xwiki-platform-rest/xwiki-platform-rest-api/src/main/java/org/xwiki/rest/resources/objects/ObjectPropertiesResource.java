@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Properties;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
 public interface ObjectPropertiesResource
 {
     @GET Properties getObjectProperties(

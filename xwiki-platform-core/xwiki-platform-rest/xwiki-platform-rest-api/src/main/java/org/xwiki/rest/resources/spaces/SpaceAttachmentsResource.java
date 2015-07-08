@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Attachments;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}/attachments")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/attachments")
 public interface SpaceAttachmentsResource
 {
     @GET Attachments getAttachments(

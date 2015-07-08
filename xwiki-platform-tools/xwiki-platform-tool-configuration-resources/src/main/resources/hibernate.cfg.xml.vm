@@ -88,6 +88,9 @@
     <!-- Configuration for the default database.
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
+
+         If you want the main wiki database to be different than "xwiki" (or the default schema for schema based engines)
+         you will also have to set the property xwiki.db in xwiki.cfg file
     -->
 ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
 ## have preferred to use an empty value but I couldn't make that work with Maven.
@@ -125,6 +128,9 @@
 
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
+         Notes:
+           - if you want the main wiki database to be different than "xwiki"
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:mysql://localhost/xwiki</property>
     <property name="connection.username">xwiki</property>
@@ -146,6 +152,9 @@
 
     <!-- HSQLDB configuration.
          Uncomment if you want to use HSQLDB and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "PUBLIC" (the default HSQLDB schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:hsqldb:file:${environment.permanentDirectory}/database/xwiki_db;shutdown=true</property>
     <property name="connection.username">sa</property>
@@ -171,6 +180,8 @@
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
            - "xwiki.virtual_mode" can be set to either "schema" or "database". Note that currently the database mode
              doesn't support database creation (see http://jira.xwiki.org/browse/XWIKI-8753)
+           - if you want the main wiki database to be different than "xwiki" (or "public" in schema mode)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
@@ -198,6 +209,8 @@
              "jdbc.batch_size". They are required to tell Oracle to allow CLOBs larger than 32K.
            - "jdbc.use_streams_for_binary" needs to be set to "false",
              see https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
+           - if you want the main wiki schema to be different than "xwiki"
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="connection.username">xwiki</property>
@@ -222,6 +235,9 @@
 
     <!-- Derby configuration.
          Uncomment if you want to use Derby and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "APP" (the default Derby schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
@@ -241,6 +257,9 @@
 
     <!-- H2 configuration.
          Uncomment if you want to use H2 and comment out other database configurations.
+         Notes:
+           - if you want the main wiki schema to be different than "PUBLIC" (the default H2 schema)
+             you will also have to set the property xwiki.db in xwiki.cfg file
 
     <property name="connection.url">jdbc:h2:${environment.permanentDirectory}/database/xwiki</property>
     <property name="connection.username">sa</property>

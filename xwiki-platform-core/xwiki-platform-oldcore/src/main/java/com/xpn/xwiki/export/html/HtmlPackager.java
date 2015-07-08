@@ -334,8 +334,8 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (String skinName : urlf.getExportURLFactoryContext().getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getExportURLFactoryContext().getExportedSkinFiles(), context);
+        for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {
+            addSkinToZip(skinName, zos, urlf.getFilesystemExportContext().getExportedSkinFiles(), context);
         }
 
         // Copy generated files in the ZIP file.

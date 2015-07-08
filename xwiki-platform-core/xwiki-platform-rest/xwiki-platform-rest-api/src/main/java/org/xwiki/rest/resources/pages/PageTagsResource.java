@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Tags;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/tags")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/tags")
 public interface PageTagsResource
 {
     @GET Tags getPageTags(

@@ -30,7 +30,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.SearchResults;
 
-@Path("/wikis/{wikiName}/{spaceName: .+}/search")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/search")
 public interface SpaceSearchResource
 {
     @GET SearchResults search(

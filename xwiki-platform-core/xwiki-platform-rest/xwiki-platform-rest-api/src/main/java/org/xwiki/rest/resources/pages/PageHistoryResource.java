@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.History;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/{spaceName: .+}/pages/{pageName}/history")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history")
 public interface PageHistoryResource
 {
     @GET History getPageHistory(

@@ -207,17 +207,37 @@ public class RefactoringScriptService implements ScriptService
         return createCopyAsRequest(reference, copyReference);
     }
 
-    private MoveRequest createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
+    /**
+     * Creates a request to delete the specified entities.
+     * 
+     * @param entityReferences the entities to delete
+     * @param deep {@code true} to delete the entity descendants too, {@code false} otherwise
+     * @return the delete request
+     */
+    public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences, boolean deep)
     {
-        MoveRequest request = new MoveRequest();
+        EntityRequest request = new EntityRequest();
+        initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
+        request.setDeep(deep);
+        return request;
+    }
+
+    private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
+    {
         request.setId(generateJobId(type));
         request.setInteractive(true);
         request.setJobType(type);
-        request.setEntityReferences(sources);
-        request.setDestination(destination);
-        request.setUpdateLinks(true);
+        request.setEntityReferences(entityReferences);
         request.setDeep(true);
         setRightsProperties(request);
+    }
+
+    private MoveRequest createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
+    {
+        MoveRequest request = new MoveRequest();
+        initEntityRequest(request, type, sources);
+        request.setDestination(destination);
+        request.setUpdateLinks(true);
         return request;
     }
 
@@ -446,6 +466,42 @@ public class RefactoringScriptService implements ScriptService
     public Job copyAs(EntityReference reference, String copyName)
     {
         return copyAs(createCopyAsRequest(reference, copyName));
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given delete request.
+     *
+     * @param request the delete request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(EntityRequest request)
+    {
+        return execute(RefactoringJobs.DELETE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to delete the specified entities.
+     * 
+     * @param entityReferences the entities to delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(Collection<EntityReference> entityReferences)
+    {
+        return delete(createDeleteRequest(entityReferences, false));
+    }
+
+    /**
+     * Schedules an asynchronous job to delete the specified entity.
+     * 
+     * @param entityReference the entity to delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(EntityReference entityReference)
+    {
+        return delete(Arrays.asList(entityReference));
     }
 
     /**

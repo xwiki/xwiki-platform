@@ -49,4 +49,9 @@ public interface RefactoringJobs
      * The role hint of the job that copies entities with a different name or reference.
      */
     String COPY_AS = "copyAs";
+
+    /**
+     * The role hint of the job that deletes entities.
+     */
+    String DELETE = "delete";
 }

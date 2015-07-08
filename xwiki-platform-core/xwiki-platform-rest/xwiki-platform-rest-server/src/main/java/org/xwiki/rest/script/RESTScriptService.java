@@ -84,6 +84,8 @@ public class RESTScriptService implements ScriptService
      */
     public URL url(DocumentReference documentReference)
     {
+        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths. 
+        // So it is consistent.
         try {
             return Utils.createURI(getBaseURI(), PageResource.class,
                 documentReference.getWikiReference().getName(), getSpaceList(documentReference.getSpaceReferences()),

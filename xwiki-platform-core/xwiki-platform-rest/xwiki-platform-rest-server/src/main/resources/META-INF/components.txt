@@ -59,3 +59,4 @@ org.xwiki.rest.internal.representations.comments.FormUrlEncodedCommentReader
 org.xwiki.rest.internal.representations.tags.TextPlainTagsReader
 org.xwiki.rest.internal.representations.tags.FormUrlEncodedTagsReader
 org.xwiki.rest.internal.exceptions.XWikiRestExceptionMapper
+org.xwiki.rest.script.RESTScriptService

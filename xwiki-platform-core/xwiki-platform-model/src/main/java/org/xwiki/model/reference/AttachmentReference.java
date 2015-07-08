@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.reference;
 
+import java.beans.Transient;
+
 import org.xwiki.model.EntityType;
 
 /**
@@ -109,6 +111,7 @@ public class AttachmentReference extends EntityReference
     /**
      * @return the document reference contained in this attachment reference
      */
+    @Transient
     public DocumentReference getDocumentReference()
     {
         return (DocumentReference) extractReference(EntityType.DOCUMENT);

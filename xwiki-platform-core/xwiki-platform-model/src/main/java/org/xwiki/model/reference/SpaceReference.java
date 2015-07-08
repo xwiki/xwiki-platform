@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.reference;
 
+import java.beans.Transient;
 import java.lang.reflect.Type;
 
 import javax.inject.Provider;
@@ -152,6 +153,7 @@ public class SpaceReference extends EntityReference
      * @return the reference of the wiki containing this space
      * @since 7.1M2
      */
+    @Transient
     public WikiReference getWikiReference()
     {
         return (WikiReference) extractReference(EntityType.WIKI);

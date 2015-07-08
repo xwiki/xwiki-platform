@@ -19,6 +19,8 @@
  */
 package org.xwiki.xar;
 
+import java.beans.Transient;
+
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -108,6 +110,7 @@ public class XarEntry extends LocalDocumentReference
      * @deprecated since 7.2M1, does not make much sense anymore with nested space
      */
     @Deprecated
+    @Transient
     public String getSpaceName()
     {
         return TOSTRING_SERIALIZER.serialize(extractReference(EntityType.SPACE));
@@ -116,6 +119,7 @@ public class XarEntry extends LocalDocumentReference
     /**
      * @return the name of the document
      */
+    @Transient
     public String getDocumentName()
     {
         return getName();

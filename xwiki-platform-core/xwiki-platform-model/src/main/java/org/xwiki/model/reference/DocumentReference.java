@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.reference;
 
+import java.beans.Transient;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -252,6 +253,7 @@ public class DocumentReference extends EntityReference
     /**
      * @return the wiki reference of this document reference
      */
+    @Transient
     public WikiReference getWikiReference()
     {
         return (WikiReference) extractReference(EntityType.WIKI);
@@ -264,6 +266,7 @@ public class DocumentReference extends EntityReference
      * @return a new document reference or the same if the passed wiki is already the current wiki
      * @since 7.2M1
      */
+    @Transient
     public DocumentReference setWikiReference(WikiReference wikiReference)
     {
         WikiReference currentWikiReferene = getWikiReference();
@@ -278,6 +281,7 @@ public class DocumentReference extends EntityReference
     /**
      * @return the space reference of the last space containing this document
      */
+    @Transient
     public SpaceReference getLastSpaceReference()
     {
         return (SpaceReference) extractReference(EntityType.SPACE);
@@ -286,6 +290,7 @@ public class DocumentReference extends EntityReference
     /**
      * @return space references of this document in an ordered list
      */
+    @Transient
     public List<SpaceReference> getSpaceReferences()
     {
         List<SpaceReference> references = new ArrayList<SpaceReference>();

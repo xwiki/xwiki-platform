@@ -289,6 +289,36 @@ public class RefactoringScriptService implements ScriptService
     }
 
     /**
+     * Schedules an asynchronous job to convert the specified nested document to a terminal document (that can't have
+     * child documents). E.g. the document {@code One.Two.WebHome} is converted to {@code One.Two} .
+     * 
+     * @param documentReference the nested document to convert to a terminal document (that can't have child documents)
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job convertToTerminalDocument(DocumentReference documentReference)
+    {
+        if (documentReference.getName().equals(
+            this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName())) {
+            EntityReference parentReference = documentReference.getParent();
+            if (parentReference.getParent().getType() == EntityType.SPACE) {
+                // There has to be at least 2 levels of nested spaces in order to be able to convert a nested document
+                // into a terminal document. We cannot convert a root document like Main.WebHome into a terminal
+                // document.
+                DocumentReference terminalDocumentReference =
+                    new DocumentReference(parentReference.getName(), new SpaceReference(parentReference.getParent()));
+                // We cannot convert a nested document to a terminal document and preserve its child documents at the
+                // same time. If the target document has child documents they will become orphans.
+                MoveRequest request = createRenameRequest(documentReference, terminalDocumentReference);
+                request.setDeep(false);
+                return rename(request);
+            }
+        }
+        // The specified document is already a terminal document or cannot be converted to a terminal document.
+        return null;
+    }
+
+    /**
      * Executes a refactoring request.
      * 
      * @param type the type of refactoring to execute

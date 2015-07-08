@@ -166,7 +166,7 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
 
     protected boolean isTerminal(EntityReference entityReference)
     {
-        return entityReference.getName().equals(
-            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()));
+        return !entityReference.getName().equals(
+            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()).getName());
     }
 }

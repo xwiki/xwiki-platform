@@ -43,6 +43,11 @@ public class MoveRequest extends EntityRequest
     private static final String PROPERTY_DESTINATION = "destination";
 
     /**
+     * @see #isDeleteSource()
+     */
+    private static final String PROPERTY_DELETE_SOURCE = "deleteSource";
+
+    /**
      * @see #isUpdateLinks()
      */
     private static final String PROPERTY_UPDATE_LINKS = "updateLinks";
@@ -63,6 +68,27 @@ public class MoveRequest extends EntityRequest
     public void setDestination(EntityReference destination)
     {
         setProperty(PROPERTY_DESTINATION, destination);
+    }
+
+    /**
+     * @return {@code true} if the source entities specified by {@link #getEntityReferences()} should be deleted,
+     *         {@code false} otherwise; in a standard move operation the source is deleted but sometimes you may want to
+     *         keep the source as a backup; this option can also be used to perform a copy instead of a move; note that
+     *         the difference between a copy and a standard move without delete is that the back-links are not updated
+     */
+    public boolean isDeleteSource()
+    {
+        return getProperty(PROPERTY_DELETE_SOURCE, true);
+    }
+
+    /**
+     * Sets whether the source entities specified by {@link #getEntityReferences()} should be deleted or not.
+     * 
+     * @param deleteSource {@code true} to delete the source, {@code false} to keep it as a backup
+     */
+    public void setDeleteSource(boolean deleteSource)
+    {
+        setProperty(PROPERTY_DELETE_SOURCE, deleteSource);
     }
 
     /**

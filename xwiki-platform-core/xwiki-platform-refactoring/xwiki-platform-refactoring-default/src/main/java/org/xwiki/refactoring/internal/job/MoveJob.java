@@ -142,7 +142,7 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         }
 
         // The move operation is currently implemented as Copy + Delete.
-        if (!hasAccess(Right.DELETE, oldReference)) {
+        if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
             this.logger.warn("You are not allowed to delete [{}].", oldReference);
             return;
         }
@@ -191,10 +191,12 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
             // Step 4: Delete the source document.
             this.progressManager.startStep(this);
-            delete(oldReference);
+            if (this.request.isDeleteSource()) {
+                delete(oldReference);
+            }
             this.progressManager.endStep(this);
 
-            // Step 5: Move the child documents.
+            // Step 5: Process the child documents.
             this.progressManager.startStep(this);
             if (deep && !isTerminal(oldReference)) {
                 moveChildren(oldReference, newReference);

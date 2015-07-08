@@ -1,0 +1,62 @@
+## Serialize in JSON a XAR package descriptor
+#############################################
+$response.setContentType("application/x-json")
+#if("$!request.document" == "")
+ #set($packageDoc = $doc)
+#else 
+ #set($packageDoc = $xwiki.getDocument($request.document))
+#end
+#if("$!request.package" == "")
+ #set($error = "No package name was given")
+#else
+ #set($attachment = $packageDoc.getAttachment($request.package))
+ #if($attachment)
+  #set($package = $services.xar.getXarPackage($attachment.contentInputStream, true))
+  #set($infos = {
+      "name" : $package.packageName,
+      "description" : $package.packageDescription,
+      "licence" : $package.packageLicense,
+      "author" : $package.packageAuthor,
+      "version" : $package.packageVersion,
+      "backup" : $package.isPackageBackupPack(),
+      "extension": $package.getPackageExtensionId()
+    })
+
+  #macro(addPageNode $parentEntities, $pageNode)
+    #set($void = $parentEntities.put($pageNode.reference.name, {}))
+    #foreach($locale in $pageNode.locales)
+      #set($void = $parentEntities.get($pageNode.reference.name).put($locale.locale, $locale))
+    #end
+  #end
+  #macro(addSpaceNode $parentEntities, $spaceNode)
+    #set($void = $parentEntities.put($spaceNode.reference.name, {}))
+    #foreach($child in $spaceNode.children)
+      #set($map = $parentEntities.get($spaceNode.reference.name))
+      #set($newParent = $child)
+      #addNode($map, $newParent)
+    #end
+  #end
+  #macro(addNode $parentEntities, $node)
+    #if ($node.children.isEmpty())
+      #addPageNode($parentEntities, $node)
+    #else
+      #addSpaceNode($parentEntities, $node)
+    #end                      
+  #end
+
+  #set($entities = {})
+  #foreach($node in $services.model.toTree($package.entries).children)
+    #addNode($entities, $node)
+  #end
+
+  #set($json = {
+      "infos" : $infos,
+      "entities" : $services.model.toTree($package.entries)
+    })
+
+   $jsontool.serialize($json)
+ #else
+  #set($error = "Package not found")
+ #end
+#end
+#if("$!error" != "") {"error":  "$error"} #end

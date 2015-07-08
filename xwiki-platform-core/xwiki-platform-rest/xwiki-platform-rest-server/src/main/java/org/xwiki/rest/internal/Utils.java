@@ -322,10 +322,13 @@ public class Utils
     {
         UriBuilder uriBuilder = UriBuilder.fromUri(baseURI).path(resourceClass);
 
-        // uriBuilder.toString() returns the path (see AbstractUriBuilder#toString())
-        // but it means UriBuilder must use AbstractUriBuilder from restlet.
-        // TODO: find a more generic way to not depend heavily on restlet.
-        List<String> pathVariableNames = getVariableNamesFromPathTemplate(uriBuilder.toString());
+        List<String> pathVariableNames = null;
+        if (pathElements.length > 0) {
+            // uriBuilder.toString() returns the path (see AbstractUriBuilder#toString())
+            // but it means UriBuilder must use AbstractUriBuilder from restlet.
+            // TODO: find a more generic way to not depend heavily on restlet.
+            pathVariableNames = getVariableNamesFromPathTemplate(uriBuilder.toString());
+        }
           
         Object[] encodedPathElements = new String[pathElements.length];
         for (int i = 0; i < pathElements.length; i++) {

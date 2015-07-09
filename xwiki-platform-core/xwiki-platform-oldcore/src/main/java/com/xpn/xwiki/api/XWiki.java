@@ -36,6 +36,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
@@ -670,8 +671,7 @@ public class XWiki extends Api
      * @deprecated use query service instead
      */
     @Deprecated
-    public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues)
-        throws XWikiException
+    public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
@@ -1593,19 +1593,121 @@ public class XWiki extends Api
     }
 
     /**
-     * API to list all non-hidden spaces in the current wiki.
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
      *
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
+     * @deprecated since 7.2M1, use {@link #getAllSpaces(int, int)} instead
      */
+    @Deprecated
     public List<String> getSpaces() throws XWikiException
     {
         return this.xwiki.getSpaces(getXWikiContext());
     }
 
     /**
-     * API to list all non-hidden documents in a space.
+     * Count all the spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @return the number of spaces in the current wiki
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public int countAllSpaces() throws XWikiException
+    {
+        return this.xwiki.countAllSpaces();
+    }
+
+    /**
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param offset the index where to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces references as {@link String}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<String> getAllSpaces(int offset, int limit) throws XWikiException
+    {
+        return this.xwiki.getAllSpaces(offset, limit);
+    }
+
+    /**
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param offset the index where to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces as {@link SpaceReference}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<SpaceReference> getAllSpaceReferences(int offset, int limit) throws XWikiException
+    {
+        return this.xwiki.getAllSpaceReferences(offset, limit);
+    }
+
+    /**
+     * Count the direct children spaces of passed space (or top level spaces if passed space reference is null).
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @return the number of direct spaces children in the passed space
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public int countSpaces(SpaceReference parentSpace) throws XWikiException
+    {
+        return this.xwiki.countSpaces(parentSpace);
+    }
+
+    /**
+     * API to list direct children spaces of passed space (or top level spaces if passed space reference is null).
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @param offset the index from which to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces references as {@link String}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<String> getSpaces(SpaceReference parentSpace, int offset, int limit) throws XWikiException
+    {
+        return this.xwiki.getSpaces(parentSpace, offset, limit);
+    }
+
+    /**
+     * API to list direct children spaces of passed space (or top level spaces if passed space reference is null).
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @param offset the index from which to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces as {@link SpaceReference}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<SpaceReference> getSpaceReferences(SpaceReference parentSpace, int offset, int limit)
+        throws XWikiException
+    {
+        return this.xwiki.getSpaceReferences(parentSpace, offset, limit);
+    }
+
+    /**
+     * API to list all documents in a space.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
      *
      * @param spaceReference the local reference of the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified

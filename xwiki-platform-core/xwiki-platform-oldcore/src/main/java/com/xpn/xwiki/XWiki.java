@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -124,10 +125,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -420,8 +423,10 @@ public class XWiki implements EventListener
     private Provider<DocumentReference> defaultDocumentReferenceProvider;
 
     private DocumentReferenceResolver<EntityReference> currentgetdocumentResolver;
-    
+
     private AttachmentReferenceResolver<EntityReference> currentAttachmentReferenceResolver;
+
+    private SpaceReferenceResolver<String> currentSpaceResolver;
 
     private ConfigurationSource getConfiguration()
     {
@@ -564,15 +569,24 @@ public class XWiki implements EventListener
 
         return this.currentgetdocumentResolver;
     }
-    
+
     private AttachmentReferenceResolver<EntityReference> getCurrentAttachmentResolver()
     {
         if (this.currentAttachmentReferenceResolver == null) {
             this.currentAttachmentReferenceResolver =
                 Utils.getComponent(AttachmentReferenceResolver.TYPE_REFERENCE, "current");
         }
-        
+
         return this.currentAttachmentReferenceResolver;
+    }
+
+    private SpaceReferenceResolver<String> getCurrentSpaceResolver()
+    {
+        if (this.currentSpaceResolver == null) {
+            this.currentSpaceResolver = Utils.getComponent(SpaceReferenceResolver.TYPE_STRING, "current");
+        }
+
+        return this.currentSpaceResolver;
     }
 
     private DocumentReference getDefaultDocumentReference()
@@ -4170,7 +4184,7 @@ public class XWiki implements EventListener
         XWikiContext context)
     {
         // TODO: replace this API with a clean implementation of EntityResourceReferenceSerializer
-        
+
         // Handle attachment URL
         if (EntityType.ATTACHMENT.equals(entityReference.getType())) {
             // Get the full attachment reference
@@ -4203,8 +4217,9 @@ public class XWiki implements EventListener
             documentReference.getLastSpaceReference().removeParent(documentReference.getWikiReference());
         String spaces = this.defaultEntityReferenceSerializer.serialize(spaceReference);
 
-        URL url = context.getURLFactory().createURL(spaces, documentReference.getName(), action, queryString, anchor,
-            documentReference.getWikiReference().getName(), context);
+        URL url =
+            context.getURLFactory().createURL(spaces, documentReference.getName(), action, queryString, anchor,
+                documentReference.getWikiReference().getName(), context);
 
         return context.getURLFactory().getURL(url, context);
     }
@@ -4265,20 +4280,21 @@ public class XWiki implements EventListener
     /**
      * @since 7.2M1
      */
-    public String getAttachmentURL(AttachmentReference attachmentReference, String action, String queryString, 
+    public String getAttachmentURL(AttachmentReference attachmentReference, String action, String queryString,
         XWikiContext context)
     {
         DocumentReference documentReference = attachmentReference.getDocumentReference();
         SpaceReference spaceReference = documentReference.getLastSpaceReference();
         WikiReference wikiReference = spaceReference.getWikiReference();
-        
+
         // We need to serialize the space reference because the old URLFactory has no method to create an Attachment URL
         // from an AttachmentReference...
         String serializedSpace = localStringEntityReferenceSerializer.serialize(spaceReference);
-        
-        URL url = context.getURLFactory().createAttachmentURL(attachmentReference.getName(), serializedSpace,
-                    documentReference.getName(), action, queryString, wikiReference.getName(), context);
-        
+
+        URL url =
+            context.getURLFactory().createAttachmentURL(attachmentReference.getName(), serializedSpace,
+                documentReference.getName(), action, queryString, wikiReference.getName(), context);
+
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -4293,8 +4309,8 @@ public class XWiki implements EventListener
     /**
      * @since 7.2M1
      */
-    public String getAttachmentRevisionURL(AttachmentReference attachmentReference, String revision, String queryString,
-        XWikiContext context)
+    public String getAttachmentRevisionURL(AttachmentReference attachmentReference, String revision,
+        String queryString, XWikiContext context)
     {
         DocumentReference documentReference = attachmentReference.getDocumentReference();
         SpaceReference spaceReference = documentReference.getLastSpaceReference();
@@ -4304,7 +4320,8 @@ public class XWiki implements EventListener
         // from an AttachmentReference...
         String serializedSpace = localStringEntityReferenceSerializer.serialize(spaceReference);
 
-        URL url = context.getURLFactory().createAttachmentRevisionURL(attachmentReference.getName(), serializedSpace,
+        URL url =
+            context.getURLFactory().createAttachmentRevisionURL(attachmentReference.getName(), serializedSpace,
                 documentReference.getName(), revision, queryString, wikiReference.getName(), context);
 
         return context.getURLFactory().getURL(url, context);
@@ -4321,9 +4338,9 @@ public class XWiki implements EventListener
     public String getAttachmentURL(String fullname, String filename, String queryString, XWikiContext context)
         throws XWikiException
     {
-        AttachmentReference attachmentReference = new AttachmentReference(filename,
-            this.currentMixedDocumentReferenceResolver.resolve(fullname));
-        
+        AttachmentReference attachmentReference =
+            new AttachmentReference(filename, this.currentMixedDocumentReferenceResolver.resolve(fullname));
+
         return getAttachmentURL(attachmentReference, queryString, context);
     }
 
@@ -5351,12 +5368,16 @@ public class XWiki implements EventListener
     }
 
     /**
-     * API to list all non-hidden spaces in the current wiki.
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
      *
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
+     * @deprecated since 7.2M1, use {@link #getAllSpaceReferences(int, int)} instead
      */
+    @Deprecated
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
         try {
@@ -5365,6 +5386,172 @@ public class XWiki implements EventListener
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
+    }
+
+    /**
+     * Count all the spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @return the number of spaces in the current wiki
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public int countAllSpaces() throws XWikiException
+    {
+        try {
+            Query query = getStore().getQueryManager().createQuery("count doc.space from Document", Query.XWQL);
+
+            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
+
+            return (Integer) query.execute().get(0);
+        } catch (QueryException ex) {
+            throw new XWikiException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * API to list all non-hidden spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param offset the index where to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces as {@link SpaceReference}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<String> getAllSpaces(int offset, int limit) throws XWikiException
+    {
+        try {
+            Query query = getStore().getQueryManager().getNamedQuery("getSpaces");
+
+            query.setOffset(offset);
+            query.setLimit(limit);
+
+            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
+
+            return query.execute();
+        } catch (QueryException ex) {
+            throw new XWikiException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param offset the index where to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces as {@link SpaceReference}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<SpaceReference> getAllSpaceReferences(int offset, int limit) throws XWikiException
+    {
+        return toSpaceReferences(getAllSpaces(offset, limit));
+    }
+
+    private List<SpaceReference> toSpaceReferences(Collection<String> spaces)
+    {
+        List<SpaceReference> references = new ArrayList<>(spaces.size());
+
+        for (String space : spaces) {
+            references.add(getCurrentSpaceResolver().resolve(space));
+        }
+
+        return references;
+    }
+
+    private Query createGetSpacesQuery(SpaceReference parentSpace) throws QueryException
+    {
+        StringBuilder builder = new StringBuilder("space.reference from Space space where ");
+
+        List<Object> values = new ArrayList<>(1);
+        if (parentSpace != null) {
+            builder.append("space.parent=?");
+            values.add(this.localStringEntityReferenceSerializer.serialize(parentSpace));
+        } else {
+            builder.append("space.parent IS NULL");
+        }
+
+        // Filter hidden documents
+        if (getUserConfiguration().getProperty("displayHiddenDocuments", 0) == 1) {
+            builder.append(" AND space.hidden <> true");
+        }
+
+        Query query = getStore().getQueryManager().createQuery(builder.toString(), Query.XWQL);
+
+        query.bindValues(values);
+
+        return query;
+    }
+
+    /**
+     * Count the direct children spaces of passed space (or top level spaces if passed space reference is null).
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @return the number of direct spaces children in the passed space
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public int countSpaces(SpaceReference parentSpace) throws XWikiException
+    {
+        Query query;
+        try {
+            query = createGetSpacesQuery(parentSpace);
+
+            return (Integer) query.execute().get(0);
+        } catch (QueryException e) {
+            throw new XWikiException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * API to list direct children spaces of passed space (or top level spaces if passed space reference is null).
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @param offset the index from which to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces references as {@link String}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<String> getSpaces(SpaceReference parentSpace, int offset, int limit) throws XWikiException
+    {
+        Query query;
+        try {
+            query = createGetSpacesQuery(parentSpace);
+
+            query.setOffset(offset);
+            query.setLimit(limit);
+
+            return query.execute();
+        } catch (QueryException e) {
+            throw new XWikiException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * API to list non-hidden direct children spaces of passed space (or top level spaces if passed space reference is
+     * null).
+     * 
+     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
+     * @param offset the index from which to start returning results
+     * @param limit the maximum number of result to return
+     * @return a list of spaces as {@link SpaceReference}
+     * @throws XWikiException if something went wrong
+     * @since 7.2M1
+     */
+    public List<SpaceReference> getSpaceReferences(SpaceReference parentSpace, int offset, int limit)
+        throws XWikiException
+    {
+        return toSpaceReferences(getSpaces(parentSpace, offset, limit));
     }
 
     /**
@@ -5379,8 +5566,8 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).bindValue("space", spaceReference)
-                .execute();
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"))
+                .bindValue("space", spaceReference).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }

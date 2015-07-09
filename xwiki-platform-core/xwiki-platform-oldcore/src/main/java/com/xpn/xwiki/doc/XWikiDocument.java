@@ -90,6 +90,7 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -540,11 +541,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private EntityReferenceSerializer<String> uidStringEntityReferenceSerializer;
 
-    /**
-     * @see #getLocalUidStringEntityReferenceSerializer()
-     */
-    private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
-
     private Provider<OldRendering> oldRenderingProvider;
 
     private JobProgressManager progress;
@@ -709,19 +705,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Used to compute document identifier.
-     */
-    private EntityReferenceSerializer<String> getLocalUidStringEntityReferenceSerializer()
-    {
-        if (this.localUidStringEntityReferenceSerializer == null) {
-            this.localUidStringEntityReferenceSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
-        }
-
-        return this.localUidStringEntityReferenceSerializer;
-    }
-
-    /**
      * Used to create proper {@link Syntax} objects.
      */
     private SyntaxFactory getSyntaxFactory()
@@ -808,7 +791,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private String getLocalKey()
     {
         if (this.localKeyCache == null) {
-            final String localUid = getLocalUidStringEntityReferenceSerializer().serialize(getDocumentReference());
+            final String localUid = LocalUidStringEntityReferenceSerializer.INSTANCE.serialize(getDocumentReference());
 
             if (StringUtils.isEmpty(getLanguage())) {
                 this.localKeyCache = localUid;

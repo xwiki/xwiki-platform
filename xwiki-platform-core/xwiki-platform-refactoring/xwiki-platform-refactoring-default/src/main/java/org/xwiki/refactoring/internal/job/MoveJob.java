@@ -154,7 +154,30 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
     private void move(DocumentReference oldReference, DocumentReference newReference, boolean deep)
     {
-        this.progressManager.pushLevelProgress(5, this);
+        this.progressManager.pushLevelProgress(2, this);
+
+        try {
+            // Step 1: Process the document itself.
+            this.progressManager.startStep(this);
+            move(oldReference, newReference);
+            this.progressManager.endStep(this);
+
+            // Note that we continue with the children even if moving the parent failed.
+
+            // Step 2: Process the child documents.
+            this.progressManager.startStep(this);
+            if (deep && !isTerminal(oldReference)) {
+                moveChildren(oldReference, newReference);
+            }
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void move(DocumentReference oldReference, DocumentReference newReference)
+    {
+        this.progressManager.pushLevelProgress(4, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -189,13 +212,6 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
                 delete(oldReference);
-            }
-            this.progressManager.endStep(this);
-
-            // Step 5: Process the child documents.
-            this.progressManager.startStep(this);
-            if (deep && !isTerminal(oldReference)) {
-                moveChildren(oldReference, newReference);
             }
             this.progressManager.endStep(this);
         } finally {

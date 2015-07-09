@@ -157,7 +157,7 @@ public class Utils
      * Get the object id given its components.
      * 
      * @param wikiName
-     * @param spaceName
+     * @param spaces
      * @param pageName
      * @param className
      * @param objectNumber
@@ -335,7 +335,7 @@ public class Utils
             if (pathElements[i] != null) {
                 try {
                     // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
-                    if ("spaceName".equals(pathVariableNames.get(i))) {
+                    if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
                         if (!(pathElements[i] instanceof List)) {
                             throw new RuntimeException("The 'spaceName' parameter must be a list!");
                         }

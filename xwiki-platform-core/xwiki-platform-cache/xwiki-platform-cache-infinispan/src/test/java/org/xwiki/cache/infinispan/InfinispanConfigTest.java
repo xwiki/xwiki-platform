@@ -19,10 +19,16 @@
  */
 package org.xwiki.cache.infinispan;
 
-import org.jmock.Expectations;
 import org.junit.Test;
+import org.xwiki.cache.infinispan.internal.InfinispanCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheManager;
+import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
 import org.xwiki.cache.tests.AbstractTestCache;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.annotation.ComponentList;
+
+import static org.mockito.Mockito.verify;
 
 /**
  * Verify that defining an Infinispan config file is taken into account.
@@ -30,6 +36,8 @@ import org.xwiki.environment.Environment;
  * @version $Id$
  * @since 3.4M1
  */
+@ComponentList(value = {InfinispanCacheFactory.class, DefaultCacheManager.class, DefaultCacheFactory.class,
+    DefaultCacheManagerConfiguration.class})
 public class InfinispanConfigTest extends AbstractTestCache
 {
     public InfinispanConfigTest()
@@ -42,12 +50,10 @@ public class InfinispanConfigTest extends AbstractTestCache
     {
         // We register a mock Container to verify that getCacheFactory() below will call
         // Environment#getResourceAsStream() which will mean that the configuration file is read.
-        final Environment environment = registerMockComponent(Environment.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(environment).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
-            will(returnValue(null));
-        }});
+        final Environment environment = this.componentManager.registerMockComponent(Environment.class);
 
         getCacheFactory();
+
+        verify(environment).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
     }
 }

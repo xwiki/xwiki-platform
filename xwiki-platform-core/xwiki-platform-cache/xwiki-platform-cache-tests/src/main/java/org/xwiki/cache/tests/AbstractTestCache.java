@@ -19,19 +19,20 @@
  */
 package org.xwiki.cache.tests;
 
-import org.jmock.Expectations;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 /**
  * Base class for testing cache component implementation.
  *
  * @version $Id$
  */
-public abstract class AbstractTestCache extends AbstractComponentTestCase
+public abstract class AbstractTestCache
 {
     /**
      * The first key.
@@ -54,6 +55,12 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
     protected static final int VALUE2 = 2;
 
     /**
+     * The Mockito tool.
+     */
+    @Rule
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
+
+    /**
      * The role hint of the cache component implementation to test.
      */
     protected String roleHint;
@@ -66,18 +73,17 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
         this.roleHint = roleHint;
     }
 
-    @Override
-    protected void registerComponents() throws Exception
+    /**
+     * Before.
+     * 
+     * @throws Exception when initialization fail
+     */
+    @Before
+    public void before() throws Exception
     {
-        final ConfigurationSource mockConfigurationSource =
-            registerMockComponent(ConfigurationSource.class, "xwikiproperties");
-        getMockery().checking(new Expectations() {
-            {
-                allowing(mockConfigurationSource)
-                    .getProperty(with(equal("cache.defaultCache")), with(any(Object.class)));
-                will(returnValue(roleHint));
-            }
-        });
+        MemoryConfigurationSource configuration = this.componentManager.registerMemoryConfigurationSource();
+
+        configuration.setProperty("cache.defaultCache", this.roleHint);
     }
 
     /**
@@ -86,7 +92,7 @@ public abstract class AbstractTestCache extends AbstractComponentTestCase
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = getComponentManager().getInstance(CacheManager.class);
+        CacheManager cacheManager = this.componentManager.getInstance(CacheManager.class);
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

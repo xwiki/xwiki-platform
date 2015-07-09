@@ -19,26 +19,18 @@
  */
 package org.xwiki.rest.script;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.rest.internal.Utils;
-import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.context.Execution;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rest.XWikiRestException;
+import org.xwiki.rest.url.RestURLGenerator;
 import org.xwiki.script.service.ScriptService;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Generate REST URLs for different types of resources.
@@ -51,47 +43,48 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class RESTScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String ERROR_KEY = "scriptservice.rest.error";
+    
     @Inject
-    private Provider<XWikiContext> contextProvider;
-    
-    private List<String> getSpaceList(List<SpaceReference> spaceReferences)
+    private RestURLGenerator restURLGenerator;
+
+    @Inject
+    private Execution execution;
+
+    /**
+     * @param reference an entity reference
+     * @return the REST URL corresponding to the referenced entity, or null if an error occurs
+     */
+    public URL url(EntityReference reference)
     {
-        List<String> spaces = new ArrayList<>(spaceReferences.size());
-        for (SpaceReference spaceReference : spaceReferences) {
-            spaces.add(spaceReference.getName());
-        }
-        return spaces;
-    }
-    
-    private URI getBaseURI()
-    {
-        // TODO: improve this method (too much use of oldcore)
         try {
-            XWikiContext context = contextProvider.get();
-            String baseURL = context.getURLFactory().getServerURL(context).toString();
-            baseURL += context.getRequest().getContextPath();
-            baseURL += "/rest";
-            return new URI(baseURL);
-        } catch (MalformedURLException | URISyntaxException e) {
-            // should never happen
+            return restURLGenerator.getURL(reference);
+        } catch (XWikiRestException e) {
+            setLastError(e);
             return null;
         }
     }
 
     /**
-     * @param documentReference a document reference
-     * @return the REST URL corresponding to the referenced document
+     * Get the error generated while performing the previously called action.
+     * @return an eventual exception or {@code null} if no exception was thrown
      */
-    public URL url(DocumentReference documentReference)
+    public XWikiRestException getLastError()
     {
-        // The idea is to use the UriBuilder of jax-rs to generate URLs that match the resources paths. 
-        // So it is consistent.
-        try {
-            return Utils.createURI(getBaseURI(), PageResource.class,
-                documentReference.getWikiReference().getName(), getSpaceList(documentReference.getSpaceReferences()),
-                    documentReference.getName()).toURL();
-        } catch (MalformedURLException e) {
-            return null;
-        }
+        return (XWikiRestException) this.execution.getContext().getProperty(ERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     */
+    private void setLastError(XWikiRestException e)
+    {
+        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

@@ -20,7 +20,7 @@
 package org.xwiki.url.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -46,13 +46,12 @@ public class DefaultURLConfiguration implements URLConfiguration
      * Defines from where to read the Resource configuration data.
      */
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource configuration;
+    private Provider<ConfigurationSource> configuration;
 
     @Override
     public String getURLFormatId()
     {
         // Note: the format corresponds to the component hint for the Resource Factory implementation to use.
-        return this.configuration.getProperty(PREFIX + "format", "standard");
+        return this.configuration.get().getProperty(PREFIX + "format", "standard");
     }
 }

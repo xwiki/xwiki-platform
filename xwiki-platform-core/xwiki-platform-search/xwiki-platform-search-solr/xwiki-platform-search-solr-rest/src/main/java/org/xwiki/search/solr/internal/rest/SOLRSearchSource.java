@@ -150,8 +150,8 @@ public class SOLRSearchSource extends AbstractSearchSource
                 searchResult.setVersion((String) document.get("version"));
 
                 searchResult.setType("page");
-                searchResult.setId(Utils.getPageId(searchResult.getWiki(), searchResult.getSpace(),
-                    searchResult.getPageName()));
+                searchResult.setId(Utils.getPageId(searchResult.getWiki(),
+                    Utils.getSpacesFromSpaceId(searchResult.getSpace()), searchResult.getPageName()));
 
                 searchResult.setScore(((Number) document.get("score")).floatValue());
                 searchResult.setAuthor((String) document.get("author"));

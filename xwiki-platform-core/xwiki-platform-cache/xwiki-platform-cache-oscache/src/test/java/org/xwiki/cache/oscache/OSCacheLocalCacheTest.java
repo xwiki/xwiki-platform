@@ -19,8 +19,15 @@
  */
 package org.xwiki.cache.oscache;
 
+import org.xwiki.cache.internal.DefaultCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheManager;
+import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
+import org.xwiki.cache.oscache.internal.LocalOSCacheCacheFactory;
 import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
+import org.xwiki.test.annotation.ComponentList;
 
+@ComponentList(value = {LocalOSCacheCacheFactory.class, DefaultCacheManager.class, DefaultCacheFactory.class,
+    DefaultCacheManagerConfiguration.class})
 public class OSCacheLocalCacheTest extends AbstractEvictionGenericTestCache
 {
     public OSCacheLocalCacheTest()

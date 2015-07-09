@@ -8,6 +8,6 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [useravatar] [username=XWiki.Admin|width=100|height=200]
-onImage [Typed = [true] Type = [attach] Reference = [XWiki.Admin@mockAvatar.png]] [false] [[alt]=[Picture of Admin][title]=[Admin][width]=[100][height]=[200]]
+onImage [Typed = [true] Type = [attach] Reference = [XWiki.Admin@mockAvatar.png]] [false] [[alt]=[Picture of Admin][height]=[200][title]=[Admin][width]=[100]]
 endMacroMarkerStandalone [useravatar] [username=XWiki.Admin|width=100|height=200]
 endDocument

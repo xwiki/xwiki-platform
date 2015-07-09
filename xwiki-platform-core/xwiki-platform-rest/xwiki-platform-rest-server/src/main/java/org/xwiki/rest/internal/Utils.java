@@ -124,14 +124,16 @@ public class Utils
 
     public static List<String> getSpacesFromSpaceId(String spaceId)
     {
+        return getSpacesHierarchy(resolveLocalSpaceId(spaceId, "whatever"));
+    }
+    
+    public static List<String> getSpacesHierarchy(SpaceReference spaceReference) 
+    {
         List<String> spaces = new ArrayList<>();
-        EntityReference spaceReference =  resolveLocalSpaceId(spaceId, "whatever");
-        
-        while(spaceReference != null && EntityType.SPACE == spaceReference.getType()) {
-            spaces.add(spaceReference.getName());
-            spaceReference = spaceReference.getParent();
+        for(EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE;
+                ref = ref.getParent()) {
+            spaces.add(ref.getName());
         }
-
         Collections.reverse(spaces);
         return spaces;
     }

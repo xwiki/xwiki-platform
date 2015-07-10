@@ -1761,6 +1761,10 @@ public class XWiki implements EventListener
         return getStore().search(sql, nb, start, whereParams, context);
     }
 
+    /**
+     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
+     */
+    @Deprecated
     public String parseContent(String content, XWikiContext xcontext)
     {
         return getOldRendering().parseContent(content, xcontext);

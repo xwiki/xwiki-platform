@@ -800,7 +800,9 @@ public class XWiki extends Api
      *
      * @param content
      * @return evaluated content if the content contains velocity scripts
+     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
      */
+    @Deprecated
     public String parseContent(String content)
     {
         return this.xwiki.parseContent(content, getXWikiContext());

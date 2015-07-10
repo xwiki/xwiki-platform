@@ -106,19 +106,24 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
             createSpaces(true, connection);
         }
 
+        private String createSpaceQuery(boolean hidden)
+        {
+            StringBuilder query = new StringBuilder("select DISTINCT XWD_WEB from xwikidoc where");
+            if (hidden) {
+                query.append("XWD_WEB not in (" + createSpaceQuery(false) + ")");
+            } else {
+                query.append("XWD_HIDDEN <> false OR XWD_HIDDEN IS NULL");
+            }
+
+            return query.toString();
+        }
+
         private List<EntityReference> getSpaces(boolean hidden, Connection connection) throws SQLException
         {
             List<EntityReference> spaces = Collections.emptyList();
 
             try (Statement selectStatement = connection.createStatement()) {
-                StringBuilder query = new StringBuilder("select DISTINCT XWD_WEB from xwikidoc where");
-                if (hidden) {
-                    query.append("doc.hidden = true");
-                } else {
-                    query.append("doc.hidden <> false OR doc.hidden IS NULL");
-                }
-
-                try (ResultSet result = selectStatement.executeQuery(query.toString())) {
+                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(hidden))) {
                     spaces = new ArrayList<>();
 
                     do {

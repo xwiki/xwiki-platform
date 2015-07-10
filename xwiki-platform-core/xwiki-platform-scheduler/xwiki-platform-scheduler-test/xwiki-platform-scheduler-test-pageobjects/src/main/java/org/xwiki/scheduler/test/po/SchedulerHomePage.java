@@ -60,13 +60,7 @@ public class SchedulerHomePage extends ViewPage
     public SchedulerEditPage clickJobActionEdit(String jobName)
     {
         clickAction(jobName, "Edit");
-
-        // Make sure we wait for the WYSIWYG fields to be loaded since otherwise they'll steal the focus and if we
-        // start typing in other fields before they're loaded what we type will end up in the wrong fields...
-        SchedulerEditPage sep = new SchedulerEditPage();
-        sep.waitForJobEditionToLoad();
-
-        return sep;
+        return new SchedulerEditPage();
     }
 
     public ConfirmationPage clickJobActionDelete(String jobName)
@@ -112,7 +106,6 @@ public class SchedulerHomePage extends ViewPage
     public SchedulerEditPage clickAdd()
     {
         this.addButton.click();
-
         return new SchedulerEditPage();
     }
 

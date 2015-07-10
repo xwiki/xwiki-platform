@@ -69,7 +69,7 @@ public class SchedulerHomePage extends ViewPage
         return new ConfirmationPage();
     }
 
-    public void clickJobActionScheduler(String jobName)
+    public void clickJobActionSchedule(String jobName)
     {
         clickAction(jobName, "Schedule");
     }

@@ -798,13 +798,15 @@ public abstract class XWikiAction extends Action
      *   <li>if A.B exists then continue</li>
      *   <li> if A.B doesn't exist then forward to A.B.WebHome</li>
      * </ul>
+     * In order to disable this redirect you should provide the {@code spaceRedirect=false} Query String parameter and
+     * value.
      *
      * @since 7.2M1
      */
     private boolean redirectSpaceURLs(String action, XWikiURLFactory urlf, XWiki xwiki, XWikiContext context)
         throws Exception
     {
-        if ( "view".equals(action)) {
+        if ("view".equals(action) && !"false".equalsIgnoreCase(context.getRequest().getParameter("spaceRedirect"))) {
             DocumentReference reference = xwiki.getDocumentReference(context.getRequest(), context);
             if (!xwiki.exists(reference, context)) {
                 String defaultDocumentName = Utils.getComponent(EntityReferenceProvider.class).getDefaultReference(

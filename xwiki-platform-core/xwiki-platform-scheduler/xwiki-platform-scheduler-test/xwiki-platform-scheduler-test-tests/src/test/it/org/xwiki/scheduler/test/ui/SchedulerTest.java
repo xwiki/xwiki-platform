@@ -41,24 +41,12 @@ public class SchedulerTest extends AbstractTest
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
-    /**
-     * Tests that a scheduler job page default edit mode is "inline"
-     */
-    @Test
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
-    public void testSchedulerJobDefaultEditMode()
-    {
-        getUtil().gotoPage("Scheduler", "WatchListDailyNotifier", "edit");
-        // This will wait for the WYSIWYG editor used to edit the job description to load.
-        new SchedulerEditPage().setJobDescription("test");
-    }
-
     @Test
     @IgnoreBrowsers({
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
     })
-    public void testJobActions()
+    public void testScheduler()
     {
         // Make sure the job doesn't exist. Note that we don't delete the job after the test is executed (@After)
         // because we want to remain on the same page in case of a test failure so that our TestDebugger rule can
@@ -80,6 +68,12 @@ public class SchedulerTest extends AbstractTest
 
         // View Job
         schedulerPage = schedulerHomePage.clickJobActionView(jobName);
+
+        // Tests that a scheduler job page's default edit mode is Form
+        // Note: This line below will fail if the page is not edited in Form mode!
+        schedulerPage.edit();
+        new SchedulerEditPage().setJobDescription("test");
+        schedulerEdit.clickCancel();
         schedulerHomePage = schedulerPage.backToHome();
 
         // Edit Job
@@ -93,13 +87,15 @@ public class SchedulerTest extends AbstractTest
         schedulerHomePage.clickJobActionDelete(jobName).clickYes();
         schedulerHomePage = SchedulerHomePage.gotoPage();
         Assert.assertFalse(getDriver().hasElementWithoutWaiting(By.linkText(jobName)));
-        getUtil().gotoPage("Scheduler", "SchedulerTestJob");
+        // Note: since the page doesn't exist, we need to disable the space redirect feature so that we end up on the
+        // terminal page that was removed.
+        getUtil().gotoPage("Scheduler", "SchedulerTestJob", "view", "spaceRedirect=false");
         getDriver().findElement(By.linkText("Restore")).click();
         schedulerPage = new SchedulerPage();
         schedulerPage.backToHome();
 
         // Schedule Job
-        schedulerHomePage.clickJobActionScheduler(jobName);
+        schedulerHomePage.clickJobActionSchedule(jobName);
         if (schedulerHomePage.hasError()) {
             Assert.fail("Failed to schedule job. Error [" + schedulerHomePage.getErrorMessage() + "]");
         }

@@ -51,5 +51,12 @@ public class ResourceTest extends AbstractTest
         getUtil().gotoPage(getUtil().getURL(new String[] {"edit", "A", "B"}, null, null));
         ep = new EditPage();
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));
+
+        // Verify that the spaceRedirect=false query string parameter and value can be used to disable the automatic
+        // space redirect
+        getUtil().gotoPage(getUtil().getURL(new String[] {"view", "A", "B"}, null, "spaceRedirect=false"));
+        new ViewPage().edit();
+        ep = new EditPage();
+        assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));
     }
 }

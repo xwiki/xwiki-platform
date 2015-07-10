@@ -21,6 +21,7 @@ package org.xwiki.resource.internal.entity;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,9 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -72,6 +76,15 @@ public class DefaultEntityResourceActionLister implements EntityResourceActionLi
         // Parse the Struts config file (struts-config.xml) to extract all available actions
         List<String> actionNames = new ArrayList<>();
         SAXBuilder builder = new SAXBuilder();
+
+        // Make sure we don't require an Internet Connection to parse the Struts config file!
+        builder.setEntityResolver(new EntityResolver() {
+            @Override public InputSource resolveEntity(String publicId, String systemId)
+                throws SAXException, IOException
+            {
+                return new InputSource(new StringReader(""));
+            }
+        });
 
         // Step 1: Get a stream on the Struts config file if it exists
         InputStream strutsConfigStream = this.environment.getResourceAsStream(getStrutsConfigResource());

@@ -447,7 +447,7 @@
                 IRC Bot application in a subwiki</justification>
             </difference>
 
-             See http://mojo.codehaus.org/clirr-maven-plugin/examples/ignored-differences.html
+             See http://www.mojohaus.org/clirr-maven-plugin/examples/ignored-differences.html
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
@@ -484,6 +484,30 @@
               <from>org.xwiki.extension.internal.safe.ScriptSafeProvider</from>
               <to>org.xwiki.script.internal.safe.ScriptSafeProvider</to>
               <justification>ScriptSafeProvider has been moved to xwiki-commons-script</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/web/ExportURLFactory</className>
+              <method>com.xpn.xwiki.web.ExportURLFactoryContext getExportURLFactoryContext()</method>
+              <justification>getExportURLFactoryContext() was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/web/ExportURLFactoryContext</className>
+              <justification>ExportURLFactoryContext was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
+            </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>com/xpn/xwiki/web/ExportURLFactoryActionHandler</className>
+              <method>java.net.URL createURL*</method>
+              <to>java.net.URL createURL*</to>
+              <justification>ExportURLFactoryActionHandler was unstable (young API). ExportURLFactoryContext been renamed to FilesystemExportContext and moved to the Filesystem URL scheme module</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/rest/resources/spaces/SpaceResource</className>
+              <method>org.xwiki.rest.model.jaxb.Space getSpace(java.lang.String, java.lang.String)</method>
+              <justification>This API has been changed to support nested spaces.</justification>
             </difference>
           </ignored>
           <excludes>

@@ -66,7 +66,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 filters.put("name", name);
             }
             if (!space.equals("")) {
-                filters.put("space", space);
+                filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
             }
             if (!author.equals("")) {
                 filters.put("author", author);

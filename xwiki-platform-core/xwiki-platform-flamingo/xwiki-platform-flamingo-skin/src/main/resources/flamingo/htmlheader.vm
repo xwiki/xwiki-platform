@@ -16,7 +16,7 @@
   #xwikiDataAttribute('space', $doc.space)
   #xwikiDataAttribute('page', $doc.name)
   #xwikiDataAttribute('version', $doc.version)
-  #xwikiDataAttribute('rest-url', "${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})")
+  #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------

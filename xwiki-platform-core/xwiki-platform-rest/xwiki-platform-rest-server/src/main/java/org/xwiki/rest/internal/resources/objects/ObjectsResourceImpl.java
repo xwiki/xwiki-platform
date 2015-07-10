@@ -91,7 +91,8 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
         }
 
         try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+            List<String> spaces = parseSpaceSegments(spaceName);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, false);
 
             Document doc = documentInfo.getDocument();
 
@@ -125,7 +126,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
 
             doc.save();
 
-            return Response.created(Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaceName,
+            return Response.created(Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces,
                 pageName, object.getClassName(), objectNumber)).entity(DomainObjectFactory.createObject(objectFactory,
                     uriInfo.getBaseUri(), Utils.getXWikiContext(componentManager), doc, xwikiObject, false,
                     Utils.getXWikiApi(componentManager), false)).build();

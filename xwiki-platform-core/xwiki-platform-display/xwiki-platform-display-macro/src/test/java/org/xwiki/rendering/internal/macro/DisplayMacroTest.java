@@ -92,14 +92,16 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroShowsVelocityMacrosAreIsolated() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
+            + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
             + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
             + "beginParagraph\n"
             + "onSpecialSymbol [#]\n"
             + "onWord [testmacro]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
+            + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
             + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the displayed page.
@@ -130,7 +132,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroWhenDisplayingDocumentWithRelativeReferences() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[displayedWiki:displayedSpace.displayedPage][source]=[displayedWiki:displayedSpace.displayedPage]]\n"
+            + "beginMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
+                + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"
             + "beginParagraph\n"
             + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
             + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
@@ -140,7 +143,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
             + "onSpace\n"
             + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][base]=[displayedWiki:displayedSpace.displayedPage][source]=[displayedWiki:displayedSpace.displayedPage]]\n"
+            + "endMetaData [[base]=[displayedWiki:displayedSpace.displayedPage]"
+                + "[source]=[displayedWiki:displayedSpace.displayedPage][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
 
         final DocumentReference displayedDocumentReference =
@@ -207,11 +211,11 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:space.relativePage][source]=[wiki:space.relativePage]]\n"
+            + "beginMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
             + "beginParagraph\n"
             + "onWord [content]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:space.relativePage][source]=[wiki:space.relativePage]]\n"
+            + "endMetaData [[base]=[wiki:space.relativePage][source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();
@@ -251,14 +255,16 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     public void testDisplayMacroWhenSectionSpecified() throws Exception
     {
         String expected = "beginDocument\n"
-            + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
+            + "beginMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
             + "beginHeader [1, Hsection]\n"
             + "onWord [section]\n"
             + "endHeader [1, Hsection]\n"
             + "beginParagraph\n"
             + "onWord [content2]\n"
             + "endParagraph\n"
-            + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]]\n"
+            + "endMetaData [[base]=[wiki:Space.DisplayedPage][source]=[wiki:Space.DisplayedPage]"
+                + "[syntax]=[XWiki 2.0]]\n"
             + "endDocument";
 
         DisplayMacroParameters parameters = new DisplayMacroParameters();

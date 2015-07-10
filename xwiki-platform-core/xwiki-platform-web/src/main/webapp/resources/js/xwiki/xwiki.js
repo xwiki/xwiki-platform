@@ -1249,7 +1249,7 @@ XWiki.Document = Class.create({
     var url = XWiki.Document.URLTemplate;
     url = url.replace("__space__", encodeURIComponent(this.space));
     url = url.replace("__page__", (this.page == 'WebHome') ? '' : encodeURIComponent(this.page));
-    url = url.replace("__action__/", (action == 'view') ? '' : (encodeURIComponent(action) + "/"));
+    url = url.replace("__action__/", encodeURIComponent(action) + "/");
     if (queryString) {
       url += '?' + queryString;
     }
@@ -1288,7 +1288,7 @@ if (htmlElement.readAttribute('data-xwiki-wiki')) {
   XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content
 } 
 XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
-if (htmlElement.readAttribute('data-xwiki-space')) {
+if (htmlElement.readAttribute('XWiki.Document.currentSpace')) {
   // HTML 5 attribute
   XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space');
 } else if ($$("meta[name=space]").length > 0) {

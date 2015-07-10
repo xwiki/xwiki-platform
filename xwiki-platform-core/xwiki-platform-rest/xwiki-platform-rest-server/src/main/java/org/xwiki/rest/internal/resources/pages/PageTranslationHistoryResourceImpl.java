@@ -49,21 +49,21 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        List<String> spaces = parseSpaceSegments(spaceName);
+        String spaceId = Utils.getLocalSpaceId(spaces);
 
         History history = new History();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
-
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
                 + " doc.space = :space and doc.name = :name and doc.language = :language"
                 + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
-
+            
             List<Object> queryResult = null;
-            queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceName).bindValue("name",
-                    pageName).setLimit(number).bindValue("language", language).setOffset(start).execute();
+            queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceId).bindValue("name",
+                    pageName).setLimit(number).bindValue("language", language).setOffset(start)
+                        .setWiki(wikiName).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
@@ -75,15 +75,13 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
                 String comment = (String) fields[5];
 
                 HistorySummary historySummary = DomainObjectFactory.createHistorySummary(objectFactory,
-                        uriInfo.getBaseUri(), wikiName, spaceName, pageName, language, nodeId.getVersion(), modifier,
+                        uriInfo.getBaseUri(), wikiName, spaces, pageName, language, nodeId.getVersion(), modifier,
                         modified, comment, Utils.getXWikiApi(componentManager), withPrettyNames);
 
                 history.getHistorySummaries().add(historySummary);
             }
         } catch (QueryException e) {
             throw new XWikiRestException(e);
-        } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return history;

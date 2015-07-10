@@ -31,6 +31,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
+import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -40,14 +41,9 @@ import org.xwiki.security.authorization.Right;
  * @since 7.2M1
  */
 @Component
-@Named(MoveJob.JOB_TYPE)
+@Named(RefactoringJobs.MOVE)
 public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStatus<MoveRequest>>
 {
-    /**
-     * The id of the job.
-     */
-    public static final String JOB_TYPE = "moveEntities";
-
     /**
      * Specifies whether all entities with the same name are to be overwritten on not. When {@code true} all entities
      * with the same name are overwritten. When {@code false} all entities with the same name are skipped. If
@@ -58,7 +54,7 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
     @Override
     public String getType()
     {
-        return JOB_TYPE;
+        return RefactoringJobs.MOVE;
     }
 
     @Override
@@ -142,7 +138,7 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         }
 
         // The move operation is currently implemented as Copy + Delete.
-        if (!hasAccess(Right.DELETE, oldReference)) {
+        if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
             this.logger.warn("You are not allowed to delete [{}].", oldReference);
             return;
         }
@@ -158,7 +154,30 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
     private void move(DocumentReference oldReference, DocumentReference newReference, boolean deep)
     {
-        this.progressManager.pushLevelProgress(5, this);
+        this.progressManager.pushLevelProgress(2, this);
+
+        try {
+            // Step 1: Process the document itself.
+            this.progressManager.startStep(this);
+            move(oldReference, newReference);
+            this.progressManager.endStep(this);
+
+            // Note that we continue with the children even if moving the parent failed.
+
+            // Step 2: Process the child documents.
+            this.progressManager.startStep(this);
+            if (deep && !isTerminal(oldReference)) {
+                moveChildren(oldReference, newReference);
+            }
+            this.progressManager.endStep(this);
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void move(DocumentReference oldReference, DocumentReference newReference)
+    {
+        this.progressManager.pushLevelProgress(4, this);
 
         try {
             // Step 1: Delete the destination document if needed.
@@ -191,13 +210,8 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
             // Step 4: Delete the source document.
             this.progressManager.startStep(this);
-            delete(oldReference);
-            this.progressManager.endStep(this);
-
-            // Step 5: Move the child documents.
-            this.progressManager.startStep(this);
-            if (deep && !isTerminal(oldReference)) {
-                moveChildren(oldReference, newReference);
+            if (this.request.isDeleteSource()) {
+                delete(oldReference);
             }
             this.progressManager.endStep(this);
         } finally {

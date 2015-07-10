@@ -219,12 +219,13 @@ public class BaseSearchResult extends XWikiResource
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
-                String spaceName = (String) fields[1];
+                String spaceId = (String) fields[1];
+                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
                 String pageName = (String) fields[2];
                 String language = (String) fields[3];
 
-                String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-                String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
+                String pageId = Utils.getPageId(wikiName, spaces, pageName);
+                String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
 
                 /* Check if the user has the right to see the found document */
                 if (xwikiApi.hasAccessLevel("view", pageId)) {
@@ -236,7 +237,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageFullName(pageFullName);
                     searchResult.setTitle(title);
                     searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceName);
+                    searchResult.setSpace(spaceId);
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
                     searchResult.setAuthor(doc.getAuthor());
@@ -251,13 +252,13 @@ public class BaseSearchResult extends XWikiResource
                     String pageUri = null;
                     if (StringUtils.isBlank(language)) {
                         pageUri =
-                            Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName,
+                            Utils.createURI(this.uriInfo.getBaseUri(), PageResource.class, wikiName, spaces,
                                 pageName).toString();
                     } else {
                         searchResult.setLanguage(language);
                         pageUri =
                             Utils.createURI(this.uriInfo.getBaseUri(), PageTranslationResource.class, wikiName,
-                                spaceName, pageName, language).toString();
+                                spaces, pageName, language).toString();
                     }
 
                     Link pageLink = new Link();
@@ -318,8 +319,9 @@ public class BaseSearchResult extends XWikiResource
                     .setOffset(start).execute();
 
             for (Object object : queryResult) {
-                String spaceName = (String) object;
-                Document spaceDoc = xwikiApi.getDocument(String.format("%s.WebHome", spaceName));
+                String spaceId = (String) object;
+                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
+                Document spaceDoc = xwikiApi.getDocument(String.format("%s.WebHome", spaceId));
 
                 /* Check if the user has the right to see the found document */
                 if (xwikiApi.hasAccessLevel("view", spaceDoc.getPrefixedFullName())) {
@@ -327,24 +329,24 @@ public class BaseSearchResult extends XWikiResource
 
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("space");
-                    searchResult.setId(Utils.getSpaceId(wikiName, spaceName));
+                    searchResult.setId(spaceId);
                     searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceName);
+                    searchResult.setSpace(spaceId);
                     searchResult.setTitle(title);
 
                     /* Add a link to the space information */
                     Link spaceLink = new Link();
                     spaceLink.setRel(Relations.SPACE);
                     String spaceUri =
-                        Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaceName).toString();
+                        Utils.createURI(uriInfo.getBaseUri(), SpaceResource.class, wikiName, spaces).toString();
                     spaceLink.setHref(spaceUri);
                     searchResult.getLinks().add(spaceLink);
 
                     /* Add a link to the webhome if it exists */
-                    String webHomePageId = Utils.getPageId(wikiName, spaceName, "WebHome");
+                    String webHomePageId = Utils.getPageId(wikiName, spaces, "WebHome");
                     if (xwikiApi.exists(webHomePageId) && xwikiApi.hasAccessLevel("view", webHomePageId)) {
                         String pageUri =
-                            Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName, "WebHome")
+                            Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, "WebHome")
                                 .toString();
 
                         Link pageLink = new Link();
@@ -453,15 +455,16 @@ public class BaseSearchResult extends XWikiResource
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
 
-                String spaceName = (String) fields[1];
+                String spaceId = (String) fields[1];
+                List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
                 String pageName = (String) fields[2];
                 String className = (String) fields[3];
                 int objectNumber = (Integer) fields[4];
 
-                String id = Utils.getObjectId(wikiName, spaceName, pageName, className, objectNumber);
+                String id = Utils.getObjectId(wikiName, spaces, pageName, className, objectNumber);
 
-                String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-                String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
+                String pageId = Utils.getPageId(wikiName, spaces, pageName);
+                String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
 
                 /*
                  * Check if the user has the right to see the found document. We also prevent guest users to access
@@ -476,7 +479,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setPageFullName(pageFullName);
                     searchResult.setTitle(title);
                     searchResult.setWiki(wikiName);
-                    searchResult.setSpace(spaceName);
+                    searchResult.setSpace(spaceId);
                     searchResult.setPageName(pageName);
                     searchResult.setVersion(doc.getVersion());
                     searchResult.setClassName(className);
@@ -491,7 +494,7 @@ public class BaseSearchResult extends XWikiResource
                     }
 
                     String pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName, pageName)
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, pageName)
                             .toString();
                     Link pageLink = new Link();
                     pageLink.setHref(pageUri);
@@ -499,7 +502,7 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.getLinks().add(pageLink);
 
                     String objectUri =
-                        Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaceName, pageName,
+                        Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, wikiName, spaces, pageName,
                             className, objectNumber).toString();
                     Link objectLink = new Link();
                     objectLink.setHref(objectUri);

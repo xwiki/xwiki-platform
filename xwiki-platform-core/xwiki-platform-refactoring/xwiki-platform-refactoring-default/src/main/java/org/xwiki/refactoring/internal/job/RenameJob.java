@@ -26,6 +26,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
  * A job that can rename entities.
@@ -34,18 +35,13 @@ import org.xwiki.model.reference.EntityReference;
  * @since 7.2M1
  */
 @Component
-@Named(RenameJob.JOB_TYPE)
+@Named(RefactoringJobs.RENAME)
 public class RenameJob extends MoveJob
 {
-    /**
-     * The id of the job.
-     */
-    public static final String JOB_TYPE = "renameEntity";
-
     @Override
     public String getType()
     {
-        return JOB_TYPE;
+        return RefactoringJobs.RENAME;
     }
 
     @Override

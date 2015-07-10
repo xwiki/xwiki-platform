@@ -108,14 +108,14 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         String expected =
             "beginDocument\n"
-                + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
+                + "beginMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
                 + "beginMacroMarkerStandalone [velocity] [] [#testmacro]\n"
                 + "beginParagraph\n"
                 + "onSpecialSymbol [#]\n"
                 + "onWord [testmacro]\n"
                 + "endParagraph\n"
                 + "endMacroMarkerStandalone [velocity] [] [#testmacro]\n"
-                + "endMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
+                + "endMetaData [[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
                 + "endDocument";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
@@ -131,7 +131,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         String expected =
             "beginDocument\n"
                 + "beginMetaData "
-                    + "[[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
+                    + "[[base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
                 + "beginMacroMarkerStandalone [velocity] [] [$foo]\n"
                 + "beginGroup [[class]=[xwikirenderingerror]]\n"
                 + "onWord [Failed to execute the [velocity] macro. Click on this message for details.]\n"
@@ -151,9 +151,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         String expected =
-            "beginDocument\n" + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage]]\n"
+            "beginDocument\n" + "beginMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n"
                 + "onMacroStandalone [velocity] [] [#testmacro]\n"
-                + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:Space.IncludedPage]]\n" + "endDocument";
+                + "endMetaData [[source]=[wiki:Space.IncludedPage][syntax]=[XWiki 2.0]]\n" + "endDocument";
 
         // We verify that a Velocity macro set in the including page is seen in the included page.
         List<Block> blocks =
@@ -185,7 +185,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         String expected =
             "beginDocument\n"
-                + "beginMetaData [[syntax]=[XWiki 2.0][base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage]]\n"
+                + "beginMetaData [[base]=[includedWiki:includedSpace.includedPage]"
+                    + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
                 + "beginParagraph\n"
                 + "beginLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
                 + "endLink [Typed = [false] Type = [doc] Reference = [page]] [false]\n"
@@ -195,7 +196,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
                 + "onSpace\n"
                 + "onImage [Typed = [false] Type = [attach] Reference = [test.png]] [true]\n"
                 + "endParagraph\n"
-                + "endMetaData [[syntax]=[XWiki 2.0][base]=[includedWiki:includedSpace.includedPage][source]=[includedWiki:includedSpace.includedPage]]\n"
+                + "endMetaData [[base]=[includedWiki:includedSpace.includedPage]"
+                    + "[source]=[includedWiki:includedSpace.includedPage][syntax]=[XWiki 2.0]]\n"
                 + "endDocument";
 
         final DocumentReference includedDocumentReference =
@@ -323,9 +325,9 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
         String expected =
-            "beginDocument\n" + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage]]\n"
+            "beginDocument\n" + "beginMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n"
                 + "beginParagraph\n" + "onWord [content]\n" + "endParagraph\n"
-                + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.relativePage]]\n" + "endDocument";
+                + "endMetaData [[source]=[wiki:space.relativePage][syntax]=[XWiki 2.0]]\n" + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("relativePage");
@@ -365,10 +367,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     public void testIncludeMacroWhenSectionSpecified() throws Exception
     {
         String expected =
-            "beginDocument\n" + "beginMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.document]]\n"
+            "beginDocument\n" + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
                 + "beginHeader [1, Hsection]\n" + "onWord [section]\n" + "endHeader [1, Hsection]\n"
                 + "beginParagraph\n" + "onWord [content2]\n" + "endParagraph\n"
-                + "endMetaData [[syntax]=[XWiki 2.0][source]=[wiki:space.document]]\n" + "endDocument";
+                + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n" + "endDocument";
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");

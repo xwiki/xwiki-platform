@@ -33,10 +33,25 @@ public interface RefactoringJobs
     /**
      * The role hint for the job that moves entities.
      */
-    String MOVE = "moveEntities";
+    String MOVE = "move";
 
     /**
      * The role hint for the job that renames entities.
      */
-    String RENAME = "renameEntity";
+    String RENAME = "rename";
+
+    /**
+     * The role hint of the job that copies entities.
+     */
+    String COPY = "copy";
+
+    /**
+     * The role hint of the job that copies entities with a different name or reference.
+     */
+    String COPY_AS = "copyAs";
+
+    /**
+     * The role hint of the job that deletes entities.
+     */
+    String DELETE = "delete";
 }

@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Comment;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/comments/{id}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/history/{version}/comments/{id}")
 public interface CommentVersionResource
 {
     @GET Comment getCommentVersion(

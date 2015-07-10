@@ -44,6 +44,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -104,29 +105,33 @@ public class ExportURLFactory extends XWikiServletURLFactory
     {
     }
 
-    public FilesystemExportContext getExportURLFactoryContext()
+    /**
+     * @since 7.2M1
+     */
+    @Unstable
+    public FilesystemExportContext getFilesystemExportContext()
     {
         return this.exportContext;
     }
 
     /**
      * @return the list skins names used.
-     * @deprecated since 6.2RC1, use {@link #getExportURLFactoryContext()}
+     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
      */
     @Deprecated
     public Collection<String> getNeededSkins()
     {
-        return getExportURLFactoryContext().getNeededSkins();
+        return getFilesystemExportContext().getNeededSkins();
     }
 
     /**
      * @return the list of custom skin files.
-     * @deprecated since 6.2RC1, use {@link #getExportURLFactoryContext()}
+     * @deprecated since 6.2RC1, use {@link #getFilesystemExportContext()}
      */
     @Deprecated
     public Collection<String> getExportedSkinFiles()
     {
-        return getExportURLFactoryContext().getExportedSkinFiles();
+        return getFilesystemExportContext().getExportedSkinFiles();
     }
 
     /**
@@ -145,10 +150,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
         this.exportContext = exportContextProvider.get();
 
         if (exportDir != null) {
-            getExportURLFactoryContext().setExportDir(exportDir);
+            getFilesystemExportContext().setExportDir(exportDir);
 
             // Backward-compatibility, also set the exportDir deprecated variable.
-            this.exportDir = getExportURLFactoryContext().getExportDir();
+            this.exportDir = getFilesystemExportContext().getExportDir();
         }
 
         if (exportedPages != null) {
@@ -169,10 +174,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
                 absolutePageName += doc.getFullName();
 
-                getExportURLFactoryContext().addExportedPage(absolutePageName);
+                getFilesystemExportContext().addExportedPage(absolutePageName);
 
                 // Backward-compatibility, also set the exportedPages deprecated variable.
-                this.exportedPages.addAll(getExportURLFactoryContext().getExportedPages());
+                this.exportedPages.addAll(getFilesystemExportContext().getExportedPages());
             }
         }
     }
@@ -181,7 +186,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
         try {
-            getExportURLFactoryContext().addNeededSkin(skin);
+            getFilesystemExportContext().addNeededSkin(skin);
 
             StringBuffer newPath = new StringBuffer("file://");
 
@@ -233,7 +238,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         try {
-            getExportURLFactoryContext().addNeededSkin(name);
+            getFilesystemExportContext().addNeededSkin(name);
 
             StringBuffer filePathBuffer = new StringBuffer();
             if (!skipSkinDirectory) {
@@ -245,10 +250,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String filePath = filePathBuffer.toString();
 
-            if (!getExportURLFactoryContext().hasExportedSkinFile(filePath)) {
-                getExportURLFactoryContext().addExportedSkinFile(filePath);
+            if (!getFilesystemExportContext().hasExportedSkinFile(filePath)) {
+                getFilesystemExportContext().addExportedSkinFile(filePath);
 
-                File file = new File(getExportURLFactoryContext().getExportDir(), filePath);
+                File file = new File(getFilesystemExportContext().getExportDir(), filePath);
                 if (!file.exists()) {
                     // Make sure the folder exists
                     File folder = file.getParentFile();
@@ -295,11 +300,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
             }
 
             // Adjust path for links inside CSS files.
-            getExportURLFactoryContext().pushCSSParentLevels(cssPathAdjustmentValue);
+            getFilesystemExportContext().pushCSSParentLevels(cssPathAdjustmentValue);
             try {
                 renderWithSkinAction(spaces, name, wikiId, path, context);
             } finally {
-                getExportURLFactoryContext().popCSSParentLevels();
+                getFilesystemExportContext().popCSSParentLevels();
             }
         } finally {
             fos.close();
@@ -373,7 +378,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {
-            File targetFile = new File(getExportURLFactoryContext().getExportDir(), "resources/" + filename);
+            File targetFile = new File(getFilesystemExportContext().getExportDir(), "resources/" + filename);
             if (!targetFile.exists()) {
                 if (!targetFile.getParentFile().exists()) {
                     targetFile.getParentFile().mkdirs();
@@ -422,7 +427,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             try {
                 ExportURLFactoryActionHandler handler = Utils.getComponent(ExportURLFactoryActionHandler.class, action);
                 return handler.createURL(spaces, name, querystring, anchor, xwikidb, context,
-                    getExportURLFactoryContext());
+                    getFilesystemExportContext());
             } catch (Exception e) {
                 // Failed to find such a component or it doesn't work, simply ignore it and continue with the default
                 // behavior!
@@ -432,7 +437,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String serializedReference = this.pathEntityReferenceSerializer.serialize(
                 new DocumentReference(wikiname, this.legacySpaceResolver.resolve(spaces), name));
-            if (getExportURLFactoryContext().hasExportedPage(serializedReference) && "view".equals(action)
+            if (getFilesystemExportContext().hasExportedPage(serializedReference) && "view".equals(action)
                 && context.getLinksAction() == null)
             {
                 StringBuffer newpath = new StringBuffer();
@@ -479,7 +484,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             new AttachmentReference(filename, documentReference));
         String path = "attachment/" + serializedReference;
 
-        File file = new File(getExportURLFactoryContext().getExportDir(), path);
+        File file = new File(getFilesystemExportContext().getExportDir(), path);
         if (!file.exists()) {
             XWikiDocument doc = context.getWiki().getDocument(documentReference, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
@@ -545,6 +550,6 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
     private void adjustCSSPath(StringBuffer path)
     {
-        path.append(StringUtils.repeat("../", getExportURLFactoryContext().getCSSParentLevel()));
+        path.append(StringUtils.repeat("../", getFilesystemExportContext().getCSSParentLevel()));
     }
 }

@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.attachments;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.inject.Named;
 import javax.mail.BodyPart;
@@ -70,7 +71,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
             throws XWikiRestException
     {
         try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
+            List<String> spaces = parseSpaceSegments(spaceName);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, true);
 
             Document doc = documentInfo.getDocument();
 
@@ -154,7 +156,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
                 return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
             } else {
                 return Response.created(Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
-                    spaceName, pageName, attachmentName)).entity(attachmentInfo.getAttachment()).build();
+                    spaces, pageName, attachmentName)).entity(attachmentInfo.getAttachment()).build();
             }
         } catch (Exception e) {
             throw new XWikiRestException(e);

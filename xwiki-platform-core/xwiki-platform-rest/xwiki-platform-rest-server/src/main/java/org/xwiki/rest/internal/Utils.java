@@ -20,6 +20,9 @@
 package org.xwiki.rest.internal;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -29,8 +32,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -59,39 +65,90 @@ public class Utils
      * @param pageName
      * @return The page id.
      */
-    public static String getPageId(String wikiName, String spaceName, String pageName)
-    {
+    public static String getPageId(String wikiName, List<String> spaceName, String pageName)
+    {        
         XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
         return document.getPrefixedFullName();
     }
+    
+    /**
+     * @param spaces the space hierarchy
+     * @param wikiName the name of the wiki
+     * @return the space reference
+     */
+    public static SpaceReference getSpaceReference(List<String> spaces, String wikiName)
+    {
+        EntityReference parentReference = new WikiReference(wikiName);
+        SpaceReference spaceReference = null;
+
+        for (String space : spaces) {
+            spaceReference = new SpaceReference(space, parentReference);
+            parentReference = spaceReference;
+        }
+
+        return spaceReference;
+    }
+
+    public static String getLocalSpaceId(List<String> spaces)
+    {
+        EntityReferenceSerializer<String> serializer =
+                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        // The wiki name cannot be not empty in a space reference, but its value has no importance since the local
+        // serializer does not use it
+        return serializer.serialize(getSpaceReference(spaces, "whatever"));
+    }
 
     /**
      * @param wikiName the name of the wiki that contains the space
-     * @param spaceName the space name
+     * @param spaces the spaces hierarchy
      * @return the space id
+     * @throws org.xwiki.rest.XWikiRestException
      */
-    public static String getSpaceId(String wikiName, String spaceName)
+    public static String getSpaceId(String wikiName, List<String> spaces)
     {
         EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
             com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
-        SpaceReference spaceReference = new SpaceReference(spaceName, new WikiReference(wikiName));
+        SpaceReference spaceReference = getSpaceReference(spaces, wikiName);
         return defaultEntityReferenceSerializer.serialize(spaceReference);
+    }
+    
+    public static SpaceReference resolveLocalSpaceId(String spaceId, String wikiName)
+    {
+        EntityReferenceResolver<String> resolver =
+                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
+        return new SpaceReference(resolver.resolve(spaceId, EntityType.SPACE, new WikiReference(wikiName)));
+    }
+
+    public static List<String> getSpacesFromSpaceId(String spaceId)
+    {
+        return getSpacesHierarchy(resolveLocalSpaceId(spaceId, "whatever"));
+    }
+    
+    public static List<String> getSpacesHierarchy(SpaceReference spaceReference) 
+    {
+        List<String> spaces = new ArrayList<>();
+        for(EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE;
+                ref = ref.getParent()) {
+            spaces.add(ref.getName());
+        }
+        Collections.reverse(spaces);
+        return spaces;
     }
 
     /**
      * Get the page full name given its components.
      * 
      * @param wikiName
-     * @param spaceName
+     * @param spaces
      * @param pageName
      * @return The page full name.
      */
-    public static String getPageFullName(String wikiName, String spaceName, String pageName)
+    public static String getPageFullName(String wikiName, List<String> spaces, String pageName)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -102,16 +159,16 @@ public class Utils
      * Get the object id given its components.
      * 
      * @param wikiName
-     * @param spaceName
+     * @param spaces
      * @param pageName
      * @param className
      * @param objectNumber
      * @return The object id.
      */
-    public static String getObjectId(String wikiName, String spaceName, String pageName, String className,
+    public static String getObjectId(String wikiName, List<String> spaces, String pageName, String className,
         int objectNumber)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaces, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -265,11 +322,29 @@ public class Utils
      */
     public static URI createURI(URI baseURI, java.lang.Class< ? > resourceClass, java.lang.Object... pathElements)
     {
+        UriBuilder uriBuilder = UriBuilder.fromUri(baseURI).path(resourceClass);
+
+        List<String> pathVariableNames = null;
+        if (pathElements.length > 0) {
+            // uriBuilder.toString() returns the path (see AbstractUriBuilder#toString())
+            // but it means UriBuilder must use AbstractUriBuilder from restlet.
+            // TODO: find a more generic way to not depend heavily on restlet.
+            pathVariableNames = getVariableNamesFromPathTemplate(uriBuilder.toString());
+        }
+          
         Object[] encodedPathElements = new String[pathElements.length];
         for (int i = 0; i < pathElements.length; i++) {
             if (pathElements[i] != null) {
                 try {
-                    encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                    // see generateEncodedSpacesURISegment() to understand why we manually handle "spaceName"
+                    if (i < pathVariableNames.size() && "spaceName".equals(pathVariableNames.get(i))) {
+                        if (!(pathElements[i] instanceof List)) {
+                            throw new RuntimeException("The 'spaceName' parameter must be a list!");
+                        }
+                        encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
+                    } else {
+                        encodedPathElements[i] = URIUtil.encodePath(pathElements[i].toString());
+                    }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
                 }
@@ -277,7 +352,64 @@ public class Utils
                 encodedPathElements[i] = null;
             }
         }
-        return UriBuilder.fromUri(baseURI).path(resourceClass).buildFromEncoded(encodedPathElements);
+        return uriBuilder.buildFromEncoded(encodedPathElements);
+    }
+
+    /**
+     * Parse a path template to find variables:
+     * e.g. with "/wikis/{wikiName}/spaces/{spaceName}/" it returns ['wikiName', 'spaceName'].
+     * @param pathTemplate the path template (from the resource)
+     * @return the list of variable names
+     */
+    private static List<String> getVariableNamesFromPathTemplate(String pathTemplate)
+    {
+        List<String> variables = new ArrayList<>();
+
+        boolean inVariable = false;
+        StringBuilder varName = new StringBuilder();
+
+        // Parse the whole string
+        for (int i = 0; i < pathTemplate.length(); ++i) {
+            char c = pathTemplate.charAt(i);
+            if (inVariable) {
+                if (c == '}') {
+                    variables.add(varName.toString());
+                    // we clear the varName buffer
+                    varName.delete(0, varName.length());
+                    inVariable = false;
+                } else {
+                    varName.append(c);
+                }
+            } else if (c == '{') {
+                inVariable = true;
+            }
+        }
+
+        return variables;
+    }
+
+    /**
+     * Generate an encoded segment for the 'spaceName' parameter of a resource URL.
+     *
+     * Using UriBuilder is an elegant way to generate a REST URL for a jax-rs resource. It takes the path from the
+     * resource (described with the @Path annotation) and fill the variable parts. However, we have introduced a special
+     * syntax for nested spaces (with /spaces/A/spaces/B, etc...) that is not supported by jax-rs. So we manually handle
+     * the spaceName part of the URL.
+     *
+     * @param spaces the list of spaces of the resource
+     * @return the encoded spaces segment of the URL
+     * @throws URIException if problems occur
+     */
+    private static String generateEncodedSpacesURISegment(List<Object> spaces) throws URIException
+    {
+        StringBuilder spaceSegment = new StringBuilder();
+        for (Object space : spaces) {
+            if (spaceSegment.length() > 0) {
+                spaceSegment.append("/spaces/");
+            }
+            spaceSegment.append(URIUtil.encodePath(space.toString()));
+        }
+        return spaceSegment.toString();
     }
 
     /**

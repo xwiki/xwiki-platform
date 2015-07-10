@@ -30,17 +30,20 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
  * Represents the actions possible on the Create Page template page.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
 public class CreatePagePage extends ViewPage
 {
-    @FindBy(id = "space")
+    @FindBy(id = "spaceReference")
     private WebElement spaceTextField;
 
-    @FindBy(id = "page")
+    @FindBy(id = "name")
     private WebElement pageTextField;
+
+    @FindBy(id = "terminal")
+    private WebElement isTerminalCheckbox;
 
     public static CreatePagePage gotoPage()
     {
@@ -123,9 +126,19 @@ public class CreatePagePage extends ViewPage
 
     public WYSIWYGEditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue)
     {
+        return createPageFromTemplate(spaceValue, pageValue, templateValue, false);
+    }
+
+    /**
+     * @since 7.2M1
+     */
+    public WYSIWYGEditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue,
+        boolean isTerminalPage)
+    {
         setSpace(spaceValue);
         setPage(pageValue);
         setTemplate(templateValue);
+        setTerminalPage(isTerminalPage);
         clickCreate();
         return new WYSIWYGEditPage();
     }
@@ -148,5 +161,27 @@ public class CreatePagePage extends ViewPage
     public void waitForFieldErrorMessage()
     {
         getDriver().waitUntilElementIsVisible(new ByChained(By.className("LV_invalid")));
+    }
+
+    /**
+     * @return true if the page to create should be a terminal page, false otherwise
+     * @since 7.2M1
+     */
+    public boolean isTerminalPage()
+    {
+        return this.isTerminalCheckbox.isSelected();
+    }
+
+    /**
+     * @param isTerminalPage true if the page to create is terminal, false otherwise
+     * @since 7.2M1
+     */
+    public void setTerminalPage(boolean isTerminalPage)
+    {
+        if (isTerminalPage && !this.isTerminalCheckbox.isSelected()) {
+            this.isTerminalCheckbox.click();
+        } else if (!isTerminalPage && this.isTerminalCheckbox.isSelected()) {
+            this.isTerminalCheckbox.click();
+        }
     }
 }

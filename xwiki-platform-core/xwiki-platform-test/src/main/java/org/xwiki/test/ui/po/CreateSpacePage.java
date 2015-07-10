@@ -26,13 +26,13 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
  * Represents the actions possible on the Create Space template page.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
 public class CreateSpacePage extends ViewPage
 {
-    @FindBy(id = "space")
+    @FindBy(id = "name")
     private WebElement spaceTextField;
 
     public WYSIWYGEditPage createSpace(String spaceValue)

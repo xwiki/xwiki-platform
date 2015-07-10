@@ -42,7 +42,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -107,11 +107,11 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     private ConfigurationSource xwikicfg;
 
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private AuthorizationManager authorizationManager;
 
     /**
      * Used to get the default document reference, which normally is used to represent the home page of a space.
-     * 
+     *
      * @see #getStaticTitle(DocumentModelBridge)
      */
     @Inject
@@ -156,7 +156,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
             try {
                 String title = rawTitle;
                 // Evaluate the title only if the document has script rights, otherwise use the raw title.
-                if (authorizationManager.hasAccess(Right.SCRIPT)) {
+                if (authorizationManager.hasAccess(Right.SCRIPT, document.getContentAuthorReference(),
+                    document.getDocumentReference())) {
                     title = evaluateTitle(rawTitle, document.getDocumentReference(), parameters);
                 }
                 return parseTitle(title);

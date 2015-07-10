@@ -509,6 +509,12 @@
               <method>org.xwiki.rest.model.jaxb.Space getSpace(java.lang.String, java.lang.String)</method>
               <justification>This API has been changed to support nested spaces.</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/bridge/DocumentModelBridge</className>
+              <method>org.xwiki.model.reference.DocumentReference getContentAuthorReference()</method>
+              <justification>Added missing methods to the DocumentModelBridge which are already implemented by XWikiDocument.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

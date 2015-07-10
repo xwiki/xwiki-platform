@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -87,6 +88,7 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 session.doWork(new R72001Work());
+
                 return Boolean.TRUE;
             }
         });
@@ -98,43 +100,48 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         public void execute(Connection connection) throws SQLException
         {
             // Copy hidden spaces
-            copySpaces(true, connection);
+            createSpaces(true, connection);
 
             // Copy visible spaces
-            copySpaces(true, connection);
+            createSpaces(true, connection);
         }
 
-        private void copySpaces(boolean hidden, Connection connection) throws SQLException
+        private List<EntityReference> getSpaces(boolean hidden, Connection connection) throws SQLException
+        {
+            List<EntityReference> spaces = Collections.emptyList();
+
+            try (Statement selectStatement = connection.createStatement()) {
+                StringBuilder query = new StringBuilder("select DISTINCT XWD_WEB from xwikidoc where");
+                if (hidden) {
+                    query.append("doc.hidden = true");
+                } else {
+                    query.append("doc.hidden <> false OR doc.hidden IS NULL");
+                }
+
+                try (ResultSet result = selectStatement.executeQuery(query.toString())) {
+                    spaces = new ArrayList<>();
+
+                    do {
+                        spaces.add(resolver.resolve(result.getString(1), EntityType.SPACE));
+                    } while (result.next());
+                }
+            }
+
+            return spaces;
+        }
+
+        private void createSpaces(boolean hidden, Connection connection) throws SQLException
         {
             // Get spaces
-            List<EntityReference> spaces = new ArrayList<>();
-            try (Statement selectStatement = connection.createStatement()) {
-                try (ResultSet result =
-                    selectStatement.executeQuery("select DISTINCT XWD_WEB from xwikidoc"
-                        + " where XWD_WEB like '%.%' OR XWD_WEB like '%\\\\%' OR XWD_WEB like '%:%'")) {
-                    convert(connection, result);
-                }
-            }
+            List<EntityReference> spaces = getSpaces(hidden, connection);
 
             // Create spaces in the xwikispace table
-            try (Statement selectStatement = connection.createStatement()) {
-                try (ResultSet result =
-                    selectStatement.executeQuery("select DISTINCT XWD_WEB from xwikidoc"
-                        + " where XWD_WEB like '%.%' OR XWD_WEB like '%\\\\%' OR XWD_WEB like '%:%'")) {
-                    convert(connection, result);
-                }
-            }
-        }
-    }
-
-    private void convert(Connection connection, ResultSet result) throws SQLException
-    {
-        if (result.next()) {
             try (PreparedStatement statement =
-                connection.prepareStatement("UPDATE xwikidoc set XWD_WEB = ? WHERE XWD_WEB = ?")) {
-                do {
-                    addBatch(statement, result.getString(1));
-                } while (result.next());
+                connection.prepareStatement("INSERT INTO xwikispace"
+                    + " (XWS_HIDDEN, XWS_REFERENCE, XWS_NAME, XWS_PARENT) VALUES (?, ?, ?, ?)")) {
+                for (EntityReference space : spaces) {
+                    addBatch(statement, space, hidden);
+                }
 
                 // Do all the changes
                 statement.executeBatch();
@@ -142,15 +149,21 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         }
     }
 
-    private void addBatch(PreparedStatement statement, String spaceName) throws SQLException
+    private void addBatch(PreparedStatement statement, EntityReference space, boolean hidden) throws SQLException
     {
-        // Convert the space name into a space reference
-        String spaceReference = serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
+        // hidden
+        statement.setBoolean(1, hidden);
 
-        statement.setString(1, spaceReference);
-        statement.setString(2, spaceName);
+        // reference
+        statement.setString(2, this.serializer.serialize(space));
 
-        // Add a conversion to the list
+        // name
+        statement.setString(3, space.getName());
+
+        // parent
+        statement.setString(4, this.serializer.serialize(space.getParent()));
+
+        // Add a space to the list
         statement.addBatch();
     }
 }

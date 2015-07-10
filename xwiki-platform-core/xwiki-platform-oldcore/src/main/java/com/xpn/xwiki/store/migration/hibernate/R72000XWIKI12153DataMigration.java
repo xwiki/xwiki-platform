@@ -119,7 +119,7 @@ public class R72000XWIKI12153DataMigration extends AbstractHibernateDataMigratio
     private void addBatch(PreparedStatement statement, String spaceName) throws SQLException
     {
         // Convert the space name into a space reference
-        String spaceReference = serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
+        String spaceReference = this.serializer.serialize(new EntityReference(spaceName, EntityType.SPACE));
 
         statement.setString(1, spaceReference);
         statement.setString(2, spaceName);

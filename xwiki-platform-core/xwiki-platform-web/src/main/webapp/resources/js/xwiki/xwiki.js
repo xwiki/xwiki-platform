@@ -1288,13 +1288,13 @@ if (htmlElement.readAttribute('data-xwiki-wiki')) {
   XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content
 } 
 XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
-if (htmlElement.readAttribute('XWiki.Document.currentSpace')) {
+if (htmlElement.readAttribute('data-xwiki-space')) {
   // HTML 5 attribute
   XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space');
 } else if ($$("meta[name=space]").length > 0) {
   // Old meta tag
   XWiki.Document.currentSpace = $$("meta[name=space]")[0].content
-} 
+}
 XWiki.Document.currentPage = XWiki.currentPage || "WebHome";
 if (htmlElement.readAttribute('data-xwiki-page')) {
     // HTML 5 attribute

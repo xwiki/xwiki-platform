@@ -36,9 +36,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.internal.NoOpQueryFilter;
@@ -66,12 +66,10 @@ public class Utils
      * @return The page id.
      */
     public static String getPageId(String wikiName, List<String> spaceName, String pageName)
-    {        
-        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
-
-        Document document = new Document(xwikiDocument, null);
-
-        return document.getPrefixedFullName();
+    {
+        EntityReferenceSerializer<String> serializer =
+                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        return serializer.serialize(new DocumentReference(wikiName, spaceName, pageName));
     }
     
     /**
@@ -98,6 +96,7 @@ public class Utils
                 com.xpn.xwiki.web.Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         // The wiki name cannot be not empty in a space reference, but its value has no importance since the local
         // serializer does not use it
+        // TODO: create a LocalSpaceReference class instead
         return serializer.serialize(getSpaceReference(spaces, "whatever"));
     }
 
@@ -117,9 +116,9 @@ public class Utils
     
     public static SpaceReference resolveLocalSpaceId(String spaceId, String wikiName)
     {
-        EntityReferenceResolver<String> resolver =
-                com.xpn.xwiki.web.Utils.getComponent(EntityReferenceResolver.TYPE_STRING);
-        return new SpaceReference(resolver.resolve(spaceId, EntityType.SPACE, new WikiReference(wikiName)));
+        SpaceReferenceResolver<String> resolver =
+                com.xpn.xwiki.web.Utils.getComponent(SpaceReferenceResolver.TYPE_STRING);
+        return resolver.resolve(spaceId, new WikiReference(wikiName));
     }
 
     public static List<String> getSpacesFromSpaceId(String spaceId)

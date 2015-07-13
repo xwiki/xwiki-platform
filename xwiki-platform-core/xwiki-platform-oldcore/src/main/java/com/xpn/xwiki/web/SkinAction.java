@@ -28,6 +28,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectPropertyReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -245,7 +247,8 @@ public class SkinAction extends XWikiAction
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
                     // Always force UTF-8, as this is the assumed encoding for text files.
                     String rawContent = new String(data, ENCODING);
-                    byte[] newdata = context.getWiki().parseContent(rawContent, context).getBytes(ENCODING);
+                    String evaluatedContent = context.getWiki().evaluateVelocity(rawContent, path);
+                    byte[] newdata = evaluatedContent.getBytes(ENCODING);
                     // If the content contained velocity code, then it should not be cached
                     if (Arrays.equals(newdata, data)) {
                         modified = context.getWiki().getResourceLastModificationDate(path);
@@ -300,7 +303,13 @@ public class SkinAction extends XWikiAction
             // the output to UTF-8.
             response.setCharacterEncoding(ENCODING);
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                content = context.getWiki().parseContent(content, context);
+                // Evaluate the file.
+                ObjectPropertyReference propertyReference =
+                    new ObjectPropertyReference(filename, object.getReference());
+                String namespace =
+                    ((EntityReferenceSerializer<String>) Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
+                        .serialize(propertyReference);
+                content = context.getWiki().evaluateVelocity(content, namespace);
             }
             byte[] data = content.getBytes(ENCODING);
             setupHeaders(response, mimetype, doc.getDate(), data.length);
@@ -334,7 +343,15 @@ public class SkinAction extends XWikiAction
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
                 byte[] data = attachment.getContent(context);
                 // Always force UTF-8, as this is the assumed encoding for text files.
-                data = context.getWiki().parseContent(new String(data, ENCODING), context).getBytes(ENCODING);
+                String velocityCode = new String(data, ENCODING);
+
+                // Evaluate the file.
+                String templateID =
+                    ((EntityReferenceSerializer<String>) Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
+                        .serialize(attachment.getReference());
+                String evaluatedContent = context.getWiki().evaluateVelocity(velocityCode, templateID);
+
+                data = evaluatedContent.getBytes(ENCODING);
                 response.setCharacterEncoding(ENCODING);
                 setupHeaders(response, mimetype, attachment.getDate(), data.length);
                 response.getOutputStream().write(data);

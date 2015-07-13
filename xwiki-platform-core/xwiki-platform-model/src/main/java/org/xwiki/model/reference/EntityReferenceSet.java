@@ -46,15 +46,6 @@ public class EntityReferenceSet
 
         public Map<String, EntityReferenceEntry> children;
 
-        public void add(EntityReferenceEntry entry)
-        {
-            if (this.children == null) {
-                this.children = new HashMap<>();
-            }
-
-            this.children.put(entry.name, entry);
-        }
-
         public EntityReferenceEntry add(String name, Map<String, Serializable> entityParameters)
         {
             if (this.children == null) {
@@ -111,14 +102,6 @@ public class EntityReferenceSet
         {
             this.type = type;
             this.name = name;
-        }
-
-        public EntityReferenceEntry(EntityReferenceEntry entry)
-        {
-            this(entry.type, entry.name);
-
-            this.children2 = entry.children2;
-            this.parameters = entry.parameters;
         }
 
         public EntityReferenceEntry add()
@@ -180,13 +163,6 @@ public class EntityReferenceSet
             return typedChildren;
         }
 
-        public void add(EntityReferenceEntry entry)
-        {
-            EntityReferenceEntryChildren child = getChildren(entry.type, true);
-
-            child.add(entry);
-        }
-
         public EntityReferenceEntry add(EntityType entityType, String entityName,
             Map<String, Serializable> entityParameters)
         {
@@ -204,11 +180,6 @@ public class EntityReferenceSet
 
                 this.parameters.add(entityParameters);
             }
-        }
-
-        public void reset()
-        {
-            this.children2 = null;
         }
 
         public boolean matches(EntityReference reference)

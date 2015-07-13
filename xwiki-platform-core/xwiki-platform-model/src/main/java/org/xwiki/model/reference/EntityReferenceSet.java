@@ -267,7 +267,7 @@ public class EntityReferenceSet
                 if (!currentEntry.matches(element)) {
                     return false;
                 }
-            } else if (currentEntry.childrenType.ordinal() < element.getType().ordinal()) {
+            } else if (currentEntry.name != null || currentEntry.childrenType.ordinal() < element.getType().ordinal()) {
                 return false;
             }
         }

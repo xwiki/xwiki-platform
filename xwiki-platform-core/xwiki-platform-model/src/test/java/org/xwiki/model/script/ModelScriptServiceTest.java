@@ -19,7 +19,8 @@
  */
 package org.xwiki.model.script;
 
-import static org.mockito.Mockito.*;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +38,10 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.model.script.ModelScriptService;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.model.script.ModelScriptService}.
@@ -128,6 +132,8 @@ public class ModelScriptServiceTest
             new EntityReference("wiki", EntityType.WIKI)))).thenReturn(reference);
 
         Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "", "page", "default"));
+        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", Collections.<String>emptyList(),
+                "page", "default"));
     }
 
     @Test
@@ -151,6 +157,8 @@ public class ModelScriptServiceTest
         when(this.resolver.resolve(new EntityReference("wiki", EntityType.WIKI))).thenReturn(reference);
 
         Assert.assertEquals(reference, this.service.createDocumentReference("wiki", "", "", "default"));
+        Assert.assertEquals(reference, this.service.createDocumentReference("wiki", Collections.<String>emptyList(),
+            "", "default"));
     }
 
     @Test
@@ -221,6 +229,11 @@ public class ModelScriptServiceTest
     {
         Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")),
             this.service.createSpaceReference("space", this.service.createWikiReference("wiki")));
+
+        Assert.assertEquals(
+                new SpaceReference("C", new SpaceReference("B", new SpaceReference("A", new WikiReference("wiki")))),
+                this.service.createSpaceReference(Arrays.asList("A", "B", "C"),
+                        this.service.createWikiReference("wiki")));
     }
 
     @Test

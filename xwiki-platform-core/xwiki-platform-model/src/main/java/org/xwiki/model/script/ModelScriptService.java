@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.script;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -99,6 +101,21 @@ public class ModelScriptService implements ScriptService
     }
 
     /**
+     * Create a Document Reference from a passed wiki, list of spaces and page names, which can be empty strings or
+     * {@code null} in which case they are resolved using the {@value #DEFAULT_RESOLVER_HINT} resolver.
+     *
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param spaces the list of spaces name to use (can be empty or null)
+     * @param page the page reference name to use (can be empty or null)
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @since 7.2M2
+     */
+    public DocumentReference createDocumentReference(String wiki, List<String> spaces, String page)
+    {
+        return createDocumentReference(wiki, spaces, page, DEFAULT_RESOLVER_HINT);
+    }
+
+    /**
      * Create a new reference with the passed {@link Locale}.
      * 
      * @param reference the reference (with or without locale)
@@ -124,12 +141,33 @@ public class ModelScriptService implements ScriptService
      */
     public DocumentReference createDocumentReference(String wiki, String space, String page, String hint)
     {
+        return createDocumentReference(wiki, StringUtils.isEmpty(space) ? null : Arrays.asList(space), page, hint);
+    }
+
+    /**
+     * Create a Document Reference from a passed wiki, list of spaces and page names, which can be empty strings or null
+     * in which case they are resolved against the Resolver having the hint passed as parameter. Valid hints are for 
+     * example "default", "current", "currentmixed".
+     *
+     * @param wiki the wiki reference name to use (can be empty or null)
+     * @param spaces the spaces list to use (can be empty or null)
+     * @param page the page reference name to use (can be empty or null)
+     * @param hint the hint of the Resolver to use in case any parameter is empty or null
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * 
+     * @since 7.2M2
+     */
+    public DocumentReference createDocumentReference(String wiki, List<String> spaces, String page, String hint)
+    {
         EntityReference reference = null;
         if (!StringUtils.isEmpty(wiki)) {
             reference = new EntityReference(wiki, EntityType.WIKI);
         }
-        if (!StringUtils.isEmpty(space)) {
-            reference = new EntityReference(space, EntityType.SPACE, reference);
+        
+        if (spaces != null && !spaces.isEmpty()) {
+            for (String space : spaces) {
+                reference = new EntityReference(space, EntityType.SPACE, reference);
+            }
         }
         if (!StringUtils.isEmpty(page)) {
             reference = new EntityReference(page, EntityType.DOCUMENT, reference);
@@ -192,6 +230,25 @@ public class ModelScriptService implements ScriptService
     public SpaceReference createSpaceReference(String spaceName, WikiReference parent)
     {
         return new SpaceReference(spaceName, parent);
+    }
+
+    /**
+     * Creates a {@link SpaceReference} from a list of string representing the space name and the name of its parents.
+     *
+     * @param spaces the list of the spaces name (eg ["A", "B", "C"])
+     * @param parent the wiki reference in which the space is located
+     * @return the reference to the space
+     * @since 7.2M2
+     */
+    public SpaceReference createSpaceReference(List<String> spaces, WikiReference parent)
+    {
+        SpaceReference spaceReference = null;
+        EntityReference parentReference = parent;
+        for (String space : spaces) {
+            spaceReference = new SpaceReference(space, parentReference);
+            parentReference = spaceReference;
+        }
+        return spaceReference;
     }
 
     /**

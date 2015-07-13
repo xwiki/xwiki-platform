@@ -248,6 +248,22 @@ public class EntityReferenceSetTest
     }
 
     @Test
+    public void testIncludeDocumentsInNestedSpaces()
+    {
+        includesDocument("wiki:space.document");
+        includesDocument("wiki:space.nestedspace.document");
+
+        assertMatchesDocument("wiki:space.document");
+        assertMatchesDocument("wiki:space.nestedspace.document");
+
+        assertNotMatchesDocument("wiki:space.othernestedspace.document");
+        assertNotMatchesDocument("notwiki:space.nestedspace.document");
+        assertNotMatchesDocument("wiki:notspace.nestedspace.document");
+        assertNotMatchesDocument("wiki:space.nestedspace.notdocument");
+        assertNotMatchesDocument("wiki:space.nestedspace.othernestedspace.document");
+    }
+
+    @Test
     public void testExcludeWiki()
     {
         excludesWiki("wiki");

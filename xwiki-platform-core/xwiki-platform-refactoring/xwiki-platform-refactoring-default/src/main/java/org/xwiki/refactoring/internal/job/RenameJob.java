@@ -60,7 +60,7 @@ public class RenameJob extends MoveJob
 
         EntityReference destination = this.request.getDestination();
         if (source.getType() != destination.getType()) {
-            this.logger.warn("You cannot change the entity type (from [{}] to [{}]).", source.getType(),
+            this.logger.error("You cannot change the entity type (from [{}] to [{}]).", source.getType(),
                 destination.getType());
             return;
         }
@@ -69,10 +69,10 @@ public class RenameJob extends MoveJob
     }
 
     @Override
-    protected void move(DocumentReference source, EntityReference destination)
+    protected void startMove(DocumentReference source, EntityReference destination)
     {
         // We know the destination is a document (see above).
-        maybeMove(source, new DocumentReference(destination));
+        startMove(source, new DocumentReference(destination));
     }
 
     @Override
@@ -80,12 +80,11 @@ public class RenameJob extends MoveJob
     {
         // Perform checks that are specific to the document source/destination type.
 
-        if (isTerminal(newReference) && !isTerminal(oldReference) && this.request.isDeep()) {
-            this.logger.warn("You cannot transform a non-terminal document [{}] into a terminal document [{}]"
+        if (isTerminalDocument(newReference) && !isTerminalDocument(oldReference) && this.request.isDeep()) {
+            this.logger.error("You cannot transform a non-terminal document [{}] into a terminal document [{}]"
                 + " and preserve its child documents at the same time.", oldReference, newReference);
-            return;
+        } else {
+            super.maybeMove(oldReference, newReference);
         }
-
-        super.maybeMove(oldReference, newReference);
     }
 }

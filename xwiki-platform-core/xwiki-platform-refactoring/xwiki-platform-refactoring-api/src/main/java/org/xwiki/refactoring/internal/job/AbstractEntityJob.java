@@ -28,8 +28,10 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceTreeNode;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -46,7 +48,25 @@ import org.xwiki.security.authorization.Right;
 public abstract class AbstractEntityJob<R extends EntityRequest, S extends EntityJobStatus<? super R>> extends
     AbstractJob<R, S> implements GroupedJob
 {
+    /**
+     * Generic interface used to implement the Visitor pattern.
+     * 
+     * @param <T> the type of nodes that are visited
+     * @version $Id$
+     */
+    public interface Visitor<T>
+    {
+        /**
+         * Visit the given node.
+         * 
+         * @param node the node to visit
+         */
+        void visit(T node);
+    }
+
     private static final JobGroupPath ROOT_GROUP = new JobGroupPath("refactoring", null);
+
+    private static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
 
     /**
      * Specifies the group this job is part of. If all the entities involved in this operation are from the same wiki
@@ -67,7 +87,7 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     /**
      * Used to distinguish between terminal and non-terminal (WebHome) documents.
      * 
-     * @see #isTerminal(EntityReference)
+     * @see #isTerminalDocument(DocumentReference)
      */
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -109,7 +129,6 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
                 } else {
                     this.progressManager.startStep(this);
                     process(entityReference);
-                    this.progressManager.endStep(this);
                 }
             }
         } finally {
@@ -164,9 +183,76 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
             || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
     }
 
-    protected boolean isTerminal(EntityReference entityReference)
+    private boolean hasDefaultName(EntityReference entityReference)
     {
-        return !entityReference.getName().equals(
+        return entityReference.getName().equals(
             this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()).getName());
+    }
+
+    protected boolean isTerminalDocument(DocumentReference documentReference)
+    {
+        return !hasDefaultName(documentReference);
+    }
+
+    protected boolean isNestedDocument(EntityReference entityReference)
+    {
+        return entityReference.getType() == EntityType.DOCUMENT && hasDefaultName(entityReference);
+    }
+
+    protected boolean isPreferencesDocument(EntityReference entityReference)
+    {
+        return entityReference.getType() == EntityType.DOCUMENT
+            && PREFERENCES_DOCUMENT_NAME.equals(entityReference.getName());
+    }
+
+    protected DocumentReference getPreferencesDocumentReference(DocumentReference documentReference)
+    {
+        return new DocumentReference(PREFERENCES_DOCUMENT_NAME, documentReference.getLastSpaceReference());
+    }
+
+    protected void visitNestedDocuments(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        EntityType nodeType = node.getReference().getType();
+        if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI) {
+            // A node that can have nested documents.
+            Collection<EntityReferenceTreeNode> children = node.getChildren();
+            this.progressManager.pushLevelProgress(children.size(), this);
+
+            try {
+                // Visit the descendant documents first, and then the WebHome & WebPreferences documents on this level.
+                EntityReferenceTreeNode webHomeNode = null;
+                EntityReferenceTreeNode webPreferencesNode = null;
+                for (EntityReferenceTreeNode child : children) {
+                    if (isNestedDocument(child.getReference())) {
+                        webHomeNode = child;
+                        continue;
+                    } else if (isPreferencesDocument(child.getReference())) {
+                        webPreferencesNode = child;
+                        continue;
+                    }
+                    visitNestedDocumentsStep(child, visitor);
+                }
+
+                if (webHomeNode != null) {
+                    visitNestedDocumentsStep(webHomeNode, visitor);
+                }
+
+                if (webPreferencesNode != null) {
+                    visitNestedDocumentsStep(webPreferencesNode, visitor);
+                }
+            } finally {
+                this.progressManager.popLevelProgress(this);
+            }
+        } else if (nodeType == EntityType.DOCUMENT) {
+            visitor.visit((DocumentReference) node.getReference());
+        }
+    }
+
+    private void visitNestedDocumentsStep(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        this.progressManager.startStep(this);
+        if (!this.status.isCanceled()) {
+            visitNestedDocuments(node, visitor);
+        }
     }
 }

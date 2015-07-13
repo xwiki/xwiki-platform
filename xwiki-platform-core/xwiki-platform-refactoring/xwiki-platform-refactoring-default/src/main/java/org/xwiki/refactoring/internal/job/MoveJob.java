@@ -86,10 +86,10 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
         switch (source.getType()) {
             case DOCUMENT:
-                move(new DocumentReference(source), destination);
+                startMove(new DocumentReference(source), destination);
                 break;
             default:
-                this.logger.warn("Unsupported source entity type [{}].", source.getType());
+                this.logger.error("Unsupported source entity type [{}].", source.getType());
         }
     }
 
@@ -102,30 +102,76 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         return parent != null;
     }
 
-    protected void move(DocumentReference source, EntityReference destination)
+    protected void startMove(DocumentReference source, EntityReference destination)
     {
         // Compute the reference of the destination document.
 
-        EntityReference currentParent = isTerminal(source) ? source.getParent() : source.getParent().getParent();
+        EntityReference currentParent =
+            isTerminalDocument(source) ? source.getParent() : source.getParent().getParent();
         EntityReference newReference = source.removeParent(currentParent);
 
         EntityReference newParent = destination;
         if (destination.getType() == EntityType.DOCUMENT) {
-            if (isTerminal(destination)) {
-                this.logger.warn("The destination document [{}] cannot have child documents.", destination);
+            if (isTerminalDocument(new DocumentReference(destination))) {
+                this.logger.error("The destination document [{}] cannot have child documents.", destination);
                 return;
             } else {
                 // The destination is a WebHome (nested) document so the new parent is its parent space.
                 newParent = destination.getParent();
             }
         } else if (destination.getType() != EntityType.SPACE
-            && (destination.getType() != EntityType.WIKI || isTerminal(source))) {
-            this.logger.warn("Unsupported destination entity type [{}].", destination.getType());
+            && (destination.getType() != EntityType.WIKI || isTerminalDocument(source))) {
+            this.logger.error("Unsupported destination entity type [{}].", destination.getType());
             return;
         }
 
         newReference = newReference.appendParent(newParent);
-        maybeMove(source, new DocumentReference(newReference));
+        startMove(source, new DocumentReference(newReference));
+    }
+
+    protected void startMove(final DocumentReference oldReference, final DocumentReference newReference)
+    {
+        this.progressManager.pushLevelProgress(3, this);
+
+        try {
+            // Step 1: Process the nested documents.
+            this.progressManager.startStep(this);
+            if (this.request.isDeep() && !isTerminalDocument(oldReference)) {
+                visitNestedDocuments(oldReference, new Visitor<DocumentReference>()
+                {
+                    @Override
+                    public void visit(DocumentReference oldChildReference)
+                    {
+                        DocumentReference newChildReference =
+                            oldChildReference.replaceParent(oldReference.getParent(), newReference.getParent());
+                        maybeMove(oldChildReference, newChildReference);
+                    }
+                });
+            }
+
+            // Step 2: Process the document itself.
+            this.progressManager.startStep(this);
+            maybeMove(oldReference, newReference);
+
+            // Step 3: Process the document preferences (WebPreferences).
+            this.progressManager.startStep(this);
+            if (!this.request.isDeep() && !isTerminalDocument(oldReference)) {
+                // Non-terminal (WebHome) documents can have a preferences child document (WebPreferences), which is
+                // processed along with the other child documents if the operation is deep. Otherwise, if deep=false, we
+                // need to copy the preferences document so that the access rights are preserved on the new location.
+                DocumentReference oldPreferencesReference = getPreferencesDocumentReference(oldReference);
+                DocumentReference newPreferencesReference = getPreferencesDocumentReference(newReference);
+                boolean deleteSource = this.request.isDeleteSource();
+                this.request.setDeleteSource(false);
+                try {
+                    maybeMove(oldPreferencesReference, newPreferencesReference);
+                } finally {
+                    this.request.setDeleteSource(deleteSource);
+                }
+            }
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
     }
 
     protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)
@@ -134,44 +180,15 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
         if (!exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
-            return;
-        }
-
-        // The move operation is currently implemented as Copy + Delete.
-        if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
-            this.logger.warn("You are not allowed to delete [{}].", oldReference);
-            return;
-        }
-
-        if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
+        } else if (this.request.isDeleteSource() && !hasAccess(Right.DELETE, oldReference)) {
+            // The move operation is implemented as Copy + Delete.
+            this.logger.error("You are not allowed to delete [{}].", oldReference);
+        } else if (!hasAccess(Right.VIEW, newReference) || !hasAccess(Right.EDIT, newReference)
             || (exists(newReference) && !hasAccess(Right.DELETE, newReference))) {
-            this.logger.warn("You don't have sufficient permissions over the destination document [{}].", newReference);
-            return;
-        }
-
-        move(oldReference, newReference, this.request.isDeep());
-    }
-
-    private void move(DocumentReference oldReference, DocumentReference newReference, boolean deep)
-    {
-        this.progressManager.pushLevelProgress(2, this);
-
-        try {
-            // Step 1: Process the document itself.
-            this.progressManager.startStep(this);
+            this.logger
+                .error("You don't have sufficient permissions over the destination document [{}].", newReference);
+        } else {
             move(oldReference, newReference);
-            this.progressManager.endStep(this);
-
-            // Note that we continue with the children even if moving the parent failed.
-
-            // Step 2: Process the child documents.
-            this.progressManager.startStep(this);
-            if (deep && !isTerminal(oldReference)) {
-                moveChildren(oldReference, newReference);
-            }
-            this.progressManager.endStep(this);
-        } finally {
-            this.progressManager.popLevelProgress(this);
         }
     }
 
@@ -192,28 +209,24 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
                     return;
                 }
             }
-            this.progressManager.endStep(this);
 
             // Step 2: Copy the source document to the destination.
             this.progressManager.startStep(this);
             if (!copy(oldReference, newReference)) {
                 return;
             }
-            this.progressManager.endStep(this);
 
             // Step 3: Update the links.
             this.progressManager.startStep(this);
             if (this.request.isUpdateLinks()) {
                 updateLinks(oldReference, newReference);
             }
-            this.progressManager.endStep(this);
 
             // Step 4: Delete the source document.
             this.progressManager.startStep(this);
             if (this.request.isDeleteSource()) {
                 delete(oldReference);
             }
-            this.progressManager.endStep(this);
         } finally {
             this.progressManager.popLevelProgress(this);
         }
@@ -239,37 +252,40 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         }
     }
 
-    private void moveChildren(DocumentReference oldReference, DocumentReference newReference)
+    private void updateLinks(DocumentReference oldReference, DocumentReference newReference)
     {
-        List<DocumentReference> oldChildReferences = getChildren(oldReference);
-
-        this.progressManager.pushLevelProgress(oldChildReferences.size(), this);
+        this.progressManager.pushLevelProgress(2, this);
 
         try {
-            for (DocumentReference oldChildReference : oldChildReferences) {
-                if (this.status.isCanceled()) {
-                    break;
-                } else {
-                    this.progressManager.startStep(this);
-
-                    DocumentReference newChildReference =
-                        oldChildReference.replaceParent(oldReference.getParent(), newReference.getParent());
-                    // We don't have to move recursively because #getChildDocuments() returns all the descendants
-                    // actually (because we don't have a way to retrieve the direct child documents at the moment).
-                    move(oldChildReference, newChildReference, false);
-
-                    this.progressManager.endStep(this);
-                }
+            // Step 1: Update the links that target the old reference to point to the new reference.
+            this.progressManager.startStep(this);
+            if (this.request.isDeleteSource()) {
+                updateBackLinks(oldReference, newReference);
             }
+
+            // Step 2: Update the relative links from the document content.
+            this.progressManager.startStep(this);
+            updateRelativeLinks(oldReference, newReference);
         } finally {
             this.progressManager.popLevelProgress(this);
         }
     }
 
-    private void updateLinks(DocumentReference oldReference, DocumentReference newReference)
+    private void updateBackLinks(DocumentReference oldReference, DocumentReference newReference)
     {
-        // TODO: Update back links
-        // TODO: Refactor links from doc content
+        List<DocumentReference> backlinkDocumentReferences = getBackLinkedReferences(oldReference);
+        this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
+
+        try {
+            for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
+                this.progressManager.startStep(this);
+                if (hasAccess(Right.EDIT, backlinkDocumentReference)) {
+                    renameLinks(backlinkDocumentReference, oldReference, newReference);
+                }
+            }
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
     }
 
     @Override

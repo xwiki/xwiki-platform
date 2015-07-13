@@ -67,6 +67,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -82,6 +83,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.XWikiSpace;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -639,16 +641,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            if (doc.isNew()) {
-                // Create new space if needed
-                String documentSpace = doc.getSpace();
-                if (!spaceExists(documentSpace)) {
-                    addSpace(doc.getDocumentReference().getLastSpaceReference());
-                }
-            } else {
-                // Update space hidden property if needed
-                updateSpaceHidden(doc);
-            }
+            // Update space table
+            updateXWikiSpaceTable(doc, session);
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -675,6 +669,76 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
+    }
+
+    private void updateXWikiSpaceTable(XWikiDocument document, Session session)
+    {
+        if (!document.isNew()) {
+            if (document.isHidden() != document.getOriginalDocument().isHidden()) {
+                // Hidden status did not changed
+                return;
+            }
+        }
+
+        updateParentSpace(document.getDocumentReference().getLastSpaceReference(), document.isNew(),
+            document.isHidden(), session);
+    }
+
+    private void insertXWikiSpace(XWikiSpace space, Session session)
+    {
+        // Insert the space
+        session.save(space);
+
+        // Update parent space
+        if (space.getSpaceReference().getParent() instanceof SpaceReference) {
+            updateParentSpace((SpaceReference) space.getSpaceReference().getParent(), true, space.isHidden(), session);
+        }
+    }
+
+    private void updateXWikiSpaceHidden(XWikiSpace space, boolean hidden, Session session)
+    {
+        // Update the space
+        session.update(space);
+
+        // Update parent space
+        if (space.getSpaceReference().getParent() instanceof SpaceReference) {
+            updateParentSpace((SpaceReference) space.getSpaceReference().getParent(), true, space.isHidden(), session);
+        }
+    }
+
+    private void updateParentSpace(SpaceReference spaceReference, boolean childNew, boolean childHidden, Session session)
+    {
+        XWikiSpace space = loadXWikiSpace(spaceReference, session);
+
+        if (space == null) {
+            space = new XWikiSpace(spaceReference);
+            space.setHidden(childHidden);
+
+            insertXWikiSpace(space, session);
+        } else {
+            if (childNew) {
+                // New document has been created
+                if (space.isHidden() && !childHidden) {
+                    updateXWikiSpaceHidden(space, false, session);
+                }
+            } else {
+                // Document hidden status changed
+                if (space.isHidden() != childHidden) {
+                    // Check if the space hidden status need to be updated if it's not the same than the document
+                    if (space.isHidden() != calculateHiddenStatus(spaceReference, session)) {
+                        updateXWikiSpaceHidden(space, !space.isHidden(), session);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Find hidden status of a space from its children.
+     */
+    private boolean calculateHiddenStatus(SpaceReference spaceReference, Session session)
+    {
+        
     }
 
     private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
@@ -922,8 +986,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // We need to ensure that the deleted document becomes the original document
             doc.setOriginalDocument(doc.clone());
 
-            // Update space table if needed (when this was the last document in the space)
+            // Update space table if needed (when this was the last entity in the space)
             String documentSpace = doc.getSpace();
+            boolean spaceDeleted = false;
             int spaceDocuments = countDocuments(documentSpace);
             if (spaceDocuments == 1) {
                 // The document is the last document in the space
@@ -931,11 +996,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (spaceSpaces == 0) {
                     // The space does not contain any subspace
                     deleteSpace(documentSpace);
+                    spaceDeleted = true;
                 }
             }
 
-            // Update space hidden property if needed
-            updateSpaceHidden(doc);
+            // Update space hidden property if needed (and if the space still exist)
+            if (!spaceDeleted) {
+                updateParentSpace(doc.getDocumentReference().getLastSpaceReference(), false, true, session);
+            }
 
             if (bTransaction) {
                 endTransaction(context, true);

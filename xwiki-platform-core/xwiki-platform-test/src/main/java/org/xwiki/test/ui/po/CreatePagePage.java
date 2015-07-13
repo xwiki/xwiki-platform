@@ -118,8 +118,14 @@ public class CreatePagePage extends ViewPage
 
     public WYSIWYGEditPage createPage(String spaceValue, String pageValue)
     {
+        return createPage(spaceValue, pageValue, false);
+    }
+
+    public WYSIWYGEditPage createPage(String spaceValue, String pageValue, boolean isTerminalPage)
+    {
         setSpace(spaceValue);
         setPage(pageValue);
+        setTerminalPage(isTerminalPage);
         clickCreate();
         return new WYSIWYGEditPage();
     }

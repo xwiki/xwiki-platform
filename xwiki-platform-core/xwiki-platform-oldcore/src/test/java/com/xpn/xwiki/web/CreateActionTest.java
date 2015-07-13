@@ -165,6 +165,29 @@ public class CreateActionTest
     }
 
     @Test
+    public void newDocumentWebHomeTopLevelFromURL() throws Exception
+    {
+        // new document = xwiki:X.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: The title is not "WebHome", but "X" (the space's name) to avoid exposing "WebHome" in the UI.
+        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
+    }
+
+    @Test
     public void newDocumentWebHomeFromURL() throws Exception
     {
         // new document = xwiki:X.Y.WebHome
@@ -183,7 +206,8 @@ public class CreateActionTest
         // Verify null is returned (this means the response has been returned)
         assertNull(result);
 
-        // Note: The title is not "WebHome", but "Y" (the space's name) to avoid exposing "WebHome" in the UI.
+        // Note1: The bebavior is the same for both a top level space and a child space WebHome.
+        // Note2: The title is not "WebHome", but "Y" (the space's name) to avoid exposing "WebHome" in the UI.
         verify(mockURLFactory).createURL("X.Y", "WebHome", "edit", "template=&title=Y", null, "xwiki", context);
     }
 
@@ -211,6 +235,33 @@ public class CreateActionTest
 
         // Note: We are creating X.Y instead of X.Y.WebHome because the tocreate parameter says "terminal".
         verify(mockURLFactory).createURL("X", "Y", "edit", "template=&title=Y", null, "xwiki", context);
+    }
+
+    @Test
+    public void newDocumentWebHomeTopLevelSpaceButTerminalFromURL() throws Exception
+    {
+        // new document = xwiki:X.WebHome
+        DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("X"), "WebHome");
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.isNew()).thenReturn(true);
+
+        context.setDoc(document);
+
+        // Pass the tocreate=terminal request parameter
+        when(mockRequest.getParameter("tocreate")).thenReturn("terminal");
+
+        // Run the action
+        String result = action.render(context);
+
+        // The tests are below this line!
+
+        // Verify null is returned (this means the response has been returned)
+        assertNull(result);
+
+        // Note: We are creating X.WebHome even if the tocreate parameter says "terminal" because there is nowhere else
+        // to go upwards since we are already in a top level space.
+        verify(mockURLFactory).createURL("X", "WebHome", "edit", "template=&title=X", null, "xwiki", context);
     }
 
     @Test

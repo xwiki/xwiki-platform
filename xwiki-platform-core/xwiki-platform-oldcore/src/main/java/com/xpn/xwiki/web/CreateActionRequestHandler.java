@@ -192,7 +192,8 @@ public class CreateActionRequestHandler
                 // Determine the new document values from the request.
 
                 String spaceReferenceParameter = request.getParameter(SPACE_REFERENCE);
-                // We can have an empty spaceReference parameter symbolizing that we are creating a top level space/ND.
+                // We can have an empty spaceReference parameter symbolizing that we are creating a top level space or
+                // non-terminal document.
                 if (StringUtils.isNotEmpty(spaceReferenceParameter)) {
                     EntityReferenceResolver<String> genericResolver =
                         Utils.getComponent(EntityReferenceResolver.TYPE_STRING, CURRENT_RESOLVER_HINT);
@@ -201,6 +202,9 @@ public class CreateActionRequestHandler
                         genericResolver.resolve(spaceReferenceParameter, EntityType.SPACE);
                     spaceReference = new SpaceReference(resolvedEntityReference);
                 }
+
+                // Note: We leave the spaceReference variable intentionally null to symbolize a top level space or
+                // non-terminal document.
 
                 name = request.getParameter(NAME);
 
@@ -240,15 +244,32 @@ public class CreateActionRequestHandler
             // ...unless explicitly overridden from the request.
             isSpace &= !TOCREATE_TERMINAL.equals(toCreate);
 
+            // Determine if the current document is in a top-level space.
+            EntityReference parentSpaceReference = spaceReference.getParent();
+            boolean isTopLevelSpace = parentSpaceReference.extractReference(EntityType.SPACE) == null;
+
+            // If overridden from the request to be a terminal document but we can`t go up any further (already in a
+            // top-level space), there is nothing left to do.
+            if (!isSpace && isTopLevelSpace) {
+                return;
+            }
+
+            // Go one level above...
+
             // Determine its name.
             name = spaceReference.getName();
 
             // Determine its space reference.
-            EntityReference parentSpaceReference = spaceReference.getParent();
-            if (parentSpaceReference != null && parentSpaceReference.extractReference(EntityType.SPACE) != null) {
-                // Only set it if it's not a top level document.
-                spaceReference = new SpaceReference(parentSpaceReference.extractReference(EntityType.SPACE));
+            if (!isTopLevelSpace) {
+                // The parent reference is a space reference. Use it.
+                spaceReference = new SpaceReference(parentSpaceReference);
+            } else {
+                // Top level document, i.e. the parent reference is a wiki reference. Clear the spaceReference variable
+                // so that this case is properly handled later on (as if an empty value was passed as parameter in the
+                // request).
+                spaceReference = null;
             }
+
         }
     }
 

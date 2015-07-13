@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro;
 
-import static org.xwiki.rendering.test.BlockAssert.*;
-
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -28,12 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
 import org.hamcrest.collection.IsArray;
 import org.jmock.Expectations;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.CustomAction;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.context.Execution;
@@ -59,8 +56,12 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
+
+import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
+import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
 
 /**
  * Unit tests for {@link IncludeMacro}.
@@ -81,6 +82,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
      */
     private DocumentReferenceResolver<String> mockDocumentReferenceResolver;
 
+    private AuthorizationManager mockAuthorization;
+
     @Override
     public void setUp() throws Exception
     {
@@ -97,8 +100,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
+
         this.mockDocumentReferenceResolver =
             registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
+        this.mockAuthorization = registerMockComponent(AuthorizationManager.class);
+
         this.includeMacro = getComponentManager().getInstance(Macro.class, "include");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }

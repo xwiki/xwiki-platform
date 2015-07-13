@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -52,6 +51,7 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
@@ -67,6 +67,8 @@ public class DisplayMacroTest extends AbstractComponentTestCase
     private DisplayMacro displayMacro;
 
     private PrintRendererFactory rendererFactory;
+
+    private AuthorizationManager mockAuthorization;
 
     @Override
     public void setUp() throws Exception
@@ -84,6 +86,9 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         super.registerComponents();
 
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
+
+        this.mockAuthorization = registerMockComponent(AuthorizationManager.class);
+
         this.displayMacro = (DisplayMacro) getComponentManager().getInstance(Macro.class, "display");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }

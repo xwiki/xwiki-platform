@@ -110,8 +110,8 @@ public class RepositoryTest extends AbstractExtensionAdminAuthenticatedTest
 
         // Create extension
 
-        getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), null,
-            "first_name", "User", "last_name", "Name");
+        getUtil().createUserAndLogin(USER_CREDENTIALS.getUserName(), USER_CREDENTIALS.getPassword(), "first_name",
+            "User", "last_name", "Name");
 
         ExtensionsPage extensionsPage = ExtensionsPage.gotoPage();
 

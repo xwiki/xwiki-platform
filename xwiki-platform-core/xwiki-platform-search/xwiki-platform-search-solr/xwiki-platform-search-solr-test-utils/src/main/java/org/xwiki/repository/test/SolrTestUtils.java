@@ -48,6 +48,10 @@ public class SolrTestUtils
     private void initService()
     {
         if (!this.testUtils.pageExists(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE)) {
+            // Make sure we create this page with SuperAdmin rights so that it has SR and PR when executed by tests.
+            testUtils.loginAsSuperAdmin();
+
+            // Create the utility page.
             this.testUtils.createPage(SOLRSERVICE_SPACE, SOLRSERVICE_PAGE,
                 "{{velocity}}$services.solr.queueSize{{/velocity}}", null);
         }

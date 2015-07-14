@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 
@@ -306,10 +307,7 @@ public class SkinAction extends XWikiAction
                 // Evaluate the file.
                 ObjectPropertyReference propertyReference =
                     new ObjectPropertyReference(filename, object.getReference());
-                String namespace =
-                    ((EntityReferenceSerializer<String>) Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
-                        .serialize(propertyReference);
-                content = context.getWiki().evaluateVelocity(content, namespace);
+                content = evaluateVelocity(content, propertyReference, context);
             }
             byte[] data = content.getBytes(ENCODING);
             setupHeaders(response, mimetype, doc.getDate(), data.length);
@@ -319,6 +317,16 @@ public class SkinAction extends XWikiAction
             LOGGER.debug("Object field not found or empty");
         }
         return false;
+    }
+
+    private String evaluateVelocity(String content, EntityReference reference, XWikiContext context)
+    {
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        String namespace = serializer.serialize(reference);
+
+        content = context.getWiki().evaluateVelocity(content, namespace);
+
+        return content;
     }
 
     /**
@@ -346,10 +354,7 @@ public class SkinAction extends XWikiAction
                 String velocityCode = new String(data, ENCODING);
 
                 // Evaluate the file.
-                String templateID =
-                    ((EntityReferenceSerializer<String>) Utils.getComponent(EntityReferenceSerializer.TYPE_STRING))
-                        .serialize(attachment.getReference());
-                String evaluatedContent = context.getWiki().evaluateVelocity(velocityCode, templateID);
+                String evaluatedContent = evaluateVelocity(velocityCode, attachment.getReference(), context);
 
                 data = evaluatedContent.getBytes(ENCODING);
                 response.setCharacterEncoding(ENCODING);

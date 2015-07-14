@@ -24,6 +24,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -60,6 +61,9 @@ public class DeleteJob extends AbstractOldCoreEntityJob<EntityRequest, EntityJob
             case DOCUMENT:
                 process(new DocumentReference(entityReference));
                 break;
+            case SPACE:
+                process(new SpaceReference(entityReference));
+                break;
             default:
                 this.logger.error("Unsupported entity type [{}].", entityReference.getType());
         }
@@ -67,31 +71,23 @@ public class DeleteJob extends AbstractOldCoreEntityJob<EntityRequest, EntityJob
 
     private void process(DocumentReference documentReference)
     {
-        this.progressManager.pushLevelProgress(2, this);
-
-        try {
-            // Step 1: Delete the nested documents.
-            this.progressManager.startStep(this);
-            if (this.request.isDeep() && !isTerminalDocument(documentReference)) {
-                visitNestedDocuments(documentReference, new Visitor<DocumentReference>()
-                {
-                    @Override
-                    public void visit(DocumentReference nestedDocument)
-                    {
-                        maybeDelete(nestedDocument);
-                    }
-                });
-            }
-
-            // Note that the WebPreferences document is not deleted when deep=false because it holds the rights
-            // configuration for the nested documents (which are not deleted).
-
-            // Step 2: Delete the document itself, if possible.
-            this.progressManager.startStep(this);
+        if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
+            process(documentReference.getLastSpaceReference());
+        } else {
             maybeDelete(documentReference);
-        } finally {
-            this.progressManager.popLevelProgress(this);
         }
+    }
+
+    private void process(SpaceReference spaceReference)
+    {
+        visitDocuments(spaceReference, new Visitor<DocumentReference>()
+        {
+            @Override
+            public void visit(DocumentReference documentReference)
+            {
+                maybeDelete(documentReference);
+            }
+        });
     }
 
     private void maybeDelete(DocumentReference documentReference)

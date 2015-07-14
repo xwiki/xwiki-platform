@@ -85,9 +85,9 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     private AuthorizationManager authorization;
 
     /**
-     * Used to distinguish between terminal and non-terminal (WebHome) documents.
+     * Used to distinguish the space home page.
      * 
-     * @see #isTerminalDocument(DocumentReference)
+     * @see #isSpaceHomeReference(DocumentReference)
      */
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -183,76 +183,59 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
             || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
     }
 
-    private boolean hasDefaultName(EntityReference entityReference)
+    protected boolean isSpaceHomeReference(DocumentReference documentReference)
     {
-        return entityReference.getName().equals(
-            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()).getName());
+        return documentReference.getName().equals(
+            this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName());
     }
 
-    protected boolean isTerminalDocument(DocumentReference documentReference)
-    {
-        return !hasDefaultName(documentReference);
-    }
-
-    protected boolean isNestedDocument(EntityReference entityReference)
-    {
-        return entityReference.getType() == EntityType.DOCUMENT && hasDefaultName(entityReference);
-    }
-
-    protected boolean isPreferencesDocument(EntityReference entityReference)
+    private boolean isSpacePreferencesReference(EntityReference entityReference)
     {
         return entityReference.getType() == EntityType.DOCUMENT
             && PREFERENCES_DOCUMENT_NAME.equals(entityReference.getName());
     }
 
-    protected DocumentReference getPreferencesDocumentReference(DocumentReference documentReference)
+    protected void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
     {
-        return new DocumentReference(PREFERENCES_DOCUMENT_NAME, documentReference.getLastSpaceReference());
-    }
-
-    protected void visitNestedDocuments(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
-    {
-        EntityType nodeType = node.getReference().getType();
-        if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI) {
-            // A node that can have nested documents.
-            Collection<EntityReferenceTreeNode> children = node.getChildren();
-            this.progressManager.pushLevelProgress(children.size(), this);
-
-            try {
-                // Visit the descendant documents first, and then the WebHome & WebPreferences documents on this level.
-                EntityReferenceTreeNode webHomeNode = null;
-                EntityReferenceTreeNode webPreferencesNode = null;
-                for (EntityReferenceTreeNode child : children) {
-                    if (isNestedDocument(child.getReference())) {
-                        webHomeNode = child;
-                        continue;
-                    } else if (isPreferencesDocument(child.getReference())) {
-                        webPreferencesNode = child;
-                        continue;
-                    }
-                    visitNestedDocumentsStep(child, visitor);
-                }
-
-                if (webHomeNode != null) {
-                    visitNestedDocumentsStep(webHomeNode, visitor);
-                }
-
-                if (webPreferencesNode != null) {
-                    visitNestedDocumentsStep(webPreferencesNode, visitor);
-                }
-            } finally {
-                this.progressManager.popLevelProgress(this);
-            }
+        EntityReference nodeReference = node.getReference();
+        EntityType nodeType = nodeReference != null ? nodeReference.getType() : null;
+        if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI || nodeType == null) {
+            // A node that corresponds to an entity that can contain documents.
+            visitDocumentAncestor(node, visitor);
         } else if (nodeType == EntityType.DOCUMENT) {
             visitor.visit((DocumentReference) node.getReference());
         }
     }
 
-    private void visitNestedDocumentsStep(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    private void visitDocumentAncestor(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        Collection<EntityReferenceTreeNode> children = node.getChildren();
+        this.progressManager.pushLevelProgress(children.size(), this);
+
+        try {
+            // Visit the space preferences document at the end as otherwise we may loose the space access rights.
+            EntityReferenceTreeNode spacePreferencesNode = null;
+            for (EntityReferenceTreeNode child : children) {
+                if (isSpacePreferencesReference(child.getReference())) {
+                    spacePreferencesNode = child;
+                    continue;
+                }
+                visitDocumentAncestorStep(child, visitor);
+            }
+
+            if (spacePreferencesNode != null) {
+                visitDocumentAncestorStep(spacePreferencesNode, visitor);
+            }
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void visitDocumentAncestorStep(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
     {
         this.progressManager.startStep(this);
         if (!this.status.isCanceled()) {
-            visitNestedDocuments(node, visitor);
+            visitDocumentNodes(node, visitor);
         }
     }
 }

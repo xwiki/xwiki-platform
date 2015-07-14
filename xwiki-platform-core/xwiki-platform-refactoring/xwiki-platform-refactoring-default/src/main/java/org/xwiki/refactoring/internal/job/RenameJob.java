@@ -26,6 +26,7 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
 /**
@@ -69,22 +70,27 @@ public class RenameJob extends MoveJob
     }
 
     @Override
-    protected void startMove(DocumentReference source, EntityReference destination)
+    protected void process(DocumentReference source, EntityReference destination)
     {
         // We know the destination is a document (see above).
-        startMove(source, new DocumentReference(destination));
+        DocumentReference destinationDocumentReference = new DocumentReference(destination);
+        if (this.request.isDeep() && isSpaceHomeReference(source)) {
+            if (isSpaceHomeReference(destinationDocumentReference)) {
+                // Rename an entire space.
+                process(source.getLastSpaceReference(), destinationDocumentReference.getLastSpaceReference());
+            } else {
+                this.logger.error("You cannot transform a non-terminal document [{}] into a terminal document [{}]"
+                    + " and preserve its child documents at the same time.", source, destinationDocumentReference);
+            }
+        } else {
+            maybeMove(source, destinationDocumentReference);
+        }
     }
 
     @Override
-    protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)
+    protected void process(SpaceReference source, EntityReference destination)
     {
-        // Perform checks that are specific to the document source/destination type.
-
-        if (isTerminalDocument(newReference) && !isTerminalDocument(oldReference) && this.request.isDeep()) {
-            this.logger.error("You cannot transform a non-terminal document [{}] into a terminal document [{}]"
-                + " and preserve its child documents at the same time.", oldReference, newReference);
-        } else {
-            super.maybeMove(oldReference, newReference);
-        }
+        // We know the destination is a space (see above).
+        process(source, new SpaceReference(destination));
     }
 }

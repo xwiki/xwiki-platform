@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.OverwriteQuestion;
@@ -86,7 +87,10 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
 
         switch (source.getType()) {
             case DOCUMENT:
-                startMove(new DocumentReference(source), destination);
+                process(new DocumentReference(source), destination);
+                break;
+            case SPACE:
+                process(new SpaceReference(source), destination);
                 break;
             default:
                 this.logger.error("Unsupported source entity type [{}].", source.getType());
@@ -102,76 +106,43 @@ public class MoveJob extends AbstractOldCoreEntityJob<MoveRequest, EntityJobStat
         return parent != null;
     }
 
-    protected void startMove(DocumentReference source, EntityReference destination)
+    protected void process(DocumentReference source, EntityReference destination)
     {
-        // Compute the reference of the destination document.
-
-        EntityReference currentParent =
-            isTerminalDocument(source) ? source.getParent() : source.getParent().getParent();
-        EntityReference newReference = source.removeParent(currentParent);
-
-        EntityReference newParent = destination;
-        if (destination.getType() == EntityType.DOCUMENT) {
-            if (isTerminalDocument(new DocumentReference(destination))) {
-                this.logger.error("The destination document [{}] cannot have child documents.", destination);
-                return;
-            } else {
-                // The destination is a WebHome (nested) document so the new parent is its parent space.
-                newParent = destination.getParent();
-            }
-        } else if (destination.getType() != EntityType.SPACE
-            && (destination.getType() != EntityType.WIKI || isTerminalDocument(source))) {
-            this.logger.error("Unsupported destination entity type [{}].", destination.getType());
-            return;
+        if (this.request.isDeep() && isSpaceHomeReference(source)) {
+            process(source.getLastSpaceReference(), destination);
+        } else if (destination.getType() == EntityType.SPACE) {
+            maybeMove(source, new DocumentReference(source.getName(), new SpaceReference(destination)));
+        } else if (destination.getType() == EntityType.DOCUMENT
+            && isSpaceHomeReference(new DocumentReference(destination))) {
+            maybeMove(source, new DocumentReference(source.getName(), new SpaceReference(destination.getParent())));
+        } else {
+            this.logger.error("Unsupported destination entity type [{}] for a document.", destination.getType());
         }
-
-        newReference = newReference.appendParent(newParent);
-        startMove(source, new DocumentReference(newReference));
     }
 
-    protected void startMove(final DocumentReference oldReference, final DocumentReference newReference)
+    protected void process(SpaceReference source, EntityReference destination)
     {
-        this.progressManager.pushLevelProgress(3, this);
-
-        try {
-            // Step 1: Process the nested documents.
-            this.progressManager.startStep(this);
-            if (this.request.isDeep() && !isTerminalDocument(oldReference)) {
-                visitNestedDocuments(oldReference, new Visitor<DocumentReference>()
-                {
-                    @Override
-                    public void visit(DocumentReference oldChildReference)
-                    {
-                        DocumentReference newChildReference =
-                            oldChildReference.replaceParent(oldReference.getParent(), newReference.getParent());
-                        maybeMove(oldChildReference, newChildReference);
-                    }
-                });
-            }
-
-            // Step 2: Process the document itself.
-            this.progressManager.startStep(this);
-            maybeMove(oldReference, newReference);
-
-            // Step 3: Process the document preferences (WebPreferences).
-            this.progressManager.startStep(this);
-            if (!this.request.isDeep() && !isTerminalDocument(oldReference)) {
-                // Non-terminal (WebHome) documents can have a preferences child document (WebPreferences), which is
-                // processed along with the other child documents if the operation is deep. Otherwise, if deep=false, we
-                // need to copy the preferences document so that the access rights are preserved on the new location.
-                DocumentReference oldPreferencesReference = getPreferencesDocumentReference(oldReference);
-                DocumentReference newPreferencesReference = getPreferencesDocumentReference(newReference);
-                boolean deleteSource = this.request.isDeleteSource();
-                this.request.setDeleteSource(false);
-                try {
-                    maybeMove(oldPreferencesReference, newPreferencesReference);
-                } finally {
-                    this.request.setDeleteSource(deleteSource);
-                }
-            }
-        } finally {
-            this.progressManager.popLevelProgress(this);
+        if (destination.getType() == EntityType.SPACE || destination.getType() == EntityType.WIKI) {
+            process(source, new SpaceReference(source.getName(), destination));
+        } else if (destination.getType() == EntityType.DOCUMENT
+            && isSpaceHomeReference(new DocumentReference(destination))) {
+            process(source, new SpaceReference(source.getName(), destination.getParent()));
+        } else {
+            this.logger.error("Unsupported destination entity type [{}] for a space.", destination.getType());
         }
+    }
+
+    protected void process(final SpaceReference source, final SpaceReference destination)
+    {
+        visitDocuments(source, new Visitor<DocumentReference>()
+        {
+            @Override
+            public void visit(DocumentReference oldChildReference)
+            {
+                DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
+                maybeMove(oldChildReference, newChildReference);
+            }
+        });
     }
 
     protected void maybeMove(DocumentReference oldReference, DocumentReference newReference)

@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceTree;
 import org.xwiki.model.reference.EntityReferenceTreeNode;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.job.EntityJobStatus;
@@ -65,8 +66,6 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
     /**
      * Regular expression used to match the special characters supported by the like HQL operator (plus the escaping
      * character).
-     * 
-     * @see #getChildren(DocumentReference)
      */
     private static final Pattern LIKE_SPECIAL_CHARS = Pattern.compile("([%_/])");
 
@@ -77,9 +76,7 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
     private Provider<XWikiContext> xcontextProvider;
 
     /**
-     * Used to serialize a space reference in order to query the child document.
-     * 
-     * @see #getChildren(DocumentReference)
+     * Used to serialize a space reference in order to query the child documents.
      */
     @Inject
     @Named("local")
@@ -87,8 +84,6 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
 
     /**
      * Used to resolve the references of child documents.
-     * 
-     * @see #getChildren(DocumentReference)
      */
     @Inject
     @Named("explicit")
@@ -128,9 +123,8 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {
-                this.logger.warn(
-                    "Cannot fully copy [{}] to [{}] because an orphan translation exists at the destination.", source,
-                    destination);
+                this.logger.warn("Cannot fully copy [{}] to [{}] because an orphan translation"
+                    + " exists at the destination.", source, destination);
             }
             return result;
         } catch (Exception e) {
@@ -165,41 +159,40 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
         return xcontext.getWiki().exists(reference, xcontext);
     }
 
-    private List<DocumentReference> getDescendants(DocumentReference documentReference)
+    private List<DocumentReference> getDocumentReferences(SpaceReference spaceReference)
     {
         try {
             // At the moment we don't have a way to retrieve only the direct children so we select all the descendants.
-            // This means we select all the documents from the same space (excluding the given document) and from all
-            // the nested spaces.
+            // This means we select all the documents from the specified space and from all the nested spaces.
             String statement =
                 "select distinct(doc.fullName) from XWikiDocument as doc "
-                    + "where (doc.space = :space and doc.name <> :name) or doc.space like :spacePrefix escape '/'";
-            Query query = this.queryManager.createQuery(statement, "hql");
-            query.setWiki(documentReference.getWikiReference().getName());
-            String localSpaceReference = this.localEntityReferenceSerializer.serialize(documentReference.getParent());
-            query.bindValue("space", localSpaceReference).bindValue("name", documentReference.getName());
+                    + "where doc.space = :space or doc.space like :spacePrefix escape '/'";
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            query.setWiki(spaceReference.getWikiReference().getName());
+            String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+            query.bindValue("space", localSpaceReference);
             String spacePrefix = LIKE_SPECIAL_CHARS.matcher(localSpaceReference).replaceAll("/$1");
             query.bindValue("spacePrefix", spacePrefix + ".%");
 
-            List<DocumentReference> children = new ArrayList<>();
+            List<DocumentReference> descendants = new ArrayList<>();
             for (Object fullName : query.execute()) {
-                children.add(this.explicitDocumentReferenceResolver.resolve((String) fullName, documentReference));
+                descendants.add(this.explicitDocumentReferenceResolver.resolve((String) fullName, spaceReference));
             }
-            return children;
+            return descendants;
         } catch (Exception e) {
-            this.logger.error("Failed to retrieve the child documents of [{}].", documentReference, e);
+            this.logger.error("Failed to retrieve the documents from [{}].", spaceReference, e);
             return Collections.emptyList();
         }
     }
 
-    private EntityReferenceTreeNode getSubTree(DocumentReference documentReference)
+    private EntityReferenceTreeNode getDocumentReferenceTree(SpaceReference spaceReference)
     {
-        return new EntityReferenceTree(getDescendants(documentReference)).get(documentReference.getParent());
+        return new EntityReferenceTree(getDocumentReferences(spaceReference)).get(spaceReference);
     }
 
-    protected void visitNestedDocuments(DocumentReference parentReference, Visitor<DocumentReference> visitor)
+    protected void visitDocuments(SpaceReference spaceReference, Visitor<DocumentReference> visitor)
     {
-        visitNestedDocuments(getSubTree(parentReference), visitor);
+        visitDocumentNodes(getDocumentReferenceTree(spaceReference), visitor);
     }
 
     protected List<DocumentReference> getBackLinkedReferences(DocumentReference documentReference)

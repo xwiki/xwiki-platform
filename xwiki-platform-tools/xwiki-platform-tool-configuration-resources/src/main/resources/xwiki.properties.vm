@@ -55,6 +55,12 @@
 #-# Default value is 100.
 # core.renderingcache.size=100
 
+#-# [Since 7.2M2]
+#-# Define if the legacy parent/child mechanism is used (for example, to display the hierarchy between documents).
+#-# It has been replaced by the concept of nested documents in XWiki 7.2. This property is for retro-compatibility
+#-# reason. The default value is false.
+# core.useLegacyParentChildMechanism=true
+
 #-------------------------------------------------------------------------------------
 # Environment
 #-------------------------------------------------------------------------------------

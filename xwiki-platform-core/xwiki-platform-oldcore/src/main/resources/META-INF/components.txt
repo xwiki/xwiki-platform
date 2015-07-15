@@ -124,3 +124,4 @@ com.xpn.xwiki.objects.meta.StaticListMetaClass
 com.xpn.xwiki.objects.meta.StringMetaClass
 com.xpn.xwiki.objects.meta.TextAreaMetaClass
 com.xpn.xwiki.objects.meta.UsersMetaClass
+com.xpn.xwiki.script.parentchild.ParentChildScriptService

@@ -21,6 +21,7 @@ package org.xwiki.gwt.wysiwyg.client.widget;
 
 import java.util.List;
 
+import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiServiceAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -73,7 +74,7 @@ public class SpaceSelector extends ListBox
             {
                 // Add all options keeping selection
                 for (String s : result) {
-                    addItem(s);
+                    addItem(new WikiPageReference(wiki, s, null).getSpacePrettyName(), s);
                     if (s.equals(currentSpace)) {
                         setSelectedIndex(getItemCount() - 1);
                     }
@@ -100,7 +101,7 @@ public class SpaceSelector extends ListBox
     public String getSelectedSpace()
     {
         if (this.getSelectedIndex() >= 0) {
-            return this.getItemText(this.getSelectedIndex());
+            return this.getValue(this.getSelectedIndex());
         }
         return null;
     }

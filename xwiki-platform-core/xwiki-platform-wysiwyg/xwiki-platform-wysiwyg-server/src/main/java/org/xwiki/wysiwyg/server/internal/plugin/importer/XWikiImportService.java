@@ -95,7 +95,8 @@ public class XWikiImportService implements ImportService
     /**
      * The object used to convert between client and server entity reference.
      */
-    private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
+    @Inject
+    private EntityReferenceConverter entityReferenceConverter;
 
     /**
      * Used to import an office file using the office macro.

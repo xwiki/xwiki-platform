@@ -110,7 +110,8 @@ public abstract class AbstractPageListSelectorWizardStep extends
     protected String serializeDocumentReference(WikiPageReference reference)
     {
         String separator = " \u00BB ";
-        return reference.getWikiName() + separator + reference.getSpaceName() + separator + reference.getPageName();
+        return reference.getWikiName() + separator + reference.getSpacePrettyName() + separator
+            + reference.getPageName();
     }
 
     /**

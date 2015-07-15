@@ -43,6 +43,8 @@ import org.xwiki.mail.internal.thread.MailRunnable;
 import org.xwiki.mail.internal.thread.PrepareMailQueueItem;
 import org.xwiki.mail.internal.thread.context.Copier;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.thread.SendMailRunnable} to send emails
  * asynchronously.
@@ -109,6 +111,15 @@ public class DefaultMailSender implements MailSender, Initializable
         // context).
         ExecutionContext executionContext = this.execution.getContext();
         ExecutionContext clonedExecutionContext = this.executionContextCloner.copy(executionContext);
+
+        // TODO: Remove once we've found the reason for the functional Mail test flicker: from time to time the wiki
+        // is not set in the Mail Status LT
+        XWikiContext xcontext = (XWikiContext) clonedExecutionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        if (xcontext.getWikiId() == null) {
+            throw new RuntimeException(String.format("Aborting Mail Sending: the Wiki Id must not be null in the "
+                + "XWiki Context. Got [%s] in the original context.",
+                ((XWikiContext) executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).getWikiId()));
+        }
 
         this.prepareMailQueueManager.addToQueue(new PrepareMailQueueItem(messages, session, listener, batchId,
             clonedExecutionContext));

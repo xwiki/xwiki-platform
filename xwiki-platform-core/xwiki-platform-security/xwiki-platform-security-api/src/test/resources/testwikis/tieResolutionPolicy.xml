@@ -117,7 +117,6 @@
     <allowUser type="delete" name="userA" />
     <allowUser type="register" name="userA" />
     <allowUser type="login" name="userA" />
-    <allowUser type="script" name="userA" />
     <denyGroup name="groupA" />
   </wiki>
   <wiki name="wikiUserGroupDenyAllowNoAdmin" alt="a wiki with a conflicting of userA deny/groupA allow all but admin access">
@@ -157,7 +156,5 @@
     <allowUser type="comment" name="userA" />
     <allowUser type="delete" name="userA" />
     <allowUser type="register" name="userA" />
-    <allowUser type="login" name="userA" />
-    <allowUser type="script" name="userA" />
-  </wiki>
+    <allowUser type="login" name="userA" />  </wiki>
 </wikis>

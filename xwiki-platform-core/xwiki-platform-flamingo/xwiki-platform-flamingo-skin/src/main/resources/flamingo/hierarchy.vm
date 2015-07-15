@@ -10,7 +10,7 @@
   ## Call the appropiate breadcrumb depending on the 
   ## configuration.
   #######################################################
-  #if ($doc.fullName != 'Main.WebHome')
+  #if (!$doc.documentReference.equals($homeReference))
     #if($services.parentchild.isLegacyParentChildMechanismEnabled())
       #hierarchy_legacy()
     #else

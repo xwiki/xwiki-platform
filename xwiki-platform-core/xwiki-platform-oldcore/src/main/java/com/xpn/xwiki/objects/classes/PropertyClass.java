@@ -298,27 +298,16 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             if (StringUtils.isNotEmpty(customDisplayer)) {
                 if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
                     content = getCustomDisplay();
-                    XWikiDocument classDocument =
-                        context.getWiki().getDocument(getObject().getDocumentReference(), context);
-                    String classSyntax = classDocument.getSyntax().toIdString();
-                    // Use the class document as security document.
-                    context.put(XWikiDocument.CKEY_SDOC, classDocument);
-
+                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
+                        .getSyntax().toIdString();
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
                 } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
                     XWikiDocument displayerDoc = context.getWiki().getDocument(
                         StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
                     content = displayerDoc.getContent();
                     String classSyntax = displayerDoc.getSyntax().toIdString();
-                    // Use the displayer document as security document.
-                    context.put(XWikiDocument.CKEY_SDOC, displayerDoc);
-
                     content = context.getDoc().getRenderedContent(content, classSyntax, context);
                 } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
-                    // Use the current document as security document.
-                    // FIXME: check if the template is to be executed with special rights and make sure to use them in
-                    // this rendering.
-
                     content = context.getWiki().evaluateTemplate(
                         StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
                 }

@@ -1483,6 +1483,7 @@ document.observe('xwiki:dom:loaded', function() {
 /*
  * AJAX improvements for setting the document parent.
  */
+#if ($services.parentchild.isLegacyParentChildMechanismEnabled())
 document.observe('xwiki:dom:loaded', function() {
   var hierarchyElement   = $('hierarchy');
   var breadcrumbsElement = $('breadcrumbs');
@@ -1563,6 +1564,7 @@ document.observe('xwiki:dom:loaded', function() {
     })
   }
 });
+#end
 
 /*
  * JS improvement for keeping the content menu visible on the screen when scrolling down.

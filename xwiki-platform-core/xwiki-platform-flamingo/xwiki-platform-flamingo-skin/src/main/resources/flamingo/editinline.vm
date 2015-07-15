@@ -16,9 +16,11 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #if ($allowDocEdit)
  <form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
 #end
-## Edit parent button added here explicitly because inline mode is handled specially in edit.vm and does not behave like the other edit modes.
 <div class='edit-meta-tools'>
-  <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a>
+  #if($services.parentchild.isLegacyParentChildMechanismEnabled())
+    ## Edit parent button added here explicitly because inline mode is handled specially in edit.vm and does not behave like the other edit modes.
+    <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a>
+  #end
 </div>
 #template("hierarchy.vm")
 <div class="row">

@@ -195,7 +195,7 @@
     #end
   #end
   #foreach ($space in $spaces)
-    #set ($spaceReference = $services.model.createSpaceReference($space, $wikiReference))
+    #set ($spaceReference = $services.model.resolveSpace($space, 'explicit', $wikiReference))
     #maybeAddSpaceNode($spaceReference $children)
   #end
   #if ($spaces.size() &gt;= $limit)
@@ -291,7 +291,7 @@
     'doc.space = :space',
     'doc.translation = 0'
   ])
-  #set ($parameters = {'space': $spaceReference.name})
+  #set ($parameters = {'space': $services.model.serialize($spaceReference, 'local')})
   #if ($docTreeConfig.showChildDocuments)
     ## Include only documents that either don't have a parent or that have a parent in a different space.
     ## On Oracle the empty parent is actually null.
@@ -443,7 +443,7 @@
     '(doc.parent in (:absoluteRef, :localRef) or (doc.space = :space and doc.parent = :relativeRef))'
   ])
   #set ($parameters = {
-    'space': $parentReference.lastSpaceReference.name,
+    'space': $services.model.serialize($parentReference.lastSpaceReference, 'local'),
     'absoluteRef': "$parentReference",
     'localRef': $services.model.serialize($parentReference, 'compactwiki', $parentReference.wikiReference),
     'relativeRef': $services.model.serialize($parentReference, 'compact', $parentReference.parent)

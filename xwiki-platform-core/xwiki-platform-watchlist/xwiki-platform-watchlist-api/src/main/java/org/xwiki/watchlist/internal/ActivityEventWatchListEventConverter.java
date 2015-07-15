@@ -60,7 +60,8 @@ public class ActivityEventWatchListEventConverter implements WatchListEventConve
         DocumentReference userReference = null;
         // Watch out for unregistered user events since they have a null user.
         if (from.getUser() != null) {
-            new DocumentReference(resolver.resolve(from.getUser(), EntityType.DOCUMENT,
+            userReference =
+                new DocumentReference(resolver.resolve(from.getUser(), EntityType.DOCUMENT,
                 new WikiReference(from.getWiki())));
         }
 

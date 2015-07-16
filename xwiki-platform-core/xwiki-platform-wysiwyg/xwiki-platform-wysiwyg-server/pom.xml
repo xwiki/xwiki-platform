@@ -30,7 +30,7 @@
   <packaging>jar</packaging>
   <description>The server side of XWiki's WYSIWYG editor.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.28</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -80,6 +80,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-gwt-user</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

@@ -72,17 +72,17 @@ XWiki.EntityReference = Class.create({
    * @return a new reference pointing to the same entity but relative to the given reference
    */
   relativeTo: function(baseReference) {
-    var components = this._extractComponents().reverse();
-    var baseComponents = baseReference ? baseReference._extractComponents().reverse() : [];
+    var components = this.getReversedReferenceChain();
+    var baseComponents = baseReference ? baseReference.getReversedReferenceChain() : [];
     while (components.length > 0 && baseComponents.length > 0 && components[0].type != baseComponents[0].type) {
       components[0].type > baseComponents[0].type ? baseComponents.shift() : components.shift();
     }
-    while (components.length > 0 && baseComponents.length > 0 && components[0].type == baseComponents[0].type
-      && components[0].name == baseComponents[0].name) {
+    while (components.length > 0 && baseComponents.length > 0 && components[0].type === baseComponents[0].type
+      && components[0].name === baseComponents[0].name) {
       components.shift();
       baseComponents.shift();
     }
-    if (components.length == 0) {
+    if (components.length === 0) {
       return new XWiki.EntityReference('', this.type);
     } else {
       components = components.reverse();
@@ -96,14 +96,27 @@ XWiki.EntityReference = Class.create({
     }
   },
 
-  _extractComponents: function() {
+  getReversedReferenceChain: function() {
     var components = [];
     var reference = this;
     while (reference) {
       components.push(reference);
       reference = reference.parent;
     }
-    return components;
+    return components.reverse();
+  },
+
+  getRoot: function() {
+    var root = this;
+    while (root.parent) {
+      root = root.parent;
+    }
+    return root;
+  },
+
+  appendParent: function(parent) {
+    this.getRoot().parent = parent;
+    return this;
   }
 });
 
@@ -162,13 +175,36 @@ var REPLACEMENTS = [
 
 var SEPARATORS = [
   /* WIKI */            [],
-  /* SPACE */           [WIKISEP],
+  /* SPACE */           [SPACESEP, WIKISEP],
   /* DOCUMENT */        [SPACESEP, WIKISEP],
   /* ATTACHMENT */      [ATTACHMENTSEP, SPACESEP, WIKISEP],
   /* OBJECT */          [OBJECTSEP, SPACESEP, WIKISEP],
   /* OBJECT_PROPERTY */ [PROPERTYSEP, OBJECTSEP, SPACESEP, WIKISEP],
   /* CLASS_PROPERTY */  [CLASSPROPSEP, SPACESEP, WIKISEP]
 ];
+
+var DEFAULT_PARENT = [
+  /* WIKI */            null,
+  /* SPACE */           XWiki.EntityType.WIKI,
+  /* DOCUMENT */        XWiki.EntityType.SPACE,
+  /* ATTACHMENT */      XWiki.EntityType.DOCUMENT,
+  /* OBJECT */          XWiki.EntityType.DOCUMENT,
+  /* OBJECT_PROPERTY */ XWiki.EntityType.OBJECT,
+  /* CLASS_PROPERTY */  XWiki.EntityType.DOCUMENT
+];
+
+var REFERENCE_SETUP = [];
+// Skip the WIKI entity type because it doesn't require special handling.
+for (var i = 1; i < SEPARATORS.length ; i++) {
+  REFERENCE_SETUP[i] = {};
+}
+REFERENCE_SETUP[XWiki.EntityType.SPACE][WIKISEP] = XWiki.EntityType.WIKI;
+REFERENCE_SETUP[XWiki.EntityType.SPACE][SPACESEP] = XWiki.EntityType.SPACE;
+REFERENCE_SETUP[XWiki.EntityType.DOCUMENT][SPACESEP] = XWiki.EntityType.SPACE;
+REFERENCE_SETUP[XWiki.EntityType.ATTACHMENT][ATTACHMENTSEP] = XWiki.EntityType.DOCUMENT;
+REFERENCE_SETUP[XWiki.EntityType.OBJECT][OBJECTSEP] = XWiki.EntityType.DOCUMENT;
+REFERENCE_SETUP[XWiki.EntityType.OBJECT_PROPERTY][PROPERTYSEP] = XWiki.EntityType.OBJECT;
+REFERENCE_SETUP[XWiki.EntityType.CLASS_PROPERTY][CLASSPROPSEP] = XWiki.EntityType.DOCUMENT;
 
 /**
  * Map defining ordered entity types of a proper reference chain for a given entity type.
@@ -197,7 +233,7 @@ function contains(text, position, subText) {
 }
 
 function replaceEach(text, matches, replacements) {
-  var result = '', i = -1;
+  var i = -1;
   while (++i < text.length) {
     for (var j = 0; j < matches.length; j++) {
       if (contains(text, i, matches[j])) {
@@ -211,83 +247,113 @@ function replaceEach(text, matches, replacements) {
 }
 
 XWiki.EntityReferenceResolver = Class.create({
-  resolve: function(representation, entityType) {
-    representation = representation || '';
-    entityType = parseInt(entityType);
+  resolve: function(value, type, defaultValueProvider) {
+    // Create a char array from the input string (as an equivalent to Java's StringBuilder).
+    var representation = (value || '').split('');
+    type = parseInt(type);
 
     // First, check if the given entity type is valid.
-    if (isNaN(entityType) || entityType < 0 || entityType >= SEPARATORS.length) {
-      throw 'No parsing definition found for Entity Type [' + entityType + ']';
+    if (isNaN(type) || type < 0 || type >= SEPARATORS.length) {
+      throw 'No parsing definition found for Entity Type [' + type + ']';
     }
 
-    var reference;
-    var separatorsForType = SEPARATORS[entityType];
-    var entityTypesForType = ENTITY_TYPES[entityType];
+    var typeSetup = REFERENCE_SETUP[type];
 
-    // Iterate over the representation string looking for separators in the correct order (rightmost separator first).
-    // Note that the representation is nullified when we reach the start without hitting the current separator.
-    for (var i = 0; i < separatorsForType.length && representation != null; i++) {
-      var parts = this._splitAndUnescape(representation, separatorsForType[i]);
-      representation = parts[0];
-      var parent = new XWiki.EntityReference(parts[1], entityTypesForType[i]);
-      reference = this._appendParent(reference, parent);
+    // Check if the specified entity type requires anything specific.
+    if (!typeSetup) {
+      return this._getEscapedReference(representation, type, defaultValueProvider);
     }
+
+    var reference, currentType = type;
+    do {
+        // Search all characters for a non escaped separator. If found, then consider the part after the
+        // character as the reference name and continue parsing the part before the separator.
+        var parentType = null;
+        var i = representation.length;
+        while (--i >= 0) {
+          var currentChar = representation[i];
+          var nextIndex = i - 1;
+          var nextChar = nextIndex < 0 ? 0 : representation[nextIndex];
+          if (typeof typeSetup[currentChar] === 'number') {
+            var numberOfBackslashes = this._getNumberOfCharsBefore(ESCAPE, representation, nextIndex);
+            if (numberOfBackslashes % 2 === 0) {
+              parentType = typeSetup[currentChar];
+              break;
+            } else {
+              // Unescape the character.
+              representation.splice(nextIndex, 1);
+              --i;
+            }
+          } else if (nextChar === ESCAPE) {
+            // Unescape the character.
+            representation.splice(nextIndex, 1);
+            --i;
+          }
+        }
+        var parent = this._getNewReference(i, representation, currentType, defaultValueProvider);
+        reference = this._appendNewReference(reference, parent);
+        currentType = parentType ? parentType : DEFAULT_PARENT[currentType];
+        typeSetup = REFERENCE_SETUP[currentType];
+    } while (typeSetup != null);
 
     // Handle last entity reference's name.
-    if (representation != null) {
-      var name = replaceEach(representation, ESCAPE_MATCHING, ESCAPE_MATCHING_REPLACE);
-      var parent = new XWiki.EntityReference(name, entityTypesForType[separatorsForType.length]);
-      reference = this._appendParent(reference, parent);
-    }
+    var root = this._getEscapedReference(representation, currentType, defaultValueProvider);
+    reference = this._appendNewReference(reference, root);
 
     return reference;
   },
 
-  _appendParent: function(reference, parent) {
-    if (reference) {
-      var root = reference;
-      while (root.parent) {
-        root = root.parent;
-      }
-      root.parent = parent;
-      return reference;
+  _getEscapedReference: function(representation, type, defaultValueProvider) {
+    if (representation.length > 0) {
+      var name = replaceEach(representation.join(''), ESCAPE_MATCHING, ESCAPE_MATCHING_REPLACE);
+      return new XWiki.EntityReference(name, type);
     } else {
-      return parent;
+      return this._resolveDefaultReference(type, defaultValueProvider);
     }
   },
 
-  _splitAndUnescape: function(representation, separator) {
-    var name = [];
-    var i = representation.length;
-    while (--i >= 0) {
-      var currentChar = representation.charAt(i);
-      var nextIndex = i - 1;
-      var nextChar = 0;
-      if (nextIndex >= 0) {
-        nextChar = representation.charAt(nextIndex);
-      }
-      if (currentChar == separator) {
-        var numberOfBackslashes = this._getNumberOfCharsBefore(ESCAPE, representation, nextIndex);
-        if (numberOfBackslashes % 2 == 0) {
-          // Found a valid separator (not escaped), separate content on its left from content on its right.
-          break;
-        } else {
-          // Skip the escape character.
-          --i;
-        }
-      } else if (nextChar == ESCAPE) {
-        // Skip the escape character.
-        --i;
-      }
-      name.push(currentChar);
+  _getNewReference: function(index, representation, type, defaultValueProvider) {
+    // Found a valid separator (not escaped), separate content on its left from content on its right.
+    var reference;
+    if (index < representation.length - 1) {
+      var name = representation.slice(index + 1).join('');
+      reference = new XWiki.EntityReference(name, type);
+    } else {
+      reference = this._resolveDefaultReference(type, defaultValueProvider);
     }
+    representation.splice(Math.max(index, 0), representation.length);
+    return reference;
+  },
 
-    return [i < 0 ? null : representation.substring(0, i), name.reverse().join('')];
+  _resolveDefaultReference: function(type, defaultValueProvider) {
+    var name;
+    if (typeof defaultValueProvider === 'object') {
+      if (defaultValueProvider && typeof defaultValueProvider.extractReferenceValue === 'function') {
+        name = defaultValueProvider.extractReferenceValue(type);
+      } else {
+        name = defaultValueProvider && defaultValueProvider[type];
+      }
+    } else if (typeof defaultValueProvider === 'function') {
+      name = defaultValueProvider(type);
+    }
+    return name ? new XWiki.EntityReference(name, type) : null;
+  },
+
+  _appendNewReference: function(reference, parent) {
+    if (parent) {
+      if (reference) {
+        return reference.appendParent(parent);
+      } else {
+        return parent;
+      }
+    } else {
+      return reference;
+    }
   },
 
   _getNumberOfCharsBefore: function(character, representation, currentPosition) {
     var position = currentPosition;
-    while (position >= 0 && representation.charAt(position) == character) {
+    while (position >= 0 && representation[position] === character) {
       --position;
     }
     return currentPosition - position;
@@ -304,7 +370,7 @@ XWiki.EntityReferenceSerializer = Class.create({
 
     // Add the separator if this is not the first component.
     if (entityReference.parent) {
-      representation += entityReference.parent.type == XWiki.EntityType.WIKI ? WIKISEP : escapes[0];
+      representation += entityReference.parent.type === XWiki.EntityType.WIKI ? WIKISEP : escapes[0];
     }
 
     // The root reference doesn't have to escape its separator because the reference is parsed from the right.
@@ -325,8 +391,8 @@ XWiki.Model = {
   serialize: function(entityReference) {
     return serializer.serialize(entityReference);
   },
-  resolve: function(representation, entityType) {
-    return resolver.resolve(representation, entityType);
+  resolve: function(representation, entityType, defaultValueProvider) {
+    return resolver.resolve(representation, entityType, defaultValueProvider);
   }
 };
 

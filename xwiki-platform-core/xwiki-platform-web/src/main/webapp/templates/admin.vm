@@ -68,7 +68,8 @@
 #else
   #if ($xwiki.exists('XWiki.AdminSheet'))
     #set ($importaction = '')
-    $xwiki.getDocument('XWiki.AdminSheet').getTranslatedDocument().getRenderedContent()
+    ## Display the current document with the XWiki.AdminSheet that is already bound to the XWikiPreferences class.
+    $services.display.content($doc)
   #else
     ## Admin app not installed, display only Import
     #set ($importaction = $doc.getURL('import'))

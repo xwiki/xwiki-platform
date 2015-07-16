@@ -619,7 +619,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
           "editor":"inline",
           "template":"AppWithinMinutes.LiveTableTemplate",
           "AppWithinMinutes.LiveTableClass_0_class":$doc.fullName,
-          "title":'$doc.space',
+          "title":'$doc.documentReference.lastSpaceReference.name',
           "parent":$wikiHomePage
         }))
       #end

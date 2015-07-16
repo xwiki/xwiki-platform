@@ -126,4 +126,10 @@ public interface DocumentModelBridge
      * @since 3.0M3
      */
     XDOM getXDOM();
+
+    /**
+     * @return the document's content author user reference
+     * @since 7.2M1
+     */
+    DocumentReference getContentAuthorReference();
 }

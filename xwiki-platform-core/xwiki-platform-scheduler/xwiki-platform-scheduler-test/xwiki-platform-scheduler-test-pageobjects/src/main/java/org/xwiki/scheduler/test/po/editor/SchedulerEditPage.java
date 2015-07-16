@@ -23,25 +23,18 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.scheduler.test.po.SchedulerPage;
 import org.xwiki.test.ui.po.editor.EditPage;
-import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 
 public class SchedulerEditPage extends EditPage
 {
     @FindBy(id = "XWiki.SchedulerJobClass_0_jobName")
     private WebElement jobName;
 
-    private final EditorElement jobDescription = new EditorElement("XWiki.SchedulerJobClass_0_jobDescription");
+    @FindBy(id = "XWiki.SchedulerJobClass_0_jobDescription")
+    private WebElement jobDescription;
 
     @FindBy(id = "XWiki.SchedulerJobClass_0_cron")
     private WebElement cron;
 
-    public SchedulerEditPage()
-    {
-        // Make sure we wait for the WYSIWYG fields to be loaded since otherwise they'll steal the focus and if we
-        // start typing in other fields before they're loaded what we type will end up in the wrong fields...
-        this.jobDescription.waitToLoad();
-    }
-    
     public void setJobName(String jobName)
     {
         this.jobName.clear();
@@ -50,8 +43,8 @@ public class SchedulerEditPage extends EditPage
 
     public void setJobDescription(String jobDescription)
     {
-        this.jobDescription.getRichTextArea().clear();
-        this.jobDescription.getRichTextArea().sendKeys(jobDescription);
+        this.jobDescription.clear();
+        this.jobDescription.sendKeys(jobDescription);
     }
 
     public void setCron(String cron)
@@ -64,15 +57,6 @@ public class SchedulerEditPage extends EditPage
     public SchedulerPage clickSaveAndView()
     {
         this.save.click();
-
         return new SchedulerPage();
-    }
-
-    /**
-     * @since 4.2M1
-     */
-    public void waitForJobEditionToLoad()
-    {
-        new EditorElement("XWiki.SchedulerJobClass_0_jobDescription").waitToLoad();
     }
 }

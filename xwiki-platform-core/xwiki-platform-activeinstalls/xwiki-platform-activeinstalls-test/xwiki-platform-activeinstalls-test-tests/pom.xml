@@ -36,7 +36,6 @@
   <properties>
     <xwikiPropertiesAdditionalProperties>activeinstalls.pingURL=http://localhost:9200</xwikiPropertiesAdditionalProperties>
     <xwikiDbHbmCommonExtraMappings>instance.hbm.xml</xwikiDbHbmCommonExtraMappings>
-    <!-- Override in order to add the JODA Time Plugin -->
     <xwikiCfgPlugins>\
       com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\

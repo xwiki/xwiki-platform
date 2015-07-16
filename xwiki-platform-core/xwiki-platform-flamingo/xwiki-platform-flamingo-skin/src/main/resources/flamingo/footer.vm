@@ -6,7 +6,8 @@
     #set ($version = $xwiki.getXWikiPreference("version"))
   #end
   #if ("$!version" != "")
-    #set ($version = $xwiki.parseContent($version))
+    ## The version information coming from preferences is usually Velocity code, so make sure to evaluate it.
+    #set ($version = "#evaluate($version)")
   #else
     #set ($version = $!xwiki.version)
   #end

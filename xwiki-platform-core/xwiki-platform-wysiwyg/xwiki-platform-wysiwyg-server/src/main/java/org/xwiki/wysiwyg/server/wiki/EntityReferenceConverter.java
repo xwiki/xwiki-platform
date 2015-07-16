@@ -22,24 +22,42 @@ package org.xwiki.wysiwyg.server.wiki;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Converts between client-side entity references and server-side entity references.
  * 
  * @version $Id$
  */
+@Component(roles = EntityReferenceConverter.class)
+@Singleton
 public class EntityReferenceConverter
 {
     /**
      * Maps entity types to client reference component names.
      */
     private static final Map<EntityType, String> REFERENCE_COMPONENT_NAME;
+
+    @Inject
+    private SpaceReferenceResolver<String> spaceResolver;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     static {
         REFERENCE_COMPONENT_NAME = new HashMap<EntityType, String>();
@@ -66,9 +84,9 @@ public class EntityReferenceConverter
         if (!StringUtils.isEmpty(wikiName)) {
             serverEntityReference = new EntityReference(wikiName, EntityType.WIKI);
         }
-        String spaceName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.SPACE));
-        if (!StringUtils.isEmpty(spaceName)) {
-            serverEntityReference = new EntityReference(spaceName, EntityType.SPACE, serverEntityReference);
+        String localSpaceReference = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.SPACE));
+        if (!StringUtils.isEmpty(localSpaceReference)) {
+            serverEntityReference = this.spaceResolver.resolve(localSpaceReference, serverEntityReference);
         }
         String pageName = clientEntityReference.getComponent(REFERENCE_COMPONENT_NAME.get(EntityType.DOCUMENT));
         if (!StringUtils.isEmpty(pageName)) {
@@ -97,7 +115,18 @@ public class EntityReferenceConverter
         } catch (Exception e) {
             return null;
         }
+
         EntityReference child = serverEntityReference;
+
+        // The client side doesn't support nested spaces yet so we 'collapse' all the nested spaces.
+        EntityReference spaceReference = serverEntityReference.extractReference(EntityType.SPACE);
+        if (spaceReference != null) {
+            String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+            EntityReference wikiReference = serverEntityReference.extractReference(EntityType.WIKI);
+            EntityReference newSpaceReference = new SpaceReference(localSpaceReference, wikiReference);
+            child = serverEntityReference.replaceParent(spaceReference, newSpaceReference);
+        }
+
         while (child != null) {
             String componentName = REFERENCE_COMPONENT_NAME.get(child.getType());
             if (componentName != null) {
@@ -115,7 +144,7 @@ public class EntityReferenceConverter
     public WikiPageReference convert(DocumentReference documentReference)
     {
         String wikiName = documentReference.getWikiReference().getName();
-        String spaceName = documentReference.getLastSpaceReference().getName();
+        String spaceName = this.localEntityReferenceSerializer.serialize(documentReference.getLastSpaceReference());
         String pageName = documentReference.getName();
         return new WikiPageReference(wikiName, spaceName, pageName);
     }
@@ -126,7 +155,9 @@ public class EntityReferenceConverter
      */
     public DocumentReference convert(WikiPageReference reference)
     {
-        return new DocumentReference(reference.getWikiName(), reference.getSpaceName(), reference.getPageName());
+        SpaceReference spaceReference =
+            this.spaceResolver.resolve(reference.getSpaceName(), new WikiReference(reference.getWikiName()));
+        return new DocumentReference(reference.getPageName(), spaceReference);
     }
 
     /**
@@ -145,7 +176,7 @@ public class EntityReferenceConverter
      */
     public AttachmentReference convert(org.xwiki.gwt.wysiwyg.client.wiki.AttachmentReference clientAttachmentReference)
     {
-        return new AttachmentReference(clientAttachmentReference.getFileName(), convert(clientAttachmentReference
-            .getWikiPageReference()));
+        return new AttachmentReference(clientAttachmentReference.getFileName(),
+            convert(clientAttachmentReference.getWikiPageReference()));
     }
 }

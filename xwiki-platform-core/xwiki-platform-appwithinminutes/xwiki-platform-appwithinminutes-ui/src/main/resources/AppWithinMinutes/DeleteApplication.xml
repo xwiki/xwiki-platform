@@ -40,10 +40,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($appName = $request.appName)
-#set ($scope = $request.scope)
-#if ("$!appName" != '')
-  #set ($dataHomeRef = $services.model.createDocumentReference($xcontext.wiki, $appName, 'WebHome'))
+#if ("$!request.appName" != '')
+  #if ($request.resolve == 'true')
+    #set ($appReference = $services.model.resolveSpace($request.appName))
+  #else
+    #set ($appReference = $services.model.createSpaceReference($request.appName,
+      $doc.documentReference.wikiReference))
+  #end
+  #set ($appLocalStringRef = $services.model.serialize($appReference, 'local'))
+  #set ($appName = $appReference.name)
+  #set ($scope = $request.scope)
+  #set ($dataHomeRef = $services.model.resolveDocument('', 'default', $appReference))
   #set ($dataHomeDoc = $xwiki.getDocument($dataHomeRef))
   #set ($liveTableObj = $dataHomeDoc.getObject('AppWithinMinutes.LiveTableClass'))
   #set ($classFullName = $liveTableObj.getProperty('class').value)
@@ -56,24 +63,27 @@
         #stop
       #end
       ##
-      #set ($classRef = $services.model.resolveDocument($classFullName))
+      #set ($classRef = $services.model.resolveDocument($classFullName, 'explicit', $dataHomeRef))
       ##
       ## Common values for both cases.
       #set ($deleteQueryString = "WHERE doc.space in (:spaces)")
-      #set ($deleteQuerySpaces = [$appName])
+      #set ($deleteQuerySpaces = [$appLocalStringRef])
+      #set ($templateDocFullName = $NULL)
       ##
       #if ("$!scope" == 'entries')
         ## Delete only the application's entries (just data) from the data space.
         ##
         ## Note: XWQL does not support parametrised object class, so we just have to push it directly in the query string.    
         #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') AS obj $deleteQueryString AND doc.fullName &lt;&gt; :template")
-        #set ($templateDocRef = $services.model.createDocumentReference($xcontext.wiki, $classRef.lastSpaceReference.name, "${appName}Template"))
+        #set ($classShortName = $classRef.lastSpaceReference.name)
+        #set ($templateDocRef = $services.model.createEntityReference("${classShortName}Template",
+          'DOCUMENT', $classRef.lastSpaceReference))
         #set ($templateDocFullName = $services.model.serialize($templateDocRef, 'local'))
       #else
         ## Delete the entire application (code + data spaces).
         ##
-        #set ($codeSpaceName = $classRef.lastSpaceReference.name)
-        #set ($discard = $deleteQuerySpaces.add($codeSpaceName))
+        #set ($codeLocalSpaceRef = $services.model.serialize($classRef.lastSpaceReference, 'local'))
+        #set ($discard = $deleteQuerySpaces.add($codeLocalSpaceRef))
       #end
       ##
       ## Run the query and delete the documents.
@@ -94,22 +104,27 @@
       #end
     #else
       ## Confirmation dialog
-      #set ($cancelURL = $doc.getURL())
-      #if ($request.xredirect)
-        #set ($redirectparam = "&amp;amp;xredirect=$escapetool.url($request.xredirect)")
-        #set ($cancelURL = $request.xredirect)
-      #end
       #if ("$!scope" == 'entries')
         #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppEntriesConfirmation', $escapetool.xml($appName)))
       #else
         #set ($confirmationMessage = $services.localization.render('platform.appwithinminutes.deleteAppConfirmation', $escapetool.xml($appName)))
       #end
+      #set ($cancelURL = $doc.getURL())
+      #set ($confirmParams = {
+        'appName': $appLocalStringRef,
+        'resolve': true,
+        'scope': $scope,
+        'confirm': 1,
+        'form_token': $services.csrf.token
+      })
+      #if ("$!request.xredirect" != '')
+        #set ($cancelURL = $request.xredirect)
+        #set ($confirmParams.xredirect = $request.xredirect)
+      #end
+      #set ($confirmURL = $doc.getURL($xcontext.action, $escapetool.url($confirmParams)))
       {{html}}
-      #xwikimessagebox($services.localization.render('core.delete')
-                      $confirmationMessage $doc.getURL($xcontext.action, "appName=$escapetool.url($appName)&amp;scope=$!{scope}&amp;confirm=1$!{redirectparam}&amp;amp;form_token=$!{services.csrf.getToken()}")
-                      $escapetool.xml($cancelURL)
-                      $services.localization.render('yes')
-                      $services.localization.render('no'))
+      #xwikimessagebox($services.localization.render('core.delete') $confirmationMessage $confirmURL
+        $escapetool.xml($cancelURL) $services.localization.render('yes') $services.localization.render('no'))
       {{/html}}
     #end
   #else

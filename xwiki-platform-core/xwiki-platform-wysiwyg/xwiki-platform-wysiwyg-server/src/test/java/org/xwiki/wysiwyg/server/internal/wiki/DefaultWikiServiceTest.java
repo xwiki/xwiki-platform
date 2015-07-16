@@ -19,9 +19,6 @@
  */
 package org.xwiki.wysiwyg.server.internal.wiki;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -30,6 +27,10 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultWikiService}.
@@ -53,6 +54,9 @@ public class DefaultWikiServiceTest
         String uploadURL = "/upload/to/page";
         when(documentAccessBridge.getDocumentURL(documentReference, "upload", "form_token=123", null)).thenReturn(
             uploadURL);
+
+        EntityReferenceConverter converter = this.mocker.getInstance(EntityReferenceConverter.class);
+        when(converter.convert(wikiPageReference)).thenReturn(documentReference);
 
         assertEquals(uploadURL, mocker.getComponentUnderTest().getUploadURL(wikiPageReference));
     }

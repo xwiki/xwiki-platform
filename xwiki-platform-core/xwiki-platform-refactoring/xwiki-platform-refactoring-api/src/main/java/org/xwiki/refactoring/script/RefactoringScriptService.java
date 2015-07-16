@@ -211,14 +211,12 @@ public class RefactoringScriptService implements ScriptService
      * Creates a request to delete the specified entities.
      * 
      * @param entityReferences the entities to delete
-     * @param deep {@code true} to delete the entity descendants too, {@code false} otherwise
      * @return the delete request
      */
-    public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences, boolean deep)
+    public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences)
     {
         EntityRequest request = new EntityRequest();
         initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
-        request.setDeep(deep);
         return request;
     }
 
@@ -228,7 +226,6 @@ public class RefactoringScriptService implements ScriptService
         request.setInteractive(true);
         request.setJobType(type);
         request.setEntityReferences(entityReferences);
-        request.setDeep(true);
         setRightsProperties(request);
     }
 
@@ -379,11 +376,7 @@ public class RefactoringScriptService implements ScriptService
                 // document.
                 DocumentReference terminalDocumentReference =
                     new DocumentReference(parentReference.getName(), new SpaceReference(parentReference.getParent()));
-                // We cannot convert a nested document to a terminal document and preserve its child documents at the
-                // same time. If the target document has child documents they will become orphans.
-                MoveRequest request = createRenameRequest(documentReference, terminalDocumentReference);
-                request.setDeep(false);
-                return rename(request);
+                return rename(documentReference, terminalDocumentReference);
             }
         }
         // The specified document is already a terminal document or cannot be converted to a terminal document.
@@ -489,7 +482,7 @@ public class RefactoringScriptService implements ScriptService
      */
     public Job delete(Collection<EntityReference> entityReferences)
     {
-        return delete(createDeleteRequest(entityReferences, false));
+        return delete(createDeleteRequest(entityReferences));
     }
 
     /**
@@ -577,6 +570,17 @@ public class RefactoringScriptService implements ScriptService
     public EntityJobStatus<MoveRequest> getCopyAsJobStatus(String id)
     {
         return getJobStatus(getJobId(RefactoringJobs.COPY_AS, id));
+    }
+
+    /**
+     * Retrieve the status of a delete job.
+     * 
+     * @param id the id of a delete job
+     * @return the status of the specified job
+     */
+    public EntityJobStatus<EntityRequest> getDeleteJobStatus(String id)
+    {
+        return getJobStatus(getJobId(RefactoringJobs.DELETE, id));
     }
 
     @SuppressWarnings("unchecked")

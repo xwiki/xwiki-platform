@@ -52,5 +52,8 @@ skin.sheet.js.deleteConfirmationText=Êtes-vous certain de vouloir supprimer ce 
 skin.sheet.js.deleteConfirmationYes=Oui, le supprimer
 skin.sheet.js.deleting=Suppression...
 skin.sheet.js.deletingDone=Le modèle a été supprimé
+skin.sheet.js.error.rights=Impossible d'enregistrer le thème, vous ne disposez pas de droits suffisants.
+skin.sheet.properties=Propriétés du thème
+skin.sheet.title=Thème
 </content>
 </xwikidoc>

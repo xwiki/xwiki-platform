@@ -395,7 +395,7 @@ Total number of XWiki installations that have ever sent us a ping (from XWiki 5.
     <property>
       <content>{{include reference="ActiveInstalls.ActiveInstallsHistory"/}}
 
-Active Installs over time (since XWiki 6.1-milestone-1).
+Active Installs over time. Total number of XWiki installations that have sent us a ping in the past week (since XWiki 6.1-milestone-1).
 
 </content>
     </property>

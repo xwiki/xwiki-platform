@@ -81,8 +81,7 @@ public class WikiReader
         return this.xarPackage;
     }
 
-    public void read(Object filter, XARInputFilter proxyFilter) throws IOException,
-        FilterException
+    public void read(Object filter, XARInputFilter proxyFilter) throws IOException, FilterException
     {
         InputStream stream;
 
@@ -95,9 +94,9 @@ public class WikiReader
 
         read(stream, filter, proxyFilter);
 
-        // Close last space
-        if (this.documentReader.isSentBeginWikiSpace() && this.documentReader.getCurrentSpaceReference() != null) {
-            for (EntityReference space = this.documentReader.getCurrentSpaceReference(); space != null; space =
+        // Close remaining opened spaces
+        if (this.documentReader.getSentSpaceReference() != null) {
+            for (EntityReference space = this.documentReader.getSentSpaceReference(); space != null; space =
                 space.getParent()) {
                 proxyFilter.endWikiSpace(space.getName(), FilterEventParameters.EMPTY);
             }

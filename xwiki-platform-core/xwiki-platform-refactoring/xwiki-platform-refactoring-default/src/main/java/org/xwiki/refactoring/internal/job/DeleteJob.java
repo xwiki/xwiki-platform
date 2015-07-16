@@ -19,13 +19,12 @@
  */
 package org.xwiki.refactoring.internal.job;
 
-import java.util.List;
-
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
@@ -60,64 +59,45 @@ public class DeleteJob extends AbstractOldCoreEntityJob<EntityRequest, EntityJob
 
         switch (entityReference.getType()) {
             case DOCUMENT:
-                delete(new DocumentReference(entityReference), this.request.isDeep());
+                process(new DocumentReference(entityReference));
+                break;
+            case SPACE:
+                process(new SpaceReference(entityReference));
                 break;
             default:
-                this.logger.warn("Unsupported entity type [{}].", entityReference.getType());
+                this.logger.error("Unsupported entity type [{}].", entityReference.getType());
         }
     }
 
-    private void delete(DocumentReference documentReference, boolean deep)
+    private void process(DocumentReference documentReference)
     {
-        this.progressManager.pushLevelProgress(2, this);
-
-        try {
-            // Step 1: Delete the document if possible.
-            this.progressManager.startStep(this);
-            if (!exists(documentReference)) {
-                this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
-            } else if (!hasAccess(Right.DELETE, documentReference)) {
-                this.logger.warn("You are not allowed to delete [{}].", documentReference);
-            } else {
-                delete(documentReference);
-            }
-            this.progressManager.endStep(this);
-
-            // Note that we continue with the children even if deleting the parent failed.
-
-            // Step 2: Delete the child documents.
-            this.progressManager.startStep(this);
-            if (deep && !isTerminal(documentReference)) {
-                deleteChildren(documentReference);
-            }
-            this.progressManager.endStep(this);
-        } finally {
-            this.progressManager.popLevelProgress(this);
+        if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
+            process(documentReference.getLastSpaceReference());
+        } else {
+            maybeDelete(documentReference);
         }
     }
 
-    private void deleteChildren(DocumentReference documentReference)
+    private void process(SpaceReference spaceReference)
     {
-        List<DocumentReference> childReferences = getChildren(documentReference);
-
-        this.progressManager.pushLevelProgress(childReferences.size(), this);
-
-        try {
-            for (DocumentReference childReference : childReferences) {
-                if (this.status.isCanceled()) {
-                    break;
-                } else {
-                    this.progressManager.startStep(this);
-
-                    // We don't have to delete recursively because #getChildDocuments() returns all the descendants
-                    // actually (because we don't have a way to retrieve the direct child documents at the moment).
-                    delete(childReference, false);
-
-                    this.progressManager.endStep(this);
-                }
+        visitDocuments(spaceReference, new Visitor<DocumentReference>()
+        {
+            @Override
+            public void visit(DocumentReference documentReference)
+            {
+                maybeDelete(documentReference);
             }
-        } finally {
-            this.progressManager.popLevelProgress(this);
+        });
+    }
+
+    private void maybeDelete(DocumentReference documentReference)
+    {
+        if (!exists(documentReference)) {
+            this.logger.warn("Skipping [{}] because it doesn't exist.", documentReference);
+        } else if (!hasAccess(Right.DELETE, documentReference)) {
+            this.logger.error("You are not allowed to delete [{}].", documentReference);
+        } else {
+            delete(documentReference);
         }
     }
 }

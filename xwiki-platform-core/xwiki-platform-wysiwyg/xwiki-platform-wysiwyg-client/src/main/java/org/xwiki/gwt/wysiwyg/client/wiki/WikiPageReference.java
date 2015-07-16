@@ -113,6 +113,18 @@ public class WikiPageReference implements IsSerializable
     }
 
     /**
+     * @return the space pretty name
+     */
+    public native String getSpacePrettyName()
+    /*-{
+        var localSpaceReference = this.@org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference::getSpaceName()();
+        var spaceReference = $wnd.XWiki.Model.resolve(localSpaceReference, $wnd.XWiki.EntityType.SPACE);
+        return spaceReference.getReversedReferenceChain().map(function(entityReference) {
+          return entityReference.name;
+        }).join(' \u00BB ');
+    }-*/;
+
+    /**
      * Sets the name of the space that hosts the referenced entity.
      * 
      * @param spaceName the name of the space that hosts the referenced entity

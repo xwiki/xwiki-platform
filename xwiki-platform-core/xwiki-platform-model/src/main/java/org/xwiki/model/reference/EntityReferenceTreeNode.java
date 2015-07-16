@@ -132,6 +132,28 @@ public class EntityReferenceTreeNode
     }
 
     /**
+     * @param path a path in the tree starting from this node, specified as an {@link EntityReference}
+     * @return the node associated to the specified path
+     * @since 7.2M1
+     */
+    public EntityReferenceTreeNode get(EntityReference path)
+    {
+        if (path == null) {
+            return null;
+        }
+
+        EntityReferenceTreeNode descendant = this;
+        for (EntityReference pathElement : path.getReversedReferenceChain()) {
+            descendant = descendant.get(pathElement.getName());
+            if (descendant == null || descendant.getReference().getType() != pathElement.getType()) {
+                return null;
+            }
+        }
+
+        return descendant;
+    }
+
+    /**
      * @return the child reference nodes
      */
     public Collection<EntityReferenceTreeNode> getChildren()

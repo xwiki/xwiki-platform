@@ -1775,6 +1775,10 @@ public class XWiki implements EventListener
         return getStore().search(sql, nb, start, whereParams, context);
     }
 
+    /**
+     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
+     */
+    @Deprecated
     public String parseContent(String content, XWikiContext xcontext)
     {
         return getOldRendering().parseContent(content, xcontext);
@@ -4986,7 +4990,7 @@ public class XWiki implements EventListener
                 }
                 text =
                     evaluateVelocity(format, "<username formatting code in " + context.getDoc().getDocumentReference()
-                        + ">", vcontext, context);
+                        + ">", vcontext);
             }
 
             if (escapeXML || link) {
@@ -5006,7 +5010,15 @@ public class XWiki implements EventListener
         }
     }
 
-    private String evaluateVelocity(String content, String name, VelocityContext vcontext, XWikiContext context)
+    /**
+     * @param content the Velocity content to evaluate
+     * @param name the namespace under which to evaluate it (used for isolation)
+     * @param vcontext the Velocity context to use when evaluating. If {@code null}, then a new context will be created,
+     *            initialized and used.
+     * @return the evaluated content
+     * @since 7.2M1
+     */
+    public String evaluateVelocity(String content, String name, VelocityContext vcontext)
     {
         StringWriter writer = new StringWriter();
         try {
@@ -5014,13 +5026,37 @@ public class XWiki implements EventListener
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
-            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
-            Object[] args = { name };
+            LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", name, content, e);
+            Object[] args = {name};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
                     XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
                     e, args);
-            return Util.getHTMLExceptionMessage(xe, context);
+            return Util.getHTMLExceptionMessage(xe, null);
+        }
+    }
+
+    /**
+     * @param content the Velocity content to evaluate
+     * @param name the namespace under which to evaluate it (used for isolation)
+     * @return the evaluated content
+     * @since 7.2M1
+     */
+    public String evaluateVelocity(String content, String name)
+    {
+        StringWriter writer = new StringWriter();
+        try {
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            VelocityContext velocityContext = velocityManager.getVelocityContext();
+            return evaluateVelocity(content, name, velocityContext);
+        } catch (Exception e) {
+            LOGGER.error("Error while parsing velocity template namespace [{}] with content:\n[{}]", name, content, e);
+            Object[] args = {name};
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while parsing velocity page {0}",
+                    e, args);
+            return Util.getHTMLExceptionMessage(xe, null);
         }
     }
 

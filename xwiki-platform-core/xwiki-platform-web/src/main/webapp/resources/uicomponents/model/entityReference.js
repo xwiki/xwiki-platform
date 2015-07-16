@@ -72,8 +72,8 @@ XWiki.EntityReference = Class.create({
    * @return a new reference pointing to the same entity but relative to the given reference
    */
   relativeTo: function(baseReference) {
-    var components = this._extractComponents().reverse();
-    var baseComponents = baseReference ? baseReference._extractComponents().reverse() : [];
+    var components = this.getReversedReferenceChain();
+    var baseComponents = baseReference ? baseReference.getReversedReferenceChain() : [];
     while (components.length > 0 && baseComponents.length > 0 && components[0].type != baseComponents[0].type) {
       components[0].type > baseComponents[0].type ? baseComponents.shift() : components.shift();
     }
@@ -96,14 +96,14 @@ XWiki.EntityReference = Class.create({
     }
   },
 
-  _extractComponents: function() {
+  getReversedReferenceChain: function() {
     var components = [];
     var reference = this;
     while (reference) {
       components.push(reference);
       reference = reference.parent;
     }
-    return components;
+    return components.reverse();
   },
 
   getRoot: function() {

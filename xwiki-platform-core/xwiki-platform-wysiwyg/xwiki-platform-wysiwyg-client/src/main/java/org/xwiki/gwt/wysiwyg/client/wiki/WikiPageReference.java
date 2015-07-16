@@ -119,12 +119,9 @@ public class WikiPageReference implements IsSerializable
     /*-{
         var localSpaceReference = this.@org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference::getSpaceName()();
         var spaceReference = $wnd.XWiki.Model.resolve(localSpaceReference, $wnd.XWiki.EntityType.SPACE);
-        var spaceNames = [];
-        while (spaceReference) {
-          spaceNames.push(spaceReference.name);
-          spaceReference = spaceReference.parent;
-        }
-        return spaceNames.reverse().join(' \u00BB ');
+        return spaceReference.getReversedReferenceChain().map(function(entityReference) {
+          return entityReference.name;
+        }).join(' \u00BB ');
     }-*/;
 
     /**

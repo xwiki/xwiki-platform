@@ -26,6 +26,7 @@ import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerialize
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.SpaceReferenceResolver;
 
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
@@ -40,6 +41,8 @@ public class XWikiSpace
     private static final String CURRENT = "current";
 
     private static final LocalStringEntityReferenceSerializer SERIALIZER = new LocalStringEntityReferenceSerializer();
+
+    private final XWikiStoreInterface store;
 
     /**
      * Synthetic id.
@@ -62,7 +65,7 @@ public class XWikiSpace
      */
     protected XWikiSpace()
     {
-
+        this(null, null);
     }
 
     /**
@@ -70,12 +73,41 @@ public class XWikiSpace
      */
     public XWikiSpace(SpaceReference reference)
     {
+        this(reference, null);
+    }
+
+    /**
+     * @param reference the complete reference of the space
+     * @param hidden true if all the documents in the space are hidden
+     */
+    public XWikiSpace(SpaceReference reference, boolean hidden)
+    {
+        this(reference, null);
+
+        setHidden(hidden);
+    }
+
+    /**
+     * @param reference the complete reference of the space
+     * @param store the store where the {@link XWikiSpace} instance come from
+     */
+    public XWikiSpace(SpaceReference reference, XWikiStoreInterface store)
+    {
         this.reference = reference;
+        this.store = store;
     }
 
     private static SpaceReferenceResolver<String> getCurrentSpaceResolver()
     {
         return Utils.getComponent(SpaceReferenceResolver.TYPE_STRING, CURRENT);
+    }
+
+    /**
+     * @return the store where the {@link XWikiSpace} instance come from
+     */
+    public XWikiStoreInterface getStore()
+    {
+        return this.store;
     }
 
     /**
@@ -186,5 +218,11 @@ public class XWikiSpace
     public SpaceReference getSpaceReference()
     {
         return this.reference;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getSpaceReference().toString();
     }
 }

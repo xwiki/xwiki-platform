@@ -674,71 +674,139 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private void updateXWikiSpaceTable(XWikiDocument document, Session session)
     {
         if (!document.isNew()) {
+            // If the hidden state of an existing document did not changed there is nothing to do
             if (document.isHidden() != document.getOriginalDocument().isHidden()) {
-                // Hidden status did not changed
-                return;
+                if (document.isHidden()) {
+                    // If the document became hidden it's possible the space did too
+                    maybeMakeSpaceHidden(document.getDocumentReference().getLastSpaceReference(),
+                        document.getFullName(), session);
+                } else {
+                    // If the document became visible then all its parents should be visible as well
+                    makeSpaceVisible(document.getDocumentReference().getLastSpaceReference(), session);
+                }
             }
+        } else {
+            // It's possible the space of a new document does not yet exist
+            maybeCreateSpace(document.getDocumentReference().getLastSpaceReference(), document.isHidden(),
+                document.getFullName(), session);
         }
-
-        updateParentSpace(document.getDocumentReference().getLastSpaceReference(), document.isNew(),
-            document.isHidden(), session);
     }
 
-    private void insertXWikiSpace(XWikiSpace space, Session session)
+    private void insertXWikiSpace(XWikiSpace space, String newDocument, Session session)
     {
         // Insert the space
         session.save(space);
 
         // Update parent space
         if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-            updateParentSpace((SpaceReference) space.getSpaceReference().getParent(), true, space.isHidden(), session);
+            maybeCreateSpace((SpaceReference) space.getSpaceReference().getParent(), space.isHidden(), newDocument,
+                session);
         }
     }
 
-    private void updateXWikiSpaceHidden(XWikiSpace space, boolean hidden, Session session)
-    {
-        // Update the space
-        session.update(space);
-
-        // Update parent space
-        if (space.getSpaceReference().getParent() instanceof SpaceReference) {
-            updateParentSpace((SpaceReference) space.getSpaceReference().getParent(), true, space.isHidden(), session);
-        }
-    }
-
-    private void updateParentSpace(SpaceReference spaceReference, boolean childNew, boolean childHidden, Session session)
+    private void makeSpaceVisible(SpaceReference spaceReference, Session session)
     {
         XWikiSpace space = loadXWikiSpace(spaceReference, session);
 
-        if (space == null) {
-            space = new XWikiSpace(spaceReference);
-            space.setHidden(childHidden);
+        makeSpaceVisible(space, session);
+    }
 
-            insertXWikiSpace(space, session);
-        } else {
-            if (childNew) {
-                // New document has been created
-                if (space.isHidden() && !childHidden) {
-                    updateXWikiSpaceHidden(space, false, session);
-                }
-            } else {
-                // Document hidden status changed
-                if (space.isHidden() != childHidden) {
-                    // Check if the space hidden status need to be updated if it's not the same than the document
-                    if (space.isHidden() != calculateHiddenStatus(spaceReference, session)) {
-                        updateXWikiSpaceHidden(space, !space.isHidden(), session);
-                    }
-                }
+    private void makeSpaceVisible(XWikiSpace space, Session session)
+    {
+        if (space.isHidden()) {
+            space.setHidden(false);
+
+            session.update(space);
+
+            // Update parent
+            if (space.getSpaceReference().getParent() instanceof SpaceReference) {
+                makeSpaceVisible((SpaceReference) space.getSpaceReference().getParent(), session);
             }
         }
+    }
+
+    private void maybeMakeSpaceHidden(SpaceReference spaceReference, String modifiedDocument, Session session)
+    {
+        XWikiSpace space = loadXWikiSpace(spaceReference, session);
+
+        // If the space is already hidden return
+        if (space.isHidden()) {
+            return;
+        }
+
+        if (calculateHiddenStatus(spaceReference, modifiedDocument, session)) {
+            // Make the space hidden
+            space.setHidden(true);
+            session.update(space);
+
+            // Update space parent
+            if (spaceReference.getParent() instanceof SpaceReference) {
+                maybeMakeSpaceHidden((SpaceReference) spaceReference.getParent(), modifiedDocument, session);
+            }
+        }
+    }
+
+    private void maybeCreateSpace(SpaceReference spaceReference, boolean hidden, String newDocument, Session session)
+    {
+        XWikiSpace space = loadXWikiSpace(spaceReference, session);
+
+        if (space != null) {
+            if (space.isHidden() && !hidden) {
+                makeSpaceVisible(space, session);
+            }
+        } else {
+            insertXWikiSpace(new XWikiSpace(spaceReference, hidden), newDocument, session);
+        }
+    }
+
+    private long countAllDocuments(SpaceReference spaceReference, Session session, String extraWhere,
+        Object... extraParameters)
+    {
+        StringBuilder builder =
+            new StringBuilder("select count(*) from XWikiDocument as xwikidoc where (space = ? OR space LIKE ?)");
+
+        if (StringUtils.isNotEmpty(extraWhere)) {
+            builder.append(" AND ");
+            builder.append('(');
+            builder.append(extraWhere);
+            builder.append(')');
+        }
+
+        Query query = session.createQuery(builder.toString());
+
+        String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
+
+        int index = 0;
+
+        query.setString(index++, localSpaceReference);
+        query.setString(index++, localSpaceReference + ".%");
+
+        if (extraParameters != null) {
+            for (Object parameter : extraParameters) {
+                query.setParameter(index++, parameter);
+            }
+        }
+
+        return (Long) query.uniqueResult();
     }
 
     /**
      * Find hidden status of a space from its children.
      */
-    private boolean calculateHiddenStatus(SpaceReference spaceReference, Session session)
+    private boolean calculateHiddenStatus(SpaceReference spaceReference, String documentToIngore, Session session)
     {
-        
+        // If there is at least one visible document then the space is visible
+        StringBuilder builder = new StringBuilder("(hidden = false OR hidden IS NULL)");
+
+        Object[] parameters;
+        if (documentToIngore != null) {
+            builder.append(" AND fullName <> ?");
+            parameters = new Object[] { documentToIngore };
+        } else {
+            parameters = null;
+        }
+
+        return !(countAllDocuments(spaceReference, session, builder.toString(), parameters) > 0);
     }
 
     private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
@@ -986,24 +1054,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // We need to ensure that the deleted document becomes the original document
             doc.setOriginalDocument(doc.clone());
 
-            // Update space table if needed (when this was the last entity in the space)
-            String documentSpace = doc.getSpace();
-            boolean spaceDeleted = false;
-            int spaceDocuments = countDocuments(documentSpace);
-            if (spaceDocuments == 1) {
-                // The document is the last document in the space
-                int spaceSpaces = countSpaces(documentSpace);
-                if (spaceSpaces == 0) {
-                    // The space does not contain any subspace
-                    deleteSpace(documentSpace);
-                    spaceDeleted = true;
-                }
-            }
-
-            // Update space hidden property if needed (and if the space still exist)
-            if (!spaceDeleted) {
-                updateParentSpace(doc.getDocumentReference().getLastSpaceReference(), false, true, session);
-            }
+            // Update space table if needed
+            maybeDeleteXWikiSpace(doc.getDocumentReference(), session);
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -1026,6 +1078,44 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
+    }
+
+    private void maybeDeleteXWikiSpace(DocumentReference deletedDocument, Session session)
+    {
+        maybeDeleteXWikiSpace(deletedDocument.getLastSpaceReference(),
+            this.localEntityReferenceSerializer.serialize(deletedDocument), session);
+    }
+
+    private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)
+    {
+        if (countAllDocuments(spaceReference, session, "fullName <> ?", deletedDocument) == 0) {
+            // The document was the last document in the space
+            XWikiSpace space = new XWikiSpace(spaceReference, this);
+
+            session.delete(space);
+
+            // Update parent
+            if (spaceReference.getParent() instanceof SpaceReference) {
+                maybeDeleteXWikiSpace((SpaceReference) spaceReference.getParent(), deletedDocument, session);
+            }
+        } else {
+            // Update space hidden property if needed
+            maybeMakeSpaceHidden(spaceReference, deletedDocument, session);
+        }
+    }
+
+    private XWikiSpace loadXWikiSpace(SpaceReference spaceReference, Session session)
+    {
+        XWikiSpace space = new XWikiSpace(spaceReference, this);
+
+        try {
+            session.load(space, new Long(space.getId()));
+        } catch (ObjectNotFoundException e) {
+            // No space
+            return null;
+        }
+
+        return space;
     }
 
     private void checkObjectClassIsLocal(BaseCollection object, XWikiContext context) throws XWikiException

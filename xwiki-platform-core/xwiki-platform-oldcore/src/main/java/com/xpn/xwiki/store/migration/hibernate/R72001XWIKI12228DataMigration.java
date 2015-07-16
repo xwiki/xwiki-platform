@@ -26,8 +26,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,12 +38,13 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSpace;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
@@ -60,12 +62,13 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigration
 {
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
+    /**
+     * We don't really care what is the wiki since it's only used to go trough XWikiSpace utility methods.
+     */
+    private static final WikiReference WIKI = new WikiReference("wiki");
 
     @Inject
-    @Named("relative")
-    private EntityReferenceResolver<String> resolver;
+    private SpaceReferenceResolver<String> spaceResolver;
 
     @Override
     public String getDescription()
@@ -99,53 +102,110 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         @Override
         public void execute(Connection connection) throws SQLException
         {
-            // Copy hidden spaces
-            createSpaces(true, connection);
-
             // Copy visible spaces
-            createSpaces(true, connection);
+            Collection<SpaceReference> visibleSpaces = createVisibleSpaces(connection);
+
+            // Copy hidden spaces
+            createHiddenSpaces(visibleSpaces, connection);
         }
 
         private String createSpaceQuery(boolean hidden)
         {
             StringBuilder query = new StringBuilder("select DISTINCT XWD_WEB from xwikidoc where");
             if (hidden) {
-                query.append("XWD_WEB not in (" + createSpaceQuery(false) + ")");
+                query.append(" XWD_WEB not in (" + createSpaceQuery(false) + ")");
             } else {
-                query.append("XWD_HIDDEN <> false OR XWD_HIDDEN IS NULL");
+                query.append(" XWD_HIDDEN <> true OR XWD_HIDDEN IS NULL");
             }
 
             return query.toString();
         }
 
-        private List<EntityReference> getSpaces(boolean hidden, Connection connection) throws SQLException
+        private Collection<SpaceReference> getVisibleSpaces(Connection connection) throws SQLException
         {
-            List<EntityReference> spaces = Collections.emptyList();
+            Collection<SpaceReference> databaseSpaces;
 
             try (Statement selectStatement = connection.createStatement()) {
-                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(hidden))) {
-                    spaces = new ArrayList<>();
+                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(false))) {
+                    databaseSpaces = new ArrayList<>();
 
-                    do {
-                        spaces.add(resolver.resolve(result.getString(1), EntityType.SPACE));
-                    } while (result.next());
+                    while (result.next()) {
+                        databaseSpaces.add(spaceResolver.resolve(result.getString(1), WIKI));
+                    }
+                }
+            }
+
+            // Resolve nested spaces
+            Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
+            for (SpaceReference space : databaseSpaces) {
+                for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+                    parent.getParent()) {
+                    spaces.add((SpaceReference) parent);
                 }
             }
 
             return spaces;
         }
 
-        private void createSpaces(boolean hidden, Connection connection) throws SQLException
+        private Collection<SpaceReference> getHiddenSpaces(Collection<SpaceReference> visibleSpaces,
+            Connection connection) throws SQLException
+        {
+            Collection<SpaceReference> databaseSpaces;
+
+            try (Statement selectStatement = connection.createStatement()) {
+                try (ResultSet result = selectStatement.executeQuery(createSpaceQuery(true))) {
+                    databaseSpaces = new ArrayList<>();
+
+                    while (result.next()) {
+                        databaseSpaces.add(spaceResolver.resolve(result.getString(1), WIKI));
+                    }
+                }
+            }
+
+            // Resolve nested spaces
+            Set<SpaceReference> spaces = new HashSet<>(databaseSpaces);
+            for (SpaceReference space : databaseSpaces) {
+                for (EntityReference parent = space.getParent(); parent instanceof SpaceReference; parent =
+                    parent.getParent()) {
+                    if (!visibleSpaces.contains(parent)) {
+                        spaces.add((SpaceReference) parent);
+                    }
+                }
+            }
+
+            return spaces;
+        }
+
+        private Collection<SpaceReference> createVisibleSpaces(Connection connection) throws SQLException
         {
             // Get spaces
-            List<EntityReference> spaces = getSpaces(hidden, connection);
+            Collection<SpaceReference> spaces = getVisibleSpaces(connection);
 
+            // Create spaces
+            createSpaces(spaces, false, connection);
+
+            return spaces;
+        }
+
+        private void createHiddenSpaces(Collection<SpaceReference> visibleSpaces, Connection connection)
+            throws SQLException
+        {
+            // Get spaces
+            Collection<SpaceReference> spaces = getHiddenSpaces(visibleSpaces, connection);
+
+            // Create spaces
+            createSpaces(spaces, true, connection);
+        }
+
+        private void createSpaces(Collection<SpaceReference> spaces, boolean hidden, Connection connection)
+            throws SQLException
+        {
             // Create spaces in the xwikispace table
             try (PreparedStatement statement =
                 connection.prepareStatement("INSERT INTO xwikispace"
-                    + " (XWS_HIDDEN, XWS_REFERENCE, XWS_NAME, XWS_PARENT) VALUES (?, ?, ?, ?)")) {
-                for (EntityReference space : spaces) {
-                    addBatch(statement, space, hidden);
+                    + " (XWS_ID, XWS_HIDDEN, XWS_REFERENCE, XWS_NAME, XWS_PARENT) VALUES (?, ?, ?, ?, ?)")) {
+                for (SpaceReference space : spaces) {
+                    addBatch(statement, new XWikiSpace(space, hidden));
                 }
 
                 // Do all the changes
@@ -154,19 +214,22 @@ public class R72001XWIKI12228DataMigration extends AbstractHibernateDataMigratio
         }
     }
 
-    private void addBatch(PreparedStatement statement, EntityReference space, boolean hidden) throws SQLException
+    private void addBatch(PreparedStatement statement, XWikiSpace space) throws SQLException
     {
+        // id
+        statement.setLong(1, space.getId());
+
         // hidden
-        statement.setBoolean(1, hidden);
+        statement.setBoolean(2, space.isHidden());
 
         // reference
-        statement.setString(2, this.serializer.serialize(space));
+        statement.setString(3, space.getReference());
 
         // name
-        statement.setString(3, space.getName());
+        statement.setString(4, space.getName());
 
         // parent
-        statement.setString(4, this.serializer.serialize(space.getParent()));
+        statement.setString(5, space.getParent());
 
         // Add a space to the list
         statement.addBatch();

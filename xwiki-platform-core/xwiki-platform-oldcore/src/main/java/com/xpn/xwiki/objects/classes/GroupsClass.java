@@ -195,7 +195,11 @@ public class GroupsClass extends ListClass
     @Override
     public void fromList(BaseProperty<?> property, List<String> list)
     {
-        property.setValue(list != null ? StringUtils.join(list, ',') : null);
+        if (isMultiSelect()) {
+            property.setValue(list != null ? StringUtils.join(list, ',') : null);
+        } else {
+            property.setValue(list != null && !list.isEmpty() ? list.get(0) : null);
+        }
     }
 
     @Override

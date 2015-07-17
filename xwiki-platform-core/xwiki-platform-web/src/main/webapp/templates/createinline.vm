@@ -247,8 +247,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     ## Make sure to use the local serialized string reference
     #set ($defaultSpaceReferenceString = $services.model.serialize($defaultSpaceReference, 'local'))
     <dt>
-      <label for='spaceReference'>Location</label>
-      <span class='xHint'>The location in the page hierarchy where this new page will be created. Leave empty for top level page.</span>
+      <label for='spaceReference'>$services.localization.render('core.create.spaceReference.label')</label>
+      <span class='xHint'>$services.localization.render('core.create.spaceReference.hint')</span>
     </dt>
     <dd>
       <input type='text' id='spaceReference' size='60' name='spaceReference' class='suggestSpaces' value="$!{escapetool.xml($defaultSpaceReferenceString)}"/>
@@ -289,8 +289,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     </dt>
     <dd>
       <label for='terminal'>
-        <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end/>
-        This is a terminal page
+        <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end />
+        $services.localization.render('core.create.terminal.status')
       </label>
     </dd>
   #end

@@ -236,9 +236,18 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   ## ---------------------------------------------------------------------------------------------------------
   ## Space Reference field
   ## ---------------------------------------------------------------------------------------------------------
-  ## In deprecated mode, we only have a space name.
-  #set ($deprecatedMode = "$!request.tocreate" == 'space')
-  #if(("$!spaceReference" == '' || $showSpaceReferenceInput) && !$deprecatedMode)
+  ## Determine if we need to show the space reference input.
+  #if (!$showSpaceReferenceInput)
+    ## We are on an existing document and no space reference was specified for the new document to create.
+    #set ($showSpaceReferenceInput = (!$doc.isNew() && "$!spaceReference" == ''))
+    #if ($showSpaceReferenceInput)
+      ## In the deprecated space creation process however, we only needed the space name.
+      #set ($deprecatedSpaceCreate = ("$!request.tocreate" == 'space'))
+      #set ($showSpaceReferenceInput = !$deprecatedSpaceCreate)
+    #end
+  #end
+  ##
+  #if ($showSpaceReferenceInput)
     #if ("$!spaceReference" == '')
       #set ($defaultSpaceReference = $doc.documentReference.lastSpaceReference)
     #else

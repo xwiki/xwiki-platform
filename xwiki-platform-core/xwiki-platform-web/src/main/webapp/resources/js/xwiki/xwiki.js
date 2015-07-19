@@ -1483,7 +1483,7 @@ document.observe('xwiki:dom:loaded', function() {
 /*
  * AJAX improvements for setting the document parent.
  */
-#if ($services.parentchild.isLegacyParentChildMechanismEnabled())
+#if ($services.parentchild.isParentChildMechanismEnabled())
 document.observe('xwiki:dom:loaded', function() {
   var hierarchyElement   = $('hierarchy');
   var breadcrumbsElement = $('breadcrumbs');

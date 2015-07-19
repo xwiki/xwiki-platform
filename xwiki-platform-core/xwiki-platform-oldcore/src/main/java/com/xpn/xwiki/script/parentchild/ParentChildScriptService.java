@@ -32,7 +32,11 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,10 +53,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Component
 @Named("parentchild")
 @Singleton
+@Unstable
 public class ParentChildScriptService implements ScriptService
 {
     @Inject
     private ConfigurationSource configurationSource;
+    
+    @Inject
+    private DocumentReferenceResolver<EntityReference> documentReferenceResolver;
     
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -61,22 +69,43 @@ public class ParentChildScriptService implements ScriptService
     private Logger logger;
 
     /** 
-     * @return whether or not the legacy parent/child mechanism is enabled
+     * @return whether or not legacy parent/child mechanism is enabled for the hierarchy handling
      */
-    public boolean isLegacyParentChildMechanismEnabled()
+    public boolean isParentChildMechanismEnabled()
     {
-        return configurationSource.getProperty("core.useLegacyParentChildMechanism", false);
+        return "parentchild".equals(
+                configurationSource.getProperty("core.hierarchyMode", "reference"));
     }
 
     /**
      * @param docRef a reference of the document
      * @return the list of parents of the document
      */
-    public List<DocumentReference> getLegacyParents(DocumentReference docRef)
+    public List<DocumentReference> getParents(DocumentReference docRef)
+    {
+        if (isParentChildMechanismEnabled()) {
+            return getParentsBasedOnParentChildRelationship(docRef);
+        } else {
+            return getParentsBasedOnReference(docRef);
+        }
+    }
+    
+    private List<DocumentReference> getParentsBasedOnReference(DocumentReference docRef)
+    {
+        List<DocumentReference> parents = new ArrayList<>();
+        
+        for (SpaceReference spaceReference : docRef.getSpaceReferences()) {
+            parents.add(documentReferenceResolver.resolve(spaceReference));
+        }
+        
+        return parents;
+    }
+    
+    private List<DocumentReference> getParentsBasedOnParentChildRelationship(DocumentReference docRef)
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
-        
+
         List<DocumentReference> parents = new ArrayList<>();
         try {
             XWikiDocument document = xwiki.getDocument(docRef, context);
@@ -89,7 +118,7 @@ public class ParentChildScriptService implements ScriptService
         }
 
         Collections.reverse(parents);
-        
+
         return parents;
     }
 }

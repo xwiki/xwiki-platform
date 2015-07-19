@@ -11,8 +11,8 @@
   ## configuration.
   #######################################################
   #if (!$doc.documentReference.equals($homeReference))
-    #if($services.parentchild.isLegacyParentChildMechanismEnabled())
-      #hierarchy_legacy()
+    #if($services.parentchild.isParentChildMechanismEnabled())
+      #hierarchy_parentChild()
     #else
       #hierarchy()
     #end
@@ -28,12 +28,11 @@
       ## We first display the home page manually because we always want it to be here even if it is not a parent of the
       ## current document.
       <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
-      #set($homeSpace = $homeReference.lastSpaceReference)
-      #foreach($space in $doc.documentReference.spaceReferences)
+      #foreach($parent in $services.parentchild.getParents($doc.documentReference))
         ## The home has already been displayed
-        #if(!$homeSpace.equals($space))
-          #set($pdoc = $xwiki.getDocument($space))
-          <li><a href='$xwiki.getURL($space)'>$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
+        #if(!$homeReference.equals($parent))
+          #set($pdoc = $xwiki.getDocument($parent))
+          <li><a href='$xwiki.getURL($parent)'>$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
         #end
       #end
       #if ($doc.name != 'WebHome')
@@ -43,14 +42,14 @@
     </ol>
   #end
   #######################################################
-  ##                LEGACY BREADCRUMB
+  ##            BREADCRUMB FOR PARENT/CHILD
   ##
   ## Display the parents of a document based on the old 
   ## parent/child mechanism.
   #######################################################
-  #macro(hierarchy_legacy)
+  #macro(hierarchy_parentChild)
     #if("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
-      #set($parents = $services.parentchild.getLegacyParents($doc.documentReference))
+      #set($parents = $services.parentchild.getParents($doc.documentReference))
       <ol id="hierarchy" class="breadcrumb clearfix">
         ## Display the parents
         #foreach($parent in $parents)

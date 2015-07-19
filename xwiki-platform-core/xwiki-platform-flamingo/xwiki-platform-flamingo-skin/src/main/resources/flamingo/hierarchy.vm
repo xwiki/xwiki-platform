@@ -32,7 +32,11 @@
         ## The home has already been displayed
         #if(!$homeReference.equals($parent))
           #set($pdoc = $xwiki.getDocument($parent))
-          <li><a href='$xwiki.getURL($parent)'>$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
+          #if ($pdoc)
+            <li><a href='$xwiki.getURL($parent)'>$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
+          #else
+            <li>$escapetool.xml($services.model.serialize($parent, 'local'))</li>
+          #end
         #end
       #end
       #if ($doc.name != 'WebHome')
@@ -57,7 +61,11 @@
             <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
           #else
             #set($pdoc = $xwiki.getDocument($parent))
-            <li><a href="$pdoc.getURL('view')">$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
+            #if ($pdoc)
+              <li><a href="$pdoc.getURL('view')">$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
+            #else
+              <li>$escapetool.xml($services.model.serialize($parent, 'local'))</li>
+            #end
           #end
         #end
         ## Display the current document

@@ -1271,4 +1271,17 @@ public class TestUtils
     {
         gotoPage(space, page, "rollback", "rev", version, "confirm", "1");
     }
+
+    /**
+     * Set the hierarchy mode used in the wiki
+     * @param mode the mode to use ("reference" or "parentchild")
+     * @since 7.2M2
+     */
+    public void setHierarchyMode(String mode) {
+        String PROPERTY_NAME = "core.hierarchyMode";
+        addClassProperty("XWiki", "XWikiPreferences", PROPERTY_NAME, "String");
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(PROPERTY_NAME, mode);
+        updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, properties);
+    }
 }

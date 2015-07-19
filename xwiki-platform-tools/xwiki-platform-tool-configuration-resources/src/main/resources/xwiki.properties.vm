@@ -55,6 +55,15 @@
 #-# Default value is 100.
 # core.renderingcache.size=100
 
+#-# [Since 7.2M2]
+#-# Define which hierarchy is used between pages (for example inside the breadcrumb).
+#-# Possible values are "reference" (default) or "parentchild".
+#-# If "parentchild" is used, the hierachy is based on the parent/child relationship, which means that any document
+#-# could be defined as the parent of an other document.
+#-# If "reference" is used, then the children of a document must be placed inside this document. It's less flexible but
+#-# more clear.
+# core.hierarchyMode=reference
+
 #-------------------------------------------------------------------------------------
 # Environment
 #-------------------------------------------------------------------------------------

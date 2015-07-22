@@ -194,4 +194,8 @@ public class ObjectEditPage extends EditPage
         }
         return objects;
     }
+
+    public boolean hasObject(String className) {
+        return !getDriver().findElementsWithoutWaiting(By.id("xclass" + className)).isEmpty();
+    }
 }

@@ -1278,10 +1278,25 @@ public class TestUtils
      * @since 7.2M2
      */
     public void setHierarchyMode(String mode) {
-        String PROPERTY_NAME = "core.hierarchyMode";
-        addClassProperty("XWiki", "XWikiPreferences", PROPERTY_NAME, "String");
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(PROPERTY_NAME, mode);
-        updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, properties);
+        setPropertyInXWikiPreferences("core.hierarchyMode", "String", mode);
+    }
+
+    /**
+     * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.  
+     * @param propertyName name of the property to set
+     * @param propertyType the type of the property to add
+     * @param value value to set to the property
+     * @since 7.2M2 
+     */
+    public void setPropertyInXWikiPreferences(String propertyName, String propertyType, Object value)
+    {
+        addClassProperty("XWiki", "XWikiPreferences", propertyName, propertyType);
+        gotoPage("XWiki", "XWikiPreferences", "edit", "editor", "object");
+        ObjectEditPage objectEditPage = new ObjectEditPage();
+        if (objectEditPage.hasObject("XWiki.XWikiPreferences")) {
+            updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, propertyName, value);
+        } else {
+            addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
+        }
     }
 }

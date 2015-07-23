@@ -120,6 +120,10 @@
             <artifactId>regexp</artifactId>
             <groupId>regexp</groupId>
           </exclusion>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- See the explanation in the tika-parsers exclusion above -->

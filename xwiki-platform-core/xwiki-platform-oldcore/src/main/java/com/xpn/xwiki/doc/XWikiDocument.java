@@ -3645,7 +3645,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param eform is form information that contains all the query parameters
      * @param context
      * @throws XWikiException
-     * @since 7.0RC1
+     * @since 7.1M1
      */
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {

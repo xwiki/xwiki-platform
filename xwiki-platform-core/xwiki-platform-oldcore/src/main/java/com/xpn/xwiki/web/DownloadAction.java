@@ -35,6 +35,10 @@ import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -86,8 +90,7 @@ public class DownloadAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        String path = request.getRequestURI();
-        String filename = Util.decodeURI(getFileName(path, ACTION_NAME), context);
+        String filename = getFileName();
         XWikiAttachment attachment = null;
 
         final String idStr = request.getParameter("id");
@@ -157,7 +160,7 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private static boolean sendPartialContent(final XWikiAttachment attachment,
+    private boolean sendPartialContent(final XWikiAttachment attachment,
         final XWikiRequest request,
         final XWikiResponse response,
         final XWikiContext context)
@@ -201,7 +204,7 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private static void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
         final XWikiRequest request,
         final XWikiResponse response,
         final XWikiContext context)
@@ -234,7 +237,7 @@ public class DownloadAction extends XWikiAction
      * @param context the XWikiContext just in case it is needed to load the attachment content
      * @throws XWikiException if something goes wrong
      */
-    private static void sendContent(final XWikiAttachment attachment,
+    private void sendContent(final XWikiAttachment attachment,
         final XWikiRequest request,
         final XWikiResponse response,
         final String filename,
@@ -259,23 +262,14 @@ public class DownloadAction extends XWikiAction
     }
 
     /**
-     * Get the filename of the attachment from the path and the action.
-     *
-     * @param path the request URI.
-     * @param action the action used to download the attachment.
      * @return the filename of the attachment.
      */
-    private static String getFileName(final String path, final String action)
+    private String getFileName()
     {
-        final String subPath = path.substring(path.indexOf(SEPARATOR + action));
-        int pos = 0;
-        for (int i = 0; i < 3; i++) {
-            pos = subPath.indexOf(SEPARATOR, pos + 1);
-        }
-        if (subPath.indexOf(SEPARATOR, pos + 1) > 0) {
-            return subPath.substring(pos + 1, subPath.indexOf(SEPARATOR, pos + 1));
-        }
-        return subPath.substring(pos + 1);
+        // Extract the Attachment file name from the parsed request URL that was done before this Action is called
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
     }
 
     /**
@@ -286,7 +280,7 @@ public class DownloadAction extends XWikiAction
      * @param response the response to write to.
      * @param context the current request context
      */
-    private static void setCommonHeaders(final XWikiAttachment attachment,
+    private void setCommonHeaders(final XWikiAttachment attachment,
         final XWikiRequest request,
         final XWikiResponse response,
         final XWikiContext context)
@@ -344,7 +338,7 @@ public class DownloadAction extends XWikiAction
      *            Range header
      * @return {@code true} if the range is valid, {@code false} otherwise
      */
-    private static boolean isValidRange(Long start, Long end)
+    private boolean isValidRange(Long start, Long end)
     {
         if (start == null && end == null) {
             return false;
@@ -352,7 +346,7 @@ public class DownloadAction extends XWikiAction
         return start == null || end == null || end >= start;
     }
 
-    private static boolean isAuthorized(String mimeType)
+    private boolean isAuthorized(String mimeType)
     {
         ConfigurationSource configuration = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
         if (configuration.containsKey(BLACKLIST_PROPERTY) && !configuration.containsKey(WHITELIST_PROPERTY)) {

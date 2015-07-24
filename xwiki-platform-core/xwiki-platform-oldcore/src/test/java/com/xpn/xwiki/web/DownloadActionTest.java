@@ -33,7 +33,12 @@ import org.hamcrest.Description;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceAction;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -43,6 +48,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
+import static org.mockito.Mockito.when;
+
 /**
  * Validate {@link DownloadAction}.
  * 
@@ -50,6 +57,12 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
  */
 public class DownloadActionTest extends AbstractBridgedComponentTestCase
 {
+    /** The name of the attachment being downloaded in most of the tests. */
+    private static final String DEFAULT_FILE_NAME = "file.txt";
+
+    /** The URI requested in most of the tests. */
+    private static final String DEFAULT_URI = "/xwiki/bin/download/space/page/file.txt";
+
     /** Mocked global XWiki object. */
     private XWiki xwiki;
 
@@ -74,11 +87,9 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     /** The content of the file being downloaded in most of the tests. */
     private byte[] fileContent = "abcdefghijklmn".getBytes(XWiki.DEFAULT_ENCODING);
 
-    /** The name of the attachment being downloaded in most of the tests. */
-    private static final String DEFAULT_FILE_NAME = "file.txt";
+    private ResourceReferenceManager resourceReferenceManager;
 
-    /** The URI requested in most of the tests. */
-    private static final String DEFAULT_URI = "/xwiki/bin/download/space/page/file.txt";
+    private DocumentReference documentReference;
 
     /**
      * Default constructor.
@@ -108,7 +119,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         final XWikiPluginManager pluginManager = new XWikiPluginManager();
         pluginManager.initInterface();
 
-        this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.documentReference = new DocumentReference("wiki", "space", "page");
+        this.document = new XWikiDocument(this.documentReference);
         getContext().setDoc(this.document);
         getMockery().checking(new Expectations()
         {
@@ -126,6 +138,10 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
                 will(returnValue(false));
             }
         });
+
+        // Mock what's needed for extracting the filename from the URL
+        this.resourceReferenceManager =
+            getComponentManager().registerMockComponent(getMockery(), ResourceReferenceManager.class);
     }
 
     @Test
@@ -133,7 +149,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -144,7 +160,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l);
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() - 1000l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -155,7 +171,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime());
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime(), DEFAULT_FILE_NAME);
         getMockery().checking(new Expectations()
         {
             {
@@ -170,7 +186,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l);
+        setRequestExpectations(DEFAULT_URI, null, null, null, d.getTime() + 1000l, DEFAULT_FILE_NAME);
         getMockery().checking(new Expectations()
         {
             {
@@ -183,7 +199,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     @Test(expected = XWikiException.class)
     public void testDownloadMissingFile() throws XWikiException
     {
-        setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/nofile.txt", null, null, null, -1l, DEFAULT_FILE_NAME);
         this.action.render(getContext());
     }
 
@@ -201,7 +217,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
             this.document.getAttachmentList().add(att);
         }
 
-        setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/file.2.txt", "5", null, null, -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), 1, "text/plain", "inline; filename*=utf-8''file.5.txt");
         getMockery().checking(new Expectations()
         {
@@ -237,7 +253,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, "42", null, null, -1l);
+        setRequestExpectations(DEFAULT_URI, "42", null, null, -1l, DEFAULT_FILE_NAME);
         this.action.render(getContext());
     }
 
@@ -246,7 +262,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, "two", null, null, -1l);
+        setRequestExpectations(DEFAULT_URI, "two", null, null, -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -255,7 +271,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     @Test(expected = XWikiException.class)
     public void testDownloadWithIncompletePath() throws XWikiException
     {
-        setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l);
+        setRequestExpectations("/xwiki/bin/download/", null, null, null, -1l, DEFAULT_FILE_NAME);
         this.action.render(getContext());
     }
 
@@ -264,7 +280,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, "file.png");
-        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/file.png", null, null, null, -1l, "file.png");
         setResponseExpectations(d.getTime(), this.fileContent.length, "image/png", "inline; filename*=utf-8''file.png");
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -282,7 +298,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, "1", null, -1l);
+        setRequestExpectations(DEFAULT_URI, null, "1", null, -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length,
             "text/plain", "attachment; filename*=utf-8''file.txt");
         setOutputExpectations(0, this.fileContent.length);
@@ -294,7 +310,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date(411757300000l);
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, null, -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -305,7 +321,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, "file name.txt");
-        setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/file+name.txt", null, null, null, -1l,
+            "file name.txt");
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "inline; filename*=utf-8''file%20name.txt");
         setOutputExpectations(0, this.fileContent.length);
@@ -324,7 +341,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, "file name.txt");
-        setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/file%20name.txt", null, "1", null, -1l,
+            "file name.txt");
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "attachment; filename*=utf-8''file%20name.txt");
         setOutputExpectations(0, this.fileContent.length);
@@ -343,7 +361,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, "file\u021B.txt");
-        setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l);
+        setRequestExpectations("/xwiki/bin/download/space/page/file%C8%9B.txt", null, "1", null, -1l,
+            "file\u021B.txt");
         setResponseExpectations(d.getTime(), this.fileContent.length, "text/plain",
             "attachment; filename*=utf-8''file%C8%9B.txt");
         setOutputExpectations(0, this.fileContent.length);
@@ -363,7 +382,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects bytes 0, 1, 2 and 3 from the file.
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-3", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), 4);
         setOutputExpectations(0, 4);
         getMockery().checking(new Expectations()
@@ -383,7 +402,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects bytes 3, 4 and 5 from the file.
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=3-5", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), 3);
         setOutputExpectations(3, 6);
         getMockery().checking(new Expectations()
@@ -403,7 +422,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects bytes 9, 10, 11, 12 and 13 from the file.
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-13", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length - 9);
         setOutputExpectations(9, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -423,7 +442,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects the last four bytes (10, 11, 12 and 13) from the file
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-0", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), 1);
         setOutputExpectations(0, 1);
         getMockery().checking(new Expectations()
@@ -443,7 +462,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects bytes from 11 to the end of the file (11, 12 and 13)
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=11-", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length - 11);
         setOutputExpectations(11, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -463,7 +482,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects the whole file
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=0-", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -483,7 +502,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects the last four bytes (10, 11, 12 and 13) from the file
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-4", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length - 10);
         setOutputExpectations(10, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -503,7 +522,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects the whole file
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-14", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -523,7 +542,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects the whole file, although the client requested more
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-40", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -543,7 +562,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects bytes 9, 10, 11, 12 and 13 from the file, although 14 and 15 are requested as well.
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-15", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length - 9);
         setOutputExpectations(9, this.fileContent.length);
         getMockery().checking(new Expectations()
@@ -562,7 +581,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=9-5", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -573,7 +592,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=all", -1l, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -585,7 +604,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects a 416 response
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-145", -1l, DEFAULT_FILE_NAME);
         getMockery().checking(new Expectations()
         {
             {
@@ -602,7 +621,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
         // This test expects a 416 response
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=129-", -1L, DEFAULT_FILE_NAME);
         getMockery().checking(new Expectations()
         {
             {
@@ -618,7 +637,7 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     {
         final Date d = new Date();
         createAttachment(d, DEFAULT_FILE_NAME);
-        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L);
+        setRequestExpectations(DEFAULT_URI, null, null, "bytes=-", -1L, DEFAULT_FILE_NAME);
         setResponseExpectations(d.getTime(), this.fileContent.length);
         setOutputExpectations(0, this.fileContent.length);
         Assert.assertNull(this.action.render(getContext()));
@@ -633,9 +652,10 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
     }
 
     private void setRequestExpectations(final String uri, final String id, final String forceDownload,
-        final String range,
-        final long modifiedSince)
+        final String range, final long modifiedSince, String attachmentName)
     {
+        final ResourceReference rr = new EntityResourceReference(
+            new AttachmentReference(attachmentName, this.documentReference), EntityResourceAction.VIEW);
         getMockery().checking(new Expectations()
         {
             {
@@ -649,6 +669,8 @@ public class DownloadActionTest extends AbstractBridgedComponentTestCase
                 will(returnValue(forceDownload));
                 allowing(DownloadActionTest.this.request).getHeader(with("Range"));
                 will(returnValue(range));
+                allowing(DownloadActionTest.this.resourceReferenceManager).getResourceReference();
+                will(returnValue(rr));
             }
         });
     }

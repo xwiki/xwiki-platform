@@ -58,11 +58,13 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
 
     private static final String VIEWATTACHREV_ACTION = "viewattachrev";
 
+    private static final String DOWNLOADREV_ACTION = "downloadrev";
+
     /**
      * List of Actions which use URLs of the format {@code /(actionname)/space1/space2/page/filename}.
      */
     private static final List<String> FILE_ACTION_LIST =
-        Arrays.asList(DOWNLOAD_ACTION, DELATTACHMENT_ACTION, VIEWATTACHREV_ACTION);
+        Arrays.asList(DOWNLOAD_ACTION, DELATTACHMENT_ACTION, VIEWATTACHREV_ACTION, DOWNLOADREV_ACTION);
 
     private StandardURLConfiguration configuration;
 

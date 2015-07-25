@@ -20,6 +20,10 @@
 package com.xpn.xwiki.web;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -27,7 +31,6 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 public class ViewAttachRevAction extends XWikiAction
 {
@@ -44,15 +47,14 @@ public class ViewAttachRevAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
-        String path = request.getRequestURI();
         String filename;
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
         } else {
-            filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
+            filename = getFileName();
         }
 
-        XWikiAttachment attachment = null;
+        XWikiAttachment attachment;
 
         if (context.getWiki().hasAttachmentRecycleBin(context) && request.getParameter("rid") != null) {
             int recycleId = Integer.parseInt(request.getParameter("rid"));
@@ -76,4 +78,14 @@ public class ViewAttachRevAction extends XWikiAction
         return "viewattachrev";
     }
 
+    /**
+     * @return the filename of the attachment.
+     */
+    private String getFileName()
+    {
+        // Extract the Attachment file name from the parsed request URL that was done before this Action is called
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
+    }
 }

@@ -22,15 +22,18 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.util.Util;
 
-public class DownloadRevAction extends XWikiAction
+public class DownloadRevAction extends DownloadAction
 {
     @Override
     public String render(XWikiContext context) throws XWikiException
@@ -39,9 +42,8 @@ public class DownloadRevAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String rev = request.getParameter("rev");
-        String path = request.getRequestURI();
-        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
-        XWikiAttachment attachment = null;
+        String filename = getFileName();
+        XWikiAttachment attachment;
 
         if (context.getWiki().hasAttachmentRecycleBin(context) && request.getParameter("rid") != null) {
             int recycleId = Integer.parseInt(request.getParameter("rid"));
@@ -99,5 +101,16 @@ public class DownloadRevAction extends XWikiAction
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         }
         return null;
+    }
+
+    /**
+     * @return the filename of the attachment.
+     */
+    private String getFileName()
+    {
+        // Extract the Attachment file name from the parsed request URL that was done before this Action is called
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
     }
 }

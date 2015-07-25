@@ -67,7 +67,7 @@ public class ExtendedURLURLNormalizerTest
         this.container = this.mocker.getInstance(Container.class);
 
         Provider<XWikiContext> xcontextProvider = this.mocker.getInstance(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(xcontext);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
     @Test
@@ -140,6 +140,15 @@ public class ExtendedURLURLNormalizerTest
 
         ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"), params);
         assertSame(params, this.mocker.getComponentUnderTest().normalize(extendedURL).getParameters());
+    }
+
+    @Test
+    public void normalizeWhenRootWebapp() throws Exception
+    {
+        when(this.configurationSource.getProperty("xwiki.webapppath")).thenReturn("");
+
+        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList("one", "two"));
+        assertEquals("/one/two", this.mocker.getComponentUnderTest().normalize(extendedURL).serialize());
     }
 
     private HttpServletRequest createMockRequest()

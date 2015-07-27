@@ -55,6 +55,7 @@
       <allowUser type="edit" name="userA" />
       <allowUser type="comment" name="userA" />
       <allowUser type="delete" name="userA" />
+      <allowUser type="script" name="userA" />
 
       <document name="any document" />
 
@@ -71,6 +72,7 @@
     <allowUser type="delete" name="userA" />
     <allowUser type="register" name="userA" />
     <allowUser type="login" name="userA" />
+    <allowUser type="script" name="userA" />
 
     <space name="any space">
       <document name="any document" />

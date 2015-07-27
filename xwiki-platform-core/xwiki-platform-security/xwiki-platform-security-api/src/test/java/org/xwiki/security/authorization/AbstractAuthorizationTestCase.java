@@ -53,6 +53,7 @@ import static org.xwiki.security.authorization.Right.ILLEGAL;
 import static org.xwiki.security.authorization.Right.LOGIN;
 import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.SCRIPT;
 
 
 /**
@@ -69,25 +70,25 @@ public abstract class AbstractAuthorizationTestCase
     /** SuperAdmin user. */
     protected static final DocumentReference SUPERADMIN = new DocumentReference("anyWiki", "anySpace", "SuperAdmin");
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, PROGRAM, CREATE_WIKI. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN, PROGRAM, CREATE_WIKI. */
     protected static final RightSet ALL_RIGHTS = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN, CREATE_WIKI. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN, CREATE_WIKI. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, ADMIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT, ADMIN. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_PROGRAMING_AND_CREATE_WIKI = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN */
+    /** VIEW, EDIT, COMMENT, DELETE, REGISTER, LOGIN, SCRIPT. */
     protected static final RightSet ALL_RIGHTS_EXCEPT_ADMIN_AND_CREATE_WIKI = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE, ADMIN. */
+    /** VIEW, EDIT, COMMENT, DELETE, SCRIPT, ADMIN. */
     protected static final RightSet ALL_SPACE_RIGHTS = new RightSet();
 
     /** VIEW, EDIT, COMMENT, REGISTER, LOGIN. */
     protected static final RightSet DEFAULT_DOCUMENT_RIGHTS = new RightSet();
 
-    /** VIEW, EDIT, COMMENT, DELETE. */
+    /** VIEW, EDIT, COMMENT, DELETE, SCRIPT. */
     protected static final RightSet ALL_DOCUMENT_RIGHTS = new RightSet();
 
     static {
@@ -105,7 +106,7 @@ public abstract class AbstractAuthorizationTestCase
                             if (right != LOGIN && right != REGISTER) {
                                 ALL_DOCUMENT_RIGHTS.add(right);
                             }
-                            if (right != DELETE) {
+                            if (right != DELETE && right != SCRIPT) {
                                 DEFAULT_DOCUMENT_RIGHTS.add(right);
                             }
                         }

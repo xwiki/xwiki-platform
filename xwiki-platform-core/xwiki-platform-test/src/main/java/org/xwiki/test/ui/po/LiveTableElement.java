@@ -127,7 +127,7 @@ public class LiveTableElement extends BaseElement
 
     /**
      * Checks if there is a row that has the given value for the specified column.
-     * 
+     *
      * @param columnTitle the title of live table column
      * @param columnValue the value to match rows against
      * @return {@code true} if there is a row that matches the given value for the specified column, {@code false}
@@ -135,12 +135,49 @@ public class LiveTableElement extends BaseElement
      */
     public boolean hasRow(String columnTitle, String columnValue)
     {
-        String escapedColumnValue = columnValue.replace("'", "\\'");
-        String cellXPath = "//tr/td[position() = %s and . = '%s']";
+        List<WebElement> elements = getRows(columnTitle);
 
-        WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
-        return liveTableBody.findElements(
-            By.xpath(String.format(cellXPath, getColumnIndex(columnTitle) + 1, escapedColumnValue))).size() > 0;
+        boolean result = elements.size() > 0;
+        boolean match = false;
+        if (result) {
+            for (WebElement element : elements) {
+                match = element.getText().equals(columnValue);
+                if (match) {
+                    break;
+                }
+            }
+        }
+
+        return result && match;
+    }
+
+    /**
+     * Checks if there are as many rows as there are passed values and check that the values match.
+     *
+     * @since 7.2M2
+     */
+    public boolean hasExactRows(String columnTitle, List<String> columnValues)
+    {
+        List<WebElement> elements = getRows(columnTitle);
+
+        boolean result = elements.size() == columnValues.size();
+        if (result) {
+            for (int i = 0; i < elements.size(); i++) {
+                result = result && elements.get(i).getText().equals(columnValues.get(i));
+                if (!result) {
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private List<WebElement> getRows(String columnTitle)
+    {
+        String cellXPath = String.format(".//tr/td[position() = %s]", getColumnIndex(columnTitle) + 1);
+        WebElement liveTableBody = getDriver().findElement(By.id("authors-display"));
+        return liveTableBody.findElements(By.xpath(cellXPath));
     }
 
     /**

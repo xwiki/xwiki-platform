@@ -14,7 +14,6 @@
       <allowUser type="edit" name="userA" />
       <allowUser type="comment" name="userA" />
       <allowUser type="delete" name="userA" />
-      <allowUser type="script" name="userA" />
 
       <document name="any document" />
 
@@ -39,7 +38,6 @@
       <allowUser type="edit" name="wiki:XWiki.userA" />
       <allowUser type="comment" name="wiki:XWiki.userA" />
       <allowUser type="delete" name="wiki:XWiki.userA" />
-      <allowUser type="script" name="wiki:XWiki.userA" />
 
       <document name="any document" />
 
@@ -61,7 +59,6 @@
     <allowUser type="delete" name="wiki:XWiki.userA" />
     <allowUser type="register" name="wiki:XWiki.userA" />
     <allowUser type="login" name="wiki:XWiki.userA" />
-    <allowUser type="script" name="wiki:XWiki.userA" />
 
     <space name="any space">
       <document name="any document" />

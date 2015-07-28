@@ -176,7 +176,7 @@ public class LiveTableElement extends BaseElement
     private List<WebElement> getRows(String columnTitle)
     {
         String cellXPath = String.format(".//tr/td[position() = %s]", getColumnIndex(columnTitle) + 1);
-        WebElement liveTableBody = getDriver().findElement(By.id("authors-display"));
+        WebElement liveTableBody = getDriver().findElement(By.id(this.livetableId + "-display"));
         return liveTableBody.findElements(By.xpath(cellXPath));
     }
 
@@ -185,7 +185,7 @@ public class LiveTableElement extends BaseElement
      */
     public int getRowCount()
     {
-        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(livetableId + "-display"));
+        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(this.livetableId + "-display"));
         // We use XPath because we're interested only in the direct children.
         return getDriver().findElementsWithoutWaiting(liveTableBody, By.xpath("tr")).size();
     }
@@ -195,7 +195,7 @@ public class LiveTableElement extends BaseElement
      */
     public WebElement getRow(int rowNumber)
     {
-        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(livetableId + "-display"));
+        WebElement liveTableBody = getDriver().findElementWithoutWaiting(By.id(this.livetableId + "-display"));
         return getDriver().findElementWithoutWaiting(liveTableBody, By.xpath("tr[" + rowNumber + "]"));
     }
 

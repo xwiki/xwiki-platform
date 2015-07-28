@@ -320,10 +320,10 @@
     #end
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))
-    #set($discard = $row.put('doc_url', $xwiki.getURL($docName)))
-    #set($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
+    #set($discard = $row.put('doc_url', $xwiki.getURL($itemDoc.documentReference)))
+    #set($discard = $row.put('doc_space_url', $xwiki.getURL($itemDoc.documentReference.extractReference('SPACE'))))
     #set($discard = $row.put('doc_wiki', $itemDoc.wiki))
-    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
+    #set($discard = $row.put('doc_wiki_url', $xwiki.getURL($itemDoc.documentReference.extractReference('WIKI'))))
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))

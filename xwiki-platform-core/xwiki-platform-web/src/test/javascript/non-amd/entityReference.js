@@ -205,5 +205,25 @@ describe('EntityReference', function() {
       execute(reference.parent, new XWiki.DocumentReference('wiki', 'Space', 'page'), 'space');
       execute(reference.parent, new XWiki.DocumentReference('xwiki', 'space', 'page'), 'wiki:space');
     });
+    it('constructor', function() {
+        // Construct a Nested Space reference
+        var reference = new XWiki.SpaceReference('wiki', ['space1', 'space2']);
+        expect(XWiki.Model.serialize(reference)).toEqual('wiki:space1.space2');
+        reference = new XWiki.DocumentReference('wiki', ['space1', 'space2'], 'page');
+        expect(XWiki.Model.serialize(reference)).toEqual('wiki:space1.space2.page');
+        // Construct a non-Nested Space reference
+        reference = new XWiki.SpaceReference('wiki', 'space');
+        expect(XWiki.Model.serialize(reference)).toEqual('wiki:space');
+        // Try passing non-valid space parameters
+        expect(function() {new XWiki.SpaceReference('wiki', [])}).toThrow('Missing mandatory space name or invalid type for: []');
+        expect(function() {new XWiki.SpaceReference('wiki', 12)}).toThrow('Missing mandatory space name or invalid type for: [12]');
+    });
+    it('equals', function() {
+        var reference1 = new XWiki.DocumentReference('wiki', ['space1', 'space2'], 'page');
+        var reference2 = new XWiki.DocumentReference('wiki', ['space1', 'space2'], 'page');
+        var reference3 = new XWiki.DocumentReference('wiki2', ['space1', 'space2'], 'page');
+        expect(reference1.equals(reference2)).toBe(true);
+        expect(reference1.equals(reference3)).toBe(false);
+    });
   });
 });

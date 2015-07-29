@@ -117,6 +117,17 @@ XWiki.EntityReference = Class.create({
   appendParent: function(parent) {
     this.getRoot().parent = parent;
     return this;
+  },
+
+  equals: function(reference) {
+      if (reference == null) {
+          return false;
+      }
+      if ((this.parent == null && reference.parent != null) || (this.parent != null && reference.parent == null)) {
+          return false;
+      }
+      return this.name === reference.name && this.type === reference.type
+          && (this.parent == null || this.parent.equals(reference.parent));
   }
 });
 
@@ -127,8 +138,22 @@ XWiki.WikiReference = Class.create(XWiki.EntityReference, {
 });
 
 XWiki.SpaceReference = Class.create(XWiki.EntityReference, {
-  initialize: function($super, wikiName, spaceName) {
-    $super(spaceName, XWiki.EntityType.SPACE, new XWiki.WikiReference(wikiName));
+  initialize: function($super, wikiName, spaceNames) {
+    var wikiReference = new XWiki.WikiReference(wikiName);
+    if (Array.isArray(spaceNames) && spaceNames.length > 0) {
+      // Support passing an Array of Spaces (Nested Spaces)
+      var reference = wikiReference;
+      var i;
+      for (i = 0; i < spaceNames.length - 1; ++i) {
+          reference = new XWiki.EntityReference(spaceNames[i], XWiki.EntityType.SPACE, reference);
+      }
+      $super(spaceNames[i], XWiki.EntityType.SPACE, reference);
+    } else if (typeof spaceNames === "string") {
+      // Support passing a single space as a String for both backward-compatibility reason but also simplicity
+      $super(spaceNames, XWiki.EntityType.SPACE, wikiReference);
+    } else {
+      throw 'Missing mandatory space name or invalid type for: [' + spaceNames + ']';
+    }
   }
 });
 

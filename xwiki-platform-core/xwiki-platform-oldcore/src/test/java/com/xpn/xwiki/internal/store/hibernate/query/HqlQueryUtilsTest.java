@@ -25,11 +25,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Validate {@link SQLQueryUtils}.
+ * Validate {@link HqlQueryUtils}.
  * 
  * @version $Id$
  */
-public class SQLQueryUtilsTest
+public class HqlQueryUtilsTest
 {
     @Test
     public void isSafe()

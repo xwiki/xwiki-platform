@@ -48,7 +48,6 @@ import net.sf.jsqlparser.statement.select.SelectItem;
  * @version $Id$
  * @since 7.2M2
  */
-// TODO: move that in a less generic place
 public final class HqlQueryUtils
 {
     private static final String DOCUMENT_FIELD_FULLNAME = "fullName";

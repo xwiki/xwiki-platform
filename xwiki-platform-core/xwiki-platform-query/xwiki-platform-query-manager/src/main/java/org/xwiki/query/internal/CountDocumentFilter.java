@@ -43,7 +43,7 @@ import org.xwiki.query.Query;
 @Component
 @Named("count")
 @Singleton
-public class CountFilter extends AbstractQueryFilter
+public class CountDocumentFilter extends AbstractQueryFilter
 {
     /**
      * Used to log debug information.

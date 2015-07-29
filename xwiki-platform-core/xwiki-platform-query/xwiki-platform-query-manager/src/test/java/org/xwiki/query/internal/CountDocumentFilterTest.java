@@ -32,16 +32,16 @@ import org.xwiki.query.Query;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
- * Tests for {@link CountFilter}
+ * Tests for {@link CountDocumentFilter}
  *
  * @version $Id$
  */
-public class CountFilterTest
+public class CountDocumentFilterTest
 {
     @Rule
-    public MockitoComponentMockingRule<CountFilter> mocker = new MockitoComponentMockingRule(CountFilter.class);
+    public MockitoComponentMockingRule<CountDocumentFilter> mocker = new MockitoComponentMockingRule(CountDocumentFilter.class);
 
-    private CountFilter filter;
+    private CountDocumentFilter filter;
 
     @Before
     public void configure() throws Exception

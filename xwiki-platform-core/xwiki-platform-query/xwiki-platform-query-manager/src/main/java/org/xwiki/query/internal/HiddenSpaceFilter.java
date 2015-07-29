@@ -19,26 +19,29 @@
  */
 package org.xwiki.query.internal;
 
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 /**
- * Query filter excluding 'hidden' documents from a {@link org.xwiki.query.Query}. Hidden documents should not be
+ * Query filter excluding 'hidden' spaces from a {@link org.xwiki.query.Query}. Hidden spaces should not be
  * returned in public search results or appear in the User Interface in general.
  * <p>
- * The filter assume the <code>XWikiDocument</code> table has a <code>space</code> alias.
+ * The filter assume the <code>XWikiSpace</code> table has a <code>space</code> alias.
  *
  * @version $Id$
- * @since 4.0RC1
+ * @since 7.2M2
  */
-@Component(hints = {"hidden", "hidden/document"})
+@Component
+@Named("hidden/space")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class HiddenDocumentFilter extends AbstractHiddenFilter
+public class HiddenSpaceFilter extends AbstractHiddenFilter
 {
     @Override
     protected String filterHidden(String statement, String language)
     {
-        return insertWhereClause("(doc.hidden <> true or doc.hidden is null)", statement, language);
+        return insertWhereClause("space.hidden <> true", statement, language);
     }
 }

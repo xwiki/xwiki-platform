@@ -38,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -130,7 +129,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
@@ -5411,7 +5409,7 @@ public class XWiki implements EventListener
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
-     * @deprecated since 7.2M1, use {@link #getAllSpaceReferences(int, int)} instead
+     * @deprecated use query service instead
      */
     @Deprecated
     public List<String> getSpaces(XWikiContext context) throws XWikiException
@@ -5425,179 +5423,15 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Count all the spaces in the current wiki.
-     * <p>
-     * Hidden spaces are filtered unless current user enabled them.
-     * 
-     * @return the number of spaces in the current wiki
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public int countAllSpaces() throws XWikiException
-    {
-        try {
-            Query query = getStore().getQueryManager().createQuery("count doc.space from Document", Query.XWQL);
-
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
-
-            return (Integer) query.execute().get(0);
-        } catch (QueryException ex) {
-            throw new XWikiException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * API to list all non-hidden spaces in the current wiki.
-     * <p>
-     * Hidden spaces are filtered unless current user enabled them.
-     * 
-     * @param offset the index where to start returning results
-     * @param limit the maximum number of result to return
-     * @return a list of spaces as {@link SpaceReference}
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public List<String> getAllSpaces(int offset, int limit) throws XWikiException
-    {
-        try {
-            Query query = getStore().getQueryManager().getNamedQuery("getSpaces");
-
-            query.setOffset(offset);
-            query.setLimit(limit);
-
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden"));
-
-            return query.execute();
-        } catch (QueryException ex) {
-            throw new XWikiException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * API to list all spaces in the current wiki.
-     * <p>
-     * Hidden spaces are filtered unless current user enabled them.
-     * 
-     * @param offset the index where to start returning results
-     * @param limit the maximum number of result to return
-     * @return a list of spaces as {@link SpaceReference}
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public List<SpaceReference> getAllSpaceReferences(int offset, int limit) throws XWikiException
-    {
-        return toSpaceReferences(getAllSpaces(offset, limit));
-    }
-
-    private List<SpaceReference> toSpaceReferences(Collection<String> spaces)
-    {
-        List<SpaceReference> references = new ArrayList<>(spaces.size());
-
-        for (String space : spaces) {
-            references.add(getCurrentSpaceResolver().resolve(space));
-        }
-
-        return references;
-    }
-
-    private Query createGetSpacesQuery(SpaceReference parentSpace) throws QueryException
-    {
-        StringBuilder builder = new StringBuilder("space.reference from Space space where ");
-
-        List<Object> values = new ArrayList<>(1);
-        if (parentSpace != null) {
-            builder.append("space.parent=?");
-            values.add(this.localStringEntityReferenceSerializer.serialize(parentSpace));
-        } else {
-            builder.append("space.parent IS NULL");
-        }
-
-        // Filter hidden documents
-        if (getUserConfiguration().getProperty("displayHiddenDocuments", 0) == 1) {
-            builder.append(" AND space.hidden <> true");
-        }
-
-        Query query = getStore().getQueryManager().createQuery(builder.toString(), Query.XWQL);
-
-        query.bindValues(values);
-
-        return query;
-    }
-
-    /**
-     * Count the direct children spaces of passed space (or top level spaces if passed space reference is null).
-     * <p>
-     * Hidden spaces are filtered unless current user enabled them.
-     * 
-     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
-     * @return the number of direct spaces children in the passed space
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public int countSpaces(SpaceReference parentSpace) throws XWikiException
-    {
-        Query query;
-        try {
-            query = createGetSpacesQuery(parentSpace);
-
-            return (Integer) query.execute().get(0);
-        } catch (QueryException e) {
-            throw new XWikiException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * API to list direct children spaces of passed space (or top level spaces if passed space reference is null).
-     * <p>
-     * Hidden spaces are filtered unless current user enabled them.
-     * 
-     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
-     * @param offset the index from which to start returning results
-     * @param limit the maximum number of result to return
-     * @return a list of spaces references as {@link String}
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public List<String> getSpaces(SpaceReference parentSpace, int offset, int limit) throws XWikiException
-    {
-        Query query;
-        try {
-            query = createGetSpacesQuery(parentSpace);
-
-            query.setOffset(offset);
-            query.setLimit(limit);
-
-            return query.execute();
-        } catch (QueryException e) {
-            throw new XWikiException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * API to list non-hidden direct children spaces of passed space (or top level spaces if passed space reference is
-     * null).
-     * 
-     * @param parentSpace the reference of the space for which to get children, if null return top level spaces
-     * @param offset the index from which to start returning results
-     * @param limit the maximum number of result to return
-     * @return a list of spaces as {@link SpaceReference}
-     * @throws XWikiException if something went wrong
-     * @since 7.2M1
-     */
-    public List<SpaceReference> getSpaceReferences(SpaceReference parentSpace, int offset, int limit)
-        throws XWikiException
-    {
-        return toSpaceReferences(getSpaces(parentSpace, offset, limit));
-    }
-
-    /**
      * API to list all non-hidden documents in a space.
      *
      * @param spaceReference the local reference of the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
      * @throws XWikiException if the loading went wrong
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> getSpaceDocsName(String spaceReference, XWikiContext context) throws XWikiException
     {
         try {

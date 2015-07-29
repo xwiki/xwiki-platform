@@ -21,6 +21,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -268,7 +270,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     }
 
     public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
-        XWikiContext context) throws XWikiException
+        final XWikiContext context) throws XWikiException
     {
         String content = "";
         try {
@@ -297,16 +299,26 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
             String customDisplayer = getCachedDefaultCustomDisplayer(context);
             if (StringUtils.isNotEmpty(customDisplayer)) {
                 if (customDisplayer.equals(CLASS_DISPLAYER_IDENTIFIER)) {
-                    content = getCustomDisplay();
-                    String classSyntax = context.getWiki().getDocument(getObject().getDocumentReference(), context)
-                        .getSyntax().toIdString();
-                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                    final String rawContent = getCustomDisplay();
+                    XWikiDocument classDocument =
+                        context.getWiki().getDocument(getObject().getDocumentReference(), context);
+                    final String classSyntax = classDocument.getSyntax().toIdString();
+                    // Using author reference since the document content is not relevant in this case.
+                    DocumentReference authorReference = classDocument.getAuthorReference();
+
+                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. class
+                    // document author).
+                    content = renderContentInContext(rawContent, classSyntax, authorReference, context);
                 } else if (customDisplayer.startsWith(DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX)) {
                     XWikiDocument displayerDoc = context.getWiki().getDocument(
                         StringUtils.substringAfter(customDisplayer, DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX), context);
-                    content = displayerDoc.getContent();
-                    String classSyntax = displayerDoc.getSyntax().toIdString();
-                    content = context.getDoc().getRenderedContent(content, classSyntax, context);
+                    final String rawContent = displayerDoc.getContent();
+                    final String displayerDocSyntax = displayerDoc.getSyntax().toIdString();
+                    DocumentReference authorReference = displayerDoc.getContentAuthorReference();
+
+                    // Make sure we render the custom displayer with the rights of the user who wrote it (i.e. displayer
+                    // document content author).
+                    content = renderContentInContext(rawContent, displayerDocSyntax, authorReference, context);
                 } else if (customDisplayer.startsWith(TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX)) {
                     content = context.getWiki().evaluateTemplate(
                         StringUtils.substringAfter(customDisplayer, TEMPLATE_DISPLAYER_IDENTIFIER_PREFIX), context);
@@ -319,6 +331,24 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
 
         }
         buffer.append(content);
+    }
+
+    /**
+     * Render content in the current document's context with the rights of the given user.
+     */
+    private String renderContentInContext(final String content, final String syntax, DocumentReference authorReference,
+        final XWikiContext context) throws Exception
+    {
+        String result = Utils.getComponent(SUExecutor.class).call(new Callable<String>()
+        {
+            @Override
+            public String call() throws Exception
+            {
+                return context.getDoc().getRenderedContent(content, syntax, context);
+            }
+        }, authorReference);
+
+        return result;
     }
 
     @Override

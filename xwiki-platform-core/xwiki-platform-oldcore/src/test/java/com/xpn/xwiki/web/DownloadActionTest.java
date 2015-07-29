@@ -48,8 +48,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
-import static org.mockito.Mockito.when;
-
 /**
  * Validate {@link DownloadAction}.
  * 

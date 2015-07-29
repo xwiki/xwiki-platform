@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
@@ -87,6 +88,11 @@ public class SOLRSearchSource extends AbstractSearchSource
         }
 
         Query query = this.queryManager.createQuery(queryString, SolrQueryExecutor.SOLR);
+
+        if (query instanceof SecureQuery) {
+            // Show only what the current user has the right to see
+            ((SecureQuery) query).checkCurrentUser(true);
+        }
 
         List<String> fq = new ArrayList<String>();
 

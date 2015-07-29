@@ -30,6 +30,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryFilter;
+import org.xwiki.query.SecureQuery;
 
 /**
  * Stores all information needed for execute a query.
@@ -37,7 +38,7 @@ import org.xwiki.query.QueryFilter;
  * @version $Id$
  * @since 1.6M1
  */
-public class DefaultQuery implements Query
+public class DefaultQuery implements SecureQuery
 {
     /**
      * Used to log possible warnings.
@@ -83,6 +84,16 @@ public class DefaultQuery implements Query
      * field for {@link Query#setOffset(int)}.
      */
     private int offset;
+
+    /**
+     * @see #isCurrentAuthorChecked()
+     */
+    private boolean checkCurrentAuthor;
+
+    /**
+     * @see #isCurrentUserChecked()
+     */
+    private boolean checkCurrentUser;
 
     /**
      * field for {@link #getFilters()}.
@@ -209,6 +220,34 @@ public class DefaultQuery implements Query
     public Query setOffset(int offset)
     {
         this.offset = offset;
+        return this;
+    }
+
+    @Override
+    public boolean isCurrentAuthorChecked()
+    {
+        return this.checkCurrentAuthor;
+    }
+
+    @Override
+    public SecureQuery checkCurrentAuthor(boolean checkCurrentAuthor)
+    {
+        this.checkCurrentAuthor = checkCurrentAuthor;
+
+        return this;
+    }
+
+    @Override
+    public boolean isCurrentUserChecked()
+    {
+        return this.checkCurrentUser;
+    }
+
+    @Override
+    public SecureQuery checkCurrentUser(boolean checkUser)
+    {
+        this.checkCurrentUser = checkUser;
+
         return this;
     }
 

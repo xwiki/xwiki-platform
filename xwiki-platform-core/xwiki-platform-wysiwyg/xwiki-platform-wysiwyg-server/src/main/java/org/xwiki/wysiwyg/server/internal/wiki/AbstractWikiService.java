@@ -39,6 +39,9 @@ import org.xwiki.gwt.wysiwyg.client.wiki.WikiPageReference;
 import org.xwiki.gwt.wysiwyg.client.wiki.WikiService;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.SpaceReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -55,15 +58,16 @@ import org.xwiki.wysiwyg.server.wiki.LinkService;
 public abstract class AbstractWikiService implements WikiService
 {
     /**
-     * The object used to convert between client and server entity reference.
-     */
-    protected final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
-
-    /**
      * Logger.
      */
     @Inject
     protected Logger logger;
+
+    /**
+     * The object used to convert between client and server entity reference.
+     */
+    @Inject
+    protected EntityReferenceConverter entityReferenceConverter;
 
     /**
      * The component used to create queries.
@@ -98,6 +102,9 @@ public abstract class AbstractWikiService implements WikiService
      */
     @Inject
     private CSRFToken csrf;
+
+    @Inject
+    private SpaceReferenceResolver<String> spaceResolver;
 
     @Override
     public Boolean isMultiWiki()
@@ -198,10 +205,12 @@ public abstract class AbstractWikiService implements WikiService
     private List<DocumentReference> searchDocumentReferences(Query query)
     {
         try {
+            WikiReference wikiReference = new WikiReference(query.getWiki());
             List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
             List<Object[]> results = query.execute();
             for (Object[] result : results) {
-                documentReferences.add(new DocumentReference(query.getWiki(), (String) result[0], (String) result[1]));
+                SpaceReference spaceReference = this.spaceResolver.resolve((String) result[0], wikiReference);
+                documentReferences.add(new DocumentReference((String) result[1], spaceReference));
             }
             return documentReferences;
         } catch (QueryException e) {

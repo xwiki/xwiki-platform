@@ -126,13 +126,25 @@ public class ViewPage extends BasePage
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
     {
+     return hasBreadcrumbContent(breadcrumbItem, isCurrent, true);
+    }
+
+    public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent, boolean withLink)
+    {
         List<WebElement> result;
         if (isCurrent) {
             result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
                 By.xpath("li[@class = 'active' and text() ='" + breadcrumbItem + "']"));
         } else {
-            result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
-                By.xpath("//a[text() = '" + breadcrumbItem + "']"));
+            if (withLink) {
+                result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
+                        By.xpath("//a[text() = '" + breadcrumbItem + "']"));
+            } else {
+                // if the user has not the right to see the parent, there is no link to the parent, only a <li> with the
+                // name of the document
+                result = getDriver().findElementsWithoutWaiting(this.breadcrumb,
+                        By.xpath("//li[text() = '" + breadcrumbItem + "']"));
+            }
         }
         return result.size() > 0;
     }

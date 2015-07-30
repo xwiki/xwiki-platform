@@ -101,12 +101,14 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
         for (Object object : queryResult) {
             Object[] fields = (Object[]) object;
 
-            String spaceName = (String) fields[1];
+            String spaceId = (String) fields[1];
             String pageName = (String) fields[2];
             String language = (String) fields[3];
+            
+            List<String> spaces = Utils.getSpacesFromSpaceId(spaceId);
 
-            String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-            String pageFullName = Utils.getPageFullName(wikiName, spaceName, pageName);
+            String pageId = Utils.getPageId(wikiName, spaces, pageName);
+            String pageFullName = Utils.getPageFullName(wikiName, spaces, pageName);
 
             /* Check if the user has the right to see the found document */
             if (xwikiApi.hasAccessLevel("view", pageId)) {
@@ -119,7 +121,7 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
                 searchResult.setPageFullName(pageFullName);
                 searchResult.setTitle(title);
                 searchResult.setWiki(wikiName);
-                searchResult.setSpace(spaceName);
+                searchResult.setSpace(spaceId);
                 searchResult.setPageName(pageName);
                 searchResult.setVersion(doc.getVersion());
                 searchResult.setAuthor(doc.getAuthor());
@@ -148,12 +150,12 @@ public abstract class AbstractDatabaseSearchSource extends AbstractSearchSource
                 String pageUri = null;
                 if (StringUtils.isBlank(language)) {
                     pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaceName, pageName)
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, spaces, pageName)
                             .toString();
                 } else {
                     searchResult.setLanguage(language);
                     pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, wikiName, spaceName,
+                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, wikiName, spaces,
                             pageName, language).toString();
                 }
 

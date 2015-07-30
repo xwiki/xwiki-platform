@@ -32,7 +32,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.cache.util.AbstractCacheConfigurationLoader;
-import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 
 import com.opensymphony.oscache.base.algorithm.LRUCache;
 import com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener;
@@ -73,7 +73,7 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
     /**
      * The container used to access configuration files.
      */
-    private Container container;
+    private Environment environment;
 
     /**
      * The maximum duration a cache entry can exists without any modification.
@@ -86,15 +86,15 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
     private String name;
 
     /**
-     * @param container the container used to access configuration files.
+     * @param environment the container used to access configuration files.
      * @param configuration the XWiki cache API configuration.
      * @param defaultPropsId the default configuration identifier used to load cache configuration file.
      */
-    public OSCacheCacheConfiguration(Container container, CacheConfiguration configuration, String defaultPropsId)
+    public OSCacheCacheConfiguration(Environment environment, CacheConfiguration configuration, String defaultPropsId)
     {
         super(configuration, defaultPropsId);
 
-        this.container = container;
+        this.environment = environment;
 
         load();
     }
@@ -142,8 +142,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
                     if (ec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
                         this.oscacheConfiguration.setProperty("cache.algorithm", LRUCache.class.getName());
                         if (ec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
-                            this.oscacheConfiguration.setProperty("cache.capacity", ec.get(
-                                LRUEvictionConfiguration.MAXENTRIES_ID).toString());
+                            this.oscacheConfiguration.setProperty("cache.capacity",
+                                ec.get(LRUEvictionConfiguration.MAXENTRIES_ID).toString());
                         }
                     }
                 }
@@ -233,10 +233,8 @@ public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
         try {
             if (file.exists()) {
                 is = new FileInputStream(file);
-            } else {
-                is =
-                    this.container.getApplicationContext().getResourceAsStream(
-                        "/WEB-INF/" + PROPS_PATH + propertiesFilename);
+            } else if (this.environment != null) {
+                is = this.environment.getResourceAsStream("/WEB-INF/" + PROPS_PATH + propertiesFilename);
             }
 
             if (is == null) {

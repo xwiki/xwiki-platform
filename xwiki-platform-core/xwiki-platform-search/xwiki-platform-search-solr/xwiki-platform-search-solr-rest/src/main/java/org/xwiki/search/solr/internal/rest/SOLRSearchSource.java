@@ -36,8 +36,11 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
 import org.xwiki.query.solr.internal.SolrQueryExecutor;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.internal.Utils;
@@ -60,6 +63,9 @@ public class SOLRSearchSource extends AbstractSearchSource
 {
     @Inject
     protected QueryManager queryManager;
+    
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Override
     public List<SearchResult> search(String queryString, String defaultWikiName, String wikis,
@@ -82,6 +88,11 @@ public class SOLRSearchSource extends AbstractSearchSource
         }
 
         Query query = this.queryManager.createQuery(queryString, SolrQueryExecutor.SOLR);
+
+        if (query instanceof SecureQuery) {
+            // Show only what the current user has the right to see
+            ((SecureQuery) query).checkCurrentUser(true);
+        }
 
         List<String> fq = new ArrayList<String>();
 
@@ -145,13 +156,14 @@ public class SOLRSearchSource extends AbstractSearchSource
                 searchResult.setPageFullName((String) document.get("fullname"));
                 searchResult.setTitle((String) document.get("title"));
                 searchResult.setWiki((String) document.get("wiki"));
+                // TODO: what SolR returns about nested spaces?
                 searchResult.setSpace((String) document.get("space"));
                 searchResult.setPageName((String) document.get("name"));
                 searchResult.setVersion((String) document.get("version"));
 
                 searchResult.setType("page");
-                searchResult.setId(Utils.getPageId(searchResult.getWiki(), searchResult.getSpace(),
-                    searchResult.getPageName()));
+                searchResult.setId(Utils.getPageId(searchResult.getWiki(),
+                    Utils.getSpacesFromSpaceId(searchResult.getSpace()), searchResult.getPageName()));
 
                 searchResult.setScore(((Number) document.get("score")).floatValue());
                 searchResult.setAuthor((String) document.get("author"));
@@ -164,17 +176,20 @@ public class SOLRSearchSource extends AbstractSearchSource
                 }
 
                 Locale locale = LocaleUtils.toLocale((String) document.get("doclocale"));
+                
+                DocumentReference docRef = documentReferenceResolver.resolve(searchResult.getPageFullName());
+                List<String> spaces = Utils.getSpacesHierarchy(docRef.getLastSpaceReference());
 
                 String pageUri = null;
                 if (Locale.ROOT == locale) {
                     pageUri =
                         Utils.createURI(uriInfo.getBaseUri(), PageResource.class, searchResult.getWiki(),
-                            searchResult.getSpace(), searchResult.getPageName()).toString();
+                                spaces, searchResult.getPageName()).toString();
                 } else {
                     searchResult.setLanguage(locale.toString());
                     pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, searchResult.getSpace(),
-                            searchResult.getPageName(), locale).toString();
+                        Utils.createURI(uriInfo.getBaseUri(), PageTranslationResource.class, spaces,
+                                searchResult.getPageName(), locale).toString();
                 }
 
                 Link pageLink = new Link();

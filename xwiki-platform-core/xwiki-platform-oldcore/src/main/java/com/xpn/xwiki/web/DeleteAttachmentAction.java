@@ -26,6 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -33,7 +37,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 
 /**
  * Delete attachment xwiki action.
@@ -89,7 +92,7 @@ public class DeleteAttachmentAction extends XWikiAction
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
             String requestUri = request.getRequestURI();
-            filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+            filename = getFileName();
         }
 
         XWikiDocument newdoc = doc.clone();
@@ -152,5 +155,16 @@ public class DeleteAttachmentAction extends XWikiAction
     public String render(XWikiContext context)
     {
         return "error";
+    }
+
+    /**
+     * @return the filename of the attachment.
+     */
+    private String getFileName()
+    {
+        // Extract the Attachment file name from the parsed request URL that was done before this Action is called
+        ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+        EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+        return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
     }
 }

@@ -670,8 +670,7 @@ public class XWiki extends Api
      * @deprecated use query service instead
      */
     @Deprecated
-    public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues)
-        throws XWikiException
+    public List<String> searchDocuments(String parameterizedWhereClause, List<?> parameterValues) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(parameterizedWhereClause, parameterValues, getXWikiContext());
     }
@@ -800,7 +799,9 @@ public class XWiki extends Api
      *
      * @param content
      * @return evaluated content if the content contains velocity scripts
+     * @deprecated Since 7.2M1. Use specific rendering/parsing options for the content type you want to parse/render.
      */
+    @Deprecated
     public String parseContent(String content)
     {
         return this.xwiki.parseContent(content, getXWikiContext());
@@ -1593,25 +1594,33 @@ public class XWiki extends Api
     }
 
     /**
-     * API to list all non-hidden spaces in the current wiki.
+     * API to list all spaces in the current wiki.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
      *
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> getSpaces() throws XWikiException
     {
         return this.xwiki.getSpaces(getXWikiContext());
     }
 
     /**
-     * API to list all non-hidden documents in a space.
+     * API to list all documents in a space.
+     * <p>
+     * Hidden spaces are filtered unless current user enabled them.
      *
      * @param spaceReference the local reference of the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
      * @throws XWikiException if the loading went wrong
+     * @deprecated use query service instead
      */
+    @Deprecated
     public List<String> getSpaceDocsName(String spaceReference) throws XWikiException
     {
         return this.xwiki.getSpaceDocsName(spaceReference, getXWikiContext());

@@ -190,7 +190,7 @@ $xwiki.getUserName("xwiki:${username}")
   #else
 </li>
   #end
- <li class="tocEntry"><a href="#$tocEntry.key">$!tocEntry.value.numbering $xwiki.parseContent($tocEntry.value.text)</a>
+ <li class="tocEntry"><a href="#$tocEntry.key">$!tocEntry.value.numbering #evaluate($tocEntry.value.text)</a>
   #set ($lastLevel = $level)
   #set($openeditem = true)
  #end

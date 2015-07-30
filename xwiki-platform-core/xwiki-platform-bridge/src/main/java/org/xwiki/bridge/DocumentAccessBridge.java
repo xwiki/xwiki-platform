@@ -236,7 +236,7 @@ public interface DocumentAccessBridge
     String getDocumentContent(String documentReference, String language) throws Exception;
 
     /**
-     * Get the number of the first object that has a property that match the expectation. 
+     * Get the number of the first object that has a property that match the expectation.
      * 
      * @param documentReference the reference of the document to look for objects into
      * @param classReference the reference of the class to look objects of
@@ -246,7 +246,7 @@ public interface DocumentAccessBridge
      */
     int getObjectNumber(DocumentReference documentReference, DocumentReference classReference,
         String parameterName, String valueToMatch);
-    
+
     /**
      * Retrieves the value for an object property.
      * 
@@ -292,7 +292,7 @@ public interface DocumentAccessBridge
      * @since 3.2M3
      */
     Object getProperty(ObjectPropertyReference objectPropertyReference);
-    
+
     /**
      * Retrieves the value for an object property, from the first object of the given class.
      * 
@@ -318,7 +318,7 @@ public interface DocumentAccessBridge
      */
     Object getProperty(DocumentReference documentReference, DocumentReference classReference, int objectNumber,
         String propertyName);
-    
+
     /**
      * Retrieves the value for an object property, from the first object of any class that has a property with that
      * name.
@@ -381,7 +381,7 @@ public interface DocumentAccessBridge
      */
     void setProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName,
         Object propertyValue) throws Exception;
-    
+
     /**
      * Returns the content of a document attachment.
      * 
@@ -554,7 +554,11 @@ public interface DocumentAccessBridge
      * @param documentReference the reference of the document to access
      * @return true if current user can view provided document.
      * @since 2.2.1
+     * @deprecated since 6.1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#checkAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
+     *             with {@link org.xwiki.security.authorization.Right#VIEW} instead
      */
+    @Deprecated
     boolean isDocumentViewable(DocumentReference documentReference);
 
     /**
@@ -577,7 +581,11 @@ public interface DocumentAccessBridge
      * @param documentReference the name of the document to be edited.
      * @return True if current user has 'edit' access on the target document.
      * @since 2.2M1
+     * @deprecated since 6.1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#checkAccess(org.xwiki.security.authorization.Right, org.xwiki.model.reference.EntityReference)}
+     *             with {@link org.xwiki.security.authorization.Right#EDIT} instead
      */
+    @Deprecated
     boolean isDocumentEditable(DocumentReference documentReference);
 
     /**

@@ -134,8 +134,6 @@ public abstract class XWikiAction extends Action
 
     private JobProgressManager progress;
 
-    private ThreadLocal<Boolean> redirectSpaceURLAlreadyHandled = new ThreadLocal<>();
-
     protected ContextualLocalizationManager getLocalization()
     {
         if (this.localization == null) {
@@ -645,9 +643,6 @@ public abstract class XWikiAction extends Action
         container.removeResponse();
         container.removeSession();
         execution.removeContext();
-
-        // Also reset the SpaceURLs redirect Thread Local so that if this Thread is reused its value it reset.
-        this.redirectSpaceURLAlreadyHandled.set(false);
     }
 
     public String getRealPath(String path)
@@ -803,21 +798,21 @@ public abstract class XWikiAction extends Action
      *   <li>if A.B exists then continue</li>
      *   <li> if A.B doesn't exist then forward to A.B.WebHome</li>
      * </ul>
+     * In order to disable this redirect you should provide the {@code spaceRedirect=false} Query String parameter and
+     * value.
      *
      * @since 7.2M1
      */
     private boolean redirectSpaceURLs(String action, XWikiURLFactory urlf, XWiki xwiki, XWikiContext context)
         throws Exception
     {
-        if ( "view".equals(action)) {
+        if ("view".equals(action) && !"false".equalsIgnoreCase(context.getRequest().getParameter("spaceRedirect"))) {
             DocumentReference reference = xwiki.getDocumentReference(context.getRequest(), context);
             if (!xwiki.exists(reference, context)) {
                 String defaultDocumentName = Utils.getComponent(EntityReferenceProvider.class).getDefaultReference(
                     EntityType.DOCUMENT).getName();
-                // Avoid an infinite loop by using a Thread Local variable (we can do this since forward() is guaranteed
-                // to be caled in the same thread by the Servlet Specifications).
-                if (this.redirectSpaceURLAlreadyHandled.get() == null || !this.redirectSpaceURLAlreadyHandled.get()) {
-                    this.redirectSpaceURLAlreadyHandled.set(true);
+                // Avoid an infinite loop by ensuring we're not on a WebHome already
+                if (!reference.getName().equals(defaultDocumentName)) {
                     // Consider the reference as a Space Reference and Construct a new reference to the home of that
                     // Space. Then generate the URL for it and forward to it
                     SpaceReference spaceReference = new SpaceReference(reference.getName(), reference.getParent());

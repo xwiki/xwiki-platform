@@ -95,8 +95,7 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 readXAR(filter, proxyFilter);
             }
         } else {
-            throw new FilterException(
-                String.format("Unsupported input source of type [%s]", inputSource.getClass()));
+            throw new FilterException(String.format("Unsupported input source of type [%s]", inputSource.getClass()));
         }
     }
 
@@ -123,8 +122,9 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
             throw new FilterException("Failed to read XAR XML document", e);
         }
 
-        if (documentReader.isSentBeginWikiSpace() && documentReader.getCurrentSpaceReference() != null) {
-            for (EntityReference space = documentReader.getCurrentSpaceReference(); space != null; space =
+        // Close remaining opened spaces
+        if (documentReader.getSentSpaceReference() != null) {
+            for (EntityReference space = documentReader.getSentSpaceReference(); space != null; space =
                 space.getParent()) {
                 proxyFilter.endWikiSpace(space.getName(), FilterEventParameters.EMPTY);
             }

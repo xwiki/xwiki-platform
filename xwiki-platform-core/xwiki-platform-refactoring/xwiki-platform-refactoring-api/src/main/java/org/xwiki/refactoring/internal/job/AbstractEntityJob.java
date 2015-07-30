@@ -28,8 +28,10 @@ import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.EntityReferenceTreeNode;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -46,7 +48,25 @@ import org.xwiki.security.authorization.Right;
 public abstract class AbstractEntityJob<R extends EntityRequest, S extends EntityJobStatus<? super R>> extends
     AbstractJob<R, S> implements GroupedJob
 {
+    /**
+     * Generic interface used to implement the Visitor pattern.
+     * 
+     * @param <T> the type of nodes that are visited
+     * @version $Id$
+     */
+    public interface Visitor<T>
+    {
+        /**
+         * Visit the given node.
+         * 
+         * @param node the node to visit
+         */
+        void visit(T node);
+    }
+
     private static final JobGroupPath ROOT_GROUP = new JobGroupPath("refactoring", null);
+
+    private static final String PREFERENCES_DOCUMENT_NAME = "WebPreferences";
 
     /**
      * Specifies the group this job is part of. If all the entities involved in this operation are from the same wiki
@@ -65,9 +85,9 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
     private AuthorizationManager authorization;
 
     /**
-     * Used to distinguish between terminal and non-terminal (WebHome) documents.
+     * Used to distinguish the space home page.
      * 
-     * @see #isTerminal(EntityReference)
+     * @see #isSpaceHomeReference(DocumentReference)
      */
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -109,7 +129,6 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
                 } else {
                     this.progressManager.startStep(this);
                     process(entityReference);
-                    this.progressManager.endStep(this);
                 }
             }
         } finally {
@@ -164,9 +183,59 @@ public abstract class AbstractEntityJob<R extends EntityRequest, S extends Entit
             || this.authorization.hasAccess(right, this.request.getUserReference(), reference);
     }
 
-    protected boolean isTerminal(EntityReference entityReference)
+    protected boolean isSpaceHomeReference(DocumentReference documentReference)
     {
-        return !entityReference.getName().equals(
-            this.defaultEntityReferenceProvider.getDefaultReference(entityReference.getType()).getName());
+        return documentReference.getName().equals(
+            this.defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName());
+    }
+
+    private boolean isSpacePreferencesReference(EntityReference entityReference)
+    {
+        return entityReference.getType() == EntityType.DOCUMENT
+            && PREFERENCES_DOCUMENT_NAME.equals(entityReference.getName());
+    }
+
+    protected void visitDocumentNodes(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        EntityReference nodeReference = node.getReference();
+        EntityType nodeType = nodeReference != null ? nodeReference.getType() : null;
+        if (nodeType == EntityType.SPACE || nodeType == EntityType.WIKI || nodeType == null) {
+            // A node that corresponds to an entity that can contain documents.
+            visitDocumentAncestor(node, visitor);
+        } else if (nodeType == EntityType.DOCUMENT) {
+            visitor.visit((DocumentReference) node.getReference());
+        }
+    }
+
+    private void visitDocumentAncestor(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        Collection<EntityReferenceTreeNode> children = node.getChildren();
+        this.progressManager.pushLevelProgress(children.size(), this);
+
+        try {
+            // Visit the space preferences document at the end as otherwise we may loose the space access rights.
+            EntityReferenceTreeNode spacePreferencesNode = null;
+            for (EntityReferenceTreeNode child : children) {
+                if (isSpacePreferencesReference(child.getReference())) {
+                    spacePreferencesNode = child;
+                    continue;
+                }
+                visitDocumentAncestorStep(child, visitor);
+            }
+
+            if (spacePreferencesNode != null) {
+                visitDocumentAncestorStep(spacePreferencesNode, visitor);
+            }
+        } finally {
+            this.progressManager.popLevelProgress(this);
+        }
+    }
+
+    private void visitDocumentAncestorStep(EntityReferenceTreeNode node, Visitor<DocumentReference> visitor)
+    {
+        this.progressManager.startStep(this);
+        if (!this.status.isCanceled()) {
+            visitDocumentNodes(node, visitor);
+        }
     }
 }

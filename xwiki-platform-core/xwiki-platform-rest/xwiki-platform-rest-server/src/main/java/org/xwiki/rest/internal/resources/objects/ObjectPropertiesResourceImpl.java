@@ -66,7 +66,8 @@ public class ObjectPropertiesResourceImpl extends BaseObjectsResource implements
             properties.getProperties().addAll(object.getProperties());
 
             String objectUri = Utils.createURI(uriInfo.getBaseUri(), ObjectResource.class, doc.getWiki(),
-                doc.getSpace(), doc.getName(), object.getClassName(), object.getNumber()).toString();
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getName(), object.getClassName(),
+                    object.getNumber()).toString();
             Link objectLink = objectFactory.createLink();
             objectLink.setHref(objectUri);
             objectLink.setRel(Relations.OBJECT);

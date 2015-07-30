@@ -19,8 +19,15 @@
  */
 package org.xwiki.cache.infinispan;
 
+import org.xwiki.cache.infinispan.internal.InfinispanCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheManager;
+import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
 import org.xwiki.cache.tests.AbstractEvictionGenericTestCache;
+import org.xwiki.test.annotation.ComponentList;
 
+@ComponentList(value = {InfinispanCacheFactory.class, DefaultCacheManager.class, DefaultCacheFactory.class,
+    DefaultCacheManagerConfiguration.class})
 public class InfinispanCacheTest extends AbstractEvictionGenericTestCache
 {
     public InfinispanCacheTest()

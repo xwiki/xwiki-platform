@@ -23,7 +23,7 @@
     #end
     ## ADMIN
     #if ($hasSpaceAdmin && $isAdminAppInstalled)
-      #set ($spaceAdminDocRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+      #set ($spaceAdminDocRef = $services.model.resolveDocument('WebPreferences'))
       #set ($adminspaceaction = $xwiki.getURL($spaceAdminDocRef, 'admin'))
       #submenuitem($adminspaceaction $services.localization.render('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace', '', 'wrench')
       #set ($hasPreviousMenuSection = true)
@@ -32,7 +32,7 @@
     #set($spaceIndexReference = $services.model.createDocumentReference('', 'Main', 'SpaceIndex'))
     #if ($xwiki.exists($spaceIndexReference))
       #submenuseparator()
-      #set ($spaceHomeReference = $services.model.createDocumentReference('', $doc.space, 'WebHome'))
+      #set ($spaceHomeReference = $services.model.resolveDocument('WebHome'))
       #if ($xwiki.exist($spaceHomeReference))
         #set ($spaceIndexUrl = $xwiki.getURL($spaceHomeReference, 'view', 'sheet=Main.SpaceIndex'))
       #elseif ($xwiki.exists($doc.documentReference))

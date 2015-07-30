@@ -202,6 +202,11 @@ public class BinEntityResourceReferenceResolverTest
             singleSpaceReference, singleSpaceReference, EntityType.ATTACHMENT);
         testCreateResource("http://localhost/bin/viewattachrev/space1/space2/page/attachment.ext", "viewattachrev",
             twoSpaceReference, twoSpaceReference, EntityType.ATTACHMENT);
+
+        testCreateResource("http://localhost/bin/downloadrev/space/page/attachment.ext", "downloadrev",
+            singleSpaceReference, singleSpaceReference, EntityType.ATTACHMENT);
+        testCreateResource("http://localhost/bin/downloadrev/space1/space2/page/attachment.ext", "downloadrev",
+            twoSpaceReference, twoSpaceReference, EntityType.ATTACHMENT);
     }
 
     @Test

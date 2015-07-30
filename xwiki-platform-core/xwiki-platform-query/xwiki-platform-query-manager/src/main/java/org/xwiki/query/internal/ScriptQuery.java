@@ -90,7 +90,7 @@ public class ScriptQuery implements Query
 
     /**
      * Allow to retrieve the total count of items for the given query instead of the actual results. This method will
-     * only work for queries selecting document full names, see {@link CountFilter} for more information.
+     * only work for queries selecting document full names, see {@link CountDocumentFilter} for more information.
      *
      * @return the total number of results for this query.
      */

@@ -39,7 +39,7 @@
     <profile>
       <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-scheduler-test-pageobjects</module>
+        <module>xwiki-platform-scheduler-test</module>
       </modules>
     </profile>
   </profiles>

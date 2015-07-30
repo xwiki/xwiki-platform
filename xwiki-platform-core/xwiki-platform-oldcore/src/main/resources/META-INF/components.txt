@@ -49,6 +49,7 @@ com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentReferenceObjectReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentSpaceReferenceProvider
 com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver
+com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.internal.model.reference.CurrentWikiReferenceProvider
@@ -101,6 +102,7 @@ com.xpn.xwiki.store.migration.hibernate.R54600TranslationDataMigration
 com.xpn.xwiki.store.migration.hibernate.R6079XWIKI1878DataMigration
 com.xpn.xwiki.store.migration.hibernate.R6405XWIKI1933DataMigration
 com.xpn.xwiki.store.migration.hibernate.R72000XWIKI12153DataMigration
+com.xpn.xwiki.store.migration.hibernate.R72001XWIKI12228DataMigration
 com.xpn.xwiki.store.migration.hibernate.R7350XWIKI2079DataMigration
 com.xpn.xwiki.store.XWikiHibernateStore
 com.xpn.xwiki.store.XWikiHibernateVersioningStore
@@ -124,3 +126,4 @@ com.xpn.xwiki.objects.meta.StaticListMetaClass
 com.xpn.xwiki.objects.meta.StringMetaClass
 com.xpn.xwiki.objects.meta.TextAreaMetaClass
 com.xpn.xwiki.objects.meta.UsersMetaClass
+com.xpn.xwiki.script.parentchild.ParentChildScriptService

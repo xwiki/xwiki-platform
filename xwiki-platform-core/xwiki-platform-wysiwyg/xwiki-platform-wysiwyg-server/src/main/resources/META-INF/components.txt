@@ -13,3 +13,4 @@ org.xwiki.wysiwyg.server.internal.wiki.DefaultWikiService
 org.xwiki.wysiwyg.server.internal.wiki.DefaultLinkService
 org.xwiki.wysiwyg.server.internal.DefaultWysiwygEditorConfiguration
 org.xwiki.wysiwyg.server.script.DefaultWysiwygEditorScriptService
+org.xwiki.wysiwyg.server.wiki.EntityReferenceConverter

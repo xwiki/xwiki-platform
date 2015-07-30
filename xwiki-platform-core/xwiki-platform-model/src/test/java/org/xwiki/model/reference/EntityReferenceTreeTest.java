@@ -19,8 +19,11 @@
  */
 package org.xwiki.model.reference;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 
 /**
  * Validate {@link EntityReferenceTree}.
@@ -106,5 +109,29 @@ public class EntityReferenceTreeTest
             Assert.assertEquals(new DocumentReference("wiki2", "space2", "page2"), treeNode.getReference());
             Assert.assertEquals(0, treeNode.getChildren().size());
         }
+    }
+
+    @Test
+    public void getDescendantByReference()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        EntityReferenceTree tree = new EntityReferenceTree(documentReference);
+
+        Assert.assertSame(documentReference.getWikiReference(), tree.get(new WikiReference("wiki")).getReference());
+
+        Assert.assertSame(documentReference.getLastSpaceReference(), tree
+            .get(documentReference.getLastSpaceReference()).getReference());
+
+        EntityReference entityReference =
+            new EntityReference(documentReference.getName(), EntityType.DOCUMENT, documentReference.getParent());
+        Assert.assertSame(documentReference, tree.get(entityReference).getReference());
+
+        // The entity type should be taken into account.
+        Assert.assertNull(tree.get(new EntityReference(documentReference.getName(), EntityType.SPACE, documentReference
+            .getParent())));
+
+        Assert.assertNull(tree.get((EntityReference) null));
+
+        Assert.assertNull(tree.get(new SpaceReference("From", documentReference.getParent().getParent())));
     }
 }

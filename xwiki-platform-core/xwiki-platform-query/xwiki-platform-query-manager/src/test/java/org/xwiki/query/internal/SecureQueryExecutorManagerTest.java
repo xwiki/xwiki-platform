@@ -19,213 +19,104 @@
  */
 package org.xwiki.query.internal;
 
-import static org.junit.Assert.fail;
-
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.assertTrue;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link SecureQueryExecutorManager}
  *
  * @version $Id$
  */
-@MockingRequirement(SecureQueryExecutorManager.class)
-public class SecureQueryExecutorManagerTest extends AbstractMockingComponentTestCase
+public class SecureQueryExecutorManagerTest
 {
-    private QueryExecutorManager qem;
+    @Rule
+    public MockitoComponentMockingRule<QueryExecutorManager> mocker =
+        new MockitoComponentMockingRule<QueryExecutorManager>(SecureQueryExecutorManager.class);
 
-    private DocumentAccessBridge dab;
+    private ContextualAuthorizationManager authorization;
+
+    private boolean hasProgrammingRight;
+
+    /**
+     * The component under test.
+     */
+    private QueryExecutorManager executor;
 
     @Before
-    public void configure() throws Exception
+    public void before() throws Exception
     {
-        final QueryExecutorManager nestedQueryExecutorManager =
-            getComponentManager().getInstance(QueryExecutorManager.class);
-        getMockery().checking(new Expectations() {{
-            allowing(nestedQueryExecutorManager).execute(with(any(Query.class)));
-        }});
+        this.executor = this.mocker.getComponentUnderTest();
+        this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
 
-        this.dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        this.qem = getComponentManager().getInstance(QueryExecutorManager.class, "secure");
-    }
+        when(this.authorization.hasAccess(Right.PROGRAM)).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                return hasProgrammingRight;
+            }
+        });
 
-    private void setProgrammingRights(final boolean hasProgrammingRights)
-    {
-        getMockery().checking(new Expectations() {{
-            allowing(dab).hasProgrammingRights();
-                will(returnValue(hasProgrammingRights));
-        }});
-    }
-    
-    private Query createQuery(String stmt, String lang)
-    {
-        return new DefaultQuery(stmt, lang, this.qem);
+        this.hasProgrammingRight = true;
     }
 
-    private Query createNamedQuery(String name)
-    {
-        return new DefaultQuery(name, this.qem);
-    }
+    // Tests
 
     @Test
-    public void createWhereXWQLQueryWithProgrammingRights() throws QueryException
+    public void executeNotSecureQueryWithoutProgrammingRight()
     {
-        setProgrammingRights(true);
-        createQuery("where doc.space='Main'", "xwql").execute();
-    }
+        this.hasProgrammingRight = false;
 
-    @Test
-    public void createFromXWQLQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
-    }
+        // Create a Query not implementing SecureQuery
+        Query query = mock(Query.class);
 
-    @Test
-    public void createCompleteXWQLQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
-
-    }
-
-    @Test
-    public void createWhereHQLQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery("where doc.space='Main'", "hql").execute();
-    }
-
-    @Test
-    public void createFromHQLQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery(", BaseObject as obj", "hql").execute();
-    }
-
-    @Test
-    public void createCompleteHQLQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery("select u from XWikiDocument as doc", "hql").execute();
-
-    }
-
-    @Test
-    public void createNamedQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createNamedQuery("somename").execute();
-    }
-
-    @Test
-    public void setWikiInQueryWithProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(true);
-        createQuery("", "xwql").setWiki("somewiki").execute();
-    }
-    
-    @Test
-    public void createWhereXWQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        createQuery("where doc.space='Main'", "xwql").execute();
-    }
-
-    @Test
-    public void createFromXWQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        createQuery("from doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
-    }
-
-    @Test
-    public void createCompleteXWQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
         try {
-            createQuery("select u from Document as doc, doc.objects(XWiki.XWikiUsers) as u", "xwql").execute();
-            fail("full form statements shouldn't be allowed since the user doesn't have programming rights");
+            this.executor.execute(query);
+            fail("Should have thrown an exception here");
         } catch (QueryException expected) {
+            assertEquals("Unsecure query require programming right. Query statement = [null]",
+                expected.getMessage());
         }
     }
 
     @Test
-    public void createWhereHQLQueryWithoutProgrammingRights() throws QueryException
+    public void executeNotSecureQueryWithProgrammingRight() throws QueryException
     {
-        setProgrammingRights(false);
-        createQuery("where doc.space='Main'", "hql").execute();
+        this.hasProgrammingRight = true;
+
+        Query query = mock(Query.class);
+
+        this.executor.execute(query);
     }
 
     @Test
-    public void createFromHQLQueryWithoutProgrammingRights() throws QueryException
+    public void executeSecureQueryWithoutCheckCurrentAuthor() throws QueryException
     {
-        setProgrammingRights(false);
-        createQuery(", BaseObject as obj", "hql").execute();
-    }
+        DefaultQuery query = new DefaultQuery("statement", "language", this.executor);
 
-    @Test
-    public void createCompleteHQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        try {
-            createQuery("select u from XWikiDocument as doc", "hql").execute();
-            createQuery(" select u from XWikiDocument as doc", "hql").execute();
-            fail("full form statements shouldn't be allowed since the user doesn't have programming rights");
-        } catch (QueryException expected) {
-        }
-    }
+        assertFalse(query.isCurrentAuthorChecked());
+        ;
 
-    @Test
-    public void createUpdateHQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        try {
-            createQuery("update u from XWikiDocument as doc", "hql").execute();
-            createQuery(" update u from XWikiDocument as doc", "hql").execute();
-            fail("full form statements shouldn't be allowed since the user doesn't have programming rights");
-        } catch (QueryException expected) {
-        }
-    }
+        this.executor.execute(query);
 
-    @Test
-    public void createDeleteHQLQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        try {
-            createQuery("delete from XWikiDocument as doc", "hql").execute();
-            createQuery(" delete from XWikiDocument as doc", "hql").execute();
-            fail("full form statements shouldn't be allowed since the user doesn't have programming rights");
-        } catch (QueryException expected) {
-        }
-    }
-
-    @Test
-    public void createNamedQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        try {
-            createNamedQuery("somename").execute();
-            fail("named queries shouldn't be allowed since the user doesn't have programming rights");
-        } catch (QueryException expected) {
-        }
-    }
-
-    @Test
-    public void setWikiInQueryWithoutProgrammingRights() throws QueryException
-    {
-        setProgrammingRights(false);
-        try {
-            createQuery("", "xwql").setWiki("somewiki").execute();
-            fail("Query#setWiki shouldn't be allowed since the user doesn't have programming rights");
-        } catch (QueryException expected) {
-        }
+        assertTrue(query.isCurrentAuthorChecked());
+        ;
     }
 }

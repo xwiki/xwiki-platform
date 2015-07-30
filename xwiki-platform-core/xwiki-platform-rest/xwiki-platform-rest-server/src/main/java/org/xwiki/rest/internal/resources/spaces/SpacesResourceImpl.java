@@ -46,19 +46,16 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
     public Spaces getSpaces(String wikiName, Integer start, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
-
         Spaces spaces = objectFactory.createSpaces();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
-
             List<String> spaceNames = queryManager.getNamedQuery("getSpaces").addFilter(
                     componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden")).setOffset(start)
-                    .setLimit(number).execute();
+                    .setLimit(number).setWiki(wikiName).execute();
 
             for (String spaceName : spaceNames) {
-                String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
+                List<String> spaceList = Utils.getSpacesFromSpaceId(spaceName);
+                String homeId = Utils.getPageId(wikiName, spaceList, "WebHome");
                 Document home = null;
 
                 XWiki xwikiApi = Utils.getXWikiApi(componentManager);
@@ -67,13 +64,11 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
                         home = Utils.getXWikiApi(componentManager).getDocument(homeId);
                     }
                     spaces.getSpaces().add(DomainObjectFactory
-                            .createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home));
+                            .createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceList, home));
                 }
             }
         } catch (Exception e) {
             throw new XWikiRestException(e);
-        } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return spaces;

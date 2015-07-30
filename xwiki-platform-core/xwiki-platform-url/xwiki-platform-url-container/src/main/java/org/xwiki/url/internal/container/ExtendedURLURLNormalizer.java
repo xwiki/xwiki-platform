@@ -90,7 +90,9 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
         contextPath = StringUtils.strip(contextPath, URL_SEGMENT_DELIMITER);
 
         List<String> segments = new ArrayList<>();
-        segments.add(contextPath);
+        if (!StringUtils.isEmpty(contextPath)) {
+            segments.add(contextPath);
+        }
         segments.addAll(partialURL.getSegments());
 
         return new ExtendedURL(segments, partialURL.getParameters());

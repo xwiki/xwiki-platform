@@ -44,6 +44,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Quotidien
+XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Horaire
+XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Hebdomadaire
+XWiki.WatchListClass_interval_realtime=Temps réel
 rendering.macro.watchlist.description=Affiche la liste des pages suivies
 rendering.macro.watchlist.name=Liste de suivi
 </content>

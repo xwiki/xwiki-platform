@@ -19,64 +19,23 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.configuration.ConfigurationSource;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Query filter excluding 'hidden' documents from a {@link org.xwiki.query.Query}. Hidden documents should not be
  * returned in public search results or appear in the User Interface in general.
+ * <p>
+ * The filter assume the <code>XWikiDocument</code> table has a <code>space</code> alias.
  *
  * @version $Id$
  * @since 4.0RC1
  */
-@Component
-@Named("hidden")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class HiddenDocumentFilter extends AbstractWhereQueryFilter implements Initializable
+@Component(hints = {"hidden", "hidden/document"})
+public class HiddenDocumentFilter extends AbstractHiddenFilter
 {
-    /**
-     * Used to retrieve user preference regarding hidden documents.
-     */
-    @Inject
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
-
-    /**
-     * @see #initialize()
-     */
-    private boolean isActive;
-
-    /**
-     * Sets the #isActive property, based on the user configuration.
-     */
     @Override
-    public void initialize()
+    protected String filterHidden(String statement, String language)
     {
-        Integer preference = userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-        isActive = preference == null || preference != 1;
-    }
-
-    @Override
-    public String filterStatement(String statement, String language)
-    {
-        String result = statement;
-        if (isActive) {
-            result = insertWhereClause("(doc.hidden <> true or doc.hidden is null)", statement, language);
-        }
-        return result;
-    }
-
-    @Override
-    public List filterResults(List results)
-    {
-        return results;
+        return insertWhereClause("(doc.hidden <> true or doc.hidden is null)", statement, language);
     }
 }

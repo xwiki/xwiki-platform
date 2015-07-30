@@ -83,7 +83,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private String currentLegacyDocument;
 
-    private EntityReference previousSpaceReference;
+    private EntityReference sentSpaceReference;
 
     private EntityReference currentSpaceReference;
 
@@ -100,8 +100,6 @@ public class DocumentLocaleReader extends AbstractReader
     private FilterEventParameters currentDocumentLocaleParameters = new FilterEventParameters();
 
     private FilterEventParameters currentDocumentRevisionParameters = new FilterEventParameters();
-
-    private boolean sentBeginWikiSpace;
 
     private boolean sentBeginWikiDocument;
 
@@ -120,6 +118,11 @@ public class DocumentLocaleReader extends AbstractReader
         this.properties = properties;
     }
 
+    public EntityReference getSentSpaceReference()
+    {
+        return this.sentSpaceReference;
+    }
+
     public EntityReference getCurrentSpaceReference()
     {
         return this.currentSpaceReference;
@@ -130,18 +133,10 @@ public class DocumentLocaleReader extends AbstractReader
         return this.currentDocumentReference;
     }
 
-    public boolean isSentBeginWikiSpace()
-    {
-        return this.sentBeginWikiSpace;
-    }
-
     private void resetDocument()
     {
-        if (!this.sentBeginWikiSpace) {
-            // Space was not sent after all so let's forget it
-            this.currentSpaceReference = null;
-            this.currentLegacySpace = null;
-        }
+        this.currentSpaceReference = null;
+        this.currentLegacySpace = null;
 
         this.currentDocumentReference = null;
         this.currentLegacyDocument = null;
@@ -157,63 +152,78 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocumentRevision = false;
     }
 
+    private void switchWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
+    {
+        if (canSendEdWikiSpace(force)) {
+            sendEndWikiSpace(proxyFilter, force);
+        }
+
+        if (canSendBeginWikiSpace(force)) {
+            sendBeginWikiSpace(proxyFilter, force);
+        }
+    }
+
     private boolean canSendBeginWikiSpace(boolean force)
     {
-        return !this.sentBeginWikiSpace && (force || this.properties.getEntities() == null);
+        return (this.sentSpaceReference == null || !this.sentSpaceReference.equals(this.currentSpaceReference))
+            && (force || this.properties.getEntities() == null);
     }
 
     private void sendBeginWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
-        if (canSendBeginWikiSpace(force)) {
-            int previousSize = this.previousSpaceReference != null ? this.previousSpaceReference.size() : 0;
-            int size = this.currentSpaceReference != null ? this.currentSpaceReference.size() : 0;
+        int sentSize = this.sentSpaceReference != null ? this.sentSpaceReference.size() : 0;
+        int size = this.currentSpaceReference != null ? this.currentSpaceReference.size() : 0;
 
-            int diff = size - previousSize;
+        int diff = size - sentSize;
 
-            if (diff > 0) {
-                List<EntityReference> spaces = this.currentSpaceReference.getReversedReferenceChain();
-                for (int i = spaces.size() - diff; i < spaces.size(); ++i) {
-                    proxyFilter.beginWikiSpace(spaces.get(i).getName(), FilterEventParameters.EMPTY);
-                    this.sentBeginWikiSpace = true;
-                    this.previousSpaceReference = this.currentSpaceReference;
-                }
+        if (diff > 0) {
+            List<EntityReference> spaces = this.currentSpaceReference.getReversedReferenceChain();
+            for (int i = spaces.size() - diff; i < spaces.size(); ++i) {
+                proxyFilter.beginWikiSpace(spaces.get(i).getName(), FilterEventParameters.EMPTY);
+                this.sentSpaceReference =
+                    new EntityReference(spaces.get(i).getName(), EntityType.SPACE, this.sentSpaceReference);
             }
         }
     }
 
-    private void sendEndWikiSpace(XARInputFilter proxyFilter) throws FilterException
+    private boolean canSendEdWikiSpace(boolean force)
     {
-        List<EntityReference> newSpaces = this.currentSpaceReference.getReversedReferenceChain();
-        List<EntityReference> previousSpaces = this.previousSpaceReference.getReversedReferenceChain();
+        return this.sentSpaceReference != null && !this.sentSpaceReference.equals(this.currentSpaceReference)
+            && (force || this.properties.getEntities() == null);
+    }
+
+    private void sendEndWikiSpace(XARInputFilter proxyFilter, boolean force) throws FilterException
+    {
+        List<EntityReference> sentSpaces = this.sentSpaceReference.getReversedReferenceChain();
+        List<EntityReference> currentSpaces = this.currentSpaceReference.getReversedReferenceChain();
 
         // Find the first different level
         int i = 0;
-        while (i < previousSpaces.size() && i < newSpaces.size()) {
-            if (!newSpaces.get(i).equals(previousSpaces.get(i))) {
+        while (i < sentSpaces.size() && i < currentSpaces.size()) {
+            if (!currentSpaces.get(i).equals(sentSpaces.get(i))) {
                 break;
             }
 
             ++i;
         }
 
-        if (i < previousSpaces.size()) {
+        if (i < sentSpaces.size()) {
             // Delete what is different
-            for (int diff = previousSpaces.size() - i; diff > 0; --diff, this.previousSpaceReference =
-                this.previousSpaceReference.getParent()) {
-                proxyFilter.endWikiSpace(this.previousSpaceReference.getName(), FilterEventParameters.EMPTY);
+            for (int diff = sentSpaces.size() - i; diff > 0; --diff, this.sentSpaceReference =
+                this.sentSpaceReference.getParent()) {
+                proxyFilter.endWikiSpace(this.sentSpaceReference.getName(), FilterEventParameters.EMPTY);
             }
 
             // If we got back to root forget about current space
-            if (this.previousSpaceReference == null) {
+            if (this.sentSpaceReference == null) {
                 this.currentSpaceReference = null;
-                this.sentBeginWikiSpace = false;
             }
         }
     }
 
     private boolean canSendBeginWikiDocument(boolean force)
     {
-        return this.sentBeginWikiSpace
+        return this.sentSpaceReference != null
             && !this.sentBeginWikiDocument
             && (force || (this.currentDocumentReference != null
                 && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS.size() && this.properties
@@ -222,10 +232,10 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendBeginWikiDocument(XARInputFilter proxyFilter, boolean force) throws FilterException
     {
-        sendBeginWikiSpace(proxyFilter, force);
+        switchWikiSpace(proxyFilter, force);
 
         if (canSendBeginWikiDocument(force)) {
-            sendBeginWikiSpace(proxyFilter, true);
+            switchWikiSpace(proxyFilter, true);
 
             proxyFilter.beginWikiDocument(this.currentDocumentReference.getName(), this.currentDocumentParameters);
             this.sentBeginWikiDocument = true;
@@ -342,18 +352,6 @@ public class DocumentLocaleReader extends AbstractReader
         readDocument(xmlReader, filter, proxyFilter);
     }
 
-    private void checkSpaces(XARInputFilter proxyFilter) throws FilterException
-    {
-        if (!this.currentSpaceReference.equals(this.previousSpaceReference)) {
-            // Close spaces that needs to be closed
-            if (this.sentBeginWikiSpace) {
-                sendEndWikiSpace(proxyFilter);
-            }
-            // Open spaces that needs to be opened
-            sendBeginWikiSpace(proxyFilter, false);
-        }
-    }
-
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException
     {
@@ -365,13 +363,10 @@ public class DocumentLocaleReader extends AbstractReader
         String referenceString = xmlReader.getAttributeValue(null, XARDocumentModel.ATTRIBUTE_DOCUMENT_REFERENCE);
         if (StringUtils.isNotEmpty(referenceString)) {
             this.currentDocumentReference = this.relativeResolver.resolve(referenceString, EntityType.DOCUMENT);
-
-            // Remember previous space reference
-            this.previousSpaceReference = this.currentSpaceReference;
-            // Get new space reference
             this.currentSpaceReference = this.currentDocumentReference.getParent();
 
-            checkSpaces(proxyFilter);
+            // Send needed wiki spaces event if possible
+            switchWikiSpace(proxyFilter, false);
         }
 
         // Locale
@@ -398,7 +393,6 @@ public class DocumentLocaleReader extends AbstractReader
 
                     if (this.currentDocumentReference == null) {
                         // Its an old thing
-                        this.previousSpaceReference = this.currentSpaceReference;
                         if (this.currentLegacyDocument == null) {
                             this.currentSpaceReference = new EntityReference(value, EntityType.SPACE);
                         } else {
@@ -407,7 +401,8 @@ public class DocumentLocaleReader extends AbstractReader
                             this.currentSpaceReference = this.currentDocumentReference.getParent();
                         }
 
-                        checkSpaces(proxyFilter);
+                        // Send needed wiki spaces event if possible
+                        switchWikiSpace(proxyFilter, false);
                     }
                 } else if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
                     this.currentLegacyDocument = value;

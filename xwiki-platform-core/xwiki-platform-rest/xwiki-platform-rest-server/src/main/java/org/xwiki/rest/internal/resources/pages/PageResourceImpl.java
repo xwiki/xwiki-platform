@@ -44,7 +44,8 @@ public class PageResourceImpl extends ModifiablePageResource implements PageReso
             throws XWikiRestException
     {
         try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null,
+                true, false);
 
             Document doc = documentInfo.getDocument();
 

@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.script.service.ScriptService;
 
@@ -64,7 +65,7 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query xwql(String statement) throws QueryException
     {
-        return new ScriptQuery(this.secureQueryManager.createQuery(statement, Query.XWQL), componentManager);
+        return createQuery(statement, Query.XWQL, false);
     }
 
     /**
@@ -76,7 +77,7 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query hql(String statement) throws QueryException
     {
-        return new ScriptQuery(this.secureQueryManager.createQuery(statement, Query.HQL), componentManager);
+        return createQuery(statement, Query.HQL, false);
     }
 
     /**
@@ -89,6 +90,17 @@ public class QueryManagerScriptService implements ScriptService
      */
     public Query createQuery(String statement, String language) throws QueryException
     {
-        return new ScriptQuery(this.secureQueryManager.createQuery(statement, language), componentManager);
+        return createQuery(statement, language, true);
+    }
+
+    private Query createQuery(String statement, String language, boolean checkCurrentUser) throws QueryException
+    {
+        Query query = this.secureQueryManager.createQuery(statement, language);
+        if (query instanceof SecureQuery) {
+            ((SecureQuery) query).checkCurrentAuthor(true);
+            ((SecureQuery) query).checkCurrentUser(checkCurrentUser);
+        }
+
+        return new ScriptQuery(query, this.componentManager);
     }
 }

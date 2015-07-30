@@ -151,21 +151,90 @@ public class RefactoringScriptService implements ScriptService
      */
     public MoveRequest createRenameRequest(EntityReference reference, String newName)
     {
-        return createMoveRequest(RefactoringJobs.RENAME, Collections.singletonList(reference), new EntityReference(
-            newName, reference.getType(), reference.getParent()));
+        return createRenameRequest(reference, new EntityReference(newName, reference.getType(), reference.getParent()));
+    }
+
+    /**
+     * Creates a request to copy the specified source entities to the specified destination entity.
+     * 
+     * @param sources specifies the entities to be copied
+     * @param destination specifies the place where to copy the entities (becomes the parent of the copies)
+     * @return the copy request
+     */
+    public MoveRequest createCopyRequest(Collection<EntityReference> sources, EntityReference destination)
+    {
+        MoveRequest request = createMoveRequest(RefactoringJobs.COPY, sources, destination);
+        request.setDeleteSource(false);
+        return request;
+    }
+
+    /**
+     * Creates a request to copy the specified source entity to the specified destination entity.
+     * 
+     * @param source specifies the entity to be copied
+     * @param destination specifies the place where to copy the source entity (becomes the parent of the copy)
+     * @return the copy request
+     */
+    public MoveRequest createCopyRequest(EntityReference source, EntityReference destination)
+    {
+        return createCopyRequest(Arrays.asList(source), destination);
+    }
+
+    /**
+     * Creates a request to copy the specified entity with a different reference.
+     * 
+     * @param sourceReference the entity to copy
+     * @param copyReference the reference to use for the copy
+     * @return the copy-as request
+     */
+    public MoveRequest createCopyAsRequest(EntityReference sourceReference, EntityReference copyReference)
+    {
+        MoveRequest request = createMoveRequest(RefactoringJobs.COPY_AS, Arrays.asList(sourceReference), copyReference);
+        request.setDeleteSource(false);
+        return request;
+    }
+
+    /**
+     * Creates a request to copy the specified entity with a different name.
+     * 
+     * @param reference the entity to copy
+     * @param copyName the name of the entity copy
+     * @return the copy-as request
+     */
+    public MoveRequest createCopyAsRequest(EntityReference reference, String copyName)
+    {
+        EntityReference copyReference = new EntityReference(copyName, reference.getType(), reference.getParent());
+        return createCopyAsRequest(reference, copyReference);
+    }
+
+    /**
+     * Creates a request to delete the specified entities.
+     * 
+     * @param entityReferences the entities to delete
+     * @return the delete request
+     */
+    public EntityRequest createDeleteRequest(Collection<EntityReference> entityReferences)
+    {
+        EntityRequest request = new EntityRequest();
+        initEntityRequest(request, RefactoringJobs.DELETE, entityReferences);
+        return request;
+    }
+
+    private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
+    {
+        request.setId(generateJobId(type));
+        request.setInteractive(true);
+        request.setJobType(type);
+        request.setEntityReferences(entityReferences);
+        setRightsProperties(request);
     }
 
     private MoveRequest createMoveRequest(String type, Collection<EntityReference> sources, EntityReference destination)
     {
         MoveRequest request = new MoveRequest();
-        request.setId(generateJobId(type));
-        request.setInteractive(true);
-        request.setJobType(type);
-        request.setEntityReferences(sources);
+        initEntityRequest(request, type, sources);
         request.setDestination(destination);
         request.setUpdateLinks(true);
-        request.setDeep(true);
-        setRightsProperties(request);
         return request;
     }
 
@@ -307,15 +376,125 @@ public class RefactoringScriptService implements ScriptService
                 // document.
                 DocumentReference terminalDocumentReference =
                     new DocumentReference(parentReference.getName(), new SpaceReference(parentReference.getParent()));
-                // We cannot convert a nested document to a terminal document and preserve its child documents at the
-                // same time. If the target document has child documents they will become orphans.
-                MoveRequest request = createRenameRequest(documentReference, terminalDocumentReference);
-                request.setDeep(false);
-                return rename(request);
+                return rename(documentReference, terminalDocumentReference);
             }
         }
         // The specified document is already a terminal document or cannot be converted to a terminal document.
         return null;
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given copy request.
+     *
+     * @param request the copy request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copy(MoveRequest request)
+    {
+        // The MOVE job can perform a COPY too.
+        return execute(RefactoringJobs.MOVE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to copy the specified source entities to the specified destination entity.
+     * 
+     * @param sources specifies the entities to be copied
+     * @param destination specifies the place where to copy the entities
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copy(Collection<EntityReference> sources, EntityReference destination)
+    {
+        return copy(createCopyRequest(sources, destination));
+    }
+
+    /**
+     * Schedules an asynchronous job to copy the specified source entity to the specified destination entity.
+     * 
+     * @param source specifies the entity to be copied
+     * @param destination specifies the place where to copy the entity
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copy(EntityReference source, EntityReference destination)
+    {
+        return copy(createCopyRequest(source, destination));
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given copy-as request.
+     *
+     * @param request the copy-as request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copyAs(MoveRequest request)
+    {
+        // The RENAME job can perform a COPY too.
+        return execute(RefactoringJobs.RENAME, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to copy the specified entity with a different reference.
+     * 
+     * @param sourceReference the entity to copy
+     * @param copyReference the reference to use for the copy
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copyAs(EntityReference sourceReference, EntityReference copyReference)
+    {
+        return copyAs(createCopyAsRequest(sourceReference, copyReference));
+    }
+
+    /**
+     * Schedules an asynchronous job to copy the specified entity with a different name.
+     * 
+     * @param reference the entity to copy
+     * @param copyName the name to use for the copy
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job copyAs(EntityReference reference, String copyName)
+    {
+        return copyAs(createCopyAsRequest(reference, copyName));
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given delete request.
+     *
+     * @param request the delete request to perform
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(EntityRequest request)
+    {
+        return execute(RefactoringJobs.DELETE, request);
+    }
+
+    /**
+     * Schedules an asynchronous job to delete the specified entities.
+     * 
+     * @param entityReferences the entities to delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(Collection<EntityReference> entityReferences)
+    {
+        return delete(createDeleteRequest(entityReferences));
+    }
+
+    /**
+     * Schedules an asynchronous job to delete the specified entity.
+     * 
+     * @param entityReference the entity to delete
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     */
+    public Job delete(EntityReference entityReference)
+    {
+        return delete(Arrays.asList(entityReference));
     }
 
     /**
@@ -369,6 +548,39 @@ public class RefactoringScriptService implements ScriptService
     public EntityJobStatus<MoveRequest> getRenameJobStatus(String id)
     {
         return getJobStatus(getJobId(RefactoringJobs.RENAME, id));
+    }
+
+    /**
+     * Retrieve the status of a copy job.
+     * 
+     * @param id the id of a copy job
+     * @return the status of the specified job
+     */
+    public EntityJobStatus<MoveRequest> getCopyJobStatus(String id)
+    {
+        return getJobStatus(getJobId(RefactoringJobs.COPY, id));
+    }
+
+    /**
+     * Retrieve the status of a copy-as job.
+     * 
+     * @param id the id of a copy-as job
+     * @return the status of the specified job
+     */
+    public EntityJobStatus<MoveRequest> getCopyAsJobStatus(String id)
+    {
+        return getJobStatus(getJobId(RefactoringJobs.COPY_AS, id));
+    }
+
+    /**
+     * Retrieve the status of a delete job.
+     * 
+     * @param id the id of a delete job
+     * @return the status of the specified job
+     */
+    public EntityJobStatus<EntityRequest> getDeleteJobStatus(String id)
+    {
+        return getJobStatus(getJobId(RefactoringJobs.DELETE, id));
     }
 
     @SuppressWarnings("unchecked")

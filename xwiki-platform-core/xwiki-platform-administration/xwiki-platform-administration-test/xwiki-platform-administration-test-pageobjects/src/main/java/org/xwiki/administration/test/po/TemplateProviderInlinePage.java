@@ -26,10 +26,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.Select;
 
 /**
  * Represents a template provider page in inline mode
- * 
+ *
  * @version $Id$
  * @since 4.2M1
  */
@@ -72,6 +73,20 @@ public class TemplateProviderInlinePage extends InlinePage
     public boolean isPageTemplate()
     {
         return this.templateTypeSelect.findElement(By.xpath("//option[@value='page']")).isSelected();
+    }
+
+    public void setPageTemplate(boolean isPageTemplate)
+    {
+        Select select = new Select(this.templateTypeSelect);
+
+        String value;
+        if (isPageTemplate) {
+            value = "page";
+        } else {
+            value = "space";
+        }
+
+        select.selectByValue(value);
     }
 
     private List<WebElement> getSpacesInput()
@@ -121,7 +136,7 @@ public class TemplateProviderInlinePage extends InlinePage
 
     /**
      * Sets all spaces besides the ones passed in the list.
-     * 
+     *
      * @param spaces the spaces to exclude
      */
     public void excludeSpaces(List<String> spaces)

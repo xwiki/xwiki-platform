@@ -64,6 +64,8 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     private StringBuffer requestURL;
 
+    private String requestURI;
+
     private String serverName;
 
     public XWikiServletRequestStub()
@@ -92,6 +94,14 @@ public class XWikiServletRequestStub implements XWikiRequest
     public void setrequestURL(StringBuffer requestURL)
     {
         this.requestURL = requestURL;
+    }
+
+    /**
+     * @since 7.2M2
+     */
+    public void setRequestURI(String requestURI)
+    {
+        this.requestURI = requestURI;
     }
 
     /**
@@ -222,7 +232,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     @Override
     public String getRequestURI()
     {
-        return null;
+        return this.requestURI;
     }
 
     @Override

@@ -1,2 +1,3 @@
+org.xwiki.refactoring.internal.job.DeleteJob
 org.xwiki.refactoring.internal.job.MoveJob
 org.xwiki.refactoring.internal.job.RenameJob

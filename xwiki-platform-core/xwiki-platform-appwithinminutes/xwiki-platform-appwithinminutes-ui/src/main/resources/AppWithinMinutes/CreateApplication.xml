@@ -63,21 +63,26 @@
   {{/html}}
 #end
 
-#macro(getAppDescriptor $appName)
+#macro(getAppDescriptor $appReference)
   #set($appDescriptorClassName = 'AppWithinMinutes.LiveTableClass')
   #set($appDescriptorStatement = "from doc.object($appDescriptorClassName) as obj where doc.space = :space")
-  ## Escape the application name because the space name is escaped in the database since 7.2
-  #set($spaceName = $services.model.escape($appName, "SPACE"))
-  #set($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $spaceName).execute())
+  #set($localSpaceReference = $services.model.serialize($appReference, 'local'))
+  #set($appDescriptors = $services.query.xwql($appDescriptorStatement).bindValue('space', $localSpaceReference).execute())
   #if($appDescriptors.size() &gt; 0)
     #set($appDescriptor = $xwiki.getDocument($appDescriptors.get(0)))
   #end
 #end
 
-#macro(processStep)
+#macro (processStep)
   ## Check if the application already exists.
-  #set($appName = $request.appName)
-  #getAppDescriptor($appName)
+  #if ($request.resolve == 'true')
+    #set ($appReference = $services.model.resolveSpace($request.appName))
+  #else
+    #set ($appReference = $services.model.createSpaceReference($request.appName,
+      $doc.documentReference.wikiReference))
+  #end
+  #set ($appName = $appReference.name)
+  #getAppDescriptor($appReference)
   #if($appDescriptor)
     ## Edit an existing application. Use the configured class name.
     #set($classStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
@@ -88,21 +93,26 @@
     #set($className = "#toXMLName($appName)")
     #set($classRef = $services.model.createDocumentReference($doc.wiki, "${className}Code", "${className}Class"))
   #end
-  #set($queryString = 'wizard=true')
+  #set($queryString = {'wizard': true})
   #if(!$xwiki.exists($classRef))
-    #set($classTitle = "$appName Class")
-    #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
-    #set($classParent = $services.model.serialize($appHomeRef))
-    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=$escapetool.url($classParent)&amp;title=$escapetool.url($classTitle)&amp;AppWithinMinutes.MetadataClass_0_dataSpaceName=$escapetool.url($appName)")
+    #set($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
+    #set($discard = $queryString.putAll({
+      'editor': 'inline',
+      'template': 'AppWithinMinutes.ClassTemplate',
+      'parent': $services.model.serialize($appHomeRef),
+      'title': "$appName Class",
+      'AppWithinMinutes.MetadataClass_0_dataSpaceName': $appName
+    }))
   #end
-  $response.sendRedirect($xwiki.getURL($classRef, 'edit', $queryString))
+  $response.sendRedirect($xwiki.getURL($classRef, 'edit', $escapetool.url($queryString)))
 #end
 
 #macro(validateAppName $appName)
-  #getAppDescriptor("$!appName")
+  #set ($appReference = $services.model.createSpaceReference($appName,
+    $doc.documentReference.wikiReference))
+  #getAppDescriptor($appReference)
   #if($appDescriptor)
     ## Edit an existing application.
-    #set($appHomeRef = $appDescriptor.documentReference)
     #set($classStringRef = $appDescriptor.getObject($appDescriptorClassName).getProperty('class').value)
     ## The class string reference is relative to the document holding the application descriptor.
     #set($appClassRef = $services.model.resolveDocument($classStringRef, 'explicit', $appDescriptor.documentReference))
@@ -112,9 +122,9 @@
     #if($className == '')
       (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameInvalidClassNameError')
     #end
-    #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
     #set($appClassRef = $services.model.createDocumentReference($doc.wiki, "$!{className}Code", "$!{className}Class"))
   #end
+  #set($appHomeRef = $services.model.resolveDocument('', 'default', $appReference))
   #set($appHomeURL = $stringtool.removeEnd($xwiki.getDocument($appHomeRef).getExternalURL(), 'WebHome'))
   ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
   : {{{$!appHomeURL}}}

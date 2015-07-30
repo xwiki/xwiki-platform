@@ -22,7 +22,7 @@ package org.xwiki.refactoring;
 import org.xwiki.rendering.block.XDOM;
 
 /**
- * Represents an in-memory wiki page used by the {@link DocumentSplitter} interface.
+ * Represents an in-memory wiki page used by the {@link org.xwiki.refactoring.splitter.DocumentSplitter} interface.
  * 
  * @version $Id$
  * @since 1.9M1

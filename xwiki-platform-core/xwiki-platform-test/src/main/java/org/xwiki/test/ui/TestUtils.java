@@ -1271,4 +1271,32 @@ public class TestUtils
     {
         gotoPage(space, page, "rollback", "rev", version, "confirm", "1");
     }
+
+    /**
+     * Set the hierarchy mode used in the wiki
+     * @param mode the mode to use ("reference" or "parentchild")
+     * @since 7.2M2
+     */
+    public void setHierarchyMode(String mode) {
+        setPropertyInXWikiPreferences("core.hierarchyMode", "String", mode);
+    }
+
+    /**
+     * Add and set a property into XWiki.XWikiPreferences. Create XWiki.XWikiPreferences if it does not exist.  
+     * @param propertyName name of the property to set
+     * @param propertyType the type of the property to add
+     * @param value value to set to the property
+     * @since 7.2M2 
+     */
+    public void setPropertyInXWikiPreferences(String propertyName, String propertyType, Object value)
+    {
+        addClassProperty("XWiki", "XWikiPreferences", propertyName, propertyType);
+        gotoPage("XWiki", "XWikiPreferences", "edit", "editor", "object");
+        ObjectEditPage objectEditPage = new ObjectEditPage();
+        if (objectEditPage.hasObject("XWiki.XWikiPreferences")) {
+            updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, propertyName, value);
+        } else {
+            addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", propertyName, value);
+        }
+    }
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.spaces;
 
+import java.util.List;
+
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -43,18 +45,19 @@ public class SpaceResourceImpl extends XWikiResource implements SpaceResource
     public Space getSpace(String wikiName, String spaceName) throws XWikiRestException
     {
         String database = Utils.getXWikiContext(componentManager).getWikiId();
+        List<String> spaces = parseSpaceSegments(spaceName);
 
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
-            String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
+            String homeId = Utils.getPageId(wikiName, spaces, "WebHome");
             Document home = null;
 
             if (Utils.getXWikiApi(componentManager).exists(homeId)) {
                 home = Utils.getXWikiApi(componentManager).getDocument(homeId);
             }
 
-            return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home);
+            return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaces, home);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {

@@ -28,12 +28,12 @@ import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -53,15 +53,6 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractDocumentMojo extends AbstractMojo
 {
-    /**
-     * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
-
     /**
      * The document to perform the update on
      * 
@@ -103,15 +94,16 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
         xcontext.put(ComponentManager.class.getName(), ecm);
 
         // Initialize the Container fields (request, response, session).
-        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
         try {
+            ExecutionContextManager ecim = ecm.getInstance(ExecutionContextManager.class);
+
             ExecutionContext econtext = new ExecutionContext();
 
             // Bridge with old XWiki Context, required for old code.
             xcontext.declareInExecutionContext(econtext);
 
             ecim.initialize(econtext);
-        } catch (ExecutionContextException e) {
+        } catch (ExecutionContextException | ComponentLookupException e) {
             throw new MojoExecutionException("Failed to initialize Execution Context.", e);
         }
 

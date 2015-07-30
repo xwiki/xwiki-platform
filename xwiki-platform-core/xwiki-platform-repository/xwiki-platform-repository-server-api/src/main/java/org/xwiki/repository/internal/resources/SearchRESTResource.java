@@ -43,6 +43,7 @@ import org.xwiki.extension.repository.xwiki.model.jaxb.Filter;
 import org.xwiki.extension.repository.xwiki.model.jaxb.SortClause;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.SecureQuery;
 import org.xwiki.repository.Resources;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 
@@ -102,6 +103,15 @@ public class SearchRESTResource extends AbstractExtensionRESTResource
 
         solrQuery.setLimit(query.getLimit());
         solrQuery.setOffset(query.getOffset());
+
+        // /////////////////
+        // Rights
+        // /////////////////
+
+        if (query instanceof SecureQuery) {
+            // Show only what the current user has the right to see
+            ((SecureQuery) query).checkCurrentUser(true);
+        }
 
         // /////////////////
         // Boost

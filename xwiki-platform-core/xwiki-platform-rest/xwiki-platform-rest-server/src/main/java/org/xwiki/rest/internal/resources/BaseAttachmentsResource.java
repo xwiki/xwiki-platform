@@ -115,7 +115,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 filters.put("page", name);
             }
             if (!space.equals("")) {
-                filters.put("space", space);
+                filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
             }
             if (!author.equals("")) {
                 filters.put("author", author);
@@ -171,9 +171,10 @@ public class BaseAttachmentsResource extends XWikiResource
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
-                String pageSpace = (String) fields[0];
+                String pageSpaceId = (String) fields[0];
+                List<String> pageSpaces = Utils.getSpacesFromSpaceId(pageSpaceId);
                 String pageName = (String) fields[1];
-                String pageId = Utils.getPageId(wikiName, pageSpace, pageName);
+                String pageId = Utils.getPageId(wikiName, pageSpaces, pageName);
                 String pageVersion = (String) fields[2];
                 XWikiAttachment xwikiAttachment = (XWikiAttachment) fields[3];
 
@@ -220,7 +221,7 @@ public class BaseAttachmentsResource extends XWikiResource
                             Utils
                                     .getXWikiContext(componentManager)
                                     .getURLFactory()
-                                    .createAttachmentURL(xwikiAttachment.getFilename(), pageSpace, pageName, "download",
+                                    .createAttachmentURL(xwikiAttachment.getFilename(), pageSpaceId, pageName, "download",
                                             null,
                                             wikiName, Utils.getXWikiContext(componentManager));
                     attachment.setXwikiAbsoluteUrl(absoluteUrl.toString());
@@ -228,14 +229,14 @@ public class BaseAttachmentsResource extends XWikiResource
                             .getURL(absoluteUrl, Utils.getXWikiContext(componentManager)));
 
                     URI pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, pageSpace, pageName);
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, pageSpaces, pageName);
                     Link pageLink = objectFactory.createLink();
                     pageLink.setHref(pageUri.toString());
                     pageLink.setRel(Relations.PAGE);
                     attachment.getLinks().add(pageLink);
 
                     URI attachmentUri =
-                        Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName, pageSpace, pageName,
+                        Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName, pageSpaces, pageName,
                             xwikiAttachment.getFilename());
                     Link attachmentLink = objectFactory.createLink();
                     attachmentLink.setHref(attachmentUri.toString());

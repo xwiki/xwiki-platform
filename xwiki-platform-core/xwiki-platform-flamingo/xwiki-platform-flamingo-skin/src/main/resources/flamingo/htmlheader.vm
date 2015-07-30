@@ -16,7 +16,7 @@
   #xwikiDataAttribute('space', $doc.space)
   #xwikiDataAttribute('page', $doc.name)
   #xwikiDataAttribute('version', $doc.version)
-  #xwikiDataAttribute('rest-url', "${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})")
+  #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,10 @@
     #if(!$title)
       #set($title = $!xwiki.getSpacePreference('title'))
       #if($title != '')
-        #set($title = "$escapetool.xml($xwiki.parseContent($title))")
+        ## Evaluate the title since it can have velocity code.
+        #set($title = "#evaluate($title)")
+        ## Don`t forget to escape it.
+        #set($title = "$escapetool.xml($title)")
       #else
         #set($title = "XWiki - $escapetool.xml($!doc.space) - $escapetool.xml($!tdoc.displayTitle)")
       #end
@@ -78,9 +81,10 @@
     ## ---------------------------------------------------------------------------------------------------------------
     <meta name="gwt:property" content="locale=$!{xcontext.language}" />
     ## ---------------------------------------------------------------------------------------------------------------
-    ## Add user-defined Meta directives
+    ## Add user-defined Meta directives.
     ## ---------------------------------------------------------------------------------------------------------------
-    $xwiki.parseContent($!xwiki.getSpacePreference("meta"))
+    ## Note: Velocity code, so it needs to be evaluated.
+    #evaluate($!xwiki.getSpacePreference("meta"))
     ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     ## ---------------------------------------------------------------------------------------------------------------

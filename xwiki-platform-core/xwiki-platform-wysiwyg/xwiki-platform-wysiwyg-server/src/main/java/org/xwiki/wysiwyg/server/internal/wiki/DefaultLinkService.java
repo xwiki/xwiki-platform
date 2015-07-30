@@ -99,7 +99,8 @@ public class DefaultLinkService implements LinkService
     /**
      * The object used to convert between client and server entity reference.
      */
-    private final EntityReferenceConverter entityReferenceConverter = new EntityReferenceConverter();
+    @Inject
+    private EntityReferenceConverter entityReferenceConverter;
 
     @Override
     public EntityConfig getEntityConfig(org.xwiki.gwt.wysiwyg.client.wiki.EntityReference origin,
@@ -205,8 +206,8 @@ public class DefaultLinkService implements LinkService
             return new URIReference(stringEntityReference).getEntityReference();
         } else {
             return entityReferenceConverter.convert(explicitStringEntityReferenceResolver.resolve(
-                stringEntityReference, EntityType.valueOf(entityType.toString()), entityReferenceConverter
-                    .convert(baseReference)));
+                stringEntityReference, EntityType.valueOf(entityType.toString()),
+                entityReferenceConverter.convert(baseReference)));
         }
     }
 }

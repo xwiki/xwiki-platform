@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal.resources.comments;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import javax.inject.Named;
@@ -79,7 +80,8 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
             throws XWikiRestException
     {
         try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, true);
+            List<String> spaces = parseSpaceSegments(spaceName);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, true);
 
             Document doc = documentInfo.getDocument();
 
@@ -112,7 +114,7 @@ public class CommentsResourceImpl extends XWikiResource implements CommentsResou
                                 Utils.getXWikiApi(componentManager), false);
 
                 return Response.created(Utils.createURI(uriInfo.getBaseUri(), CommentResource.class, wikiName,
-                    spaceName, pageName, id)).entity(createdComment).build();
+                    spaces, pageName, id)).entity(createdComment).build();
             }
 
             return null;

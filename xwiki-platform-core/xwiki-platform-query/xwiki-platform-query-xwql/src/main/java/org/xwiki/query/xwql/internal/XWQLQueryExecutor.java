@@ -38,6 +38,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
 
 @Component
 @Named("xwql")
@@ -92,6 +93,11 @@ public class XWQLQueryExecutor implements QueryExecutor
             }
             for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
                 nativeQuery.bindValue(e.getKey(), e.getValue());
+            }
+
+            if (nativeQuery instanceof SecureQuery && query instanceof SecureQuery) {
+                ((SecureQuery) nativeQuery).checkCurrentAuthor(((SecureQuery) query).isCurrentAuthorChecked());
+                ((SecureQuery) nativeQuery).checkCurrentUser(((SecureQuery) query).isCurrentUserChecked());
             }
 
             return nativeQuery.execute();

@@ -111,7 +111,6 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 |Lien vers une pièce jointe à une autre page|{{{[[text&gt;&gt;attach:Space.Page@img.png]]}}}|[[text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Lien vers une ancre dans une page|{{{[[label&gt;&gt;Space.Page#ancre]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=ancre]]
 |Lien vers un titre dans une page|{{{[[label&gt;&gt;Space.Page#HMontitre]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMontitre]]
-|Link vers une ancre dans la page courante|{{{[[label&gt;&gt;#ancre]]}}}|[[label&gt;&gt;||anchor="ancre"]]
 
 {{info}}Quand vous ajoutez un Titre, une ancre nommée "H" suivie du titre avec uniquement les lettres est créé. Par exemple, pour le Titre "Mon titre", l'ancre générée sera "HMontitre".{{/info}}
 
@@ -144,9 +143,8 @@ La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 |Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||height="26" width="26"]]&gt;&gt;Main.WebHome]]
 |Lien vers une pièce jointe à la page courante|{{{[[texte&gt;&gt;attach:img.png]]}}}|[[texte&gt;&gt;attach:img.png]]
 |Lien vers une pièce jointe à une autre page|{{{[[texte&gt;&gt;attach:Space.Page@img.png]]}}}|[[texte&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
-|Lien vers une ancre dans une page|{{{[[label&gt;&gt;Space.Page||ancre="ancre"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="ancre"]]
-|Lien vers un titre dans une page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMontitre"]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor="HMontitre"]]
-|Link vers une ancre dans la page courante|{{{[[label&gt;&gt;||anchor="ancre"]]}}}|[[label&gt;&gt;||anchor="ancre"]]
+|Lien vers une ancre dans une page|{{{[[label&gt;&gt;Space.Page||ancre=ancre]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=ancre]]
+|Lien vers un titre dans une page|{{{[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMontitre]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=HMontitre]]
 
 {{info}}Quand vous ajoutez un Titre, une ancre nommée "H" suivie du titre avec uniquement les lettres est créé. Par exemple, pour le Titre "Mon titre", l'ancre générée sera "HMontitre".{{/info}}
 

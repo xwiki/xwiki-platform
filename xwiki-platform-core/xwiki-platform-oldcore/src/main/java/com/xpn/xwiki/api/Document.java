@@ -247,10 +247,11 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the space of the document for example if the fullName of a document is "MySpace.Mydoc", the
-     * name is MySpace.
+     * Return the full local space reference of the Document.
+     * For example a document located in sub-space <code>space11</code> of space <code>space1</code> will return
+     * <code>space1.space11</code>.
      *
-     * @return the name of the space of the document
+     * @return the name of the spaces of the document
      */
     public String getSpace()
     {

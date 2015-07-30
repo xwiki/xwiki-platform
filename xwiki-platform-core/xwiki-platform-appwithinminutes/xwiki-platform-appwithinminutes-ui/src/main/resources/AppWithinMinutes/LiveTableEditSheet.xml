@@ -181,7 +181,16 @@
 #macro(updateAndSaveLiveTable)
   #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
   #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
-  #set($discard = $doc.setContent($doc.getRenderedContent($liveTableGeneratorDoc.content, $liveTableGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+
+  ## Generate the LiveTable by displaying the LiveTableGenerator document in the context of the current document.
+  #set ($displayParameters = $services.display.createDocumentDisplayerParameters())
+  #set ($discard = $displayParameters.setExecutionContextIsolated(false))
+  #set ($discard = $displayParameters.setContentTranslated(true))
+  #set ($generatedLiveTableContent = $services.display.content($liveTableGeneratorDoc, { 'outputSyntaxId' : 'plain/1.0', 'displayerParameters' : $displayParameters }))
+
+  ## Use the generated LiveTable content for the current document.
+  #set ($discard = $doc.setContent($generatedLiveTableContent))
+
   #set($minorEdit = "$!request.minorEdit" != '')
   #set($comment = $request.comment)
   #if("$!comment" == '')

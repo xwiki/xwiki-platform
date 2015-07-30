@@ -20,8 +20,6 @@
 package org.xwiki.query.internal;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 /**
  * Query filter excluding 'hidden' documents from a {@link org.xwiki.query.Query}. Hidden documents should not be
@@ -33,7 +31,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
  * @since 4.0RC1
  */
 @Component(hints = {"hidden", "hidden/document"})
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class HiddenDocumentFilter extends AbstractHiddenFilter
 {
     @Override

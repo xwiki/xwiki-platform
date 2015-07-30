@@ -24,7 +24,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
@@ -36,8 +35,6 @@ import org.xwiki.configuration.ConfigurationSource;
  * @version $Id$
  * @since 7.2M2
  */
-@Component
-@Named("hidden/space")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter implements Initializable
 {

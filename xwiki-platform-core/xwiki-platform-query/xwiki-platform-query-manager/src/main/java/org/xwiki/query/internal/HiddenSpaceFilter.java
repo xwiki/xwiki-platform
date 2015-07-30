@@ -22,8 +22,6 @@ package org.xwiki.query.internal;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 /**
  * Query filter excluding 'hidden' spaces from a {@link org.xwiki.query.Query}. Hidden spaces should not be
@@ -36,7 +34,6 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
  */
 @Component
 @Named("hidden/space")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class HiddenSpaceFilter extends AbstractHiddenFilter
 {
     @Override

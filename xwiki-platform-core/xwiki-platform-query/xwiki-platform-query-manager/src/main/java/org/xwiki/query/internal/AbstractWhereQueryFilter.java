@@ -48,7 +48,11 @@ public abstract class AbstractWhereQueryFilter implements QueryFilter
      * @param statement statement to filter.
      * @return true if the filter can be applied to the passed statement, false otherwise.
      */
-    protected abstract boolean isFilterable(String statement);
+    protected boolean isFilterable(String statement)
+    {
+        // This could be replaced by the following regex: "xwikidocument(\\s)+(as)?(\\s)+doc"
+        return statement.indexOf("xwikidocument as doc") > -1 || statement.indexOf("xwikidocument doc") > -1;
+    }
 
     /**
      * Inserts the passed where clause in the passed statement.

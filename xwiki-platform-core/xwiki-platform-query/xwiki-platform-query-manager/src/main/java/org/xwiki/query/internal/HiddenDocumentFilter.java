@@ -34,13 +34,6 @@ import org.xwiki.component.annotation.Component;
 public class HiddenDocumentFilter extends AbstractHiddenFilter
 {
     @Override
-    protected boolean isFilterable(String statement)
-    {
-        // This could be replaced by the following regex: "xwikidocument(\\s)+(as)?(\\s)+doc"
-        return statement.indexOf("xwikidocument as doc") > -1 || statement.indexOf("xwikidocument doc") > -1;
-    }
-
-    @Override
     protected String filterHidden(String statement, String language)
     {
         return insertWhereClause("(doc.hidden <> true or doc.hidden is null)", statement, language);

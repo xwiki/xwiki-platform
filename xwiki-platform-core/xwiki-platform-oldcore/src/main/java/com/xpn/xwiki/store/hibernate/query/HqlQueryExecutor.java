@@ -21,14 +21,19 @@ package com.xpn.xwiki.store.hibernate.query;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.Session;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.NamedQueryDefinition;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -80,10 +85,22 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private ContextualAuthorizationManager authorization;
 
+    private Set<String> allowedNamedQueries = new HashSet<>();
+
     @Override
     public void initialize() throws InitializationException
     {
-        this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(MAPPING_PATH));
+        Configuration configuration = this.sessionFactory.getConfiguration();
+
+        configuration.addInputStream(Util.getResourceAsStream(MAPPING_PATH));
+
+        // Gather the list of allowed named queries
+        Map<String, NamedQueryDefinition> namedQueries = configuration.getNamedQueries();
+        for (Map.Entry<String, NamedQueryDefinition> query : namedQueries.entrySet()) {
+            if (HqlQueryUtils.isSafe(query.getValue().getQuery())) {
+                this.allowedNamedQueries.add(query.getKey());
+            }
+        }
     }
 
     /**
@@ -99,7 +116,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     {
         if (query instanceof SecureQuery && ((SecureQuery) query).isCurrentAuthorChecked()) {
             if (!this.authorization.hasAccess(Right.PROGRAM)) {
-                if (query.isNamed()) {
+                if (query.isNamed() && !this.allowedNamedQueries.contains(query.getStatement())) {
                     throw new QueryException("Named queries requires programming right", query, null);
                 }
 

@@ -19,12 +19,11 @@
  */
 package org.xwiki.query.internal;
 
-import java.lang.reflect.Field;
-
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -73,10 +72,7 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     {
         // We need to do it that way since the expectation must be set in #configure() and the expectation sets the
         // isActive property to true
-        Class filterClass = filter.getClass();
-        Field field = filterClass.getDeclaredField("isActive");
-        field.setAccessible(true);
-        field.set(filter, false);
+        ReflectionUtils.setFieldValue(this.filter, "isActive", false);
 
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",

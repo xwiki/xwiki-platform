@@ -20,29 +20,33 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link XClassRelativeStringEntityReferenceResolver}.
  *
  * @version $Id$
  */
-public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
+public class XClassRelativeStringEntityReferenceResolverTest
 {
+    @Rule
+    public MockitoComponentMockingRule<EntityReferenceResolver<String>> mocker =
+        new MockitoComponentMockingRule<EntityReferenceResolver<String>>(
+            XClassRelativeStringEntityReferenceResolver.class);
+
     private EntityReferenceResolver<String> resolver;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void before() throws Exception
     {
-        super.setUp();
-
-        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "xclass");
+        this.resolver = this.mocker.getComponentUnderTest();
     }
 
     @Test
@@ -57,8 +61,8 @@ public class XClassRelativeStringEntityReferenceResolverTest extends AbstractBri
     @Test
     public void testResolveWhenExplicitParameterAndNoPageInStringRepresentation()
     {
-        EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT,
-            new DocumentReference("dummy", "dummy", "page"));
+        EntityReference reference =
+            this.resolver.resolve("", EntityType.DOCUMENT, new DocumentReference("dummy", "dummy", "page"));
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("XWiki", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertNull(reference.extractReference(EntityType.WIKI));

@@ -6,10 +6,7 @@
 */
 require.config({
   paths: {
-    jsTree: [
-      '//cdnjs.cloudflare.com/ajax/libs/jstree/${jstree.version}/jstree.min',
-      "$!services.webjars.url('jstree', 'jstree.min')"
-    ],
+    jsTree: "$!services.webjars.url('jstree', 'jstree.min')",
     JobRunner: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-job-webjar", "jobRunner${minified}")',
     'tree-finder': '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "finder${minified}")',
     tree: '$!services.webjars.url("org.xwiki.platform:xwiki-platform-tree-webjar", "tree${minified}")'

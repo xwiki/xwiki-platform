@@ -37,6 +37,13 @@ import org.xwiki.component.annotation.Component;
 public class HiddenSpaceFilter extends AbstractHiddenFilter
 {
     @Override
+    protected boolean isFilterable(String statement)
+    {
+        // This could be replaced by the following regex: "xwikispace(\\s)+(as)?(\\s)+space"
+        return statement.indexOf("xwikispace as space") > -1 || statement.indexOf("xwikispace space") > -1;
+    }
+
+    @Override
     protected String filterHidden(String statement, String language)
     {
         return insertWhereClause("space.hidden <> true", statement, language);

@@ -177,8 +177,8 @@ XWiki.SpaceReference = Class.create(XWiki.EntityReference, {
 });
 
 XWiki.DocumentReference = Class.create(XWiki.EntityReference, {
-  initialize: function($super, wikiName, spaceName, pageName) {
-    $super(pageName, XWiki.EntityType.DOCUMENT, new XWiki.SpaceReference(wikiName, spaceName));
+  initialize: function($super, wikiName, spaceNames, pageName) {
+    $super(pageName, XWiki.EntityType.DOCUMENT, new XWiki.SpaceReference(wikiName, spaceNames));
   }
 });
 

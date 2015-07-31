@@ -33,7 +33,7 @@
   <description>Component for using Atlassian's JIRA REST API to access JIRA instances</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>JIRA Macro</xwiki.extension.name>
+    <xwiki.extension.name>JIRA Scripting API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

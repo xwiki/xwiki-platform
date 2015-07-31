@@ -1276,16 +1276,33 @@ XWiki.Document = Class.create({
     return url;
   }
 });
-
-/* Initialize the document URL factory, and create XWiki.currentDocument. */
+/* Initialize the document URL factory, and create XWiki.currentDocument.
+TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225) */
 var htmlElement = $(document.documentElement);
-
-require(['xwiki-meta'], function (xmeta) {
-  XWiki.Document.currentWiki = XWiki.currentWiki || xmeta.wiki || "xwiki";
-  XWiki.Document.currentSpace = XWiki.currentSpace || xmeta.space || "Main";
-  XWiki.Document.currentPage = XWiki.currentPage || xmeta.page || "WebHome";
-});
-
+XWiki.Document.currentWiki = XWiki.currentWiki || "xwiki";
+if (htmlElement.readAttribute('data-xwiki-wiki')) {
+  // HTML 5 attribute
+  XWiki.Document.currentWiki = htmlElement.readAttribute('data-xwiki-wiki');
+} else if ($$("meta[name=wiki]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content
+} 
+XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
+if (htmlElement.readAttribute('data-xwiki-space')) {
+  // HTML 5 attribute
+  XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space');
+} else if ($$("meta[name=space]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentSpace = $$("meta[name=space]")[0].content
+}
+XWiki.Document.currentPage = XWiki.currentPage || "WebHome";
+if (htmlElement.readAttribute('data-xwiki-page')) {
+    // HTML 5 attribute
+  XWiki.Document.currentPage = htmlElement.readAttribute('data-xwiki-page');
+} else if ($$("meta[name=page]").length > 0) {
+  // Old meta tag
+  XWiki.Document.currentPage = $$("meta[name=page]")[0].content
+} 
 XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
 XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
 XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";

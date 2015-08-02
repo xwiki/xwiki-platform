@@ -41,7 +41,7 @@ public class ActiveInstallsTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
     @Test
-    public void verifyPingIsSent() throws Exception
+    public void verifyActiveInstalls() throws Exception
     {
         // Note that we verify that the ES Runner has been initialized as this allows us to more easily debug the test
         // by manually starting an XWiki instance and an ES instance prior to running this test (in this case we don't
@@ -142,5 +142,27 @@ public class ActiveInstallsTest extends AbstractTest
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Servlet Container Active Installs Count\\r?\\njetty 1"));
+
+        // Verify Extension Count
+        // Create a page calling the Extension Count macro
+        String content  = "{{include reference=\"ActiveInstalls.ExtensionCount\"/}}\n"
+            + "\n"
+            + "{{velocity}}\n"
+            + "#set ($extensionIds = [\n"
+            + "  'org.xwiki.contrib:xwiki-totem-application',\n"
+            + "  'jsimard:event-reporter-application',\n"
+            + "  'mouhb:likeapplication'\n"
+            + "])\n"
+            + "|=Extension Id|=Count\n"
+            + "#foreach($extensionId in $extensionIds)\n"
+            + "  #countActiveInstallsUsingExtension($extensionId $count)\n"
+            + "  |$extensionId|$count\n"
+            + "#end\n"
+            + "{{/velocity}}";
+        vp = getUtil().createPage(getTestClassName(), "ExtensionCountExample", content, "Example");
+        assertTrue("Got [" + vp.getContent() + "]", vp.getContent().matches("Extension Id Count\n"
+            + "org.xwiki.contrib:xwiki-totem-application 0\n"
+            + "jsimard:event-reporter-application 0\n"
+            + "mouhb:likeapplication 0"));
     }
 }

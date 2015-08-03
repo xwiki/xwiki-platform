@@ -125,7 +125,7 @@ var XWiki = (function(XWiki){
             this.successCallback = options.onSuccess || function(){};
             this.failureCallback = options.onFailure || function(){};
 
-            var url = window.docgeturl + "?xpage=packageinfo&package=" + encodeURIComponent(name);
+            var url = window.docgeturl + "?xpage=packagedescriptor&package=" + encodeURIComponent(name);
 
             var ajx = new Ajax.Request(url, {
                 onSuccess: this.onSuccess.bindAsEventListener(this),
@@ -157,7 +157,6 @@ var XWiki = (function(XWiki){
           this.failureCallback(response);
         }
     });
-
 
     /**
      * A widget that allows to browse the contents of a package (a XAR).
@@ -209,7 +208,7 @@ var XWiki = (function(XWiki){
             var pack = transport.responseText.evalJSON();
 
             this.infos = pack.infos;
-            this.packageDocuments = pack.files;
+            this.entities = pack.entities;
 
             this.container = new Element("div", {'id':'packageDescription'});
             this.node.insert(this.container);
@@ -233,8 +232,8 @@ var XWiki = (function(XWiki){
             this.list = new Element("ul", {'class':'xlist package'});
             this.container.insert( new Element("div", {'id':'package'}).update(this.list) );
 
-            // Create the list of spaces and their documents
-            Object.keys(this.packageDocuments).sort().each(this.addSpaceToPackage.bind(this));
+            // Add the entities tree
+            this.entities.children.each(this.addSpaceToPackage.bind(this));
 
             // Insert options and button to submit the form.
             this.container.insert(  this.createPackageFormSubmit( pack.infos) );
@@ -431,9 +430,9 @@ var XWiki = (function(XWiki){
         /**
          * Adds a sigle space to the package explorer.
          */
-        addSpaceToPackage: function(space)
+        addSpaceToPackage: function(spaceNode)
         {
-            var docNb = this.countDocumentsInSpace(space);
+            var docNb = this.countDocumentsInSpace(spaceNode);
             var selection =  docNb + " / " + docNb + " " + translations["documentSelected"];
 
             var spaceItem = new Element("li", {'class':'xitem xunderline collapsed'});
@@ -520,7 +519,7 @@ var XWiki = (function(XWiki){
             });
         },
 
-        countDocumentsInSpace: function(spaceName)
+        countDocumentsInSpace: function(spaceNode)
         {
             var self = this;
             if (typeof this.documentCount[spaceName] == "undefined") {

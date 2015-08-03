@@ -25,22 +25,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-flamingo</artifactId>
     <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-flamingo-themes</artifactId>
     <version>7.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-bootswatchthemes</artifactId>
+  <artifactId>xwiki-platform-flamingo-theme-bootswatch</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Flamingo - Bootswatch Themes</name>
-  <description>Nice Themes for Flamingo created by Bootswatch.</description>
+  <name>XWiki Platform - Flamingo - Theme - Bootswatch</name>
+  <description>Themes for Flamingo created by Bootswatch</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Bootswatch Themes for Flamingo</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-flamingo-bootswatchthemes</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-theme</artifactId>
+      <artifactId>xwiki-platform-flamingo-theme-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

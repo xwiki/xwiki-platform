@@ -34,7 +34,6 @@
   <modules>
     <module>xwiki-platform-cache-api</module>
     <module>xwiki-platform-cache-tests</module>
-    <module>xwiki-platform-cache-oscache</module>
     <module>xwiki-platform-cache-infinispan</module>
   </modules>
 </project>

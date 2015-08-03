@@ -150,6 +150,17 @@ XWiki.EntityReference = Class.create({
   }
 });
 
+XWiki.EntityReference.fromJSONObject = function (object) {
+  var parent;
+  if (object.parent != null) {
+    parent = XWiki.EntityReference.fromJSONObject(object.parent);
+  } else {
+    parent = null;
+  }
+
+  return new XWiki.EntityReference(object.name, XWiki.EntityType.byName(object.type), parent);
+};
+
 XWiki.WikiReference = Class.create(XWiki.EntityReference, {
   initialize: function($super, wikiName) {
     $super(wikiName, XWiki.EntityType.WIKI);
@@ -187,6 +198,46 @@ XWiki.AttachmentReference = Class.create(XWiki.EntityReference, {
     $super(fileName, XWiki.EntityType.ATTACHMENT, documentReference);
   }
 });
+
+XWiki.EntityReferenceTreeNode = Class.create({
+  children: {},
+
+  locales: {},
+
+  _fromJSONObject: function(node) {
+    // Reference
+    if (node.reference != null) {
+      this.reference = XWiki.EntityReference.fromJSONMap(node.reference);
+    }
+
+    // Children
+    node.children.each(_childFromJSONObject);
+
+    // Locales
+    node.locales.each(_localeFromJSONObject);
+  },
+
+  _childFromJSONObject: function(jsonNode) {
+    var node = new XWiki.EntityReferenceTreeNode();
+    node._fromJSONNode(jsonNode);
+
+    this.children[node.reference.name] = node;
+  },
+
+  _localeFromJSONObject: function(jsonReference) {
+    this.locales[jsonReference.locale] = XWiki.EntityReference.fromJSONObject(jsonReference);
+  }
+});
+
+XWiki.EntityReferenceTree = Class.create(XWiki.EntityReferenceTreeNode, {
+});
+
+XWiki.EntityReferenceTree.fromJSONObject = function (object) {
+   var tree = new XWiki.EntityReferenceTree();
+   tree._fromJSONObject(object);
+
+   return tree;
+};
 
 var ESCAPE = '\\';
 var DBLESCAPE = ESCAPE + ESCAPE;

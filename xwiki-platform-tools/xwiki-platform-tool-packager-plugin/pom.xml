@@ -131,7 +131,7 @@
          pom.xml that uses this packager plugin is built after those deps are built -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-flamingo-skin</artifactId>
+      <artifactId>xwiki-platform-flamingo-skin-resources</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>

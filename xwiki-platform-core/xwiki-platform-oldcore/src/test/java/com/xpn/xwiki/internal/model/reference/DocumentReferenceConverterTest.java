@@ -17,13 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference.converter;
+package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -31,8 +32,11 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.Converter;
+import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ColorConverter;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
+import org.xwiki.properties.internal.converter.EnumConverter;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
@@ -40,7 +44,8 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * 
  * @version $Id$
  */
-@AllComponents
+@ComponentList(value = { DefaultConverterManager.class, ContextComponentManagerProvider.class, EnumConverter.class,
+ConvertUtilsConverter.class })
 public class DocumentReferenceConverterTest
 {
     @Rule
@@ -61,7 +66,7 @@ public class DocumentReferenceConverterTest
         this.converterManager = mocker.getInstance(ConverterManager.class);
 
         this.mockStringResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
-        this.mockReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        this.mockReferenceResolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_REFERENCE, "currentgetdocument");
         this.mockSerialier = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "compact");
     }
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference.converter;
+package com.xpn.xwiki.internal.model.reference;
 
 import java.lang.reflect.Type;
 
@@ -48,7 +48,7 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
     private DocumentReferenceResolver<String> stringResolver;
 
     @Inject
-    @Named("current")
+    @Named("currentgetdocument")
     private DocumentReferenceResolver<EntityReference> referenceResolver;
 
     @Inject

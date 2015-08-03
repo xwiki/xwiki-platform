@@ -46,8 +46,9 @@ XWiki.EntityType.getName = function(entityType) {
   return entityTypeNames[entityType];
 };
 XWiki.EntityType.byName = function(name) {
+  var lowerName = name.toLowerCase();
   for(var index = 0; index < entityTypeNames.length; index++) {
-    if (entityTypeNames[index] === name) {
+    if (entityTypeNames[index] === lowerName) {
       return index;
     }
   }
@@ -147,6 +148,10 @@ XWiki.EntityReference = Class.create({
       }
       return this.name === reference.name && this.type === reference.type
           && (this.parent == null || this.parent.equals(reference.parent));
+  },
+
+  toString : function() {
+    return XWiki.Model.serialize(this);
   }
 });
 
@@ -200,32 +205,91 @@ XWiki.AttachmentReference = Class.create(XWiki.EntityReference, {
 });
 
 XWiki.EntityReferenceTreeNode = Class.create({
-  children: {},
-
-  locales: {},
+  initialize: function() {
+    this.children = {};
+    this.locales = {};
+  },
 
   _fromJSONObject: function(node) {
     // Reference
     if (node.reference != null) {
-      this.reference = XWiki.EntityReference.fromJSONMap(node.reference);
+      this.reference = XWiki.EntityReference.fromJSONObject(node.reference);
     }
 
     // Children
-    node.children.each(_childFromJSONObject);
+    node.children.each(this._childFromJSONObject.bind(this));
 
     // Locales
-    node.locales.each(_localeFromJSONObject);
+    node.locales.each(this._localeFromJSONObject.bind(this));
   },
 
   _childFromJSONObject: function(jsonNode) {
     var node = new XWiki.EntityReferenceTreeNode();
-    node._fromJSONNode(jsonNode);
+    node._fromJSONObject(jsonNode);
 
     this.children[node.reference.name] = node;
   },
 
   _localeFromJSONObject: function(jsonReference) {
     this.locales[jsonReference.locale] = XWiki.EntityReference.fromJSONObject(jsonReference);
+  },
+
+  /**
+   * @return true if the node contains children
+   */
+  hasChildren: function() {
+    return Object.keys(this.children).length !== 0;
+  },
+
+  /**
+   * @return true if the node contains locales
+   */
+  hasLocales: function() {
+    return Object.keys(this.locales).length !== 0;
+  },
+
+  /**
+   * @return the node associated to the passed reference
+   */
+  getChildByReference: function(reference) {
+    if (typeof reference == "undefined") {
+      return null;
+    }
+
+    var descendant = this;
+    var references = reference.getReversedReferenceChain();
+    for (i = 0; i < references.length; i++) {
+      var element = references[i];
+      descendant = descendant.children[element.name];
+      if (typeof descendant == "undefined" || descendant.reference.type != element.type) {
+        return null;
+      }
+    }
+
+    return descendant;
+  },
+
+  /**
+   * Count the number of final children nodes (nodes without any children or locales)
+   */
+  countFinalNodes: function() {
+    var childrenSize = 0;
+
+    Object.values(this.children).each(function(node) {
+      childrenSize += node.countFinalNodes();
+    });
+
+    if (childrenSize === 0) {
+      var localesSize = Object.keys(this.locales).length;
+
+      if (localesSize === 0) {
+        return 1;
+      } else {
+        return localesSize;
+      }
+    }
+
+    return childrenSize;
   }
 });
 

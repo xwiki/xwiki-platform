@@ -208,7 +208,7 @@ var XWiki = (function(XWiki){
             var pack = transport.responseText.evalJSON();
 
             this.infos = pack.infos;
-            this.entities = pack.entities;
+            this.entities = XWiki.EntityReferenceTree.fromJSONObject(pack.entities);
 
             this.container = new Element("div", {'id':'packageDescription'});
             this.node.insert(this.container);
@@ -233,7 +233,7 @@ var XWiki = (function(XWiki){
             this.container.insert( new Element("div", {'id':'package'}).update(this.list) );
 
             // Add the entities tree
-            this.entities.children.each(this.addSpaceToPackage.bind(this));
+            Object.values(this.entities.children).each(this.addSpaceToPackage.bind(this));
 
             // Insert options and button to submit the form.
             this.container.insert(  this.createPackageFormSubmit( pack.infos) );
@@ -428,9 +428,17 @@ var XWiki = (function(XWiki){
         },
 
         /**
-         * Adds a sigle space to the package explorer.
+         * Adds a space to the package explorer.
          */
         addSpaceToPackage: function(spaceNode)
+        {
+            this.addSpaceToSpace(this.list, spaceNode);
+        },
+
+        /**
+         * Adds a space to parent space.
+         */
+        addSpaceToSpace: function(parentList, spaceNode)
         {
             var docNb = this.countDocumentsInSpace(spaceNode);
             var selection =  docNb + " / " + docNb + " " + translations["documentSelected"];
@@ -450,7 +458,7 @@ var XWiki = (function(XWiki){
 
             spaceItemContainer.insert(spaceBox);
 
-            var spaceName = new Element("div", {'class':'spacename'}).update(space)
+            var spaceName = new Element("div", {'class':'spacename'}).update(spaceNode.reference.name)
             spaceItemContainer.insert(spaceName);
 
             var onToggle = function(event){
@@ -467,16 +475,20 @@ var XWiki = (function(XWiki){
 
             var self = this;
 
-            // Fill in the space with the list of document it contains
-            Object.keys(this.packageDocuments[space]).sort().each(function(page) {
-                self.addDocumentToSpace(list, space, page);
+            // Add children
+            Object.values(spaceNode.children).each(function(childNode) {
+              if (childNode.reference.type === EntityType.SPACE) {
+                this.addSpaceToSpace(list, childNode);
+              } else if (childNode.reference.type === EntityType.DOCUMENT) {
+                //this.addDocumentToSpace(list, childNode);
+              }
             });
 
             pagesContainer.update(list);
             spaceItemContainer.insert(pagesContainer);
 
             spaceItem.insert(spaceItemContainer);
-            this.list.insert(spaceItem);
+            parentList.insert(spaceItem);
 
             spaceBox.checked = true;
             // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
@@ -484,12 +496,8 @@ var XWiki = (function(XWiki){
 
         /**
          * Adds a single document to a space
-         *
-         * @param list
-         * @param space
-         * @param page
          */
-        addDocumentToSpace: function(list, space, page)
+        addDocumentToSpace: function(list, documentNode)
         {
             var trList = this.packageDocuments[space][page], self = this;
             trList.sortBy(function(s){return s.language}).each(function(infos) {
@@ -503,7 +511,7 @@ var XWiki = (function(XWiki){
                 pageItemContainer.insert(new Element("span", {'class':'documentName'}).update(page));
                 if (infos.language != "") {
                    pageItemContainer.insert(new Element("span", {'class':'documentLanguage'}).update(" - " + infos.language));
-                            }
+                }
                 pageItemContainer.insert(new Element("div", {'class':'clearfloats'}));
 
                 // Insert some hidden div to store exact fullName and language of the node.
@@ -521,15 +529,11 @@ var XWiki = (function(XWiki){
 
         countDocumentsInSpace: function(spaceNode)
         {
-            var self = this;
-            if (typeof this.documentCount[spaceName] == "undefined") {
-                this.documentCount[spaceName] = Object.keys(this.packageDocuments[spaceName]).inject(0, function(acc, elem) {
-                    // Not super efficient, but will do the trick.
-                    return acc + self.packageDocuments[spaceName][elem].length;
-                });
+            if (typeof spaceNode.count == "undefined") {
+              spaceNode.count = spaceNode.countFinalNodes();
             }
-            delete self;
-            return this.documentCount[spaceName];
+
+            return spaceNode.count;
         },
 
         countSelectedDocumentsInSpace: function(spaceName)

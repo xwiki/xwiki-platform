@@ -60,11 +60,11 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
 
     public TemplateProviderInlinePage createTemplateProvider(String space, String page)
     {
-        spaceInput.clear();
-        spaceInput.sendKeys(space);
-        pageInput.clear();
-        pageInput.sendKeys(page);
-        createButton.click();
+        this.spaceInput.clear();
+        this.spaceInput.sendKeys(space);
+        this.pageInput.clear();
+        this.pageInput.sendKeys(page);
+        this.createButton.click();
         return new TemplateProviderInlinePage();
     }
 

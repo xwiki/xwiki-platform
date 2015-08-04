@@ -195,6 +195,31 @@ var XWiki = (function(XWiki){
          */
         onPackageInfosAvailable: function(transport)
         {
+            var pack = transport.responseText.evalJSON();
+
+            this.infos = pack.infos;
+            this.entities = XWiki.EntityReferenceTree.fromJSONObject(pack.entities);
+
+            // Load tree css
+            (function loadCss(url) {
+              var link = document.createElement("link");
+               link.type = "text/css";
+               link.rel = "stylesheet";
+               link.href = url;
+              document.getElementsByTagName("head")[0].appendChild(link);
+             })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})");
+
+            // Insert the package tree
+            require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], this.requireTree.bind(this));
+        },
+
+        requireTree: function()
+        {
+            require(['tree'], this.initXTree.bind(this));
+        },
+
+        initXTree: function($)
+        {
             // Remove loading indicator.
             this.node.removeClassName("loading");
 
@@ -202,19 +227,14 @@ var XWiki = (function(XWiki){
             this.node.update();
 
             if (this.node.empty()) {
-                this.node.insert( new Element("h4", {'class':'legend'}).update( translations["availableDocuments"] ));
+              this.node.insert( new Element("h4", {'class':'legend'}).update( translations["availableDocuments"] ));
             }
-
-            var pack = transport.responseText.evalJSON();
-
-            this.infos = pack.infos;
-            this.entities = XWiki.EntityReferenceTree.fromJSONObject(pack.entities);
 
             this.container = new Element("div", {'id':'packageDescription'});
             this.node.insert(this.container);
 
             // Inject the package header.
-            this.container.insert( this.createPackageHeader(pack.infos) );
+            this.container.insert( this.createPackageHeader(this.infos) );
 
             // Inject the block with select all/none links
             var noneLink = new Element("span").update( translations["none"] );
@@ -222,10 +242,10 @@ var XWiki = (function(XWiki){
             var allLink = new Element("span").update( translations["all"] );
             allLink.observe("click", this.onRestoreAllDocuments.bind(this));
             this.container.insert( new Element("div", {'class':'selectLinks'})
-                                         .insert( translations["select"] )
-                                         .insert( noneLink )
-                                         .insert(", ")
-                                         .insert( allLink )  );
+                                       .insert( translations["select"] )
+                                       .insert( noneLink )
+                                       .insert(", ")
+                                       .insert( allLink )  );
 
             // Create and inject in the DOM the parent UL HTML element
             // that will contain the list of space and documents present in the package.
@@ -239,31 +259,11 @@ var XWiki = (function(XWiki){
             Object.values(this.entities.children).each(this.addSpace.bind(this));
 
             // Insert options and button to submit the form.
-            this.container.insert(  this.createPackageFormSubmit( pack.infos) );
+            this.container.insert(  this.createPackageFormSubmit(this.infos) );
 
             this.container.down("div.packagesubmit input[type=radio]").checked = true;
             // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
 
-            (function loadCss(url) {
-              var link = document.createElement("link");
-               link.type = "text/css";
-               link.rel = "stylesheet";
-               link.href = url;
-              document.getElementsByTagName("head")[0].appendChild(link);
-             })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})");
-
-            var self = this;
-
-            require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], this.requireTree.bind(this));
-        },
-
-        requireTree: function()
-        {
-            require(['tree'], this.initXTree.bind(this));
-        },
-
-        initXTree: function($)
-        {
             $('.xtree').xtree({
               plugins: ['checkbox']
             });

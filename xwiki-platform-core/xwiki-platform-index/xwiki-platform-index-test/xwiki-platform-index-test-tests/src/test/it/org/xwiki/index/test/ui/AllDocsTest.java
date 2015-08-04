@@ -20,6 +20,7 @@
 package org.xwiki.index.test.ui;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -94,32 +95,34 @@ public class AllDocsTest extends AbstractTest
     {
         // Create a tree structure.
         String spaceName = getTestMethodName();
-        getUtil().createPage(spaceName, "WebHome", null, "Grandparent Page");
-        getUtil().createPage(spaceName, "Parent", null, "Parent Page", null, spaceName + ".WebHome");
-        getUtil().createPageWithAttachment(spaceName, "Child", null, "Child Page", null, spaceName + ".Parent",
+        getUtil().createPage(spaceName, "WebHome", null, null);
+        getUtil().createPageWithAttachment(Arrays.asList(spaceName, "A", "B"), "C", null, "Child Page", null, null,
             "file.txt", getClass().getResourceAsStream("/file.txt"), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
         DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
 
-        assertFalse(tree.hasDocument(spaceName, "WebHome"));
-        tree.getSpaceNode(spaceName).open().waitForIt();
-        TreeNodeElement grandParent = tree.getDocumentNode(spaceName, "WebHome");
-        assertEquals("Grandparent Page", grandParent.getLabel());
+        TreeNodeElement root = tree.getDocumentNode(spaceName, "WebHome");
+        assertEquals(spaceName, root.getLabel());
 
-        assertFalse(tree.hasDocument(spaceName, "Parent"));
-        grandParent.open().waitForIt();
-        TreeNodeElement parent = tree.getDocumentNode(spaceName, "Parent");
-        assertEquals("Parent Page", parent.getLabel());
+        assertFalse(tree.hasDocument(spaceName, "A", "WebHome"));
+        root.open().waitForIt();
+        TreeNodeElement alice = tree.getDocumentNode(spaceName, "A", "WebHome");
+        assertEquals("A", alice.getLabel());
 
-        assertFalse(tree.hasDocument(spaceName, "Child"));
-        parent.open().waitForIt();
-        TreeNodeElement child = tree.getDocumentNode(spaceName, "Child");
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "WebHome"));
+        alice.open().waitForIt();
+        TreeNodeElement bob = tree.getDocumentNode(spaceName, "A", "B", "WebHome");
+        assertEquals("B", bob.getLabel());
+
+        assertFalse(tree.hasDocument(spaceName, "A", "B", "C"));
+        bob.open().waitForIt();
+        TreeNodeElement child = tree.getDocumentNode(spaceName, "A", "B", "C");
         assertEquals("Child Page", child.getLabel());
 
-        assertFalse(tree.hasAttachment(spaceName, "Child", "file.txt"));
+        assertFalse(tree.hasAttachment(spaceName, "A", "B", "C", "file.txt"));
         // Open the Attachments node.
         child.open().waitForIt().getChildren().get(0).open().waitForIt();
-        TreeNodeElement file = tree.getAttachmentNode(spaceName, "Child", "file.txt");
+        TreeNodeElement file = tree.getAttachmentNode(spaceName, "A", "B", "C", "file.txt");
         assertEquals("file.txt", file.getLabel());
     }
 
@@ -132,30 +135,24 @@ public class AllDocsTest extends AbstractTest
     {
         // Create a tree structure.
         String spaceName = getTestMethodName() + ".0";
-        String spaceRef = getTestMethodName() + "\\.0";
-        getUtil().createPage(spaceName, "WebHome", null, null);
-        getUtil().createPage(spaceName, "Level.1", null, null, null, spaceRef + ".WebHome");
-        getUtil().createPage(spaceName, "Level{[(2)]}", null, null, null, spaceRef + ".Level\\.1");
-        getUtil().createPage(spaceName, "Level@3", null, null, null, spaceRef + ".Level{[(2)]}");
-        getUtil().createPage(spaceName, "End", null, null, null, spaceRef + ".Level@3");
+        getUtil().createPage(Arrays.asList(spaceName, "Level.1", "Level{[(2)]}", "Level@3"), "End", null, null);
 
         DocumentTreeElement tree = AllDocsPage.gotoPage().clickTreeTab();
-        tree.openToDocument(spaceName, "End");
+        tree.openToDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "End");
 
-        assertTrue(tree.hasDocument(spaceName, "Level.1"));
-        assertTrue(tree.hasDocument(spaceName, "Level{[(2)]}"));
-        assertTrue(tree.hasDocument(spaceName, "Level@3"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "WebHome"));
+        assertTrue(tree.hasDocument(spaceName, "Level.1", "Level{[(2)]}", "Level@3", "WebHome"));
     }
 
     /**
-     * This test is against XWiki Enterprise XE-701 http://jira.xwiki.org/jira/browse/XE-701 (fixed in 2.5M1)
-     * WARN: calling isReady() and waitUntilReady() from LiveTableElement.java inside this class fails.
+     * This test is against XWiki Enterprise XE-701 http://jira.xwiki.org/jira/browse/XE-701 (fixed in 2.5M1) WARN:
+     * calling isReady() and waitUntilReady() from LiveTableElement.java inside this class fails.
      */
     @Test
     @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See http://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See http://jira.xwiki.org/browse/XE-1177")
-    })
+    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See http://jira.xwiki.org/browse/XE-1146"),
+    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See http://jira.xwiki.org/browse/XE-1177")})
     public void attachmentsTabFiltering() throws Exception
     {
         // Create 2 pages with attachments so that this test filter returns only one.

@@ -19,13 +19,14 @@
  */
 package org.xwiki.index.test.po;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.openqa.selenium.WebElement;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
@@ -57,28 +58,36 @@ public class DocumentTreeElement extends TreeElement
     }
 
     /**
-     * Opens the tree to the specified document.
+     * Opens the tree to the specified space.
      * 
-     * @param space the space name
-     * @param name the document name
+     * @param path the path used to locate the space
      * @return this tree
      */
-    public DocumentTreeElement openToDocument(String space, String name)
+    public DocumentTreeElement openToSpace(String... path)
     {
-        return openTo(getDocumentNodeId(space, name));
+        return openTo(getSpaceNodeId(path));
+    }
+
+    /**
+     * Opens the tree to the specified document.
+     * 
+     * @param path the path used to locate the document
+     * @return this tree
+     */
+    public DocumentTreeElement openToDocument(String... path)
+    {
+        return openTo(getDocumentNodeId(path));
     }
 
     /**
      * Opens the tree to the specified attachment.
      * 
-     * @param space the space name
-     * @param document the document name
-     * @param fileName the file name
+     * @param path the path used to locate the attachment
      * @return this tree
      */
-    public DocumentTreeElement openToAttachment(String space, String document, String fileName)
+    public DocumentTreeElement openToAttachment(String... path)
     {
-        return openTo(getAttachmentNodeId(space, document, fileName));
+        return openTo(getAttachmentNodeId(path));
     }
 
     @Override
@@ -88,63 +97,57 @@ public class DocumentTreeElement extends TreeElement
     }
 
     /**
-     * @param name the space name
+     * @param path the path used to locate the space
      * @return {@code true} if the specified space appears in the tree
      */
-    public boolean hasSpace(String name)
+    public boolean hasSpace(String... path)
     {
-        return hasNode(getSpaceNodeId(name));
+        return hasNode(getSpaceNodeId(path));
     }
 
     /**
-     * @param space the space name
-     * @param name the document name
+     * @param path the path used to locate the document
      * @return {@code true} if the specified document appears in the tree
      */
-    public boolean hasDocument(String space, String name)
+    public boolean hasDocument(String... path)
     {
-        return hasNode(getDocumentNodeId(space, name));
+        return hasNode(getDocumentNodeId(path));
     }
 
     /**
-     * @param space the space name
-     * @param document the document name
-     * @param fileName the file name
+     * @param path the path used to locate the attachment
      * @return {@code true} if the specified attachment is present in the tree
      */
-    public boolean hasAttachment(String space, String document, String fileName)
+    public boolean hasAttachment(String... path)
     {
-        return hasNode(getAttachmentNodeId(space, document, fileName));
+        return hasNode(getAttachmentNodeId(path));
     }
 
     /**
-     * @param name the space name
+     * @param path the path used to locate the space
      * @return the corresponding space node
      */
-    public TreeNodeElement getSpaceNode(String name)
+    public TreeNodeElement getSpaceNode(String... path)
     {
-        return getNode(getSpaceNodeId(name));
+        return getNode(getSpaceNodeId(path));
     }
 
     /**
-     * @param space the space name
-     * @param name the document name
+     * @param path the path used to locate the document
      * @return the corresponding document node
      */
-    public TreeNodeElement getDocumentNode(String space, String name)
+    public TreeNodeElement getDocumentNode(String... path)
     {
-        return getNode(getDocumentNodeId(space, name));
+        return getNode(getDocumentNodeId(path));
     }
 
     /**
-     * @param space the space node
-     * @param document the document name
-     * @param fileName the file name
+     * @param path the path used to locate the attachment
      * @return the corresponding attachment node
      */
-    public TreeNodeElement getAttachmentNode(String space, String document, String fileName)
+    public TreeNodeElement getAttachmentNode(String... path)
     {
-        return getNode(getAttachmentNodeId(space, document, fileName));
+        return getNode(getAttachmentNodeId(path));
     }
 
     private String getNodeId(EntityReference reference)
@@ -152,18 +155,38 @@ public class DocumentTreeElement extends TreeElement
         return reference.getType().getLowerCase() + ":" + this.entityReferenceSerializer.serialize(reference);
     }
 
-    private String getSpaceNodeId(String name)
+    private String getSpaceNodeId(String... path)
     {
-        return getNodeId(new SpaceReference(name, new WikiReference("xwiki")));
+        if (path.length > 0) {
+            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList(path), "WebHome");
+            return getNodeId(documentReference.getParent());
+        } else {
+            throw new IllegalArgumentException("Incomplete path: it should have at least 1 element (space)");
+        }
     }
 
-    private String getDocumentNodeId(String space, String name)
+    private String getDocumentNodeId(String... path)
     {
-        return getNodeId(new DocumentReference("xwiki", space, name));
+        if (path.length > 1) {
+            List<String> pathElements = Arrays.asList(path);
+            List<String> spaces = pathElements.subList(0, path.length - 1);
+            String document = path[path.length - 1];
+            return getNodeId(new DocumentReference("xwiki", spaces, document));
+        } else {
+            throw new IllegalArgumentException("Incomplete path: it should have at least 2 elements (space/page)");
+        }
     }
 
-    private String getAttachmentNodeId(String space, String document, String fileName)
+    private String getAttachmentNodeId(String... path)
     {
-        return getNodeId(new AttachmentReference(fileName, new DocumentReference("xwiki", space, document)));
+        if (path.length > 2) {
+            List<String> pathElements = Arrays.asList(path);
+            List<String> spaces = pathElements.subList(0, path.length - 2);
+            String document = path[path.length - 2];
+            String fileName = path[path.length - 1];
+            return getNodeId(new AttachmentReference(fileName, new DocumentReference("xwiki", spaces, document)));
+        } else {
+            throw new IllegalArgumentException("Incomplete path: it should have at least 3 elements (space/page/file)");
+        }
     }
 }

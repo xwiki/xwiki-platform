@@ -268,29 +268,6 @@ XWiki.EntityReferenceTreeNode = Class.create({
     }
 
     return descendant;
-  },
-
-  /**
-   * Count the number of final children nodes (nodes without any children or locales)
-   */
-  countFinalNodes: function() {
-    var childrenSize = 0;
-
-    Object.values(this.children).each(function(node) {
-      childrenSize += node.countFinalNodes();
-    });
-
-    if (childrenSize === 0) {
-      var localesSize = Object.keys(this.locales).length;
-
-      if (localesSize === 0) {
-        return 1;
-      } else {
-        return localesSize;
-      }
-    }
-
-    return childrenSize;
   }
 });
 

@@ -58,10 +58,6 @@
 
   {{documentTree compact="true" /}}
 
-  == Document Index Tree ==
-
-  {{documentTree showSpaces="true" /}}
-
   == Wiki &gt; Space &gt; Page Tree ==
 
   {{documentTree showWikis="true" showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" /}}

@@ -26,6 +26,5 @@ org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver
 org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer
 org.xwiki.model.internal.reference.PathStringDocumentReferenceResolver
-org.xwiki.model.internal.reference.converter.DocumentReferenceConverter
 org.xwiki.model.internal.reference.converter.EntityReferenceConverter
 org.xwiki.model.script.ModelScriptService

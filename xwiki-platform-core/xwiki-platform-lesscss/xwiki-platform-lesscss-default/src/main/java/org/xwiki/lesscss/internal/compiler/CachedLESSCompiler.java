@@ -51,12 +51,12 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
      * The name of the file holding the main skin style (on which Velocity is always executed).
      */
     public static final String MAIN_SKIN_STYLE_FILENAME = "style.less.vm";
-    
+
     private static final String SKIN_CONTEXT_KEY = "skin";
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-    
+
     @Inject
     private Less4jCompiler less4JCompiler;
 
@@ -68,7 +68,7 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
 
         try {
             if (lessResourceReference instanceof LESSSkinFileResourceReference || includeSkinStyle) {
-                
+
                 if (includeSkinStyle) {
                     // Add the import line to the LESS resource.
                     // We import this file to be able to use variables and mix-ins defined in it.
@@ -86,12 +86,12 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
             if (useVelocity) {
                 lessCode = executeVelocity(lessCode, skin);
             }
-            
+
             // Compile the LESS code
             if (useLESS) {
                 return less4JCompiler.compile(lessCode, skin);
             }
-            
+
             // Otherwise return the raw LESS code
             return lessCode;
         } catch (Less4jException e) {
@@ -113,7 +113,8 @@ public class CachedLESSCompiler implements CachedCompilerInterface<String>
             if (!currentSkin.equals(skin)) {
                 xcontext.put(SKIN_CONTEXT_KEY, skin);
             }
-            return xwiki.parseContent(source, xcontext);
+
+            return xwiki.evaluateVelocity(source, xcontext.getDoc().getPrefixedFullName());
 
         } finally {
             // Reset the current skin to the old value

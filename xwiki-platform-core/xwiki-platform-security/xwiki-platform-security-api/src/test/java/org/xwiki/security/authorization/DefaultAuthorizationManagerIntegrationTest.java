@@ -384,7 +384,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
         initialiseWikiMock("emptyWikis");
 
         // Public access on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
             null, getXDoc("an empty main wiki", "anySpace"));
 
         // SuperAdmin access on main wiki
@@ -392,7 +392,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             CREATE_WIKI, ILLEGAL), SUPERADMIN, getXDoc("an empty main wiki", "anySpace"));
 
         // Any Global user without access rules on main wiki
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
             getXUser("a global user without any access rule"), getXDoc("main wiki", "anySpace"));
 
         // Any Local user on main wiki
@@ -400,7 +400,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             getUser("a local user", "any SubWiki"), getXDoc("main wiki", "anySpace"));
 
         // Public access on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
             null, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // SuperAdmin access on sub wiki
@@ -409,7 +409,7 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             SUPERADMIN, getDoc("an empty sub wiki", "anySpace", "any SubWiki"));
 
         // Any Global user without access rules on sub wiki
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, REGISTER, LOGIN),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, REGISTER, LOGIN),
             getXUser("a global user without any access rule"), getDoc("a subwiki", "anySpace", "any SubWiki"));
 
         // Any Local user on another subwiki
@@ -559,13 +559,13 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
     {
         initialiseWikiMock("documentCreator");
 
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userA"),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userA"),
             getXDoc("userAdoc", "space"));
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, LOGIN, REGISTER), getXUser("userA"),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userA"),
             getXDoc("userBdoc", "space"));
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, LOGIN, REGISTER), getXUser("userB"),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, LOGIN, REGISTER), getXUser("userB"),
             getXDoc("userAdoc", "space"));
-        assertAccess(new RightSet(VIEW, EDIT, SCRIPT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"),
+        assertAccess(new RightSet(VIEW, EDIT, COMMENT, DELETE, CREATOR, LOGIN, REGISTER), getXUser("userB"),
             getXDoc("userBdoc", "space"));
     }
 

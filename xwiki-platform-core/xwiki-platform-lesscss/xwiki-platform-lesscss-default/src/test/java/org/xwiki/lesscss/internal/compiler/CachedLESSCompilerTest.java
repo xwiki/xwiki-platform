@@ -33,6 +33,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.github.sommeri.less4j.Less4jException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
 import static org.junit.Assert.assertEquals;
@@ -57,7 +58,7 @@ public class CachedLESSCompilerTest
             new MockitoComponentMockingRule<>(CachedLESSCompiler.class);
 
     private Provider<XWikiContext> xcontextProvider;
-    
+
     private Less4jCompiler less4jCompiler;
 
     private XWikiContext xcontext;
@@ -78,6 +79,10 @@ public class CachedLESSCompilerTest
         engineContext = mock(XWikiEngineContext.class);
         when(xwiki.getEngineContext()).thenReturn(engineContext);
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
+
+        XWikiDocument mockDocument = mock(XWikiDocument.class);
+        when(mockDocument.getPrefixedFullName()).thenReturn("SomeContextDocument");
+        when(xcontext.getDoc()).thenReturn(mockDocument);
     }
 
     @Test
@@ -86,7 +91,7 @@ public class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
+        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
             thenReturn("Some Velocity-rendered LESS content");
         when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin2")))
             .thenReturn("output");
@@ -120,13 +125,13 @@ public class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent(eq("skin2"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
+        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
                 thenReturn("Some Velocity-rendered LESS content");
-        
+
         // Tests
-        assertEquals("Some Velocity-rendered LESS content", mocker.getComponentUnderTest().compute(resource, false, 
+        assertEquals("Some Velocity-rendered LESS content", mocker.getComponentUnderTest().compute(resource, false,
             true, false, "skin2"));
-        
+
         // Verify that the LESS compiler is never called
         verifyZeroInteractions(less4jCompiler);
     }
@@ -137,8 +142,9 @@ public class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent(eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("@import (reference) \"style.less.vm\";\n"
-            + "Some LESS content"), eq(xcontext)))
+        when(
+            xwiki.evaluateVelocity(eq("@import (reference) \"style.less.vm\";\n" + "Some LESS content"),
+                eq("SomeContextDocument")))
                 .thenReturn("@import (reference) \"style.less.vm\";\n"
                         +"Some Velocity-rendered LESS content");
         when(less4jCompiler.compile(eq("@import (reference) \"style.less.vm\";\n"
@@ -156,7 +162,7 @@ public class CachedLESSCompilerTest
         // Mocks
         LESSResourceReference resource = mock(LESSSkinFileResourceReference.class);
         when(resource.getContent(eq("skin"))).thenReturn("Some LESS content");
-        when(xwiki.parseContent(eq("Some LESS content"), eq(xcontext))).
+        when(xwiki.evaluateVelocity(eq("Some LESS content"), eq("SomeContextDocument"))).
                 thenReturn("Some Velocity-rendered LESS content");
         Less4jException lessCompilerException = mock(Less4jException.class);
         when(less4jCompiler.compile(eq("Some Velocity-rendered LESS content"), eq("skin"))).

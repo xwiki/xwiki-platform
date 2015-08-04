@@ -30,18 +30,9 @@
   <artifactId>xwiki-platform-flamingo</artifactId>
   <name>XWiki Platform - Flamingo - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
+  <description>Modules related to the Flamingo Skin</description>
   <modules>
     <module>xwiki-platform-flamingo-skin</module>
-    <module>xwiki-platform-flamingo-theme</module>
-    <module>xwiki-platform-flamingo-bootswatchthemes</module>
+    <module>xwiki-platform-flamingo-themes</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-flamingo-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

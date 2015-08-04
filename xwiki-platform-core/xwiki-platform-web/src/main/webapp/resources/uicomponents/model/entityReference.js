@@ -184,7 +184,7 @@ XWiki.SpaceReference = Class.create(XWiki.EntityReference, {
           reference = new XWiki.EntityReference(spaceNames[i], XWiki.EntityType.SPACE, reference);
       }
       $super(spaceNames[i], XWiki.EntityType.SPACE, reference);
-    } else if (typeof spaceNames === "string") {
+    } else if (typeof spaceNames === "string" || typeof spaceNames == 'undefined') {
       // Support passing a single space as a String for both backward-compatibility reason but also simplicity
       $super(spaceNames, XWiki.EntityType.SPACE, wikiReference);
     } else {

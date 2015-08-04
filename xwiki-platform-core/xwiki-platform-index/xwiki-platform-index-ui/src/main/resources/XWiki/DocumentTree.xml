@@ -58,10 +58,6 @@
 
   {{documentTree compact="true" /}}
 
-  == Document Index Tree ==
-
-  {{documentTree showSpaces="true" /}}
-
   == Wiki &gt; Space &gt; Page Tree ==
 
   {{documentTree showWikis="true" showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" /}}
@@ -193,17 +189,20 @@
   'showWikis': false,
   'showWikiPrettyName': true,
   'showSpaces': false,
-  'showSpaceAsDocument': false,
   'showDocumentTitle': true,
   'showTranslations': true,
   'showAttachments': true,
   'showObjects': false,
   'showClassProperties': false,
-  'showChildDocuments': true,
+  'hierarchyMode': 'reference',
   'showOnlyViewable': true,
   'filterByClass': '',
   'root': ''
 })
+## showChildDocuments is deprecated since 7.2M2. Fall-back on hierarchyMode for backwards compatibility.
+#if ($xcontext.macro.params.showChildDocuments == 'true')
+  #set ($discard = $xcontext.macro.params.set('hierarchyMode', 'parentchild'))
+#end
 #set ($resourceParams = {'outputSyntax': 'plain'})
 #foreach ($entry in $docTreeConfig.entrySet())
   #set ($value = $xcontext.macro.params.get($entry.key))
@@ -908,16 +907,16 @@
       </name>
     </class>
     <property>
-      <defaultValue>true</defaultValue>
+      <defaultValue>reference</defaultValue>
     </property>
     <property>
-      <description>Whether to show the child documents based on the document parent field.</description>
+      <description>Specifies which hierarchy to use between documents. Possible values are "reference" (default) and "parentchild". If "reference" is used then the document hierarchy is defined using only the document reference, especially the nested spaces component of the document reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" document field from the database.</description>
     </property>
     <property>
       <mandatory>0</mandatory>
     </property>
     <property>
-      <name>showChildDocuments</name>
+      <name>hierarchyMode</name>
     </property>
   </object>
   <object>
@@ -1446,72 +1445,6 @@
     </property>
     <property>
       <name>finder</name>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.DocumentTree</name>
-    <number>18</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>eb1c8574-06a3-4f72-a945-d132fc1ca7b2</guid>
-    <class>
-      <name>XWiki.WikiMacroParameterClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultValue>
-        <disabled>0</disabled>
-        <name>defaultValue</name>
-        <number>4</number>
-        <prettyName>Parameter default value</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultValue>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Parameter description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <mandatory>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>mandatory</name>
-        <number>3</number>
-        <prettyName>Parameter mandatory</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </mandatory>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Parameter name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-    </class>
-    <property>
-      <defaultValue>false</defaultValue>
-    </property>
-    <property>
-      <description>Show the space nodes as document nodes. This is achieved by merging the space home document node with the space node. As a consequence, the documents from each space will appear as children of the space home document.</description>
-    </property>
-    <property>
-      <mandatory>0</mandatory>
-    </property>
-    <property>
-      <name>showSpaceAsDocument</name>
     </property>
   </object>
 </xwikidoc>

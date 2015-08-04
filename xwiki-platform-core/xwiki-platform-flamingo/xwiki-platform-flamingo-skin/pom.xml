@@ -28,124 +28,18 @@
     <version>7.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin</artifactId>
-  <name>XWiki Platform - Flamingo - Skin</name>
+  <name>XWiki Platform - Flamingo - Skin - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
-  <properties>
-    <!-- Don't run CLIRR here since there's no Java code. -->
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
-  </properties>
-  <dependencies>
-    <!-- HTML5 renderer since this skin outputs html5. See src/main/resources/flamingo/skin.properties -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-html5</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <!-- LESS Module -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-lesscss-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- WebJars -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-webjars</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>requirejs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>respond</artifactId>
-      <version>1.4.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>html5shiv</artifactId>
-      <version>3.7.2</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <!-- Step 2: Verify and minify the JavaScript code. -->
-      <plugin>
-        <groupId>com.cj.jshintmojo</groupId>
-        <artifactId>jshint-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Step 2: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>bootstrap-jar</id>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.webjars</groupId>
-                  <artifactId>bootstrap</artifactId>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>
-                  <includes>
-                    META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/**
-                  </includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Assembly -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <appendAssemblyId>false</appendAssemblyId>
-          <descriptors>
-            <descriptor>${basedir}/src/assemble/skin.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <description>XWiki Platform - Flamingo - Skin - Parent POM</description>
+  <modules>
+    <module>xwiki-platform-flamingo-skin-resources</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-flamingo-skin-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -40,7 +40,7 @@ public class ResourceTest extends AbstractTest
     public void accessResources() throws Exception
     {
         // Verify that accessing /view/A/B goes to A.B.WebHome (Nested Documents URL shortcut feature)
-        getUtil().gotoPage(getUtil().getURL(new String[] {"view", "A", "B"}, null, null));
+        getUtil().gotoPage(getUtil().getURL("view", new String[] {"A", "B"}, null));
         // Edit the page and verify the URL
         // The wiki is empty and there's no WYSIWYG so clicking edit will go to the wiki editor
         new ViewPage().edit();
@@ -48,13 +48,13 @@ public class ResourceTest extends AbstractTest
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B/WebHome"));
 
         // Verify that accessing /edit/A/B edits A.B (Nested Documents URL shortcut feature is only for view mode)
-        getUtil().gotoPage(getUtil().getURL(new String[] {"edit", "A", "B"}, null, null));
+        getUtil().gotoPage(getUtil().getURL("edit", new String[] {"A", "B"}, null));
         ep = new EditPage();
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));
 
         // Verify that the spaceRedirect=false query string parameter and value can be used to disable the automatic
         // space redirect
-        getUtil().gotoPage(getUtil().getURL(new String[] {"view", "A", "B"}, null, "spaceRedirect=false"));
+        getUtil().gotoPage(getUtil().getURL("view", new String[] {"A", "B"}, "spaceRedirect=false"));
         new ViewPage().edit();
         ep = new EditPage();
         assertTrue(new URL(ep.getPageURL()).getPath().endsWith("A/B"));

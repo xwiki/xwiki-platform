@@ -49,8 +49,6 @@ rendering.macro.documentTree.parameter.showWikiPrettyName.name=Show Wiki Pretty 
 rendering.macro.documentTree.parameter.showWikiPrettyName.description=Show the wiki pretty name instead of the wiki id when displaying a wiki node.
 rendering.macro.documentTree.parameter.showSpaces.name=Show Spaces
 rendering.macro.documentTree.parameter.showSpaces.description=Whether to show the space nodes or not. The documents are grouped by space if the space nodes are displayed.
-rendering.macro.documentTree.parameter.showSpaceAsDocument.name=Show Spaces as Documents
-rendering.macro.documentTree.parameter.showSpaceAsDocument.description=Show the space nodes as document nodes. This is achieved by merging the space home document node with the space node. As a consequence, the documents from each space will appear as children of the space home document.
 rendering.macro.documentTree.parameter.showDocumentTitle.name=Show Document Title
 rendering.macro.documentTree.parameter.showDocumentTitle.description=Whether to show the document title instead of the document name when displaying a document node.
 rendering.macro.documentTree.parameter.showTranslations.name=Show Translations
@@ -61,8 +59,6 @@ rendering.macro.documentTree.parameter.showObjects.name=Show Objects
 rendering.macro.documentTree.parameter.showObjects.description=Whether to show the document objects or not.
 rendering.macro.documentTree.parameter.showClassProperties.name=Show Class Properties
 rendering.macro.documentTree.parameter.showClassProperties.description=Whether to show the class properties for documents that define classes.
-rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
-rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.
 rendering.macro.documentTree.parameter.root.name=Root
 rendering.macro.documentTree.parameter.root.description=The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified. The format of a node identifier is entityType:entityReference, where the entity type can be for instance wiki, space, document. E.g.: wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
 rendering.macro.documentTree.parameter.compact.name=Compact
@@ -78,7 +74,15 @@ rendering.macro.documentTree.parameter.showOnlyViewable.description=Show only th
 rendering.macro.documentTree.parameter.filterByClass.name=Filter by Class
 rendering.macro.documentTree.parameter.filterByClass.description=Show only the documents that have an object of the specified type. The value of this parameter is the full name of an XWiki document that holds a class definition. For example, 'Blog.CategoryClass' can be used to show only the documents that represent blog categories. Leave this parameter empty if you don't want to restrict the type of documents shown in the tree.
 rendering.macro.documentTree.parameter.finder.name=Finder
-rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.</content>
+rendering.macro.documentTree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected the tree is expanded up to the corresponding node.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Document Hierarchy Mode
+rendering.macro.documentTree.parameter.hierarchyMode.description=Specifies which hierarchy to use between documents. Possible values are "reference" (default) and "parentchild". If "reference" is used then the document hierarchy is defined using only the document reference, especially the nested spaces component of the document reference. If "parentchild" is used then the hierarchy is based on the parent/child relationship defined by the "parent" document field from the database.
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Show Child Documents
+rendering.macro.documentTree.parameter.showChildDocuments.description=Whether to show the child documents based on the document parent field.</content>
   <object>
     <name>XWiki.DocumentTreeTranslations</name>
     <number>0</number>

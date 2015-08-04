@@ -213,11 +213,6 @@ public class DocumentLocaleReader extends AbstractReader
                 this.sentSpaceReference.getParent()) {
                 proxyFilter.endWikiSpace(this.sentSpaceReference.getName(), FilterEventParameters.EMPTY);
             }
-
-            // If we got back to root forget about current space
-            if (this.sentSpaceReference == null) {
-                this.currentSpaceReference = null;
-            }
         }
     }
 

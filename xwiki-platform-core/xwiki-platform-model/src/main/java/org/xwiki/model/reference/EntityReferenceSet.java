@@ -92,7 +92,7 @@ public class EntityReferenceSet
 
         public List<Map<String, Serializable>> parameters;
 
-        public Map<EntityType, EntityReferenceEntryChildren> children2;
+        public Map<EntityType, EntityReferenceEntryChildren> children;
 
         public EntityReferenceEntry()
         {
@@ -111,15 +111,15 @@ public class EntityReferenceSet
 
         public EntityReferenceEntryChildren getChildren(EntityType entityType, boolean create)
         {
-            if (this.children2 == null) {
+            if (this.children == null) {
                 if (!create) {
                     return null;
                 }
 
-                this.children2 = new HashMap<>();
+                this.children = new HashMap<>();
             }
 
-            EntityReferenceEntryChildren child = this.children2.get(entityType);
+            EntityReferenceEntryChildren child = this.children.get(entityType);
 
             if (child == null) {
                 if (!create) {
@@ -128,7 +128,7 @@ public class EntityReferenceSet
 
                 child = new EntityReferenceEntryChildren();
                 child.childrenType = entityType;
-                this.children2.put(entityType, child);
+                this.children.put(entityType, child);
             }
 
             return child;
@@ -144,11 +144,11 @@ public class EntityReferenceSet
 
             // Search for the closest
 
-            if (this.children2 == null) {
+            if (this.children == null) {
                 return null;
             }
 
-            for (Map.Entry<EntityType, EntityReferenceEntryChildren> entry : this.children2.entrySet()) {
+            for (Map.Entry<EntityType, EntityReferenceEntryChildren> entry : this.children.entrySet()) {
                 EntityReferenceEntryChildren typedChilrendEntry = entry.getValue();
 
                 if (typedChilrendEntry.childrenType.ordinal() > entityType.ordinal()) {
@@ -226,9 +226,9 @@ public class EntityReferenceSet
                 builder.append(this.name);
             }
 
-            if (this.children2 != null) {
+            if (this.children != null) {
                 builder.append('(');
-                builder.append(this.children2);
+                builder.append(this.children);
                 builder.append(')');
             }
 
@@ -245,7 +245,7 @@ public class EntityReferenceSet
         EntityReferenceEntry currentEntry = entry;
         for (EntityReference element : reference.getReversedReferenceChain()) {
             // Move to the right level in the tree
-            while (currentEntry.children2 != null && currentEntry.getClosestChildren(element.getType()) == null) {
+            while (currentEntry.children != null && currentEntry.getClosestChildren(element.getType()) == null) {
                 currentEntry = currentEntry.add();
             }
 
@@ -292,11 +292,11 @@ public class EntityReferenceSet
         EntityReferenceEntry currentEntry = this.includes;
         for (EntityReference element : reference.getReversedReferenceChain()) {
             // No children
-            if (currentEntry.children2 == null) {
+            if (currentEntry.children == null) {
                 return true;
             }
 
-            EntityReferenceEntryChildren typedChildren = currentEntry.children2.get(element.getType());
+            EntityReferenceEntryChildren typedChildren = currentEntry.children.get(element.getType());
 
             if (typedChildren != null) {
                 // Children have same type
@@ -334,11 +334,11 @@ public class EntityReferenceSet
         EntityReferenceEntry currentEntry = this.excludes;
         for (EntityReference element : reference.getReversedReferenceChain()) {
             // No children
-            if (currentEntry.children2 == null) {
+            if (currentEntry.children == null) {
                 return false;
             }
 
-            EntityReferenceEntryChildren typedChildren = currentEntry.children2.get(element.getType());
+            EntityReferenceEntryChildren typedChildren = currentEntry.children.get(element.getType());
 
             if (typedChildren != null) {
                 // Children have same type
@@ -361,7 +361,7 @@ public class EntityReferenceSet
         }
 
         // Check if the reference is shorter than the exclude(s)
-        return currentEntry.children2 != null
+        return currentEntry.children != null
         // Check if the excluded parameters are the same as the one the reference contains
             || (currentEntry.parameters != null && CollectionUtils.intersection(
                 getParametersKeys(currentEntry.parameters), reference.getParameters().keySet()).isEmpty());

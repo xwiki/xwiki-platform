@@ -152,3 +152,73 @@ div#package {
   display: block;
   margin-top: .5em;
 }
+
+/*
+  Used when javascript is disabled
+*/
+
+ul {
+  list-style-position: outside !important;
+}
+
+ul.xlist li.xunderline {
+  border: 0 !important;
+}
+
+#packagelist ul.xlist {
+  margin: 0 !important;
+}
+
+div#package ul.package {
+  margin: 0 0 1em 0 !important;
+  padding: 3px !important;
+}
+
+ul.package li.xitem div.xitemcontainer span.checkbox,
+ul.package li.xitem div.xitemcontainer input.space {
+  float: right;
+}
+
+ul.package li.xitem div.xitemcontainer {
+  text-indent: 0;
+}
+ul.package li.xitem div.xitemcontainer .spacename:before {
+  content: '\229F';
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 400;
+  height: 16px;
+  margin-right: 20px;
+  text-align: center;
+  width: 16px;
+}
+ul.package li.xitem.collapsed div.xitemcontainer .spacename:before {
+  content: '\229E'
+}
+
+ul.package li.collapsed div.xitemcontainer .pages {
+  display: none;
+}
+
+ul.package li.xitem div.xitemcontainer div.spacename {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
+  cursor: pointer;
+  float: left;
+  font-weight: bold;
+}
+
+ul.package li.xitem div.xitemcontainer div.selection {
+  color: $theme.textSecondaryColor;
+  float: right;
+  font-size: .8em;
+  line-height: 1.7em;
+  margin-right: .2em;
+}
+
+ul.pages {
+  margin: 0 0 0 18px !important;
+}
+
+ul.pages li.xitem {
+  width: 100%;
+}

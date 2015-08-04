@@ -42,10 +42,6 @@ div.loading {
   padding-left: 20px;
 }
 
-/*#packagelist ul.xlist {
-  margin: 0 !important;
-}*/
-
 #packagelist .xitemcontainer {
   background: transparent url("$xwiki.getSkinFile('icons/silk/package.png')") no-repeat scroll 5px 0.5em;
   font-size: .85em;

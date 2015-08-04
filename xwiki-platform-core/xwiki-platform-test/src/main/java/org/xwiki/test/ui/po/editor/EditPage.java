@@ -51,6 +51,12 @@ public class EditPage extends BasePage
     @FindBy(id = "xwikidocsyntaxinput2")
     protected WebElement syntaxIdSelect;
 
+    @FindBy(name = "parent")
+    private WebElement parentInput;
+
+    @FindBy(id = "xwikidoctitleinput")
+    private WebElement titleField;
+
     /**
      * The top floating edit menu bar.
      */
@@ -180,5 +186,23 @@ public class EditPage extends BasePage
     {
         Select select = new Select(this.syntaxIdSelect);
         select.selectByValue(syntaxId);
+    }
+
+    /**
+     * @return the value of the parent field.
+     * @since 7.2M2
+     */
+    public String getParent()
+    {
+        return this.parentInput.getAttribute("value");
+    }
+
+    /**
+     * @since 7.2M2
+     */
+    @Override
+    public String getDocumentTitle()
+    {
+        return this.titleField.getAttribute("value");
     }
 }

@@ -565,6 +565,9 @@ public class TestUtils
         return getURL(action, new String[]{ space, page }, queryString);
     }
 
+    /**
+     * @since 7.2M1
+     */
     public String getURL(String action, String[] path, String queryString)
     {
         StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);

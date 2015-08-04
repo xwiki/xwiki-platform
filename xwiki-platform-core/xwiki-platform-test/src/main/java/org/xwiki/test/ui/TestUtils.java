@@ -562,10 +562,10 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(new String[]{ space, page }, action, queryString);
+        return getURL(action, new String[]{ space, page }, queryString);
     }
 
-    public String getURL(String[] path, String action, String queryString)
+    public String getURL(String action, String[] path, String queryString)
     {
         StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
@@ -617,7 +617,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(new String[] {space, page, attachment}, action, queryString);
+        return getURL(action, new String[] {space, page, attachment}, queryString);
     }
 
     /**

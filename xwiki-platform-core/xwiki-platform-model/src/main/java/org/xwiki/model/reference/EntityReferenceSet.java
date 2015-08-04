@@ -243,10 +243,13 @@ public class EntityReferenceSet
     private void add(EntityReference reference, EntityReferenceEntry entry)
     {
         EntityReferenceEntry currentEntry = entry;
+
         for (EntityReference element : reference.getReversedReferenceChain()) {
-            // Move to the right level in the tree
-            while (currentEntry.children != null && currentEntry.getClosestChildren(element.getType()) == null) {
-                currentEntry = currentEntry.add();
+            // Move the first element to the right level in the tree
+            if (currentEntry == entry) {
+                while (currentEntry.children != null && currentEntry.getClosestChildren(element.getType()) == null) {
+                    currentEntry = currentEntry.add();
+                }
             }
 
             currentEntry = currentEntry.add(element.getType(), element.getName(), element.getParameters());

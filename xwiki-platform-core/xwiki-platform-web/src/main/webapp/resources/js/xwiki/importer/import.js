@@ -229,29 +229,57 @@ var XWiki = (function(XWiki){
 
             // Create and inject in the DOM the parent UL HTML element
             // that will contain the list of space and documents present in the package.
-            this.list = new Element("ul", {'class':'xlist package'});
-            this.container.insert( new Element("div", {'id':'package'}).update(this.list) );
+            this.list = new Element("ul");
+            this.container.insert(new Element("div", {
+                'id' : 'package',
+                'class' : 'package xtree jstree-no-links'
+              }).update(this.list));
 
             // Add the entities tree
-            Object.values(this.entities.children).each(this.addSpaceToPackage.bind(this));
+            Object.values(this.entities.children).each(this.addSpace.bind(this));
 
             // Insert options and button to submit the form.
             this.container.insert(  this.createPackageFormSubmit( pack.infos) );
 
             this.container.down("div.packagesubmit input[type=radio]").checked = true;
             // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
+
+            (function loadCss(url) {
+              var link = document.createElement("link");
+               link.type = "text/css";
+               link.rel = "stylesheet";
+               link.href = url;
+              document.getElementsByTagName("head")[0].appendChild(link);
+             })("$services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})");
+
+            var self = this;
+
+            require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], this.requireTree.bind(this));
+        },
+
+        requireTree: function()
+        {
+            require(['tree'], this.initXTree.bind(this));
+        },
+
+        initXTree: function($)
+        {
+            $('.xtree').xtree({
+              plugins: ['checkbox']
+            });
+
+            this.xtree = $.jstree.reference($('.xtree'));
+            this.xtree.check_all();
         },
 
         onIgnoreAllDocuments: function()
         {
-            this.container.select("input[type=checkbox][class=space]").invoke("uncheck");
-            this.container.select("input[type=checkbox][class=space]").invoke("fire","custom:click");
+            this.xtree.uncheck_all();
         },
 
         onRestoreAllDocuments : function()
         {
-            this.container.select("input[type=checkbox][class=space]").invoke("check");
-            this.container.select("input[type=checkbox][class=space]").invoke("fire","custom:click");
+            this.xtree.check_all();
         },
 
         onPackageInfosRequestFailed: function(transport)
@@ -317,7 +345,9 @@ var XWiki = (function(XWiki){
          */
         onPackageSubmit: function()
         {
-            if (this.countSelectedDocuments() == 0) {
+            var selectedNodes = this.xtree.get_bottom_checked(true);
+
+            if (selectedNodes.length == 0) {
               // Refuse to import since no document remains selected.
               // Displays a warning and exit.
               var warning = new Element("span", {'class':'warningmessage'}).update( translations["selectionEmpty"] );
@@ -345,21 +375,12 @@ var XWiki = (function(XWiki){
 
             var pages = [];
 
-            var spaces = Object.keys(this.packageDocuments);
-            for (var i=0;i < spaces.length; i++) {
-                var space = this.packageDocuments[spaces[i]];
-                var documents = Object.keys(space);
-                for (var j=0;j<documents.length;j++) {
-                    var doc = space[documents[j]];
-                    doc.each(function(item){
-                        if (!this.isIgnored(spaces[i], documents[j], item.language)) {
-                            var expectedName = item.fullName + ":" + item.language
-                            pages.push( expectedName );
-                            parameters["language_" + expectedName] = item.language;
-                        }
-                    }.bind(this));
-                }
-            }
+            selectedNodes.each(function(node) {
+              var expectedName = node.data.reference + ":" + node.data.locale
+              pages.push( expectedName );
+              parameters["language_" + expectedName] = node.data.locale;
+            });
+
             parameters["pages"] = pages;
 
             this.node.update();
@@ -384,7 +405,6 @@ var XWiki = (function(XWiki){
                    $('packagecontainer').update( new Element("div", {'class':'errormessage'}).update(errorMessage) );
               }
             });
-
         },
 
         /**
@@ -430,267 +450,63 @@ var XWiki = (function(XWiki){
         /**
          * Adds a space to the package explorer.
          */
-        addSpaceToPackage: function(spaceNode)
+        addSpace: function(spaceNode)
         {
-            this.addSpaceToSpace(this.list, spaceNode);
+            this.addSpaceToList(this.list, spaceNode);
         },
 
         /**
          * Adds a space to parent space.
          */
-        addSpaceToSpace: function(parentList, spaceNode)
+        addSpaceToList: function(parentList, spaceNode)
         {
-            var docNb = this.countDocumentsInSpace(spaceNode);
-            var selection =  docNb + " / " + docNb + " " + translations["documentSelected"];
+            var spaceItem = new Element("li", {
+                'data-type' : 'space',
+                'data-reference' : spaceNode.reference,
+                'data-jstree':
+                  '{'+
+                    '"icon":"fa fa-folder-o",' +
+                    '"iconOpened":"fa fa-folder-open-o"'
+                  +'}'
+              }).update(spaceNode.reference.name);
 
-            var spaceItem = new Element("li", {'class':'xitem xunderline collapsed'});
-
-            var spaceItemContainer = new Element("div", {'class':'xitemcontainer'});
-            var spaceBox = new Element("input", {'type':'checkbox','checked':'checked', 'class':'space'});
-            spaceBox.observe("click", function(originalEvent) {
-                // Instead of directly binding the callback to the click event, we proxy it to a custom event
-                // so that it's possible to programmatically fire this event,
-                // since prototype.js does not support manual native event firing as of 1.6
-                // See #onIgnoreAllDocuments and onRestoreAllDocuments
-                spaceBox.fire("custom:click", originalEvent.memo);
-            }.bind(this));
-            spaceBox.observe("custom:click", this.spaceCheckboxClicked.bind(this));
-
-            spaceItemContainer.insert(spaceBox);
-
-            var spaceName = new Element("div", {'class':'spacename'}).update(spaceNode.reference.name)
-            spaceItemContainer.insert(spaceName);
-
-            var onToggle = function(event){
-                event.element().up("li").toggleClassName("collapsed");
-            };
-
-            spaceName.observe("click", onToggle);
-
-            spaceItemContainer.insert(new Element("div", {'class':'selection'}).update(selection));
-            spaceItemContainer.insert(new Element("div", {'class':'clearfloats'}));
-
-            var pagesContainer = new Element("div", {'class':'pages'});
-            var list = new Element("ul", {'class':'xlist pages'});
+            var list = new Element("ul");
 
             var self = this;
 
             // Add children
             Object.values(spaceNode.children).each(function(childNode) {
-              if (childNode.reference.type === EntityType.SPACE) {
-                this.addSpaceToSpace(list, childNode);
-              } else if (childNode.reference.type === EntityType.DOCUMENT) {
-                //this.addDocumentToSpace(list, childNode);
+              if (childNode.reference.type === XWiki.EntityType.SPACE) {
+                self.addSpaceToList(list, childNode);
+              } else if (childNode.reference.type === XWiki.EntityType.DOCUMENT) {
+                self.addDocumentToList(list, childNode);
               }
             });
 
-            pagesContainer.update(list);
-            spaceItemContainer.insert(pagesContainer);
+            spaceItem.insert(list);
 
-            spaceItem.insert(spaceItemContainer);
             parentList.insert(spaceItem);
-
-            spaceBox.checked = true;
-            // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
         },
 
         /**
          * Adds a single document to a space
          */
-        addDocumentToSpace: function(list, documentNode)
+        addDocumentToList: function(list, documentNode)
         {
-            var trList = this.packageDocuments[space][page], self = this;
-            trList.sortBy(function(s){return s.language}).each(function(infos) {
-                var pageItem = new Element("li", {'class':'xitem xhighlight'});
-                var pageItemContainer = new Element("div", {'class': 'xitemcontainer xpagecontainer'});
+            Object.values(documentNode.locales).each(function(localeReference) {
+            var pageItem = new Element("li", {
+                'data-type' : 'document',
+                'data-reference' : localeReference,
+                'data-locale' : localeReference.locale,
+                'data-jstree':
+                  '{'+
+                    '"icon":"fa fa-file-o"'
+                  +'}'
+              }).update(documentNode.reference.name);
 
-                var docBox = new Element("input", {'type':'checkbox','checked':'checked'});
-                docBox.observe("click", self.documentCheckboxClicked.bind(self));
-                pageItemContainer.insert( new Element("span", {'class':'checkbox'}).update(docBox) );
-
-                pageItemContainer.insert(new Element("span", {'class':'documentName'}).update(page));
-                if (infos.language != "") {
-                   pageItemContainer.insert(new Element("span", {'class':'documentLanguage'}).update(" - " + infos.language));
-                }
-                pageItemContainer.insert(new Element("div", {'class':'clearfloats'}));
-
-                // Insert some hidden div to store exact fullName and language of the node.
-                pageItem.insert(new Element("div", {'class': 'fullName hidden'}).update(infos.fullName));
-                pageItem.insert(new Element("div", {'class': 'language hidden'}).update(infos.language));
-
-                // Finally inserts the page item in the list of pages for that space.
-                pageItem.insert(pageItemContainer);
-                list.insert(pageItem);
-
-                docBox.checked = true;
-                // The line above should not be needed, but as it appears IE will not let one check a checkbox before it's inserted in the DOM
-            });
+            list.insert(pageItem);
+          });
         },
-
-        countDocumentsInSpace: function(spaceNode)
-        {
-            if (typeof spaceNode.count == "undefined") {
-              spaceNode.count = spaceNode.countFinalNodes();
-            }
-
-            return spaceNode.count;
-        },
-
-        countSelectedDocumentsInSpace: function(spaceName)
-        {
-            // compute the number of selected documents in that space substracting the ones marked ignored to the total
-            var selected;
-            if (typeof this.ignore[spaceName] == "undefined") {
-                return this.countDocumentsInSpace(spaceName);
-            }
-            else {
-                var self = this;
-                return (this.countDocumentsInSpace(spaceName) - Object.keys(this.ignore[spaceName]).inject(0, function(acc, elem) {
-                    // Same. Not super efficient, but will do the count.
-                    return acc + self.ignore[spaceName][elem].length;
-                }));
-            }
-        },
-
-        countSelectedDocuments: function()
-        {
-            var self = this;
-            return Object.keys(this.packageDocuments).inject(0, function(acc, elem) {
-                return acc + self.countSelectedDocumentsInSpace(elem);
-            });
-        },
-
-        /**
-         * Update the number of selected docs displayed.
-         */
-        updateSelection: function(container, spaceName)
-        {
-            // First count the total number of documents per space,
-            // It correspond to the sum of the number of translations for each document
-            var total = this.countDocumentsInSpace(spaceName);
-            var selected = this.countSelectedDocumentsInSpace(spaceName);
-
-            container.down(".selection").update(selected + " / " + total + " " + translations["documentSelected"]);
-
-            if (selected == 0) {
-              // If all document checkboxes have been unchecked, ensure that the space box is unchecked as well
-              container.down("input.space").uncheck();
-            }
-            else {
-              // At least one document box is checked, let's make sure the space box is too
-              container.down("input.space").check();
-            }
-        },
-
-        /**
-         * Callback triggered when a space checkbox has been clicked (either selected or unselected).
-         */
-        spaceCheckboxClicked: function(event)
-        {
-            var selected = event.element().checked;
-            var spaceName = event.element().up(".xitemcontainer").down(".spacename").innerHTML;
-            var pages = event.element().up(".xitemcontainer").down("div.pages");
-            if (!selected) {
-                // An entire space has been unselected.
-                // Add the whole space to the ignore list and make sure all its docs appears unselected.
-                this.ignoreSpace(spaceName);
-                pages.select("input[type='checkbox']").invoke("uncheck");
-            }
-            else {
-                this.restoreSpace(spaceName);
-                pages.select("input[type='checkbox']").invoke("check");
-            }
-            this.updateSelection(event.element().up(".xitemcontainer"), spaceName);
-        },
-
-        /**
-         * Callback when a checkbox has been clicked for a single document.
-         */
-        documentCheckboxClicked: function(event)
-        {
-            var page = event.element().up("div").down("span.documentName").innerHTML.stripTags().strip();
-            var space = event.element().up("li").up("div.xitemcontainer").down(".spacename").innerHTML;
-            var language = event.element().up("li").down(".language").innerHTML;
-            var selected = event.element().checked;
-            if (!selected) {
-                this.ignoreDocument(space, page, language);
-            }
-            else {
-                this.restoreDocument(space, page, language);
-            }
-            this.updateSelection(event.element().up("li").up("div.xitemcontainer"), space);
-        },
-
-        /**
-         * Checks wether the passed document as been marked as ignored for import by the user
-         */
-        isIgnored: function(space, docName, language) {
-            if (typeof this.ignore[space] == "undefined") {
-                return false;
-            }
-            if (typeof this.ignore[space][docName] == "undefined") {
-                return false;
-            }
-
-            for (var i=0;i<this.ignore[space][docName].length;i++) {
-                if (this.ignore[space][docName][i].language == language) {
-                    return true;
-                }
-            }
-            return false;
-        },
-
-        /**
-         * Ignore an entire space.
-         */
-        ignoreSpace: function(spaceName)
-        {
-            this.ignore[spaceName] = Object.toJSON(this.packageDocuments[spaceName]).evalJSON();
-            // Object#clone is swallow copy
-            // here we emulate a deep copy by serializing/unserializing to/from JSON.
-            // FIXME: not the most efficient for spaces with lot of documents.
-        },
-
-        /**
-         * Restore an entire space in case some of its documents are ignored.
-         */
-        restoreSpace: function(spaceName)
-        {
-            if (typeof this.ignore[spaceName] != "undefined") {
-                delete this.ignore[spaceName];
-            }
-        },
-
-        /**
-         * Ignore a single document
-         */
-        ignoreDocument: function(spaceName, documentName, language)
-        {
-            if (typeof this.ignore[spaceName] == "undefined") {
-                this.ignore[spaceName] = new Object();
-            }
-            if (typeof this.ignore[spaceName][documentName] == "undefined") {
-                this.ignore[spaceName][documentName] = [];
-            }
-            this.ignore[spaceName][documentName][this.ignore[spaceName][documentName].length] = {"language":language};
-        },
-
-        /**
-         * Restore a single document.
-         */
-        restoreDocument: function(spaceName, documentName, language)
-        {
-            if (typeof this.ignore[spaceName] != "undefined" && typeof this.ignore[spaceName][documentName] != "undefined") {
-                for(var i=0;i<this.ignore[spaceName][documentName].length;i++) {
-                    if (this.ignore[spaceName][documentName][i].language === language) {
-                        delete this.ignore[spaceName][documentName][i];
-                        this.ignore[spaceName][documentName] = this.ignore[spaceName][documentName].compact();
-                    }
-                }
-            }
-
-        }
-
     });
 
     return XWiki;

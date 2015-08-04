@@ -1,4 +1,5 @@
 ## Serialize in JSON a XAR package descriptor
+## @since 7.2M2
 #############################################
 $response.setContentType("application/json")
 #if("$!request.document" == "")

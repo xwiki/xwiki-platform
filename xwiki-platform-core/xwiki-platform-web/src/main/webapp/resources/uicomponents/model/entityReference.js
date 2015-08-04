@@ -56,10 +56,11 @@ XWiki.EntityType.byName = function(name) {
 };
 
 XWiki.EntityReference = Class.create({
-  initialize: function(name, type, parent) {
+  initialize: function(name, type, parent, locale) {
     this.name = name;
     this.type = type;
     this.parent = parent;
+    this.locale = locale;
   },
 
   /**
@@ -163,7 +164,7 @@ XWiki.EntityReference.fromJSONObject = function (object) {
     parent = null;
   }
 
-  return new XWiki.EntityReference(object.name, XWiki.EntityType.byName(object.type), parent);
+  return new XWiki.EntityReference(object.name, XWiki.EntityType.byName(object.type), parent, object.locale);
 };
 
 XWiki.WikiReference = Class.create(XWiki.EntityReference, {

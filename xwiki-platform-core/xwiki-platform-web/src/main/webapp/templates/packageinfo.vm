@@ -1,3 +1,4 @@
+##@Deprecated Use packagedescriptor.vm instead
 $response.setContentType("application/x-json")
 #if("$!request.document" == "")
  #set($packageDoc = $doc)

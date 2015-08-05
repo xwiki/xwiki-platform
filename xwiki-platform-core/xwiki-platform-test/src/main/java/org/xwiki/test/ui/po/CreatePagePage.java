@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.pagefactory.ByChained;
-import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
+import org.xwiki.test.ui.po.editor.EditPage;
 
 /**
  * Represents the actions possible on the Create Page template page.
@@ -116,21 +116,19 @@ public class CreatePagePage extends ViewPage
         this.pageTextField.submit();
     }
 
-    public WYSIWYGEditPage createPage(String spaceValue, String pageValue)
+    public EditPage createPage(String spaceValue, String pageValue)
     {
         return createPage(spaceValue, pageValue, false);
     }
 
-    public WYSIWYGEditPage createPage(String spaceValue, String pageValue, boolean isTerminalPage)
+    public EditPage createPage(String spaceValue, String pageValue, boolean isTerminalPage)
     {
-        setSpace(spaceValue);
-        setPage(pageValue);
-        setTerminalPage(isTerminalPage);
+        createPageInternal(spaceValue, pageValue, isTerminalPage);
         clickCreate();
-        return new WYSIWYGEditPage();
+        return new EditPage();
     }
 
-    public WYSIWYGEditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue)
+    public EditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue)
     {
         return createPageFromTemplate(spaceValue, pageValue, templateValue, false);
     }
@@ -138,15 +136,25 @@ public class CreatePagePage extends ViewPage
     /**
      * @since 7.2M1
      */
-    public WYSIWYGEditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue,
+    public EditPage createPageFromTemplate(String spaceValue, String pageValue, String templateValue,
         boolean isTerminalPage)
+    {
+        createPageInternal(spaceValue, pageValue, isTerminalPage);
+        setTemplate(templateValue);
+        clickCreate();
+        return new EditPage();
+    }
+
+    private void createPageInternal(String spaceValue, String pageValue, boolean isTerminalPage)
     {
         setSpace(spaceValue);
         setPage(pageValue);
-        setTemplate(templateValue);
-        setTerminalPage(isTerminalPage);
-        clickCreate();
-        return new WYSIWYGEditPage();
+        // Since the default is to not create terminal pages, only set this if the user is asking to create a terminal
+        // page. This allows this API to work when using isTerminalPage = false even for simpler users which don't get
+        // to see the Terminal option.
+        if (isTerminalPage) {
+            setTerminalPage(isTerminalPage);
+        }
     }
 
     /**

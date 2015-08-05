@@ -27,6 +27,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 
 /**
@@ -107,8 +109,18 @@ public class ViewPage extends BasePage
      */
     public void clickWantedLink(String spaceName, String pageName, boolean waitForTemplateDisplay)
     {
+        clickWantedLink(new DocumentReference("xwiki", spaceName, pageName), waitForTemplateDisplay);
+    }
+
+    /**
+     * Clicks on a wanted link in the page.
+     *
+     * @since 7.2M2
+     */
+    public void clickWantedLink(EntityReference reference, boolean waitForTemplateDisplay)
+    {
         WebElement brokenLink = getDriver().findElement(
-            By.xpath("//span[@class='wikicreatelink']/a[contains(@href,'/create/" + spaceName + "/" + pageName
+            By.xpath("//span[@class='wikicreatelink']/a[contains(@href,'/create/" + getUtil().getURLFragment(reference)
                 + "')]"));
         brokenLink.click();
         if (waitForTemplateDisplay) {
@@ -126,7 +138,7 @@ public class ViewPage extends BasePage
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
     {
-     return hasBreadcrumbContent(breadcrumbItem, isCurrent, true);
+        return hasBreadcrumbContent(breadcrumbItem, isCurrent, true);
     }
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent, boolean withLink)

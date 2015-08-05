@@ -19,11 +19,20 @@
  */
 package org.xwiki.test.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.annotation.ComponentDeclaration;
+import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -59,12 +68,26 @@ public abstract class AbstractTest
 
     protected static PersistentTestContext context;
 
+    protected static EmbeddableComponentManager componentManager;
+
     /** Used so that AllTests can set the persistent test context. */
-    public static void setContext(PersistentTestContext context)
+    public static void initializeSystem(PersistentTestContext context) throws Exception
     {
         AbstractTest.context = context;
         BaseElement.setContext(context);
         TestUtils.setContext(context);
+        AbstractTest.componentManager = new EmbeddableComponentManager();
+
+        // Only load the minimal number of components required for the test framework, for both performance reasons
+        // and for avoiding having to declare dependencies such as HttpServletRequest.
+        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
+        List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
+        componentDeclarations.add(new ComponentDeclaration(DefaultStringEntityReferenceResolver.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
+        loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
+
+        TestUtils.initializeComponent(AbstractTest.componentManager);
     }
 
     @BeforeClass
@@ -73,7 +96,7 @@ public abstract class AbstractTest
         // This will not be null if we are in the middle of allTests
         if (context == null) {
             PersistentTestContext persistentTestContext = new PersistentTestContext();
-            setContext(persistentTestContext);
+            initializeSystem(persistentTestContext);
 
             // Start XWiki
             persistentTestContext.getExecutor().start();

@@ -36,6 +36,10 @@ import org.xwiki.test.ui.po.Select;
  */
 public class TemplateProviderInlinePage extends InlinePage
 {
+    public static final String ACTION_SAVEANDEDIT = "saveandedit";
+
+    public static final String ACTION_EDITONLY = "edit";
+
     @FindBy(name = "XWiki.TemplateProviderClass_0_template")
     private WebElement templateInput;
 
@@ -164,8 +168,16 @@ public class TemplateProviderInlinePage extends InlinePage
         }
     }
 
-    public void setSaveAndEdit()
+    /**
+     * The action to execute when the create button is pushed, you can configure here whether the new document is saved
+     * before it is opened for edition or not.
+     *
+     * @param actionName the behavior to have on create; valid values are "saveandedit" and "edit". See
+     *        {@link #ACTION_EDITONLY} and {@link #ACTION_SAVEANDEDIT}
+     * @since 7.2M2
+     */
+    public void setActionOnCreate(String actionName)
     {
-        this.templateActionSelect.findElement(By.xpath("//option[@value='saveandedit']")).click();
+        this.templateActionSelect.findElement(By.xpath("//option[@value='" + actionName + "']")).click();
     }
 }

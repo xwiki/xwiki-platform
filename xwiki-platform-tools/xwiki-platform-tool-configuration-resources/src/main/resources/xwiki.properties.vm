@@ -444,6 +444,20 @@ rendering.transformations = $xwikiRenderingTransformations
 # csrf.enabled = true
 
 #-------------------------------------------------------------------------------------
+# Jobs
+#-------------------------------------------------------------------------------------
+
+#-# [Since 4.0M1]
+#-# The folder containing job executing status.
+#-# The default is {environment.permanentDirectory}/jobs/
+# job.statusFolder=/var/lib/xwiki/data/jobs/
+
+#-# [Since 7.2M2]
+#-# The maximum number of entries to put in the job status cache.
+#-# The default is 50.
+# job.statusCacheSize=50
+
+#-------------------------------------------------------------------------------------
 # Extension Manager
 #-------------------------------------------------------------------------------------
 

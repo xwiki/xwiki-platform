@@ -280,7 +280,6 @@
 
 #macro (addSpaceChildren $spaceId $offset $limit $children)
   #set ($spaceReference = $services.model.resolveSpace($spaceId))
-  #maybeAddAddDocumentNode($spaceReference $children)
   #getSpaceChildrenQuery($spaceReference $selectQuery)
   #set ($results = $selectQuery.setOffset($offset).setLimit($limit).execute())
   #if ($results.size() &gt;= $limit)
@@ -489,6 +488,12 @@
     #set ($xclass = $document.getxWikiClass())
     #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
     #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $document.getxWikiObjects().size() &gt; 0))
+    #set ($hasChildren = $hasChildren || (
+      $docTreeConfig.showAddDocument &amp;&amp;
+      $docTreeConfig.hierarchyMode == 'reference' &amp;&amp;
+      $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name &amp;&amp;
+      $services.security.authorization.hasAccess('edit', $documentReference.parent)
+    ))
   #end
   #if (!$hasChildren)
     #getChildDocumentsCount($documentReference $count)
@@ -579,6 +584,7 @@
       }
     }))
   #end
+  #maybeAddAddDocumentNode($documentReference $children)
   #addChildDocuments($documentReference $offset $limit $children)
 #end
 
@@ -656,16 +662,18 @@
   #end
 #end
 
-#macro (maybeAddAddDocumentNode $reference $siblings)
-  #if ($docTreeConfig.showAddDocument &amp;&amp; $services.security.authorization.hasAccess('edit', $reference))
-    #addAddDocumentNode($reference $siblings)
+#macro (maybeAddAddDocumentNode $documentReference $siblings)
+  #if ($docTreeConfig.showAddDocument &amp;&amp;
+      $docTreeConfig.hierarchyMode == 'reference' &amp;&amp;
+      $documentReference.name == $services.model.getEntityReference('DOCUMENT', 'default').name &amp;&amp;
+      $services.security.authorization.hasAccess('edit', $documentReference.parent))
+    #addAddDocumentNode($documentReference $siblings)
   #end
 #end
 
-#macro (addAddDocumentNode $reference $siblings)
-  #set ($parentReference = $services.model.resolveDocument('', 'default', $reference))
+#macro (addAddDocumentNode $documentReference $siblings)
   #set ($discard = $siblings.add({
-    'id': "addDocument:$reference.type.toString().toLowerCase():$services.model.serialize($reference, 'default')",
+    'id': "addDocument:$services.model.serialize($documentReference, 'default')",
     'text': 'New document...',
     'icon': 'fa fa-plus-circle',
     'children': false,
@@ -674,7 +682,7 @@
       'validChildren': []
     },
     'a_attr': {
-      'href': $xwiki.getURL($parentReference, 'create')
+      'href': $xwiki.getURL($documentReference, 'create')
     }
   }))
 #end

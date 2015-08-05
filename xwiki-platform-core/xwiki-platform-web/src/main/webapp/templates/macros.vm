@@ -2144,14 +2144,12 @@ var $jsVarName = {
 #end
 #set($ok = $parameters.put('documentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
   'outputSyntax': 'plain',
-  'showSpaces': true,
   'showAddDocument': true,
   'showTranslations': false,
   'showAttachments': false
 }))))
 #set($ok = $parameters.put('attachmentTreeURL', $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
   'outputSyntax': 'plain',
-  'showSpaces': true,
   'showTranslations': false,
   'showAddAttachment': true
 }))))

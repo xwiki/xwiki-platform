@@ -171,10 +171,19 @@ public class XWikiExplorer extends Widget implements HasDoubleClickNodeHandlers
      * 
      * @return the name of the space selected in the Tree, empty string if none selected.
      */
-    public String getSelectedSpace()
-    {
-        return getSelectedEntity(1);
-    }
+    public native String getSelectedSpace()
+    /*-{
+        var entityReference = this.@org.xwiki.gwt.wysiwyg.client.widget.explorer.XWikiExplorer::getSelectedEntity()();
+        if (entityReference) {
+            var spaceReference = entityReference.extractReference($wnd.XWiki.EntityType.SPACE);
+            if (spaceReference) {
+                var wikiReference = entityReference.extractReference($wnd.XWiki.EntityType.WIKI);
+                var localSpaceReference = spaceReference.relativeTo(wikiReference);
+                return $wnd.XWiki.Model.serialize(localSpaceReference);
+            }
+        }
+        return null;
+    }-*/;
 
     /**
      * Get the name of the page selected in the Tree.
@@ -227,11 +236,13 @@ public class XWikiExplorer extends Widget implements HasDoubleClickNodeHandlers
     public native void selectEntity(EntityReference entityReference, String anchor)
     /*-{
         var wiki = entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('wikiName');
-        var space = entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('spaceName');
+        var localSpaceReference = entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('spaceName');
         var page = entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('pageName');
         var file = entityReference.@org.xwiki.gwt.wysiwyg.client.wiki.EntityReference::getComponent(Ljava/lang/String;)('fileName');
 
-        var nodeId, documentReference = new $wnd.XWiki.DocumentReference(wiki, space, page);
+        var spaceReference = $wnd.XWiki.Model.resolve(localSpaceReference, $wnd.XWiki.EntityType.SPACE, [wiki]);
+        var nodeId, documentReference = new $wnd.XWiki.EntityReference(page, $wnd.XWiki.EntityType.DOCUMENT,
+            spaceReference);
         if (file) {
             var attachmentReference = new $wnd.XWiki.AttachmentReference(file, documentReference);
             nodeId = 'attachment:' + $wnd.XWiki.Model.serialize(attachmentReference);
@@ -240,8 +251,9 @@ public class XWikiExplorer extends Widget implements HasDoubleClickNodeHandlers
         } else if (page) {
             nodeId = 'document:' + $wnd.XWiki.Model.serialize(documentReference);
         } else {
-            var spaceReference = new $wnd.XWiki.SpaceReference(wiki, space);
-            nodeId = 'addDocument:space:' + $wnd.XWiki.Model.serialize(spaceReference);
+            var spaceHomePageRef = new $wnd.XWiki.EntityReference('WebHome', $wnd.XWiki.EntityType.DOCUMENT,
+                spaceReference);
+            nodeId = 'addDocument:' + $wnd.XWiki.Model.serialize(spaceHomePageRef);
         }
 
         var element = this.@com.google.gwt.user.client.ui.UIObject::getElement()();

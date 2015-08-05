@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,13 +49,42 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
     private EntityReferenceProvider provider;
 
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation,
+    public String serialize(EntityReference reference, Object... parameters)
+    {
+        if (reference == null) {
+            return null;
+        }
+
+        StringBuilder representation = new StringBuilder();
+
+        List<EntityReference> references = reference.getReversedReferenceChain();
+        for (int i = 0; i < references.size();) {
+            EntityReference currentReference = references.get(i);
+            EntityType currentType = currentReference.getType();
+
+            // Move to last element of the same type
+            while (++i < references.size() && references.get(i).getType() == currentType) {
+                currentReference = references.get(i);
+            }
+
+            if (shouldSerialize(currentReference, representation, currentReference == reference, parameters)) {
+                serializeEntityReferenceType(currentReference, representation, currentReference == reference);
+            }
+        }
+
+        return representation.toString();
+    }
+
+    /**
+     * @since 7.2M2
+     */
+    protected boolean shouldSerialize(EntityReference currentReference, StringBuilder representation,
         boolean isLastReference, Object... parameters)
     {
         boolean shouldPrint = false;
 
         // Only serialize if:
-        // - the current entity reference has a different value than the passed reference
+        // - the current entity reference has a different value and type than the passed reference
         // - the entity type being serialized is not the last type of the chain
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
@@ -67,24 +98,37 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
             }
         }
 
-        if (shouldPrint) {
-            super.serializeEntityReference(currentReference, representation, isLastReference);
-        }
+        return shouldPrint;
     }
 
-    protected boolean equal(EntityReference reference1, EntityReference reference2)
+    /**
+     * Serialize the last part of the reference (all the ending elements having the same entity type).
+     * 
+     * @param reference the reference to serialize
+     * @since 7.2M2
+     */
+    protected void serializeEntityReferenceType(EntityReference reference, StringBuilder representation,
+        boolean isLastReference)
     {
-        EntityReference currentReference1 = reference1;
-        EntityReference currentReference2 = reference2;
+        EntityReference parent = reference.getParent();
+        if (parent != null && parent.getType() == reference.getType()) {
+            serializeEntityReferenceType(parent, representation, false);
+        }
 
-        while (currentReference1 != null && currentReference2 != null
-            && currentReference1.getType() == currentReference2.getType()) {
-            if (!currentReference1.getName().equals(currentReference2.getName())) {
+        super.serializeEntityReference(reference, representation, isLastReference);
+    }
+
+    protected boolean equal(EntityReference defaultReference, EntityReference currentReference)
+    {
+        EntityReference defaultReferenceIt = defaultReference;
+        EntityReference currentReferenceIt = currentReference;
+
+        for (; defaultReferenceIt != null; defaultReferenceIt = defaultReferenceIt.getParent(), currentReferenceIt =
+            currentReferenceIt.getParent()) {
+            if (currentReferenceIt == null || defaultReferenceIt.getType() != currentReferenceIt.getType()
+                || !defaultReferenceIt.getName().equals(currentReferenceIt.getName())) {
                 return false;
             }
-
-            currentReference1 = currentReference1.getParent();
-            currentReference2 = currentReference2.getParent();
         }
 
         return true;

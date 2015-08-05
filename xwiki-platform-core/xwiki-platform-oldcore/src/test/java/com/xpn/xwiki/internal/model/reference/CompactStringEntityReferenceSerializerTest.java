@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -154,5 +156,25 @@ public class CompactStringEntityReferenceSerializerTest
             "space.page",
             this.mocker.getComponentUnderTest().serialize(reference,
                 new EntityReference("otherspace", EntityType.SPACE)));
+    }
+
+    @Test
+    public void testSerializeNestedSpaceFromBaseReference() throws ComponentLookupException
+    {
+        DocumentReference baseReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space", "nested"), "page");
+
+        Assert.assertEquals("space.nested.page", this.mocker.getComponentUnderTest().serialize(reference, baseReference));
+    }
+
+    @Test
+    public void testSerializeNestedSpaceFromContext() throws ComponentLookupException
+    {
+        DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space", "nested"), "page");
+
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+        this.oldcore.getXWikiContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page2")));
+
+        Assert.assertEquals("space.nested.page", this.mocker.getComponentUnderTest().serialize(reference));
     }
 }

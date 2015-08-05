@@ -54,18 +54,22 @@ public class SolrEntityReferenceResolver implements EntityReferenceResolver<Solr
     @Override
     public EntityReference resolve(SolrDocument solrDocument, EntityType type, Object... parameters)
     {
-        EntityReference solrEntityReference = getEntityReference(solrDocument, parameters);
+        EntityReference solrEntityReference = getEntityReference(solrDocument, type, parameters);
         return this.explicitReferenceEntityReferenceResolver.resolve(solrEntityReference, type, parameters);
     }
 
-    private EntityReference getEntityReference(SolrDocument solrDocument, Object... parameters)
+    private EntityReference getEntityReference(SolrDocument solrDocument, EntityType expectedEntityType,
+        Object... parameters)
     {
         EntityReference wikiReference = getWikiReference(solrDocument, parameters);
         EntityReference spaceReference = getSpaceReference(solrDocument, wikiReference, parameters);
         EntityReference documentReference = getDocumentReferenceWithLocale(solrDocument, spaceReference, parameters);
 
-        EntityType entityType = EntityType.valueOf((String) solrDocument.get(FieldUtils.TYPE));
-        switch (entityType) {
+        String indexedEntityType = (String) solrDocument.get(FieldUtils.TYPE);
+        EntityType actualEntityType =
+            StringUtils.isEmpty(indexedEntityType) ? expectedEntityType : EntityType.valueOf(indexedEntityType);
+
+        switch (actualEntityType) {
             case ATTACHMENT:
                 return getAttachmentReference(solrDocument, documentReference, parameters);
             case OBJECT:

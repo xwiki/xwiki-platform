@@ -737,7 +737,9 @@ public class RepositoryManager implements Initializable, Disposable
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, getSummary(extension));
 
         // Category
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY, extension.getCategory());
+        if (extension.getCategory() != null) {
+            needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_CATEGORY, extension.getCategory());
+        }
 
         // Website
         /*

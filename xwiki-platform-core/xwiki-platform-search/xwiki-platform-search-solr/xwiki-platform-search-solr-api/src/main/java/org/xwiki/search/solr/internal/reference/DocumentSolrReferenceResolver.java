@@ -62,21 +62,21 @@ public class DocumentSolrReferenceResolver extends AbstractSolrReferenceResolver
      */
     @Inject
     @Named("object")
-    protected Provider<SolrReferenceResolver> objectResolverProvider;
+    private Provider<SolrReferenceResolver> objectResolverProvider;
 
     /**
      * Used to resolve space references.
      */
     @Inject
     @Named("space")
-    protected Provider<SolrReferenceResolver> spaceResolverProvider;
+    private Provider<SolrReferenceResolver> spaceResolverProvider;
 
     /**
      * Used to resolve attachment references.
      */
     @Inject
     @Named("attachment")
-    protected Provider<SolrReferenceResolver> attachmentResolverProvider;
+    private Provider<SolrReferenceResolver> attachmentResolverProvider;
 
     @Override
     public List<EntityReference> getReferences(EntityReference reference) throws SolrIndexerException

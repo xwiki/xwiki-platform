@@ -91,7 +91,7 @@ public final class FieldUtils
     public static final String NAME = "name";
 
     /**
-     * Unanalyzed and not stored version of the document's space.
+     * Unanalyzed and not stored version of the document's name.
      */
     public static final String NAME_EXACT = "name_exact";
 

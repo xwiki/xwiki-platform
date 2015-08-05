@@ -19,30 +19,33 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Named;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.solr.common.SolrDocument;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Resolve object properties references.
+ * Component used to extract a {@link DocumentReference} from a {@link SolrDocument}.
  * 
  * @version $Id$
- * @since 5.1M2
+ * @since 7.2M2
  */
 @Component
-@Named("object_property")
 @Singleton
-public class ObjectPropertySolrReferenceResolver extends AbstractSolrReferenceResolver
+public class SolrDocumentReferenceResolver implements DocumentReferenceResolver<SolrDocument>
 {
+    @Inject
+    private EntityReferenceResolver<SolrDocument> entityReferenceResolver;
+
     @Override
-    public List<EntityReference> getReferences(EntityReference objectPropertyReference) throws SolrIndexerException
+    public DocumentReference resolve(SolrDocument documentReferenceRepresentation, Object... parameters)
     {
-        return Arrays.asList(objectPropertyReference);
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
+            EntityType.DOCUMENT, parameters));
     }
 }

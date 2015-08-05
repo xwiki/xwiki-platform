@@ -45,7 +45,6 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
@@ -95,7 +94,8 @@ public class DocumentSolrMetadataExtractorTest
      */
     private XWikiDocument document;
 
-    private DocumentReference documentReference = new DocumentReference("wiki", "Space", "Name");
+    private DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"),
+        "WebHome");
 
     @Before
     public void setUp() throws Exception
@@ -169,6 +169,10 @@ public class DocumentSolrMetadataExtractorTest
         EntityReferenceSerializer<String> localEntityReferenceSerializer =
             this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
         when(localEntityReferenceSerializer.serialize(this.documentReference)).thenReturn(fullName);
+
+        String localSpaceReference = "Path.To.Page";
+        when(localEntityReferenceSerializer.serialize(this.documentReference.getLastSpaceReference())).thenReturn(
+            localSpaceReference);
 
         // Creator.
         DocumentReference creatorReference = new DocumentReference("wiki", "Space", "Creator");
@@ -247,8 +251,7 @@ public class DocumentSolrMetadataExtractorTest
         assertEquals(id, solrDocument.getFieldValue(FieldUtils.ID));
 
         assertEquals(this.documentReference.getWikiReference().getName(), solrDocument.getFieldValue(FieldUtils.WIKI));
-        assertEquals(this.documentReference.getLastSpaceReference().getName(),
-            solrDocument.getFieldValue(FieldUtils.SPACE));
+        assertEquals(localSpaceReference, solrDocument.getFieldValue(FieldUtils.SPACE));
         assertEquals(this.documentReference.getName(), solrDocument.getFieldValue(FieldUtils.NAME));
 
         assertEquals(Locale.US.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
@@ -520,9 +523,6 @@ public class DocumentSolrMetadataExtractorTest
         String authorFullName = "XWiki." + authorAlias;
         DocumentReference authorReference = new DocumentReference("wiki", "XWiki", authorAlias);
         when(attachment.getAuthorReference()).thenReturn(authorReference);
-
-        DocumentReferenceResolver<String> resolver = this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        when(resolver.resolve(authorFullName, attachment.getReference())).thenReturn(authorReference);
 
         EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         String authorStringReference = "wiki:" + authorFullName;

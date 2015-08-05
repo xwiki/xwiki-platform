@@ -39,11 +39,11 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.SecureQuery;
-import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 
 import com.xpn.xwiki.XWikiContext;
@@ -97,6 +97,12 @@ public class SolrQueryExecutor implements QueryExecutor
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    /**
+     * Used to extract a {@link DocumentReference} from a {@link SolrDocument}.
+     */
+    @Inject
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
     @Override
     public <T> List<T> execute(Query query) throws QueryException
     {
@@ -107,7 +113,7 @@ public class SolrQueryExecutor implements QueryExecutor
         }
 
         try {
-            SolrInstance solrInstance = this.solrInstanceProvider.get();
+            SolrInstance solrInstance = solrInstanceProvider.get();
             SolrQuery solrQuery = createSolrQuery(query);
             QueryResponse response = solrInstance.query(solrQuery);
 
@@ -212,9 +218,7 @@ public class SolrQueryExecutor implements QueryExecutor
         // Since we are modifying the results collection, we need to iterate over its copy.
         for (SolrDocument result : new ArrayList<SolrDocument>(results)) {
             try {
-                DocumentReference resultDocumentReference =
-                    new DocumentReference((String) result.get(FieldUtils.WIKI), (String) result.get(FieldUtils.SPACE),
-                        (String) result.get(FieldUtils.NAME));
+                DocumentReference resultDocumentReference = this.solrDocumentReferenceResolver.resolve(result);
 
                 if (!documentAccessBridge.exists(resultDocumentReference)
                     || !documentAccessBridge.isDocumentViewable(resultDocumentReference)) {

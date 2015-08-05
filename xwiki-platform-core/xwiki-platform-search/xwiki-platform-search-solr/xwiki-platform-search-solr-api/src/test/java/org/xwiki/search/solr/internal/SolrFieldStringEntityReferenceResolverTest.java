@@ -19,19 +19,22 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import java.util.Arrays;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SolrFieldStringEntityReferenceResolver}.
@@ -48,29 +51,38 @@ public class SolrFieldStringEntityReferenceResolverTest
     @Test
     public void resolve() throws Exception
     {
+        EntityReferenceProvider currentEntityReferenceProvider =
+            this.mocker.getInstance(EntityReferenceProvider.class, "current");
+        when(currentEntityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("test"));
+
         EntityReferenceResolver<String> resolver = mocker.getComponentUnderTest();
 
-        assertEquals(new ClassPropertyReference("title", new DocumentReference("wiki", "My Space", "A Class")),
-            new ClassPropertyReference(resolver.resolve("wiki.My Space.A Class.title", EntityType.CLASS_PROPERTY)));
+        DocumentReference documentReference =
+            new DocumentReference("test", Arrays.asList("My App", "Code", "Model"), "A Class");
+        assertEquals(new ClassPropertyReference("title", documentReference),
+            new ClassPropertyReference(resolver.resolve("My App.Code.Model.A Class.title", EntityType.CLASS_PROPERTY)));
 
-        assertEquals(
-            new ClassPropertyReference("ti.tle", new DocumentReference("w.iki", "My.Space", "A.Class")),
-            new ClassPropertyReference(resolver.resolve("w..iki.My..Space.A..Class.ti..tle", EntityType.CLASS_PROPERTY)));
-        assertEquals(new SpaceReference("a..z", new WikiReference("from")),
-            new SpaceReference(resolver.resolve("from.a....z", EntityType.SPACE)));
+        documentReference = new DocumentReference("test", Arrays.asList("My.App", "Co.de"), "A.Class");
+        assertEquals(new ClassPropertyReference("ti.tle", documentReference),
+            new ClassPropertyReference(resolver.resolve("My..App.Co..de.A..Class.ti..tle", EntityType.CLASS_PROPERTY)));
+
+        assertEquals(new SpaceReference("0.9", new SpaceReference("a..z", new WikiReference("test"))),
+            new SpaceReference(resolver.resolve("a....z.0..9", EntityType.SPACE)));
 
         // Relative reference resolved based on the given parameters.
+
         assertEquals(
-            new ClassPropertyReference("title", new DocumentReference("foo", "My Space", "A Class")),
-            new ClassPropertyReference(resolver.resolve("A Class.title", EntityType.CLASS_PROPERTY, new SpaceReference(
-                "My Space", new WikiReference("foo")))));
+            new ClassPropertyReference("title", new DocumentReference("foo", Arrays.asList("Code", "Model"), "A Class")),
+            new ClassPropertyReference(resolver.resolve("Code.Model.A Class.title", EntityType.CLASS_PROPERTY,
+                new SpaceReference("My App", new WikiReference("foo")))));
 
         // Relative reference resolve based on the current entity.
-        EntityReferenceValueProvider currentEntityReferenceValueProvider =
-            mocker.getInstance(EntityReferenceValueProvider.class, "current");
-        when(currentEntityReferenceValueProvider.getDefaultValue(EntityType.SPACE)).thenReturn("My Space");
+
+        when(currentEntityReferenceProvider.getDefaultReference(EntityType.SPACE)).thenReturn(
+            new EntityReference("Code", EntityType.SPACE, new EntityReference("My App", EntityType.SPACE, null)));
         assertEquals(
-            new ClassPropertyReference("title", new DocumentReference("bar", "My Space", "A Class")),
+            new ClassPropertyReference("title",
+                new DocumentReference("bar", Arrays.asList("My App", "Code"), "A Class")),
             new ClassPropertyReference(resolver.resolve("A Class.title", EntityType.CLASS_PROPERTY, new WikiReference(
                 "bar"))));
     }

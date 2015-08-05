@@ -27,14 +27,20 @@ import javax.inject.Provider;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.SolrParams;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
@@ -48,6 +54,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -81,6 +88,16 @@ public class SolrQueryExecutorTest
     @Rule
     public final MockitoOldcoreRule oldCore = new MockitoOldcoreRule(this.componentManager);
 
+    private SolrInstance solr = mock(SolrInstance.class);
+
+    @Before
+    public void configure() throws Exception
+    {
+        ParameterizedType solrProviderType = new DefaultParameterizedType(null, Provider.class, SolrInstance.class);
+        Provider<SolrInstance> provider = this.componentManager.registerMockComponent(solrProviderType);
+        when(provider.get()).thenReturn(this.solr);
+    }
+
     @Test
     public void testExecutorRegistration() throws Exception
     {
@@ -92,7 +109,6 @@ public class SolrQueryExecutorTest
     @Test
     public void testMultiValuedQueryArgs() throws Exception
     {
-        SolrInstance solr = mock(SolrInstance.class);
         when(solr.query(any(SolrQuery.class))).then(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -112,10 +128,6 @@ public class SolrQueryExecutorTest
             }
         });
 
-        ParameterizedType solrProviderType = new DefaultParameterizedType(null, Provider.class, SolrInstance.class);
-        Provider<SolrInstance> provider = componentManager.registerMockComponent(solrProviderType);
-        when(provider.get()).thenReturn(solr);
-
         DefaultQuery query = new DefaultQuery("TestQuery", null);
         query.bindValue(ITERABLE_PARAM_NAME, ITERABLE_PARAM_VALUE);
         query.bindValue(INT_ARR_PARAM_NAME,  INT_ARR_PARAM_VALUE);
@@ -128,5 +140,46 @@ public class SolrQueryExecutorTest
             Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN));
 
         componentManager.getComponentUnderTest().execute(query);
+    }
+
+    @Test
+    public void filterResponse() throws Exception
+    {
+        ParameterizedType resolverType =
+            new DefaultParameterizedType(null, DocumentReferenceResolver.class, SolrDocument.class);
+        DocumentReferenceResolver<SolrDocument> resolver = this.componentManager.getInstance(resolverType);
+
+        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+
+        DocumentReference aliceReference = new DocumentReference("wiki", "Users", "Alice");
+        when(documentAccessBridge.exists(aliceReference)).thenReturn(true);
+        SolrDocument alice = new SolrDocument();
+        when(resolver.resolve(alice)).thenReturn(aliceReference);
+
+        DocumentReference bobReference = new DocumentReference("wiki", "Users", "Bob");
+        when(documentAccessBridge.isDocumentViewable(bobReference)).thenReturn(true);
+        SolrDocument bob = new SolrDocument();
+        when(resolver.resolve(bob)).thenReturn(bobReference);
+
+        DocumentReference carolReference = new DocumentReference("wiki", "Users", "Carol");
+        when(documentAccessBridge.exists(carolReference)).thenReturn(true);
+        when(documentAccessBridge.isDocumentViewable(carolReference)).thenReturn(true);
+        SolrDocument carol = new SolrDocument();
+        when(resolver.resolve(carol)).thenReturn(carolReference);
+
+        SolrDocumentList results = new SolrDocumentList();
+        results.addAll(Arrays.asList(alice, bob, carol));
+        results.setNumFound(3);
+
+        QueryResponse response = mock(QueryResponse.class);
+        when(response.getResults()).thenReturn(results);
+        when(this.solr.query(any(SolrParams.class))).thenReturn(response);
+
+        DefaultQuery query = new DefaultQuery("", null);
+        query.checkCurrentUser(true);
+        assertEquals(Arrays.asList(response), this.componentManager.getComponentUnderTest().execute(query));
+
+        assertEquals(1, results.getNumFound());
+        assertEquals(Arrays.asList(carol), results);
     }
 }

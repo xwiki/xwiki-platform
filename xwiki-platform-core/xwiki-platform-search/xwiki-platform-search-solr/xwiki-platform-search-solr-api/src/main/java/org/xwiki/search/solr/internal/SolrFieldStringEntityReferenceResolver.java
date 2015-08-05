@@ -28,12 +28,14 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.reference.AbstractEntityReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
- * Resolves an {@link EntityReference} that has been serialized with {@link SolrFieldStringEntityReferenceSerializer}.
+ * Resolves a <strong>local</strong> {@link EntityReference} that has been serialized with
+ * {@link SolrFieldStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  * @since 5.3RC1
@@ -41,7 +43,8 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 @Component
 @Named("solr")
 @Singleton
-public class SolrFieldStringEntityReferenceResolver implements EntityReferenceResolver<String>
+public class SolrFieldStringEntityReferenceResolver extends AbstractEntityReferenceResolver implements
+    EntityReferenceResolver<String>
 {
     /**
      * The character used to separate the entities in the string serialization.
@@ -70,7 +73,7 @@ public class SolrFieldStringEntityReferenceResolver implements EntityReferenceRe
 
     @Inject
     @Named("current")
-    private EntityReferenceValueProvider currentEntityReferenceValueProvider;
+    private EntityReferenceProvider currentEntityReferenceProvider;
 
     @Override
     public EntityReference resolve(String entityReferenceRepresentation, EntityType type, Object... parameters)
@@ -83,19 +86,23 @@ public class SolrFieldStringEntityReferenceResolver implements EntityReferenceRe
         EntityReference entityReference = null;
         int entityTypeOffset = 0;
         int offset = entityReferenceRepresentation.length() - 1;
-        while (offset >= 0 && entityTypeOffset < entityTypesForType.length) {
+        while (offset >= 0) {
+            // Small hack in order to be able to resolve nested spaces. Basically we never read the WIKI component from
+            // the passed entity reference representation (we assume it is a space). We fill the WIKI entity reference
+            // after this while loop.
+            entityTypeOffset = Math.min(entityTypeOffset, entityTypesForType.length - 2);
+
             StringBuilder entityName = new StringBuilder();
             offset = readEntityName(entityReferenceRepresentation, entityName, offset);
-            EntityReference parent =
-                new EntityReference(entityName.reverse().toString(), entityTypesForType[entityTypeOffset++]);
+            EntityReference parent = getNewEntityReference(entityName.reverse().toString(),
+                entityTypesForType[entityTypeOffset++], parameters);
             entityReference = entityReference == null ? parent : entityReference.appendParent(parent);
         }
 
         // Handle the case when the passed string representation is relative. Use the provided parameters in this case.
         for (int i = entityTypeOffset; i < entityTypesForType.length; i++) {
-            String entityName = resolveDefaultValue(entityTypesForType[i], parameters);
-            if (entityName != null) {
-                EntityReference parent = new EntityReference(entityName, entityTypesForType[i]);
+            EntityReference parent = resolveDefaultReference(entityTypesForType[i], parameters);
+            if (parent != null) {
                 entityReference = entityReference == null ? parent : entityReference.appendParent(parent);
             } else {
                 // We cannot skip reference components.
@@ -154,36 +161,18 @@ public class SolrFieldStringEntityReferenceResolver implements EntityReferenceRe
         return offset - 1;
     }
 
-    /**
-     * Resolve the default name for a given reference type.
-     * 
-     * @param type the type for which a default name is requested
-     * @param parameters optional parameters, if the first parameter is an entity reference which is of the given type
-     *            or contains the given types in its parent chain, use the name of the reference having the requested
-     *            type in place of the default value
-     * @return a name for the given type
-     */
-    private String resolveDefaultValue(EntityType type, Object... parameters)
+    private EntityReference getNewEntityReference(String name, EntityType type, Object... parameters)
     {
-        if (parameters.length > 0 && parameters[0] instanceof EntityReference) {
-            // Try to extract the type from the passed parameter.
-            EntityReference referenceParameter = (EntityReference) parameters[0];
-            EntityReference extractedReference = referenceParameter.extractReference(type);
-            if (extractedReference != null) {
-                return extractedReference.getName();
-            }
+        if ("".equals(name)) {
+            return resolveDefaultReference(type, parameters);
+        } else {
+            return new EntityReference(name, type);
         }
-
-        return getDefaultValue(type, parameters);
     }
 
-    /**
-     * @param type the entity type for which to return the default value to use (since the user has not specified it)
-     * @param parameters optional parameters. Their meaning depends on the resolver implementation
-     * @return the default value to use
-     */
-    private String getDefaultValue(EntityType type, Object... parameters)
+    @Override
+    protected EntityReference getDefaultReference(EntityType type, Object... parameters)
     {
-        return currentEntityReferenceValueProvider.getDefaultValue(type);
+        return currentEntityReferenceProvider.getDefaultReference(type);
     }
 }

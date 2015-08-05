@@ -19,15 +19,14 @@
  */
 package org.xwiki.search.solr.internal.job;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -38,12 +37,18 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SolrDocumentIterator}.
@@ -59,6 +64,8 @@ public class SolrDocumentIteratorTest
 
     private SolrInstance solr;
 
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
     @Before
     public void configure() throws Exception
     {
@@ -67,6 +74,10 @@ public class SolrDocumentIteratorTest
         Provider<SolrInstance> solrInstanceProvider =
             mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
         when(solrInstanceProvider.get()).thenReturn(solr);
+
+        this.solrDocumentReferenceResolver =
+            this.mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
+                SolrDocument.class));
     }
 
     @Test
@@ -101,15 +112,15 @@ public class SolrDocumentIteratorTest
     public void iterate() throws Exception
     {
         SolrDocumentList firstResults = new SolrDocumentList();
-        firstResults.add(createSolrDocument("chess", "A", "B", "", "1.3"));
-        firstResults.add(createSolrDocument("chess", "M", "N", "en", "2.4"));
+        firstResults.add(createSolrDocument("chess", Arrays.asList("A", "B"), "C", "", "1.3"));
+        firstResults.add(createSolrDocument("chess", Arrays.asList("M"), "N", "en", "2.4"));
 
         QueryResponse firstResponse = mock(QueryResponse.class);
         when(firstResponse.getNextCursorMark()).thenReturn("foo");
         when(firstResponse.getResults()).thenReturn(firstResults);
 
         SolrDocumentList secondResults = new SolrDocumentList();
-        secondResults.add(createSolrDocument("tennis", "X", "Y", "fr", "1.1"));
+        secondResults.add(createSolrDocument("tennis", Arrays.asList("X", "Y", "Z"), "V", "fr", "1.1"));
 
         QueryResponse secondResponse = mock(QueryResponse.class);
         when(secondResponse.getNextCursorMark()).thenReturn("bar");
@@ -131,23 +142,24 @@ public class SolrDocumentIteratorTest
         verify(resolver).getQuery(rootReference);
 
         List<Pair<DocumentReference, String>> expectedResult = new ArrayList<Pair<DocumentReference, String>>();
-        DocumentReference documentReference = new DocumentReference("chess", "A", "B");
+        DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
         expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "1.3"));
-        documentReference = new DocumentReference("chess", "M", "N", "en");
+        documentReference = new DocumentReference("chess", Arrays.asList("M"), "N", Locale.ENGLISH);
         expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "2.4"));
-        documentReference = new DocumentReference("tennis", "X", "Y", "fr");
+        documentReference = new DocumentReference("tennis", Arrays.asList("X", "Y", "Z"), "V", Locale.FRENCH);
         expectedResult.add(new ImmutablePair<DocumentReference, String>(documentReference, "1.1"));
 
         assertEquals(expectedResult, actualResult);
     }
 
-    private SolrDocument createSolrDocument(String wiki, String space, String name, String locale, String version)
+    private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale, String version)
     {
         SolrDocument doc = new SolrDocument();
-        doc.setField(FieldUtils.WIKI, wiki);
-        doc.setField(FieldUtils.SPACE, space);
-        doc.setField(FieldUtils.NAME, name);
-        doc.setField(FieldUtils.DOCUMENT_LOCALE, locale);
+        DocumentReference docRef = new DocumentReference(wiki, spaces, name);
+        if (!StringUtils.isEmpty(locale)) {
+            docRef = new DocumentReference(docRef, LocaleUtils.toLocale(locale));
+        }
+        when(this.solrDocumentReferenceResolver.resolve(doc)).thenReturn(docRef);
         doc.setField(FieldUtils.VERSION, version);
         return doc;
     }

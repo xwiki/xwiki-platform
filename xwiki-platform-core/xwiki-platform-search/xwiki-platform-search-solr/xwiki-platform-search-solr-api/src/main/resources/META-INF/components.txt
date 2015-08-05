@@ -21,6 +21,8 @@ org.xwiki.search.solr.internal.reference.DefaultSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.ObjectPropertySolrReferenceResolver
 org.xwiki.search.solr.internal.reference.ObjectSolrReferenceResolver
+org.xwiki.search.solr.internal.reference.SolrDocumentReferenceResolver
+org.xwiki.search.solr.internal.reference.SolrEntityReferenceResolver
 org.xwiki.search.solr.internal.reference.SpaceSolrReferenceResolver
 org.xwiki.search.solr.internal.reference.WikiSolrReferenceResolver
 org.xwiki.search.solr.script.SolrIndexScriptService

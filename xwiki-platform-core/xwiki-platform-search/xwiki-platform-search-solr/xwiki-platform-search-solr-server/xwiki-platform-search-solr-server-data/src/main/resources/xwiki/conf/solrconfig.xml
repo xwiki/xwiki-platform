@@ -899,7 +899,7 @@
        <str name="f.web.qf">space</str>
 
        <!-- Faceting defaults. -->
-       <str name="facet">on</str>
+       <str name="facet">false</str>
        <!-- NOTE: The search UI displays the facets in this order so keep the most important facets first. -->
        <str name="facet.field">wiki</str>
        <str name="facet.field">space_exact</str>
@@ -917,7 +917,7 @@
        <str name="facet.field">attsize</str>
 
        <!-- Highlighting defaults -->
-       <str name="hl">true</str>
+       <str name="hl">false</str>
        <!-- Highlight all possible fields, on which we get a hit. -->
        <str name="hl.fl">*</str>
        <str name="hl.requireFieldMatch">true</str>

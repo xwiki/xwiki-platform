@@ -31,6 +31,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.search.solr.internal.api.FieldUtils;
@@ -69,10 +70,16 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
     @Inject
     private QueryManager queryManager;
 
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
     @Override
     public List<EntityReference> getReferences(EntityReference spaceReference) throws SolrIndexerException
     {
         List<EntityReference> result = new ArrayList<EntityReference>();
+        EntityReference wikiReference = spaceReference.extractReference(EntityType.WIKI);
+        String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
 
         // Ignore the space reference because it is not indexable.
 
@@ -80,8 +87,8 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
         List<String> documentNames;
         try {
             documentNames =
-                this.queryManager.getNamedQuery("getSpaceDocsName").setWiki(spaceReference.getParent().getName())
-                    .bindValue("space", spaceReference.getName()).execute();
+                this.queryManager.getNamedQuery("getSpaceDocsName").setWiki(wikiReference.getName())
+                    .bindValue("space", localSpaceReference).execute();
         } catch (QueryException e) {
             throw new SolrIndexerException("Failed to query space [" + spaceReference + "] documents", e);
         }
@@ -111,7 +118,8 @@ public class SpaceSolrReferenceResolver extends AbstractSolrReferenceResolver
 
         builder.append(FieldUtils.SPACE_EXACT);
         builder.append(':');
-        builder.append(ClientUtils.escapeQueryChars(reference.getName()));
+        String localSpaceReference = this.localEntityReferenceSerializer.serialize(reference);
+        builder.append(ClientUtils.escapeQueryChars(localSpaceReference));
 
         return builder.toString();
     }

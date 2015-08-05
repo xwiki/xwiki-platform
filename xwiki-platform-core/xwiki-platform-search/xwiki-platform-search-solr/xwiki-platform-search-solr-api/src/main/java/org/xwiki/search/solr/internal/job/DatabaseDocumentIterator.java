@@ -39,6 +39,10 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -94,6 +98,14 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     @Inject
     private QueryManager queryManager;
 
+    @Inject
+    @Named("explicit")
+    private EntityReferenceResolver<String> explicitEntityReferenceResolver;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
     /**
      * The query used to fetch the documents from the database.
      */
@@ -121,11 +133,14 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     public Pair<DocumentReference, String> next()
     {
         Object[] result = getResults().get(index++);
-        String space = (String) result[0];
+        String localSpaceReference = (String) result[0];
         String name = (String) result[1];
         String locale = (String) result[2];
         String version = (String) result[3];
-        DocumentReference documentReference = new DocumentReference(wiki, space, name);
+        SpaceReference spaceReference =
+            new SpaceReference(this.explicitEntityReferenceResolver.resolve(localSpaceReference, EntityType.SPACE,
+                new WikiReference(wiki)));
+        DocumentReference documentReference = new DocumentReference(name, spaceReference);
         if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
         }
@@ -221,7 +236,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
             countQuery = queryManager.createQuery(whereClause, Query.HQL).addFilter(countFilter);
 
             if (spaceReference != null) {
-                query.bindValue("space", spaceReference.getName());
+                query.bindValue("space", this.localEntityReferenceSerializer.serialize(spaceReference));
                 if (documentReference != null) {
                     query.bindValue("name", documentReference.getName());
                 }

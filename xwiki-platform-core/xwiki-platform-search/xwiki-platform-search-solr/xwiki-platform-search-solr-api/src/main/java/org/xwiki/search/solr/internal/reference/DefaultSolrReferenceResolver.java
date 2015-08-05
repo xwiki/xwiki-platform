@@ -19,11 +19,11 @@
  */
 package org.xwiki.search.solr.internal.reference;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -34,12 +34,11 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
- * Dispatch to the proper {@link SolrDocumentReferenceResolver}.
+ * Dispatch to the proper {@link SolrReferenceResolver}.
  * 
  * @version $Id$
  * @since 5.1M2
@@ -120,22 +119,22 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
     }
 
     /**
-     * Used to find the {@link SolrDocumentReferenceResolver}.
+     * Used to find the {@link SolrReferenceResolver}.
      */
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * Used to access the database.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * The logger.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Used to get the list of available wikis.
+     */
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * @param reference the reference
@@ -163,14 +162,11 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
         if (reference != null) {
             return getResover(reference).getReferences(reference);
         } else {
-            // All the document in the farm
-            XWikiContext xcontext = xcontextProvider.get();
-
             final List<String> wikis;
             try {
-                wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-            } catch (XWikiException e) {
-                throw new SolrIndexerException("Failed to get the list of wikis", e);
+                wikis = new ArrayList<String>(this.wikiDescriptorManager.getAllIds());
+            } catch (WikiManagerException e) {
+                throw new SolrIndexerException("Failed to get the list of available wikis.", e);
             }
 
             return new Iterable<EntityReference>()

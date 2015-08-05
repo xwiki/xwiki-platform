@@ -19,12 +19,6 @@
  */
 package org.xwiki.search.solr.internal.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,17 +28,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DatabaseDocumentIterator}.
@@ -57,6 +59,10 @@ public class DatabaseDocumentIteratorTest
     @Rule
     public MockitoComponentMockingRule<DocumentIterator<String>> mocker =
         new MockitoComponentMockingRule<DocumentIterator<String>>(DatabaseDocumentIterator.class);
+    
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+    
+    private EntityReferenceResolver<String> explicitEntityReferenceResolver;
 
     @Before
     public void configure() throws Exception
@@ -66,6 +72,9 @@ public class DatabaseDocumentIteratorTest
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         when(wikiDescriptorManager.getAllIds()).thenReturn(wikiIds);
+
+        this.localEntityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.explicitEntityReferenceResolver = this.mocker.getInstance(EntityReferenceResolver.TYPE_STRING, "explicit");
     }
 
     @Test
@@ -78,16 +87,28 @@ public class DatabaseDocumentIteratorTest
         when(chessQuery.setOffset(0)).thenReturn(chessQuery);
         when(chessQuery.setOffset(100)).thenReturn(emptyQuery);
         when(chessQuery.execute()).thenReturn(Arrays.<Object> asList(
-            new Object[] {"Blog", "WebHome", "", "3.2"},
+            new Object[] {"Blog.Code", "WebHome", "", "3.2"},
             new Object[] {"Main", "Welcome", "en", "1.1"},
-            new Object[] {"XWiki", "Syntax", "fr", "2.5"}));
+            new Object[] {"XWiki.Syntax", "Links", "fr", "2.5"}));
+
+        DocumentReference chessBlogCodeWebHome =
+            createDocumentReference("chess", Arrays.asList("Blog", "Code"), "WebHome", null);
+        DocumentReference chessMainWelcome =
+            createDocumentReference("chess", Arrays.asList("Main"), "Welcome", Locale.ENGLISH);
+        DocumentReference chessXWikiSyntaxLinks =
+            createDocumentReference("chess", Arrays.asList("XWiki", "Syntax"), "Links", Locale.FRENCH);
 
         Query tennisQuery = mock(Query.class);
         when(tennisQuery.setOffset(0)).thenReturn(tennisQuery);
         when(tennisQuery.setOffset(100)).thenReturn(emptyQuery);
         when(tennisQuery.execute()).thenReturn(Arrays.<Object> asList(
             new Object[] {"Main", "Welcome", "en", "2.1"},
-            new Object[] {"XWiki", "Syntax", "fr", "1.3"}));
+            new Object[] {"XWiki.Syntax", "Links", "fr", "1.3"}));
+
+        DocumentReference tennisMainWelcome =
+            createDocumentReference("tennis", Arrays.asList("Main"), "Welcome", Locale.ENGLISH);
+        DocumentReference tennisXWikiSyntaxLinks =
+            createDocumentReference("tennis", Arrays.asList("XWiki", "Syntax"), "Links", Locale.FRENCH);
 
         Query query = mock(Query.class);
         when(query.setLimit(anyInt())).thenReturn(query);
@@ -121,16 +142,11 @@ public class DatabaseDocumentIteratorTest
         }
 
         List<Pair<DocumentReference, String>> expectedResults = new ArrayList<Pair<DocumentReference, String>>();
-        expectedResults.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "Blog",
-            "WebHome"), "3.2"));
-        expectedResults.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "Main",
-            "Welcome", Locale.ENGLISH), "1.1"));
-        expectedResults.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("chess", "XWiki",
-            "Syntax", Locale.FRENCH), "2.5"));
-        expectedResults.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("tennis", "Main",
-            "Welcome", Locale.ENGLISH), "2.1"));
-        expectedResults.add(new ImmutablePair<DocumentReference, String>(new DocumentReference("tennis", "XWiki",
-            "Syntax", Locale.FRENCH), "1.3"));
+        expectedResults.add(new ImmutablePair<DocumentReference, String>(chessBlogCodeWebHome, "3.2"));
+        expectedResults.add(new ImmutablePair<DocumentReference, String>(chessMainWelcome, "1.1"));
+        expectedResults.add(new ImmutablePair<DocumentReference, String>(chessXWikiSyntaxLinks, "2.5"));
+        expectedResults.add(new ImmutablePair<DocumentReference, String>(tennisMainWelcome, "2.1"));
+        expectedResults.add(new ImmutablePair<DocumentReference, String>(tennisXWikiSyntaxLinks, "1.3"));
 
         assertEquals(expectedResults, actualResults);
     }
@@ -138,7 +154,7 @@ public class DatabaseDocumentIteratorTest
     @Test
     public void iterateOneWiki() throws Exception
     {
-        DocumentReference rootReference = new DocumentReference("gang", "XWiki", "Syntax");
+        DocumentReference rootReference = createDocumentReference("gang", Arrays.asList("A", "B"), "C", null);
 
         Query emptyQuery = mock(Query.class);
         when(emptyQuery.execute()).thenReturn(Collections.emptyList());
@@ -148,12 +164,11 @@ public class DatabaseDocumentIteratorTest
         when(query.setWiki(rootReference.getWikiReference().getName())).thenReturn(query);
         when(query.setOffset(0)).thenReturn(query);
         when(query.setOffset(100)).thenReturn(emptyQuery);
-        when(query.execute()).thenReturn(Collections.<Object> singletonList(
-            new Object[]{rootReference.getLastSpaceReference().getName(), rootReference.getName(), "de", "3.1"}));
+        when(query.execute()).thenReturn(Collections.<Object>singletonList(new Object[] {"A.B", "C", "de", "3.1"}));
 
         Map<String, Object> namedParameters = new HashMap<String, Object>();
-        namedParameters.put("space", rootReference.getLastSpaceReference().getName());
-        namedParameters.put("name", rootReference.getName());
+        namedParameters.put("space", "A.B");
+        namedParameters.put("name", "C");
         when(query.getNamedParameters()).thenReturn(namedParameters);
 
         Query countQuery = mock(Query.class);
@@ -179,10 +194,25 @@ public class DatabaseDocumentIteratorTest
 
         assertEquals(expectedResults, actualResults);
 
-        verify(query).bindValue("space", rootReference.getLastSpaceReference().getName());
-        verify(query).bindValue("name", rootReference.getName());
+        verify(query).bindValue("space", "A.B");
+        verify(query).bindValue("name", "C");
 
-        verify(countQuery).bindValue("space", rootReference.getLastSpaceReference().getName());
-        verify(countQuery).bindValue("name", rootReference.getName());
+        verify(countQuery).bindValue("space", "A.B");
+        verify(countQuery).bindValue("name", "C");
+    }
+
+    private DocumentReference createDocumentReference(String wiki, List<String> spaces, String name, Locale locale)
+    {
+        DocumentReference documentReference = new DocumentReference(wiki, spaces, name);
+        if (locale != null) {
+            documentReference = new DocumentReference(documentReference, locale);
+        }
+        String localSpaceReference = StringUtils.join(spaces, '.');
+        when(this.localEntityReferenceSerializer.serialize(documentReference.getParent())).thenReturn(
+            localSpaceReference);
+        when(
+            this.explicitEntityReferenceResolver.resolve(localSpaceReference, EntityType.SPACE,
+                documentReference.getWikiReference())).thenReturn(documentReference.getParent());
+        return documentReference;
     }
 }

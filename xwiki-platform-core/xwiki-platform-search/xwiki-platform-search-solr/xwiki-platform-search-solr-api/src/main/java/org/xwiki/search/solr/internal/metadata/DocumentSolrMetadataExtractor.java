@@ -32,7 +32,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -69,13 +68,6 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Used to resolve the attachment author reference because {@link XWikiAttachment} doesn't have a method to return
-     * the author reference.
-     */
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * Used to serialize entity reference to be used in dynamic field names.

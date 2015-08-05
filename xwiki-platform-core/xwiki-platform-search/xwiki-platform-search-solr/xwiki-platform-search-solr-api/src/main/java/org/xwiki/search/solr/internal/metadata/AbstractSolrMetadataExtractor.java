@@ -233,7 +233,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         solrDocument.setField(FieldUtils.HIDDEN, document.isHidden());
 
         solrDocument.setField(FieldUtils.WIKI, documentReference.getWikiReference().getName());
-        solrDocument.setField(FieldUtils.SPACE, documentReference.getLastSpaceReference().getName());
+        solrDocument.setField(FieldUtils.SPACE,
+            this.localSerializer.serialize(documentReference.getLastSpaceReference()));
         solrDocument.setField(FieldUtils.NAME, documentReference.getName());
 
         Locale locale = getLocale(documentReference);

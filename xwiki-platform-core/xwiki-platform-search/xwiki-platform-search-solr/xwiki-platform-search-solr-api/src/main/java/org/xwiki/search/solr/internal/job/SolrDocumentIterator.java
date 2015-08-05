@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -35,13 +34,12 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.apache.solr.common.params.FacetParams;
-import org.apache.solr.common.params.HighlightParams;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.api.SolrInstance;
@@ -85,6 +83,9 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
     @Inject
     private SolrReferenceResolver solrReferenceResolver;
 
+    @Inject
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
     @Override
     public boolean hasNext()
     {
@@ -95,15 +96,8 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
     public Pair<DocumentReference, String> next()
     {
         SolrDocument result = getResults().get(index++);
-        String wiki = (String) result.get(FieldUtils.WIKI);
-        String space = (String) result.get(FieldUtils.SPACE);
-        String name = (String) result.get(FieldUtils.NAME);
-        String locale = (String) result.get(FieldUtils.DOCUMENT_LOCALE);
+        DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(result);
         String version = (String) result.get(FieldUtils.VERSION);
-        DocumentReference documentReference = new DocumentReference(wiki, space, name);
-        if (!locale.isEmpty()) {
-            documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
-        }
         return new ImmutablePair<DocumentReference, String>(documentReference, version);
     }
 
@@ -152,14 +146,9 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
             query.setFields(FieldUtils.WIKI, FieldUtils.SPACE, FieldUtils.NAME, FieldUtils.DOCUMENT_LOCALE,
                 FieldUtils.VERSION);
             query.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
-            // We must add the unique key field (ID in our case) to the list of sort fields (as a tie breaker) in order
-            // to use the cursor-based pagination.
-            query.addSort(FieldUtils.WIKI, ORDER.asc).addSort(FieldUtils.SPACE_EXACT, ORDER.asc)
-                .addSort(FieldUtils.NAME_EXACT, ORDER.asc).addSort(FieldUtils.DOCUMENT_LOCALE, ORDER.asc)
-                .addSort(FieldUtils.ID, ORDER.asc);
-            // Speed up the query by disabling the faceting and the highlighting.
-            query.set(FacetParams.FACET, false);
-            query.set(HighlightParams.HIGHLIGHT, false);
+            // We sort by ID, which is normally the serialized document reference, in order to ensure this iterator has
+            // the same order as the database iterator.
+            query.addSort(FieldUtils.ID, ORDER.asc);
             // Paginate using a cursor because it performs better than basic pagination (using absolute offset,
             // especially when the offset is big) and because the impact of index modifications is much smaller (and we
             // plan to update the index to match the database during the synchronization process).

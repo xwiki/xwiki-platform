@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal.resolver;
+package org.xwiki.search.solr.internal.reference;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,28 +43,23 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.internal.DefaultQuery;
-import org.xwiki.search.solr.internal.reference.AttachmentSolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.DefaultSolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.ObjectPropertySolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.ObjectSolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.SpaceSolrReferenceResolver;
-import org.xwiki.search.solr.internal.reference.WikiSolrReferenceResolver;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -81,7 +76,6 @@ import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.web.Utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -104,7 +98,8 @@ DefaultEntityReferenceProvider.class, CompactWikiStringEntityReferenceSerializer
 DefaultStringDocumentReferenceResolver.class, DefaultStringEntityReferenceResolver.class,
 DefaultStringEntityReferenceSerializer.class, DefaultExecution.class, AttachmentSolrReferenceResolver.class,
 DefaultSolrReferenceResolver.class, DocumentSolrReferenceResolver.class, ObjectPropertySolrReferenceResolver.class,
-ObjectSolrReferenceResolver.class, SpaceSolrReferenceResolver.class, WikiSolrReferenceResolver.class})
+ObjectSolrReferenceResolver.class, SpaceSolrReferenceResolver.class, WikiSolrReferenceResolver.class,
+ExplicitStringEntityReferenceResolver.class})
 public class SolrReferenceResolverTest
 {
     @Rule
@@ -118,7 +113,7 @@ public class SolrReferenceResolverTest
 
     private WikiReference wikiReference1 = new WikiReference("wiki1");
 
-    private SpaceReference spaceReference11 = new SpaceReference("space11", wikiReference1);
+    private SpaceReference spaceReference11 = new SpaceReference("data", new SpaceReference("space11", wikiReference1));
 
     private DocumentReference classReference111 = new DocumentReference("class111", spaceReference11);
 
@@ -138,7 +133,7 @@ public class SolrReferenceResolverTest
 
     private XWikiDocument xdocument113 = null;
 
-    private SpaceReference spaceReference12 = new SpaceReference("space12", wikiReference1);
+    private SpaceReference spaceReference12 = new SpaceReference("code", new SpaceReference("space12", wikiReference1));
 
     private DocumentReference documentReference121 = new DocumentReference("document121", spaceReference12);
 
@@ -166,10 +161,6 @@ public class SolrReferenceResolverTest
 
     private StringProperty xproperty12221;
 
-    private ObjectPropertyReference passwordPropertyReference12222;
-
-    private StringProperty xpasswordProperty12222;
-
     private ObjectPropertyReference propertyReference12223;
 
     private IntegerProperty xproperty12223;
@@ -178,7 +169,7 @@ public class SolrReferenceResolverTest
 
     private XWikiDocument xdocument122;
 
-    private SpaceReference spaceReference13 = new SpaceReference("space13", wikiReference1);
+    private SpaceReference spaceReference13 = new SpaceReference("test", new SpaceReference("space13", wikiReference1));
 
     private WikiReference wikiReference2 = new WikiReference("wiki2");
 
@@ -192,6 +183,10 @@ public class SolrReferenceResolverTest
         this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         this.mocker.registerMockComponent(QueryManager.class);
         this.mockDAB = this.mocker.registerMockComponent(DocumentAccessBridge.class);
+
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.registerMockComponent(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(
+            Arrays.asList(wikiReference1.getName(), wikiReference2.getName()));
     }
 
     @Before
@@ -228,7 +223,6 @@ public class SolrReferenceResolverTest
         this.objectReference1222 = new BaseObjectReference(this.classReference111, 1, this.documentReference122);
         this.propertyReference12221 = new ObjectPropertyReference("aStringProperty", objectReference1222);
         this.propertyReference12223 = new ObjectPropertyReference("anIntegerProperty", objectReference1222);
-        this.passwordPropertyReference12222 = new ObjectPropertyReference("aPasswordProperty", objectReference1222);
 
         // XWiki model data
 
@@ -245,7 +239,6 @@ public class SolrReferenceResolverTest
         this.xobject1221 = mock(BaseObject.class, "xwikiObject1221");
         this.xobject1222 = mock(BaseObject.class, "xwikiObject1222");
         this.xproperty12221 = mock(StringProperty.class, "xwikiProperty12221");
-        this.xpasswordProperty12222 = mock(StringProperty.class, "xwikiPasswordProperty12222");
         this.xproperty12223 = mock(IntegerProperty.class, "xwikiProperty12223");
 
         this.queryManager = this.mocker.getInstance(QueryManager.class);
@@ -271,17 +264,22 @@ public class SolrReferenceResolverTest
 
         when(documentsSpace11Query.setWiki(any(String.class))).thenReturn(documentsSpace11Query);
 
-        when(documentsSpace11Query.bindValue("space", spaceReference11.getName())).thenReturn(documentsSpace11Query);
-
-        when(documentsSpace11Query.bindValue("space", spaceReference12.getName())).thenReturn(documentsSpace12Query);
-
-        when(documentsSpace11Query.bindValue("space", spaceReference13.getName())).thenReturn(documentsSpace13Query);
+        EntityReferenceSerializer<String> localEntityReferenceSerializer =
+            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(documentsSpace11Query.bindValue("space", localEntityReferenceSerializer.serialize(spaceReference11)))
+            .thenReturn(documentsSpace11Query);
+        when(documentsSpace11Query.bindValue("space", localEntityReferenceSerializer.serialize(spaceReference12)))
+            .thenReturn(documentsSpace12Query);
+        when(documentsSpace11Query.bindValue("space", localEntityReferenceSerializer.serialize(spaceReference13)))
+            .thenReturn(documentsSpace13Query);
 
         // Spaces in wikis.
         when(spacesWiki1Query.execute()).thenReturn(
-            Arrays.<Object> asList(spaceReference11.getName(), spaceReference12.getName(), spaceReference13.getName()));
+            Arrays.<Object>asList(localEntityReferenceSerializer.serialize(spaceReference11),
+                localEntityReferenceSerializer.serialize(spaceReference12),
+                localEntityReferenceSerializer.serialize(spaceReference13)));
 
-        when(spacesWiki2Query.execute()).thenReturn(Collections.EMPTY_LIST);
+        when(spacesWiki2Query.execute()).thenReturn(Collections.emptyList());
 
         // space 11
         when(documentsSpace11Query.execute()).thenReturn(
@@ -297,16 +295,16 @@ public class SolrReferenceResolverTest
         // document 112
         when(xwiki.getDocument(eq(documentReference112), any(XWikiContext.class))).thenReturn(xdocument112);
 
-        when(xdocument112.getXObjects()).thenReturn(Collections.EMPTY_MAP);
+        when(xdocument112.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
 
-        when(xdocument112.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument112.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.<Locale>emptyList());
 
         // document 113
         when(xwiki.getDocument(eq(documentReference113), any(XWikiContext.class))).thenReturn(xdocument113);
 
-        when(xdocument113.getAttachmentList()).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument113.getAttachmentList()).thenReturn(Collections.<XWikiAttachment>emptyList());
 
-        when(xdocument113.getXObjects()).thenReturn(Collections.EMPTY_MAP);
+        when(xdocument113.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
 
         when(xdocument113.getTranslationLocales(any(XWikiContext.class))).thenReturn(Arrays.asList(new Locale("ro")));
 
@@ -323,21 +321,21 @@ public class SolrReferenceResolverTest
 
         when(xattachment1212.getReference()).thenReturn(attachmentReference1212);
 
-        when(xdocument121.getXObjects()).thenReturn(Collections.EMPTY_MAP);
+        when(xdocument121.getXObjects()).thenReturn(Collections.<DocumentReference, List<BaseObject>>emptyMap());
 
-        when(xdocument121.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument121.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.<Locale>emptyList());
 
         // document 122
         when(xwiki.getDocument(eq(documentReference122), any(XWikiContext.class))).thenReturn(xdocument122);
 
-        when(xdocument122.getAttachmentList()).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument122.getAttachmentList()).thenReturn(Collections.<XWikiAttachment>emptyList());
 
         Map<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
         // Yes, it seems that we can have null objects for some reason.
         xObjects.put(classReference111, Arrays.asList(null, xobject1221, xobject1222));
         when(xdocument122.getXObjects()).thenReturn(xObjects);
 
-        when(xdocument122.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.EMPTY_LIST);
+        when(xdocument122.getTranslationLocales(any(XWikiContext.class))).thenReturn(Collections.<Locale>emptyList());
 
         // object 1221
         when(xdocument122.getXObject(objectReference1221)).thenReturn(xobject1221);
@@ -358,14 +356,11 @@ public class SolrReferenceResolverTest
         when(xobject1222.getXClass(any(XWikiContext.class))).thenReturn(xclass111);
 
         when(xobject1222.getFieldList()).thenReturn(
-            Arrays.asList(xproperty12221, xpasswordProperty12222, xproperty12223));
+            Arrays.asList(xproperty12221, xproperty12223));
 
         // object 1222 fields
         when(xproperty12221.getReference()).thenReturn(propertyReference12221);
         when(xproperty12221.getName()).thenReturn(propertyReference12221.getName());
-
-        when(xpasswordProperty12222.getReference()).thenReturn(passwordPropertyReference12222);
-        when(xpasswordProperty12222.getName()).thenReturn(passwordPropertyReference12222.getName());
 
         when(xproperty12223.getReference()).thenReturn(propertyReference12223);
         when(xproperty12223.getName()).thenReturn(propertyReference12223.getName());
@@ -373,16 +368,10 @@ public class SolrReferenceResolverTest
         // class 111 fields
         when(xclass111.get(propertyReference12221.getName())).thenReturn(null);
 
-        when(xclass111.get(passwordPropertyReference12222.getName())).thenReturn(new PasswordClass());
-
         when(xclass111.get(propertyReference12223.getName())).thenReturn(null);
 
         // space 13
-        when(documentsSpace13Query.execute()).thenReturn(Collections.EMPTY_LIST);
-
-        // farm
-        when(xwiki.getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
-            Arrays.asList(wikiReference1.getName(), wikiReference2.getName()));
+        when(documentsSpace13Query.execute()).thenReturn(Collections.emptyList());
     }
 
     // getReferences
@@ -531,16 +520,6 @@ public class SolrReferenceResolverTest
         Assert.assertEquals(propertyReference12221, result.iterator().next());
     }
 
-    @Test
-    public void getReferencesRestrictedProperty() throws Exception
-    {
-        Iterable<EntityReference> result =
-            this.defaultSolrReferenceResolver.getReferences(passwordPropertyReference12222);
-
-        Assert.assertNotNull(result);
-        assertThat(result, Matchers.<EntityReference> iterableWithSize(0));
-    }
-
     // getId
 
     @Test
@@ -579,36 +558,37 @@ public class SolrReferenceResolverTest
     @Test
     public void getQuerySpace() throws Exception
     {
-        Assert.assertEquals("wiki:wiki1 AND space_exact:space11",
+        Assert.assertEquals("wiki:wiki1 AND space_exact:space11.data",
             this.defaultSolrReferenceResolver.getQuery(spaceReference11));
     }
 
     @Test
     public void getQueryDocument() throws Exception
     {
-        Assert.assertEquals("wiki:wiki1 AND space_exact:space11 AND name_exact:class111",
+        Assert.assertEquals("wiki:wiki1 AND space_exact:space11.data AND name_exact:class111",
             this.defaultSolrReferenceResolver.getQuery(documentReference111));
     }
 
     @Test
     public void getQueryObject() throws Exception
     {
-        Assert.assertEquals(
-            "wiki:wiki1 AND space_exact:space12 AND name_exact:space12 AND class:space11.class111 AND number:0",
+        Assert.assertEquals("wiki:wiki1" + " AND space_exact:space12.code AND name_exact:document122"
+            + " AND class:space11.data.class111 AND number:0",
             this.defaultSolrReferenceResolver.getQuery(objectReference1221));
     }
 
     @Test
     public void getQueryObjectProperty() throws Exception
     {
-        Assert.assertEquals("id:wiki1\\:space12.document122\\^wiki1\\:space11.class111\\[1\\].aStringProperty",
+        Assert.assertEquals(
+            "id:wiki1\\:space12.code.document122\\^wiki1\\:space11.data.class111\\[1\\].aStringProperty",
             this.defaultSolrReferenceResolver.getQuery(propertyReference12221));
     }
 
     @Test
     public void getQueryAttachment() throws Exception
     {
-        Assert.assertEquals("id:wiki1\\:space12.document121@attachment1211.ext",
+        Assert.assertEquals("id:wiki1\\:space12.code.document121@attachment1211.ext",
             this.defaultSolrReferenceResolver.getQuery(attachmentReference1211));
     }
 }

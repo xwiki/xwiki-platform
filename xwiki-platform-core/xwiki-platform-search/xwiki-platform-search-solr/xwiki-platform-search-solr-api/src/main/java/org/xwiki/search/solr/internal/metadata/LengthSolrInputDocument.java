@@ -30,6 +30,11 @@ import org.apache.solr.common.SolrInputDocument;
 public class LengthSolrInputDocument extends SolrInputDocument
 {
     /**
+     * Serialization identifier.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * @see #getLength()
      */
     private int length;

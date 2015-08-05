@@ -38,6 +38,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.query.SecureQuery;
@@ -49,6 +50,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -63,9 +65,13 @@ public class SOLRSearchSource extends AbstractSearchSource
 {
     @Inject
     protected QueryManager queryManager;
-    
+
     @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     @Override
     public List<SearchResult> search(String queryString, String defaultWikiName, String wikis,
@@ -153,32 +159,31 @@ public class SOLRSearchSource extends AbstractSearchSource
             for (SolrDocument document : documents) {
                 SearchResult searchResult = this.objectFactory.createSearchResult();
 
-                searchResult.setPageFullName((String) document.get("fullname"));
-                searchResult.setTitle((String) document.get("title"));
-                searchResult.setWiki((String) document.get("wiki"));
-                // TODO: what SolR returns about nested spaces?
-                searchResult.setSpace((String) document.get("space"));
-                searchResult.setPageName((String) document.get("name"));
-                searchResult.setVersion((String) document.get("version"));
+                DocumentReference documentReference = this.solrDocumentReferenceResolver.resolve(document);
+                searchResult.setPageFullName(this.localEntityReferenceSerializer.serialize(documentReference));
+                searchResult.setTitle((String) document.get(FieldUtils.TITLE));
+                searchResult.setWiki(documentReference.getWikiReference().getName());
+                searchResult.setSpace(this.localEntityReferenceSerializer.serialize(documentReference.getParent()));
+                searchResult.setPageName(documentReference.getName());
+                searchResult.setVersion((String) document.get(FieldUtils.VERSION));
 
                 searchResult.setType("page");
                 searchResult.setId(Utils.getPageId(searchResult.getWiki(),
                     Utils.getSpacesFromSpaceId(searchResult.getSpace()), searchResult.getPageName()));
 
-                searchResult.setScore(((Number) document.get("score")).floatValue());
-                searchResult.setAuthor((String) document.get("author"));
+                searchResult.setScore(((Number) document.get(FieldUtils.SCORE)).floatValue());
+                searchResult.setAuthor((String) document.get(FieldUtils.AUTHOR));
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTime((Date) document.get("date"));
+                calendar.setTime((Date) document.get(FieldUtils.DATE));
                 searchResult.setModified(calendar);
 
                 if (withPrettyNames) {
-                    searchResult.setAuthorName((String) document.get("author_display"));
+                    searchResult.setAuthorName((String) document.get(FieldUtils.AUTHOR_DISPLAY));
                 }
 
-                Locale locale = LocaleUtils.toLocale((String) document.get("doclocale"));
-                
-                DocumentReference docRef = documentReferenceResolver.resolve(searchResult.getPageFullName());
-                List<String> spaces = Utils.getSpacesHierarchy(docRef.getLastSpaceReference());
+                Locale locale = LocaleUtils.toLocale((String) document.get(FieldUtils.DOCUMENT_LOCALE));
+
+                List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
 
                 String pageUri = null;
                 if (Locale.ROOT == locale) {

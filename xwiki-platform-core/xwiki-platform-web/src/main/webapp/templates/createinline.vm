@@ -291,7 +291,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   ## -------
   ## Page type - Advanced users
   ## -------
-  #if ($xwiki.getUserPreference('usertype') == 'Advanced')
+  #if ($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin)
     <dt>
       <label for='tocreate'>$services.localization.render('core.create.terminal.label')</label>
       <span class='xHint'>$services.localization.render('core.create.terminal.hint')</span>

@@ -3,7 +3,13 @@
   #######################################################
   ##                     GLOBALS
   #######################################################
-  #set($homeReference = $services.wiki.currentWikiDescriptor.mainPageReference)
+  ## Make sure we get the Main Page Reference whether the Wiki Script Service is available or not (since it's optional)
+  #set($wikiService = $services.wiki)
+  #if("$!wikiService" != '')
+    #set($homeReference = $services.wiki.currentWikiDescriptor.mainPageReference)
+  #else
+    #set($homeReference = $services.model.resolveDocument('', 'default'))
+  #end
   #######################################################
   ##                   CONTROLLER
   ##

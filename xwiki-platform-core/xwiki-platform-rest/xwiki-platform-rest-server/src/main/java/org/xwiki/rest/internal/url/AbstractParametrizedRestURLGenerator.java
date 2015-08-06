@@ -42,9 +42,9 @@ import com.xpn.xwiki.XWikiContext;
  * Abstract class for ParametrizedRestURLGenerator.
  *
  * @param <T> the type of the resource for which the URL are created for. Must inherit from
- * {@link org.xwiki.model.reference.EntityReference}.
+ *            {@link org.xwiki.model.reference.EntityReference}.
  * @version $Id$
- * @since 7.2M1 
+ * @since 7.2M1
  */
 public abstract class AbstractParametrizedRestURLGenerator<T> implements ParametrizedRestURLGenerator<T>
 {
@@ -57,10 +57,20 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
 
-            String url = context.getURLFactory().getServerURL(context).toString() +  "/"
-                + xwiki.getWebAppPath(context) + "rest";
+            StringBuilder url = new StringBuilder();
 
-            return new URI(url);
+            url.append(context.getURLFactory().getServerURL(context));
+
+            url.append('/');
+
+            String webAppPath = xwiki.getWebAppPath(context);
+            if (!webAppPath.equals("/")) {
+                url.append(webAppPath);
+            }
+
+            url.append("rest");
+
+            return new URI(url.toString());
         } catch (URISyntaxException | MalformedURLException e) {
             throw new XWikiRestException("Failed to generate a proper base URI.", e);
         }
@@ -69,8 +79,8 @@ public abstract class AbstractParametrizedRestURLGenerator<T> implements Paramet
     protected List<String> getSpaceList(SpaceReference spaceReference)
     {
         List<String> spaces = new ArrayList<>();
-        for (EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE;
-                ref = ref.getParent()) {
+        for (EntityReference ref = spaceReference; ref != null && ref.getType() == EntityType.SPACE; ref =
+            ref.getParent()) {
             spaces.add(ref.getName());
         }
         Collections.reverse(spaces);

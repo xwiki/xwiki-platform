@@ -24,26 +24,50 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.diff.internal.DefaultDiffManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.model.internal.DefaultModelConfiguration;
+import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
+import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeException;
 import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
+import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Validate {@link XWikiDocument#merge(XWikiDocument, XWikiDocument, MergeConfiguration, com.xpn.xwiki.XWikiContext)}.
  * 
  * @version $Id$
  */
-public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
+@ComponentList(value = { DefaultDiffManager.class, LocalStringEntityReferenceSerializer.class,
+CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class,
+CurrentEntityReferenceProvider.class, DefaultModelConfiguration.class, CurrentStringDocumentReferenceResolver.class,
+CurrentStringEntityReferenceResolver.class, LocalUidStringEntityReferenceSerializer.class,
+DefaultStringEntityReferenceSerializer.class, DefaultStringDocumentReferenceResolver.class,
+DefaultStringEntityReferenceResolver.class, DefaultEntityReferenceProvider.class })
+public class XWikiDocumentMergeTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     private XWikiDocument currentDocument;
 
     private XWikiDocument previousDocument;
@@ -56,11 +80,10 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
     private MergeConfiguration configuration;
 
-    @Override
     @Before
-    public void setUp() throws Exception
+    public void before() throws Exception
     {
-        super.setUp();
+        this.oldcore.registerMockEnvironment();
 
         this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.previousDocument = this.currentDocument.clone();
@@ -93,7 +116,8 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     private MergeResult merge() throws Exception
     {
         MergeResult result =
-            this.currentDocument.merge(this.previousDocument, this.nextDocument, this.configuration, getContext());
+            this.currentDocument.merge(this.previousDocument, this.nextDocument, this.configuration,
+                this.oldcore.getXWikiContext());
 
         List<LogEvent> exception = result.getLog().getLogs(LogLevel.ERROR);
         if (!exception.isEmpty()) {
@@ -207,7 +231,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -225,7 +249,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -242,7 +266,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -258,7 +282,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -266,7 +290,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
 
         attachment = (XWikiAttachment) attachment.clone();
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
         attachment.setFilesize(9);
 
         this.currentDocument.addAttachment(attachment);
@@ -281,7 +305,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -295,7 +319,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertNotNull(newAttachment);
         Assert.assertEquals(10, newAttachment.getFilesize());
-        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, newAttachment.getContent(null));
+        Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, newAttachment.getContent(null));
     }
 
     @Test
@@ -303,7 +327,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -324,7 +348,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
         attachment.setFilesize(10);
         attachment.setFilename("file");
 
@@ -332,7 +356,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
 
         attachment = (XWikiAttachment) attachment.clone();
-        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setContent(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
         attachment.setFilesize(9);
 
         this.nextDocument.addAttachment(attachment);
@@ -345,7 +369,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertNotNull(newAttachment);
         Assert.assertEquals(9, newAttachment.getFilesize());
-        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8}, newAttachment.getContent(null));
+        Assert.assertArrayEquals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, newAttachment.getContent(null));
     }
 
     // #apply

@@ -106,7 +106,7 @@ public class DefaultRenderingCacheConfiguration implements RenderingCacheConfigu
     private EntityReferenceSerializer<String> wikiSerializer;
 
     /**
-     * USed to get the current wiki.
+     * Used to get the current wiki.
      */
     @Inject
     private ModelContext modelContext;

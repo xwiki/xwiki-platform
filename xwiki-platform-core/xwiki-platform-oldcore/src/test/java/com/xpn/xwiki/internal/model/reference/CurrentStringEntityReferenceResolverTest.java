@@ -20,50 +20,55 @@
 package com.xpn.xwiki.internal.model.reference;
 
 import org.junit.Assert;
-
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.internal.DefaultModelConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
+ * Unit tests for {@link CurrentStringEntityReferenceResolver}.
  * 
  * @version $Id$
  */
-public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedComponentTestCase
+@ComponentList(value = { CurrentEntityReferenceProvider.class, CurrentStringEntityReferenceResolver.class,
+DefaultModelConfiguration.class })
+public class CurrentStringEntityReferenceResolverTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     private static final String CURRENT_WIKI = "currentwiki";
 
     private static final String CURRENT_SPACE = "currentspace";
 
     private static final String CURRENT_PAGE = "currentpage";
-    
+
     private static final String CURRENTDOC_SPACE = "currentdocspace";
 
     private static final String CURRENTDOC_PAGE = "currentdocpage";
 
     private EntityReferenceResolver<String> resolver;
 
-    @Override
-    public void setUp() throws Exception
+    @Before
+    public void before() throws Exception
     {
-        super.setUp();
+        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
 
-        getContext().setWikiId(CURRENT_WIKI);
-
-        this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
+        this.resolver = this.oldcore.getMocker().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenNoContext() throws Exception
+    public void testResolveDocumentReferenceWhenNoContextWiki() throws Exception
     {
-        getComponentManager().<Execution>getInstance(Execution.class).setContext(null);
+        this.oldcore.getXWikiContext().setWikiId(null);
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
@@ -75,8 +80,8 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
     {
-        getContext().setWikiId(null);
-        getContext().setDoc(null);
+        this.oldcore.getXWikiContext().setWikiId(null);
+        this.oldcore.getXWikiContext().setDoc(null);
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
@@ -88,7 +93,8 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
 
@@ -100,7 +106,8 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveAttachmentReference() throws Exception
     {
-        getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENTDOC_SPACE, CURRENTDOC_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.ATTACHMENT);
 
@@ -126,8 +133,9 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setWikiId(CURRENT_WIKI);
-        getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
+        this.oldcore.getXWikiContext().setWikiId(CURRENT_WIKI);
+        this.oldcore.getXWikiContext().setDoc(
+            new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);
 

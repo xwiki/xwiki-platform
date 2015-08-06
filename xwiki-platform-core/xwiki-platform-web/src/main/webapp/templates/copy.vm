@@ -46,8 +46,15 @@
     ## Decide whether to perform the copy or display the copy form
     ##-------------------------------------------------------------
     #if($sourcewiki != "" && $sourcespace != "" && $sourcepage != "" && $targetwiki != "" && $targetspace != "" && $targetpage != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
-      #set($sourceDocReference = $services.model.createDocumentReference($sourcewiki, $sourcespace, $sourcepage))
-      #set($targetDocReference = $services.model.createDocumentReference($targetwiki, $targetspace, $targetpage))
+      #set ($locale = $services.localization.toLocale($language))
+      #set ($sourceWikiReference = $services.model.createWikiReference($sourcewiki))
+      #set ($sourceSpaceReference = $services.model.resolveSpace($sourcespace, 'explicit', $sourceWikiReference))
+      #set ($sourceDocReference = $services.model.createEntityReference($sourcepage, 'DOCUMENT', $sourceSpaceReference))
+      #set ($sourceDocReference = $services.model.createDocumentReference($sourceDocReference, $locale))
+      #set ($targetWikiReference = $services.model.createWikiReference($targetwiki))
+      #set ($targetSpaceReference = $services.model.resolveSpace($targetspace, 'explicit', $targetWikiReference))
+      #set ($targetDocReference = $services.model.createEntityReference($targetpage, 'DOCUMENT', $targetSpaceReference))
+      #set ($targetDocReference = $services.model.createDocumentReference($targetDocReference, $locale))
       ##-----------------------------------------------------------
       ## If the target document already exists, warn the user
       ##-----------------------------------------------------------
@@ -70,19 +77,28 @@
             <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
           </div>
         </form>
-      #elseif($xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
-        #if($escapedLanguage)
-          #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
-          #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
-        #else
-          #set($fromurl = $xwiki.getURL($sourceDocReference))
-          #set($tourl = $xwiki.getURL($targetDocReference))
-        #end
-        #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
-        #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
-        #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
       #else
-        #error($services.localization.render('core.rename.targetNotWritable'))
+        #set ($success = false)
+        #set ($copyAsJob = $services.refactoring.copyAs($sourceDocReference, $targetDocReference))
+        #try()
+          #set ($discard = $copyAsJob.join())
+          #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
+          #set ($success = $copyAsJobStatus.log.getLogs('ERROR').isEmpty())
+        #end
+        #if ($success)
+          #if($escapedLanguage)
+            #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
+            #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))
+          #else
+            #set($fromurl = $xwiki.getURL($sourceDocReference))
+            #set($tourl = $xwiki.getURL($targetDocReference))
+          #end
+          #set($sourcelink = "<a href='${fromurl}'>$!{escapetool.xml($sourceDocReference.name)} #if($escapedLanguage)($escapedLanguage)#end</a>")
+          #set($targetlink = "<a href='${tourl}'>$!{escapetool.xml($targetDocReference.name)}</a>")
+          #info($services.localization.render('core.copy.copyingdoc', [$sourcelink, $targetlink]))
+        #else
+          #error($services.localization.render('core.rename.targetNotWritable'))
+        #end
       #end
     #else
     <form action="$xwiki.relativeRequestURL" class="xform third">

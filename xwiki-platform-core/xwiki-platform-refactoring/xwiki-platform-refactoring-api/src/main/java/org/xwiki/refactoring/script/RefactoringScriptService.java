@@ -223,7 +223,6 @@ public class RefactoringScriptService implements ScriptService
     private void initEntityRequest(EntityRequest request, String type, Collection<EntityReference> entityReferences)
     {
         request.setId(generateJobId(type));
-        request.setInteractive(true);
         request.setJobType(type);
         request.setEntityReferences(entityReferences);
         setRightsProperties(request);

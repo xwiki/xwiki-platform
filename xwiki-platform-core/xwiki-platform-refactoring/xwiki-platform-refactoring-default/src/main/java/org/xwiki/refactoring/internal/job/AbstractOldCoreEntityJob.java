@@ -119,7 +119,9 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
         DocumentReference userReference = xcontext.getUserReference();
         try {
             xcontext.setUserReference(this.request.getUserReference());
-            boolean result = xcontext.getWiki().copyDocument(source, destination, null, false, true, false, xcontext);
+            String language = source.getLocale() != null ? source.getLocale().toString() : null;
+            boolean result =
+                xcontext.getWiki().copyDocument(source, destination, language, false, true, false, xcontext);
             if (result) {
                 this.logger.info("Document [{}] has been copied to [{}].", source, destination);
             } else {
@@ -142,8 +144,13 @@ public abstract class AbstractOldCoreEntityJob<R extends EntityRequest, S extend
         try {
             xcontext.setUserReference(this.request.getUserReference());
             XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
-            xcontext.getWiki().deleteAllDocuments(document, xcontext);
-            this.logger.info("Document [{}] has been deleted with all its translations.", reference);
+            if (document.getTranslation() == 1) {
+                xcontext.getWiki().deleteDocument(document, xcontext);
+                this.logger.info("Document [{}] has been deleted.", reference);
+            } else {
+                xcontext.getWiki().deleteAllDocuments(document, xcontext);
+                this.logger.info("Document [{}] has been deleted with all its translations.", reference);
+            }
             return true;
         } catch (Exception e) {
             this.logger.error("Failed to delete document [{}].", reference, e);

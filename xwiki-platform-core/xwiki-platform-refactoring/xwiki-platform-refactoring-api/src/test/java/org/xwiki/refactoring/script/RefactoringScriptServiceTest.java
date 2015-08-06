@@ -115,7 +115,7 @@ public class RefactoringScriptServiceTest
         assertEquals(false, request.getValue().isDeep());
         assertEquals(true, request.getValue().isDeleteSource());
         assertEquals(true, request.getValue().isUpdateLinks());
-        assertEquals(true, request.getValue().isInteractive());
+        assertEquals(false, request.getValue().isInteractive());
         assertEquals(true, request.getValue().isCheckRights());
     }
 

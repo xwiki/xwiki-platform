@@ -35,17 +35,23 @@
         #error($services.localization.render('core.rename.emptyName'))
         #template("renameStep1.vm")
       #else
-        #set($newDocReference = $services.model.createDocumentReference('', $!{request.newSpaceName}, $!{request.newPageName}))
-        #set($newDocReferenceAsString = $services.model.serialize($newDocReference))
+        #set ($newSpaceReference = $services.model.resolveSpace($request.newSpaceName))
+        #set ($newDocReference = $services.model.createEntityReference($request.newPageName, 'DOCUMENT',
+          $newSpaceReference))
+        #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
-          #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)}, $xwiki.getURL($newDocReference)]))
+          #error($services.localization.render('core.rename.alreadyExists', [${escapetool.xml($newDocReferenceAsString)},
+            $xwiki.getURL($newDocReference)]))
           #template("renameStep1.vm")
         #elseif(!$xwiki.hasAccessLevel('edit', $xcontext.user, $newDocReferenceAsString))
           $response.setStatus(403)
-          #error($services.localization.render('core.rename.targetNotWritable', [${escapetool.xml($newDocReferenceAsString)}]))
+          #error($services.localization.render('core.rename.targetNotWritable',
+            [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
+          ## FIXME: Decide whether we continue to support selective backlink / children update or not. At the moment we
+          ## collect the selected backlinks and children but we don't use them: we update everything.
           #set($backlinks = [])
           #set($children = [])
           #foreach($param in $request.parameterNames)
@@ -55,11 +61,25 @@
               #set($discard = $children.add($services.model.resolveDocument($param.substring(6))))
             #end
           #end
-          ## Save the old document name so that we can display it in the notice box. After the rename the
-          ## doc points to the new reference!
-          #set ($oldDocReference = $doc.documentReference)
-          $doc.rename($newDocReference, $backlinks, $children)
-          #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('core.rename.success', [${escapetool.xml($oldDocReference.name)}, ${escapetool.xml($doc.name)}, $doc.getURL(), ${escapetool.xml($oldDocReference.getLastSpaceReference().getName())}, ${escapetool.xml($doc.space)}]))
+          #set ($success = false)
+          #set ($renameJob = $services.refactoring.rename($doc.documentReference, $newDocReference))
+          #try()
+            #set ($discard = $renameJob.join())
+            #set ($renameJobStatus = $services.job.getJobStatus($renameJob.request.id))
+            #set ($success = $renameJobStatus.log.getLogs('ERROR').isEmpty())
+          #end
+          #if ($success)
+            #set ($message = $services.localization.render('core.rename.success', [
+              $escapetool.xml($doc.name),
+              $escapetool.xml($newDocReference.name),
+              $xwiki.getURL($newDocReference),
+              $escapetool.xml($doc.space),
+              $escapetool.xml($services.model.serialize($newSpaceReference))
+            ]))
+          #else
+            #set ($message = $services.localization.render('core.rename.targetNotWritable'))
+          #end
+          #xwikimessageboxstart($services.localization.render('notice') $message)
           #xwikimessageboxend()
         #end
       #end

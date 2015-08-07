@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -34,9 +33,12 @@ public class WikiEditPage extends PreviewableEditPage
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleInput;
 
-    @FindBy(name = "parent")
+    @FindBy(id = "xwikidocparentinput")
     private WebElement parentInput;
 
+    /**
+     * The hierarchy icon that needs to be clicked to reveal the parent field.
+     */
     @FindBy(id = "editParentTrigger")
     private WebElement editParentTrigger;
 
@@ -90,8 +92,6 @@ public class WikiEditPage extends PreviewableEditPage
      */
     public void setParent(String parent)
     {
-        // Without this, the following cast fails with a ClassCastException
-        this.parentInput = this.getDriver().findElement(By.name("parent"));
         if (!this.parentInput.isDisplayed()) {
             this.editParentTrigger.click();
         }

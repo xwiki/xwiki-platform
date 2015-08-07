@@ -76,6 +76,12 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- We have to bundle an implementation for the refactoring API because some tests need to delete pages. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-refactoring-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

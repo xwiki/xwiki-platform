@@ -286,6 +286,13 @@ public class MockitoOldcoreRule implements MethodRule
             environment.setPermanentDirectory(this.permanentDirectory);
         }
 
+        // Initialize the Execution Context
+        if (this.componentManager.hasComponent(ExecutionContextManager.class)) {
+            ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+            ExecutionContext ec = new ExecutionContext();
+            ecm.initialize(ec);
+        }
+
         // Bridge with old XWiki Context, required for old code.
         Execution execution;
         if (this.componentManager.hasComponent(Execution.class)) {
@@ -301,13 +308,6 @@ public class MockitoOldcoreRule implements MethodRule
             econtext = execution.getContext();
         }
         econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
-
-        // Initialize the Execution Context
-        if (this.componentManager.hasComponent(ExecutionContextManager.class)) {
-            ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
-            ExecutionContext ec = new ExecutionContext();
-            ecm.initialize(ec);
-        }
 
         // Initialize XWikiContext provider
         if (!this.componentManager.hasComponent(XWikiContext.TYPE_PROVIDER)) {

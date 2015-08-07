@@ -21,10 +21,12 @@ package com.xpn.xwiki.doc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
+import org.junit.Test;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -74,6 +76,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
     private Mock mockXWikiStoreInterface;
 
     private Mock mockXWikiRightService;
+
+    private Mock mockDisplayConfiguration;
 
     private BaseClass baseClass;
 
@@ -161,9 +165,9 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         super.registerComponents();
 
         // Setup display configuration.
-        Mock mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
-        mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
-        mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
+        this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
+        this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
+        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
     }
 
     public void testCurrentDocumentVariableIsInjectedBeforeRendering() throws XWikiException
@@ -326,5 +330,54 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         // Now verify that the Velocity Engine doesn't contain any more cached macro namespace to prove that
         // getRenderedContent has correctly cleaned the Velocity macro cache.
         assertEquals(cachedMacroNamespaceSize, mbean.getTemplates().values().size());
+    }
+
+    @Test
+    public void testGetRenderedTitleWhenMatchingTitleHeaderDepth()
+    {
+        this.document.setContent("=== level3");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
+        // Overwrite the title heading depth.
+        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(3));
+
+        assertEquals("level3", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    @Test
+    public void testGetRenderedTitleWhenNotMatchingTitleHeaderDepth()
+    {
+        this.document.setContent("=== level3");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    public void testGetRenderedContent() throws XWikiException
+    {
+        this.document.setContent("**bold**");
+        this.document.setSyntax(Syntax.XWIKI_2_0);
+
+        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
+
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        this.translatedDocument.setContent("//italic//");
+        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        this.translatedDocument.setNew(false);
+
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
+        this.mockXWiki.stubs().method("getDocument").with(eq(new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())), ANYTHING).will(returnValue(this.translatedDocument));
+
+        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
+    }
+
+    public void testGetRenderedContentWithSourceSyntax()
+    {
+        this.document.setSyntax(Syntax.XWIKI_1_0);
+
+        assertEquals("<p><strong>bold</strong></p>",
+            this.document.getRenderedContent("**bold**", "xwiki/2.0", getContext()));
     }
 }

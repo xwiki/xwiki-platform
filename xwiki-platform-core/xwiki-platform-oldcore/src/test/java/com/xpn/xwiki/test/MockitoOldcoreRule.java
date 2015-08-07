@@ -99,6 +99,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolv
 import com.xpn.xwiki.internal.model.reference.CurrentStringSpaceReferenceResolver;
 import com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -135,7 +136,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     protected File temporaryDirectory;
 
-    private XWikiStoreInterface mockStore;
+    private XWikiHibernateStore mockHibernateStore;
 
     private XWikiVersioningStoreInterface mockVersioningStore;
 
@@ -247,11 +248,12 @@ public class MockitoOldcoreRule implements MethodRule
         this.mockXWiki = mock(XWiki.class);
         getXWikiContext().setWiki(this.mockXWiki);
 
-        this.mockStore = mock(XWikiStoreInterface.class);
+        this.mockHibernateStore = mock(XWikiHibernateStore.class);
         this.mockVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockRightService = mock(XWikiRightService.class);
 
-        when(mockXWiki.getStore()).thenReturn(mockStore);
+        when(mockXWiki.getStore()).thenReturn(mockHibernateStore);
+        when(mockXWiki.getHibernateStore()).thenReturn(mockHibernateStore);
         when(mockXWiki.getVersioningStore()).thenReturn(mockVersioningStore);
         when(mockXWiki.getRightService()).thenReturn(mockRightService);
 
@@ -772,7 +774,7 @@ public class MockitoOldcoreRule implements MethodRule
 
     public XWikiStoreInterface getMockStore()
     {
-        return this.mockStore;
+        return this.mockHibernateStore;
     }
 
     /**
@@ -880,7 +882,7 @@ public class MockitoOldcoreRule implements MethodRule
      * 
      * @since 7.2M2
      */
-    public void registerEntityReferenceFramework() throws Exception
+    public void registerEntityReferenceComponents() throws Exception
     {
         this.componentManager.registerComponentIfDontExist(CompactStringEntityReferenceSerializer.class);
         this.componentManager.registerComponentIfDontExist(CompactWikiStringEntityReferenceSerializer.class);

@@ -95,6 +95,14 @@ public class EditAction extends XWikiAction
         updateDocumentTitleAndContentFromRequest(editedDocument, context);
         editedDocument.readObjectsFromForm(editForm, context);
 
+        // Set the current user as creator, author and contentAuthor when the edited document is newly created to avoid
+        // using XWikiGuest instead (because those fields were not previously initialized).
+        if (editedDocument.isNew()) {
+            editedDocument.setCreatorReference(context.getUserReference());
+            editedDocument.setAuthorReference(context.getUserReference());
+            editedDocument.setContentAuthorReference(context.getUserReference());
+        }
+
         // Expose the edited document on the XWiki context and the Velocity context.
         putDocumentOnContext(editedDocument, context);
 

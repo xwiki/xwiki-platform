@@ -192,7 +192,7 @@ public class XWikiExplorer extends Widget implements HasDoubleClickNodeHandlers
      */
     public String getSelectedPage()
     {
-        return getSelectedEntity(2);
+        return isNewPage() ? null : getSelectedEntity(2);
     }
 
     /**

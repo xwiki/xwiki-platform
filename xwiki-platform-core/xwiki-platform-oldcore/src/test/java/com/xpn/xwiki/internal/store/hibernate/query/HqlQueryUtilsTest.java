@@ -43,6 +43,8 @@ public class HqlQueryUtilsTest
         assertTrue(HqlQueryUtils.isSafe("select count(name) from XWikiDocument"));
         assertTrue(HqlQueryUtils.isSafe("select count(doc.name) from XWikiDocument doc"));
 
+        assertTrue(HqlQueryUtils.isSafe("select doc.fullName from XWikiDocument as doc, com.xpn.xwiki.objects.StringProperty as str"));
+
         // not allowed
 
         assertFalse(HqlQueryUtils.isSafe("select name from OtherTable"));

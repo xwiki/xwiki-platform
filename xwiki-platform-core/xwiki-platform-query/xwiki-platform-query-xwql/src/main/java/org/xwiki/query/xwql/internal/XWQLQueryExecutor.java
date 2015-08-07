@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -59,6 +60,15 @@ public class XWQLQueryExecutor implements QueryExecutor
     {
         // We can't inject QueryManager because of cyclic dependency.
         return this.componentManager.getInstance(QueryManager.class);
+    }
+
+    /**
+     * @param statement the statement to evaluate
+     * @return true if the statement is complete, false otherwise
+     */
+    public static boolean isShortFormStatement(String statement)
+    {
+        return StringUtils.startsWithAny(statement.trim().toLowerCase(), ",", "from", "where", "order");
     }
 
     @Override
@@ -95,7 +105,8 @@ public class XWQLQueryExecutor implements QueryExecutor
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }
 
-            if (nativeQuery instanceof SecureQuery && query instanceof SecureQuery) {
+            if (nativeQuery instanceof SecureQuery && query instanceof SecureQuery
+                && !isShortFormStatement(query.getStatement())) {
                 ((SecureQuery) nativeQuery).checkCurrentAuthor(((SecureQuery) query).isCurrentAuthorChecked());
                 ((SecureQuery) nativeQuery).checkCurrentUser(((SecureQuery) query).isCurrentUserChecked());
             }

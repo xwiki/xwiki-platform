@@ -19,18 +19,30 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Unit tests for the {@link BaseClass} class.
  *
  * @version $Id$
  */
-public class BaseClassTest extends AbstractBridgedComponentTestCase
+public class BaseClassTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
+    @Before
+    public void before() throws Exception
+    {
+        this.oldcore.registerEntityReferenceComponents();
+    }
+
     @Test
     public void testSetDocumentReference() throws Exception
     {
@@ -45,7 +57,7 @@ public class BaseClassTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetNameSetWiki() throws Exception
     {
-        String database = getContext().getWikiId();
+        String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
 
         baseClass.setName("space.page");
@@ -58,13 +70,13 @@ public class BaseClassTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetNameAloneWithChangingContext() throws Exception
     {
-        String database = getContext().getWikiId();
+        String database = this.oldcore.getXWikiContext().getWikiId();
         BaseClass baseClass = new BaseClass();
 
         baseClass.setName("space.page");
 
         try {
-            getContext().setWikiId("otherwiki");
+            this.oldcore.getXWikiContext().setWikiId("otherwiki");
 
             Assert.assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
             Assert.assertEquals("space", baseClass.getDocumentReference().getLastSpaceReference().getName());
@@ -72,7 +84,7 @@ public class BaseClassTest extends AbstractBridgedComponentTestCase
 
             baseClass.setName("otherspace.otherpage");
         } finally {
-            getContext().setWikiId(database);
+            this.oldcore.getXWikiContext().setWikiId(database);
         }
 
         Assert.assertEquals(database, baseClass.getDocumentReference().getWikiReference().getName());
@@ -81,10 +93,10 @@ public class BaseClassTest extends AbstractBridgedComponentTestCase
 
         baseClass = new BaseClass();
         try {
-            getContext().setWikiId("otherwiki");
+            this.oldcore.getXWikiContext().setWikiId("otherwiki");
             baseClass.setName("space.page");
         } finally {
-            getContext().setWikiId(database);
+            this.oldcore.getXWikiContext().setWikiId(database);
         }
 
         Assert.assertEquals("otherwiki", baseClass.getDocumentReference().getWikiReference().getName());

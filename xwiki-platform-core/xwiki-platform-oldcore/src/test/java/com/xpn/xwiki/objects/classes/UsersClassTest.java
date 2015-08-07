@@ -34,8 +34,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.web.Utils;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.objects.classes.UsersClass}.

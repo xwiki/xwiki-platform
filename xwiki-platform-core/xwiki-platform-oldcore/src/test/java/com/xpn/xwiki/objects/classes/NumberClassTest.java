@@ -19,17 +19,35 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit tests for the {@link NumberClass} class.
  * 
  * @version $Id$
  */
-public class NumberClassTest extends AbstractBridgedXWikiComponentTestCase
+public class NumberClassTest
 {
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
+    @Before
+    public void before() throws Exception
+    {
+        this.oldcore.registerEntityReferenceComponents();
+    }
+
     /** Test the fromString method. */
+    @Test
     public void testFromString()
     {
         // Create a default Number property

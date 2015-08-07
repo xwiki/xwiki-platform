@@ -23,39 +23,51 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.jmock.Mock;
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link StaticListClass}.
  * 
  * @version $Id$
  */
-public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
+public class StaticListClassTest
 {
     /**
      * Static list values that contain HTML special characters that need to be escaped in the HTML display.
      */
     private static final List<String> VALUES_WITH_HTML_SPECIAL_CHARS = Arrays.asList("a<b>c", "1\"2'3", "x{y&z");
 
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     /** Tests that {@link StaticListClass#getList} returns values sorted according to the property's sort option. */
+    @Test
     public void testGetListIsSorted()
     {
         StaticListClass listClass = new StaticListClass();
         listClass.setValues("a=A|c=D|d=C|b");
 
-        assertEquals("Default order was not preserved.", "[a, c, d, b]", listClass.getList(getContext()).toString());
+        assertEquals("Default order was not preserved.", "[a, c, d, b]",
+            listClass.getList(this.oldcore.getXWikiContext()).toString());
         listClass.setSort("none");
-        assertEquals("Default order was not preserved.", "[a, c, d, b]", listClass.getList(getContext()).toString());
+        assertEquals("Default order was not preserved.", "[a, c, d, b]",
+            listClass.getList(this.oldcore.getXWikiContext()).toString());
         listClass.setSort("id");
-        assertEquals("Items were not ordered by ID.", "[a, b, c, d]", listClass.getList(getContext()).toString());
+        assertEquals("Items were not ordered by ID.", "[a, b, c, d]", listClass.getList(this.oldcore.getXWikiContext())
+            .toString());
         listClass.setSort("value");
-        assertEquals("Items were not ordered by value.", "[a, b, d, c]", listClass.getList(getContext()).toString());
+        assertEquals("Items were not ordered by value.", "[a, b, d, c]",
+            listClass.getList(this.oldcore.getXWikiContext()).toString());
     }
 
     /**
@@ -63,6 +75,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
      * 
      * @see "XWIKI-9680: Apostrophes in static list value are encoded on .display()"
      */
+    @Test
     public void testDisplayView()
     {
         ListProperty listProperty = new ListProperty();
@@ -116,6 +129,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the 'input' display type.
      */
+    @Test
     public void testDisplayEditInput()
     {
         testDisplayEdit("input", VALUES_WITH_HTML_SPECIAL_CHARS, "<input size='7' id='w&#62;vb&#38;a&#60;r' "
@@ -125,6 +139,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the 'select' display type.
      */
+    @Test
     public void testDisplayEditSelect()
     {
         String expectedHTML =
@@ -139,6 +154,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the 'radio' display type.
      */
+    @Test
     public void testDisplayEditRadio()
     {
         StringBuilder expectedHTML = new StringBuilder();
@@ -158,6 +174,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the 'checkbox' display type.
      */
+    @Test
     public void testDisplayEditCheckbox()
     {
         StringBuilder expectedHTML = new StringBuilder();
@@ -177,6 +194,7 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the hidden display type.
      */
+    @Test
     public void testDisplayHidden()
     {
         ListProperty listProperty = new ListProperty();
@@ -195,8 +213,11 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     /**
      * Tests the suggest code generated when "use suggest" is set.
      */
-    public void testDisplayEditWithSuggest()
+    @Test
+    public void testDisplayEditWithSuggest() throws Exception
     {
+        this.oldcore.registerEntityReferenceComponents();
+
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(VALUES_WITH_HTML_SPECIAL_CHARS);
 
@@ -223,10 +244,9 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
 
         staticListClass.setDisplayType("input");
         staticListClass.setPicker(true);
-        Mock xwikiMock = mock(XWiki.class);
-        xwikiMock.stubs().method("getURL").will(returnValue("/xwiki/bin/view/Main/WebHome"));
-        getContext().setWiki((XWiki) xwikiMock.proxy());
-        String output = staticListClass.displayEdit(propertyName, prefix, object, getContext());
+        when(this.oldcore.getMockXWiki().getURL("Main.WebHome", "view", this.oldcore.getXWikiContext())).thenReturn(
+            "/xwiki/bin/view/Main/WebHome");
+        String output = staticListClass.displayEdit(propertyName, prefix, object, this.oldcore.getXWikiContext());
         System.err.println(output);
         assertTrue(output
             .contains("new ajaxSuggest(this, &#123;script:&#34;/xwiki/bin/view/Main/WebHome?xpage=suggest&#38;"

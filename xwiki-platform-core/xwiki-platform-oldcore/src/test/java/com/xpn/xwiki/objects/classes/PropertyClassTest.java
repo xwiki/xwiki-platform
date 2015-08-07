@@ -22,8 +22,7 @@ package com.xpn.xwiki.objects.classes;
 import java.util.Random;
 
 import org.junit.Assert;
-
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import org.junit.Test;
 
 /**
  * Unit tests for the base {@link PropertyClass} class.
@@ -31,9 +30,10 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @version $Id$
  * @since 2.4M2
  */
-public class PropertyClassTest extends AbstractBridgedXWikiComponentTestCase
+public class PropertyClassTest
 {
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */
+    @Test
     public void testCompareTo()
     {
         PropertyClass one = new PropertyClass();

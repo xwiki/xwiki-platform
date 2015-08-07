@@ -105,9 +105,13 @@ public class XWQLQueryExecutor implements QueryExecutor
                 nativeQuery.bindValue(e.getKey(), e.getValue());
             }
 
-            if (nativeQuery instanceof SecureQuery && query instanceof SecureQuery
-                && !isShortFormStatement(query.getStatement())) {
-                ((SecureQuery) nativeQuery).checkCurrentAuthor(((SecureQuery) query).isCurrentAuthorChecked());
+            if (nativeQuery instanceof SecureQuery && query instanceof SecureQuery) {
+                // No need to validate the HQL query for short XWQL queries
+                if (((SecureQuery) query).isCurrentAuthorChecked() && !isShortFormStatement(query.getStatement())) {
+                    ((SecureQuery) nativeQuery).checkCurrentAuthor(true);
+                }
+
+                // Let HQL module take care of that is supported
                 ((SecureQuery) nativeQuery).checkCurrentUser(((SecureQuery) query).isCurrentUserChecked());
             }
 

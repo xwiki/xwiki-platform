@@ -28,6 +28,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
+import org.xwiki.query.SecureQuery;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ import java.util.Map;
  * @version $Id$
  * @since 4.0RC1
  */
-public class ScriptQuery implements Query
+public class ScriptQuery implements SecureQuery
 {
     /**
      * Used to log possible warnings.
@@ -234,5 +235,35 @@ public class ScriptQuery implements Query
     public <T> List<T> execute() throws QueryException
     {
         return this.query.execute();
+    }
+
+    @Override
+    public boolean isCurrentAuthorChecked()
+    {
+        return this.query instanceof SecureQuery ? ((SecureQuery) this.query).isCurrentAuthorChecked() : true;
+    }
+
+    @Override
+    public SecureQuery checkCurrentAuthor(boolean checkCurrentAuthor)
+    {
+        // Always check current author for scripts
+
+        return this;
+    }
+
+    @Override
+    public boolean isCurrentUserChecked()
+    {
+        return this.query instanceof SecureQuery ? ((SecureQuery) this.query).isCurrentAuthorChecked() : false;
+    }
+
+    @Override
+    public SecureQuery checkCurrentUser(boolean checkCurrentUser)
+    {
+        if (this.query instanceof SecureQuery) {
+            ((SecureQuery) this.query).isCurrentAuthorChecked();
+        }
+
+        return this;
     }
 }

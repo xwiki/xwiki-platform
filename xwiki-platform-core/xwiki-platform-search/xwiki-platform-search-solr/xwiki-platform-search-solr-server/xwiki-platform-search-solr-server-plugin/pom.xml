@@ -29,12 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
   <name>XWiki Platform - Search - Solr - Server - Plugin</name>
+  <packaging>jar</packaging>
   <description>This module provides various Solr plugins specific to XWiki. See http://wiki.apache.org/solr/SolrPlugins .</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search Plugin</xwiki.extension.name>
     <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
-
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-search-solr-plugin</xwiki.extension.features>
   </properties>

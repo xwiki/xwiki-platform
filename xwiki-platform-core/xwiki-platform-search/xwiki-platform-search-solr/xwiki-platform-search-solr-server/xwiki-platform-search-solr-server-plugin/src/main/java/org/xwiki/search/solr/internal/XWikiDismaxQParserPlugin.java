@@ -220,8 +220,8 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
 
     /**
      * @param fieldName the field name to match
-     * @param fieldNames the list of field name patterns; a field name pattern is a string that can start or end with a
-     *            {@link #WILDCARD}.
+     * @param fieldNamePatterns the list of field name patterns; a field name pattern is a string that can start or
+     *        end with a {@link #WILDCARD}.
      * @return {@code true} if at least one of the field name patterns matches the given field name, {@code false}
      *         otherwise
      */

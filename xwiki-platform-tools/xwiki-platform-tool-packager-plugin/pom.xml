@@ -278,6 +278,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Use Logback as the logging implementation -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -310,7 +316,8 @@
     <profile>
       <id>integration-tests</id>
       <!-- The integration tests use only the local maven repository (as specified by the dedicated settings.xml) and so
-        we have to make sure the required dependencies are present in the local maven repository by listing them here. -->
+           we have to make sure the required dependencies are present in the local maven repository by listing them
+           here. -->
       <dependencies>
         <!-- Used by package-simple integration test -->
         <dependency>
@@ -329,11 +336,14 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <postBuildHookScript>verify</postBuildHookScript>
               <goals>
                 <goal>clean</goal>
                 <goal>package</goal>
               </goals>
-              <debug>true</debug>
+              <!-- Don't display debug logs by default because it takes more time and one test asserts that there's no
+                   extra debug log displayed since we don't want that when we execute this plugin on projects -->
+              <debug>false</debug>
             </configuration>
             <executions>
               <execution>

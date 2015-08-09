@@ -43,8 +43,8 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
       <version>${project.version}</version>
-      <!-- We use "runtime" so that this dep is not used transitively by Maven and thus doesn't find its way into
-           our distirbution's WEB-INF/lib directory. -->
+      <!-- We use "provided" so that this dep is not used transitively by Maven and thus doesn't find its way into
+           our distribution's WEB-INF/lib directory. -->
       <scope>provided</scope>
     </dependency>
   </dependencies>

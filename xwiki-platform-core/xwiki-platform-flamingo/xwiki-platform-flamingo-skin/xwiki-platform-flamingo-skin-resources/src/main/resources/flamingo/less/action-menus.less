@@ -78,13 +78,17 @@
 // Navbar avatar ==========================================================
 
 .navbar-avatar {
-  > a > img {
-    @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
-    border-radius: @thumbnail-border-radius;
-    height: @avatar-size;
-    margin-top: -@navbar-padding-vertical+@navbar-height/2-@avatar-size/2;
-    vertical-align: middle;
-    width: @avatar-size;
+  > a {
+    max-height: @navbar-height;
+    
+    > img {
+      @avatar-size: floor(ceil(@navbar-height/2)/2)*2;
+      border-radius: @thumbnail-border-radius;
+      height: @avatar-size;
+      margin-top: -@navbar-padding-vertical+@navbar-height/2-@avatar-size/2;
+      vertical-align: middle;
+      width: @avatar-size;
+    }
   }
 }
 

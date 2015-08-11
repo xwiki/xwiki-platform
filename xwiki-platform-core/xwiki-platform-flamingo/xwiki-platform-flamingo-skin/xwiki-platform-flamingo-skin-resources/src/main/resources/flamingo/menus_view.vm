@@ -10,7 +10,7 @@
     ## Right menu
     #xwikitopmenurightstart()
       <li>
-        <a class="icon-navbar drawer-toggle"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+        <a class="icon-navbar drawer-toggle" id="tmDrawerActivator"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
       </li>
       #template("quicksearch.vm")
       #displayUserAvatar()
@@ -23,8 +23,10 @@
 #end
 ##
 #macro(displayUserAvatar)
-  #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
-  <li class="navbar-avatar">
-    <a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"><span class="sr-only">See user profile</span>#smallUserAvatar($xcontext.user)</a>
-  </li>
+  #if ($xcontext.user != 'XWiki.XWikiGuest')
+    #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
+    <li class="navbar-avatar">
+      <a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"><span class="sr-only">$services.localization.render('homepage')</span>#smallUserAvatar($xcontext.user)</a>
+    </li>
+  #end
 #end

@@ -33,7 +33,7 @@ public class ExtendedViewPage extends ViewPage
 
     public CreateWikiPage createWiki()
     {
-        toggleCreateMenu();
+        toggleDrawer();
         this.createWikiMenuLink.click();
         return new CreateWikiPage();
     }
@@ -43,7 +43,7 @@ public class ExtendedViewPage extends ViewPage
      */
     public DeleteWikiPage deleteWiki()
     {
-        toggleWikiMenu();
+        toggleDrawer();
         this.deleteWikiMenuLink.click();
         return new DeleteWikiPage();
     }

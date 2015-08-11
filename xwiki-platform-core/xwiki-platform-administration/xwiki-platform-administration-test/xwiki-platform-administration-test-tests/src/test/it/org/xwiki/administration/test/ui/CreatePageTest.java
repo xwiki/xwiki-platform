@@ -253,8 +253,11 @@ public class CreatePageTest extends AbstractTest
         createPage.waitForErrorMessage();
 
         // Step 3: Create a space that already exists
-        vp = getUtil().gotoPage(existingPageReference);
-        CreateSpacePage createSpace = vp.createSpace();
+        // Since the Flamingo skin no longer supports creating a space from the UI, trigger the Space creation UI
+        // by using directly the direct action URL for it.
+        getUtil().gotoPage(getUtil().getURL("create", 
+                new String[] {getTestClassName(), "ExistingPage", "WebHome"}, "tocreate=space"));
+        CreateSpacePage createSpace = new CreateSpacePage();
         currentURL = getDriver().getCurrentUrl();
         // strip the parameters out of this URL
         currentURL =

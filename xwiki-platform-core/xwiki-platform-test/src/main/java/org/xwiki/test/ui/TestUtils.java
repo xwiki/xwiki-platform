@@ -352,12 +352,17 @@ public class TestUtils
 
     public String getLoggedInUserName()
     {
-        String loggedInUserName = null;
-        List<WebElement> elements = getDriver().findElementsWithoutWaiting(By.xpath("(//.[@id='tmUser']//a)[1]"));
-        if (!elements.isEmpty()) {
-            String href = elements.get(0).getAttribute("href");
-            loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
+        By userAvatar = By.xpath("//div[@id='xwikimainmenu']//li[contains(@class, 'navbar-avatar')]/a");
+        if (!getDriver().hasElementWithoutWaiting(userAvatar)) {
+            // Guest
+            return null;
         }
+        
+        WebElement element = getDriver().findElementWithoutWaiting(userAvatar);
+        String href = element.getAttribute("href");
+        String loggedInUserName = href.substring(href.lastIndexOf("/") + 1);
+        
+        // Return
         return loggedInUserName;
     }
 
@@ -966,7 +971,7 @@ public class TestUtils
 
     public boolean isInViewMode()
     {
-        return getDriver().findElements(By.id("tmEdit")).size() > 0;
+        return !getDriver().hasElementWithoutWaiting(By.id("editMeta"));
     }
 
     public boolean isInSourceViewMode()

@@ -34,19 +34,28 @@ public class AnnotationsPane extends BaseElement
 {
     @FindBy(id = "annotationsdisplay")
     private WebElement checkBox;
+    
+    private void clickOnAnnotationMenu()
+    {
+        String dropDownMenuXPath = "//div[@id='tmMoreActions']//ul[contains(@class, 'dropdown-menu')]"; 
+
+        // Open the page menu
+        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/a[contains(@role, 'button')]")).click();
+        // Wait for the drop down menu to be displayed
+        getDriver().waitUntilElementIsVisible(
+                By.xpath(dropDownMenuXPath));
+        // Click on the annotations button
+        WebElement annotationsPane = getDriver().findElement(
+                By.xpath(dropDownMenuXPath + "//a[contains(., 'Annotations')]"));
+        annotationsPane.click();
+    }
 
     /**
      * Shows the annotations pane from the top of the page
      */
     public void showAnnotationsPane()
     {
-        // Open the page menu
-        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
-            click();
-        // Click on the annotations button
-        WebElement annotationsPane = getDriver().findElement(
-            By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
-        annotationsPane.click();
+        clickOnAnnotationMenu();
         // Verify that the annotationssettings panel is open
         getDriver().waitUntilElementIsVisible(By.className("annotationsettings"));
     }
@@ -56,13 +65,7 @@ public class AnnotationsPane extends BaseElement
      */
     public void hideAnnotationsPane()
     {
-        // Open the page menu
-        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
-                click();
-        // Click on the annotations button
-        WebElement annotationsPane = getDriver().findElement(
-                By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
-        annotationsPane.click();
+        clickOnAnnotationMenu();
         // Verify that the annotationssettings panel is close
         getDriver().waitUntilElementDisappears(By.className("annotationsettings"));
     }

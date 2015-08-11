@@ -1,6 +1,15 @@
-#macro(drawerItem $url $icon $text)
+##########################################
+##              GLOBALS
+##########################################
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
+##########################################
+##            DRAWER ITEM
+##########################################
+#macro(drawerItem $url $icon $text $id)
   <li class="drawer-menu-item">
-    <a href="$url">
+    <a href="$url" #if($id)id="$id"#end>
       <div class="drawer-menu-item-icon">
         <span class="glyphicon glyphicon-${icon}"></span>
       </div>
@@ -8,25 +17,28 @@
     </a>
   </li>
 #end
-
+##########################################
+##            DRAWER SEPARATOR
+##########################################
 #macro(drawerSeparator)
   <li class="drawer-menuseparator"></li>
 #end
-
-## Start Drawer customization
-<div class="drawer-main drawer-default">
+##########################################
+##               DRAWER
+##########################################
+<div class="drawer-main drawer-default" id="tmDrawer">
   <nav class="drawer-nav" role="navigation">
     <div class="drawer-brand clearfix">
       <a href="$xwiki.getURL($xcontext.user, 'view')">
       #largeUserAvatar($xcontext.user)
       </a>
       <div class="brand-links">
-        <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user">$!xwiki.getUserName($xcontext.user, false)</a>
-        #if ($xcontext.user == 'XWiki.XWikiGuest')
-          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('login')</a>
-          <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('register')</a>
+        #if ($xcontext.user != 'XWiki.XWikiGuest')
+          <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user" id="tmUser">$!xwiki.getUserName($xcontext.user, false)</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogout">$services.localization.render('logout')</a>
         #else
-          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('logout')</a>
+          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmLogin">$services.localization.render('login')</a>
+          <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")" id="tmRegister">$services.localization.render('register')</a>
         #end
       </div>
     </div>
@@ -43,12 +55,12 @@
         #set ($isHomeAdminAppInstalled = $xwiki.exists($homeAdminSheetRef))
         #if ($isHomeAdminAppInstalled)
           #if($xcontext.isMainWiki())
-            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'))
+            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'), 'tmAdminWiki')
           #else
-            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin'))
+            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin'), 'tmAdminWiki')
           #end
         #else
-          #drawerItem($importaction, 'wrench', $services.localization.render('core.menu.admin'))
+          #drawerItem($importaction, 'wrench', $services.localization.render('core.menu.admin'), 'tmAdminWiki')
         #end
         #set ($hasPreviousMenuSection = true)
       #end
@@ -58,18 +70,26 @@
       ## DOCUMENT INDEX
       #set($homeDocumentIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'AllDocs'))
       #if ($xwiki.exists($homeDocumentIndexRef))
-        #drawerItem($xwiki.getURL($homeDocumentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'))
+        #drawerItem($xwiki.getURL($homeDocumentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'), 'tmWikiDocumentIndex')
       #end
       ## USER INDEX
       #set($homeUserIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'UserDirectory'))
       #if ($xwiki.exists($homeUserIndexRef))
-        #drawerItem($xwiki.getURL($homeUserIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'))
+        #drawerItem($xwiki.getURL($homeUserIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'), 'tmMainUserIndex')
       #end
       ## CREATE WIKI
       #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
         #drawerSeparator()
         #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
-        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $services.localization.render('core.menu.create.wiki'))
+        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $services.localization.render('core.menu.create.wiki'), 'tmCreateWiki')
+      #end
+      #set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
+      ## DELETE WIKI
+      #if ($canDeleteWiki)
+        #drawerSeparator()
+        #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
+        #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
+        #drawerItem($deleteUrl, 'remove', $services.localization.render('platform.wiki.menu.deletewiki'), 'tmDeleteWiki')
       #end
     </ul>
   </nav>

@@ -197,7 +197,7 @@ $services.localization.render('xe.scheduler.welcome')
   &lt;input type="hidden" name="space" value="Scheduler"/&gt;
   &lt;label class="hidden" for="page"&gt;$services.localization.render('xe.scheduler.jobs.create.nameTip')&lt;/label&gt;
   &lt;input id="page" name="page" size="30" type="text" class="withTip" value="$services.localization.render('xe.scheduler.jobs.create.nameTip')" /&gt;
-  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$services.localization.render('xe.scheduler.jobs.create.submit')"/&gt;&lt;/span&gt;
+  &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="btn btn-success button" value="$services.localization.render('xe.scheduler.jobs.create.submit')"/&gt;&lt;/span&gt;
 &lt;/div&gt;&lt;/form&gt;
 {{/html}}
 

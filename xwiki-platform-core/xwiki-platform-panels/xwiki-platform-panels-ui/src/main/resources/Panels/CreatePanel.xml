@@ -49,7 +49,7 @@
       &lt;input type="hidden" name="parent" value="Panels.WebHome"/&gt;
       &lt;label for="panelTitle" class="hidden"&gt;$services.localization.render('xe.panels.create.title')&lt;/label&gt;
       &lt;input type="text" id="panelTitle" name="panelTitle" value="$services.localization.render('xe.panels.create.title')" class="panelinput withTip" /&gt;
-      &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
+      &lt;input type="submit" class="btn btn-success button" value="$services.localization.render('create')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}##

@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-jira</artifactId>
   <name>XWiki Platform - JIRA</name>
   <packaging>jar</packaging>
-  <description>Component for using Atlassian's JIRA REST API to access JIRA instances</description>
+  <description>Provides scripting access to JIRA using JIRA's Client API (JRJC)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JIRA Scripting API</xwiki.extension.name>

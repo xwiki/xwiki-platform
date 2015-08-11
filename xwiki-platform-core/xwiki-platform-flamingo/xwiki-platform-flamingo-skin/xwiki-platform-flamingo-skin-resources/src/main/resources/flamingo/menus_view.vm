@@ -9,20 +9,22 @@
     
     ## Right menu
     #xwikitopmenurightstart()
+      <li>
+        <a class="icon-navbar drawer-toggle"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+      </li>
       #template("quicksearch.vm")
-      #template("menus_language.vm")
-      #template("menus_user.vm")
+      #displayUserAvatar()
     #xwikitopmenurightend()
-    
-    ## Left menu
-    #xwikitopmenuleftstart()
-      #template("menus_home.vm")
-      #template("menus_wiki.vm")
-      #template("menus_space.vm")
-      #template("menus_page.vm")
-      #template("menus_create.vm")
-    #xwikitopmenuleftend()
     
   ## End of Top Menu
   #xwikitopmenuend()
+  
+  #template("drawer.vm")
+#end
+##
+#macro(displayUserAvatar)
+  #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
+  <li class="navbar-avatar">
+    <a href="$xwiki.getURL($xcontext.user)" class="icon-navbar"><span class="sr-only">See user profile</span>#smallUserAvatar($xcontext.user)</a>
+  </li>
 #end

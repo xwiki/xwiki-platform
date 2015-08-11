@@ -1,0 +1,76 @@
+#macro(drawerItem $url $icon $text)
+  <li class="drawer-menu-item">
+    <a href="$url">
+      <div class="drawer-menu-item-icon">
+        <span class="glyphicon glyphicon-${icon}"></span>
+      </div>
+      <div class="drawer-menu-item-text">$text</div>
+    </a>
+  </li>
+#end
+
+#macro(drawerSeparator)
+  <li class="drawer-menuseparator"></li>
+#end
+
+## Start Drawer customization
+<div class="drawer-main drawer-default">
+  <nav class="drawer-nav" role="navigation">
+    <div class="drawer-brand clearfix">
+      <a href="$xwiki.getURL($xcontext.user, 'view')">
+      #largeUserAvatar($xcontext.user)
+      </a>
+      <div class="brand-links">
+        <a href="$xwiki.getURL($xcontext.user, 'view')" class="brand-user">$!xwiki.getUserName($xcontext.user, false)</a>
+        #if ($xcontext.user == 'XWiki.XWikiGuest')
+          <a href="$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('login')</a>
+          <a href="$xwiki.getURL('XWiki.XWikiRegister', 'register', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('register')</a>
+        #else
+          <a href="$xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")">$services.localization.render('logout')</a>
+        #end
+      </div>
+    </div>
+
+    <ul class="drawer-menu">
+      #drawerItem($xwiki.getURL($mainWikiHomeDocumentReference), 'home', 'Home')
+      ## ADMINISTER WIKI
+      #set ($hasHomeWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${mainWikiId}:XWiki.XWikiPreferences"))
+      #if ($hasHomeWikiAdmin)
+        #set ($adminRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'XWikiPreferences'))
+        #set ($adminwikiaction = $!xwiki.getURL($adminRef, 'admin'))
+        #set ($importaction = $!xwiki.getURL($adminRef, 'import'))
+        #set ($homeAdminSheetRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'AdminSheet'))
+        #set ($isHomeAdminAppInstalled = $xwiki.exists($homeAdminSheetRef))
+        #if ($isHomeAdminAppInstalled)
+          #if($xcontext.isMainWiki())
+            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin.wiki'))
+          #else
+            #drawerItem($adminwikiaction, 'wrench', $services.localization.render('core.menu.admin'))
+          #end
+        #else
+          #drawerItem($importaction, 'wrench', $services.localization.render('core.menu.admin'))
+        #end
+        #set ($hasPreviousMenuSection = true)
+      #end
+      ## WIKI INDEX
+      #drawerSeparator()
+      #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', 'Wiki Index')
+      ## DOCUMENT INDEX
+      #set($homeDocumentIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'AllDocs'))
+      #if ($xwiki.exists($homeDocumentIndexRef))
+        #drawerItem($xwiki.getURL($homeDocumentIndexRef), 'book', $services.localization.render('core.menu.wiki.documentindex'))
+      #end
+      ## USER INDEX
+      #set($homeUserIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'UserDirectory'))
+      #if ($xwiki.exists($homeUserIndexRef))
+        #drawerItem($xwiki.getURL($homeUserIndexRef), 'user', $services.localization.render('xe.panels.quicklinks.userdirectory'))
+      #end
+      ## CREATE WIKI
+      #if ($isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
+        #drawerSeparator()
+        #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
+        #drawerItem($xwiki.getURL($createWikiDocReference), 'plus', $services.localization.render('core.menu.create.wiki'))
+      #end
+    </ul>
+  </nav>
+</div>

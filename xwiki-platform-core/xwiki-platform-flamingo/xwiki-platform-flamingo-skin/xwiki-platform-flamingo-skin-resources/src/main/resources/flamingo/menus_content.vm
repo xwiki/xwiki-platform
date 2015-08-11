@@ -1,32 +1,125 @@
-#set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
+###########################################
+##                GLOBALS
+###########################################
+#set ($canCopy = $canView && $hasCreatePage)
+#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+###########################################
+##            MENU CONTENT
+###########################################
 <div id="contentmenu" class="pull-right actionmenu">
-#if($hasEdit && !$isReadOnly)
-  ## Compute the default edit mode
-  #set($editaction = $doc.getDefaultEditMode())
-  ##
-  ## Edit menu
-  ##
-  #if($isAdvancedUser)
-    #xwikisplitbuttonentrystart($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit' 'btn-primary' 'pencil')
-      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench')
+  #if ($hasEdit && !$isReadOnly)
+    #displayEditMenu()
+  #end
+  #if ($hasCreatePage)
+    #displayCreateButton()
+  #end
+  #if (!$doc.isNew())
+    #diplayOptionsMenu()
+    #exportModal()
+  #end
+  #if($keyboardShortcutsEnabled)
+    #keyboardShortcuts()
+  #end
+</div>
+###########################################
+##        DISPLAY CREATE BUTTON
+###########################################
+#macro(displayCreateButton)
+  <div class="dropdown">
+    <a href="$doc.getURL('create')" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+  </div>
+#end
+###########################################
+##         DISPLAY EDIT MENU
+###########################################
+#macro(displayEditMenu)
+  <div class="dropdown">
+    <a href="$doc.getURL($doc.getDefaultEditMode(), $!languageparams)" #if ($isAdvancedUser)data-toggle="dropdown"#end id="tmEdit" role="button"><span class="glyphicon glyphicon-pencil"></span></a>
+    #if ($isAdvancedUser)
+    <ul class="dropdown-menu">
       ## Check if the WYSIWYG supports the current document's syntax and if so add a menu entry to edit the current
       ## document with the WYSIWYG editor.
       #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) || $tdoc.syntax.toIdString() == 'xwiki/1.0')
         #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil')
       #end
-      #submenuitem($doc.getURL($editaction, "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
-      #submenuseparator()
-      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
-      #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
-      #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
-    #xwikibuttonentryend()
-  #else ## !isAdvanced
-    #xwikibutton($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit', 'btn-primary', 'pencil')
-  #end
-  #if($keyboardShortcutsEnabled)
-    <script type="text/javascript">
-    //<![CDATA[
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench')
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
+    </ul>
+    #end
+  </div>
+#end
+###########################################
+##         DISPLAY ACTIONS MENU
+###########################################
+#macro(diplayOptionsMenu)
+  <div class="dropdown" id="tmMoreActions">
+    <a href="" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-option-vertical"></span></a>
+    <ul class="dropdown-menu">
+      ## WATCH /UNWATCH
+      #if (!$doc.isNew() && $hasWatch)
+        #set ($watchClasses = '')
+        #set ($unwatchClasses = 'hidden')
+        #if ($services.watchlist.isWatched("DOCUMENT"))
+          #set ($watchClasses = 'hidden')
+          #set ($unwatchClasses = '')
+        #end
+        #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses 'eye-open')
+        #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses 'eye-close')
+        #submenuseparator()
+      #end
+      ## COPY
+      #if ($canCopy)
+        #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')
+      #end
+      ## DELETE
+      #if ($canDelete)
+        #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')
+        #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')
+      #end
+      #if ($canCopy || $canDelete)
+        #submenuseparator()
+      #end
+      ## Export
+      #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
+      ## Print
+      #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
+      ## View source
+      #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
+      ## Share by email
+      #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
+      #if ($canShare)
+        #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'viewer=share') $services.localization.render('core.menu.share') 'tmActionShare', '', 'envelope')
+        #userPicker_import()
+        $xwiki.jsx.use('XWiki.SharePage')
+        $xwiki.ssx.use('XWiki.SharePage')
+      #end
+      #if($hasEdit && !$isReadOnly && $isAdvancedUser)
+        #submenuseparator()
+        ## Rights
+        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
+        ## Objects
+        #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
+        ## Class
+        #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
+      #end
+      ## ----------------------------
+      ## Display the shortcuts
+      ## ----------------------------
+      #if($displayShortcuts)
+        #submenuseparator()
+        #template("shortcuts.vm")
+      #end
+    </ul>
+  </div>
+#end
+###########################################
+##          KEYBOARD SHORTCUTS
+###########################################
+#macro(keyboardShortcuts)
+  <script type="text/javascript">
+  //<![CDATA[
+    #if ($hasEdit && !$isReadOnly)
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
       #if($isAdvancedUser)
         shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
@@ -37,37 +130,18 @@
           shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
         #end
       #end
-    //]]>
-    </script>
-  #end
+    #end
+    #if ($canDelete)
+      shortcut.add("$services.localization.render('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+    #end
+  //]]>
+  </script>
 #end
-##
-## Actions menu
-##
-#if($displayMoreActionsMenu && !$doc.isNew())
-  #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' 'btn-default' 'cog')
-    ## Export
-    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
-    #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
-    #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
-    ## Share by email
-    #if ($canShare)
-      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'viewer=share') $services.localization.render('core.menu.share') 'tmActionShare', '', 'envelope')
-      #userPicker_import()
-      $xwiki.jsx.use('XWiki.SharePage')
-      $xwiki.ssx.use('XWiki.SharePage')
-    #end
-    
-    ## ----------------------------
-    ## Display the shortcuts
-    ## ----------------------------
-    #if($displayShortcuts)
-      #submenuseparator()
-      #template("shortcuts.vm")
-    #end
-    
-  #xwikibuttonentryend()
-  ## Export modal
+###########################################
+##            EXPORT MODAL
+###########################################
+#macro(exportModal)
   <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -90,14 +164,4 @@
       </div>
     </div>
   </div>
-  #if ($keyboardShortcutsEnabled)
-    <script type="text/javascript">
-    //<![CDATA[
-      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
-        location.href = $('tmViewSource').href;
-      }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
-    //]]>
-    </script>
-  #end
 #end
-</div>

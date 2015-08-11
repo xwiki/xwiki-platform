@@ -1,0 +1,99 @@
+/* Drawer */
+.drawer-default {
+  background-color: @xwiki-page-content-bg;
+}
+
+.drawer-default .drawer-brand a {
+  color: @navbar-default-link-color;
+}
+
+.drawer-default .drawer-brand a:hover, .drawer-default .drawer-brand a:focus {
+  color: @navbar-default-link-hover-color;
+  text-decoration: none;
+}
+
+.drawer-default .drawer-menu-item a,
+.drawer-default .drawer-menu-item a:hover, .drawer-default .drawer-menu-item a:focus {
+  color: @text-color;
+  text-decoration: none;
+}
+
+.drawer-menu-item:hover a:hover {
+  color: inherit;
+}
+
+.drawer-main {
+  box-shadow: -1px 0px 1px rgba(0,0,0,.05);
+}
+
+.drawer-brand {
+  background-color: @navbar-default-bg;
+  padding: 20px 16px;
+  border-bottom: 1px solid @navbar-default-border;
+}
+
+.drawer-brand img {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
+.drawer-default .drawer-brand a {
+  padding: 0;
+}
+
+.drawer-brand .brand-links, .drawer-brand img {
+  float: left;
+}
+
+.drawer-brand .brand-links {
+  margin-left: 16px;
+  margin-top: 8px;
+}
+
+.drawer-brand .brand-links a {
+  font-size: 14px;
+}
+
+.drawer-brand .brand-links .brand-user {
+  font-weight: 400;
+  color: @navbar-default-color;
+}
+
+.drawer-default .drawer-menu-item{
+  padding: 0;
+
+  a {
+    margin-top: 0;
+    padding: @navbar-padding-vertical 0 @navbar-padding-vertical @navbar-padding-horizontal;
+    font-size: @font-size-base;
+    font-weight: 400;
+    color: @text-color;
+  }
+}
+
+.drawer-menu-item-icon {
+  display: inline-block;
+  width: 30px;
+  vertical-align: middle;
+}
+
+.drawer-menu-item-text {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: normal;
+}
+
+.drawer-menu-item:hover {
+  background-color: @navbar-inverse-link-active-bg;
+  color: @navbar-inverse-link-active-color;
+  
+  a {
+    color: @navbar-inverse-link-active-color;
+  }
+}
+
+.drawer-menuseparator {
+  border-top: 1px solid darken(@xwiki-page-content-bg, 10%);
+  margin: 12px 0;
+}

@@ -276,6 +276,11 @@ public class BasePage extends BaseElement
             // The drawer is not visible, so we open it
             this.drawerActivator.click();
             getDriver().waitUntilElementIsVisible(drawer);
+            // The drawer appears with a transition, and when this transition is over, a css property is changed.
+            // So we rely on this property to know when the drawer is fully shown.
+            // See https://github.com/blivesta/drawer/blob/cc0888295868462ecbdd176d5f44eabb6e40db51/src/js/drawer.js#L79
+            // Without this wait, you cannot close the drawer just after having open it, because of the transition.
+            getDriver().waitUntilJavascriptCondition("jQuery('body').css('overflow') == 'hidden'");
         }
     }
 

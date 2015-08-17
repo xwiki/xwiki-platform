@@ -34,7 +34,7 @@
       ## We first display the home page manually because we always want it to be here even if it is not a parent of the
       ## current document.
       <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
-      #foreach($parent in $services.parentchild.getParents($doc.documentReference))
+      #foreach($parent in $services.parentchild.getParentsBasedOnReference($doc.documentReference))
         ## The home has already been displayed
         #if(!$homeReference.equals($parent))
           #set($pdoc = $xwiki.getDocument($parent))
@@ -59,7 +59,7 @@
   #######################################################
   #macro(hierarchy_parentChild)
     #if("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
-      #set($parents = $services.parentchild.getParents($doc.documentReference))
+      #set($parents = $services.parentchild.getParentsBasedOnParentChildRelationship($doc.documentReference))
       <ol id="hierarchy" class="breadcrumb clearfix">
         ## Display the parents
         #foreach($parent in $parents)

@@ -40,7 +40,6 @@ import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -89,8 +88,13 @@ public class ParentChildScriptService implements ScriptService
             return getParentsBasedOnReference(docRef);
         }
     }
-    
-    private List<DocumentReference> getParentsBasedOnReference(DocumentReference docRef)
+
+    /**
+     * Returns the parents of a document, based on the nested document paradigm (described in the document reference).
+     * @param docRef a reference of the document
+     * @return the list of parents of the document
+     */
+    public List<DocumentReference> getParentsBasedOnReference(DocumentReference docRef)
     {
         List<DocumentReference> parents = new ArrayList<>();
         
@@ -100,8 +104,13 @@ public class ParentChildScriptService implements ScriptService
         
         return parents;
     }
-    
-    private List<DocumentReference> getParentsBasedOnParentChildRelationship(DocumentReference docRef)
+
+    /**
+     * Returns the parents of a document, based on the parent/child relationship.
+     * @param docRef a reference of the document
+     * @return the list of parents of the document
+     */
+    public List<DocumentReference> getParentsBasedOnParentChildRelationship(DocumentReference docRef)
     {
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
@@ -110,10 +119,14 @@ public class ParentChildScriptService implements ScriptService
         try {
             XWikiDocument document = xwiki.getDocument(docRef, context);
             while (document.getParentReference() != null) {
+                DocumentReference parentReference = document.getParentReference();
+                if (parents.contains(parentReference)) {
+                    throw new Exception("Cyclic references of parent documents");
+                }
                 parents.add(document.getParentReference());
                 document = xwiki.getDocument(document.getParentReference(), context);
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             logger.error("Failed to get the parents of [{}].", docRef, e);
         }
 

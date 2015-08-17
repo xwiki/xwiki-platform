@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxMacros</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1380707156000</date>
+  <contentUpdateDate>1380707156000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxMacros</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programmering =
+
+== Makroer ==
+
+=== 1.0 Makroer ===
+
+Der er to slags makroer i XWiki Syntax 1.0:
+
+* Velocity makoer (kaldt med ###makronavn(param1 ... paramN)## syntaks)
+* Radeox makroer (kaldt med ##{makronavn:param1=value1|...|paramN=valueN}## syntaks)
+
+{{info}}For en fuld liste af makroer, se [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}}
+
+|=Funktion|=XWiki Syntax 1.0
+|Velocity Makro|(((
+{{{#info("Noget tekst")}}}
+)))
+|Radeox Makro|(((
+{{{{code:java}
+java-kode
+{code}
+}}}
+)))
+
+=== 2.0 Makroer ===
+Der er kun en slags makroer i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, som kaldes med syntaks ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. For makroer uden indhold er der en kort notation: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
+
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Vise Makro med indhold|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+|Vise macro uden indhold|(((
+{{{{{include reference="Space.Page"/}}}}}
+)))|Indhold fra referet side vises i siden
+
+{{info}}
+Radeox makroer kan ikke bruges i XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. De er omskrevet til visnings-makroer.
+{{/info}}
+
+{{info}}
+For en komplet liste af makroer, check  [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
+{{/info}} </content>
+</xwikidoc>

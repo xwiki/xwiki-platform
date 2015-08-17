@@ -9,10 +9,8 @@
     
     ## Right menu
     #xwikitopmenurightstart()
-      <li>
-        <a class="icon-navbar drawer-toggle" id="tmDrawerActivator"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
-      </li>
-      #template("quicksearch.vm")
+      #displayDrawerActivator()
+      #displaySearch()
       #displayUserAvatar()
     #xwikitopmenurightend()
     
@@ -21,7 +19,23 @@
   
   #template("drawer.vm")
 #end
-##
+################################
+##  DISPLAY DRAWER ACTIVATOR
+################################
+#macro(displayDrawerActivator)
+  <li>
+    <a class="icon-navbar drawer-toggle" id="tmDrawerActivator"><span class="sr-only">$services.localization.render('core.menu.toggleNavigation')</span><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+  </li>
+#end
+################################
+##       DISPLAY SEARCH
+################################
+#macro(displaySearch)
+  #template("quicksearch.vm")
+#end
+################################
+##    DISPLAY USER AVATAR
+################################
 #macro(displayUserAvatar)
   #if ($xcontext.user != 'XWiki.XWikiGuest')
     #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)

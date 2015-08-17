@@ -54,7 +54,7 @@ public class ExtensionInstanceOutputFilterStreamFactory extends
     {
         super(ID);
 
-        setName("XWiki extensions instance input stream");
-        setDescription("Specialized version of the XWiki instance input stream for extensions.");
+        setName("XWiki extensions instance output stream");
+        setDescription("Specialized version of the XWiki instance output stream for extensions.");
     }
 }

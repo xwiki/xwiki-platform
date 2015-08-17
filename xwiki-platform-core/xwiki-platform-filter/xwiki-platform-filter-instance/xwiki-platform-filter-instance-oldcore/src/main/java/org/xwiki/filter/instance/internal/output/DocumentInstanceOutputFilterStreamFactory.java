@@ -54,7 +54,7 @@ public class DocumentInstanceOutputFilterStreamFactory extends
     {
         super(ID);
 
-        setName("XWiki documents instance input stream");
-        setDescription("Specialized version of the XWiki instance input stream for documents.");
+        setName("XWiki documents instance output stream");
+        setDescription("Specialized version of the XWiki instance output stream for documents.");
     }
 }

@@ -21,14 +21,19 @@ require(['jquery', 'bootstrap'], function($) {
       if (icon.hasClass('glyphicon-search')) {
         icon.removeClass('glyphicon-search');
         icon.addClass('glyphicon-remove');
-        $('#globalsearch').fadeIn();
+        globalSearch.fadeIn();
       } else {
         icon.removeClass('glyphicon-remove');
         icon.addClass('glyphicon-search');
-        $('#globalsearch').fadeOut();
+        globalSearch.fadeOut();
       }
       
       return false;
+    });
+    
+    // When the drawer is close, collapse sub items
+    $(body).on('drawer.closed', function() {
+      $('.drawer-menu-sub-item').removeClass('in').attr('aria-expanded', 'false');
     });
   
   });

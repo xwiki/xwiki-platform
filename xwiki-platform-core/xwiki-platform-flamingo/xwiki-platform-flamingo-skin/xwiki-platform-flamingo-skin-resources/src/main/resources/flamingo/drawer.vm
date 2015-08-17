@@ -18,6 +18,23 @@
   </li>
 #end
 ##########################################
+##          DRAWER TOP ITEM
+##########################################
+#macro(drawerTopItemStart $icon $text $id)
+  <li class="drawer-menu-item">
+    <a id="$id" role="button" data-toggle="collapse" href="#${id}_menu" aria-expanded="false" aria-controls="${id}_menu"">
+      <div class="drawer-menu-item-icon">
+        <span class="glyphicon glyphicon-${icon}"></span>
+      </div>
+      <div class="drawer-menu-item-text">$text</div>
+    </a>
+    <ul class="drawer-menu-sub-item collapse" id="${id}_menu">
+#end
+#macro(drawerTopItemStop)
+    </ul>
+  </li>
+#end
+##########################################
 ##            DRAWER SEPARATOR
 ##########################################
 #macro(drawerSeparator)
@@ -64,6 +81,8 @@
         #end
         #set ($hasPreviousMenuSection = true)
       #end
+      ## LANGUAGES
+      #template('menus_language.vm')
       ## WIKI INDEX
       #drawerSeparator()
       #drawerItem($xwiki.getURL($WikiManagerMainDocReference), 'list', $services.localization.render('platform.wiki.menu.wikiindex'))

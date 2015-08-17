@@ -82,15 +82,23 @@
   display: inline-block;
   vertical-align: middle;
   white-space: normal;
+  
+  .glyphicon {
+    padding-left: @navbar-padding-horizontal;
+  }
 }
 
-.drawer-menu-item:hover {
+.drawer-default .drawer-menu-item a:hover {
   background-color: @navbar-inverse-link-active-bg;
   color: @navbar-inverse-link-active-color;
   
   a {
     color: @navbar-inverse-link-active-color;
   }
+}
+
+.drawer-default .drawer-menu-sub-item a {
+  padding-left: @navbar-padding-horizontal * 2;
 }
 
 .drawer-menuseparator {

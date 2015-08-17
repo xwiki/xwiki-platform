@@ -2,6 +2,8 @@
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
+  #drawerSeparator()
+  #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
   #set($currentLanguage = "$!{tdoc.realLanguage}")
   #set($originalLanguage = "$!{doc.realLanguage}")
   #if($currentLanguage != '')
@@ -18,19 +20,14 @@
     ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
     #set($queryStringMap = {})
     #set($discard = $queryStringMap.putAll($request.parameterMap))
-    #if($additionallangs.size() > 0)
-      #set($discard = $queryStringMap.put('language', $currentLanguage))
-      #xwikitopmenuentrystart ($doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
-      #foreach($lang in $additionallangs)
-        #set($discard = $queryStringMap.put('language', $lang))
-        #submenuitem($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($lang)", '', '', '')
-      #end
-      #xwikitopmenuentryend()
-    #else
-      #set($discard = $queryStringMap.put('language', $currentLanguage))
-      #xwikitopmenuentry($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
+    #set($discard = $queryStringMap.put('language', $currentLanguage))
+    #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
+    #foreach($lang in $additionallangs)
+      #set($discard = $queryStringMap.put('language', $lang))
+      #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
     #end
   #end
+  #drawerTopItemStop()
 #end
 ##########################################
 ## Display the pretty name of a language

@@ -2,8 +2,6 @@
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
-  #drawerSeparator()
-  #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
   #set($currentLanguage = "$!{tdoc.realLanguage}")
   #set($originalLanguage = "$!{doc.realLanguage}")
   #if($currentLanguage != '')
@@ -21,10 +19,14 @@
     #set($queryStringMap = {})
     #set($discard = $queryStringMap.putAll($request.parameterMap))
     #set($discard = $queryStringMap.put('language', $currentLanguage))
-    #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
-    #foreach($lang in $additionallangs)
-      #set($discard = $queryStringMap.put('language', $lang))
-      #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
+    #if ($additionallangs.size() > 0)
+      #drawerSeparator()
+      #drawerTopItemStart('flag', $services.localization.render('languages'), 'tmLanguages')
+      #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($currentLanguage) <span class='glyphicon glyphicon-ok'></span>")
+      #foreach($lang in $additionallangs)
+        #set($discard = $queryStringMap.put('language', $lang))
+        #drawerItem($!doc.getURL('view', $escapetool.url($queryStringMap)), 'flag', "#displayLanguagePrettyName($lang)")
+      #end
     #end
   #end
   #drawerTopItemStop()

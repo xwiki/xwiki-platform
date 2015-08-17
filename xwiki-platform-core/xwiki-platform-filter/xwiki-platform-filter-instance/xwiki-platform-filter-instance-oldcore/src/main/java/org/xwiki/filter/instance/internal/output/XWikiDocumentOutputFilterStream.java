@@ -158,6 +158,10 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
 
     private <T> T get(Type type, String key, FilterEventParameters parameters, T def, boolean replaceNull)
     {
+        if (parameters == null) {
+            return def;
+        }
+
         if (!parameters.containsKey(key)) {
             return def;
         }
@@ -243,7 +247,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     {
         this.currentEntityReference = new EntityReference(name, EntityType.DOCUMENT, this.currentEntityReference);
 
-        this.currentDefaultLocale = (Locale) parameters.get(WikiDocumentFilter.PARAMETER_LOCALE);
+        this.currentDefaultLocale = get(Locale.class, WikiDocumentFilter.PARAMETER_LOCALE, parameters, null);
     }
 
     @Override

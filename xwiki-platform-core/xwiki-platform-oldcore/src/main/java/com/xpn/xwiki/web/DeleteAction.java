@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
 
@@ -40,6 +45,14 @@ public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */
     protected static final String CONFIRM_PARAM = "confirm";
+    
+    protected static final String ACTION_NAME = "delete";
+    
+    protected boolean isJobLaunched(XWikiRequest request)
+    {
+        // If the jobId is given, then the deletion is already processing, and we let the UI display a progress bar
+        return StringUtils.isNotEmpty(request.getParameter("jobId"));
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -49,6 +62,10 @@ public class DeleteAction extends XWikiAction
         // If confirm=1 then delete the page. If not, the render action will go to the "delete" page so that the
         // user can confirm. That "delete" page will then call the delete action again with confirm=1.
         if (!"1".equals(request.getParameter(CONFIRM_PARAM))) {
+            return true;
+        }
+
+        if (isJobLaunched(request)) {
             return true;
         }
 
@@ -85,13 +102,18 @@ public class DeleteAction extends XWikiAction
                 recycleIdIsValid = true;
             }
         }
-        String result = "delete";
+        
+        if (isJobLaunched(request)) {
+            return ACTION_NAME;
+        }        
         if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
-            result = "deleted";
-        } else if (doc.isNew() && !recycleIdIsValid) {
-            result = Utils.getPage(request, "docdoesnotexist");
+            return "deleted";
         }
-        return result;
+        if (doc.isNew() && !recycleIdIsValid) {
+            return Utils.getPage(request, "docdoesnotexist");
+        }
+        
+        return ACTION_NAME;
     }
 
     protected boolean delete(XWikiContext context) throws XWikiException
@@ -100,8 +122,11 @@ public class DeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        boolean redirected = false;
-
+ 
+        if (isJobLaunched(request)) {
+            return false;
+        }
+        
         String sindex = request.getParameter("id");
         if (sindex != null && xwiki.hasRecycleBin(context)) {
             long index = Long.parseLong(sindex);
@@ -124,30 +149,34 @@ public class DeleteAction extends XWikiAction
                 xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
             }
             sendRedirect(response, Utils.getRedirect("view", context));
-            redirected = true;
         } else if (doc.isNew()) {
             // Redirect the user to the view template so that he gets the "document doesn't exist" dialog box.
             sendRedirect(response, Utils.getRedirect("view", context));
-            redirected = true;
         } else {
             // Delete to recycle bin.
-            delete(doc.getTranslatedDocument(context).getDocumentReferenceWithLocale());
+            List<String> jobId = delete(doc.getTranslatedDocument(context).getDocumentReferenceWithLocale(),
+                    StringUtils.isNotEmpty(request.getParameter("affectChildren")));
+            sendRedirect(response, 
+                    Utils.getRedirect("delete", String.format("jobId=%s", serializeJobId(jobId)), context));
         }
 
-        return redirected;
+        return true;
+    }
+    
+    protected String serializeJobId(List<String> jobId)
+    {
+        return StringUtils.join(jobId, "/");
     }
 
-    protected void delete(EntityReference entityReference) throws XWikiException
+    protected List<String> delete(EntityReference entityReference, boolean deep) throws XWikiException
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        Job deleteJob = refactoring.delete(entityReference);
+        EntityRequest deleteRequest = refactoring.createDeleteRequest(Arrays.asList(entityReference));
+        deleteRequest.setDeep(deep);
+        Job deleteJob = refactoring.delete(deleteRequest);
         if (deleteJob != null) {
-            try {
-                deleteJob.join();
-            } catch (InterruptedException e) {
-                throw new XWikiException(String.format("Failed to delete [%s]", entityReference), e);
-            }
+            return deleteRequest.getId(); 
         } else {
             throw new XWikiException(String.format("Failed to schedule the delete job for [%s]", entityReference),
                 refactoring.getLastError());

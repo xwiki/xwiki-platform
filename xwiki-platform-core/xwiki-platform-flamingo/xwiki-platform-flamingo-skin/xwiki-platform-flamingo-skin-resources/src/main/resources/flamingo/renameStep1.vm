@@ -2,7 +2,10 @@
 ### Rename document template, step 1: choose new name + updated backlinks + updated parents
 ###
 ## TODO: check if this information should be displayed?
-<div id="document-title"><h1>$services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+<div id="mainContentArea">
+  #set($titleToDisplay = $services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
+  <div class="xcontent">
+  #template('contentheader.vm')
 #set($newname = $services.localization.render('core.rename.inputPrompt'))
 <form action="?xpage=rename&amp;step=2" method="post" class="xform"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
@@ -72,6 +75,8 @@
       #end
     #end
   #end
+  </div>
+  </div>
   </div>
   </div>
 </form>

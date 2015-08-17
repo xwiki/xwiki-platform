@@ -31,10 +31,6 @@
   #end
 #end
 
-#if($xcontext.action == 'view' && $viewer != 'content')
-  <div class="text-right">
-  #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' 'btn-default' 'cog')
-#end
 #foreach($docextralink in $docextralinks)
   #set ($extraAnchor = $docextralink.get(0))
   #set ($extraText = $docextralink.get(1))
@@ -47,10 +43,6 @@
     #set ($extraText = "$extraText ($extraCount)")
   #end
   #submenuitem($doc.getURL('view', "viewer=$!{escapetool.url(${extraAnchor})}"), ${escapetool.xml(${extraText})}, '', '', $glyphIcon)
-#end
-#if($xcontext.action == 'view' && $viewer != 'content')
-  #xwikibuttonentryend()
-  </div>
 #end
 
 ###########################################

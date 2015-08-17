@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -33,11 +35,15 @@ public class DeleteSpaceAction extends DeleteAction
     @Override
     protected boolean delete(XWikiContext context) throws XWikiException
     {
+        XWikiResponse response = context.getResponse();
+        
         // Delete to recycle bin.
-        delete(context.getDoc().getDocumentReference().getLastSpaceReference());
+        List<String> jobId = delete(context.getDoc().getDocumentReference().getLastSpaceReference(), true);
+        sendRedirect(response,
+                Utils.getRedirect("delete", String.format("jobId=%s", serializeJobId(jobId)), context));
 
-        // No redirect has been performed.
-        return false;
+        // A redirect has been performed.
+        return true;
     }
 
     @Override

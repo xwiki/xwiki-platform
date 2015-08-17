@@ -60,7 +60,7 @@
   <div class="dropdown" id="tmMoreActions">
     <a href="" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-option-vertical"></span></a>
     <ul class="dropdown-menu">
-      ## WATCH /UNWATCH
+      ## WATCH /UNWATCH PAGE
       #if (!$doc.isNew() && $hasWatch)
         #set ($watchClasses = '')
         #set ($unwatchClasses = 'hidden')
@@ -70,6 +70,25 @@
         #end
         #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses 'eye-open')
         #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses 'eye-close')
+      #end
+      ## WATCH /UNWATCH SPACE
+      #if ($hasWatch)
+        #set ($watchClasses = '')
+        #set ($unwatchClasses = 'hidden')
+        #if ($services.watchlist.isWatched("SPACE"))
+          #set ($watchClasses = 'hidden')
+          #set ($unwatchClasses = '')
+        #end
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space') 'tmWatchSpace', $watchClasses, 'eye-open')
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses, 'eye-close')
+        #set ($watchClasses = '')
+        #set ($unwatchClasses = 'hidden')
+        #if ($services.watchlist.isWatched("WIKI"))
+          #set ($watchClasses = 'hidden')
+          #set ($unwatchClasses = '')
+        #end
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.wiki') 'tmWatchWiki', $watchClasses 'eye-open')
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses 'eye-close')
         #submenuseparator()
       #end
       ## COPY

@@ -441,8 +441,9 @@ public class BasePage extends BaseElement
      */
     public void watchSpace()
     {
-        // TODO: fix this
+        toggleActionMenu();
         this.watchSpaceLink.click();
+        toggleActionMenu();
     }
 
     /**
@@ -450,8 +451,9 @@ public class BasePage extends BaseElement
      */
     public void watchWiki()
     {
-        // TODO: fix this
+        toggleActionMenu();
         this.watchWikiLink.click();
+        toggleActionMenu();
     }
 
     /**

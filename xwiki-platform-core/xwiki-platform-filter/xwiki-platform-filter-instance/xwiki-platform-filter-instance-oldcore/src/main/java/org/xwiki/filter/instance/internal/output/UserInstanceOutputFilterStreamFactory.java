@@ -52,7 +52,7 @@ public class UserInstanceOutputFilterStreamFactory extends
     {
         super(ID);
 
-        setName("XWiki users instance input stream");
-        setDescription("Specialized version of the XWiki instance input stream for users.");
+        setName("XWiki users instance output stream");
+        setDescription("Specialized version of the XWiki instance output stream for users.");
     }
 }

@@ -1,0 +1,85 @@
+#######################################################
+##                     GLOBALS
+#######################################################
+## Make sure we get the Main Page Reference whether the Wiki Script Service is available or not (since it's optional).
+#set ($wikiService = $services.wiki)
+#if ("$!wikiService" != '')
+  #set ($homeReference = $wikiService.currentWikiDescriptor.mainPageReference)
+#else
+  #set ($homeReference = $services.model.resolveDocument('', 'default'))
+#end
+#*
+ * Display the parents of a document based on the nested spaces mechanism.
+ *
+ * @param document the document for which to display the hierarchy, defaults on the current document
+ * @param showOnlySpaces true if only space homepages should be displayed in the hierarchy, excluding the document in the case when it is a terminal page;
+ *                       false if the document should always be displayed in the hierarchy. Defaults to false
+ *#
+#macro (hierarchy $document $showOnlySpaces)
+  #if ("$!document" == '')
+    ## Default on the current (translated) document.
+    #set ($macro.document = $tdoc)
+  #else
+    #set ($macro.document = $document)
+  #end
+  <ol id='hierarchy' class='breadcrumb clearfix'>
+    ## We first display the home page manually because we always want it to be here even if it is not a parent of the
+    ## current document.
+    <li><a href="$xwiki.getURL($homeReference)"><span class='glyphicon glyphicon-home'></span></a></li>
+    #foreach ($parentReference in $services.parentchild.getParentsBasedOnReference($macro.document.documentReference))
+      ## The home has already been displayed
+      #if (!$homeReference.equals($parentReference))
+        #hierarchy_document($parentReference)
+      #end
+    #end
+    #if ($macro.document.name != 'WebHome' && !$showOnlySpaces)
+      ## Display the current document if it is not a terminal document.
+      #hierarchy_currentDoc($macro.document)
+    #end
+  </ol>
+#end
+#*
+ * Display the parents of a document based on the old parent/child mechanism.
+ *#
+#macro (hierarchy_parentChild)
+  #if ("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
+    #set ($parentReferences = $services.parentchild.getParentsBasedOnParentChildRelationship($doc.documentReference))
+    <ol id="hierarchy" class="breadcrumb clearfix">
+      ## Display the parents.
+      #foreach ($parentReference in $parentReferences)
+        #if ($homeReference.equals($parentReference))
+          <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
+        #else
+          #hierarchy_document($parentReference)
+        #end
+      #end
+      ## Display the current document.
+      #hierarchy_currentDoc($tdoc)
+    </ol>
+  #end
+#end
+#*
+ * Display in the breadcrumb a document that is part of a hierarchy.
+ *
+ * @param documentReference the reference of the document to display as part of a hierarchy
+ *#
+#macro (hierarchy_document $documentReference)
+  #set ($macro.document = $xwiki.getDocument($documentReference))
+  #if ($macro.document)
+    <li><a href="$macro.document.getURL()">$escapetool.xml($macro.document.translatedDocument.plainTitle)</a></li>
+  #else
+    <li>$escapetool.xml($services.model.serialize($documentReference, 'local'))</li>
+  #end
+#end
+#*
+ * Display in the breadcrumb the current document (i.e. last element in the hierarchy).
+ *
+ * @param document the document to display as current document
+ *#
+#macro (hierarchy_currentDoc $document)
+  #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
+    <li class="active"><a href="$document.getURL('view')">$escapetool.xml($document.getPlainTitle())</a></li>
+  #else
+    <li class="active">$escapetool.xml($document.getPlainTitle())</li>
+  #end
+#end

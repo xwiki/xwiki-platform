@@ -1,15 +1,6 @@
 #template('xwikivars.vm')
 #if($isInServletMode) ## Visible only in a page
-  #######################################################
-  ##                     GLOBALS
-  #######################################################
-  ## Make sure we get the Main Page Reference whether the Wiki Script Service is available or not (since it's optional)
-  #set($wikiService = $services.wiki)
-  #if("$!wikiService" != '')
-    #set($homeReference = $services.wiki.currentWikiDescriptor.mainPageReference)
-  #else
-    #set($homeReference = $services.model.resolveDocument('', 'default'))
-  #end
+  #template('hierarchy_macros.vm')
   #######################################################
   ##                   CONTROLLER
   ##
@@ -21,72 +12,6 @@
       #hierarchy_parentChild()
     #else
       #hierarchy()
-    #end
-  #end
-  #######################################################
-  ##                   BREADCRUMB
-  ##
-  ## Display the parents of a document based on the 
-  ## nested spaces mechanism
-  #######################################################
-  #macro(hierarchy)
-    <ol id="hierarchy" class="breadcrumb clearfix">
-      ## We first display the home page manually because we always want it to be here even if it is not a parent of the
-      ## current document.
-      <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
-      #foreach($parent in $services.parentchild.getParentsBasedOnReference($doc.documentReference))
-        ## The home has already been displayed
-        #if(!$homeReference.equals($parent))
-          #set($pdoc = $xwiki.getDocument($parent))
-          #if ($pdoc)
-            <li><a href='$xwiki.getURL($parent)'>$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
-          #else
-            <li>$escapetool.xml($services.model.serialize($parent, 'local'))</li>
-          #end
-        #end
-      #end
-      #if ($doc.name != 'WebHome')
-        ## Display the current page if it is not a terminal page
-        #hierarchy_currentDoc()
-      #end
-    </ol>
-  #end
-  #######################################################
-  ##            BREADCRUMB FOR PARENT/CHILD
-  ##
-  ## Display the parents of a document based on the old 
-  ## parent/child mechanism.
-  #######################################################
-  #macro(hierarchy_parentChild)
-    #if("$!doc.parent" !=  '' || $xcontext.action == 'edit' || $xcontext.action == 'inline')
-      #set($parents = $services.parentchild.getParentsBasedOnParentChildRelationship($doc.documentReference))
-      <ol id="hierarchy" class="breadcrumb clearfix">
-        ## Display the parents
-        #foreach($parent in $parents)
-          #if($homeReference.equals($parent))
-            <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>
-          #else
-            #set($pdoc = $xwiki.getDocument($parent))
-            #if ($pdoc)
-              <li><a href="$pdoc.getURL('view')">$escapetool.xml($pdoc.translatedDocument.plainTitle)</a></li>
-            #else
-              <li>$escapetool.xml($services.model.serialize($parent, 'local'))</li>
-            #end
-          #end
-        #end
-        ## Display the current document
-        #hierarchy_currentDoc()
-      </ol>
-    #end
-  #end
-  #######################################################
-  ##   Display the current document in the breadcrumb
-  #######################################################
-  #macro(hierarchy_currentDoc)
-    #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-      <li class="active"><a href="$doc.getURL('view')">$escapetool.xml($tdoc.getPlainTitle())</a></li>
-    #else
-      <li class="active">$escapetool.xml($tdoc.getPlainTitle())</li>
     #end
   #end
 #end

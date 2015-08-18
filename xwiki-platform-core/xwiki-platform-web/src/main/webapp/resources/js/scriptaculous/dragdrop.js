@@ -85,7 +85,7 @@ var Droppables = {
     this.last_active = drop;
   },
 
-  show: function(point, element) {
+  show: function(point, element, event) {
     if(!this.drops.length) return;
     var drop, affected = [];
 
@@ -101,7 +101,7 @@ var Droppables = {
     if (drop) {
       Position.within(drop.element, point[0], point[1]);
       if(drop.onHover)
-        drop.onHover(element, drop.element, Position.overlap(drop.overlap, drop.element));
+        drop.onHover(element, drop.element, Position.overlap(drop.overlap, drop.element), event);
 
       if (drop != this.last_active) Droppables.activate(drop);
     }
@@ -359,7 +359,7 @@ var Draggable = Class.create({
 
     if(!this.options.quiet){
       Position.prepare();
-      Droppables.show(pointer, this.element);
+      Droppables.show(pointer, this.element, event);
     }
 
     Draggables.notify('onDrag', this, event);
@@ -400,7 +400,7 @@ var Draggable = Class.create({
     if(this.options.quiet){
       Position.prepare();
       var pointer = [Event.pointerX(event), Event.pointerY(event)];
-      Droppables.show(pointer, this.element);
+      Droppables.show(pointer, this.element, event);
     }
 
     if(this.options.ghosting) {
@@ -527,7 +527,7 @@ var Draggable = Class.create({
     }
 
     Position.prepare();
-    Droppables.show(Draggables._lastPointer, this.element);
+    Droppables.show(Draggables._lastPointer, this.element, null);
     Draggables.notify('onDrag', this);
     if (this._isScrollChild) {
       Draggables._lastScrollPointer = Draggables._lastScrollPointer || $A(Draggables._lastPointer);
@@ -749,7 +749,7 @@ var Sortable = {
       element, options.only, options.tree ? true : false, options.treeTag);
   },
 
-  onHover: function(element, dropon, overlap) {
+  onHover: function(element, dropon, overlap, event) {
     if(Element.isParent(dropon, element)) return;
 
     if(overlap > .33 && overlap < .66 && Sortable.options(dropon).tree) {

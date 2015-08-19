@@ -559,19 +559,23 @@ public class XWikiLDAPUtils
 
         int nbMembers = memberMap.size();
         if (LDAPDN.isValid(userOrGroup)) {
+            LOGGER.debug("[{}] is a valid DN, lets try to get corresponding entry.", userOrGroup);
+
             // Stop there if passed used is already a resolved member
             if (memberMap.containsKey(userOrGroup.toLowerCase())) {
+                LOGGER.debug("[{}] is already resolved", userOrGroup);
+
                 return false;
             }
 
             // Stop there if subgroup resolution is disabled
             if (!subgroups.isEmpty() && !isResolveSubgroups()) {
+                LOGGER.debug("Group members resolve is disabled to add [{}] as group member directly", userOrGroup);
+
                 memberMap.put(userOrGroup.toLowerCase(), userOrGroup);
 
                 return false;
             }
-
-            LOGGER.debug("[{}] is a valid DN, lets try to get corresponding entry.", userOrGroup);
 
             isGroup = getGroupMembersFromDN(userOrGroup, memberMap, subgroups, context);
         }
@@ -595,12 +599,16 @@ public class XWikiLDAPUtils
                     String dn = searchAttributeList.get(0).value;
 
                     // Stop there if passed used is already a resolved member
-                    if (memberMap.containsKey(userOrGroup.toLowerCase())) {
+                    if (memberMap.containsKey(dn.toLowerCase())) {
+                        LOGGER.debug("[{}] is already resolved", dn);
+
                         return false;
                     }
 
                     // Stop there if subgroup resolution is disabled
                     if (!subgroups.isEmpty() && !isResolveSubgroups()) {
+                        LOGGER.debug("Group members resolve is disabled to add [{}] as group member directly", dn);
+
                         memberMap.put(dn.toLowerCase(), dn);
 
                         return false;

@@ -38,6 +38,7 @@
         #set ($newSpaceReference = $services.model.resolveSpace($request.newSpaceName))
         #set ($newDocReference = $services.model.createEntityReference($request.newPageName, 'DOCUMENT',
           $newSpaceReference))
+        #set ($newDocReference = $services.model.createDocumentReference($newDocReference, $NULL))
         #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)

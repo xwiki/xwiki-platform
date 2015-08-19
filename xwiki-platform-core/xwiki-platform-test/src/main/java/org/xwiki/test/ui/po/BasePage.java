@@ -219,7 +219,7 @@ public class BasePage extends BaseElement
      */
     public RightsEditPage editRights()
     {
-        clickMoreActionsSubMenuEntry("tmEditRights");
+        clickEditSubMenuEntry("tmEditRights");
         return new RightsEditPage();
     }
 
@@ -228,7 +228,7 @@ public class BasePage extends BaseElement
      */
     public ObjectEditPage editObjects()
     {
-        clickMoreActionsSubMenuEntry("tmEditObject");
+        clickEditSubMenuEntry("tmEditObject");
         return new ObjectEditPage();
     }
 
@@ -237,7 +237,7 @@ public class BasePage extends BaseElement
      */
     public ClassEditPage editClass()
     {
-        clickMoreActionsSubMenuEntry("tmEditClass");
+        clickEditSubMenuEntry("tmEditClass");
         return new ClassEditPage();
     }
 

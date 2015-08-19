@@ -49,6 +49,13 @@
       #end
       #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench')
       #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
+      #submenuseparator()
+      ## Rights
+      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
+      ## Objects
+      #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
+      ## Class
+      #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
     </ul>
     #end
   </div>
@@ -117,17 +124,6 @@
           $xwiki.jsx.use('XWiki.SharePage')
           $xwiki.ssx.use('XWiki.SharePage')
         #end
-      #end
-      #if($hasEdit && !$isReadOnly && $isAdvancedUser)
-        #if ($canView)
-          #submenuseparator()
-        #end
-        ## Rights
-        #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'lock')
-        ## Objects
-        #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
-        ## Class
-        #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
       #end
       ## ----------------------------
       ## Display the shortcuts

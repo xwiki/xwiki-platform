@@ -540,6 +540,13 @@ public class XWikiLDAPUtils
         if (LDAPDN.isValid(userOrGroup)) {
             LOGGER.debug("[{}] is a valid DN, lets try to get corresponding entry.", userOrGroup);
 
+            // Stop there if passed used is already a resolved member
+            if (memberMap.containsKey(userOrGroup.toLowerCase())) {
+                LOGGER.debug("[{}] already resolved.", userOrGroup);
+
+                return false;
+            }
+
             isGroup = getGroupMembersFromDN(userOrGroup, memberMap, subgroups, context);
         }
 
@@ -560,6 +567,14 @@ public class XWikiLDAPUtils
 
                 if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
                     String dn = searchAttributeList.get(0).value;
+
+                    // Stop there if passed used is already a resolved member
+                    if (memberMap.containsKey(dn.toLowerCase())) {
+                        LOGGER.debug("[{}] already resolved.", dn);
+
+                        return false;
+                    }
+
                     isGroup = getGroupMembers(dn, memberMap, subgroups, context);
                 }
             }

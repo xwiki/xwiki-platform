@@ -559,6 +559,11 @@ public class XWikiLDAPUtils
 
         int nbMembers = memberMap.size();
         if (LDAPDN.isValid(userOrGroup)) {
+            // Stop there if passed used is already a resolved member
+            if (memberMap.containsKey(userOrGroup.toLowerCase())) {
+                return false;
+            }
+
             // Stop there if subgroup resolution is disabled
             if (!subgroups.isEmpty() && !isResolveSubgroups()) {
                 memberMap.put(userOrGroup.toLowerCase(), userOrGroup);
@@ -588,11 +593,20 @@ public class XWikiLDAPUtils
 
                 if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
                     String dn = searchAttributeList.get(0).value;
+
+                    // Stop there if passed used is already a resolved member
+                    if (memberMap.containsKey(userOrGroup.toLowerCase())) {
+                        return false;
+                    }
+
+                    // Stop there if subgroup resolution is disabled
                     if (!subgroups.isEmpty() && !isResolveSubgroups()) {
                         memberMap.put(dn.toLowerCase(), dn);
-                    } else {
-                        isGroup = getGroupMembers(dn, memberMap, subgroups, context);
+
+                        return false;
                     }
+
+                    isGroup = getGroupMembers(dn, memberMap, subgroups, context);
                 }
             }
         }

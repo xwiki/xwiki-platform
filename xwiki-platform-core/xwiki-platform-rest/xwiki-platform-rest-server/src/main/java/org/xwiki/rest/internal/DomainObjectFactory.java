@@ -34,6 +34,8 @@ import org.xwiki.rest.model.jaxb.Attribute;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.HistorySummary;
+import org.xwiki.rest.model.jaxb.JobProgress;
+import org.xwiki.rest.model.jaxb.JobStatus;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
@@ -394,7 +396,7 @@ public class DomainObjectFactory
 
         return pageSummary;
     }
-
+    
     public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
         XWiki xwikiApi, Boolean withPrettyNames) throws XWikiException
     {
@@ -748,6 +750,37 @@ public class DomainObjectFactory
         object.getLinks().add(objectLink);
 
         return object;
+    }
+
+    public static JobStatus createJobStatus(ObjectFactory objectFactory, URI self, 
+            org.xwiki.job.event.status.JobStatus jobStatus) throws XWikiException
+    {
+        JobStatus status = objectFactory.createJobStatus();
+        status.setId(StringUtils.join(jobStatus.getRequest().getId(), "/"));
+        status.setState(jobStatus.getState().name());
+        status.setProgress(createJobProgress(objectFactory, jobStatus.getProgress()));
+        Calendar calendarStartDate = Calendar.getInstance();
+        calendarStartDate.setTime(jobStatus.getStartDate());
+        Calendar calendarEndDate = Calendar.getInstance();
+        calendarEndDate.setTime(jobStatus.getEndDate());
+        status.setStartDate(calendarStartDate);
+        status.setEndDate(calendarEndDate);
+        if (self != null) {
+            Link link = objectFactory.createLink();
+            link.setHref(self.toString());
+            link.setRel(Relations.SELF);
+            status.getLinks().add(link);
+        }
+        return status;
+    }
+
+    public static JobProgress createJobProgress(ObjectFactory objectFactory,
+            org.xwiki.job.event.status.JobProgress jobProgress) throws XWikiException
+    {
+        JobProgress progress = objectFactory.createJobProgress();
+        progress.setOffset(jobProgress.getOffset());
+        progress.setCurrentLevelOffset(jobProgress.getCurrentLevelOffset());
+        return progress;
     }
 
     private static Link getObjectLink(ObjectFactory objectFactory, URI baseUri, Document doc, BaseObject xwikiObject,

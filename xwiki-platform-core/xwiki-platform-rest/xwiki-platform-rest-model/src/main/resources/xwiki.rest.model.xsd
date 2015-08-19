@@ -272,7 +272,27 @@
       </extension>
     </complexContent>
   </complexType>
-
+  
+  <complexType name="JobProgress">
+    <sequence>
+      <element name="offset" type="double"></element>
+      <element name="currentLevelOffset" type="double"></element>
+    </sequence>
+  </complexType>
+  
+  <complexType name="JobStatus">
+    <complexContent>
+      <extension base="xwiki:LinkCollection">
+        <sequence>
+          <element name="id" type="string"></element>
+          <element name="state" type="string"></element>
+          <element name="progress" type="xwiki:JobProgress"></element>
+          <element name="startDate" type="dateTime"></element>
+          <element name="endDate" type="dateTime"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
 
   <!--
   *
@@ -504,4 +524,6 @@
   </complexType>
 
   <element name="syntaxes" type="xwiki:Syntaxes"></element>
+  
+  <element name="jobStatus" type="xwiki:JobStatus"></element>
 </schema>

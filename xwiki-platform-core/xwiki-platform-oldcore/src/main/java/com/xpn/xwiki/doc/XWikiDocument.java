@@ -95,6 +95,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -6599,8 +6600,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
-        if (StringUtils.equals(newdoc.getTitle(), this.getDocumentReference().getName())) {
-            newdoc.setTitle(newDocumentReference.getName());
+        if (StringUtils.equals(newdoc.getTitle(), getPrettyName(this.getDocumentReference()))) {
+            newdoc.setTitle(getPrettyName(newDocumentReference));
         }
 
         newdoc.setOriginalDocument(null);
@@ -6613,6 +6614,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return newdoc;
+    }
+
+    /**
+     * Avoid the technical "WebHome" name.
+     * 
+     * @param documentReference a document reference
+     * @return the last space name if the document is the home of a space, the document name otherwise
+     */
+    private String getPrettyName(DocumentReference documentReference)
+    {
+        EntityReferenceProvider defaultEntityReferenceProvider = Utils.getComponent(EntityReferenceProvider.class);
+        if (defaultEntityReferenceProvider.getDefaultReference(documentReference.getType()).getName()
+            .equals(documentReference.getName())) {
+            return documentReference.getLastSpaceReference().getName();
+        }
+        return documentReference.getName();
     }
 
     /**

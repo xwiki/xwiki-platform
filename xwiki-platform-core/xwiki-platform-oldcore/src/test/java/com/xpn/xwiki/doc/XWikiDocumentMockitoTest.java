@@ -1335,18 +1335,31 @@ public class XWikiDocumentMockitoTest
     }
 
     /**
-     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-6743">XWIKI-6743</a>
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-6743">XWIKI-6743</a>
+     * @see <a href="http://jira.xwiki.org/browse/XWIKI-12349">XWIKI-12349</a>
      */
     @Test
     public void testCopyDocumentSetsTitleToNewDocNameIfPreviouslySetToDocName() throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("wiki1", "space1", "page1"));
-        doc.setTitle(doc.getDocumentReference().getName());
+        copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "page1"), "page1", new DocumentReference(
+            "wiki2", "space2", "page2"), "page2");
 
-        XWikiDocument newDoc =
-            doc.copyDocument(new DocumentReference("wiki2", "space2", "page2"), this.oldcore.getXWikiContext());
+        copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "WebHome"), "space1",
+            new DocumentReference("wiki2", "space2", "page2"), "page2");
 
-        // Verify that the title is modified
-        assertEquals("page2", newDoc.getTitle());
+        copyDocumentAndAssertTitle(new DocumentReference("wiki1", "space1", "WebHome"), "space1",
+            new DocumentReference("wiki2", "space2", "WebHome"), "space2");
+    }
+
+    private void copyDocumentAndAssertTitle(DocumentReference oldReference, String oldTitle,
+        DocumentReference newReference, String expectedNewTitle) throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument(oldReference);
+        doc.setTitle(oldTitle);
+
+        XWikiDocument newDoc = doc.copyDocument(newReference, this.oldcore.getXWikiContext());
+
+        // Verify that we get the expected title.
+        assertEquals(expectedNewTitle, newDoc.getTitle());
     }
 }

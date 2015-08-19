@@ -610,6 +610,10 @@
     'localRef': $services.model.serialize($parentReference, 'compactwiki', $wikiReference),
     'relativeRef': $services.model.serialize($parentReference, 'compact', $parentReference.parent)
   })
+  #if ($docTreeConfig.showSpaces)
+    #set ($discard = $constraints.add(0, 'doc.space = :space'))
+    #set ($discard = $constraints.set(2, 'doc.parent in (:absoluteRef, :localRef, :relativeRef)'))
+  #end
   #getDocumentsQuery($constraints $parameters $query)
   #set ($return = $NULL)
   #setVariable("$return" $query)

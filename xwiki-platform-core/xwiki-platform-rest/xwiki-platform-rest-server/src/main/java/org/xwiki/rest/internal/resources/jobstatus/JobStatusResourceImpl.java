@@ -39,6 +39,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
+ * @since 7.2M3
  */
 @Component
 @Named("org.xwiki.rest.internal.resources.jobstatus.JobStatusResourceImpl")

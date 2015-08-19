@@ -28,6 +28,7 @@ import org.xwiki.rest.model.jaxb.JobStatus;
 
 /**
  * @version $Id$
+ * @since 7.2M3
  */
 @Path("/jobstatus/{jobId: .+}")
 public interface JobStatusResource

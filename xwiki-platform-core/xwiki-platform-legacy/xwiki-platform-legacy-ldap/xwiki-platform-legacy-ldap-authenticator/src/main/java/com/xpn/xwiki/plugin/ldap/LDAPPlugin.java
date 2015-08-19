@@ -200,7 +200,12 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 try {
                     entry = results.next();
                 } catch (LDAPException e) {
-                    LOGGER.debug("Error while reading ldap entry", e);
+                    if(LOGGER.isInfoEnabled()){
+                        LOGGER.info("Error while reading ldap entry", e);
+                        LOGGER.debug("Result Code {}",e.getResultCode());
+                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                    }
                     // Exception is thrown, go for next entry
                     continue;
                 }

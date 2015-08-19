@@ -552,8 +552,13 @@ public class XWikiLDAPUtils
                 new RfcFilter(userOrGroup);
                 isGroup = getGroupMembersFromFilter(userOrGroup, memberMap, subgroups, context);
             } catch (LDAPException e) {
-                LOGGER.debug("[{}] is not a valid LDAP filter, lets try id", userOrGroup, e);
-
+                if(LOGGER.isInfoEnabled()){
+                    LOGGER.info("[{}] is not a valid LDAP filter, lets try id", userOrGroup, e);
+                    LOGGER.debug("Result Code {}",e.getResultCode());
+                    LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                    LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                }
+                
                 // Not a valid filter, try as uid
                 List<XWikiLDAPSearchAttribute> searchAttributeList =
                     searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN});
@@ -594,7 +599,12 @@ public class XWikiLDAPUtils
         try {
             result = searchGroupsMembersByDN(userOrGroupDN);
         } catch (LDAPException e) {
-            LOGGER.debug("Failed to search for [{}]", userOrGroupDN, e);
+            if(LOGGER.isInfoEnabled()){
+                LOGGER.info("Failed to search for [{}]", userOrGroupDN, e);
+                LOGGER.debug("Result Code {}",e.getResultCode());
+                LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                LOGGER.debug("Matched DN {}",e.getMatchedDN());
+            }
 
             return false;
         }
@@ -606,7 +616,12 @@ public class XWikiLDAPUtils
                 try {
                     getConnection().getConnection().abandon(result);
                 } catch (LDAPException e) {
-                    LOGGER.debug("LDAP Search clean up failed", e);
+                    if(LOGGER.isInfoEnabled()){
+                        LOGGER.info("LDAP Search clean up failed", e);                
+                        LOGGER.debug("Result Code {}",e.getResultCode());
+                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                    }                    
                 }
             }
         }
@@ -633,7 +648,12 @@ public class XWikiLDAPUtils
         try {
             result = searchGroupsMembersByFilter(filter);
         } catch (LDAPException e) {
-            LOGGER.debug("Failed to search for [{}]", filter, e);
+            if(LOGGER.isInfoEnabled()){
+                LOGGER.info("Failed to search for [{}]", filter, e);
+                LOGGER.debug("Result Code {}",e.getResultCode());
+                LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                LOGGER.debug("Matched DN {}",e.getMatchedDN());
+            }
 
             return false;
         }
@@ -645,7 +665,12 @@ public class XWikiLDAPUtils
                 try {
                     getConnection().getConnection().abandon(result);
                 } catch (LDAPException e) {
-                    LOGGER.debug("LDAP Search clean up failed", e);
+                    if(LOGGER.isInfoEnabled()){
+                        LOGGER.info("LDAP Search clean up failed", e);
+                        LOGGER.debug("Result Code {}",e.getResultCode());
+                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                    }                    
                 }
             }
         }
@@ -675,7 +700,12 @@ public class XWikiLDAPUtils
             try {
                 resultEntry = result.next();
             } catch (LDAPException e) {
-                LOGGER.debug("Failed to get group members", e);
+                if(LOGGER.isInfoEnabled()){
+                    LOGGER.info("Failed to get group members", e);
+                    LOGGER.debug("Result Code {}",e.getResultCode());
+                    LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                    LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                } 
             }
         }
 
@@ -686,7 +716,12 @@ public class XWikiLDAPUtils
 
                     resultEntry = result.hasMore() ? result.next() : null;
                 } catch (LDAPException e) {
-                    LOGGER.debug("Failed to get group members", e);
+                    if(LOGGER.isInfoEnabled()){
+                        LOGGER.info("Failed to get group members", e);
+                        LOGGER.debug("Result Code {}",e.getResultCode());
+                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                    }
                 }
             } while (resultEntry != null);
         }

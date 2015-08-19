@@ -321,13 +321,23 @@ public class XWikiLDAPConnection
 
             ldapToXWikiAttribute(searchAttributeList, attributeSet);
         } catch (LDAPException e) {
-            LOGGER.debug("LDAP Search failed", e);
+            if(LOGGER.isInfoEnabled()){
+                LOGGER.info("LDAP Search failed", e);
+                LOGGER.debug("Result Code {}",e.getResultCode());
+                LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                LOGGER.debug("Matched DN {}",e.getMatchedDN());
+            }
         } finally {
             if (searchResults != null) {
                 try {
                     this.connection.abandon(searchResults);
-                } catch (LDAPException e) {
-                    LOGGER.debug("LDAP Search clean up failed", e);
+                } catch (LDAPException e) {                    
+                    if(LOGGER.isInfoEnabled()){
+                        LOGGER.info("LDAP Search clean up failed", e);
+                        LOGGER.debug("Result Code {}",e.getResultCode());
+                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                    }
                 }
             }
         }

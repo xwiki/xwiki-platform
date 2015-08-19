@@ -498,6 +498,16 @@ xwiki.authentication.ldap.update_user=1
 #-# The default is always
 # xwiki.authentication.ldap.mode_group_sync=always
 
+#-# [Since 7.2M3, XWikiLDAPAuthServiceImpl]
+#-# Indicate groups members should be resolved in case they are subgroups.
+#-# Doing so can be very expensive so it should be disabled if you know there is no subgroups
+#-# (or if you don't care about them).
+#-# If the group is actually a filter it will always be resolved since it does not make sense left alone.
+#-# - 0: disable
+#-# - 1: enable
+#-# The default is 1
+# xwiki.authentication.ldap.group_sync_resolve_subgroups=0
+
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# If ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
 #-# - 0: disable

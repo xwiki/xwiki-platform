@@ -138,6 +138,11 @@ public class XWikiLDAPUtils
     private String userSearchFormatString = "({0}={1})";
 
     /**
+     * @see #isResolveSubgroups()
+     */
+    private boolean resolveSubgroups = true;
+
+    /**
      * Create an instance of {@link XWikiLDAPUtils}.
      * 
      * @param connection the XWiki LDAP connection tool.
@@ -225,6 +230,22 @@ public class XWikiLDAPUtils
     public Collection<String> getGroupMemberFields()
     {
         return this.groupMemberFields;
+    }
+
+    /**
+     * @return true if sub groups should be resolved too
+     */
+    public boolean isResolveSubgroups()
+    {
+        return this.resolveSubgroups;
+    }
+
+    /**
+     * @param resolveSubgroups true if sub groups should be resolved too
+     */
+    public void setResolveSubgroups(boolean resolveSubgroups)
+    {
+        this.resolveSubgroups = resolveSubgroups;
     }
 
     /**
@@ -538,6 +559,13 @@ public class XWikiLDAPUtils
 
         int nbMembers = memberMap.size();
         if (LDAPDN.isValid(userOrGroup)) {
+            // Stop there if subgroup resolution is disabled
+            if (!subgroups.isEmpty() && !isResolveSubgroups()) {
+                memberMap.put(userOrGroup.toLowerCase(), userOrGroup);
+
+                return false;
+            }
+
             LOGGER.debug("[{}] is a valid DN, lets try to get corresponding entry.", userOrGroup);
 
             isGroup = getGroupMembersFromDN(userOrGroup, memberMap, subgroups, context);
@@ -560,7 +588,11 @@ public class XWikiLDAPUtils
 
                 if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
                     String dn = searchAttributeList.get(0).value;
-                    isGroup = getGroupMembers(dn, memberMap, subgroups, context);
+                    if (!subgroups.isEmpty() && !isResolveSubgroups()) {
+                        memberMap.put(dn.toLowerCase(), dn);
+                    } else {
+                        isGroup = getGroupMembers(dn, memberMap, subgroups, context);
+                    }
                 }
             }
         }
@@ -871,11 +903,11 @@ public class XWikiLDAPUtils
             MessageFormat.format(
                 this.userSearchFormatString,
                 new Object[] {XWikiLDAPConnection.escapeLDAPSearchFilter(this.uidAttributeName),
-                XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
+                    XWikiLDAPConnection.escapeLDAPSearchFilter(uid)});
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Searching for the user in LDAP: user [{}] base [{}] query [{}] uid [{}]", new Object[] {uid,
-            this.baseDN, filter, this.uidAttributeName});
+                this.baseDN, filter, this.uidAttributeName});
         }
 
         return this.connection.searchLDAP(this.baseDN, filter, attributeNameTable, LDAPConnection.SCOPE_SUB);

@@ -126,8 +126,7 @@
 #panelheader($services.localization.render('xe.panels.navigation'))
 ## Escape special characters in macro parameter values.
 #set ($openToDoc = $doc.documentReference.toString().replaceAll('([~"])', '~$1'))
-{{documentTree showSpaces="true" showTranslations="false" showAttachments="false"
-  showChildDocuments="false" compact="true" openTo="document:$openToDoc" /}}
+{{documentTree showTranslations="false" showAttachments="false" compact="true" openTo="document:$openToDoc" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>

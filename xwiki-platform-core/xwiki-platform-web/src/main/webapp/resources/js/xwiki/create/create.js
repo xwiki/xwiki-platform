@@ -152,7 +152,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
      * @param input the input from which to read the data attributes containing the list of allowed spaces and error
      *              message.
      **/
-    updateSpaceValidatorFromTemplateProviderInput(input) {
+    updateSpaceValidatorFromTemplateProviderInput : function(input) {
       var allowedSpaces = JSON.parse(jQuery(input).attr('data-allowed-spaces'));
       var message = jQuery(input).attr('data-allowed-spaces-message');
       this.updateSpaceValidator(allowedSpaces, message);

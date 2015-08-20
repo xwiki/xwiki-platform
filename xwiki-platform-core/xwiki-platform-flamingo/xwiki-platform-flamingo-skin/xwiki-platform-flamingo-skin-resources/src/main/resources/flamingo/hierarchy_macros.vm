@@ -26,11 +26,9 @@
     ## We first display the home page manually because we always want it to be here even if it is not a parent of the
     ## current document.
     <li><a href="$xwiki.getURL($homeReference)"><span class='glyphicon glyphicon-home'></span></a></li>
+    ## Display each parent reference.
     #foreach ($parentReference in $services.parentchild.getParentsBasedOnReference($macro.document.documentReference))
-      ## The home has already been displayed
-      #if (!$homeReference.equals($parentReference))
-        #hierarchy_document($parentReference)
-      #end
+      #hierarchy_document($parentReference)
     #end
     #if ($macro.document.name != 'WebHome' && !$showOnlySpaces)
       ## Display the current document if it is not a terminal document.

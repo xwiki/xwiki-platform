@@ -7,11 +7,9 @@
   ## Call the appropiate breadcrumb depending on the 
   ## configuration.
   #######################################################
-  #if (!$doc.documentReference.equals($homeReference))
-    #if($services.parentchild.isParentChildMechanismEnabled())
-      #hierarchy_parentChild()
-    #else
-      #hierarchy()
-    #end
+  #if($services.parentchild.isParentChildMechanismEnabled())
+    #hierarchy_parentChild()
+  #else
+    #hierarchy()
   #end
 #end

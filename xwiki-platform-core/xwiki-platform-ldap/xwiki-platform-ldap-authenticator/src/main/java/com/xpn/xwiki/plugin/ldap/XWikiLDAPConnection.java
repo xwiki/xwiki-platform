@@ -321,11 +321,8 @@ public class XWikiLDAPConnection
 
             ldapToXWikiAttribute(searchAttributeList, attributeSet);
         } catch (LDAPException e) {
-            if(LOGGER.isInfoEnabled()){
-                LOGGER.info("LDAP Search failed", e);
-                LOGGER.debug("Result Code {}",e.getResultCode());
-                LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
-                LOGGER.debug("Matched DN {}",e.getMatchedDN());
+            if(LOGGER.isInfoEnabled()) {
+                detailledLDAPExceptionLog(e);
             }
         } finally {
             if (searchResults != null) {
@@ -333,10 +330,7 @@ public class XWikiLDAPConnection
                     this.connection.abandon(searchResults);
                 } catch (LDAPException e) {                    
                     if(LOGGER.isInfoEnabled()){
-                        LOGGER.info("LDAP Search clean up failed", e);
-                        LOGGER.debug("Result Code {}",e.getResultCode());
-                        LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
-                        LOGGER.debug("Matched DN {}",e.getMatchedDN());
+                        detailledLDAPExceptionLog(e);
                     }
                 }
             }
@@ -397,6 +391,18 @@ public class XWikiLDAPConnection
                 }
             }
         }
+    }
+    
+    /**
+     * This methode log detailles on LDAP exception
+     * @param e The exception
+     */
+    protected void detailledLDAPExceptionLog(LDAPException e) 
+    {
+                LOGGER.info("LDAP Search failed", e);
+                LOGGER.debug("Result Code {}",e.getResultCode());
+                LOGGER.debug("LDAP server Message {}",e.getLDAPErrorMessage());
+                LOGGER.debug("Matched DN {}",e.getMatchedDN());
     }
 
     /**

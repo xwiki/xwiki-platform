@@ -54,12 +54,8 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
       this.nameInput.on('input', this.updateLocationFromNameInput.bind(this));
       this.spaceReferenceInput.on('input xwiki:suggest:selected', this.updateLocationFromSpaceReference.bind(this));
 
-      // Update the location with whatever the initial value of the name or the title is.
-      if (this.nameInput.val()) {
-        this.updateLocationFromNameInput();
-      } else {
-        this.updateLocationAndNameFromTitleInput();
-      }
+      // Update the location with whatever the initial value of the title is.
+      this.updateLocationFromTitleInput();
 
       // Clean the output of the hierarchy macro when it should display a top level document.
       if (this.spaceReferenceInput.val().length == 0) {
@@ -207,10 +203,10 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
      **/
     updateLocationAndNameFromTitleInput : function(event) {
       // Update the location preview.
-      var title = this.titleInput.val();
-      this.updateLocationLastElement(title);
+      this.updateLocationFromTitleInput();
 
       // Update the name field.
+      var title = this.titleInput.val();
       var name = this.getPageName(title);
       this.nameInput.val(name);
       // Trigger page name validation.
@@ -218,11 +214,24 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
     },
 
     /**
+     * Update the location with the value from the title input.
+     **/
+    updateLocationFromTitleInput : function() {
+      var title = this.titleInput.val();
+      this.updateLocationLastElement(title);
+    },
+
+    /**
      * Event handler for the name input that updates the location preview's last element.
      **/
     updateLocationFromNameInput : function(event) {
-      var name = this.nameInput.val();
-      this.updateLocationLastElement(name);
+      var title = this.titleInput.val();
+
+      // Only update the location from the name when there is no title provided.
+      if (!title) {
+        var name = this.nameInput.val();
+        this.updateLocationLastElement(name);
+      }
     },
 
     /**

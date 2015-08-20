@@ -20,6 +20,17 @@
 #set ($parent = "$!request.getParameter('parent')")
 
 ## ---------------------------------------------------------------------------------------------------------
+## This parent can be passed a title for the document to create (using the "title" parameter).
+## The title is used to automatically compute a page name, which can then be customized by the user.
+## If no title is given, the page name (if set) will be used as title.
+## ---------------------------------------------------------------------------------------------------------
+#if ("$!request.title" != '')
+  #set ($title = "$!request.title")
+#else
+  #set ($title = "$!name")
+#end
+
+## ---------------------------------------------------------------------------------------------------------
 ## Get the passed template provider, if any
 ## ---------------------------------------------------------------------------------------------------------
 #set($templateProvider = "$!request.templateprovider")
@@ -63,75 +74,12 @@
   #set ($showNameInput = true)
 #end
 ## ---------------------------------------------------------------------------------------------------------
-## Output JavaScript validation code
+## JavaScript validation and UI code
 ## ---------------------------------------------------------------------------------------------------------
 $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')##
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)##
-<script type='text/javascript'>
-//<![CDATA[
-  XWiki.createPage = {
-    spaceValidator : {},
-    pageValidator : {},
-    currentSpaceInclusionParameters : {},
-    /**
-     * Create Name Field Validator.
-     */
-    initPageValidator : function() {
-      var pageInput = $('name');
-      this.pageValidator = new LiveValidation(pageInput, { validMessage: "$services.localization.render('core.validation.valid.message')" });
-      // We use a custom validation in order to handle the default value on browsers that don't support the placeholder attribute.
-      this.pageValidator.displayMessageWhenEmpty = true;
-      this.pageValidator.add(Validate.Custom, {
-        failureMessage: "$services.localization.render('core.validation.required.message')",
-        against: function(value) {
-          return !pageInput.hasClassName('empty') && typeof value == 'string' && value.strip().length > 0;
-        }
-      });
-    },
-    /**
-     * Create Space Reference Field Validator.
-     */
-    initSpaceValidator : function() {
-      var spaceReferenceInput = $('spaceReference');
-      var terminalCheckbox = $('terminal');
-      this.spaceValidator = new LiveValidation($('spaceReference'), { validMessage: "$services.localization.render('core.validation.valid.message')" });
-      this.spaceValidator.displayMessageWhenEmpty = true;
-      this.spaceValidator.add(Validate.Custom, {
-        failureMessage: "$services.localization.render('core.validation.required.message')",
-        against: function(value) {
-          if (terminalCheckbox.checked) {
-            // Space reference is required for terminal documents
-            return typeof value == 'string' && value.strip().length > 0;
-          } else {
-            // Space reference can be empty for non-terminal documents
-            return true;
-          }
-        }
-      });
-
-      // Trigger validation when the terminal status changes.
-      terminalCheckbox.observe('change', function() {
-        this.spaceValidator.validate();
-      }.bind(this));
-    },
-    /**
-     * Update Space Field Validator, allows to specify a list of allowed spaces for the field.
-     */
-    updateSpaceValidator : function(values, failureMessage) {
-      if(values.length > 0) {
-        this.currentSpaceInclusionParameters = {
-          within: values,
-          failureMessage: failureMessage
-        };
-        this.spaceValidator.add(Validate.Inclusion, this.currentSpaceInclusionParameters);
-      } else {
-        this.spaceValidator.remove(Validate.Inclusion, this.currentSpaceInclusionParameters);
-      }
-      this.spaceValidator.validate();
-    }
-  };
-//]]>
-</script>
+$xwiki.get('jsfx').use('js/xwiki/create/create.js', true)##
+$xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
 
 ## ---------------------------------------------------------------------------------------------------------
 ## Note: The list of available template providers is computed in the action and set on the context under
@@ -145,8 +93,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     ## ---------------------------------------------------------------------------------------------------------
     ## Template field
     ## ---------------------------------------------------------------------------------------------------------
-    #if(!$availableTemplateProviders.isEmpty() && $templateProvider == '' && $template == '')
-      #set ($jsSpaceInclusionValidationContainer = [])
+    #if(!$availableTemplateProviders.isEmpty() && $template == '')
       <dl>
         <dt>
           <label>$services.localization.render('core.create.template')</label>
@@ -154,31 +101,20 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         </dt>
         <dd>
           <label for='xwiki-create-form-0' class='xwiki-form-listclass'>
-            <input id='xwiki-create-form-0' type='radio' name='templateprovider' value='' checked='checked'/>
+            <input id='xwiki-create-form-0' type='radio' name='templateprovider' value='' checked='checked' data-allowed-spaces='[]' data-allowed-spaces-message=''/>
             $services.localization.render('core.create.page.template.empty')
           </label>
-          #set($discard = $jsSpaceInclusionValidationContainer.add(['xwiki-create-form-0', [], '']))
           #foreach($tpdoc in $availableTemplateProviders)
             #set ($tpobj = $tpdoc.getObject('XWiki.TemplateProviderClass'))
             ##
-            ## Display the template provider field option in the form.
+            ## Extract and save in data-* attributes list of allowed spaces to be used in the JavaScript validation of the spaceReference input.
             ##
-            #set($inputId = "xwiki-create-form-${velocityCount}")
-            <label for="$inputId" class='xwiki-form-listclass'>
-              ## pass the template provider to the create action. Prepare the template provider reference
-              #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
-              <input id="$inputId" type='radio' name='templateprovider' value="$escapetool.xml(${tpdocRef})"/>
-              ## use the template name as a translation key, to allow i18n
-              $escapetool.xml($services.localization.render($tpobj.getProperty('name').value))
-            </label>
-            ##
-            ## Extract and save the list of allowed spaces to be used in the JavaScript validation of the spaceReference input.
-            ##
-            #set($jsAllowedSpacesArray = '')## Reset previous value
+            #set($jsAllowedSpacesArray = '[]')## Reset any previous value
             #set($allowedSpaces = $tpobj.getProperty('spaces').getValue())
-            #if(!$allowedSpaces.isEmpty())
-              #set($jsAllowedSpacesArray = "'$stringtool.join($allowedSpaces, ''', ''')'")
+            #if($allowedSpaces.size() > 0)
+              #set($jsAllowedSpacesArray = $jsontool.serialize($allowedSpaces))
             #end
+            ## Compute the error message.
             #if($allowedSpaces.isEmpty())
               #set($message = '')
             #elseif($allowedSpaces.size() == 1)
@@ -186,29 +122,23 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
             #else
               #set($message = $services.localization.render('core.create.template.allowedspaces.inline', [$tpobj.getProperty('name').getValue(), $jsAllowedSpacesArray]))
             #end
-            #set($discard = $jsSpaceInclusionValidationContainer.add([$inputId, "[${jsAllowedSpacesArray}]", $message]))
+            ##
+            ## Display the template provider field option in the form.
+            ##
+            #set($inputId = "xwiki-create-form-${velocityCount}")
+            <label for="$inputId" class='xwiki-form-listclass'>
+              ## pass the template provider to the create action. Prepare the template provider reference
+              #set($tpdocRef = $services.model.serialize($tpdoc.documentReference, 'local'))
+              <input id="$inputId" type='radio' name='templateprovider' value="$escapetool.xml(${tpdocRef})" #if ($templateProvider == $tpdocRef)checked='checked'#end
+                data-allowed-spaces="$escapetool.xml($jsAllowedSpacesArray)" data-allowed-spaces-message="$escapetool.xml($message)"/>
+              ## use the template name as a translation key, to allow i18n
+              $escapetool.xml($services.localization.render($tpobj.getProperty('name').value))
+            </label>
           #end
         </dd>
       </dl>
-      ## ---------------------------------------------------------------------------------------------------------
-      ## Output JavaScript code that will update validation rules for the spaceReference field (depends on template)
-      ## ---------------------------------------------------------------------------------------------------------
-      <script type='text/javascript'>
-      //<![CDATA[
-      Event.observe(document, 'xwiki:dom:loaded', function() {
-        #foreach($validator in $jsSpaceInclusionValidationContainer)
-          $("$validator.get(0)").observe('click', function() {
-            XWiki.createPage.updateSpaceValidator($validator.get(1), "$validator.get(2)");
-          }.bindAsEventListener(XWiki.createPage));
-        #end
-      });
-      //]]>
-      </script>
     #else
-      #if ($templateProvider != '')
-        ## if a template provider is set (e.g. when this page is displayed as a result of an error), put it in the form
-        <input type='hidden' id='templateprovider' name='templateprovider' value="$!{escapetool.xml($templateProvider)}" />
-      #elseif ($template != '')
+      #if ($template != '')
         ## if a template is set (to allow to get the create form from a template directly, without having to choose 
         ## the template provider), use that template
         <input type='hidden' id='template' name='template' value="$!{escapetool.xml($template)}" />
@@ -221,106 +151,172 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
 ## ---------------------------------------------------------------------------------------------------------
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
-<form action="$doc.getURL('create')" method='post' class='xform third'>
-  <dl>
+## FIXME: Using the 'container' class when displayed in an ajax call by clicking on a Wanted Link so that it looks good (proper margins) in the popup.
+<form action="$doc.getURL('create')" method='post' class='xform #if($request.ajax)container#end'>
 
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Page creation
-  ## ---------------------------------------------------------------------------------------------------------
-  #set ($jsValidationInitializersContainer = [])
+  ## Deprecated: Pass along any received page parent.
   <input type='hidden' name='parent' value="$!{escapetool.xml($parent)}"/>
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Template field
-  ## ---------------------------------------------------------------------------------------------------------
-  #displayTemplateChoice()
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Space Reference field
-  ## ---------------------------------------------------------------------------------------------------------
+
+  ## Determine if we need to show the name input.
+  #if (!$showNameInput)
+    #set ($showNameInput = "$!name" == '')
+  #end
+
   ## Determine if we need to show the space reference input.
+  #set ($deprecatedSpaceCreate = ("$!request.tocreate" == 'space'))
   #if (!$showSpaceReferenceInput)
     ## We are on an existing document and no space reference was specified for the new document to create.
     #set ($showSpaceReferenceInput = (!$doc.isNew() && "$!spaceReference" == ''))
     #if ($showSpaceReferenceInput)
       ## In the deprecated space creation process however, we only needed the space name.
-      #set ($deprecatedSpaceCreate = ("$!request.tocreate" == 'space'))
       #set ($showSpaceReferenceInput = !$deprecatedSpaceCreate)
     #end
   #end
-  ##
-  #if ($showSpaceReferenceInput)
-    #if ("$!spaceReference" == '')
-      #set ($defaultSpaceReference = $doc.documentReference.lastSpaceReference)
-    #else
-      #set ($defaultSpaceReference = $spaceReference)
-    #end
-    ## Make sure to use the local serialized string reference
-    #set ($defaultSpaceReferenceString = $services.model.serialize($defaultSpaceReference, 'local'))
-    <dt>
-      <label for='spaceReference'>$services.localization.render('core.create.spaceReference.label')</label>
-      <span class='xHint'>$services.localization.render('core.create.spaceReference.hint')</span>
-    </dt>
-    <dd>
-      <input type='text' id='spaceReference' size='60' name='spaceReference' class='suggestSpaces' value="$!{escapetool.xml($defaultSpaceReferenceString)}"/>
-    </dd>
-    #set($discard = $jsValidationInitializersContainer.add('XWiki.createPage.initSpaceValidator();'))
-  #else
-    #set ($spaceReferenceLocalString = $services.model.serialize($spaceReference, 'local'))
-    <input type='hidden' id='spaceReference' name='spaceReference' value="$!{escapetool.xml($spaceReferenceLocalString)}" />
-  #end
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Name field
-  ## ---------------------------------------------------------------------------------------------------------
-  #if("$!name" == '' || $showNameInput)
-    #if ("$!name" == '')
-      #set ($defaultName = $services.localization.render('core.create.pageText'))
-      #set ($isPlaceholder = true)
-    #else
-      #set ($defaultName = $name)
-    #end
-    <dt>
-      <label for='name'>$services.localization.render('core.create.page')</label>
-      <span class='xHint'>$services.localization.render('core.create.page.hint')</span>
-    </dt>
-    <dd>
-      <input type='text' id='name' size='60' name='name' value="$defaultName" #if ($isPlaceholder)class='withTip'#end/>
-    </dd>
-    #set($discard = $jsValidationInitializersContainer.add('XWiki.createPage.initPageValidator();'))
-  #else
-    <input type='hidden' id='name' name='name' value="$!{escapetool.xml($name)}" />
-  #end
-  ## -------
-  ## Page type - Advanced users
-  ## -------
-  #if ($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin)
-    <dt>
-      <label for='tocreate'>$services.localization.render('core.create.terminal.label')</label>
-      <span class='xHint'>$services.localization.render('core.create.terminal.hint')</span>
-    </dt>
-    <dd>
-      <label for='terminal'>
-        <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end />
-        $services.localization.render('core.create.terminal.status')
-      </label>
-    </dd>
-  #end
-  ## ---------------------------------------------------------------------------------------------------------
-  ## Output JavaScript validation code
-  ## ---------------------------------------------------------------------------------------------------------
-  <script type='text/javascript'>
-  //<![CDATA[
-    Event.observe(document, 'xwiki:dom:loaded', function() {
-      #foreach($initializer in $jsValidationInitializersContainer)
-        $initializer
-      #end
-    }.bindAsEventListener(XWiki.createPage));
-  //]]>
-  </script>
 
-  </dl>
+  ## Determine if we need to show the first column.
+  #set ($showFirstColumn = $showSpaceReferenceInput || $showNameInput)
+
+  <div class='row'>
+    #if ($showFirstColumn)
+      <div class='col-xs-12 col-lg-6'>
+        <dl>
+          ##
+          ## ---------------------------------------------------------------------------------------------------------
+          ## Title field
+          ## ---------------------------------------------------------------------------------------------------------
+          ##
+          #if ($title == '')
+            #set ($defaultTitle = $services.localization.render('core.create.identifier.placeholder'))
+            #set ($titleIsPlaceholder = true)
+          #else
+            #set ($defaultTitle = $title)
+          #end
+          <dt>
+            <label for='title'>$services.localization.render('core.create.title')</label>
+            <span class='xHint'>$services.localization.render('core.create.title.hint')</span>
+          </dt>
+          <dd>
+            <input type='text' id='title' size='60' name='title' value="$defaultTitle" #if ($titleIsPlaceholder)class='withTip'#end/>
+          </dd>
+          ##
+          ## ---------------------------------------------------------------------------------------------------------
+          ## Location preview
+          ## ---------------------------------------------------------------------------------------------------------
+          ##
+          <dt>
+            <label for='locationPreview'>$services.localization.render('core.create.locationPreview.label')</label>
+            <span class='xHint'>$services.localization.render('core.create.locationPreview.hint')</span>
+          </dt>
+          <dd>
+            ## Location edit button
+            <a href='#'><span id='location-edit-toggle' class='glyphicon glyphicon-pencil'></span></a>
+
+            ## Hierarchy preview
+            #if ("$!spaceReference" == '')
+              #set ($hierarchyDoc = $tdoc)
+            #else
+              #set ($hierarchyDoc = $xwiki.getDocument($spaceReference))
+            #end
+            ## Note: we are only setting the spaceReference here. The new document part will be added from javascript.
+            #template('hierarchy_macros.vm')
+            #hierarchy($hierarchyDoc, true)
+            ##
+            ## ---------------------------------------------------------------------------------------------------------
+            ## Location edit
+            ## ---------------------------------------------------------------------------------------------------------
+            ##
+            <div id='location-edit' class='hidden'>
+              <dl>
+                ## ---------------------------------------------------------------------------------------------------------
+                ## Space Reference field
+                ## ---------------------------------------------------------------------------------------------------------
+                ##
+                #if ("$!spaceReference" == '')
+                  ## Note: the $homeReference variable is defined in hierarchy_macros.vm which we have called above.
+                  #if ($doc.documentReference.equals($homeReference))
+                    ## We want to discourage ending up with all the pages children of the homepage so we
+                    ## default to top level documents, uless the user explicitly says otherwise.
+                    #set ($defaultSpaceReference = $NULL)
+                  #else
+                    ## For all other documents, default to the current space, i.e. create the new page as a child of the current one.
+                    #set ($defaultSpaceReference = $doc.documentReference.lastSpaceReference)
+                  #end
+                #else
+                  #set ($defaultSpaceReference = $spaceReference)
+                #end
+                ## Make sure to use the local serialized string reference
+                #set ($defaultSpaceReferenceString = $services.model.serialize($defaultSpaceReference, 'local'))
+
+                <dt>
+                  <label for='spaceReference'>$services.localization.render('core.create.spaceReference.label')</label>
+                  <span class='xHint'>$services.localization.render('core.create.spaceReference.hint')</span>
+                </dt>
+                <dd>
+                  <input type='text' id='spaceReference' size='60' name='spaceReference' class='suggestSpaces' value="$!{escapetool.xml($defaultSpaceReferenceString)}"/>
+                </dd>
+                ##
+                ## ---------------------------------------------------------------------------------------------------------
+                ## Name field
+                ## ---------------------------------------------------------------------------------------------------------
+                ##
+                #if ("$!name" == '')
+                  #set ($defaultName = $services.localization.render('core.create.identifier.placeholder'))
+                  #set ($nameIsPlaceholder = true)
+                #else
+                  #set ($defaultName = $name)
+                #end
+
+                <dt>
+                  <label for='name'>$services.localization.render('core.create.identifier.label')</label>
+                  <span class='xHint'>$services.localization.render('core.create.identifier.hint')</span>
+                </dt>
+                <dd>
+                  <input type='text' id='name' size='60' name='name' value="$defaultName" #if ($nameIsPlaceholder)class='withTip'#end/>
+                </dd>
+            </div>
+          </dd>
+        </dl>
+      </div>
+    #else
+      ## First column is hidden.
+      ## Pass along the known values as hidden inputs.
+      ##
+      <input type='hidden' name='title' value="$!{escapetool.xml($title)}"/>
+      <input type='hidden' id='name' name='name' value="$!{escapetool.xml($name)}" />
+      #set ($spaceReferenceLocalString = $services.model.serialize($spaceReference, 'local'))
+      <input type='hidden' id='spaceReference' name='spaceReference' value="$!{escapetool.xml($spaceReferenceLocalString)}" />
+    #end
+    ## FIXME: When displayed in an ajax call by clicking on a Wanted Link, the responsive classes consider the calling document (large screen)
+    ## as the viewport and not the popup (small screen), so we can not use them since they create problems instead of fixing them.
+    <div class='#if(!$request.ajax)col-xs-12 col-lg-6#end'>
+      <dl>
+        ## ---------------------------------------------------------------------------------------------------------
+        ## Template field
+        ## ---------------------------------------------------------------------------------------------------------
+        #displayTemplateChoice()
+        ## ---------------------------------------------------------------------------------------------------------
+        ## Page type - Advanced users
+        ## ---------------------------------------------------------------------------------------------------------
+        #if ($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin)
+          <dt>
+            <label for='tocreate'>$services.localization.render('core.create.terminal.label')</label>
+            <span class='xHint'>$services.localization.render('core.create.terminal.hint')</span>
+          </dt>
+          <dd>
+            <label for='terminal'>
+              <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end #if($deprecatedSpaceCreate)disabled='disabled'#end />
+              $services.localization.render('core.create.terminal.status')
+            </label>
+          </dd>
+        #end
+      </dl>
+    </div>
+  </div>
 
   <div class='buttons'>
     <span class='buttonwrapper'>
       <input type='submit' class='button' value="$services.localization.render('create')"/>
     </span>
   </div>
+
 </form>

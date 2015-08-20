@@ -1,0 +1,8 @@
+##
+## Template used to generate the hierarchy of the document on which it is applied by always using the reference-based
+## hierarchy mode, regardless of the configured hierarchy mode used in the page breadcrumbs.
+##
+## Initially made to be used in an AJAX call when generating the location preview of a new page.
+##
+#template('hierarchy_macros.vm')
+#hierarchy()

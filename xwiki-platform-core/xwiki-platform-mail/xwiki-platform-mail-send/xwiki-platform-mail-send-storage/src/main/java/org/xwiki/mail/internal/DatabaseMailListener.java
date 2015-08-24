@@ -114,7 +114,7 @@ public class DatabaseMailListener extends AbstractMailListener implements Initia
         super.onPrepareFatalError(exception, parameters);
 
         //TODO: Store failure exception
-        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]");
+        logger.error("Failure during preparation phase of thread [" + getBatchId() + "]", exception);
     }
 
     @Override

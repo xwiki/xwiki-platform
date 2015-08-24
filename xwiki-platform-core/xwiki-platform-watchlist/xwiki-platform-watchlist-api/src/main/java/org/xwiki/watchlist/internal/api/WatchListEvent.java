@@ -26,10 +26,9 @@ import java.util.List;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.watchlist.internal.WatchListEventHTMLDiffExtractor;
 
 import com.xpn.xwiki.XWikiContext;
@@ -172,7 +171,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getSpace()
     {
-        return getDocumentReference().getLastSpaceReference().getName();
+        SpaceReference spaceReference = getDocumentReference().getLastSpaceReference();
+        return getLocalSerializer().serialize(spaceReference);
     }
 
     /**
@@ -180,7 +180,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      */
     public String getPrefixedSpace()
     {
-        EntityReference spaceReference = getDocumentReference().extractReference(EntityType.SPACE);
+        SpaceReference spaceReference = getDocumentReference().getLastSpaceReference();
         return getSerializer().serialize(spaceReference);
     }
 
@@ -414,7 +414,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     @Override
     public int compareTo(WatchListEvent event)
     {
-        return getDocumentReference().compareTo(event.getDocumentReference());
+        // FIXME: Workaround for http://jira.xwiki.org/browse/XWIKI-12432
+        // Compare the references when it gets fixed like the commented code below.
+        // return getDocumentReference().compareTo(event.getDocumentReference());
+
+        return getPrefixedFullName().compareTo(event.getPrefixedFullName());
     }
 
     /**

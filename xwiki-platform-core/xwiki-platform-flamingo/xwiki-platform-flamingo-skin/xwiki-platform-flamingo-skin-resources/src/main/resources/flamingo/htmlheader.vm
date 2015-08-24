@@ -11,16 +11,10 @@
   data-xwiki-${name}="$escapetool.xml($value)"
 #end
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language"
-  ## Note: Starting with XWiki 7.2M2, the "document", "xwiki", "space" and "page" metas are deprecated
-  ## and it's recommended to use the new "reference" meta instead, which holds the full String reference of the current
-  ## document.
-  ## In addition starting with XWiki 7.2M1, the "space" variable now holds the full space reference (i.e. one or
-  ## several spaces separated by dots, e.g. "space1.space2").
-  #xwikiDataAttribute('reference', $services.model.serialize($doc.documentReference))
-  #xwikiDataAttribute('document', $doc.fullName)## Deprecated
-  #xwikiDataAttribute('wiki', $doc.wiki)## Deprecated
-  #xwikiDataAttribute('space', $doc.space)## Deprecated
-  #xwikiDataAttribute('page', $doc.name)## Deprecated
+  #xwikiDataAttribute('document', $doc.fullName)
+  #xwikiDataAttribute('wiki', $doc.wiki)
+  #xwikiDataAttribute('space', $doc.space)
+  #xwikiDataAttribute('page', $doc.name)
   #xwikiDataAttribute('version', $doc.version)
   #xwikiDataAttribute('rest-url', $services.rest.url($doc.documentReference).path)
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>

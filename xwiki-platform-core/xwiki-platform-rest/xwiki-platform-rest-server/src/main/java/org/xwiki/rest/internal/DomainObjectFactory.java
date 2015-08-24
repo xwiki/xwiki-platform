@@ -761,10 +761,12 @@ public class DomainObjectFactory
         status.setProgress(createJobProgress(objectFactory, jobStatus.getProgress()));
         Calendar calendarStartDate = Calendar.getInstance();
         calendarStartDate.setTime(jobStatus.getStartDate());
-        Calendar calendarEndDate = Calendar.getInstance();
-        calendarEndDate.setTime(jobStatus.getEndDate());
         status.setStartDate(calendarStartDate);
-        status.setEndDate(calendarEndDate);
+        Calendar calendarEndDate = Calendar.getInstance();
+        if (jobStatus.getEndDate() != null) {
+            calendarEndDate.setTime(jobStatus.getEndDate());
+            status.setEndDate(calendarEndDate);
+        }
         if (self != null) {
             Link link = objectFactory.createLink();
             link.setHref(self.toString());

@@ -140,7 +140,7 @@
   overflow-x: auto;
 }
 
-span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
+span.wikiWatchlistType, span.spaceWatchlistType, span.documentWatchlistType {
   width: 16px;
   height: 16px;
   display: block;
@@ -154,7 +154,7 @@ span.spaceWatchlistType {
   background: url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat;
 }
 
-span.pageWatchlistType {
+span.documentWatchlistType {
   background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat;
 }</code>
     </property>
@@ -303,13 +303,17 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
       "callback": "function (row, i, table) {
                       var tr = new Element('tr');
                       tr.insert(new Element('td').insert(new Element('span').addClassName(row.type + 'WatchlistType')));
-                      tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
-                      if (row.spaceUrl != '') {
+                      if (row.wikiUrl) {
+                        tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
+                      } else {
+                        tr.insert(new Element('td').update(row.wikiName));
+                      }
+                      if (row.spaceUrl) {
                         tr.insert(new Element('td').insert(new Element('a', { href : row.spaceUrl}).update(row.spaceName)));
                       } else {
                         tr.insert(new Element('td').update(row.spaceName));
                       }
-                      if (row.pageUrl != '') {
+                      if (row.pageUrl) {
                         tr.insert(new Element('td').insert(new Element('a', { href : row.pageUrl}).update(row.pageName)));
                       } else {
                         tr.insert(new Element('td').update(row.pageName));

@@ -84,7 +84,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
             computedLocale = getDefaultLocale();
         }
 
-        DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
+        // Note: Make sure to use the class reference relative to the template's wiki and not the current wiki.
+        DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS, templateReference.getWikiReference());
 
         VelocityContext velocityContext = createVelocityContext(velocityVariables);
 

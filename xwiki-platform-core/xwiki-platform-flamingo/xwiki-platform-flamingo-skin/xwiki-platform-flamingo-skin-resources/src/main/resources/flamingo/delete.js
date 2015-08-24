@@ -12,8 +12,10 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     var getProgressStatus = function() {
       // TODO: add a factory for the REST URL
-      var url = '/rest/jobstatus/' + jobId;
-      $.ajax(url).done(function (data) {
+      var baseURL = xm.restURL.substr(0, xm.restURL.indexOf('/rest/'));
+      var url = baseURL + '/rest/jobstatus/' + jobId;
+      // Note: we use JSON because it is easier to parse with javascript
+      $.ajax(url, {'data': {'media': 'json'}}).done(function (data) {
         if (data.progress.offset < 1) {
           updateProgressBar(data.progress.offset);
           setTimeout(getProgressStatus, 1000);

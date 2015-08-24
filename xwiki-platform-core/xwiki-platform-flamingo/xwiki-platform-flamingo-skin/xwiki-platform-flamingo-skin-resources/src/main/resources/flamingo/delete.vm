@@ -45,7 +45,7 @@
 ##              DISPLAY PROGRESS BAR
 #######################################################
 #macro(displayProgressBar)
-  #set($discard = $xwiki.jsfx.use('delete.js', true))
+  #set($discard = $xwiki.jsfx.use("delete${jsExtension}", true))
   #set($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
   #set($jobId = $request.jobId)
   <div class="ui-progress" id="delete-progress-bar-container">

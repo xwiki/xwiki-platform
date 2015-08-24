@@ -762,8 +762,8 @@ public class DomainObjectFactory
         Calendar calendarStartDate = Calendar.getInstance();
         calendarStartDate.setTime(jobStatus.getStartDate());
         status.setStartDate(calendarStartDate);
-        Calendar calendarEndDate = Calendar.getInstance();
         if (jobStatus.getEndDate() != null) {
+            Calendar calendarEndDate = Calendar.getInstance();
             calendarEndDate.setTime(jobStatus.getEndDate());
             status.setEndDate(calendarEndDate);
         }

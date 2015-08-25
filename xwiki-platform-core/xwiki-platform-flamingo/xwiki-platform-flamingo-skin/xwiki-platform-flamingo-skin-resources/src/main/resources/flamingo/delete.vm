@@ -75,30 +75,32 @@
 ##                    CHILDREN
 #######################################################
 #macro(getChildren)
-  #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
-  #set($childCount = $services.query.xwql($childCountXWQL).bindValue('space', "${doc.space}.%").bindValue('fullName', $doc.fullName).addFilter('unique').count())
-  #if ($childCount > 0)
-    #define($heading)
-      <input name="affectChildren" id="affectChildren" type="checkbox" /><label for="affectChildren">Affect children</label> ($childCount)
+  #if ($doc.name == 'WebHome') ## terminal documents have no child
+    #set($childCountXWQL = "WHERE doc.fullName LIKE :space AND doc.fullName <> :fullName")
+    #set($childCount = $services.query.xwql($childCountXWQL).bindValue('space', "${doc.space}.%").bindValue('fullName', $doc.fullName).addFilter('unique').count())
+    #if ($childCount > 0)
+      #define($heading)
+        <input name="affectChildren" id="affectChildren" type="checkbox" /><label for="affectChildren">Affect children</label> ($childCount)
+      #end
+      #define($body)
+        ##
+        ## List the documents to be deleted using a livetable
+        ##
+        #set ($collist = ['doc.title','doc.date', 'doc.author'])
+        #set ($colprops = {
+          'doc.title' : { 'link' : 'view' },
+          'doc.author' : { 'link' : 'author' }
+        })
+        #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
+        #set ($options = { 
+          'url' : "$doc.getURL('get', $urlParameters)",
+          'translationPrefix' : 'platform.index.',
+          'outputOnlyHtml' : true
+        })
+        #livetable('deleteSpaceIndex' $collist $colprops $options)
+      #end
+      #displayPanel('panel-children', 'panel-default', $heading, $body)
     #end
-    #define($body)
-      ##
-      ## List the documents to be deleted using a livetable
-      ##
-      #set ($collist = ['doc.title','doc.date', 'doc.author'])
-      #set ($colprops = {
-        'doc.title' : { 'link' : 'view' },
-        'doc.author' : { 'link' : 'author' }
-      })
-      #set ($urlParameters = "xpage=getdocuments&childrenOf=$escapetool.url($doc.space)&queryFilters=unique")
-      #set ($options = { 
-        'url' : "$doc.getURL('get', $urlParameters)",
-        'translationPrefix' : 'platform.index.',
-        'outputOnlyHtml' : true
-      })
-      #livetable('deleteSpaceIndex' $collist $colprops $options)
-    #end
-    #displayPanel('panel-children', 'panel-default', $heading, $body)
   #end
 #end
 #######################################################

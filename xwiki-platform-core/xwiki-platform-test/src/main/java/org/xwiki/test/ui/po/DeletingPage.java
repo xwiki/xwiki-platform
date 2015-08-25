@@ -36,9 +36,6 @@ public class DeletingPage extends ViewPage
     @FindBy(id = SUCCESS_MESSAGE_ID)
     private WebElement successMessage;
     
-    @FindBy(xpath = "//div[@id = 'document-title']/h1/a")
-    private WebElement documentTitleLink;
-    
     /** 
      * @return true if the deletion process is terminated
      */
@@ -57,7 +54,7 @@ public class DeletingPage extends ViewPage
     
     public DeletePageOutcomePage getDeletePageOutcomePage()
     {
-        documentTitleLink.click();
+        this.delete();
         return new DeletePageOutcomePage();
     }
     

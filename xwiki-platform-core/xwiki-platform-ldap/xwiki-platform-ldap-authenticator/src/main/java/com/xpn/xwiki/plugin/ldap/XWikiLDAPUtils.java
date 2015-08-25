@@ -963,8 +963,6 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @throws XWikiException error when updating or creating XWiki user.
      */
-    // TODO this method does a variable re-assignment on userProfile.
-    // This need to be investigated and refactored to avoid this need.
     public void syncUser(XWikiDocument userProfile, List<XWikiLDAPSearchAttribute> searchAttributeListIn,
         String ldapDn, String ldapUid, XWikiContext context) throws XWikiException
     {

@@ -55,6 +55,7 @@
     </div>
   </div>
   <p class="successmessage hidden" id="successMessage">$services.localization.render('core.delete.success')</p>
+  <p class="errormessage hidden" id="errorMessage">$services.localization.render('core.delete.error')</p>
 #end
 #######################################################
 ##                  DISPLAY PANEL

@@ -118,7 +118,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
       this.spaceValidator.add(Validate.Custom, {
         failureMessage: "$services.localization.render('core.validation.required.message')",
         against: function(value) {
-          if (terminalCheckbox.checked) {
+          if (terminalCheckbox && terminalCheckbox.checked) {
             // Space reference is required for terminal documents
             return typeof value == 'string' && value.strip().length > 0;
           } else {
@@ -129,7 +129,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
       });
 
       // Trigger validation when the terminal status changes.
-      terminalCheckbox.observe('change', function() {
+      terminalCheckbox && terminalCheckbox.observe('change', function() {
         this.spaceValidator.validate();
       }.bind(this));
 

@@ -297,14 +297,14 @@ $xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
         ## ---------------------------------------------------------------------------------------------------------
         ## Page type - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
-        #if ($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin)
+        #if (($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin) && !$deprecatedSpaceCreate)
           <dt>
             <label for='tocreate'>$services.localization.render('core.create.terminal.label')</label>
             <span class='xHint'>$services.localization.render('core.create.terminal.hint')</span>
           </dt>
           <dd>
             <label for='terminal'>
-              <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end #if($deprecatedSpaceCreate)disabled='disabled'#end />
+              <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end/>
               $services.localization.render('core.create.terminal.status')
             </label>
           </dd>

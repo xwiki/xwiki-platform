@@ -302,35 +302,6 @@
     * [[[[image:${category.iconReference}]] **${category.name}**&gt;&gt;path:${category.url}]] (% class="description" %)$!{category.description}
   #end
 #end
-
-#**
- * Displays the drop down allowing to choose a different space to administer.
- *#
-#macro (admin_spaceSwitch)
-{{html clean="false"}}
-  &lt;form id="change-context" class="xformInline" action="$!doc.getURL($xcontext.action)"&gt;
-    &lt;div&gt;
-      &lt;input type="hidden" name="xaction" value="switchContext" /&gt;
-      &lt;select id="goto-select" name="target"&gt;
-        #if ($xwiki.hasAccessLevel('admin', $xcontext.user, 'XWiki.XWikiPreferences'))
-          &lt;optgroup label="$services.localization.render('admin.gotoglobaladministration')"&gt;
-            &lt;option value="$xwiki.getURL('XWiki.XWikiPreferences', 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$services.localization.render('admin.globaladministration')&lt;/option&gt;
-          &lt;/optgroup&gt;
-        #end
-        &lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
-        #foreach($spaceitem in $xwiki.spaces)
-          #set ($spacePreferencesDocument = $services.model.createDocumentReference('', $spaceitem, 'WebPreferences'))
-          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocument, 'default')))
-            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', "section=$escapetool.url($crtSectionId)")" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
-          #end
-        #end
-        &lt;/optgroup&gt;
-      &lt;/select&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-{{/html}}
-#end
 {{/velocity}}
 
 {{velocity}}
@@ -370,7 +341,6 @@
   #else
     #set ($sectionName = $currentSpace)
   #end
-#admin_spaceSwitch()
 (% id="hierarchy" %)
 (((
 

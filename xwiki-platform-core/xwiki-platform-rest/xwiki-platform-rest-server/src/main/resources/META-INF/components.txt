@@ -22,7 +22,8 @@ org.xwiki.rest.internal.resources.comments.CommentResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentsResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentsVersionResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentVersionResourceImpl
-org.xwiki.rest.internal.resources.jobstatus.JobStatusResourceImpl
+org.xwiki.rest.internal.resources.job.JobStatusResourceImpl
+org.xwiki.rest.internal.resources.job.JobLogResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentAtPageVersionResourceImpl

@@ -48,6 +48,8 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.internal.syntax.DefaultSyntaxFactory;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.velocity.VelocityManager;
@@ -62,6 +64,7 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.web.EditForm;
 
 import static org.junit.Assert.assertEquals;
@@ -74,6 +77,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -1361,5 +1365,34 @@ public class XWikiDocumentMockitoTest
 
         // Verify that we get the expected title.
         assertEquals(expectedNewTitle, newDoc.getTitle());
+    }
+
+    @Test
+    public void testValidateWithoutPR() throws XWikiException, AccessDeniedException
+    {
+        this.document.setValidationScript("validationScript");
+
+        when(this.oldcore.getMockXWiki().parseGroovyFromPage("validationScript", this.oldcore.getXWikiContext()))
+            .thenReturn(new XWikiValidationInterface()
+            {
+                @Override
+                public boolean validateObject(BaseObject object, XWikiContext context)
+                {
+                    return true;
+                }
+
+                @Override
+                public boolean validateDocument(XWikiDocument doc, XWikiContext context)
+                {
+                    return true;
+                }
+            });
+
+        assertTrue(this.document.validate(this.oldcore.getXWikiContext()));
+
+        doThrow(AccessDeniedException.class).when(this.oldcore.getMockContextualAuthorizationManager()).checkAccess(
+            Right.PROGRAM, new DocumentReference("wiki", "space", "validationScript"));
+
+        assertFalse(this.document.validate(this.oldcore.getXWikiContext()));
     }
 }

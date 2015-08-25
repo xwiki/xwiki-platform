@@ -54,12 +54,16 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
       this.nameInput.on('input', this.updateLocationFromNameInput.bind(this));
       this.spaceReferenceInput.on('input xwiki:suggest:selected', this.updateLocationFromSpaceReference.bind(this));
 
-      // Update the location with whatever the initial value of the title is.
-      this.updateLocationFromTitleInput();
-
       // Clean the output of the hierarchy macro when it should display a top level document.
-      if (this.spaceReferenceInput.val().length == 0) {
+      if (!this.spaceReferenceInput.val()) {
         this.updateLocationFromSpaceReference();
+      }
+
+      // Update the location with whatever the initial value of the title is.
+      if (!this.nameInput.val()) {
+        this.updateLocationAndNameFromTitleInput();
+      } else {
+        this.updateLocationFromTitleInput();
       }
 
       // Validate the form.
@@ -214,7 +218,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
     },
 
     /**
-     * Update the location with the value from the title input.
+     * Update the location preview's last element with the value from the title input.
      **/
     updateLocationFromTitleInput : function() {
       var title = this.titleInput.val();
@@ -225,12 +229,22 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
      * Event handler for the name input that updates the location preview's last element.
      **/
     updateLocationFromNameInput : function(event) {
-      var title = this.titleInput.val();
-
       // Only update the location from the name when there is no title provided.
-      if (!title) {
+      if (!this.titleInput.val()) {
         var name = this.nameInput.val();
         this.updateLocationLastElement(name);
+      }
+    },
+
+    /**
+     * Update the location preview's last element with the value from the title input, if available. Otherwise, the
+     * value from the name value is used instead.
+     **/
+    updateLocationFromTitleOrNameInput : function() {
+      if (this.titleInput.val()) {
+        this.updateLocationFromTitleInput();
+      } else {
+        this.updateLocationFromNameInput();
       }
     },
 
@@ -280,7 +294,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
         });
 
         // Update the document part of the new location.
-        this.updateLocationFromNameInput();
+        this.updateLocationFromTitleOrNameInput();
       } else {
         var spaceHierarchyURL = this.getSpaceHierarchyURL(spaceReference);
         jQuery.get(spaceHierarchyURL, function(data) {
@@ -290,7 +304,7 @@ require(['jquery', 'xwiki-events-bridge'], function(jQuery) {
           this.locationContainer = newLocationContainer;
 
           // Update the document part of the new location.
-          this.updateLocationFromNameInput();
+          this.updateLocationFromTitleOrNameInput();
         }.bind(this));
       }
     }

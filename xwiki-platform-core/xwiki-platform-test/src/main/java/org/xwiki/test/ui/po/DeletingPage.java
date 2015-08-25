@@ -19,37 +19,46 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Represents a confirmation page that allows the user cancel or confirm the current action (e.g. delete a page, delete
- * a space, etc.).
- * 
+ * Represents the page displayed while the page (and maybe its children) is deleted.
+ *  
  * @version $Id$
- * @since 4.0M2
+ * @since 7.2M3 
  */
-public class ConfirmationPage extends ViewPage
+public class DeletingPage extends ViewPage
 {
-    @FindBy(xpath = "//*[contains(@class, 'btn') and (contains(@value, 'Yes') or contains(text(), 'Yes'))]")
-    private WebElement yesButton;
-
-    @FindBy(xpath = "//a[contains(@class, 'btn') and (contains(@value, 'No') or contains(text(), 'No'))]")
-    private WebElement noButton;
-
-    /**
-     * Clicks on the Yes button to confirm the current action.
+    private static final String SUCCESS_MESSAGE_ID = "successMessage";
+    
+    @FindBy(id = SUCCESS_MESSAGE_ID)
+    private WebElement successMessage;
+    
+    @FindBy(xpath = "//div[@id = 'document-title']/h1/a")
+    private WebElement documentTitleLink;
+    
+    /** 
+     * @return true if the deletion process is terminated
      */
-    public void clickYes()
+    public boolean isTerminated()
     {
-        this.yesButton.click();
+        return successMessage.isDisplayed();
     }
 
     /**
-     * Clicks on the No button to cancel the current action.
+     * Wait until the delete process is terminated 
      */
-    public void clickNo()
+    public void waitUntilIsTerminated()
     {
-        this.noButton.click();
+        getDriver().waitUntilElementIsVisible(By.id(SUCCESS_MESSAGE_ID), 5000);
     }
+    
+    public DeletePageOutcomePage getDeletePageOutcomePage()
+    {
+        documentTitleLink.click();
+        return new DeletePageOutcomePage();
+    }
+    
 }

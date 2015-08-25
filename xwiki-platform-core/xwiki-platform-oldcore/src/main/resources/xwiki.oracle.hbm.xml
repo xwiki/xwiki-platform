@@ -96,7 +96,9 @@
             <column name="XWS_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="reference" type="string" unique="true" column="XWS_REFERENCE" length="255" index="SPACE_REFERENCE" not-null="true" />
+        <!-- Note: We don't create an index explicity for this column since Hibernate/Oracle will create one by default
+             since we have a unique constraint -->
+        <property name="reference" type="string" unique="true" column="XWS_REFERENCE" length="255" not-null="true" />
         <property name="name" type="string" column="XWS_NAME" length="255" index="SPACE_NAME" not-null="true" />
         <property name="parent" type="string" column="XWS_PARENT" length="255" index="SPACE_PARENT" />
         <property name="hidden" type="boolean" column="XWS_HIDDEN" length="255" index="SPACE_HIDDEN" not-null="true" />

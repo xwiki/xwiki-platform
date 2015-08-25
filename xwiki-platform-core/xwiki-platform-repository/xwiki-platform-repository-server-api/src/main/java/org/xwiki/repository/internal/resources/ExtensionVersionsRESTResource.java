@@ -21,8 +21,12 @@
 package org.xwiki.repository.internal.resources;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -37,6 +41,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersionSummary;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionVersions;
 import org.xwiki.extension.version.InvalidVersionRangeException;
+import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
@@ -56,7 +61,7 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
 {
     @GET
     public ExtensionVersions getExtensionVersions(@PathParam("extensionId") String extensionId,
-        @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("-1") int offset,
+        @QueryParam(Resources.QPARAM_LIST_START) @DefaultValue("0") int offset,
         @QueryParam(Resources.QPARAM_LIST_NUMBER) @DefaultValue("-1") int number,
         @QueryParam(Resources.QPARAM_VERSIONS_RANGES) String ranges) throws QueryException,
         InvalidVersionRangeException
@@ -84,6 +89,29 @@ public class ExtensionVersionsRESTResource extends AbstractExtensionRESTResource
                 }
             }
         }
+
+        // Order by version
+        final Map<String, Version> versionCache = new HashMap<String, Version>();
+        Collections.sort(extensions.getExtensionVersionSummaries(), new Comparator<ExtensionVersionSummary>()
+        {
+            @Override
+            public int compare(ExtensionVersionSummary o1, ExtensionVersionSummary o2)
+            {
+                return toVersion(o1.getVersion()).compareTo(toVersion(o2.getVersion()));
+            }
+
+            private Version toVersion(String versionString)
+            {
+                Version version = versionCache.get(versionString);
+
+                if (version == null) {
+                    version = new DefaultVersion(versionString);
+                    versionCache.put(versionString, version);
+                }
+
+                return version;
+            }
+        });
 
         extensions.setTotalHits(extensions.getExtensionVersionSummaries().size());
         extensions.setOffset(offset);

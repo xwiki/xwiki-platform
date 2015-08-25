@@ -341,35 +341,12 @@
   #else
     #set ($sectionName = $currentSpace)
   #end
-(% id="hierarchy" %)
-(((
 
 {{html}}
-#breadcrumb_start()
-  #if ($crtCategory)
-    #breadcrumb_line($xwiki.getURL($currentDoc, $adminAction), $services.localization.render('admin.main.title'))
-    ##&lt;li&gt;&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;&lt;/li&gt;
-  #else
-    #breadcrumb_current_line($services.localization.render('admin.main.title'))
-    ##&lt;li class="active"&gt;$services.localization.render('admin.main.title')&lt;/li&gt;
-  #end
-  #if ($crtCategory)
-    #if ($crtSection)
-      #breadcrumb_line($crtCategory.url, $crtCategory.name)
-      ##&lt;li&gt;&lt;a href="$crtCategory.url"&gt;$crtCategory.name&lt;/a&gt;&lt;/li&gt;
-    #else
-      #breadcrumb_current_line($crtCategory.name)
-      ##&lt;li class="active"&gt;$crtCategory.name&lt;/li&gt;
-    #end
-    #if ($crtSection)
-      #breadcrumb_current_line($crtSection.name) 
-      ##&lt;li class="active"&gt;$crtSection.name&lt;/li&gt;
-    #end
-  #end
-#breadcrumb_end()
+#template('hierarchy_macros.vm')
+#hierarchy($tdoc, true)
 {{/html}}
 
-)))
 (% id="document-title" %)(((
   = $services.localization.render('admin.section.title', [$sectionName]) =
 )))

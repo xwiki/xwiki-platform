@@ -123,9 +123,7 @@ public class DownloadAction extends XWikiAction
                 extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
 
             if (result == null) {
-                Object[] args = { filename };
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
+                throwNotFoundException(filename);
             }
 
             XWikiDocument backwardCompatibilityDocument = result.getLeft();
@@ -140,6 +138,10 @@ public class DownloadAction extends XWikiAction
         try {
             XWikiPluginManager plugins = context.getWiki().getPluginManager();
             attachment = plugins.downloadAttachment(attachment, context);
+
+            if (attachment == null) {
+                throwNotFoundException(filename);
+            }
 
             // Try to load the attachment content just to make sure that the attachment really exists
             // This will throw an exception if the attachment content isn't available
@@ -176,6 +178,13 @@ public class DownloadAction extends XWikiAction
                 popDocumentFromContext(backwardCompatibilityContextObjects);
             }
         }
+    }
+
+    private void throwNotFoundException(String filename) throws XWikiException
+    {
+        Object[] args = { filename };
+        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
     }
 
     /**

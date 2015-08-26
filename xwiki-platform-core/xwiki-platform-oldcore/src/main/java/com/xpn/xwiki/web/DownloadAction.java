@@ -22,9 +22,12 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,8 +37,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BoundedInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceReference;
@@ -89,60 +97,85 @@ public class DownloadAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+
         XWikiDocument doc = context.getDoc();
         String filename = getFileName();
-        XWikiAttachment attachment = null;
+        XWikiAttachment attachment = getAttachment(request, doc, filename);
 
-        final String idStr = request.getParameter("id");
-        if (StringUtils.isNumeric(idStr)) {
-            int id = Integer.parseInt(idStr);
-            if (doc.getAttachmentList().size() > id) {
-                attachment = doc.getAttachmentList().get(id);
-            }
-        } else {
-            attachment = doc.getAttachment(filename);
-        }
+        Map<String, Object> backwardCompatibilityContextObjects = null;
 
         if (attachment == null) {
-            Object[] args = { filename };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found",
-                null, args);
+            // If some plugins extend the Download URL format for the Standard Scheme the document in the context will
+            // most likely not have a reference that corresponds to what the plugin expects. For example imagine that
+            // the URL is a Zip Explorer URL like .../download/space/page/attachment/index.html. This will be parsed
+            // as space.page.attachment@index.html by the Standard URL scheme parsers. Thus the attachment won't be
+            // found since index.html is not the correct attachment for the Zip Explorer plugin's URL format.
+            //
+            // Thus in order to preseve backward compatibility for existing plugins that have custom URL formats
+            // extending the Download URL format, we reparse the URL by considering that it doesn't contain any Nested
+            // Space. This also means that those plugins will need to completely reparse the URL if they wish to support
+            // Nested Spaces.
+            //
+            // Also note that this code below is not compatible with the notion of having several URL schemes. The real
+            // fix will be to not allow plugins to support custom URL formats and instead to have them register new
+            // Actions if they need a different URL format.
+            Pair<XWikiDocument, XWikiAttachment> result =
+                extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(request, context);
+
+            if (result == null) {
+                Object[] args = { filename };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
+            }
+
+            XWikiDocument backwardCompatibilityDocument = result.getLeft();
+            attachment = result.getRight();
+
+            // Set the new doc as the context doc so that plugins see it as the context doc
+            backwardCompatibilityContextObjects = new HashMap<>();
+            pushDocumentInContext(backwardCompatibilityContextObjects,
+                backwardCompatibilityDocument.getDocumentReference());
         }
 
-        XWikiPluginManager plugins = context.getWiki().getPluginManager();
-        attachment = plugins.downloadAttachment(attachment, context);
-
-        // Try to load the attachment content just to make sure that the attachment really exists
-        // This will throw an exception if the attachment content isn't available
         try {
-            attachment.getContentSize(context);
-        } catch (XWikiException e) {
-            Object[] args = { filename };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                "Attachment content {0} not found", null, args);
-        }
+            XWikiPluginManager plugins = context.getWiki().getPluginManager();
+            attachment = plugins.downloadAttachment(attachment, context);
 
-        long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
-        long lastModifiedOnServer = attachment.getDate().getTime();
-        if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
-            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-            return null;
-        }
-
-        // Sending the content of the attachment
-        if (request.getHeader(RANGE_HEADER_NAME) != null) {
+            // Try to load the attachment content just to make sure that the attachment really exists
+            // This will throw an exception if the attachment content isn't available
             try {
-                if (sendPartialContent(attachment, request, response, context)) {
-                    return null;
+                attachment.getContentSize(context);
+            } catch (XWikiException e) {
+                Object[] args = { filename };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                    "Attachment content {0} not found", null, args);
+            }
+
+            long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
+            long lastModifiedOnServer = attachment.getDate().getTime();
+            if (lastModifiedOnClient != -1 && lastModifiedOnClient >= lastModifiedOnServer) {
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                return null;
+            }
+
+            // Sending the content of the attachment
+            if (request.getHeader(RANGE_HEADER_NAME) != null) {
+                try {
+                    if (sendPartialContent(attachment, request, response, context)) {
+                        return null;
+                    }
+                } catch (IOException ex) {
+                    // Broken response...
                 }
-            } catch (IOException ex) {
-                // Broken response...
+            }
+            sendContent(attachment, request, response, filename, context);
+            return null;
+        } finally {
+            if (backwardCompatibilityContextObjects != null) {
+                popDocumentFromContext(backwardCompatibilityContextObjects);
             }
         }
-        sendContent(attachment, request, response, filename, context);
-        return null;
     }
 
     /**
@@ -270,6 +303,102 @@ public class DownloadAction extends XWikiAction
         ResourceReference resourceReference = Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
         EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
         return entityResource.getEntityReference().extractReference(EntityType.ATTACHMENT).getName();
+    }
+
+    private Pair<XWikiDocument, XWikiAttachment> extractAttachmentAndDocumentFromURLWithoutSupportingNestedSpaces(
+        XWikiRequest request, XWikiContext context)
+    {
+        String path = request.getRequestURI();
+
+        // Extract the path part after the action, e.g. "/space/page/attachment/path1/path2" when you have
+        // ".../download/space/page/attachment/path1/path2".
+        int pos = path.indexOf(SEPARATOR + ACTION_NAME);
+        String subPath = path.substring(pos + (SEPARATOR + ACTION_NAME).length() + 1);
+
+        List<String> segments = new ArrayList<>();
+        for (String pathSegment : subPath.split(SEPARATOR, -1)) {
+            segments.add(Util.decodeURI(pathSegment, context));
+        }
+
+        // We need at least 3 segments
+        if (segments.size() < 3) {
+            return null;
+        }
+
+        String spaceName = segments.get(0);
+        String pageName = segments.get(1);
+        String attachmentName = segments.get(2);
+
+        // Generate the XWikiDocument and try to load it (if the user has permission to it)
+        DocumentReference reference = new DocumentReference(context.getWikiId(), spaceName, pageName);
+        XWiki xwiki = context.getWiki();
+
+        XWikiDocument backwardCompatibilityDocument;
+        try {
+            backwardCompatibilityDocument = xwiki.getDocument(reference, context);
+            if (!backwardCompatibilityDocument.isNew()) {
+                if (!context.getWiki().checkAccess(context.getAction(), backwardCompatibilityDocument, context)) {
+                    // No permission to access the document, consider that the attachment doesn't exist
+                    return null;
+                }
+            } else {
+                // Document doesn't exist
+                return null;
+            }
+        } catch (XWikiException e) {
+            // An error happened when getting the doc or checking the permission, consider that the attachment
+            // doesn't exist
+            return null;
+        }
+
+        // Look for the attachment and return it
+        XWikiAttachment attachment = getAttachment(request, backwardCompatibilityDocument, attachmentName);
+
+        return new ImmutablePair<>(backwardCompatibilityDocument, attachment);
+    }
+
+    private void pushDocumentInContext(Map<String, Object> backupObjects, DocumentReference documentReference)
+        throws XWikiException
+    {
+        XWikiContext xcontext = getContext();
+
+        // Backup current context state
+        XWikiDocument.backupContext(backupObjects, xcontext);
+
+        // Make sure to get the current XWikiContext after ExcutionContext clone
+        xcontext = getContext();
+
+        // Change context document
+        xcontext.getWiki().getDocument(documentReference, xcontext).setAsContextDoc(xcontext);
+    }
+
+    private void popDocumentFromContext(Map<String, Object> backupObjects)
+    {
+        XWikiDocument.restoreContext(backupObjects, getContext());
+    }
+
+    private XWikiContext getContext()
+    {
+        Execution execution = Utils.getComponent(Execution.class);
+        ExecutionContext econtext = execution.getContext();
+        return econtext != null ? (XWikiContext) econtext.getProperty("xwikicontext") : null;
+    }
+
+    private XWikiAttachment getAttachment(XWikiRequest request, XWikiDocument document, String filename)
+    {
+        XWikiAttachment attachment = null;
+
+        String idStr = request.getParameter("id");
+        if (StringUtils.isNumeric(idStr)) {
+            int id = Integer.parseInt(idStr);
+            if (document.getAttachmentList().size() > id) {
+                attachment = document.getAttachmentList().get(id);
+            }
+        } else {
+            attachment = document.getAttachment(filename);
+        }
+
+        return attachment;
     }
 
     /**

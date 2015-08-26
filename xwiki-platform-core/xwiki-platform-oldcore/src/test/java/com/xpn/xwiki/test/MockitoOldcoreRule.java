@@ -449,7 +449,7 @@ public class MockitoOldcoreRule implements MethodRule
 
                 XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
-                if (previousDocument != document) {
+                if (previousDocument != null && previousDocument != document) {
                     for (XWikiAttachment attachment : document.getAttachmentList()) {
                         if (!attachment.isContentDirty()) {
                             attachment.setAttachment_content(previousDocument.getAttachment(attachment.getFilename())

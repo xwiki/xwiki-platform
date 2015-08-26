@@ -29,12 +29,16 @@ import javax.servlet.ServletOutputStream;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.velocity.VelocityManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -108,6 +112,77 @@ public class MockitoDownloadActionTest
             new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page")), EntityResourceAction.VIEW));
 
         // Note: we don't give PR and the attachment is not an authorized mime type.
+
+        assertNull(action.render(xcontext));
+
+        // This is the test, we verify what is set in the response
+        verify(response).setContentType("mimetype");
+        verify(response).setHeader("Accept-Ranges", "bytes");
+        verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.ext");
+        verify(response).setDateHeader("Last-Modified", now.getTime());
+        verify(response).setContentLength(100);
+        assertEquals("test", ssos.baos.toString());
+    }
+
+    @Test
+    public void renderWhenZipExplorerPluginURL() throws Exception
+    {
+        DownloadAction action = new DownloadAction();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+
+        // Set the Request URL
+        XWikiServletRequestStub request = new XWikiServletRequestStub();
+        request.setRequestURI("http://localhost:8080/xwiki/bin/download/space/page/file.ext/some/path");
+        xcontext.setRequest(request);
+
+        // Set the current doc and current wiki
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getAttachment("path")).thenReturn(null);
+        xcontext.setDoc(document);
+        xcontext.setWikiId("wiki");
+        xcontext.setAction("download");
+
+        // Set the Response
+        XWikiResponse response = mock(XWikiResponse.class);
+        StubServletOutputStream ssos = new StubServletOutputStream();
+        when(response.getOutputStream()).thenReturn(ssos);
+        xcontext.setResponse(response);
+
+        // Set the Resource Reference Manager used to parse the URL and extract the attachment name
+        ResourceReferenceManager rrm = this.oldcore.getMocker().registerMockComponent(ResourceReferenceManager.class);
+        when(rrm.getResourceReference()).thenReturn(new EntityResourceReference(new AttachmentReference("path",
+            new DocumentReference("wiki", Arrays.asList("space", "page", "file.ext"), "some")),
+            EntityResourceAction.VIEW));
+
+        // Setup the returned attachment
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getContentSize(xcontext)).thenReturn(100);
+        Date now = new Date();
+        when(attachment.getDate()).thenReturn(now);
+        when(attachment.getFilename()).thenReturn("file.ext");
+        when(attachment.getContentInputStream(xcontext)).thenReturn(new ByteArrayInputStream("test".getBytes()));
+        when(attachment.getMimeType(xcontext)).thenReturn("mimetype");
+        when(attachment.clone()).thenReturn(attachment);
+
+        // Configure an existing doc in the store
+        XWiki xwiki = this.oldcore.getMockXWiki();
+        XWikiDocument backwardCompatDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        backwardCompatDocument.addAttachment(attachment);
+        xwiki.saveDocument(backwardCompatDocument, xcontext);
+
+        // Make sure the user has permission to access the doc
+        when(xwiki.checkAccess(eq("download"), any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(true);
+
+        // Setup ExecutionContextManager & VelocityManager using in the context backup
+        ExecutionContextManager ecm = this.oldcore.getMocker().registerMockComponent(ExecutionContextManager.class);
+        ExecutionContext ec = this.oldcore.getExecutionContext();
+        when(ecm.clone(ec)).thenReturn(ec);
+        VelocityManager vm = this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+
+        // Set the Plugin Manager
+        XWikiPluginManager pluginManager = mock(XWikiPluginManager.class);
+        when(pluginManager.downloadAttachment(attachment, xcontext)).thenReturn(attachment);
+        when(this.oldcore.getMockXWiki().getPluginManager()).thenReturn(pluginManager);
 
         assertNull(action.render(xcontext));
 

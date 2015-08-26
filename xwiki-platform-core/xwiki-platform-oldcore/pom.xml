@@ -865,6 +865,7 @@
               **/web/DeleteAction.java,
               **/web/DeleteAttachmentAction.java,
               **/web/DotAction.java,
+              **/web/DownloadAction.java,
               **/web/DownloadRevAction.java,
               **/web/EditAction.java,
               **/web/EditBean.java,

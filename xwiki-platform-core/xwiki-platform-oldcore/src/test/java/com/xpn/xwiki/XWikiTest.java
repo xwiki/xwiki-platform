@@ -36,6 +36,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.junit.Assert;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -60,6 +61,8 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
@@ -541,5 +544,35 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(documentReference,
             this.xwiki.getDocument(new ObjectReference("object", documentReference), getContext())
                 .getDocumentReference());
+    }
+
+    /**
+     * XWIKI-12398: No layout for login page in a closed wiki
+     */
+    public void testSkinResourcesAreAlwaysAllowed() throws XWikiException
+    {
+        // /skin/resources/icons/xwiki/noavatar.png
+        XWikiDocument doc1 =
+            new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("resources", "icons", "xwiki"),
+                "noavatar.png"));
+        // /skin/skins/flamingo/style.css
+        XWikiDocument doc2 =
+            new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("skins", "flamingo", "xwiki"), "style.css"));
+
+        // Register a mock authService just so that we limit the test to a minimum.
+        Mock mockAuthService = mock(XWikiAuthService.class);
+        mockAuthService.expects(exactly(2)).method("checkAuth").with(same(getContext())).will(returnValue(null));
+        this.xwiki.setAuthService((XWikiAuthService) mockAuthService.proxy());
+
+        // Register a mock rights service and make sure it is never called to validate the test's results.
+        Mock mockRightService = mock(XWikiRightService.class);
+        mockRightService.expects(
+            never("Skin action resources inside the 'skins' and 'resources' folders"
+                + " should never be checked for rights.")).method("checkAccess");
+        this.xwiki.setRightService((XWikiRightService) mockRightService.proxy());
+
+        // Verify the results.
+        Assert.assertTrue(this.xwiki.checkAccess("skin", doc1, getContext()));
+        Assert.assertTrue(this.xwiki.checkAccess("skin", doc2, getContext()));
     }
 }

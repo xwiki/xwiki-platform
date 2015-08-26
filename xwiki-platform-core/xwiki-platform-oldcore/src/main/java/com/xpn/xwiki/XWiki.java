@@ -426,6 +426,12 @@ public class XWiki implements EventListener
 
     private SpaceReferenceResolver<String> currentSpaceResolver;
 
+    /**
+     * List of top level space names that can be used in the fake context document created when accessing a resource
+     * with the 'skin' action.
+     */
+    private List<String> SKIN_RESOURCE_SPACE_NAMES = Arrays.asList("skins", "resources");
+
     private ConfigurationSource getConfiguration()
     {
         if (this.xwikicfg == null) {
@@ -1544,7 +1550,7 @@ public class XWiki implements EventListener
      * Since 7.2M1, the passed reference can be anything. If if a document child, the document reference will be
      * extracted from it. If it's a document parent it will be completed with the necessary default references (for
      * example if it's a space reference it will load the space home page).
-     * 
+     *
      * @since 5.0M1
      */
     @Unstable
@@ -3426,14 +3432,19 @@ public class XWiki implements EventListener
 
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        if (action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources"))) {
+        // Handle the 'skin' action specially so that resources don`t require special (or even 'view') rights.
+        String firstSpaceName = doc.getDocumentReference().getSpaceReferences().get(0).getName();
+        if (action.equals("skin") && SKIN_RESOURCE_SPACE_NAMES.contains(firstSpaceName)) {
             // We still need to call checkAuth to set the proper user.
             XWikiUser user = checkAuth(context);
             if (user != null) {
                 context.setUser(user.getUser());
             }
+
+            // Always allow.
             return true;
         }
+
         return getRightService().checkAccess(action, doc, context);
     }
 

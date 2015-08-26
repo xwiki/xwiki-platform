@@ -345,3 +345,17 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   text-align: right;
   margin: 4px 0 -16px;
 }
+
+@media (max-width: 616px) {
+  #propname, #proptype {
+    display: block;
+  }
+  #add_xproperty {
+    background-image: none;
+  }
+  .property-name-label {
+    background: transparent url("/xwiki/resources/icons/silk/bullet_add.png") left center no-repeat; 
+    padding-left: 16px;
+    margin-left: 16px;
+  }
+}

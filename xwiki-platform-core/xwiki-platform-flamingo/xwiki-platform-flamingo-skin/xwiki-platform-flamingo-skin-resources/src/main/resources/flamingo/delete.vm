@@ -3,15 +3,7 @@
 ###              ------------------
 ###
 #######################################################
-##                     HEADER
-#######################################################
-#template("startpage.vm")
-<div class="main">
-<div id="mainContentArea">
-  #set($quote = '"')
-  #set($titleToDisplay = $services.localization.render('core.delete.title', ["<a href=${quote}$doc.getURL('view')${quote}>$doc.plainTitle</a>"]))
-  <div class="xcontent">
-  #template('contentheader.vm')
+##
 #######################################################
 ##                     GLOBALS
 #######################################################
@@ -19,26 +11,48 @@
 #set($quote = '"')
 #set($hasInlinks = false)
 #######################################################
+##                     DISPLAY
+#######################################################
+#template("startpage.vm")
+<div class="main">
+  <div id="mainContentArea">
+    #define($title)
+      <a href="$doc.getURL('view')">$doc.plainTitle</a>
+    #end
+    #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
+    <div class="xcontent">
+      #template('contentheader.vm')
+      #controller()
+      <div class="clearfloats"></div>
+    </div> ## xcontent
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")
+#######################################################
 ##                    CONTROLLER
 #######################################################
-#if("$!{request.jobId}" == '')
-  #if("$!{request.id}" == '')
-    #displayConfirmationPage()
-  #else ## request.id means that we are deleting a document from the recycle bin
-    #displayCompletelyDeleteConfirmMessage()
+#macro(controller)
+  #if("$!{request.jobId}" != '')
+    ## A delete job is running
+    #displayProgressBar()
+  #else
+    #if("$!{request.id}" != '')
+      ## request.id means that we are deleting a document from the recycle bin
+      #displayCompletelyDeleteConfirmMessage()
+    #else
+      #displayConfirmationPage()
+    #end
   #end
-#else
-  #displayProgressBar()
 #end
 #######################################################
 ##            DISPLAY CONFIRMATION PAGE
 #######################################################
 #macro(displayConfirmationPage)
   <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
-  #getChildren()
-  #getBacklinks()
-  #getChildren_legacy()
-  #displayConfirmMessage()
+    #getChildren()
+    #getBacklinks()
+    #getChildren_legacy()
+    #displayConfirmMessage()
   </form>
 #end
 #######################################################
@@ -51,7 +65,7 @@
   <div class="ui-progress" id="delete-progress-bar-container">
     <p>$services.localization.render('core.delete.waitmessage')</p>
     <div class="ui-progress-background">
-      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$jobId" data-progress="0"></div>
+      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$jobId" data-progress="0" style="width: 0"></div>
     </div>
   </div>
   <p class="successmessage hidden" id="successMessage">$services.localization.render('core.delete.success')</p>
@@ -119,15 +133,15 @@
       #define($heading)
         <strong>Orphans</strong> ($children.size())
       #end
-      #define($body)
-        #set($tmpmsg = '<ul>')
-        #foreach($docname in $children)
-          #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-          #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
-        #end
-        #set($tmpmsg = "${tmpmsg}</ul>")
-        $services.localization.render('core.delete.orphansWarning', [$tmpmsg])
+      #define($message)
+        <ul>
+          #foreach($docname in $children)
+            #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+            <li><a href="$doc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
+          #end
+        </ul>
       #end
+      #set($body = $services.localization.render('core.delete.orphansWarning', [$message]))
       #displayPanel('panel-legacy-children', 'panel-default', $heading, $body)
     #end
   #end
@@ -144,17 +158,15 @@
     #define($heading)
      <strong>Backlinks</strong> ($links.size())
     #end
-    #define($body)
-      #define($tmpmsg)
-        <ul>
-        #foreach($docname in $links)
-          #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-          <li><a href="${rdoc.getURL('view')}">$escapetool.xml(${rdoc.getPlainTitle()})</a></li>
-        #end
-        </ul>
+    #define($message)
+      <ul>
+      #foreach($docname in $links)
+        #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+        <li><a href="$rdoc.getURL('view')">$escapetool.xml($rdoc.getPlainTitle())</a></li>
       #end
-      $services.localization.render('core.delete.backlinksWarning', [$tmpmsg])
+      </ul>
     #end
+    #set($body = $services.localization.render('core.delete.backlinksWarning', [$message]))
     #displayPanel('panel-backlinks', 'panel-default', $heading, $body)
     #set($hasInlinks = true)
   #end
@@ -165,18 +177,17 @@
 #macro(displayConfirmMessage)
   #if($xwiki.hasRecycleBin())
     #if($hasInlinks)
-      #set($fullmsg = "${fullmsg}<strong>${services.localization.render('core.recyclebin.confirmWithInlinks')}</strong>")
+      <p><strong>$services.localization.render('core.recyclebin.confirmWithInlinks')</strong></p>
     #else
-      #set($fullmsg = $services.localization.render('core.recyclebin.confirm'))
+      <p>$services.localization.render('core.recyclebin.confirm')</p>
     #end
   #else
     #if($hasInlinks)
-      #set($fullmsg = "${fullmsg}<strong>${services.localization.render('core.delete.confirmWithInlinks')}</strong>")
+      <p><strong>$services.localization.render('core.delete.confirmWithInlinks')</strong></p>
     #else
-      #set($fullmsg = $services.localization.render('core.delete.confirm'))
+      <p>$services.localization.render('core.delete.confirm')</p>
     #end
   #end
-  <p>$fullmsg</p>
   <div class="hidden">
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
     <input type="hidden" name="confirm" value="1"/>
@@ -193,7 +204,7 @@
   <a class="btn btn-primary" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('core.delete.confirm.no')</a>
 #end
 #######################################################
-##              DISPLAY CONFIRM MESSAGE
+##      DISPLAY DELETE COMPLETELY CONFIRM MESSAGE
 ##
 ## Display a confirmation message when the user wants 
 ## to delete a page from the recycle bin.
@@ -220,11 +231,3 @@
     </form>
   #xwikimessageboxend()
 #end
-#######################################################
-##                     FOOTER
-#######################################################
-<div class="clearfloats"></div>
-</div>
-</div>## mainContentArea
-</div>## main
-#template("endpage.vm")

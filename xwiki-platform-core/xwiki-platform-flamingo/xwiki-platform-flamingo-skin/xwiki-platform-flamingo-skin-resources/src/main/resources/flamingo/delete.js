@@ -11,7 +11,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     
     var whenTerminated = function() {
       updateProgressBar(1);
-      $('#delete-progress-bar-container').remove();
+      $('#delete-progress-bar-container').hide();
       // TODO: add a factory for the REST URL
       var url = baseURL + '/rest/joblog/' + jobId;
       $.ajax(url, {'data': {'media': 'json', 'level': 'ERROR'}}).done(function (data) {

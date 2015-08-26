@@ -33,15 +33,25 @@ public class DeletingPage extends ViewPage
 {
     private static final String SUCCESS_MESSAGE_ID = "successMessage";
     
+    private static final String ERROR_MESSAGE_ID = "errorMessage";
+    
+    private static final String PROGRESS_BAR_CONTAINER_ID = "delete-progress-bar-container";
+    
     @FindBy(id = SUCCESS_MESSAGE_ID)
     private WebElement successMessage;
+
+    @FindBy(id = ERROR_MESSAGE_ID)
+    private WebElement errorMessage;
+
+    @FindBy(id = PROGRESS_BAR_CONTAINER_ID)
+    private WebElement progressBarContainer;
     
     /** 
      * @return true if the deletion process is terminated
      */
     public boolean isTerminated()
     {
-        return successMessage.isDisplayed();
+        return !progressBarContainer.isDisplayed();
     }
 
     /**
@@ -49,7 +59,17 @@ public class DeletingPage extends ViewPage
      */
     public void waitUntilIsTerminated()
     {
-        getDriver().waitUntilElementIsVisible(By.id(SUCCESS_MESSAGE_ID), 5000);
+        getDriver().waitUntilElementDisappears(By.id(PROGRESS_BAR_CONTAINER_ID));
+    }
+    
+    public boolean isSuccess()
+    {
+        return successMessage.isDisplayed();        
+    }
+    
+    public String getSuccessMessage()
+    {
+        return successMessage.getText();
     }
     
     public DeletePageOutcomePage getDeletePageOutcomePage()

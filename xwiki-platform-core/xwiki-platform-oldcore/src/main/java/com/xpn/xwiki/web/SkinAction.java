@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
@@ -37,7 +39,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -237,18 +241,28 @@ public class SkinAction extends XWikiAction
     private boolean renderFileFromFilesystem(String path, XWikiContext context) throws XWikiException
     {
         LOGGER.debug("Rendering filesystem file from path [{}]", path);
+
         XWikiResponse response = context.getResponse();
         try {
             byte[] data;
             data = context.getWiki().getResourceContentAsBytes(path);
             if (data != null && data.length > 0) {
                 String filename = path.substring(path.lastIndexOf("/") + 1, path.length());
-                String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
+
                 Date modified = null;
+
+                // Evaluate the file only if it's of a supported type.
+                String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype) || isLessCssFile(filename)) {
                     // Always force UTF-8, as this is the assumed encoding for text files.
                     String rawContent = new String(data, ENCODING);
-                    String evaluatedContent = context.getWiki().evaluateVelocity(rawContent, path);
+
+                    // Evaluate the content with the rights of the superadmin user, since this is a filesystem file.
+                    DocumentReference superadminUserReference =
+                        new DocumentReference(context.getMainXWiki(), XWiki.SYSTEM_SPACE,
+                            XWikiRightService.SUPERADMIN_USER);
+                    String evaluatedContent = evaluateVelocity(rawContent, path, superadminUserReference, context);
+
                     byte[] newdata = evaluatedContent.getBytes(ENCODING);
                     // If the content contained velocity code, then it should not be cached
                     if (Arrays.equals(newdata, data)) {
@@ -257,10 +271,13 @@ public class SkinAction extends XWikiAction
                         modified = new Date();
                         data = newdata;
                     }
+
                     response.setCharacterEncoding(ENCODING);
                 } else {
                     modified = context.getWiki().getResourceLastModificationDate(path);
                 }
+
+                // Write the content to the response's output stream.
                 setupHeaders(response, mimetype, modified, data.length);
                 try {
                     response.getOutputStream().write(data);
@@ -268,6 +285,7 @@ public class SkinAction extends XWikiAction
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                         XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
                 }
+
                 return true;
             }
         } catch (IOException ex) {
@@ -286,10 +304,11 @@ public class SkinAction extends XWikiAction
      *         successfully sent.
      * @throws IOException If the response cannot be sent.
      */
-    public boolean renderFileFromObjectField(String filename, XWikiDocument doc, XWikiContext context)
+    public boolean renderFileFromObjectField(String filename, XWikiDocument doc, final XWikiContext context)
         throws IOException
     {
         LOGGER.debug("... as object property");
+
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
         String content = null;
         if (object != null) {
@@ -298,35 +317,68 @@ public class SkinAction extends XWikiAction
 
         if (!StringUtils.isBlank(content)) {
             XWiki xwiki = context.getWiki();
-            XWikiResponse response = context.getResponse();
+
+            // Evaluate the file only if it's of a supported type.
             String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+            if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
+                final ObjectPropertyReference propertyReference =
+                    new ObjectPropertyReference(filename, object.getReference());
+
+                // Evaluate the content with the rights of the document's author.
+                content = evaluateVelocity(content, propertyReference, doc.getAuthorReference(), context);
+            }
+
+            // Prepare the response.
+            XWikiResponse response = context.getResponse();
             // Since object fields are read as unicode strings, the result does not depend on the wiki encoding. Force
             // the output to UTF-8.
             response.setCharacterEncoding(ENCODING);
-            if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                // Evaluate the file.
-                ObjectPropertyReference propertyReference =
-                    new ObjectPropertyReference(filename, object.getReference());
-                content = evaluateVelocity(content, propertyReference, context);
-            }
+
+            // Write the content to the response's output stream.
             byte[] data = content.getBytes(ENCODING);
             setupHeaders(response, mimetype, doc.getDate(), data.length);
             response.getOutputStream().write(data);
+
             return true;
         } else {
             LOGGER.debug("Object field not found or empty");
         }
+
         return false;
     }
 
-    private String evaluateVelocity(String content, EntityReference reference, XWikiContext context)
+    private String evaluateVelocity(String content, EntityReference reference, DocumentReference author,
+        XWikiContext context)
     {
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         String namespace = serializer.serialize(reference);
 
-        content = context.getWiki().evaluateVelocity(content, namespace);
+        String result = evaluateVelocity(content, namespace, author, context);
 
-        return content;
+        return result;
+    }
+
+    private String evaluateVelocity(final String content, final String namespace, final DocumentReference author,
+        final XWikiContext context)
+    {
+        String result = content;
+
+        try {
+            result = Utils.getComponent(SUExecutor.class).call(new Callable<String>()
+            {
+                @Override
+                public String call() throws Exception
+                {
+                    return context.getWiki().evaluateVelocity(content, namespace);
+                }
+            }, author);
+        } catch (Exception e) {
+            // Should not happen since there is nothing in the call() method throwing an exception.
+            LOGGER.error("Failed to evaluate velocity content for namespace {} with the rights of the user {}",
+                namespace, author, e);
+        }
+
+        return result;
     }
 
     /**
@@ -343,31 +395,41 @@ public class SkinAction extends XWikiAction
         throws IOException, XWikiException
     {
         LOGGER.debug("... as attachment");
+
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment != null) {
             XWiki xwiki = context.getWiki();
             XWikiResponse response = context.getResponse();
+
+            // Evaluate the file only if it's of a supported type.
             String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
             if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
                 byte[] data = attachment.getContent(context);
                 // Always force UTF-8, as this is the assumed encoding for text files.
                 String velocityCode = new String(data, ENCODING);
 
-                // Evaluate the file.
-                String evaluatedContent = evaluateVelocity(velocityCode, attachment.getReference(), context);
+                // Evaluate the content with the rights of the document's author.
+                String evaluatedContent =
+                    evaluateVelocity(velocityCode, attachment.getReference(), doc.getAuthorReference(), context);
 
-                data = evaluatedContent.getBytes(ENCODING);
+                // Prepare the response.
                 response.setCharacterEncoding(ENCODING);
+
+                // Write the content to the response's output stream.
+                data = evaluatedContent.getBytes(ENCODING);
                 setupHeaders(response, mimetype, attachment.getDate(), data.length);
                 response.getOutputStream().write(data);
             } else {
+                // Otherwise, return the raw content.
                 setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(context));
                 IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
             }
+
             return true;
         } else {
             LOGGER.debug("Attachment not found");
         }
+
         return false;
     }
 

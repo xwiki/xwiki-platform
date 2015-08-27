@@ -43,6 +43,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
@@ -425,5 +426,24 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         @SuppressWarnings("unchecked")
         EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         return serializer.serialize(resolver.resolve(documentName, EntityType.DOCUMENT));
+    }
+
+    /**
+     * @param documentName the Skin Extension's document name
+     * @param context the XWiki Context
+     * @return true if the specified document is accessible (i.e. has view rights) by the current user; false otherwise
+     */
+    protected boolean isAccessible(String documentName, XWikiContext context)
+    {
+        DocumentReference documentReference = getCurrentDocumentReferenceResolver().resolve(documentName);
+
+        if (!Utils.getComponent(ContextualAuthorizationManager.class).hasAccess(Right.VIEW, documentReference)) {
+            LOGGER.debug("[{}] The current user [{}] does not have 'view' rights on the Skin Extension document [{}]",
+                getName(), context.getUserReference(), documentReference);
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -78,6 +78,12 @@ public class JsSkinExtensionPlugin extends AbstractDocumentSkinExtensionPlugin
     @Override
     public String getLink(String documentName, XWikiContext context)
     {
+        if (!isAccessible(documentName, context)) {
+            // No access to view the Skin Extension's document. Don`t generate any link to avoid a useless network
+            // request always leading to a 403 Error.
+            return "";
+        }
+
         StringBuilder result = new StringBuilder("<script type='text/javascript' src='");
         result.append(context.getWiki().getURL(documentName, PLUGIN_NAME,
             "language=" + sanitize(context.getLanguage()) + parametersAsQueryString(documentName, context), context));

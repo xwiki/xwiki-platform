@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
@@ -76,6 +77,11 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * @see #getDefaultEntityReferenceSerializer()
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    /**
+     * @see #getCurrentDocumentReferenceResolver()
+     */
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
 
     /**
      * XWiki plugin constructor.
@@ -365,12 +371,25 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Used to convert a proper Document Reference to string (standard form).
      */
-    private EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
+    protected EntityReferenceSerializer<String> getDefaultEntityReferenceSerializer()
     {
         if (this.defaultEntityReferenceSerializer == null) {
             this.defaultEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
         }
 
         return this.defaultEntityReferenceSerializer;
+    }
+
+    /**
+     * Used to resolve a document string reference to a Document Reference.
+     */
+    protected DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
+    {
+        if (this.currentDocumentReferenceResolver == null) {
+            this.currentDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        }
+
+        return this.currentDocumentReferenceResolver;
     }
 }

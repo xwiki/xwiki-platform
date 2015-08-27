@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -31,8 +31,8 @@
   <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1391781566000</date>
-  <contentUpdateDate>1391621055000</contentUpdateDate>
+  <date>1440677917000</date>
+  <contentUpdateDate>1440677917000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -906,52 +906,54 @@ XWiki.Annotation = Class.create({
    * @param force boolean specifying whether loading should be done even if there are no annotations to display (useful for deleting annotations, which should be reflected in the annotated element even if no annotations are still left to display)   
    */
   fetchAnnotations : function(andShow, force) {
-    var getAnnotationsURL = XWiki.contextPath + '/rest/wikis/' + encodeURIComponent(XWiki.currentWiki) + '/spaces/' + encodeURIComponent(XWiki.currentSpace) + '/pages/' + encodeURIComponent(XWiki.currentPage) + '/annotations?media=json';
-    new Ajax.Request(getAnnotationsURL, {method: 'GET',
-      parameters: this.prepareRequestParameters(new Hash()), 
-      onCreate: function() {
-        // show nice loading message at page bottom
-        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loading')", 'inprogress');
-      }.bind(this),
+    require(['xwiki-meta'], function (xm) {
+      var getAnnotationsURL = xm.restURL + '/annotations?media=json';
+      new Ajax.Request(getAnnotationsURL, {method: 'GET',
+        parameters: this.prepareRequestParameters(new Hash()), 
+        onCreate: function() {
+          // show nice loading message at page bottom
+          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loading')", 'inprogress');
+        }.bind(this),
 
-      onSuccess: function(response) {
-        // check the response to make sure it suceeded
-        if (this.checkResponseCodeAndFail(response)) {
-          return;
-        }
-        // hide message at page bottom
-        this._x_notification.hide();
-        // load the received annotated content in the page, along with annotations and annotations markers.
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
-        // store the state of the annotations
-        this.fetchedAnnotations = true;
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.checked = true;
-        }
-      }.bind(this),
+        onSuccess: function(response) {
+          // check the response to make sure it suceeded
+          if (this.checkResponseCodeAndFail(response)) {
+            return;
+          }
+          // hide message at page bottom
+          this._x_notification.hide();
+          // load the received annotated content in the page, along with annotations and annotations markers.
+          this.loadAnnotatedContent(response.responseJSON.annotatedContent, andShow, false, force);
+          // store the state of the annotations
+          this.fetchedAnnotations = true;
+          if (this.displayAnnotationsCheckbox) {
+            this.displayAnnotationsCheckbox.checked = true;
+          }
+        }.bind(this),
 
-      onFailure: function(response) {
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
-        // show the error message at the bottom
-        this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.checked = false;
-        }
-      }.bind(this),
+        onFailure: function(response) {
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          // show the error message at the bottom
+          this._x_notification.replace(new XWiki.widgets.Notification("$services.localization.render('annotations.annotated.loaderror')" + failureReason, 'error', {timeout : 5}));
+          if (this.displayAnnotationsCheckbox) {
+            this.displayAnnotationsCheckbox.checked = false;
+          }
+        }.bind(this),
 
-      on0: function (response) {
-        response.request.options.onFailure(response);
-      }.bind(this),
+        on0: function (response) {
+          response.request.options.onFailure(response);
+        }.bind(this),
 
-      onComplete: function() {
-        // In the end: re-enable the checkbox
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.disabled = false;
-        }
-      }.bind(this)
+        onComplete: function() {
+          // In the end: re-enable the checkbox
+          if (this.displayAnnotationsCheckbox) {
+            this.displayAnnotationsCheckbox.disabled = false;
+          }
+        }.bind(this)
+      });
     });
   },
 
@@ -1502,42 +1504,42 @@ XWiki.Annotation = Class.create({
       new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.selection.invalid')", 'error', {timeout : 5});
     } else {
       this.selectionService.computeContext();
-      // fetch the creation for this annotation and display it at the position of the selection
-      new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
-        parameters: {
-          'xpage' : 'plain',
-          'selection' : selectionText,
-          'selectionContext' : this.selectionService.selectionContext,
-          'selectionOffset' : this.selectionService.selectionOffset,
-          'wiki' : XWiki.currentWiki,
-          'space' : XWiki.currentSpace,
-          'page' : XWiki.currentPage
-        },
-        onCreate: function() {
-          // create nice loading panel
-          this.displayAnnotationCreationForm();
-        }.bind(this),
+      require(['xwiki-meta'], function (xm) {
+        // fetch the creation for this annotation and display it at the position of the selection
+        new Ajax.Request('$xwiki.getURL("AnnotationCode.CreateForm")', {
+          parameters: {
+            'xpage' : 'plain',
+            'selection' : selectionText,
+            'selectionContext' : this.selectionService.selectionContext,
+            'selectionOffset' : this.selectionService.selectionOffset,
+            'reference' : xm.document
+          },
+          onCreate: function() {
+            // create nice loading panel
+            this.displayAnnotationCreationForm();
+          }.bind(this),
 
-        onSuccess: function(response) {
-          // display the annotation creation form
-          this.fillCreateForm(this.createPanel, response.responseText);
-        }.bind(this),
+          onSuccess: function(response) {
+            // display the annotation creation form
+            this.fillCreateForm(this.createPanel, response.responseText);
+          }.bind(this),
 
-        onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
-          // show the error message at the bottom
-          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
-          // and hide the create form panel
-          this.hideAnnotationCreationForm();
-        }.bind(this),
+          onFailure: function(response) {
+            var failureReason = response.statusText;
+            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+              failureReason = 'Server not responding';
+            }
+            // show the error message at the bottom
+            this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.form.loaderror')" + failureReason, 'error', {timeout : 5});
+            // and hide the create form panel
+            this.hideAnnotationCreationForm();
+          }.bind(this),
 
-        on0: function (response) {
-          response.request.options.onFailure(response);
-        }.bind(this)
-      });
+          on0: function (response) {
+            response.request.options.onFailure(response);
+          }.bind(this)
+        });
+      }.bind(this));
     }
   },
 

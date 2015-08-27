@@ -33,6 +33,7 @@ import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.script.service.ScriptService;
 
@@ -129,10 +130,11 @@ public class AnnotationScriptService implements ScriptService
     }
 
     /**
-     * Returns result obtained by rendering with annotations markers the source referenced by the {@code
-     * sourceReference} parsed in {@code sourceSyntax}. The list of annotations to be added markers for is passed in the
-     * {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the passed
-     * list, they will all be rendered, as long as their selected text and context can be identified in the content.
+     * Returns result obtained by rendering with annotations markers the source referenced by the
+     * {@code sourceReference} parsed in {@code sourceSyntax}. The list of annotations to be added markers for is passed
+     * in the {@code annotations} parameter. Note that no test is done on the actual target of the annotations in the
+     * passed list, they will all be rendered, as long as their selected text and context can be identified in the
+     * content.
      * 
      * @param sourceReference the reference to the source to be rendered in XHTML with annotations
      * @param sourceSyntax the syntax to parse the source in. If this parameter is null, the default source syntax will
@@ -181,6 +183,22 @@ public class AnnotationScriptService implements ScriptService
             setExceptionOnContext(e);
             return null;
         }
+    }
+
+    /**
+     * Returns the annotation identified by {@code id} on the specified target.
+     * 
+     * @param reference the reference to the content on which the annotation is added
+     * @param id the identifier of the annotation
+     * @return the annotation identified by {@code id}, or {@code null} if an exception occurs and the exception is
+     *         saved on the xwiki context
+     * @see AnnotationService#getAnnotation(String, String)
+     */
+    public Annotation getAnnotation(EntityReference reference, String id)
+    {
+        String serializedRef = this.serializer.serialize(reference);
+
+        return getAnnotation(serializedRef, id);
     }
 
     /**
@@ -292,13 +310,28 @@ public class AnnotationScriptService implements ScriptService
      * @param page the document page
      * @return {@code true} if the current user can edit the annotation identified by the id on the specified document,
      *         {@code false} otherwise
+     * @deprecated since 7.2M3, use {@link #canEditAnnotation(String, DocumentReference)} instead
      */
+    @Deprecated
     public boolean canEditAnnotation(String annotationId, String wiki, String space, String page)
     {
-        DocumentReference docRef = new DocumentReference(wiki, space, page);
-        String serializedDocRef = this.serializer.serialize(docRef);
+        return canEditAnnotation(annotationId, new DocumentReference(wiki, space, page));
+    }
 
-        return this.rightsService.canEditAnnotation(annotationId, serializedDocRef, getCurrentUser());
+    /**
+     * Checks if the current user can edit an annotation on the document given by wiki, space and page.
+     * 
+     * @param annotationId the id of the annotation to edit
+     * @param reference the reference of the document where the annotation is added
+     * @return {@code true} if the current user can edit the annotation identified by the id on the specified document,
+     *         {@code false} otherwise
+     * @since 7.2M3
+     */
+    public boolean canEditAnnotation(String annotationId, DocumentReference reference)
+    {
+        String target = this.serializer.serialize(reference);
+
+        return this.rightsService.canEditAnnotation(annotationId, target, getCurrentUser());
     }
 
     /**
@@ -311,13 +344,27 @@ public class AnnotationScriptService implements ScriptService
      * @param page the document page
      * @return {@code true} if the current user can add an annotation on the specified document, {@code false} otherwise
      * @see #canEditAnnotation(String, String, String, String)
+     * @deprecated since 7.2M3, use {@link #canAddAnnotation(DocumentReference)} instead
      */
+    @Deprecated
     public boolean canAddAnnotation(String wiki, String space, String page)
     {
-        DocumentReference docRef = new DocumentReference(wiki, space, page);
-        String serializedDocRef = this.serializer.serialize(docRef);
+        return canAddAnnotation(new DocumentReference(wiki, space, page));
+    }
 
-        return this.rightsService.canAddAnnotation(serializedDocRef, getCurrentUser());
+    /**
+     * Checks if the current user can add an annotation on the document given by the reference.
+     * 
+     * @param reference the reference of the document where the annotation is added
+     * @return {@code true} if the current user can add an annotation on the specified document, {@code false} otherwise
+     * @see #canEditAnnotation(String, String, String, String)
+     * @since 7.2M3
+     */
+    public boolean canAddAnnotation(DocumentReference reference)
+    {
+        String target = this.serializer.serialize(reference);
+
+        return this.rightsService.canAddAnnotation(target, getCurrentUser());
     }
 
     /**

@@ -40,6 +40,7 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationUpdateRequest;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rest.XWikiRestException;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -51,7 +52,7 @@ import com.xpn.xwiki.XWikiException;
  */
 @Component
 @Named("org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource")
-@Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/annotation/{id}")
+@Path("/wikis/{wikiName}/spaces/{spaceName: .+}/pages/{pageName}/annotations/{id}")
 @Singleton
 public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
 {
@@ -71,17 +72,20 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
      * @param request the annotation request to configure the returned annotated content after the execution of the
      *            operation
      * @return a annotation response for which the response code will be 0 in case of success and non-zero otherwise
+     * @throws XWikiRestException when failing to parse space
      */
     @DELETE
     public AnnotationResponse doDelete(@PathParam("spaceName") String space, @PathParam("pageName") String page,
         @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationRequest request)
+        throws XWikiRestException
     {
         try {
-            // Initialize the context with the correct value.
-            updateContext(wiki, space, page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
 
-            DocumentReference docRef = new DocumentReference(wiki, space, page);
-            String documentName = referenceSerializer.serialize(docRef);
+            // Initialize the context with the correct value.
+            updateContext(documentReference);
+
+            String documentName = referenceSerializer.serialize(documentReference);
 
             // check access to this function
             if (!annotationRightService.canEditAnnotation(id, documentName, getXWikiUser())) {
@@ -110,17 +114,20 @@ public class SingleAnnotationRESTResource extends AbstractAnnotationRESTResource
      * @param id the id of the annotation to update
      * @param updateRequest the request to update the annotation pointed by the id
      * @return a annotation response for which the response code will be 0 in case of success and non-zero otherwise
+     * @throws XWikiRestException when failing to parse space
      */
     @PUT
     public AnnotationResponse doUpdate(@PathParam("spaceName") String space, @PathParam("pageName") String page,
         @PathParam("wikiName") String wiki, @PathParam("id") String id, AnnotationUpdateRequest updateRequest)
+        throws XWikiRestException
     {
         try {
-            // Initialize the context with the correct value.
-            updateContext(wiki, space, page);
+            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
 
-            DocumentReference docRef = new DocumentReference(wiki, space, page);
-            String documentName = referenceSerializer.serialize(docRef);
+            // Initialize the context with the correct value.
+            updateContext(documentReference);
+
+            String documentName = referenceSerializer.serialize(documentReference);
 
             // check access to this function
             if (!annotationRightService.canEditAnnotation(id, documentName, getXWikiUser())) {

@@ -1257,7 +1257,7 @@ XWiki.Document = Class.create({
    * Initialize the document with a document reference.
    */
   initializeFromReference : function(reference) {
-    this.documentReference = reference || XWiki.Document.currentDocumentReference;
+    this.documentReference  = reference || XWiki.Document.currentDocumentReference;
     var wikiReference       = this.documentReference.extractReference(XWiki.EntityType.WIKI);
     var spaceReference      = this.documentReference.extractReference(XWiki.EntityType.SPACE);
     var localSpaceReference = spaceReference.relativeTo(wikiReference);
@@ -1326,38 +1326,46 @@ XWiki.Document = Class.create({
       url += '?' + queryString;
     }
     return url;
+  },
+  getDocumentReference : function() {
+    return this.documentReference;
   }
 });
 /* Initialize the document URL factory, and create XWiki.currentDocument.
-TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225) */
+TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225).
+Currently not done because the new API is asynchronous meanwhile this script must be loaded first/ */
 var htmlElement = $(document.documentElement);
-XWiki.Document.currentWiki = XWiki.currentWiki || "xwiki";
-if (htmlElement.readAttribute('data-xwiki-wiki')) {
-  // HTML 5 attribute
-  XWiki.Document.currentWiki = htmlElement.readAttribute('data-xwiki-wiki');
-} else if ($$("meta[name=wiki]").length > 0) {
-  // Old meta tag
-  XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content
-} 
-XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
-if (htmlElement.readAttribute('data-xwiki-space')) {
-  // HTML 5 attribute
-  XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space');
-} else if ($$("meta[name=space]").length > 0) {
-  // Old meta tag
-  XWiki.Document.currentSpace = $$("meta[name=space]")[0].content
+if (htmlElement.readAttribute('data-xwiki-document-reference') != null) {
+  // Case 1: meta information are stored in the data- attributes of the <html> tag
+  // (since Flamingo)
+  var documentReference = XWiki.Model.resolve(
+    htmlElement.readAttribute('data-xwiki-document-reference'), XWiki.EntityType.DOCUMENT);
+  var spaceReference    = documentReference.extractReference(XWiki.EntityType.SPACE);
+  var wikiReference     = documentReference.extractReference(XWiki.EntityType.WIKI);
+  XWiki.Document.currentDocumentReference = documentReference;
+  XWiki.Document.currentPage              = XWiki.Document.currentDocumentReference.getName();
+  XWiki.Document.currentSpace             = XWiki.Model.serialize(spaceReference.relativeTo(wikiReference));
+  XWiki.Document.currentWiki              = wikiReference.getName();
+  XWiki.currentDocument = new XWiki.Document();
+} else {
+  // Case 2: meta information are stored in deprecated <meta> tags
+  // (in colibri)
+  XWiki.Document.currentWiki  = XWiki.currentWiki  || "xwiki";
+  XWiki.Document.currentSpace = XWiki.currentSpace || "Main";
+  XWiki.Document.currentPage  = XWiki.currentPage  || "WebHome";
+  if ($$("meta[name=wiki]").length > 0) {
+    XWiki.Document.currentWiki = $$("meta[name=wiki]")[0].content;
+  }
+  if ($$("meta[name=space]").length > 0) {
+    XWiki.Document.currentSpace = $$("meta[name=space]")[0].content;
+  }
+  if ($$("meta[name=page]").length > 0) {
+    XWiki.Document.currentPage = $$("meta[name=page]")[0].content;
+  }
+  XWiki.currentDocument = new XWiki.Document(XWiki.Document.currentPage, XWiki.Document.currentSpace,
+    XWiki.Document.currentWiki);
+  XWiki.Document.currentDocumentReference = XWiki.currentDocument.getDocumentReference();
 }
-XWiki.Document.currentPage = XWiki.currentPage || "WebHome";
-if (htmlElement.readAttribute('data-xwiki-page')) {
-    // HTML 5 attribute
-  XWiki.Document.currentPage = htmlElement.readAttribute('data-xwiki-page');
-} else if ($$("meta[name=page]").length > 0) {
-  // Old meta tag
-  XWiki.Document.currentPage = $$("meta[name=page]")[0].content
-}
-var docRef = htmlElement.readAttribute('data-xwiki-document-reference');
-XWiki.Document.currentDocumentReference = docRef != null ? XWiki.Model.resolve(docRef, XWiki.EntityType.DOCUMENT) :
- new XWiki.DocumentReference(XWiki.Document.currentWiki, [XWiki.Document.currentSpace], XWiki.Document.currentPage);
 XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
 XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
 XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
@@ -1375,7 +1383,6 @@ XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
   }
   return url;
 };
-XWiki.currentDocument = new XWiki.Document();
 
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.

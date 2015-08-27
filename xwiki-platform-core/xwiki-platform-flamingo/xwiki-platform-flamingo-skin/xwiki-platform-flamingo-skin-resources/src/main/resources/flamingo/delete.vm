@@ -16,9 +16,7 @@
 #template("startpage.vm")
 <div class="main">
   <div id="mainContentArea">
-    #define($title)
-      <a href="$doc.getURL('view')">$doc.plainTitle</a>
-    #end
+    #define($title)<a href="$doc.getURL('view')">$!escapetool.xml($doc.plainTitle)</a>#end
     #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
     <div class="xcontent">
       #template('contentheader.vm')
@@ -65,7 +63,7 @@
   <div class="ui-progress" id="delete-progress-bar-container">
     <p>$services.localization.render('core.delete.waitmessage')</p>
     <div class="ui-progress-background">
-      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$jobId" data-progress="0" style="width: 0"></div>
+      <div class="ui-progress-bar green" id="delete-progress-bar" data-job-id="$!escapetool.xml($jobId)" data-progress="0" style="width: 0"></div>
     </div>
   </div>
   <p class="successmessage hidden" id="successMessage">$services.localization.render('core.delete.success')</p>

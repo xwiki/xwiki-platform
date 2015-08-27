@@ -1262,7 +1262,7 @@ XWiki.Document = Class.create({
     var spaceReference      = this.documentReference.extractReference(XWiki.EntityType.SPACE);
     var localSpaceReference = spaceReference.relativeTo(wikiReference);
     this.page   = this.documentReference.extractReferenceValue(XWiki.EntityType.DOCUMENT);
-    this.space  = XWiki.Model.serialize(spaceReference.relativeTo(wikiReference));
+    this.space  = XWiki.Model.serialize(localSpaceReference);
     this.spaces = localSpaceReference.getReversedReferenceChain().map(function(spaceRef) {
       return spaceRef.getName();
     });

@@ -18,15 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define(['jquery'], function($) {
+  // Note: Starting with XWiki 7.2M3, the returned "document", "xwiki", "space" and "page" variables are deprecated
+  // and it's recommended to use the new "reference" variable, which holds the full String reference of the current
+  // document.
+  // In addition starting with XWiki 7.2M1, the "space" variable now holds the full space reference (i.e. one or
+  // several spaces separated by dots, e.g. "space1.space2").
   var html = $('html');
   // Case 1: meta information are stored in the data- attributes of the <html> tag
   // (since Flamingo)
   if (html.data('xwiki-document') !== undefined) {
     return {
-      'document':   html.data('xwiki-document'),
-      'wiki':       html.data('xwiki-wiki'),
-      'space':      html.data('xwiki-space'),
-      'page':       html.data('xwiki-page'),
+      'documentReference': XWiki.Model.resolve(html.data('xwiki-document-reference')),
+      'document':   html.data('xwiki-document'), // deprecated, use 'documentReference' instead
+      'wiki':       html.data('xwiki-wiki'),     // deprecated, use 'documentReference' instead
+      'space':      html.data('xwiki-space'),    // deprecated, use 'documentReference' instead
+      'page':       html.data('xwiki-page'),     // deprecated, use 'documentReference' instead
       'version':    html.data('xwiki-version'),
       'restURL':    html.data('xwiki-rest-url'),
       'form_token': html.data('xwiki-form-token')

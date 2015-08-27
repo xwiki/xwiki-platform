@@ -1235,19 +1235,80 @@ var browser = new BrowserDetect();
 XWiki.Document = Class.create({
   /**
    * Constructor. All parameters are optional, and default to the current document location.
+   *
+   * Note: Starting with XWiki 7.2M1 the space field is deprecated and holds a space reference (i.e. one or
+   * several spaces separated by dots, e.g. "space1.space2").
+   *
+   * The constructor which takes the 3 arguments is mostly for retro-compatibility. The best practice is to construct a 
+   * new instance with a document reference.
+   * e.g. new XWiki.Document(new XWiki.DocumentReference('xwiki', ['Space1', 'Space2'], 'Page'));
    */
-  initialize : function(page, space, wiki) {
-    this.page = page || XWiki.Document.currentPage;
-    this.space = space || XWiki.Document.currentSpace;
-    this.wiki = wiki || XWiki.Document.currentWiki;
+  initialize : function(pageNameOrReference, space, wiki) {
+    if (typeof pageNameOrReference === 'string') {
+      // The first argument is the page name
+      this.initializeFromStrings(pageNameOrReference, space, wiki);
+    } else {
+      // The first argument is a document reference (or it is null).
+      // We ignore the other arguments since all the needed information is on the reference
+      this.initializeFromReference(pageNameOrReference);
+    }
   },
+  
+  /**
+   * Initialize the document with a document reference.
+   */
+  initializeFromReference : function(reference) {
+    this.documentReference = reference || XWiki.Document.currentDocumentReference;
+    this.page = this.documentReference.extractReferenceValue(XWiki.EntityType.DOCUMENT);
+    var referenceArray = this.documentReference.extractReference(XWiki.EntityType.SPACE).getReversedReferenceChain();
+    this.spaces = [];
+    this.space = '';
+    // start at index 1 to skip the wiki reference part since we only want an array of spaces.
+    for (var i = 1; i < referenceArray.length; i++) {
+      this.spaces[i - 1] = referenceArray[i].getName();
+      // TODO: replace this part by a 'local' serializer for the space reference
+      if (i > 1) {
+        this.space += '.';
+      }
+      // Escape the dots
+      this.space += this.spaces[i - 1].replace(/\./g, '\\.');
+    }
+    this.wiki = this.documentReference.extractReferenceValue(XWiki.EntityType.WIKI);
+  },
+  
+  /**
+   * Initialize the document with some strings
+   */
+  initializeFromStrings : function(page, space, wiki) {
+    this.page = page || XWiki.Document.currentPage;
+    // Note: Starting with XWiki 7.2M1 the this.space variable is deprecated and holds a space reference (i.e. one or
+    // several spaces separated by dots, e.g. "space1.space2").
+    // It is recommended to use the new this.spaces variable which is an array of space Strings, representing the spaces
+    // in which the document is located.
+    this.space = space || XWiki.Document.currentSpace;
+    var referenceArray = XWiki.Model.resolve(this.space, XWiki.EntityType.SPACE).getReversedReferenceChain();
+    this.spaces = [];
+    for (var i = 0; i < referenceArray.length; i++) {
+      this.spaces[i] = referenceArray[i].getName();
+    }
+    this.wiki = wiki || XWiki.Document.currentWiki;
+    this.documentReference = new XWiki.DocumentReference(this.wiki, this.spaces, this.page);
+  },
+  
   /**
    * Gets an URL pointing to this document.
    */
   getURL : function(action, queryString, fragment) {
     action = action || 'view';
     var url = XWiki.Document.URLTemplate;
-    url = url.replace("__space__", encodeURIComponent(this.space));
+    var spaceSegments = '';
+    for (var i = 0; i < this.spaces.length; ++i) {
+      if (i > 0) {
+        spaceSegments += '/';
+      }
+      spaceSegments += encodeURIComponent(this.spaces[i]);
+    }
+    url = url.replace("__space__", spaceSegments);
     url = url.replace("__page__", (this.page == 'WebHome') ? '' : encodeURIComponent(this.page));
     url = url.replace("__action__/", encodeURIComponent(action) + "/");
     if (queryString) {
@@ -1265,7 +1326,14 @@ XWiki.Document = Class.create({
     entity = entity || '';
     var url = XWiki.Document.RestURLTemplate;
     url = url.replace("__wiki__", this.wiki);
-    url = url.replace("__space__", this.space);
+    var spaceSegments = '';
+    for (var i = 0; i < this.spaces.length; ++i) {
+      if (i > 0) {
+        spaceSegments += '/spaces/';
+      }
+      spaceSegments += encodeURIComponent(this.spaces[i]);
+    }
+    url = url.replace("__space__", spaceSegments);
     url = url.replace("__page__", this.page);
     if (entity) {
       url += "/" + entity;
@@ -1302,7 +1370,10 @@ if (htmlElement.readAttribute('data-xwiki-page')) {
 } else if ($$("meta[name=page]").length > 0) {
   // Old meta tag
   XWiki.Document.currentPage = $$("meta[name=page]")[0].content
-} 
+}
+var docRef = htmlElement.readAttribute('data-xwiki-document-reference');
+XWiki.Document.currentDocumentReference = docRef != null ? XWiki.Model.resolve(docRef, XWiki.EntityType.DOCUMENT) :
+ new XWiki.DocumentReference(XWiki.Document.currentWiki, [XWiki.Document.currentSpace], XWiki.Document.currentPage);
 XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
 XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
 XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";

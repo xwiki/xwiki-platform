@@ -11,6 +11,7 @@
   data-xwiki-${name}="$escapetool.xml($value)"
 #end
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language"
+  #xwikiDataAttribute('document-reference', $services.model.serialize($doc.documentReference, 'default'))
   #xwikiDataAttribute('document', $doc.fullName)
   #xwikiDataAttribute('wiki', $doc.wiki)
   #xwikiDataAttribute('space', $doc.space)

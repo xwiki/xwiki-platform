@@ -153,6 +153,10 @@ XWiki.EntityReference = Class.create({
 
   toString : function() {
     return XWiki.Model.serialize(this);
+  },
+  
+  getName : function() {
+    return this.name;
   }
 });
 

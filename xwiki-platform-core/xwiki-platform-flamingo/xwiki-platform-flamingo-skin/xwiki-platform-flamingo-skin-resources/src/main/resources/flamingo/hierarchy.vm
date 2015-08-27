@@ -10,6 +10,6 @@
   #if($services.parentchild.isParentChildMechanismEnabled())
     #hierarchy_parentChild()
   #else
-    #hierarchy()
+    #hierarchy($NULL {'id': 'hierarchy'})
   #end
 #end

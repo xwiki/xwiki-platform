@@ -35,10 +35,11 @@
         #error($services.localization.render('core.rename.emptyName'))
         #template("renameStep1.vm")
       #else
-        #set ($newSpaceReference = $services.model.resolveSpace($request.newSpaceName))
-        #set ($newDocReference = $services.model.createEntityReference($request.newPageName, 'DOCUMENT',
-          $newSpaceReference))
-        #set ($newDocReference = $services.model.createDocumentReference($newDocReference, $NULL))
+        #template('refactoring_macros.vm')
+        ## Determine if the new document should be terminal.
+        #isTargetDocumentTerminal($doc.name)
+        #getNestedDocumentReference($request.newWikiName $request.newSpaceName $request.newPageName $NULL $terminal
+          $newDocReference)
         #set ($newDocReferenceAsString = $services.model.serialize($newDocReference))
         #if($xwiki.exists($newDocReference))
           $response.setStatus(409)
@@ -51,19 +52,14 @@
             [${escapetool.xml($newDocReferenceAsString)}]))
           #template('renameStep1.vm')
         #else
-          ## FIXME: Decide whether we continue to support selective backlink / children update or not. At the moment we
-          ## collect the selected backlinks and children but we don't use them: we update everything.
-          #set($backlinks = [])
-          #set($children = [])
-          #foreach($param in $request.parameterNames)
-            #if($param.startsWith("backlink_"))
-              #set($discard = $backlinks.add($services.model.resolveDocument($param.substring(9))))
-            #elseif($param.startsWith("child_"))
-              #set($discard = $children.add($services.model.resolveDocument($param.substring(6))))
-            #end
-          #end
+          ## We can't rename the children if the new page is terminal.
           #set ($success = false)
-          #set ($renameJob = $services.refactoring.rename($doc.documentReference, $newDocReference))
+          #set ($renameRequest = $services.refactoring.createRenameRequest($doc.documentReference, $newDocReference))
+          #set ($deep = $request.deep == 'true' && !$terminal)
+          #set ($discard = $renameRequest.setDeep($deep))
+          #set ($updateLinks = $request.updateLinks == 'true')
+          #set ($discard = $renameRequest.setUpdateLinks($updateLinks))
+          #set ($renameJob = $services.refactoring.rename($renameRequest))
           #try()
             #set ($discard = $renameJob.join())
             #set ($renameJobStatus = $services.job.getJobStatus($renameJob.request.id))
@@ -75,7 +71,7 @@
               $escapetool.xml($newDocReference.name),
               $xwiki.getURL($newDocReference),
               $escapetool.xml($doc.space),
-              $escapetool.xml($services.model.serialize($newSpaceReference))
+              $escapetool.xml($services.model.serialize($newDocReference.parent))
             ]))
           #else
             #set ($message = $services.localization.render('core.rename.targetNotWritable'))

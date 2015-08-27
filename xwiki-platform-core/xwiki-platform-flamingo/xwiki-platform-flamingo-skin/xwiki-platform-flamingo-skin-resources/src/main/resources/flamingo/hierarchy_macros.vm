@@ -1,37 +1,76 @@
 #######################################################
 ##                     GLOBALS
 #######################################################
-## Make sure we get the Main Page Reference whether the Wiki Script Service is available or not (since it's optional).
-#set ($wikiService = $services.wiki)
-#if ("$!wikiService" != '')
-  #set ($homeReference = $wikiService.currentWikiDescriptor.mainPageReference)
-#else
-  #set ($homeReference = $services.model.resolveDocument('', 'default'))
+#macro (getWikiHomePageReference $wiki $return)
+  #set ($_wikiHomePageReference = $services.wiki.getById($wiki).mainPageReference)
+  #if (!$_wikiHomePageReference)
+    #set ($wikiReference = $services.model.createWikiReference($wiki))
+    #set ($_wikiHomePageReference = $services.model.resolveDocument('', 'default', $wikiReference))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $_wikiHomePageReference)
 #end
 #*
  * Display the parents of a document based on the nested spaces mechanism.
  *
  * @param document the document for which to display the hierarchy, defaults on the current document
- * @param showOnlySpaces true if only space homepages should be displayed in the hierarchy, excluding the document in the case when it is a terminal page;
- *                       false if the document should always be displayed in the hierarchy. Defaults to false
+ * @param options a map of configuration options; available options are:
+ *          id: the id of the container element, unset by default
+ *          showOnlySpaces: true if only space home pages should be displayed in the hierarchy, excluding the document in the case when it is a terminal page;
+ *                          false if the document should always be displayed in the hierarchy. Defaults to false
  *#
-#macro (hierarchy $document $showOnlySpaces)
+#macro (hierarchy $document $options)
+  #if (!$options)
+    #set ($options = {})
+  #end
   #if ("$!document" == '')
     ## Default on the current (translated) document.
     #set ($macro.document = $tdoc)
   #else
     #set ($macro.document = $document)
   #end
-  <ol id='hierarchy' class='breadcrumb clearfix'>
-    ## We first display the home page manually because we always want it to be here even if it is not a parent of the
-    ## current document.
-    <li><a href="$xwiki.getURL($homeReference)"><span class='glyphicon glyphicon-home'></span></a></li>
-    ## Display each parent reference.
+  <ol id="$!options.id" class="breadcrumb clearfix">
+    ##
+    ## Global Home
+    ##
+    #set ($displayGlobalHome = $macro.document.wiki != $xcontext.mainWikiName
+      && $services.wiki.user.getUserScope($macro.document.wiki) != 'LOCAL_ONLY')
+    #if ($displayGlobalHome)
+      #getWikiHomePageReference($xcontext.mainWikiName $globalHomeReference)
+      <li class="wiki">
+        <a href="$xwiki.getURL($globalHomeReference)">
+          <span class="glyphicon glyphicon-home"></span>
+        </a>
+      </li>
+    #end
+    ##
+    ## Local Home
+    ##
+    #getWikiHomePageReference($macro.document.wiki $localHomeReference)
+    <li class="wiki">
+      <a href="$xwiki.getURL($localHomeReference)">
+        #if (!$displayGlobalHome)
+          <span class="glyphicon glyphicon-home"></span>
+        #else
+          #set ($wikiPrettyName = $services.wiki.getById($macro.document.wiki).prettyName)
+          #if ("$!wikiPrettyName" == '')
+            #set ($wikiPrettyName = $macro.document.wiki)
+          #end
+          $wikiPrettyName
+        #end
+      </a>
+    </li>
+    ##
+    ## Local Path
+    ##
     #foreach ($parentReference in $services.parentchild.getParentsBasedOnReference($macro.document.documentReference))
       #hierarchy_document($parentReference)
     #end
-    #if ($macro.document.name != 'WebHome' && !$showOnlySpaces)
-      ## Display the current document if it is not a terminal document.
+    ##
+    ## Terminal Page Name
+    ##
+    #set ($defaultPageName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+    #if ($macro.document.name != $defaultPageName && !$options.showOnlySpaces)
       #hierarchy_currentDoc($macro.document)
     #end
   </ol>
@@ -44,6 +83,7 @@
     #set ($parentReferences = $services.parentchild.getParentsBasedOnParentChildRelationship($doc.documentReference))
     <ol id="hierarchy" class="breadcrumb clearfix">
       ## Display the parents.
+      #getWikiHomePageReference($doc.wiki $homeReference)
       #foreach ($parentReference in $parentReferences)
         #if ($homeReference.equals($parentReference))
           <li><a href='$xwiki.getURL($homeReference)'><span class="glyphicon glyphicon-home"></span></a></li>

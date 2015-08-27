@@ -73,13 +73,6 @@
   ## Show the name input for the user to change the value
   #set ($showNameInput = true)
 #end
-## ---------------------------------------------------------------------------------------------------------
-## JavaScript validation and UI code
-## ---------------------------------------------------------------------------------------------------------
-$xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')##
-$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)##
-$xwiki.get('jsfx').use('js/xwiki/create/create.js', true)##
-$xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
 
 ## ---------------------------------------------------------------------------------------------------------
 ## Note: The list of available template providers is computed in the action and set on the context under
@@ -152,7 +145,7 @@ $xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
 ## Display the form.
 ## ---------------------------------------------------------------------------------------------------------
 ## FIXME: Using the 'container' class when displayed in an ajax call by clicking on a Wanted Link so that it looks good (proper margins) in the popup.
-<form action="$doc.getURL('create')" method='post' class='xform #if($request.ajax)container#end'>
+<form action="$doc.getURL('create')" method="post" id="create" class="xform #if($request.ajax)container#end">
 
   ## Deprecated: Pass along any received page parent.
   <input type='hidden' name='parent' value="$!{escapetool.xml($parent)}"/>
@@ -179,103 +172,35 @@ $xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
   <div class='row'>
     #if ($showFirstColumn)
       <div class='col-xs-12 col-lg-6'>
-        <dl>
-          ##
-          ## ---------------------------------------------------------------------------------------------------------
-          ## Title field
-          ## ---------------------------------------------------------------------------------------------------------
-          ##
-          #if ($title == '')
-            #set ($defaultTitle = $services.localization.render('core.create.identifier.placeholder'))
-            #set ($titleIsPlaceholder = true)
-          #else
-            #set ($defaultTitle = $title)
-          #end
-          <dt>
-            <label for='title'>$services.localization.render('core.create.title')</label>
-            <span class='xHint'>$services.localization.render('core.create.title.hint')</span>
-          </dt>
-          <dd>
-            <input type='text' id='title' size='60' name='title' value="$defaultTitle" #if ($titleIsPlaceholder)class='withTip'#end/>
-          </dd>
-          ##
-          ## ---------------------------------------------------------------------------------------------------------
-          ## Location preview
-          ## ---------------------------------------------------------------------------------------------------------
-          ##
-          <dt>
-            <label for='locationPreview'>$services.localization.render('core.create.locationPreview.label')</label>
-            <span class='xHint'>$services.localization.render('core.create.locationPreview.hint')</span>
-          </dt>
-          <dd>
-            ## Location edit button
-            <a href='#'><span id='location-edit-toggle' class='glyphicon glyphicon-pencil'></span></a>
-
-            ## Hierarchy preview
-            #if ("$!spaceReference" == '')
-              #set ($hierarchyDoc = $tdoc)
-            #else
-              #set ($hierarchyDoc = $xwiki.getDocument($spaceReference))
-            #end
-            ## Note: we are only setting the spaceReference here. The new document part will be added from javascript.
-            #template('hierarchy_macros.vm')
-            #hierarchy($hierarchyDoc, true)
-            ##
-            ## ---------------------------------------------------------------------------------------------------------
-            ## Location edit
-            ## ---------------------------------------------------------------------------------------------------------
-            ##
-            <div id='location-edit' class='hidden'>
-              <dl>
-                ## ---------------------------------------------------------------------------------------------------------
-                ## Space Reference field
-                ## ---------------------------------------------------------------------------------------------------------
-                ##
-                #if ("$!spaceReference" == '')
-                  ## Note: the $homeReference variable is defined in hierarchy_macros.vm which we have called above.
-                  #if ($doc.documentReference.equals($homeReference))
-                    ## We want to discourage ending up with all the pages children of the homepage so we
-                    ## default to top level documents, uless the user explicitly says otherwise.
-                    #set ($defaultSpaceReference = $NULL)
-                  #else
-                    ## For all other documents, default to the current space, i.e. create the new page as a child of the current one.
-                    #set ($defaultSpaceReference = $doc.documentReference.lastSpaceReference)
-                  #end
-                #else
-                  #set ($defaultSpaceReference = $spaceReference)
-                #end
-                ## Make sure to use the local serialized string reference
-                #set ($defaultSpaceReferenceString = $services.model.serialize($defaultSpaceReference, 'local'))
-
-                <dt>
-                  <label for='spaceReference'>$services.localization.render('core.create.spaceReference.label')</label>
-                  <span class='xHint'>$services.localization.render('core.create.spaceReference.hint')</span>
-                </dt>
-                <dd>
-                  <input type='text' id='spaceReference' size='60' name='spaceReference' class='suggestSpaces' value="$!{escapetool.xml($defaultSpaceReferenceString)}"/>
-                </dd>
-                ##
-                ## ---------------------------------------------------------------------------------------------------------
-                ## Name field
-                ## ---------------------------------------------------------------------------------------------------------
-                ##
-                #if ("$!name" == '')
-                  #set ($defaultName = $services.localization.render('core.create.identifier.placeholder'))
-                  #set ($nameIsPlaceholder = true)
-                #else
-                  #set ($defaultName = $name)
-                #end
-
-                <dt>
-                  <label for='name'>$services.localization.render('core.create.identifier.label')</label>
-                  <span class='xHint'>$services.localization.render('core.create.identifier.hint')</span>
-                </dt>
-                <dd>
-                  <input type='text' id='name' size='60' name='name' value="$defaultName" #if ($nameIsPlaceholder)class='withTip'#end/>
-                </dd>
-            </div>
-          </dd>
-        </dl>
+        #template('locationPicker_macros.vm')
+        #locationPicker({
+          'id': 'target',
+          'title': {
+            'label': 'core.create.title',
+            'hint': 'core.create.title.hint',
+            'name': 'title',
+            'value': $title,
+            'placeholder': 'core.create.name.placeholder'
+          },
+          'preview': {
+            'label': 'core.create.locationPreview.label',
+            'hint': 'core.create.locationPreview.hint'
+          },
+          'parent': {
+            'label': 'core.create.spaceReference.label',
+            'hint': 'core.create.spaceReference.hint',
+            'name': 'spaceReference',
+            'reference': $spaceReference,
+            'placeholder': 'core.create.spaceReference.placeholder'
+          },
+          'name': {
+            'label': 'core.create.name.label',
+            'hint': 'core.create.name.hint',
+            'name': 'name',
+            'value': $name,
+            'placeholder': 'core.create.name.placeholder'
+          }
+        })
       </div>
     #else
       ## First column is hidden.
@@ -297,17 +222,14 @@ $xwiki.get('ssfx').use('js/xwiki/create/create.css', true)##
         ## ---------------------------------------------------------------------------------------------------------
         ## Page type - Advanced users
         ## ---------------------------------------------------------------------------------------------------------
-        #if (($xwiki.getUserPreference('usertype') == 'Advanced' || $isSuperAdmin) && !$deprecatedSpaceCreate)
+        #if (($isAdvancedUser || $isSuperAdmin) && !$deprecatedSpaceCreate)
           <dt>
-            <label for='tocreate'>$services.localization.render('core.create.terminal.label')</label>
-            <span class='xHint'>$services.localization.render('core.create.terminal.hint')</span>
-          </dt>
-          <dd>
-            <label for='terminal'>
-              <input type='checkbox' id='terminal' name='tocreate' value='terminal' #if(!$isSpace)checked='checked'#end/>
-              $services.localization.render('core.create.terminal.status')
+            <label for="terminal">
+              <input type="checkbox" id="terminal" name="tocreate" value="terminal" #if(!$isSpace)checked="checked"#end/>
+              $services.localization.render('core.create.terminal.label')
             </label>
-          </dd>
+            <span class="xHint">$services.localization.render('core.create.terminal.hint')</span>
+          </dt>
         #end
       </dl>
     </div>

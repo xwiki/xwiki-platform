@@ -1,0 +1,202 @@
+#template('hierarchy_macros.vm')
+
+#set ($displayWikiFields = $xcontext.userReference.wikiReference.name == $xcontext.mainWikiName && $xwiki.hasSubWikis())
+
+#macro (locationPicker $options)
+  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js'))
+  #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true))
+  #set ($discard = $xwiki.get('jsfx').use('uicomponents/widgets/locationPicker.js', true))
+  #set ($discard = $xwiki.get('ssfx').use('uicomponents/widgets/locationPicker.css', true))
+  <dl class="location-picker">
+    ##
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Title field
+    ## ---------------------------------------------------------------------------------------------------------
+    ##
+    #set ($titleField = $options.title)
+    #if ($titleField.label)
+      <dt>
+        <label for="$!{id}Title">$services.localization.render($titleField.label)</label>
+        <span class="xHint">$services.localization.render($titleField.hint)</span>
+      </dt>
+      <dd>
+        <input type="text" id="$!{id}Title" name="$titleField.name" value="$!escapetool.xml($titleField.value)"
+          class="location-title-field" placeholder="$services.localization.render($titleField.placeholder)" />
+      </dd>
+    #elseif ($titleField)
+      <dd class="hidden">
+        <input type="hidden" name="$titleField.name" value="$!escapetool.xml($titleField.value)"
+          class="location-title-field" />
+      </dd>
+    #end
+    ##
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Location preview
+    ## ---------------------------------------------------------------------------------------------------------
+    ##
+    <dt>
+      <label>$services.localization.render($options.preview.label)</label>
+      <span class="xHint">$services.localization.render($options.preview.hint)</span>
+    </dt>
+    <dd>
+      #documentPickerModal($options)
+      #locationPickerActions
+      #if ("$!options.parent.reference" == '')
+        #set ($hierarchyDoc = $tdoc)
+      #else
+        #set ($hierarchyDoc = $xwiki.getDocument($options.parent.reference))
+      #end
+      ## Note: we are only setting the parent reference here. The new document part will be added from JavaScript.
+      #hierarchy($hierarchyDoc {'showOnlySpaces': true})
+      ##
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Location advanced edit
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #locationAdvancedEdit($options)
+    </dd>
+  </dl>
+#end
+
+#macro (locationPickerActions)
+  <div class="location-actions">
+    ## Tree picker toggle
+    <a href="#" class="location-action location-action-pick" title="Select a new location">
+      $services.icon.renderHTML('chart-organisation')</a>
+    ## Location advanced edit button.
+    #if ($isAdvancedUser)
+      <a href="#" class="location-action location-action-edit">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    #end
+  </div>
+#end
+
+#macro (locationAdvancedEdit $options)
+  <div class="location-edit hidden">
+    <dl>
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Wiki field
+      ## ---------------------------------------------------------------------------------------------------------
+      #set ($wikiField = $options.wiki)
+      #if ($wikiField.label && $displayWikiFields)
+        <dt>
+          <label for="$!{id}Wiki">$services.localization.render($wikiField.label)</label>
+          <span class="xHint">$services.localization.render($wikiField.hint)</span>
+        </dt>
+        <dd>
+          <select id="$!{id}Wiki" name="$wikiField.name" class="location-wiki-field">
+            #set ($wikis = $xwiki.wikiNames)
+            #foreach ($wiki in $wikis)
+              #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
+              #if ("$!wikiPrettyName.trim()" == '')
+                #set ($wikiPrettyName = $wiki)
+              #end
+              <option value="$!escapetool.xml($wiki)" #if ($wiki == $wikiField.value) selected="selected" #end>
+                $!escapetool.xml($wikiPrettyName)
+              </option>
+            #end
+          </select>
+        </dd>
+      #elseif ($wikiField)
+        <dt class="hidden">
+          <input type="hidden" name="$wikiField.name" class="location-wiki-field"
+            value="$!escapetool.xml($wikiField.value)" />
+        </dt>
+      #end
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Parent Reference field
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #set ($parentField = $options.parent)
+      #if ("$!parentField.reference" == '')
+        #getWikiHomePageReference($doc.wiki $homeReference)
+        #if ($doc.documentReference.equals($homeReference))
+          ## We want to discourage ending up with all the pages children of the homepage so we
+          ## default to top level documents, unless the user explicitly says otherwise.
+          #set ($defaultParentReference = $NULL)
+        #else
+          ## For all other documents, default to the current space, i.e. create the new page as a child of the current one.
+          #set ($defaultParentReference = $doc.documentReference.lastSpaceReference)
+        #end
+      #else
+        #set ($defaultParentReference = $parentField.reference)
+      #end
+      ## Make sure to use the local serialized string reference
+      #set ($defaultParentReferenceString = $services.model.serialize($defaultParentReference, 'local'))
+      <dt>
+        <label for="$!{id}ParentReference">$services.localization.render($parentField.label)</label>
+        <span class="xHint">$services.localization.render($parentField.hint)</span>
+      </dt>
+      <dd>
+        <input type="text" id="$!{id}ParentReference" class="location-parent-field suggestSpaces"
+          name="$parentField.name" value="$!escapetool.xml($defaultParentReferenceString)"
+          placeholder="$!services.localization.render($parentField.placeholder)" />
+      </dd>
+      ##
+      ## ---------------------------------------------------------------------------------------------------------
+      ## Name field
+      ## ---------------------------------------------------------------------------------------------------------
+      ##
+      #set ($nameField = $options.name)
+      #if ($nameField.label)
+        <dt>
+          <label for="$!{id}Name">$services.localization.render($nameField.label)</label>
+          <span class="xHint">$services.localization.render($nameField.hint)</span>
+        </dt>
+        <dd>
+          <input type="text" id="$!{id}Name" name="$nameField.name" class="location-name-field"
+            value="$!escapetool.xml($nameField.value)"
+            placeholder="$!services.localization.render($nameField.placeholder)" />
+        </dd>
+      #elseif ($nameField)
+        <dd class="hidden">
+          <input type="hidden" name="$nameField.name" class="location-name-field"
+            value="$!escapetool.xml($nameField.value)" />
+        </dd>
+      #end
+  </div>
+#end
+
+#macro (documentTree)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'tree.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'finder.min.css', {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($showWikis = $options.wiki && $displayWikiFields)
+  ## FIXME: The document picker must work on an empty wiki.
+  #set ($url = $xwiki.getURL('XWiki.DocumentTree', 'get', $escapetool.url({
+    'outputSyntax': 'plain',
+    'showWikis': $showWikis,
+    'showTerminalDocuments': false,
+    'showAttachments': false,
+    'showTranslations': false
+  })))
+  <div class="xtree jstree-no-links" data-responsive="true" data-url="$url" data-finder="true"></div>
+#end
+
+#macro (documentPickerModal $options)
+  <div class="location-tree modal fade" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">$services.localization.render('core.documentPicker.title')</h4>
+        </div>
+        <div class="modal-body">
+          #documentTree($options)
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            $services.localization.render('core.documentPicker.cancel')
+          </button>
+          <button type="button" class="btn btn-primary" disabled="disabled">
+            $services.localization.render('core.documentPicker.select')
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+#end

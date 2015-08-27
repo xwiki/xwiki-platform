@@ -6,77 +6,101 @@
   #set($titleToDisplay = $services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()]))
   <div class="xcontent">
   #template('contentheader.vm')
-#set($newname = $services.localization.render('core.rename.inputPrompt'))
-<form action="?xpage=rename&amp;step=2" method="post" class="xform"
-    onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
-  ## CSRF prevention
-  <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-  #set($pweb = $doc.space)
+#template('refactoring_macros.vm')
+#template('locationPicker_macros.vm')
+#set ($sourcePageIsTerminal = $doc.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
+<form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
+  <div class="hidden">
+    ## CSRF prevention
+    <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+  </div>
   <div class="row">
-  <div class="padded col-xs-12 col-md-6">
-    #set($backlinks = $doc.getBacklinks())
-    #if($backlinks.size() > 0)
-      <h2><span>$services.localization.render('core.rename.title.newName')</span></h2>
-    #end
-    <dl>
-      <dt>
-        <label for="sourceSpaceName">$services.localization.render('core.rename.sourcespace')</label>
-        <span class="xHint">$services.localization.render('core.rename.sourcespace.hint')</span>
-      </dt>
-      <dd>$!{escapetool.xml($doc.space)} <input type="hidden" id="sourceSpaceName" name="sourceSpaceName" value="$!{escapetool.xml($doc.space)}" size="60"/></dd>
-      <dt>
-        <label for="sourcePageName">$services.localization.render('core.rename.sourcepage')</label>
-        <span class="xHint">$services.localization.render('core.rename.sourcepage.hint')</span>
-      </dt>
-      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
-      <dt>
-        <label for="newSpaceName">$services.localization.render('core.rename.newspace')</label>
-        <span class="xHint">$services.localization.render('core.rename.newspace.hint')</span>
-      </dt>
-      <dd>
-        <input type="text" name="newSpaceName" id="newSpaceName" size="60" class="suggestSpaces" value="$escapetool.xml($doc.space)"/>
-      </dd>
-      <dt>
-        <label for="newPageName">$services.localization.render('core.rename.newpage')</label>
-        <span class="xHint">$services.localization.render('core.rename.newpage.hint')</span>
-      </dt>
-      <dd>
-        <input type="text" id="newPageName" size="60" name="newPageName" value="${escapetool.xml($doc.name)}" class="panelinput"/>
-      </dd>
-    </dl>
-    <div class="padded">
-      <span class="buttonwrapper"><input class="button" type="submit" name="formactionrename" value="$services.localization.render('core.rename.submit')"/></span>
-      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a></span>
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        ##------------
+        ## Source Page
+        ##------------
+        #displaySourceDocument({
+          'label': 'core.rename.source.label',
+          'hint': 'core.rename.source.hint'
+        })
+        ##---------------
+        ## Children field
+        ##---------------
+        #displayChildrenCheckbox({
+          'label': 'core.rename.children.label',
+          'hint': 'core.rename.children.hint'
+        })
+        ##------------
+        ## Links field
+        ##------------
+        #displayLinksCheckbox({
+          'label': 'core.rename.links.label',
+          'hint': 'core.rename.links.hint'
+        })
+      </dl>
+    </div>
+    <div class="col-xs-12 col-lg-6">
+      ##------------
+      ## Target Page
+      ##------------
+      #set ($parentReference = $doc.documentReference.parent)
+      #set ($name = $doc.name)
+      #if (!$sourcePageIsTerminal)
+        #set ($name = $parentReference.name)
+        #set ($parentReference = $parentReference.parent)
+      #end
+      #locationPicker({
+        'id': 'target',
+        'title': {
+          'label': 'core.rename.target.title.label',
+          'hint': 'core.rename.target.title.hint',
+          'name': 'newPageTitle',
+          'value': $doc.plainTitle,
+          'placeholder': 'core.create.name.placeholder'
+        },
+        'preview': {
+          'label': 'core.rename.target.location.label',
+          'hint': 'core.rename.target.location.hint'
+        },
+        'wiki': {
+          'label': 'core.rename.target.wiki.label',
+          'hint': 'core.rename.target.wiki.hint',
+          'name': 'newWikiName',
+          'value': $doc.wiki
+        },
+        'parent': {
+          'label': 'core.rename.target.parent.label',
+          'hint': 'core.rename.target.parent.hint',
+          'name': 'newSpaceName',
+          'reference': $parentReference,
+          'placeholder': 'core.create.spaceReference.placeholder'
+        },
+        'name': {
+          'label': 'core.rename.target.name.label',
+          'hint': 'core.rename.target.name.hint',
+          'name': 'newPageName',
+          'value': $name,
+          'placeholder': 'core.create.name.placeholder'
+        }
+      })
+      ## -------------------------------------
+      ## Target Page Type (for advanced users)
+      ## -------------------------------------
+      #maybeDisplayTerminalCheckbox({
+        'label': 'core.rename.target.terminal.label',
+        'hint': 'core.rename.target.terminal.hint'
+      })
     </div>
   </div>
-  <div class="col-xs-12 col-md-6">
-  #if($backlinks.size() > 0)
-    <h2><span>$services.localization.render('core.rename.title.updateDocs')</span></h2>
-    #foreach($backlink in $backlinks)
-      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $backlink))
-        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
-      #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
-      #else
-        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)" checked="checked"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
-      #end
-    #end
-  #end
-  #set($children = $doc.getChildren())
-  #if($children.size() > 0)
-    <h2><span>$services.localization.render('core.rename.title.updateChildren')</span></h2>
-    #foreach($child in $children)
-      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $child))
-        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
-      #elseif($xwiki.getDocument($child).isProgrammaticContent())
-        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
-      #else
-        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)" checked="checked"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
-      #end
-    #end
-  #end
-  </div>
-  </div>
-  </div>
+  <div class="buttons">
+    <span class="buttonwrapper">
+      <input type="submit" value="$services.localization.render('core.rename.submit')" class="button" />
+    </span>
+    <span class="buttonwrapper">
+      <a class="secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a>
+    </span>
   </div>
 </form>
+</div>
+</div>

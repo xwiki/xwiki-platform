@@ -39,6 +39,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
@@ -94,6 +96,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver;
+
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (this.currentMixedDocumentReferenceResolver == null) {
@@ -102,6 +106,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         }
 
         return this.currentMixedDocumentReferenceResolver;
+    }
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks.
+     * 
+     * @since 7.2M3
+     */
+    private DocumentReferenceResolver<String> getCurrentDocumentReferenceResolver()
+    {
+        if (this.currentDocumentReferenceResolver == null) {
+            this.currentDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        }
+
+        return this.currentDocumentReferenceResolver;
     }
 
     @Override
@@ -1192,6 +1212,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context)
     {
         try {
+            ContextualAuthorizationManager authorization = Utils.getComponent(ContextualAuthorizationManager.class);
+            DocumentReference validationScriptReference =
+                getCurrentDocumentReferenceResolver().resolve(validationScript, getDocumentReference());
+
+            // Make sure target document is allowed to execute Groovy
+            // TODO: this check should probably be right in XWiki#parseGroovyFromPage
+            authorization.checkAccess(Right.PROGRAM, validationScriptReference);
+
             XWikiValidationInterface validObject =
                 (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
 

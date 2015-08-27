@@ -1368,9 +1368,10 @@ public class XWikiDocumentMockitoTest
     }
 
     @Test
-    public void testValidateWithoutPR() throws XWikiException, AccessDeniedException
+    public void testValidate() throws XWikiException, AccessDeniedException
     {
         this.document.setValidationScript("validationScript");
+        this.baseClass.setValidationScript("validationScript");
 
         when(this.oldcore.getMockXWiki().parseGroovyFromPage("validationScript", this.oldcore.getXWikiContext()))
             .thenReturn(new XWikiValidationInterface()
@@ -1388,11 +1389,17 @@ public class XWikiDocumentMockitoTest
                 }
             });
 
-        assertTrue(this.document.validate(this.oldcore.getXWikiContext()));
+        // With PR
 
+        assertTrue(this.document.validate(this.oldcore.getXWikiContext()));
+        assertTrue(this.baseClass.validateObject(this.baseObject, this.oldcore.getXWikiContext()));
+
+        // Without PR
+        
         doThrow(AccessDeniedException.class).when(this.oldcore.getMockContextualAuthorizationManager()).checkAccess(
             Right.PROGRAM, new DocumentReference("wiki", "space", "validationScript"));
 
         assertFalse(this.document.validate(this.oldcore.getXWikiContext()));
+        assertFalse(this.baseClass.validateObject(this.baseObject, this.oldcore.getXWikiContext()));
     }
 }
